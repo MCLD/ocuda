@@ -1,0 +1,25 @@
+{
+  "name": "ocuda.ops.web",
+  "authors": [
+    "Maricopa County Library District developers <development@mcldaz.org>"
+  ],
+  "description": "",
+  "license": "MIT",
+  "homepage": "https://github.com/mcld/",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.3.1",
+    "popper.js": "^1.14.3",
+    "bootstrap": "^4.1.1",
+    "fontawesome": "^5.0.12",
+    "jquery-validation": "^1.17.0",
+    "jquery-validation-unobtrusive": "^3.2.9"
+  }
+}

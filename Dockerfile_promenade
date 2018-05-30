@@ -1,0 +1,28 @@
+# Get build image
+FROM microsoft/dotnet:2.1-sdk AS dotnet-sdk
+WORKDIR /app
+
+# Copy source and build
+COPY . ./
+RUN dotnet restore
+
+# Build and publish
+RUN dotnet publish -c Release -o "/app/publish/promenade" "src/Promenade.Web"
+
+# Get runtime image
+FROM microsoft/dotnet:2.1-aspnetcore-runtime
+WORKDIR /app
+
+LABEL maintainer="Maricopa County Library District developers <development@mcldaz.org>"
+
+# Copy source
+COPY --from=dotnet-sdk "/app/publish/promenade" .
+
+# Persist shared directory
+VOLUME ["/app/shared"]
+
+# Port 80 for http
+EXPOSE 80
+
+# Set entrypoint
+ENTRYPOINT ["dotnet", "Ocuda.Promenade.Web.dll"]

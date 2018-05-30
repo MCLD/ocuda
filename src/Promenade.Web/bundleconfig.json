@@ -1,0 +1,46 @@
+[
+  {
+    "outputFileName": "wwwroot/js/main.min.js",
+    "inputFiles": [
+      "bower_components/jquery/dist/jquery.js",
+      "bower_components/popper.js/dist/umd/popper.js",
+      "bower_components/bootstrap/dist/js/bootstrap.js",
+      "bower_components/jquery-validation/dist/jquery.validate.js",
+      "bower_components/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    }
+  },
+  {
+    "outputFileName": "wwwroot/js/site.min.js",
+    "inputFiles": [
+      "Scripts/site.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    }
+  },
+  {
+    "outputFileName": "wwwroot/css/main.min.css",
+    "inputFiles": [
+      "Scripts/Bootstrap/bootstrap.css",
+      "bower_components/fontawesome/web-fonts-with-css/css/fontawesome-all.css"
+    ],
+    "minify": {
+      "enabled": true,
+      "adjustRelativePaths": false
+    }
+  },
+  {
+    "outputFileName": "wwwroot/css/site.min.css",
+    "inputFiles": [
+      "Styles/site.css"
+    ],
+    "minify": {
+      "enabled": true
+    }
+  }
+]

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AssemblyName>Ocuda.Promenade.DataProvider.SQLite.Promenade</AssemblyName>
+    <RootNamespace>Ocuda.Promenade.DataProvider.SQLite.Promenade</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Promenade.Data\Promenade.Data.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,31 @@
+stages:
+  - prepare
+  - clean
+  - build
+
+prepare:
+  stage: prepare
+  tags:
+    - shell
+  script:
+    - docker info
+
+clean:
+  stage: clean
+  tags:
+    - shell
+  script:
+    - docker rmi $CI_REGISTRY_IMAGE/ops
+    - docker rmi $CI_REGISTRY_IMAGE/promenade
+  allow_failure: true
+
+build:
+  stage: build
+  tags:
+    - shell
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker build -f Dockerfile_ops -t $CI_REGISTRY_IMAGE/ops .
+    - docker push $CI_REGISTRY_IMAGE/ops
+    - docker build -f Dockerfile_promenade -t $CI_REGISTRY_IMAGE/promenade .
+    - docker push $CI_REGISTRY_IMAGE/promenade

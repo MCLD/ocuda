@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AssemblyName>Ocuda.Ops.DataProvider.SqlServer.Promenade</AssemblyName>
+    <RootNamespace>Ocuda.Ops.DataProvider.SqlServer.Promenade</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ops.Data\Ops.Data.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AssemblyName>Ocuda.Promenade.Service</AssemblyName>
+    <RootNamespace>Ocuda.Promenade.Service</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Promenade.Data\Promenade.Data.csproj" />
+    <ProjectReference Include="..\Promenade.Models\Promenade.Models.csproj" />
+  </ItemGroup>
+
+</Project>

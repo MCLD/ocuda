@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <PackageId>Ocuda.Ops.Controllers</PackageId>
+    <Version>0.0.1</Version>
+    <Company>Maricopa County Library District</Company>
+    <Product>Maricopa County Library District</Product>
+    <Authors>Maricopa County Library District</Authors>
+    <Copyright>2018 Maricopa County Library District</Copyright>
+    <RepositoryType>Git</RepositoryType>
+    <LangVersion>Latest</LangVersion>
+    <AssemblyName>Ocuda.Ops.Controllers</AssemblyName>
+    <RootNamespace>Ocuda.Ops.Controllers</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.0-rc1-final" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ops.Service\Ops.Service.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,13 @@
+# Set default behavior to automatically normalize line endings.
+* text=auto
+
+# linguist overrides https://github.com/github/linguist#overrides
+src/bower_components linguist-vendored
+dev/* linguist-documentation
+docs/* linguist-documentation
+re/* linguist-documentation
+*.min.css linguist-generated=true
+*.min.js linguist-generated=true
+
+# fix CHANGELOG.md to default to union merge
+CHANGELOG merge=union
