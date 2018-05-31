@@ -13,6 +13,10 @@ RUN dotnet publish -c Release -o "/app/publish/promenade" "src/Promenade.Web"
 FROM microsoft/dotnet:2.1-aspnetcore-runtime
 WORKDIR /app
 
+# Bring in metadata
+ARG commit=unknown
+
+LABEL ocuda.commit=$commit
 LABEL maintainer="Maricopa County Library District developers <development@mcldaz.org>"
 
 # Copy source

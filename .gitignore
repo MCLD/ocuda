@@ -245,3 +245,5 @@ ModelManifest.xml
 ##### Project-specific #####
 src/Ops.Web/logs/*
 src/Promenade.Web/logs/*
+
+!dev/bin
