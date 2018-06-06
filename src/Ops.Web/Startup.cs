@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Ocuda.Ops.Controllers.RouteConstraint;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Web.Middleware;
+using Ops.Service;
 using Serilog.Context;
 
 namespace Ocuda.Ops.Web
@@ -57,6 +58,12 @@ namespace Ocuda.Ops.Web
 
             services.AddMvc()
                 .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_1);
+
+            // filters
+            services.AddScoped<Controllers.Filter.OpsFilter>();
+
+            // services
+            services.AddScoped<SectionService>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

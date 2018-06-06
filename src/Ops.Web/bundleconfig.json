@@ -39,6 +39,7 @@
     "outputFileName": "wwwroot/css/site.min.css",
     "inputFiles": [
       "Styles/WMD.css",
+      "Styles/ops.css",
       "Styles/site.css"
     ],
     "minify": {

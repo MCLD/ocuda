@@ -8,11 +8,68 @@
     <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
 </head>
 <body>
-    <div class="container body-content">
+    <div class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-dark">
+        <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+            <span class="fa fa-home"></span>
+            Home
+        </a>
+        <button class="navbar-toggler btn-sm justify-self-end" type="button"
+                data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle Navigation</span>
+            Menu
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end">
+            <ul class="navbar-nav">
+                @foreach (var sec in (IEnumerable<Section>)Context.Items[ItemKey.Sections])
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" href="@sec.Path">
+                            <span class="fa @sec.Icon" title="@sec.Name"></span>
+                            <span class="d-sm-none"> @sec.Name</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <div class="container-fluid">
         @RenderBody()
     </div>
+
     <script src="~/js/main.min.js" asp-append-version="true"></script>
     <script src="~/js/site.min.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>
+
+@*
+
+        <li class="nav-item" ActiveBy routeKey="Controller" value="Home">
+        <a class="nav-link" href="#">
+            <span class="fa fa-envelope" title="Mail"></span>
+            <span class="d-sm-none"> Mail</span>
+        </a>
+    </li>
+    <li class="nav-item" ActiveBy routeKey="Controller" value="Home">
+        <a class="nav-link" href="#">
+            <span class="fa fa-hourglass" title="Time"></span>
+            <span class="d-sm-none"> Time</span>
+        </a>
+    </li>
+    <li class="nav-item" ActiveBy routeKey="Controller" value="Home">
+        <a class="nav-link" href="#" title="Mail">
+            <span class="fa fa-newspaper"></span>
+            <span class="d-sm-none"> News</span>
+        </a>
+    </li>
+
+    <li class="nav-item" ActiveBy routeKey="Controller" value="Home">
+        <a class="nav-link" asp-controller="Home" asp-action="Index" title="Participants">
+            <span class="fa fa-users"></span>
+            <span class="d-sm-none"> Participants</span>
+        </a>
+    </li>
+
+*@

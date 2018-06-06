@@ -12,6 +12,7 @@ namespace Ocuda.Ops.Models
         [Required]
         [MaxLength(255)]
         public string FilePath { get; set; }
+        public string Icon { get; set; }
 
         public bool IsDraft { get; set; }
         public bool IsPinned { get; set; }

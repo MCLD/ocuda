@@ -1,0 +1,57 @@
+﻿.oc-header, .oc-footer {
+    padding: 0.25rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.oc-title {
+    margin: 0;
+    color: white;
+}
+
+.oc-content {
+    padding-bottom: 1rem;
+    padding-left: 0;
+    padding-right: 0.5rem;
+    padding-top: 1rem;
+}
+
+.oc-content-card {
+    margin-bottom: 1.5rem;
+    border-color: black;
+    border-width: thin;
+}
+
+.oc-content-header {
+    background-color: #307fe2;
+    color: white;
+}
+
+.oc-content-header-icon{
+    align-self:center;
+}
+
+.oc-content-header-pinned {
+    background-color: #f0b323;
+    color: white;
+}
+
+.oc-sidebar {
+    padding-bottom: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0;
+    padding-top: 1rem;
+}
+
+.oc-sidebar-card {
+    margin-bottom: 1rem;
+}
+
+.oc-sidebar-header {
+    background-color: #a4343a;
+    color: white;
+}
+
+.oc-sidebar-body{
+    padding:0;
+}

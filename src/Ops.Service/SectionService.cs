@@ -87,6 +87,28 @@ namespace Ops.Service
             };
         }
 
+        public IEnumerable<SectionLink> GetLinks()
+        {
+            return new List<SectionLink>
+            {
+                new SectionLink
+                {
+                    Url = "#",
+                    Name = "Summer Reading"
+                },
+                new SectionLink
+                {
+                    Url = "#",
+                    Name = "Reading Adventure"
+                },
+                new SectionLink
+                {
+                    Url = "#",
+                    Name = "Find Libraries"
+                }
+            };
+        }
+
         public IEnumerable<SectionCalendar> GetCalendars()
         {
             return new List<SectionCalendar>
@@ -122,19 +144,22 @@ namespace Ops.Service
                     CreatedAt = DateTime.Parse("2018-05-01"),
                     IsPinned = true,
                     FilePath = "/file.txt",
-                    Name = "Important File!"
+                    Name = "Important File!",
+                    Icon = "fa-file-word alert-primary"
                 },
                 new SectionFile
                 {
                     CreatedAt = DateTime.Parse("2018-06-04"),
                     FilePath = "/file.txt",
-                    Name = "New File 2"
+                    Name = "New File 2",
+                    Icon = "fa-file-excel alert-success"
                 },
                 new SectionFile
                 {
                     CreatedAt = DateTime.Parse("2018-05-20"),
                     FilePath = "/file.txt",
-                    Name = "New File 1"
+                    Name = "New File 1",
+                    Icon = "fa-file-pdf alert-danger"
                 }
             };
         }
