@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ocuda.Ops.Data;
+using Ocuda.Ops.Web.Middleware;
 using Serilog.Context;
 
 namespace Ocuda.Ops.Web
@@ -27,6 +28,8 @@ namespace Ocuda.Ops.Web
                     = new Microsoft.AspNetCore.Localization.RequestCulture(culture);
             });
 
+            services.AddDistributedMemoryCache();
+
             switch (Configuration["Ops.DatabaseProvider"])
             {
                 case "SqlServer":
@@ -44,6 +47,12 @@ namespace Ocuda.Ops.Web
                 default:
                     throw new System.Exception("No Ops.DatabaseProvider configured.");
             }
+
+            services.AddSession(_ =>
+            {
+                _.IdleTimeout = System.TimeSpan.FromHours(2);
+                _.Cookie.HttpOnly = true;
+            });
 
             services.AddMvc()
                 .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_1);
@@ -75,6 +84,10 @@ namespace Ocuda.Ops.Web
             app.UseRequestLocalization();
 
             app.UseStaticFiles();
+
+            app.UseSession();
+
+            app.UseOpsAuthentication();
 
             app.UseMvc(routes =>
             {
