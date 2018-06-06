@@ -1,40 +1,43 @@
-﻿.oc-header, .oc-footer {
-    padding: 0.25rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
-}
-
-.oc-title {
-    margin: 0;
-    color: white;
-}
-
-.oc-content {
+﻿.oc-blog {
     padding-bottom: 1rem;
     padding-left: 0;
     padding-right: 0.5rem;
     padding-top: 1rem;
 }
 
-.oc-content-card {
-    margin-bottom: 1.5rem;
-    border-color: black;
-    border-width: thin;
-}
+    .oc-blog .card {
+        margin-bottom: 1.5rem;
+        border-color: #77787a;
+        border-width: thin;
+    }
 
-.oc-content-header {
-    background-color: #307fe2;
-    color: white;
-}
+    .oc-blog .card-header {
+        padding: 0.25rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        background-color: #307fe2;
+        color: white;
+    }
 
-.oc-content-header-icon{
-    align-self:center;
-}
+    .oc-blog h1 {
+        font-size: xx-large;
+    }
 
-.oc-content-header-pinned {
-    background-color: #f0b323;
-    color: white;
-}
+    .oc-blog .oc-pinned {
+        background-color: #f0b323;
+    }
+
+    .oc-blog .card-title {
+        margin: 0;
+        color: white;
+    }
+
+    .oc-blog .card-footer {
+        padding: 0.25rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        color: #5f6063;
+    }
 
 .oc-sidebar {
     padding-bottom: 1rem;
@@ -43,15 +46,36 @@
     padding-top: 1rem;
 }
 
-.oc-sidebar-card {
-    margin-bottom: 1rem;
-}
+    .oc-sidebar .card {
+        margin-bottom: 1rem;
+        border-color: #77787a;
+        border-width: thin;
+    }
 
-.oc-sidebar-header {
-    background-color: #a4343a;
-    color: white;
-}
+    .oc-sidebar .card-header {
+        padding: 0.25rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        background-color: #a4343a;
+        color: white;
+    }
 
-.oc-sidebar-body{
-    padding:0;
-}
+    .oc-sidebar h2 {
+        font-size: x-large;
+    }
+
+    .oc-sidebar .card-title {
+        margin: 0;
+        color: white;
+    }
+
+    .oc-sidebar .card-body {
+        padding: 0;
+    }
+
+    .oc-sidebar .card-footer {
+        padding: 0.25rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        color: #5f6063;
+    }

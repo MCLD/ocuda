@@ -6,28 +6,28 @@
 
 <div class="container-fluid">
     <div class="row">
-        @* Content *@
-        <div class="col-sm-8 oc-content">
+        @* Blog Content *@
+        <div class="col-sm-8 oc-blog">
             @foreach (var post in Model.SectionPosts)
             {
-                <div class="card oc-content-card">
+                <div class="card">
                     @if (post.IsPinned)
                     {
-                        <div class="card-header oc-header oc-content-header-pinned d-flex">
-                            <h3 class="card-title oc-title flex-grow-1">@post.Title</h3>
-                            <span class="fa fa-star oc-content-header-icon"></span>
+                        <div class="card-header oc-pinned d-flex">
+                            <h1 class="card-title flex-grow-1">@post.Title</h1>
+                            <span class="fa fa-star align-self-center"></span>
                         </div>
                     }
                     else
                     {
-                        <div class="card-header oc-header oc-content-header d-flex">
-                            <h3 class="card-title oc-title flex-grow-1">@post.Title</h3>
+                        <div class="card-header d-flex">
+                            <h1 class="card-title flex-grow-1">@post.Title</h1>
                         </div>
                     }
                     <div class="card-body">
                         @post.Content
                     </div>
-                    <div class="card-footer oc-footer d-flex">
+                    <div class="card-footer d-flex">
                         <div class="flex-grow-1">Posted by <a href="#">@post.CreatedBy</a></div>
                         <div>@post.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")</div>
                     </div>
@@ -55,15 +55,15 @@
                 </ul>
             </div>
         </div>
-        @* End Content *@
+        @* End Blog Content *@
 
         @* Sidebar *@
         <div class="col-sm-4 oc-sidebar">
-            <div class="card oc-sidebar-card">
-                <div class="card-header oc-header oc-sidebar-header d-flex justify-content-center">
-                    <h5 class="oc-title">Department Staff</h5>
+            <div class="card">
+                <div class="card-header d-flex justify-content-center">
+                    <h2 class="card-title">Department Staff</h2>
                 </div>
-                <div class="card-body oc-sidebar-body">
+                <div class="card-body">
                     <div id="carouselDepartmentStaff" class="carousel slide" data-ride="carousel" data-interval="false">
                         <ul class="carousel-indicators">
                             <li data-target="#carouselDepartmentStaff" data-slide-to="0" class="active"></li>
@@ -93,15 +93,13 @@
                         </a>
                     </div>
                 </div>
-            </div>
+            </div>           
 
-            
-
-            <div class="card oc-sidebar-card">
-                <div class="card-header oc-header oc-sidebar-header d-flex justify-content-center">
-                    <h5 class="oc-title">Department Links</h5>
+            <div class="card">
+                <div class="card-header d-flex justify-content-center">
+                    <h2 class="card-title">Department Links</h2>
                 </div>
-                <div class="card-body oc-sidebar-body">
+                <div class="card-body">
                     <ul class="list-group list-group-flush">
                         @foreach (var link in Model.SectionLinks)
                         {
@@ -111,16 +109,16 @@
                         }
                     </ul>
                 </div>
-                <div class="card-footer oc-footer d-flex justify-content-center">
+                <div class="card-footer d-flex justify-content-center">
                     <a href="#" class="card-link">All Links for Department</a>
                 </div>
             </div>
 
-            <div class="card oc-sidebar-card">
-                <div class="card-header oc-header oc-sidebar-header d-flex justify-content-center">
-                    <h5 class="oc-title">Department Files</h5>
+            <div class="card">
+                <div class="card-header d-flex justify-content-center">
+                    <h2 class="card-title">Department Files</h2>
                 </div>
-                <div class="card-body oc-sidebar-body">
+                <div class="card-body">
                     <ul class="list-group list-group-flush">
                         @foreach (var file in Model.SectionFiles)
                         {
@@ -130,7 +128,7 @@
                         }
                     </ul>
                 </div>
-                <div class="card-footer oc-footer">
+                <div class="card-footer">
                     <a href="#" class="card-link d-flex justify-content-center">Department File Directory</a>
                 </div>
             </div>
@@ -138,50 +136,3 @@
         @* End Sidebar *@
     </div>
 </div>
-
-@*<div class="card m-1 p-1">
-        <div class="card-header">
-            Aenean eget
-        </div>
-        <div class="card-body">
-            Aenean eget euismod ligula. Nullam vehicula, neque sed fermentum euismod, mauris lectus aliquet sapien, sed fringilla tellus metus sed odio. Pellentesque sodales, nulla ultrices pretium semper, nisi leo fermentum lorem, eu tincidunt ligula neque sit amet eros. Nulla facilisi. Nullam sed magna elementum, laoreet erat non, congue orci. Pellentesque sollicitudin nulla in risus imperdiet placerat. Quisque nec est metus. Proin scelerisque consectetur faucibus. Donec consequat et eros ac sagittis. Nulla sem libero, molestie in nisi in, rhoncus consectetur velit. Phasellus pharetra laoreet quam vitae vulputate. Nam pretium erat in sapien pharetra, a ultricies metus vestibulum. Maecenas iaculis rutrum lacinia. Maecenas maximus pulvinar felis non blandit. Duis semper nulla imperdiet nulla sollicitudin consequat. Phasellus scelerisque nisi nec vulputate pellentesque.
-        </div>
-    </div>
-
-    <div class="card m-1 p-1">
-        <div class="card-header">
-            Nam gravida
-        </div>
-        <div class="card-body">
-            Nam gravida nisl vehicula, tristique leo quis, rutrum ante. Proin accumsan blandit lectus, in vulputate urna congue vel. Vestibulum quis diam bibendum, accumsan nunc non, eleifend tortor. Aenean dignissim faucibus suscipit. Etiam eu urna sollicitudin, vestibulum nunc vel, sodales metus. Sed justo mauris, auctor eu ipsum et, lobortis tempus nisl. Sed vestibulum odio pulvinar feugiat molestie. Mauris ultricies elit vitae lacus aliquet auctor. Quisque at suscipit nunc. Phasellus sit amet imperdiet nisi. Nullam ultrices malesuada pharetra.
-        </div>
-    </div>
-
-    <div class="card m-1 p-1">
-        <div class="card-header">
-            Vestibulum at egestas
-        </div>
-        <div class="card-body">
-            Vestibulum at egestas sapien. Phasellus ac viverra odio. Morbi et nisl sit amet nulla eleifend pulvinar eu nec ante. Nam et neque id ligula viverra pretium. Nunc vel mi ac ipsum tempor interdum et vitae libero. Integer non libero enim. Sed accumsan ipsum in lorem hendrerit, vel condimentum metus gravida. Etiam nec tortor massa. Aliquam eget porttitor tellus, nec blandit ligula. Nulla id luctus justo. Quisque cursus at odio nec vulputate. Donec blandit ex nec neque pellentesque varius. Nullam at luctus mi. Nullam nec nisi purus.
-        </div>
-    </div>*@
-
-@*<div class="card m-1 p-1 border-dark">
-        <div class="card-header bg-primary text-white">
-            <h2 class="card-title">Lorem ipsum</h2>
-        </div>
-        <div class="card-body">
-            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras fermentum erat ut nibh egestas, vitae eleifend purus tincidunt.</p>
-            <p class="card-text">Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis ac aliquam diam. Vestibulum purus felis, rutrum non rutrum in, efficitur vulputate urna. Morbi vulputate fermentum accumsan.</p>
-            <p class="card-text text-truncate">Maecenas neque nunc, auctor ac sodales a, rhoncus sit amet libero. Mauris consectetur non nibh a scelerisque. Phasellus sodales ipsum eu turpis egestas commodo. Duis interdum, felis sed ornare rhoncus, dui erat sagittis erat, non condimentum libero eros eu purus. Vivamus sagittis aliquam eros et rutrum. Proin varius et massa at vestibulum. Pellentesque sit amet nisl quis nisl semper malesuada. Phasellus lectus lorem, ultricies et iaculis sit amet, dapibus eu dolor. Vestibulum blandit faucibus ligula sed vestibulum.</p>
-        </div>
-    </div>
-
-    <div class="card m-1 p-1 border-dark">
-        <div class="card-header bg-primary text-white">
-            <h2 class="card-title">Morbi tempus</h2>
-        </div>
-        <div class="card-body">
-            <p class="card-text text-truncate">Curabitur scelerisque at diam sit amet molestie. Aenean tempus tortor urna, eu sagittis nisi bibendum sit amet. Proin faucibus condimentum elit, eget suscipit turpis facilisis pulvinar. Nunc elementum et eros quis luctus. Morbi ipsum ligula, lobortis et nisi eu, ultricies consequat quam. Sed efficitur risus ullamcorper euismod consequat. Vestibulum cursus porttitor fermentum. Etiam maximus laoreet justo sagittis scelerisque. Phasellus ornare, arcu non finibus iaculis, lectus nunc ornare risus, at laoreet nulla sem at tellus. Nullam rhoncus ligula sed mi placerat dapibus.</p>
-        </div>
-    </div>*@
