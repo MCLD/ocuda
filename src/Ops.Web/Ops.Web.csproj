@@ -54,6 +54,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="bower_components\commonmark\.bower.json" />
+    <Content Include="bower_components\commonmark\bower.json" />
+    <Content Include="bower_components\commonmark\changelog.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="appsettings.Development.json" />
     <None Include="bower.json" />
     <None Include="bower_components\bootstrap\.babelrc.js" />
@@ -493,6 +499,9 @@
     <None Include="bower_components\bootstrap\scss\utilities\_text.scss" />
     <None Include="bower_components\bootstrap\scss\utilities\_visibility.scss" />
     <None Include="bower_components\bootstrap\sw.js" />
+    <None Include="bower_components\commonmark\dist\commonmark.js" />
+    <None Include="bower_components\commonmark\dist\commonmark.min.js" />
+    <None Include="bower_components\commonmark\LICENSE" />
     <None Include="bower_components\fontawesome\.bower.json" />
     <None Include="bower_components\fontawesome\.github\ISSUE_TEMPLATE\bug-report.md" />
     <None Include="bower_components\fontawesome\.github\ISSUE_TEMPLATE\feature-request.md" />

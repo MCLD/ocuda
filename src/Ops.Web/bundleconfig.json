@@ -6,7 +6,8 @@
       "bower_components/popper.js/dist/umd/popper.js",
       "bower_components/bootstrap/dist/js/bootstrap.js",
       "bower_components/jquery-validation/dist/jquery.validate.js",
-      "bower_components/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js"
+      "bower_components/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js",
+      "bower_components/commonmark/dist/commonmark.js"
     ],
     "minify": {
       "enabled": true,
@@ -37,6 +38,7 @@
   {
     "outputFileName": "wwwroot/css/site.min.css",
     "inputFiles": [
+      "Styles/WMD.css",
       "Styles/site.css"
     ],
     "minify": {

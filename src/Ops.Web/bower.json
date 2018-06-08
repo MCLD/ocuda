@@ -20,6 +20,7 @@
     "bootstrap": "^4.1.1",
     "fontawesome": "^5.0.12",
     "jquery-validation": "^1.17.0",
-    "jquery-validation-unobtrusive": "^3.2.9"
+    "jquery-validation-unobtrusive": "^3.2.9",
+    "commonmark": "0.28.1"
   }
 }
