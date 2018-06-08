@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.AspNetCore.Routing;
 using Ocuda.Utility.Models;
 
-namespace Ocuda.Utility.Helpers
+namespace Ocuda.Utility.TagHelpers
 {
     [HtmlTargetElement("paginate", Attributes = "paginateModel")]
     public class PaginateTagHelper : TagHelper

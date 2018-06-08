@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Ocuda.Ops.Controllers.RouteConstraint;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Web.Middleware;
 using Serilog.Context;
@@ -91,6 +92,14 @@ namespace Ocuda.Ops.Web
 
             app.UseMvc(routes =>
             {
+                routes.MapRoute(
+                    name: null,
+                    template: "{section}/{controller}/{action}/{id?}",
+                    defaults: new { controller = "Home", action = "Index" },
+                    constraints: new
+                    {
+                        section = new SectionRouteConstraint()
+                    });
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
