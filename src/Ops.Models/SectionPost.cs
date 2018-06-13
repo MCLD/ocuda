@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Ops.Models
 {
@@ -16,8 +17,13 @@ namespace Ocuda.Ops.Models
         [MaxLength(2000)]
         public string Content { get; set; }
 
+        [DisplayName("Is this a Draft?")]
         public bool IsDraft { get; set; }
+
+        [DisplayName("Pin this post?")]
         public bool IsPinned { get; set; }
+
+        [DisplayName("Show on home page?")]
         public bool ShowOnHomepage { get; set; }
     }
 }

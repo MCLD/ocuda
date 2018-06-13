@@ -4,8 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
+    @*<title>@ViewData[Ocuda.Ops.Controllers.ViewDataKey.Title]</title>*@
     <link rel="stylesheet" href="~/css/main.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    @RenderSection("Styles", required: false)
 </head>
 <body>
     <div class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-dark">
@@ -35,11 +37,53 @@
     </div>
 
     <div class="container-fluid">
+        @if (TempData[Ocuda.Ops.Controllers.TempDataKey.AlertDanger] != null)
+        {
+            <div class="row">
+                <div class="col-12 col-md-6 offset-md-3">
+                    <div class="alert alert-danger">@Html.Raw(TempData[Ocuda.Ops.Controllers.TempDataKey.AlertDanger])</div>
+                </div>
+            </div>
+        }
+        @if (TempData[Ocuda.Ops.Controllers.TempDataKey.AlertWarning] != null)
+        {
+            <div class="row">
+                <div class="col-12 col-md-6 offset-md-3">
+                    <div class="alert alert-warning">@Html.Raw(TempData[Ocuda.Ops.Controllers.TempDataKey.AlertWarning])</div>
+                </div>
+            </div>
+        }
+        @if (TempData[Ocuda.Ops.Controllers.TempDataKey.AlertSuccess] != null)
+        {
+            <div class="row">
+                <div class="col-12 col-md-6 offset-md-3">
+                    <div class="alert alert-success">@Html.Raw(TempData[Ocuda.Ops.Controllers.TempDataKey.AlertSuccess])</div>
+                </div>
+            </div>
+        }
+        @if (TempData[Ocuda.Ops.Controllers.TempDataKey.AlertInfo] != null)
+        {
+            <div class="row">
+                <div class="col-12 col-md-6 offset-md-3">
+                    <div class="alert alert-info">@Html.Raw(TempData[Ocuda.Ops.Controllers.TempDataKey.AlertInfo])</div>
+                </div>
+            </div>
+        }
+
+        @if (ViewData.ContainsKey(Ocuda.Ops.Controllers.ViewDataKey.Title))
+        {
+            <div class="row">
+                <div class="col-12">
+                    @RenderSection("inHeading", required: false)
+                    <span class="h2">@ViewData[Ocuda.Ops.Controllers.ViewDataKey.Title]</span>
+                </div>
+            </div>
+        }
+
         @RenderBody()
     </div>
 
     <script src="~/js/main.min.js" asp-append-version="true"></script>
-    <script src="~/js/site.min.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

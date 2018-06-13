@@ -24,7 +24,6 @@ namespace Ocuda.Ops.Controllers
         {
             var viewModel = new IndexViewModel
             {
-                Sections = _sectionService.GetAll(),
                 SectionFiles = _sectionService.GetFiles(),
                 SectionLinks = _sectionService.GetLinks(),
                 SectionPosts = _sectionService.GetBlogPosts(),

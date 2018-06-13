@@ -7,7 +7,7 @@
       "bower_components/bootstrap/dist/js/bootstrap.js",
       "bower_components/jquery-validation/dist/jquery.validate.js",
       "bower_components/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js",
-      "bower_components/commonmark/dist/commonmark.js"
+      "Scripts/ops.js"
     ],
     "minify": {
       "enabled": true,
@@ -18,6 +18,17 @@
     "outputFileName": "wwwroot/js/site.min.js",
     "inputFiles": [
       "Scripts/site.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    }
+  },
+  {
+    "outputFileName": "wwwroot/js/md.min.js",
+    "inputFiles": [
+      "bower_components/commonmark/dist/commonmark.js",
+      "Scripts/WMD.js"
     ],
     "minify": {
       "enabled": true,
@@ -41,6 +52,15 @@
       "Styles/WMD.css",
       "Styles/ops.css",
       "Styles/site.css"
+    ],
+    "minify": {
+      "enabled": true
+    }
+  },
+  {
+    "outputFileName": "wwwroot/css/md.min.css",
+    "inputFiles": [
+      "Styles/WMD.css"
     ],
     "minify": {
       "enabled": true

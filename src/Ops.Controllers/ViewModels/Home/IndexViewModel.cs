@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Ocuda.Ops.Controllers.ViewModels.Shared;
 using Ocuda.Ops.Models;
 
 namespace Ocuda.Ops.Controllers.ViewModels.Home
 {
-    public class IndexViewModel : BaseViewModel
+    public class IndexViewModel
     {
         public IEnumerable<SectionPost> SectionPosts { get; set; }
         public IEnumerable<SectionLink> SectionLinks { get; set; }
