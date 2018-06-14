@@ -39,7 +39,8 @@
     "outputFileName": "wwwroot/css/main.min.css",
     "inputFiles": [
       "Scripts/Bootstrap/bootstrap.css",
-      "bower_components/fontawesome/web-fonts-with-css/css/fontawesome-all.css"
+      "bower_components/fontawesome/web-fonts-with-css/css/fontawesome-all.css",
+      "Styles/ops.css"
     ],
     "minify": {
       "enabled": true,
@@ -49,8 +50,6 @@
   {
     "outputFileName": "wwwroot/css/site.min.css",
     "inputFiles": [
-      "Styles/WMD.css",
-      "Styles/ops.css",
       "Styles/site.css"
     ],
     "minify": {
