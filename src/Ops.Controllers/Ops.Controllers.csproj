@@ -22,4 +22,9 @@
     <ProjectReference Include="..\Ops.Service\Ops.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ViewModels\Links\" />
+    <Folder Include="ViewModels\Shared\" />
+  </ItemGroup>
+
 </Project>

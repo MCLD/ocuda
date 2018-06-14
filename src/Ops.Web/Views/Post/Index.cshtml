@@ -1,0 +1,34 @@
+﻿@model Ocuda.Ops.Controllers.ViewModels.Post.PostListViewModel
+
+<div class="oc-blog">
+    @foreach (var post in Model.SectionPosts)
+    {
+        <div class="card">
+            @if (post.IsPinned)
+            {
+                <div class="card-header oc-pinned d-flex">
+                    <h1 class="card-title flex-grow-1">@post.Title</h1>
+                    <span class="fa fa-thumbtack align-self-center"></span>
+                </div>
+            }
+            else
+            {
+                <div class="card-header d-flex">
+                    <h1 class="card-title flex-grow-1">@post.Title</h1>
+                </div>
+            }
+            <div class="card-body">
+                @post.Content
+            </div>
+            <div class="card-footer d-flex">
+                <div class="flex-grow-1">Posted by <a href="#">@post.CreatedBy</a></div>
+                <div>@post.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")</div>
+            </div>
+        </div>
+    }
+
+    @if (Model.PaginateModel.MaxPage > 1)
+    {
+        <paginate paginateModel="@Model.PaginateModel"></paginate>
+    }
+</div>

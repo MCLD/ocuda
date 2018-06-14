@@ -72,14 +72,14 @@ namespace Ocuda.Utility.TagHelpers
         {
             TagBuilder liTag = new TagBuilder("li");
             liTag.TagRenderMode = TagRenderMode.Normal;
-            liTag.MergeAttribute("class", "disabled");
+            liTag.MergeAttribute("class", "page-item disabled");
 
             if (asButtons)
             {
                 TagBuilder buttonTag = new TagBuilder("button");
                 buttonTag.TagRenderMode = TagRenderMode.Normal;
                 buttonTag.InnerHtml.SetHtmlContent(text);
-                buttonTag.MergeAttribute("class", "page-button disabled");
+                buttonTag.MergeAttribute("class", "page-link disabled");
                 buttonTag.MergeAttribute("type", "button");
                 liTag.InnerHtml.SetHtmlContent(buttonTag);
             }
@@ -87,6 +87,7 @@ namespace Ocuda.Utility.TagHelpers
             {
                 TagBuilder aTag = new TagBuilder("a");
                 aTag.MergeAttribute("href", "#");
+                aTag.MergeAttribute("class", "page-link");
                 aTag.MergeAttribute("onclick", "return false;");
                 aTag.InnerHtml.SetHtmlContent(text);
                 aTag.TagRenderMode = TagRenderMode.Normal;
@@ -107,12 +108,12 @@ namespace Ocuda.Utility.TagHelpers
             {
                 TagBuilder buttonTag = new TagBuilder("button");
                 buttonTag.TagRenderMode = TagRenderMode.Normal;
-                buttonTag.MergeAttribute("class", "page-button");
+                buttonTag.MergeAttribute("class", "page-link");
                 buttonTag.MergeAttribute("type", "button");
                 if (pageUrl == null)
                 {
                     buttonTag.AddCssClass("disabled");
-                    liTag.MergeAttribute("class", "disabled");
+                    liTag.MergeAttribute("class", "page-item disabled");
                 }
                 else
                 {
@@ -127,12 +128,15 @@ namespace Ocuda.Utility.TagHelpers
                 aTag.TagRenderMode = TagRenderMode.Normal;
                 if (pageUrl == null)
                 {
-                    liTag.MergeAttribute("class", "disabled");
+                    liTag.MergeAttribute("class", "page-item disabled");
                     aTag.MergeAttribute("href", "#");
+                    aTag.MergeAttribute("class", "page-link");
                     aTag.MergeAttribute("onclick", "return false;");
                 }
                 else
                 {
+                    liTag.MergeAttribute("class", "page-item");
+                    aTag.MergeAttribute("class", "page-link");
                     aTag.MergeAttribute("href", pageUrl);
                 }
 

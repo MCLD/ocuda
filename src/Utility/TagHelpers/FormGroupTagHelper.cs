@@ -17,9 +17,9 @@ namespace Ocuda.Utility.TagHelpers
     {
         private const string attributeName = "formgroup";
         private const string forAttributeName = "asp-for";
-        private const string defaultWraperDivClass = "form-group";
+        private const string defaultWraperDivClass = "form-group row";
         private const string defaultRowDivClass = "row";
-        private const string defaultLabelClass = "col-md-3 col-form-label";
+        private const string defaultLabelClass = "col-md-3 col-form-label text-md-right";
         private const string defaultInputClass = "form-control";
         private const string defaultInnerDivClass = "col-md-9";
         private const string defaultValidationMessageClass = "text-danger";
@@ -107,6 +107,7 @@ namespace Ocuda.Utility.TagHelpers
                 }
             }
             inputOutput.Content.AppendHtml(output.PreContent.GetContent());
+            inputOutput.Content.AppendHtml(output.Content.GetContent());
             inputOutput.Content.AppendHtml(await output.GetChildContentAsync());
             inputOutput.Content.AppendHtml(output.PostContent.GetContent());
 
@@ -124,10 +125,10 @@ namespace Ocuda.Utility.TagHelpers
 
             TagHelperOutput validationMessageOutput = CreateTagHelperOutput("span");
 
-            await validationMessageTagHelper.ProcessAsync(context, validationMessageOutput);
-
             validationMessageOutput.Attributes.Add(
                 new TagHelperAttribute("class", defaultValidationMessageClass));
+
+            await validationMessageTagHelper.ProcessAsync(context, validationMessageOutput);        
 
             return validationMessageOutput;
         }

@@ -12,9 +12,10 @@ namespace Ocuda.Ops.Models
         [Required]
         [MaxLength(255)]
         public string FilePath { get; set; }
+        public string Icon { get; set; }
+        [MaxLength(255)]
+        public string Description { get; set; }
 
-        public bool IsDraft { get; set; }
-        public bool IsPinned { get; set; }
-        public bool ShowOnHomepage { get; set; }
+        public bool IsFeatured { get; set; }
     }
 }
