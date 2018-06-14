@@ -2,7 +2,6 @@
 using Ocuda.Ops.Controllers.Abstract;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Http;
 using Ops.Service;
 using System.Threading.Tasks;
 using Ocuda.Ops.Controllers.ViewModels.Home;
@@ -30,13 +29,13 @@ namespace Ocuda.Ops.Controllers
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var viewModel = new IndexViewModel
             {
-                Files = _fileService.GetFiles(),
-                Links = _linkService.GetLinks(),
-                Posts = _postService.GetPosts(),
+                Files = await _fileService.GetFilesAsync(),
+                Links = await _linkService.GetLinksAsync(),
+                Posts = await _postService.GetPostsAsync(),
                 Calendars = _sectionService.GetCalendars()
             };
 

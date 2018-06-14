@@ -13,6 +13,5 @@ namespace Ocuda.Ops.Models
         [Required]
         [MaxLength(255)]
         public string Name { get; set; }
-
     }
 }

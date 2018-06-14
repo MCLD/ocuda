@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -6,24 +7,26 @@ using Microsoft.Extensions.DependencyInjection;
 using Ocuda.Ops.Controllers.RouteConstraint;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Web.Middleware;
+using Ocuda.Ops.Web.StartupHelper;
 using Ops.Service;
-using Serilog.Context;
 
 namespace Ocuda.Ops.Web
 {
     public class Startup
     {
+        private readonly IConfiguration _config;
+
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
-
-        public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var logger = Serilog.Log.Logger;
             // set a default culture of en-US if none is specified
-            string culture = Configuration["Ops.Culture"] ?? "en-US";
+            string culture = _config["Ops.Culture"] ?? "en-US";
+            logger.Information($"Configuring for culture: {culture}");
             services.Configure<RequestLocalizationOptions>(_ =>
             {
                 _.DefaultRequestCulture
@@ -32,27 +35,30 @@ namespace Ocuda.Ops.Web
 
             services.AddDistributedMemoryCache();
 
-            switch (Configuration["Ops.DatabaseProvider"])
+            switch (_config["Ops.DatabaseProvider"])
             {
                 case "SqlServer":
+                    logger.Information("Using SqlServer data provider");
                     services.AddDbContextPool<OpsContext, DataProvider.SqlServer.Ops.Context>(_ =>
-                        _.UseSqlServer(@"Data Source=(LocalDb)\MSSQLLocalDB;"));
-                    services.AddDbContext<PromenadeContext, DataProvider.SqlServer.Promenade.Context>(_ =>
-                        _.UseSqlServer(@"Data Source=(LocalDb)\MSSQLLocalDB;"));
+                        _.UseSqlServer(@"Data Source=(LocalDb)\MSSQLLocalDB;Database=Ocuda.Ops;Trusted_Connection=True;MultipleActiveResultSets=True"));
+                    services.AddDbContextPool<PromenadeContext, DataProvider.SqlServer.Promenade.Context>(_ =>
+                        _.UseSqlServer(@"Data Source=(LocalDb)\MSSQLLocalDB;Database=Ocuda.Promenade;Trusted_Connection=True;MultipleActiveResultSets=True"));
                     break;
                 case "SQLite":
+                    logger.Information("Using SQLite data provider");
                     services.AddDbContextPool<OpsContext, DataProvider.SQLite.Ops.Context>(_ =>
-                        _.UseSqlite(@"ops.sqlite"));
-                    services.AddDbContext<PromenadeContext, DataProvider.SQLite.Promenade.Context>(_ =>
-                        _.UseSqlite(@"promenade.sqlite"));
+                        _.UseSqlite(@"Data Source=ops.db"));
+                    services.AddDbContextPool<PromenadeContext, DataProvider.SQLite.Promenade.Context>(_ =>
+                        _.UseSqlite(@"Data Source=promenade.db"));
                     break;
                 default:
-                    throw new System.Exception("No Ops.DatabaseProvider configured.");
+                    logger.Fatal("No Ops.DatabaseProvider configured in settings. Exiting.");
+                    throw new Exception("No Ops.DatabaseProvider configured.");
             }
 
             services.AddSession(_ =>
             {
-                _.IdleTimeout = System.TimeSpan.FromHours(2);
+                _.IdleTimeout = TimeSpan.FromHours(2);
                 _.Cookie.HttpOnly = true;
             });
 
@@ -62,11 +68,23 @@ namespace Ocuda.Ops.Web
             // filters
             services.AddScoped<Controllers.Filter.OpsFilter>();
 
+            // repositories
+            services.AddScoped<Data.Ops.FileRepository>();
+            services.AddScoped<Data.Ops.LinkRepository>();
+            services.AddScoped<Data.Ops.PageRepository>();
+            services.AddScoped<Data.Ops.PostRepository>();
+            services.AddScoped<Data.Ops.SectionRepository>();
+            services.AddScoped<Data.Ops.SiteSettingRepository>();
+            services.AddScoped<Data.Ops.UserRepository>();
+
             // services
+            services.AddScoped<InitialSetupService>();
+            services.AddScoped<InsertSampleDataService>();
             services.AddScoped<SectionService>();
             services.AddScoped<FileService>();
             services.AddScoped<LinkService>();
             services.AddScoped<PostService>();
+            services.AddScoped<UserService>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -85,11 +103,16 @@ namespace Ocuda.Ops.Web
             // insert remote address into the log context for each request
             app.Use(async (context, next) =>
             {
-                using (LogContext.PushProperty("RemoteAddress", context.Connection.RemoteIpAddress))
+                using (Serilog.Context
+                    .LogContext
+                    .PushProperty("RemoteAddress", context.Connection.RemoteIpAddress))
                 {
                     await next.Invoke();
                 }
             });
+
+            // update databases to include latest migrations
+            app.InitialSetup();
 
             // use the culture configured above in services
             app.UseRequestLocalization();

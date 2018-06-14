@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
@@ -20,18 +18,18 @@ namespace Ocuda.Ops.Controllers
             _linkService = linkService ?? throw new ArgumentNullException(nameof(linkService));
         }
 
-        public IActionResult Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var linkList = _linkService.GetLinks();
+            var linkList = await _linkService.GetLinksAsync();
 
             var paginateModel = new PaginateModel()
             {
-                ItemCount = linkList.Count(),
+                ItemCount = await _linkService.GetLinkCountAsync(),
                 CurrentPage = page,
                 ItemsPerPage = 2
             };
 
-            if(paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
+            if (paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
             {
                 return RedirectToRoute(
                     new
@@ -50,13 +48,13 @@ namespace Ocuda.Ops.Controllers
             return View(viewModel);
         }
 
-        public IActionResult AdminList(int page = 1)
+        public async Task<IActionResult> AdminList(int page = 1)
         {
-            var linkList = _linkService.GetLinks();
+            var linkList = await _linkService.GetLinksAsync();
 
             var paginateModel = new PaginateModel()
             {
-                ItemCount = linkList.Count(),
+                ItemCount = await _linkService.GetLinkCountAsync(),
                 CurrentPage = page,
                 ItemsPerPage = 2
             };
@@ -93,7 +91,7 @@ namespace Ocuda.Ops.Controllers
         [HttpPost]
         public async Task<IActionResult> AdminCreate(AdminDetailViewModel model)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {
@@ -111,12 +109,12 @@ namespace Ocuda.Ops.Controllers
             return View("AdminDetail", model);
         }
 
-        public IActionResult AdminEdit(int id)
+        public async Task<IActionResult> AdminEdit(int id)
         {
             var viewModel = new AdminDetailViewModel()
             {
                 Action = nameof(AdminEdit),
-                Link = _linkService.GetLinkById(id)
+                Link = await _linkService.GetLinkByIdAsync(id)
             };
 
             return View("AdminDetail", viewModel);
@@ -125,7 +123,7 @@ namespace Ocuda.Ops.Controllers
         [HttpPost]
         public async Task<IActionResult> AdminEdit(AdminDetailViewModel model)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {
@@ -133,7 +131,7 @@ namespace Ocuda.Ops.Controllers
                     ShowAlertSuccess($"Updated link: {link.Name}");
                     return RedirectToAction(nameof(AdminList));
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     ShowAlertDanger("Unable to update link: ", ex.Message);
                 }
@@ -151,7 +149,7 @@ namespace Ocuda.Ops.Controllers
                 await _linkService.DeleteLinkAsync(model.Link.Id);
                 ShowAlertSuccess("Link deleted successfully.");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ShowAlertDanger("Unable to delete link: ", ex.Message);
             }
