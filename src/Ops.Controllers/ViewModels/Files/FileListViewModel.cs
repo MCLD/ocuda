@@ -8,7 +8,7 @@ namespace Ocuda.Ops.Controllers.ViewModels.Files
 {
     public class FileListViewModel
     {
-        public IEnumerable<SectionFile> SectionFiles { get; set; }
+        public IEnumerable<File> Files { get; set; }
         public PaginateModel PaginateModel { get; set; }
     }
 }

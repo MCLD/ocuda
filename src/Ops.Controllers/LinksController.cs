@@ -1,37 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
-using Ocuda.Ops.Controllers.ViewModels.Files;
+using Ocuda.Ops.Controllers.ViewModels.Links;
 using Ocuda.Utility.Models;
 using Ops.Service;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Ocuda.Ops.Controllers
 {
-    public class FilesController : BaseController
+    public class LinksController : BaseController
     {
-        private readonly FileService _fileService;
+        private readonly LinkService _linkService;
 
-        public FilesController(FileService fileService)
+        public LinksController(LinkService linkService)
         {
-            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+            _linkService = linkService ?? throw new ArgumentNullException(nameof(linkService));
         }
 
         public IActionResult Index(int page = 1)
         {
-            var fileList = _fileService.GetFiles();
+            var linkList = _linkService.GetLinks();
 
             var paginateModel = new PaginateModel()
             {
-                ItemCount = fileList.Count(),
+                ItemCount = linkList.Count(),
                 CurrentPage = page,
                 ItemsPerPage = 2
             };
 
-            if (paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
+            if(paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
             {
                 return RedirectToRoute(
                     new
@@ -40,10 +40,10 @@ namespace Ocuda.Ops.Controllers
                     });
             }
 
-            var viewModel = new FileListViewModel()
+            var viewModel = new LinkListViewModel()
             {
                 PaginateModel = paginateModel,
-                Files = fileList.Skip((page - 1) * paginateModel.ItemsPerPage)
+                Links = linkList.Skip((page - 1) * paginateModel.ItemsPerPage)
                                         .Take(paginateModel.ItemsPerPage)
             };
 
@@ -52,11 +52,11 @@ namespace Ocuda.Ops.Controllers
 
         public IActionResult AdminList(int page = 1)
         {
-            var fileList = _fileService.GetFiles();
+            var linkList = _linkService.GetLinks();
 
             var paginateModel = new PaginateModel()
             {
-                ItemCount = fileList.Count(),
+                ItemCount = linkList.Count(),
                 CurrentPage = page,
                 ItemsPerPage = 2
             };
@@ -73,7 +73,7 @@ namespace Ocuda.Ops.Controllers
             var viewModel = new AdminListViewModel()
             {
                 PaginateModel = paginateModel,
-                Files = fileList.Skip((page - 1) * paginateModel.ItemsPerPage)
+                Links = linkList.Skip((page - 1) * paginateModel.ItemsPerPage)
                                         .Take(paginateModel.ItemsPerPage)
             };
 
@@ -97,13 +97,13 @@ namespace Ocuda.Ops.Controllers
             {
                 try
                 {
-                    var newFile = await _fileService.CreateFileAsync(model.File);
-                    ShowAlertSuccess($"Added file: {newFile.Name}");
+                    var newLink = await _linkService.CreateLinkAsync(model.Link);
+                    ShowAlertSuccess($"Added link: {newLink.Name}");
                     return RedirectToAction(nameof(AdminList));
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    ShowAlertDanger("Unable to add file: ", ex.Message);
+                    ShowAlertDanger("Unable to add link: ", ex.Message);
                 }
             }
 
@@ -116,7 +116,7 @@ namespace Ocuda.Ops.Controllers
             var viewModel = new AdminDetailViewModel()
             {
                 Action = nameof(AdminEdit),
-                File = _fileService.GetFileById(id)
+                Link = _linkService.GetLinkById(id)
             };
 
             return View("AdminDetail", viewModel);
@@ -129,18 +129,17 @@ namespace Ocuda.Ops.Controllers
             {
                 try
                 {
-                    var file = await _fileService.EditFileAsync(model.File);
-                    // Save file data logic here
-                    ShowAlertSuccess($"Updated file: {file.Name}");
+                    var link = await _linkService.EditLinkAsync(model.Link);
+                    ShowAlertSuccess($"Updated link: {link.Name}");
                     return RedirectToAction(nameof(AdminList));
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
-                    ShowAlertDanger("Unable to update file: ", ex.Message);
+                    ShowAlertDanger("Unable to update link: ", ex.Message);
                 }
             }
 
-            model.Action = nameof(AdminCreate);
+            model.Action = nameof(AdminEdit);
             return View("AdminDetail", model);
         }
 
@@ -149,12 +148,12 @@ namespace Ocuda.Ops.Controllers
         {
             try
             {
-                await _fileService.DeleteFileAsync(model.File.Id);
-                ShowAlertSuccess("File deleted successfully.");
+                await _linkService.DeleteLinkAsync(model.Link.Id);
+                ShowAlertSuccess("Link deleted successfully.");
             }
             catch(Exception ex)
             {
-                ShowAlertDanger("Unable to delete file: ", ex.Message);
+                ShowAlertDanger("Unable to delete link: ", ex.Message);
             }
 
             return RedirectToAction(nameof(AdminList), new { page = model.PaginateModel.CurrentPage });
@@ -162,7 +161,7 @@ namespace Ocuda.Ops.Controllers
 
         public IActionResult AdminCategories(int page = 1)
         {
-            var categoryList = _fileService.GetFileCategories();
+            var categoryList = _linkService.GetLinkCategories();
 
             var paginateModel = new PaginateModel()
             {
@@ -198,8 +197,8 @@ namespace Ocuda.Ops.Controllers
             {
                 try
                 {
-                    var newCategory = await _fileService.CreateFileCategoryAsync(model.Category);
-                    ShowAlertSuccess($"Added file category: {newCategory.Name}");
+                    var newCategory = await _linkService.CreateLinkCategoryAsync(model.Category);
+                    ShowAlertSuccess($"Added link category: {newCategory.Name}");
                 }
                 catch (Exception ex)
                 {
@@ -217,8 +216,8 @@ namespace Ocuda.Ops.Controllers
             {
                 try
                 {
-                    var category = await _fileService.EditFileCategoryAsync(model.Category);
-                    ShowAlertSuccess($"Updated file category: {category.Name}");
+                    var category = await _linkService.EditLinkCategoryAsync(model.Category);
+                    ShowAlertSuccess($"Updated link category: {category.Name}");
                 }
                 catch (Exception ex)
                 {
@@ -234,8 +233,8 @@ namespace Ocuda.Ops.Controllers
         {
             try
             {
-                await _fileService.DeleteFileCategoryAsync(model.Category.Id);
-                ShowAlertSuccess("File category deleted successfully.");
+                await _linkService.DeleteLinkCategoryAsync(model.Category.Id);
+                ShowAlertSuccess("Link category deleted successfully.");
             }
             catch (Exception ex)
             {

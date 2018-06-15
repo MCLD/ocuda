@@ -6,10 +6,10 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.ViewModels.Files
 {
-    public class AdminListViewModel
+    public class AdminCategoriesViewModel
     {
-        public IEnumerable<File> Files { get; set; }
-        public File File { get; set; }
+        public IEnumerable<FileCategory> Categories { get; set; }
+        public FileCategory Category { get; set; }
         public PaginateModel PaginateModel { get; set; }
     }
 }

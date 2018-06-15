@@ -3,7 +3,7 @@
 <div class="row">
     @* Blog Content *@
     <div class="col-sm-8 oc-blog">
-        @foreach (var post in Model.SectionPosts)
+        @foreach (var post in Model.Posts)
         {
             <div class="card">
                 @if (post.IsPinned)
@@ -96,7 +96,7 @@
             </div>
             <div class="card-body">
                 <ul class="list-group list-group-flush">
-                    @foreach (var link in Model.SectionLinks)
+                    @foreach (var link in Model.Links)
                     {
                         <li class="list-group-item">
                             <a href="@link.Url" class="card-link">@link.Name</a>
@@ -115,7 +115,7 @@
             </div>
             <div class="card-body">
                 <ul class="list-group list-group-flush">
-                    @foreach (var file in Model.SectionFiles)
+                    @foreach (var file in Model.Files)
                     {
                         <li class="list-group-item">
                             <a href="@file.FilePath" class="card-link"><span class="fa @file.Icon"></span> @file.Name</a>

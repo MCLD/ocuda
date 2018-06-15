@@ -1,7 +1,7 @@
 ﻿@model Ocuda.Ops.Controllers.ViewModels.Post.PostListViewModel
 
 <div class="oc-blog">
-    @foreach (var post in Model.SectionPosts)
+    @foreach (var post in Model.Posts)
     {
         <div class="card">
             @if (post.IsPinned)

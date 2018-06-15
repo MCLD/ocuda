@@ -1,6 +1,6 @@
 ﻿@model Ocuda.Ops.Controllers.ViewModels.Files.FileListViewModel
 
-@if (Model.SectionFiles.Count() == 0)
+@if (Model.Files.Count() == 0)
 {
     <div class="alert alert-warning">No Files Found</div>
 }
@@ -16,7 +16,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var file in Model.SectionFiles)
+            @foreach (var file in Model.Files)
             {
                 <tr>
                     <td class="rowlink-parent">

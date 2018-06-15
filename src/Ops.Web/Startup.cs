@@ -64,6 +64,9 @@ namespace Ocuda.Ops.Web
 
             // services
             services.AddScoped<SectionService>();
+            services.AddScoped<FileService>();
+            services.AddScoped<LinkService>();
+            services.AddScoped<PostService>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

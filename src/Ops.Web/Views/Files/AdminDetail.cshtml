@@ -1,15 +1,15 @@
 ﻿@model Ocuda.Ops.Controllers.ViewModels.Files.AdminDetailViewModel
 
 <form asp-action="@Model.Action" method="post" role="form" enctype="multipart/form-data">
-    <input asp-for="SectionFile.Name" formgroup />
-    <input asp-for="SectionFile.Description" formgroup />
+    <input asp-for="File.Name" formgroup />
+    <input asp-for="File.Description" formgroup />
 
     @if (Model.Action == nameof(FilesController.AdminEdit))
     {
         <div class="form-group row">
             <label class="col-md-3 col-form-label text-md-right">Current File</label>
             <div class="col-md-9">
-                <a class="form-vertical-alignment" asp-action="#" target="_blank">@Model.SectionFile.Name</a>
+                <a class="form-vertical-alignment" asp-action="#" target="_blank">@Model.File.Name</a>
             </div>
         </div>
     }
@@ -25,7 +25,7 @@
                     </label>
                 </div>
                 <div class="custom-file">
-                    <input type="text" class="form-control" readonly id="selectedFile" />
+                    <input type="text" asp-for="File.FilePath" class="form-control" readonly id="selectedFile" />
                 </div>
             </div>
             <div>
@@ -34,15 +34,19 @@
         </div>
     </div>
 
-    <select class="w-auto" asp-for="SectionFile.IsFeatured" formgroup>
+    <select class="w-auto" asp-for="File.IsFeatured" formgroup>
         <option value="false">No</option>
         <option value="true">Yes</option>
     </select>
 
     <div class="row">
         <div class="offset-md-3 col-md-9">
-            <button class="btn btn-primary" type="submit">Save</button>
-            <a class="btn btn-secondary" asp-action="AdminList">Cancel</a>
+            <a class="btn btn-outline-secondary text-dark" asp-action="AdminList">Cancel</a>
+            <button type="submit" class="btn btn-success btn-spinner" aria-label="Confirm">
+                <span class="fa fa-save" aria-hidden="true"></span>
+                Save
+                <span class="fa fa-spinner fa-pulse fa-fw d-none"></span>
+            </button>
         </div>
     </div>
 </form>

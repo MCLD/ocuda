@@ -1,43 +1,17 @@
 ﻿@model Ocuda.Ops.Controllers.ViewModels.Post.AdminListViewModel
 
-
-<div class="row">
-    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel">
-        <div class="modal-dialog" role="document">
-            <form asp-controller="Post" asp-action="AdminDelete" method="post" role="form" style="display:inline">
-                <input asp-for="SectionPost.Id" type="hidden" />
-                <input asp-for="PaginateModel.CurrentPage" type="hidden" />
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="deleteModalLabel">Delete Blog Post</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span class="fa fa-times" aria-hidden="true"></span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
-                        <span id="modal-text"></span>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-danger btn-spinner" aria-label="Confirm">
-                            <span class="fa fa-times" aria-hidden="true"></span>
-                            Delete
-                            <span class="fa fa-spinner fa-pulse fa-fw d-none"></span>
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
+<form asp-controller="Post" asp-action="AdminDelete" method="post" role="form">
+    <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
+    <input id="deleteName" asp-for="Post.Title" type="hidden" />
+    <input id="deleteId" asp-for="Post.Id" type="hidden" />
+    <div modal id="deleteModal" name="Post" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+</form>
 
 <div class="mb-2">
     <a class="btn btn-outline-secondary text-dark" asp-action="AdminCreate">Create Blog Post</a>
 </div>
 
-@if (Model.SectionPosts.Count() == 0)
+@if (Model.Posts.Count() == 0)
 {
     <div class="alert alert-warning">No Blog Posts Found</div>
 }
@@ -54,7 +28,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var post in Model.SectionPosts)
+            @foreach (var post in Model.Posts)
             {
                 <tr>
                     <td class="rowlink-parent">
@@ -110,8 +84,9 @@ else
             var id = button.data("id");
             var title = button.data("title");
             var modal = $(this);
-            modal.find("#modal-text").text("Are you sure you wish to delete \"" + title + "\"?");
-            modal.find("#SectionPost_Id").val(id);
+            $("#deleteName").val(title);
+            $("#deleteId").val(id);
+            modal.find(".modal-text").text(" Are you sure you want to delete \"" + title + "\"?");
         });
     </script>
 }

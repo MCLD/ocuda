@@ -49,193 +49,30 @@ namespace Ops.Service
             };
         }
 
-        public IEnumerable<SectionPost> GetBlogPosts()
+        public IEnumerable<Calendar> GetCalendars()
         {
-            return new List<SectionPost>
+            return new List<Calendar>
             {
-                new SectionPost
-                {
-                    Id = 1,
-                    Content = "Nam dignissim porta leo vitae sodales. Morbi mollis, libero vitae sagittis tincidunt, mi dui luctus metus, elementum tincidunt nisl nisl at elit. Nulla tellus elit, aliquam in pulvinar id, interdum in velit. Suspendisse non aliquam dolor, vestibulum lacinia est. Pellentesque placerat nibh blandit, gravida nulla sed, tristique nisi. Nunc volutpat ultrices augue et congue. In in lacus condimentum dui finibus sagittis nec ut neque. Aenean accumsan nisl quis convallis rutrum. Cras vel imperdiet est. Curabitur et sagittis dui.",
-                    CreatedAt = DateTime.Parse("2018-06-04 15:00"),
-                    CreatedBy = 1,
-                    IsPinned = true,
-                    Title = "Test Post 3"
-                },
-                new SectionPost
-                {
-                    Id = 2,
-                    Content = "Ut auctor risus diam, sed aliquam quam iaculis ac. Sed rutrum tortor eget ante consequat, ac malesuada ligula dictum. Phasellus non urna interdum, vehicula augue ac, egestas orci. Sed ut nisl ipsum. Donec hendrerit, nisl vitae interdum pretium, ligula lorem varius nisi, non cursus libero libero eu dolor. Fusce bibendum, lorem sed tempor condimentum, enim ante sollicitudin dolor, faucibus viverra quam erat ac neque. Integer sagittis magna eu augue eleifend, at pellentesque diam malesuada.",
-                    CreatedAt = DateTime.Parse("2018-06-04 17:25"),
-                    CreatedBy = 1,
-                    IsPinned = false,
-                    Title = "Test Post 4"
-                },
-                new SectionPost
-                {
-                    Id = 3,
-                    Content = "Pellentesque sit amet risus eu lorem elementum porttitor. Ut pretium facilisis finibus. Suspendisse potenti. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Duis vestibulum tortor blandit, imperdiet sem et, venenatis lectus. Sed id metus magna. Etiam vel congue sapien, nec blandit lectus. Etiam feugiat est ornare quam sollicitudin, et luctus neque efficitur. Nullam quis pretium ipsum. Pellentesque eleifend quam vitae laoreet varius. Integer fringilla velit in metus finibus, a aliquet lectus tincidunt. Pellentesque varius eleifend est, id maximus nunc tristique ac.",
-                    CreatedAt = DateTime.Parse("2018-06-04 13:30"),
-                    CreatedBy = 1,
-                    IsPinned = false,
-                    Title = "Test Post 2"
-                },
-                new SectionPost
-                {
-                    Id = 4,
-                    Content = "Sed semper, sapien quis luctus semper, nibh eros sollicitudin tellus, at tincidunt arcu odio a est. Nam nec nulla ex. Nullam et maximus ex, at porttitor velit. Sed ac justo ligula. Morbi sed lectus turpis. Aenean suscipit tellus nec risus aliquam, et dignissim urna mollis. Aliquam erat volutpat. Curabitur risus tellus, facilisis a tempus eu, hendrerit ut elit. Phasellus ut quam consequat, molestie mauris non, faucibus felis. Pellentesque finibus lobortis arcu, a tincidunt erat pulvinar vel. Proin in egestas magna, nec feugiat velit.",
-                    CreatedAt = DateTime.Parse("2018-06-04 12:15"),
-                    CreatedBy = 1,
-                    IsPinned = false,
-                    Title = "Test Post 1"
-                }
-            };
-        }
-
-        public SectionPost GetSectionPostById(int id)
-        {
-            return new SectionPost
-            {
-                Id = id,
-                Content = "Sed semper, sapien quis luctus semper, nibh eros sollicitudin tellus, at tincidunt arcu odio a est. Nam nec nulla ex. Nullam et maximus ex, at porttitor velit. Sed ac justo ligula. Morbi sed lectus turpis. Aenean suscipit tellus nec risus aliquam, et dignissim urna mollis. Aliquam erat volutpat. Curabitur risus tellus, facilisis a tempus eu, hendrerit ut elit. Phasellus ut quam consequat, molestie mauris non, faucibus felis. Pellentesque finibus lobortis arcu, a tincidunt erat pulvinar vel. Proin in egestas magna, nec feugiat velit.",
-                CreatedAt = DateTime.Parse("2018-06-04 12:15"),
-                CreatedBy = 1,
-                Title = "Test Post 1",
-                Stub = "test-post-1",
-                IsDraft = true,
-                IsPinned = true,
-                ShowOnHomepage = true
-            };
-        }
-
-        public SectionFile GetSectionFileById(int id)
-        {
-            return new SectionFile
-            {
-                Id = id,
-                CreatedAt = DateTime.Parse("2018-05-01"),
-                CreatedBy = 1,
-                IsFeatured = true,
-                FilePath = "/file.txt",
-                Name = "Important File!",
-                Icon = "fa-file-word alert-primary"
-            };
-        }
-
-
-        public IEnumerable<SectionLink> GetLinks()
-        {
-            return new List<SectionLink>
-            {
-                new SectionLink
-                {
-                    Url = "#",
-                    Name = "Summer Reading"
-                },
-                new SectionLink
-                {
-                    Url = "#",
-                    Name = "Reading Adventure"
-                },
-                new SectionLink
-                {
-                    Url = "#",
-                    Name = "Find Libraries"
-                }
-            };
-        }
-
-        public IEnumerable<SectionCalendar> GetCalendars()
-        {
-            return new List<SectionCalendar>
-            {
-                new SectionCalendar
+                new Calendar
                 {
                     IsPinned = true,
                     Name = "Staff Training",
                     Url = "https://www.google.com/",
                     When = DateTime.Parse("2018-06-19 10:00")
                 },
-                new SectionCalendar
+                new Calendar
                 {
                     Name = "Fun Event!",
                     Url = "https://www.google.com/",
                     When = DateTime.Parse("2018-06-08 12:00")
                 },
-                new SectionCalendar
+                new Calendar
                 {
                     Name = "Important Date Reminder",
                     Url = "https://www.google.com/",
                     When = DateTime.Parse("2018-06-12 9:00")
                 }
             };
-        }
-
-        public IEnumerable<SectionFile> GetFiles()
-        {
-            return new List<SectionFile>
-            {
-                new SectionFile
-                {
-                    CreatedAt = DateTime.Parse("2018-05-01"),
-                    IsFeatured = true,
-                    FilePath = "/file.txt",
-                    Name = "Important File!",
-                    Icon = "fa-file-word alert-primary"
-                },
-                new SectionFile
-                {
-                    CreatedAt = DateTime.Parse("2018-06-04"),
-                    FilePath = "/file.txt",
-                    Name = "New File 2",
-                    Icon = "fa-file-excel alert-success"
-                },
-                new SectionFile
-                {
-                    CreatedAt = DateTime.Parse("2018-05-20"),
-                    FilePath = "/file.txt",
-                    Name = "New File 1",
-                    Icon = "fa-file-pdf alert-danger"
-                }
-            };
-        }
-
-        // SectionPost
-        public async Task<SectionPost> CreateSectionPostAsync(SectionPost post)
-        {
-            // call create method from repository
-            return post;
-        }
-
-        public async Task<SectionPost> EditSectionPostAsync(SectionPost post)
-        {
-            // get existing post and update properties that changed
-            // call edit method on existing post
-            return post;
-        }
-
-        public async Task DeleteSectionPostAsync(int id)
-        {
-            // call delete method from repository
-        }
-
-        // SectionFile
-        public async Task<SectionFile> CreateSectionFileAsync(SectionFile file)
-        {
-            // call create method from repository
-            return file;
-        }
-
-        public async Task<SectionFile> EditSectionFileAsync(SectionFile file)
-        {
-            // get existing post and update properties that changed
-            // call edit method on existing post
-            return file;
-        }
-
-        public async Task DeleteSectionFileAsync(int id)
-        {
-            // call delete method from repository
         }
     }
 }
