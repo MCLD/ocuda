@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ExcelDataReader" Version="3.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Ops.Data\Ops.Data.csproj" />
     <ProjectReference Include="..\Ops.Models\Ops.Models.csproj" />
     <ProjectReference Include="..\Promenade.Models\Promenade.Models.csproj" />
