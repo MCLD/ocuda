@@ -1,23 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Ocuda.Ops.Models
 {
-    public class SectionLink : Abstract.BaseEntity
+    public class Post : Abstract.BaseEntity
     {
         public int SectionId { get; set; }
         public Section Section { get; set; }
         [Required]
         [MaxLength(255)]
-        public string Name { get; set; }
+        public string Title { get; set; }
         [Required]
         [MaxLength(255)]
-        public string Url { get; set; }
+        public string Stub { get; set; }
+        [Required]
+        [MaxLength(2000)]
+        public string Content { get; set; }
 
+        [DisplayName("Is this a Draft?")]
         public bool IsDraft { get; set; }
+
+        [DisplayName("Pin this post?")]
         public bool IsPinned { get; set; }
+
+        [DisplayName("Show on home page?")]
         public bool ShowOnHomepage { get; set; }
     }
 }

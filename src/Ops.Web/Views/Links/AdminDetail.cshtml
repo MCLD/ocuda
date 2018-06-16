@@ -1,0 +1,22 @@
+﻿@model Ocuda.Ops.Controllers.ViewModels.Links.AdminDetailViewModel
+
+<form asp-action="@Model.Action" method="post" role="form">
+    <input asp-for="Link.Name" formgroup />
+    <input asp-for="Link.Url" formgroup />
+
+    <select class="w-auto" asp-for="Link.IsFeatured" formgroup>
+        <option value="false">No</option>
+        <option value="true">Yes</option>
+    </select>
+
+    <div class="row">
+        <div class="offset-md-3 col-md-9">
+            <a class="btn btn-outline-secondary text-dark" asp-action="AdminList">Cancel</a>
+            <button type="submit" class="btn btn-success btn-spinner" aria-label="Confirm">
+                <span class="fa fa-save" aria-hidden="true"></span>
+                Save
+                <span class="fa fa-spinner fa-pulse fa-fw d-none"></span>
+            </button>
+        </div>
+    </div>
+</form>

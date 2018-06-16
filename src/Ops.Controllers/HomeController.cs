@@ -13,21 +13,31 @@ namespace Ocuda.Ops.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly SectionService _sectionService;
+        private readonly FileService _fileService;
+        private readonly LinkService _linkService;
+        private readonly PostService _postService;
 
-        public HomeController(ILogger<HomeController> logger, SectionService sectionService)
+        public HomeController(ILogger<HomeController> logger, 
+                              SectionService sectionService,
+                              FileService fileService,
+                              LinkService linkService,
+                              PostService postService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
+            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+            _linkService = linkService ?? throw new ArgumentNullException(nameof(linkService));
+            _postService = postService ?? throw new ArgumentNullException(nameof(postService));
         }
 
         public IActionResult Index()
         {
             var viewModel = new IndexViewModel
             {
-                SectionFiles = _sectionService.GetFiles(),
-                SectionLinks = _sectionService.GetLinks(),
-                SectionPosts = _sectionService.GetBlogPosts(),
-                SectionCalendars = _sectionService.GetCalendars()
+                Files = _fileService.GetFiles(),
+                Links = _linkService.GetLinks(),
+                Posts = _postService.GetPosts(),
+                Calendars = _sectionService.GetCalendars()
             };
 
             return View(viewModel);

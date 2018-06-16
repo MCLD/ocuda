@@ -2,7 +2,7 @@
 
 namespace Ocuda.Ops.Models
 {
-    public class SectionFile : Abstract.BaseEntity
+    public class File : Abstract.BaseEntity
     {
         public int SectionId { get; set; }
         public Section Section { get; set; }

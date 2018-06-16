@@ -7,9 +7,9 @@ namespace Ocuda.Ops.Controllers
     public class ItemKey
     {
         public const string Sections = "Sections";
-        public const string SectionFiles = "SectionFiles";
-        public const string SectionLinks = "SectionLinks";
-        public const string SectionPosts = "SectionPosts";
-        public const string SectionCalendars = "SectionCalendars";
+        public const string Files = "Files";
+        public const string Links = "Links";
+        public const string Posts = "Posts";
+        public const string Calendars = "Calendars";
     }
 }

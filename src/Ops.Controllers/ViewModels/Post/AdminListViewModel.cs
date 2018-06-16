@@ -8,8 +8,8 @@ namespace Ocuda.Ops.Controllers.ViewModels.Post
 {
     public class AdminListViewModel
     {
-        public IEnumerable<SectionPost> SectionPosts { get; set; }
-        public SectionPost SectionPost { get; set; }
+        public IEnumerable<Models.Post> Posts { get; set; }
+        public Models.Post Post { get; set; }
         public PaginateModel PaginateModel { get; set; }
     }
 }

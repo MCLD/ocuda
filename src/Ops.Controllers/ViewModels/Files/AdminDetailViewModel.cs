@@ -8,8 +8,8 @@ namespace Ocuda.Ops.Controllers.ViewModels.Files
 {
     public class AdminDetailViewModel
     {
-        public SectionFile SectionFile { get; set; }
+        public File File { get; set; }
         public string Action { get; set; }
-        public IFormFile File { get; set; }
+        public IFormFile FileData { get; set; }
     }
 }

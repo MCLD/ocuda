@@ -5,49 +5,54 @@
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
 
-<form asp-action="@Model.Action" method="post" role="form">
-    <input asp-for="SectionPost.Title" formgroup />
-    <input asp-for="SectionPost.Stub" formgroup readonly="@(Model.Action == nameof(PostController.AdminEdit) ? "readonly" : null)" />
-    
-    <div class="form-group row">
-        <label asp-for="SectionPost.Content" class="col-md-3 col-form-label text-md-right"></label>
-        <div class="col-md-9">
-            <nav class="nav nav-tabs">
-                <a class="nav-link active" data-toggle="tab" href="#md-edit" role="tab">Edit</a>
-                <a class="nav-link" data-toggle="tab" href="#md-preview" role="tab">Preview</a>
-            </nav>
-            <div class="tab-content" id="md-edit-preview">
-                <div class="tab-pane show active" id="md-edit" role="tabpanel">
-                    <div id="wmd-button-bar" class="wmd-button-row"></div>
-                    <textarea asp-for="SectionPost.Content" class="form-control wmd-input" id="wmd-input"></textarea>
+    <form asp-action="@Model.Action" method="post" role="form">
+        <input asp-for="Post.Title" formgroup />
+        <input asp-for="Post.Stub" formgroup readonly="@(Model.Action == nameof(PostController.AdminEdit) ? "readonly" : null)" />
+
+        <div class="form-group row">
+            <label asp-for="Post.Content" class="col-md-3 col-form-label text-md-right"></label>
+            <div class="col-md-9">
+                <nav class="nav nav-tabs">
+                    <a class="nav-link active" data-toggle="tab" href="#md-edit" role="tab">Edit</a>
+                    <a class="nav-link" data-toggle="tab" href="#md-preview" role="tab">Preview</a>
+                </nav>
+                <div class="tab-content" id="md-edit-preview">
+                    <div class="tab-pane show active" id="md-edit" role="tabpanel">
+                        <div id="wmd-button-bar" class="wmd-button-row"></div>
+                        <textarea asp-for="Post.Content" class="form-control wmd-input" id="wmd-input"></textarea>
+                    </div>
+                    <div class="tab-pane" id="md-preview" role="tabpanel">
+                        <div id="preview" class="wmd-preview"></div>
+                    </div>
+                    <span asp-validation-for="Post.Content" class="text-danger"></span>
                 </div>
-                <div class="tab-pane" id="md-preview" role="tabpanel">
-                    <div id="preview" class="wmd-preview"></div>
-                </div>
-                <span asp-validation-for="SectionPost.Content" class="text-danger"></span>
             </div>
         </div>
-    </div>
 
-    <select class="w-auto" asp-for="SectionPost.IsDraft" formgroup>
-        <option value="false">No</option>
-        <option value="true">Yes</option>
-    </select>
-    <select class="w-auto" asp-for="SectionPost.IsPinned" formgroup>
-        <option value="false">No</option>
-        <option value="true">Yes</option>
-    </select>
-    <select class="w-auto" asp-for="SectionPost.ShowOnHomepage" formgroup>
-        <option value="false">No</option>
-        <option value="true">Yes</option>
-    </select>
-    <div class="row">
-        <div class="offset-md-3 col-md-9">
-            <button class="btn btn-primary" type="submit">Save</button>
-            <a class="btn btn-secondary" asp-action="AdminList">Cancel</a>
+        <select class="w-auto" asp-for="Post.IsDraft" formgroup>
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+        </select>
+        <select class="w-auto" asp-for="Post.IsPinned" formgroup>
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+        </select>
+        <select class="w-auto" asp-for="Post.ShowOnHomepage" formgroup>
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+        </select>
+
+        <div class="row">
+            <div class="offset-md-3 col-md-9">
+                <a class="btn btn-outline-secondary text-dark" asp-action="AdminList">Cancel</a>
+                <button type="submit" class="btn btn-success btn-spinner" aria-label="Confirm">
+                    <span class="fa fa-save" aria-hidden="true"></span>
+                    Save
+                    <span class="fa fa-spinner fa-pulse fa-fw d-none"></span>
+                </button>
+            </div>
         </div>
-    </div>
-</form>
+    </form>
 
 
 @section scripts
@@ -58,7 +63,7 @@
         var editor = new Markdown.Editor({ allowUploads: true });
         editor.run();
 
-        $('#SectionPost_Title').on("keyup", function () {
+        $('#Post_Title').on("keyup", function () {
             // From https://gist.github.com/mathewbyrne/1280286
             var slug = $(this).val().toLowerCase()
                 .replace(/\s+/g, '-')
@@ -67,7 +72,7 @@
                 .replace(/\-\-+/g, '-')
                 .replace(/^-+/, '')
                 .replace(/-+$/, '');
-            $('#SectionPost_Stub').val(slug);
+            $('#Post_Stub').val(slug);
         });
     </script>
 }

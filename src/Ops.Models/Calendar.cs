@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Ocuda.Ops.Models
 {
-    public class SectionCalendar : Abstract.BaseEntity
+    public class Calendar : Abstract.BaseEntity
     {
         public int SectionId { get; set; }
         public Section Section { get; set; }

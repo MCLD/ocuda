@@ -14,16 +14,16 @@ namespace Ocuda.Ops.Controllers
 {
     public class PostController : BaseController
     {
-        private readonly SectionService _sectionService;
+        private readonly PostService _postService;
 
-        public PostController(SectionService sectionService)
+        public PostController(PostService postService)
         {
-            _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
+            _postService = postService ?? throw new ArgumentNullException(nameof(postService));
         }
 
         public IActionResult Index(int page = 1)
         {
-            var postList = _sectionService.GetBlogPosts();
+            var postList = _postService.GetPosts();
 
             var paginateModel = new PaginateModel()
             {
@@ -44,7 +44,7 @@ namespace Ocuda.Ops.Controllers
             var viewModel = new PostListViewModel()
             {
                 PaginateModel = paginateModel,
-                SectionPosts = postList.Skip((page - 1) * paginateModel.ItemsPerPage)
+                Posts = postList.Skip((page - 1) * paginateModel.ItemsPerPage)
                                         .Take(paginateModel.ItemsPerPage)
             };
 
@@ -53,7 +53,7 @@ namespace Ocuda.Ops.Controllers
 
         public IActionResult AdminList(int page = 1)
         {
-            var postList = _sectionService.GetBlogPosts();
+            var postList = _postService.GetPosts();
 
             var paginateModel = new PaginateModel()
             {
@@ -74,7 +74,7 @@ namespace Ocuda.Ops.Controllers
             var viewModel = new AdminListViewModel()
             {
                 PaginateModel = paginateModel,
-                SectionPosts = postList.Skip((page - 1) * paginateModel.ItemsPerPage)
+                Posts = postList.Skip((page - 1) * paginateModel.ItemsPerPage)
                                         .Take(paginateModel.ItemsPerPage)
             };
 
@@ -98,7 +98,7 @@ namespace Ocuda.Ops.Controllers
             {
                 try
                 {
-                    var newPost = await _sectionService.CreateSectionPostAsync(model.SectionPost);
+                    var newPost = await _postService.CreatePostAsync(model.Post);
                     ShowAlertSuccess($"Added blog post: {newPost.Title}");
                     return RedirectToAction(nameof(AdminList));
                 }
@@ -118,7 +118,7 @@ namespace Ocuda.Ops.Controllers
             var viewModel = new AdminDetailViewModel()
             {
                 Action = nameof(AdminEdit),
-                SectionPost = _sectionService.GetSectionPostById(id)
+                Post = _postService.GetPostById(id)
             };
 
             return View("AdminDetail", viewModel);
@@ -131,7 +131,7 @@ namespace Ocuda.Ops.Controllers
             {
                 try
                 {
-                    var post = await _sectionService.EditSectionPostAsync(model.SectionPost);
+                    var post = await _postService.EditPostAsync(model.Post);
                     ShowAlertSuccess($"Updated blog post: {post.Title}");
                     return RedirectToAction(nameof(AdminList));
                 }
@@ -150,7 +150,7 @@ namespace Ocuda.Ops.Controllers
         {
             try
             {
-                await _sectionService.DeleteSectionPostAsync(model.SectionPost.Id);
+                await _postService.DeletePostAsync(model.Post.Id);
                 ShowAlertSuccess("Post deleted successfully.");
             }
             catch(Exception ex)

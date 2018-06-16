@@ -7,9 +7,9 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
 {
     public class IndexViewModel
     {
-        public IEnumerable<SectionPost> SectionPosts { get; set; }
-        public IEnumerable<SectionLink> SectionLinks { get; set; }
-        public IEnumerable<SectionFile> SectionFiles { get; set; }
-        public IEnumerable<SectionCalendar> SectionCalendars { get; set; }
+        public IEnumerable<Models.Post> Posts { get; set; }
+        public IEnumerable<Link> Links { get; set; }
+        public IEnumerable<File> Files { get; set; }
+        public IEnumerable<Calendar> Calendars { get; set; }
     }
 }
