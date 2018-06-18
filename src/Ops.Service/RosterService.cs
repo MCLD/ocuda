@@ -10,7 +10,6 @@ namespace Ops.Service
 {
     public class RosterService
     {
-
         public const string NameHeading = "Name";
         public const string EmployeeIdHeading = "ID";
         public const string PositionHeading = "Position #";
@@ -19,6 +18,7 @@ namespace Ops.Service
         public const string ReportsToPosHeading = "Reports to Position";
         public const string EmailHeading = "Email Address";
         public const string AsOfHeading = "As Of Date";
+
         public async Task UploadRosterAsync(string filename)
         {
             var rosterDetail = new RosterDetail
@@ -114,12 +114,88 @@ namespace Ops.Service
             }
             finally
             {
-                File.Delete(filePath);
+                System.IO.File.Delete(filePath);
             }
 
             // add rosterdetail
             // addrange rosterentries
             // save
+        }
+
+        public async Task<(RosterDetail RosterDetail, 
+                           IEnumerable<RosterEntry> NewEmployees, 
+                           IEnumerable<RosterEntry> RemovedEmployees)> GetRosterChangesAsync()
+        {
+            var detail = new RosterDetail()
+            {
+                CreatedAt = DateTime.Now,
+                CreatedBy = 1
+            };
+
+            var newEmployees = new List<RosterEntry>()
+            {
+                new RosterEntry
+                {
+                    Id = 1,
+                    Name = "Harry Potter",
+                    EmailAddress = "harry@hogwarts.edu",
+                    JobTitle = "Student",
+                    EmployeeId = 1,
+                },
+                new RosterEntry
+                {
+                    Id = 2,
+                    Name = "Hermione Granger",
+                    EmailAddress = "hermione@hogwarts.edu",
+                    JobTitle = "Student",
+                    EmployeeId = 2,
+                },
+                new RosterEntry
+                {
+                    Id = 3,
+                    Name = "Ron Weasley",
+                    EmailAddress = "ron@hogwarts.edu",
+                    JobTitle = "Student",
+                    EmployeeId = 3,
+                }
+            };
+
+            var removedEmployees = new List<RosterEntry>()
+            {
+                new RosterEntry
+                {
+                    Id = 4,
+                    Name = "Severus Snape",
+                    EmailAddress = "snape@hogwarts.edu",
+                    JobTitle = "Potions Master",
+                    EmployeeId = 4,
+                },
+                new RosterEntry
+                {
+                    Id = 5,
+                    Name = "Albus Dumbledore",
+                    EmailAddress = "dubledore@hogwarts.edu",
+                    JobTitle = "Headmaster",
+                    EmployeeId = 5,
+                },
+                new RosterEntry
+                {
+                    Id = 6,
+                    Name = "Tom Riddle",
+                    EmailAddress = "voldemort@hogwarts.edu",
+                    JobTitle = "Dark Lord Voldemort",
+                    EmployeeId = 6,
+                }
+            };
+
+            return (detail, newEmployees, removedEmployees);
+        }
+
+        public async Task<bool> ApproveRosterChanges(int rosterEntryId)
+        {
+            var serviceResult = true;
+
+            return serviceResult;
         }
     }
 }

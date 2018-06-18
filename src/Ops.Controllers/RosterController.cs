@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.ViewModels.Roster;
+using Ocuda.Ops.Models;
 using Ops.Service;
 
 namespace Ocuda.Ops.Controllers
@@ -12,10 +15,50 @@ namespace Ocuda.Ops.Controllers
     public class RosterController : Abstract.BaseController
     {
         private RosterService _rosterService;
-        public RosterController(RosterService rosterService)
+        private ILogger<RosterController> _logger;
+
+        public RosterController(RosterService rosterService, ILogger<RosterController> logger)
         {
             _rosterService = rosterService
                 ?? throw new ArgumentNullException(nameof(rosterService));
+            _logger = logger
+                ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        public async Task<IActionResult> Changes()
+        {
+            var rosterChanges = await _rosterService.GetRosterChangesAsync();
+
+            var viewModel = new RosterChangesViewModel
+            {
+                RosterDetail = rosterChanges.RosterDetail,
+                NewEmployees = rosterChanges.NewEmployees,
+                RemovedEmployees = rosterChanges.RemovedEmployees
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ApproveChange(int rosterId)
+        {
+            var result = false;
+            var message = string.Empty;
+
+            try
+            {
+                result = await _rosterService.ApproveRosterChanges(rosterId);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError("Error approving roster entry: ", ex);
+                message = "An error occured while trying to approve the change: " + ex.Message;
+            }
+            return Json(new
+            {
+                success = result,
+                message = message
+            });
         }
 
         public IActionResult Upload()
