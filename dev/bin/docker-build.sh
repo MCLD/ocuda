@@ -22,7 +22,7 @@ if [[ "$BRANCH" == "master" ]]; then
 elif [[ "$BRANCH" == "develop" ]]; then
   export TAG="develop";
 else
-  export TAG=$BRANCH;
+  export TAG=$COMMIT;
 fi
 
 if [ "$#" -gt 0 ]; then
