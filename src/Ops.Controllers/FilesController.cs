@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Files;
@@ -20,13 +18,13 @@ namespace Ocuda.Ops.Controllers
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         }
 
-        public IActionResult Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var fileList = _fileService.GetFiles();
+            var fileList = await _fileService.GetFilesAsync();
 
             var paginateModel = new PaginateModel()
             {
-                ItemCount = fileList.Count(),
+                ItemCount = await _fileService.GetFileCountAsync(),
                 CurrentPage = page,
                 ItemsPerPage = 2
             };
@@ -50,13 +48,13 @@ namespace Ocuda.Ops.Controllers
             return View(viewModel);
         }
 
-        public IActionResult AdminList(int page = 1)
+        public async Task<IActionResult> AdminList(int page = 1)
         {
-            var fileList = _fileService.GetFiles();
+            var fileList = await _fileService.GetFilesAsync();
 
             var paginateModel = new PaginateModel()
             {
-                ItemCount = fileList.Count(),
+                ItemCount = await _fileService.GetFileCountAsync(),
                 CurrentPage = page,
                 ItemsPerPage = 2
             };
@@ -111,12 +109,12 @@ namespace Ocuda.Ops.Controllers
             return View("AdminDetail", model);
         }
 
-        public IActionResult AdminEdit(int id)
+        public async Task<IActionResult> AdminEdit(int id)
         {
             var viewModel = new AdminDetailViewModel()
             {
                 Action = nameof(AdminEdit),
-                File = _fileService.GetFileById(id)
+                File = await _fileService.GetFileByIdAsync(id)
             };
 
             return View("AdminDetail", viewModel);

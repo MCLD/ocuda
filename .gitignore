@@ -247,3 +247,6 @@ src/Ops.Web/logs/*
 src/Promenade.Web/logs/*
 
 !dev/bin
+
+# Exclude migrations during development
+src/Ops.DataProvider.*/Migrations/

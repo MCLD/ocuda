@@ -1,58 +1,70 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using Ocuda.Ops.Data.Ops;
 using Ocuda.Ops.Models;
 
 namespace Ops.Service
 {
     public class FileService
     {
-        public IEnumerable<File> GetFiles()
+        private readonly InsertSampleDataService _insertSampleDataService;
+        private readonly FileRepository _fileRepository;
+
+        public FileService(InsertSampleDataService insertSampleDataService,
+            FileRepository fileRepository)
         {
-            return new List<File>
-            {
-                new File
-                {
-                    CreatedAt = DateTime.Parse("2018-05-01"),
-                    IsFeatured = true,
-                    FilePath = "/file.txt",
-                    Name = "Important File!",
-                    Icon = "fa-file-word alert-primary"
-                },
-                new File
-                {
-                    CreatedAt = DateTime.Parse("2018-06-04"),
-                    FilePath = "/file.txt",
-                    Name = "New File 2",
-                    Icon = "fa-file-excel alert-success"
-                },
-                new File
-                {
-                    CreatedAt = DateTime.Parse("2018-05-20"),
-                    FilePath = "/file.txt",
-                    Name = "New File 1",
-                    Icon = "fa-file-pdf alert-danger"
-                }
-            };
+            _insertSampleDataService = insertSampleDataService
+                ?? throw new ArgumentNullException(nameof(insertSampleDataService));
+            _fileRepository = fileRepository
+                ?? throw new ArgumentNullException(nameof(fileRepository));
         }
 
-        public File GetFileById(int id)
+        public async Task<int> GetFileCountAsync()
         {
-            return new File
-            {
-                Id = id,
-                CreatedAt = DateTime.Parse("2018-05-01"),
-                CreatedBy = 1,
-                IsFeatured = true,
-                FilePath = "/file.txt",
-                Name = "Important File!",
-                Icon = "fa-file-word alert-primary"
-            };
+            return await _fileRepository.CountAsync();
         }
 
+        public async Task<ICollection<File>> GetFilesAsync()
+        {
+            var files = await _fileRepository.ToListAsync(_ => _.Name);
+            if (files == null || files.Count == 0)
+            {
+                files = await _fileRepository.ToListAsync(_ => _.Name);
+            }
+            return files;
+        }
+
+        public async Task<File> GetFileByIdAsync(int id)
+        {
+            return await _fileRepository.FindAsync(id);
+        }
+
+        public async Task<File> CreateFileAsync(File file)
+        {
+            file.CreatedAt = DateTime.Now;
+            await _fileRepository.AddAsync(file);
+            await _fileRepository.SaveAsync();
+            return file;
+        }
+
+        public async Task<File> EditFileAsync(File file)
+        {
+            // get existing post and update properties that changed
+            // call edit method on existing post
+            _fileRepository.Update(file);
+            await _fileRepository.SaveAsync();
+            return file;
+        }
+
+        public async Task DeleteFileAsync(int id)
+        {
+            _fileRepository.Remove(id);
+            await _fileRepository.SaveAsync();
+        }
         public IEnumerable<FileCategory> GetFileCategories()
         {
+            // TODO repository/database
             return new List<FileCategory>
             {
                 new FileCategory
@@ -73,41 +85,16 @@ namespace Ops.Service
             };
         }
 
-        public FileCategory GetFileCategoryById(int id)
-        {
-            return new FileCategory
-            {
-                Id = id,
-                Name = $"Category {id}",
-            };
-        }
-
-        public async Task<File> CreateFileAsync(File file)
-        {
-            // call create method from repository
-            return file;
-        }
-
-        public async Task<File> EditFileAsync(File file)
-        {
-            // get existing item and update properties that changed
-            // call edit method on existing post
-            return file;
-        }
-
-        public async Task DeleteFileAsync(int id)
-        {
-            // call delete method from repository
-        }
-
         public async Task<FileCategory> CreateFileCategoryAsync(FileCategory fileCategory)
         {
+            // TODO repository/database
             // call create method from repository
             return fileCategory;
         }
 
         public async Task<FileCategory> EditFileCategoryAsync(FileCategory fileCategory)
         {
+            // TODO repository/database
             // get existing item and update properties that changed
             // call edit method on existing post
             return fileCategory;
@@ -115,7 +102,9 @@ namespace Ops.Service
 
         public async Task DeleteFileCategoryAsync(int id)
         {
+            // TODO repository/database
             // call delete method from repository
+            throw new NotImplementedException();
         }
     }
 }

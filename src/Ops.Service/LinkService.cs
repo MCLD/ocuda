@@ -1,53 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using Ocuda.Ops.Data.Ops;
 using Ocuda.Ops.Models;
 
 namespace Ops.Service
 {
     public class LinkService
     {
-        public IEnumerable<Link> GetLinks()
+        private readonly InsertSampleDataService _insertSampleDataService;
+        private readonly LinkRepository _linkRepository;
+
+        public LinkService(InsertSampleDataService insertSampleDataService,
+            LinkRepository linkRepository)
         {
-            return new List<Link>
-            {
-                new Link
-                {
-                    Id = 1,
-                    Url = "www.google.com",
-                    Name = "Summer Reading",
-                    IsFeatured = true
-                },
-                new Link
-                {
-                    Id = 2,
-                    Url = "#",
-                    Name = "Reading Adventure",
-                    IsFeatured = false
-                },
-                new Link
-                {
-                    Id = 3,
-                    Url = "#",
-                    Name = "Find Libraries",
-                    IsFeatured = false
-                }
-            };
+            _insertSampleDataService = insertSampleDataService
+                ?? throw new ArgumentNullException(nameof(insertSampleDataService));
+            _linkRepository = linkRepository
+                ?? throw new ArgumentNullException(nameof(linkRepository));
+        }
+        public async Task<int> GetLinkCountAsync()
+        {
+            return await _linkRepository.CountAsync();
         }
 
-        public Link GetLinkById(int id)
+        public async Task<ICollection<Link>> GetLinksAsync()
         {
-            return new Link
+            var links = await _linkRepository.ToListAsync(_ => _.Name);
+            if (links == null || links.Count == 0)
             {
-                Id = id,
-                Url = "#",
-                Name = $"Link {id}"
-            };
+                await _insertSampleDataService.InsertLinks();
+                links = await _linkRepository.ToListAsync(_ => _.Name);
+            }
+            return links;
+        }
+
+        public async Task<Link> GetLinkByIdAsync(int id)
+        {
+            return await _linkRepository.FindAsync(id);
         }
 
         public IEnumerable<LinkCategory> GetLinkCategories()
         {
+            // TODO repository/database
             return new List<LinkCategory>
             {
                 new LinkCategory
@@ -70,6 +65,7 @@ namespace Ops.Service
 
         public LinkCategory GetLinkCategoryById(int id)
         {
+            // TODO repository/database
             return new LinkCategory
             {
                 Id = id,
@@ -80,12 +76,14 @@ namespace Ops.Service
 
         public async Task<Link> CreateLinkAsync(Link link)
         {
+            // TODO repository/database
             // call create method from repository
             return link;
         }
 
         public async Task<Link> EditLinkAsync(Link link)
         {
+            // TODO repository/database
             // get existing item and update properties that changed
             // call edit method on existing post
             return link;
@@ -93,11 +91,14 @@ namespace Ops.Service
 
         public async Task DeleteLinkAsync(int id)
         {
+            // TODO repository/database
             // call delete method from repository
+            throw new NotImplementedException();
         }
 
         public async Task<LinkCategory> CreateLinkCategoryAsync(LinkCategory linkCategory)
         {
+            // TODO repository/database
             // call create method from repository
             return linkCategory;
         }
@@ -111,7 +112,9 @@ namespace Ops.Service
 
         public async Task DeleteLinkCategoryAsync(int id)
         {
+            // TODO repository/database
             // call delete method from repository
+            throw new NotImplementedException();
         }
     }
 }

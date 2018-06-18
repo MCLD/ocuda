@@ -61,8 +61,8 @@ namespace Ocuda.Ops.Web
                     string httpLogFile = rollingLogLocation + instance + "-" + httpErrorFileTag + "-{Date}.txt";
 
                     loggerConfig.WriteTo.Logger(_ => _
-                    .Filter.ByIncludingOnly(Matching.FromSource(ErrorControllerName))
-                    .WriteTo.RollingFile(httpLogFile));
+                        .Filter.ByIncludingOnly(Matching.FromSource(ErrorControllerName))
+                        .WriteTo.RollingFile(httpLogFile));
                 }
             }
 

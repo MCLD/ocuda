@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Post;
-using Ocuda.Ops.Models;
 using Ocuda.Utility.Models;
 using Ops.Service;
 using System.Linq;
@@ -21,13 +18,13 @@ namespace Ocuda.Ops.Controllers
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
         }
 
-        public IActionResult Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var postList = _postService.GetPosts();
+            var postList = await _postService.GetPostsAsync();
 
             var paginateModel = new PaginateModel()
             {
-                ItemCount = postList.Count(),
+                ItemCount = await _postService.GetPostCountAsync(),
                 CurrentPage = page,
                 ItemsPerPage = 2
             };
@@ -51,13 +48,13 @@ namespace Ocuda.Ops.Controllers
             return View(viewModel);
         }
 
-        public IActionResult AdminList(int page = 1)
+        public async Task<IActionResult> AdminList(int page = 1)
         {
-            var postList = _postService.GetPosts();
+            var postList = await _postService.GetPostsAsync();
 
             var paginateModel = new PaginateModel()
             {
-                ItemCount = postList.Count(),
+                ItemCount = await _postService.GetPostCountAsync(),
                 CurrentPage = page,
                 ItemsPerPage = 2
             };
@@ -102,7 +99,7 @@ namespace Ocuda.Ops.Controllers
                     ShowAlertSuccess($"Added blog post: {newPost.Title}");
                     return RedirectToAction(nameof(AdminList));
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     ShowAlertDanger("Unable to add blog post: ", ex.Message);
                 }
@@ -113,12 +110,12 @@ namespace Ocuda.Ops.Controllers
         }
 
 
-        public IActionResult AdminEdit(int id)
+        public async Task<IActionResult> AdminEdit(int id)
         {
             var viewModel = new AdminDetailViewModel()
             {
                 Action = nameof(AdminEdit),
-                Post = _postService.GetPostById(id)
+                Post = await _postService.GetPostByIdAsync(id)
             };
 
             return View("AdminDetail", viewModel);
@@ -153,7 +150,7 @@ namespace Ocuda.Ops.Controllers
                 await _postService.DeletePostAsync(model.Post.Id);
                 ShowAlertSuccess("Post deleted successfully.");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ShowAlertDanger("Unable to delete blog post: ", ex.Message);
             }
