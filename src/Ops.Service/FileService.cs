@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Ocuda.Ops.Data.Ops;
 using Ocuda.Ops.Models;
 
-namespace Ops.Service
+namespace Ocuda.Ops.Service
 {
     public class FileService
     {

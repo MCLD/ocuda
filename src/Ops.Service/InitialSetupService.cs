@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 
-namespace Ops.Service
+namespace Ocuda.Ops.Service
 {
     public class InitialSetupService
     {

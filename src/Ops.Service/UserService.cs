@@ -1,7 +1,7 @@
 ﻿using System;
 using Ocuda.Ops.Data.Ops;
 
-namespace Ops.Service
+namespace Ocuda.Ops.Service
 {
     public class UserService
     {
