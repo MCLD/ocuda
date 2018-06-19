@@ -80,6 +80,7 @@ namespace Ocuda.Ops.Web
             // services
             services.AddScoped<InitialSetupService>();
             services.AddScoped<InsertSampleDataService>();
+            services.AddScoped<RosterService>();
             services.AddScoped<SectionService>();
             services.AddScoped<FileService>();
             services.AddScoped<LinkService>();
