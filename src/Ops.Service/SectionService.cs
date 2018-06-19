@@ -67,5 +67,35 @@ namespace Ops.Service
                 }
             };
         }
+
+        public Section GetSectionById(int id)
+        {
+            return new Section
+            {
+                Id = id,
+                Icon = "fa-exclamation-triangle",
+                Name = "Security",
+                Path = null,
+                SortOrder = 9
+            };
+        }
+
+        public async Task<Section> CreateSectionAsync(Section section)
+        {
+            // call create method from repository
+            return section;
+        }
+
+        public async Task<Section> EditSectionAsync(Section section)
+        {
+            // get existing item and update properties that changed
+            // call edit method on existing post
+            return section;
+        }
+
+        public async Task DeleteSectionAsync(int id)
+        {
+            // call delete method from repository
+        }
     }
 }
