@@ -1,18 +1,18 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Ocuda.Ops.Data.Ops;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Service.Interfaces.Ops;
 
 namespace Ocuda.Ops.Service
 {
     public class SectionService
     {
         private readonly InsertSampleDataService _insertSampleDataService;
-        private readonly SectionRepository _sectionRepository;
+        private readonly ISectionRepository _sectionRepository;
         public SectionService(InsertSampleDataService insertSampleDataService,
-            SectionRepository sectionRepository)
+            ISectionRepository sectionRepository)
         {
             _insertSampleDataService = insertSampleDataService
                 ?? throw new ArgumentNullException(nameof(insertSampleDataService));

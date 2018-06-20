@@ -69,13 +69,13 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Controllers.Filter.OpsFilter>();
 
             // repositories
-            services.AddScoped<Data.Ops.FileRepository>();
-            services.AddScoped<Data.Ops.LinkRepository>();
-            services.AddScoped<Data.Ops.PageRepository>();
-            services.AddScoped<Data.Ops.PostRepository>();
-            services.AddScoped<Data.Ops.SectionRepository>();
-            services.AddScoped<Data.Ops.SiteSettingRepository>();
-            services.AddScoped<Data.Ops.UserRepository>();
+            services.AddScoped<Service.Interfaces.Ops.IFileRepository, Data.Ops.FileRepository>();
+            services.AddScoped<Service.Interfaces.Ops.ILinkRepository, Data.Ops.LinkRepository>();
+            services.AddScoped<Service.Interfaces.Ops.IPageRepository, Data.Ops.PageRepository>();
+            services.AddScoped<Service.Interfaces.Ops.IPostRepository, Data.Ops.PostRepository>();
+            services.AddScoped<Service.Interfaces.Ops.ISectionRepository, Data.Ops.SectionRepository>();
+            services.AddScoped<Service.Interfaces.Ops.ISiteSettingRepository, Data.Ops.SiteSettingRepository>();
+            services.AddScoped<Service.Interfaces.Ops.IUserRepository, Data.Ops.UserRepository>();
 
             // services
             services.AddScoped<InitialSetupService>();

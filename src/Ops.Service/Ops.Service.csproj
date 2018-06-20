@@ -7,11 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ExcelDataReader" Version="3.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.0-rc1-final" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ops.Data\Ops.Data.csproj" />
     <ProjectReference Include="..\Ops.Models\Ops.Models.csproj" />
     <ProjectReference Include="..\Promenade.Models\Promenade.Models.csproj" />
   </ItemGroup>

@@ -2,10 +2,12 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Service.Interfaces.Ops;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class SectionRepository : GenericRepository<Models.Section, int>
+    public class SectionRepository 
+        : GenericRepository<Models.Section, int>, ISectionRepository
     {
         public SectionRepository(OpsContext context, ILogger<SectionRepository> logger) 
             : base(context, logger)

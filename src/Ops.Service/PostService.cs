@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Ocuda.Ops.Data.Ops;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Service.Interfaces.Ops;
 
 namespace Ocuda.Ops.Service
 {
     public class PostService
     {
         private readonly InsertSampleDataService _insertSampleDataService;
-        private readonly PostRepository _postRepository;
+        private readonly IPostRepository _postRepository;
 
         public PostService(InsertSampleDataService insertSampleDataService,
-            PostRepository postRepository)
+            IPostRepository postRepository)
         {
             _postRepository = postRepository 
                 ?? throw new ArgumentNullException(nameof(postRepository));
