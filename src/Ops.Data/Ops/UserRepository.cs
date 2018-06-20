@@ -1,10 +1,12 @@
 ﻿using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Service.Interfaces.Ops;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class UserRepository : GenericRepository<Models.User, int>
+    public class UserRepository 
+        : GenericRepository<Models.User, int>, IUserRepository
     {
         public UserRepository(OpsContext context, ILogger<UserRepository> logger)
             : base(context, logger)

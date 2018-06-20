@@ -1,12 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Ocuda.Ops.Models
 {
-    public class User : Abstract.BaseEntity
+    public class User
     {
+        public int Id { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public int CreatedBy { get; set; }
+
         [Required]
         public string Username { get; set; }
         public bool IsSysadmin { get; set; }

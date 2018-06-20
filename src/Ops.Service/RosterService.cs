@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using ExcelDataReader;
 using Ocuda.Ops.Models;
 
-namespace Ops.Service
+namespace Ocuda.Ops.Service
 {
     public class RosterService
     {

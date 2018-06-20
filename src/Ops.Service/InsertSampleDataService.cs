@@ -1,30 +1,31 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Ocuda.Ops.Data.Ops;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Service.Interfaces.Ops;
 
-namespace Ops.Service
+namespace Ocuda.Ops.Service
 {
     public class InsertSampleDataService
     {
-        private readonly FileRepository _fileRepository;
-        private readonly LinkRepository _linkRepository;
-        private readonly PostRepository _postRepository;
-        private readonly SectionRepository _sectionRepository;
-        private readonly UserRepository _userRepository;
-        private readonly PageRepository _pageRepository;
-
-        public InsertSampleDataService(FileRepository fileRepository,
-            LinkRepository linkRepository,
-            PostRepository postRepository,
-            SectionRepository sectionRepository,
-            UserRepository userRepository,
-            PageRepository pageRepository)
+        private readonly IFileRepository _fileRepository;
+        private readonly ILinkRepository _linkRepository;
+        private readonly IPageRepository _pageRepository;
+        private readonly IPostRepository _postRepository;
+        private readonly ISectionRepository _sectionRepository;
+        private readonly IUserRepository _userRepository;
+        public InsertSampleDataService(IFileRepository fileRepository,
+            ILinkRepository linkRepository,
+            IPageRepository pageRepository,
+            IPostRepository postRepository,
+            ISectionRepository sectionRepository,
+            IUserRepository userRepository)
         {
             _fileRepository = fileRepository
                 ?? throw new ArgumentNullException(nameof(fileRepository));
             _linkRepository = linkRepository
                 ?? throw new ArgumentNullException(nameof(linkRepository));
+            _pageRepository = pageRepository
+                ?? throw new ArgumentNullException(nameof(pageRepository));
             _postRepository = postRepository
                 ?? throw new ArgumentNullException(nameof(postRepository));
             _sectionRepository = sectionRepository

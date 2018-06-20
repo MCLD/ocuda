@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Ocuda.Ops.Data.Ops;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Service.Interfaces.Ops;
 
-namespace Ops.Service
+namespace Ocuda.Ops.Service
 {
     public class LinkService
     {
         private readonly InsertSampleDataService _insertSampleDataService;
-        private readonly LinkRepository _linkRepository;
+        private readonly ILinkRepository _linkRepository;
 
         public LinkService(InsertSampleDataService insertSampleDataService,
-            LinkRepository linkRepository)
+            ILinkRepository linkRepository)
         {
             _insertSampleDataService = insertSampleDataService
                 ?? throw new ArgumentNullException(nameof(insertSampleDataService));

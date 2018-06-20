@@ -1,16 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Ocuda.Ops.Service</AssemblyName>
+    <RootNamespace>Ocuda.Ops.Service</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="ExcelDataReader" Version="3.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.*" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ops.Data\Ops.Data.csproj" />
     <ProjectReference Include="..\Ops.Models\Ops.Models.csproj" />
     <ProjectReference Include="..\Promenade.Models\Promenade.Models.csproj" />
   </ItemGroup>

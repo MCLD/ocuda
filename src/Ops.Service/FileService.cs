@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Ocuda.Ops.Data.Ops;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Service.Interfaces.Ops;
 
-namespace Ops.Service
+namespace Ocuda.Ops.Service
 {
     public class FileService
     {
         private readonly InsertSampleDataService _insertSampleDataService;
-        private readonly FileRepository _fileRepository;
+        private readonly IFileRepository _fileRepository;
 
         public FileService(InsertSampleDataService insertSampleDataService,
-            FileRepository fileRepository)
+            IFileRepository fileRepository)
         {
             _insertSampleDataService = insertSampleDataService
                 ?? throw new ArgumentNullException(nameof(insertSampleDataService));

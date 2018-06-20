@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
-using Ops.Service;
+using Ocuda.Ops.Service;
 
 namespace Ocuda.Ops.Controllers.Filter
 {
