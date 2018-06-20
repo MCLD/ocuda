@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
-using Ocuda.Ops.Controllers.ViewModels.Post;
+using Ocuda.Ops.Controllers.ViewModels.Posts;
 using Ocuda.Ops.Service;
 using Ocuda.Utility.Models;
 

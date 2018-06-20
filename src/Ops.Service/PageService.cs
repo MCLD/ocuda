@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Ocuda.Ops.Data.Ops;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Interfaces.Ops;
 
-namespace Ops.Service
+namespace Ocuda.Ops.Service
 {
     public class PageService
     {
         private readonly InsertSampleDataService _insertSampleDataService;
-        private PageRepository _pageRepository;
+        private IPageRepository _pageRepository;
 
-        public PageService(PageRepository pageRepository, InsertSampleDataService insertSampleDataService)
+        public PageService(IPageRepository pageRepository, InsertSampleDataService insertSampleDataService)
         {
             _pageRepository = pageRepository 
                 ?? throw new ArgumentNullException(nameof(pageRepository));

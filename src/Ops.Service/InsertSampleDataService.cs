@@ -9,11 +9,13 @@ namespace Ocuda.Ops.Service
     {
         private readonly IFileRepository _fileRepository;
         private readonly ILinkRepository _linkRepository;
+        private readonly IPageRepository _pageRepository;
         private readonly IPostRepository _postRepository;
         private readonly ISectionRepository _sectionRepository;
         private readonly IUserRepository _userRepository;
         public InsertSampleDataService(IFileRepository fileRepository,
             ILinkRepository linkRepository,
+            IPageRepository pageRepository,
             IPostRepository postRepository,
             ISectionRepository sectionRepository,
             IUserRepository userRepository)
@@ -22,6 +24,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(fileRepository));
             _linkRepository = linkRepository
                 ?? throw new ArgumentNullException(nameof(linkRepository));
+            _pageRepository = pageRepository
+                ?? throw new ArgumentNullException(nameof(pageRepository));
             _postRepository = postRepository
                 ?? throw new ArgumentNullException(nameof(postRepository));
             _sectionRepository = sectionRepository
