@@ -1,0 +1,52 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Files.DetailViewModel
+
+<form asp-action="@Model.Action" method="post" role="form" enctype="multipart/form-data">
+    <input asp-for="File.Name" formgroup />
+    <input asp-for="File.Description" formgroup />
+
+    @if (Model.Action == nameof(FilesController.Edit))
+    {
+    <div class="form-group row">
+        <label class="col-md-3 col-form-label text-md-right">Current File</label>
+        <div class="col-md-9">
+            <a class="form-vertical-alignment" asp-action="#" target="_blank">@Model.File.Name</a>
+        </div>
+    </div>
+    }
+
+    <div class="form-group row">
+        <label asp-for="File" class="col-md-3 col-form-label text-md-right">Upload a File</label>
+        <div class="col-md-9">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <label class="btn btn-outline-secondary btn-file form-control">
+                        <span class="far fa-file"></span> Select a File
+                        <input type="file" asp-for="File" hidden />
+                    </label>
+                </div>
+                <div class="custom-file">
+                    <input type="text" asp-for="File.FilePath" class="form-control" readonly id="selectedFile" />
+                </div>
+            </div>
+            <div>
+                <span asp-validation-for="File" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <select class="w-auto" asp-for="File.IsFeatured" formgroup>
+        <option value="false">No</option>
+        <option value="true">Yes</option>
+    </select>
+
+    <div class="row">
+        <div class="offset-md-3 col-md-9">
+            <a class="btn btn-outline-secondary text-dark" asp-action="Index">Cancel</a>
+            <button type="submit" class="btn btn-success btn-spinner" aria-label="Confirm">
+                <span class="fa fa-save" aria-hidden="true"></span>
+                Save
+                <span class="fa fa-spinner fa-pulse fa-fw d-none"></span>
+            </button>
+        </div>
+    </div>
+</form>

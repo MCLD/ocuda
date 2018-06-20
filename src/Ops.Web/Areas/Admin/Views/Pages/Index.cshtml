@@ -1,0 +1,88 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages.IndexViewModel
+
+<form asp-controller="Pages" asp-action="Delete" method="post" role="form">
+    <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
+    <input id="deleteName" asp-for="Page.Title" type="hidden" />
+    <input id="deleteId" asp-for="Page.Id" type="hidden" />
+    <div modal id="deleteModal" name="Post" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+</form>
+
+<div class="mb-2">
+    <a class="btn btn-outline-secondary text-dark" asp-action="Create">Create Page</a>
+</div>
+
+@if (Model.Pages.Count() == 0)
+{
+    <div class="alert alert-warning">No Pages Found</div>
+
+}
+else
+{
+    <table class="table table-sm table-bordered link-table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Date</th>
+                <th>Draft</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ocPage in Model.Pages)
+            {
+            <tr>
+                <td class="rowlink-parent">
+                    <a asp-action="Edit" asp-route-id="@ocPage.Id" class="rowlink">
+                        @ocPage.Title
+                    </a>
+                </td>
+                <td>@ocPage.CreatedBy</td>
+                <td>@ocPage.CreatedAt</td>
+                <td>@ocPage.IsDraft</td>
+                <td align="center" class="on-top">
+                    <button type="button"
+                            class="btn btn-danger btn-xs"
+                            data-toggle="modal"
+                            data-target="#deleteModal"
+                            data-id="@ocPage.Id"
+                            data-title="@ocPage.Title">
+                        <span class="fa fa-times" aria-hidden="true"></span>
+                    </button>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (Model.PaginateModel.MaxPage > 1)
+    {
+        <paginate paginateModel="@Model.PaginateModel"></paginate>
+    }
+}
+
+@section scripts
+    {
+    <script>
+        $(document).ready(function () {
+            $('.rowlink-parent').each(function () {
+                $(this).children('a.rowlink').height($(this).height() + 12);
+            });
+        });
+        $(window).resize(function () {
+            $('.rowlink-parent').each(function () {
+                $(this).children('a.rowlink').height($(this).height() + 12);
+            });
+        });
+
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var title = button.data("title");
+            var modal = $(this);
+            $("#deleteName").val(title);
+            $("#deleteId").val(id);
+            modal.find(".modal-text").text(" Are you sure you want to delete \"" + title + "\"?");
+        });
+    </script>
+}
