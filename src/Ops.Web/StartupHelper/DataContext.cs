@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -37,7 +38,7 @@ namespace Ocuda.Ops.Web.StartupHelper
 
                 // verify initial setup data is accurate
                 var initialSetup = scope.ServiceProvider.GetRequiredService<InitialSetupService>();
-                initialSetup.VerifyInitialSetup();
+                Task.Run(() => initialSetup.VerifyInitialSetupAsync()).Wait();
             }
 
         }

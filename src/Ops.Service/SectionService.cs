@@ -21,30 +21,37 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
         }
 
+        /// <summary>
+        /// Ensure the default section exists.
+        /// </summary>
+        public async Task EnsureDefaultSectionAsync(int sysadminId)
+        {
+            var defaultSection = await _sectionRepository.GetDefaultSectionAsync();
+            if (defaultSection == null)
+            {
+                await _sectionRepository.AddAsync(new Ocuda.Ops.Models.Section
+                {
+                    Name = "Default Section",
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = sysadminId,
+                    SortOrder = 0
+                });
+                await _sectionRepository.SaveAsync();
+            }
+        }
+
         public async Task<IEnumerable<Section>> GetNavigationAsync()
         {
             var sections = await _sectionRepository
                 .ToListAsync(_ => _.SortOrder);
-            if (sections == null || sections.Count == 0)
-            {
-                await _insertSampleDataService.InsertSections();
-                sections = await _sectionRepository.ToListAsync(_ => _.SortOrder);
-            }
-
-            return sections.Where(_ => !string.IsNullOrEmpty(_.Path));
+            
+            return sections.Where(_ => !string.IsNullOrEmpty(_.Icon));
         }
 
         public async Task<IEnumerable<Section>> GetSectionsAsync()
         {
-            var sections = await _sectionRepository
+            return await _sectionRepository
                 .ToListAsync(_ => _.SortOrder);
-            if (sections == null || sections.Count == 0)
-            {
-                await _insertSampleDataService.InsertSections();
-                sections = await _sectionRepository.ToListAsync(_ => _.SortOrder);
-            }
-
-            return sections;
         }
 
         public async Task<int> GetSectionCountAsync()

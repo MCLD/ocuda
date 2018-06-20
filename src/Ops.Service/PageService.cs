@@ -28,15 +28,7 @@ namespace Ocuda.Ops.Service
         public async Task<ICollection<Page>> GetPagesAsync(int skip = 0, int take = 5)
         {
             // TODO modify this to do descending (most recent first)
-            var pages = await _pageRepository.ToListAsync(skip, take, _ => _.CreatedAt);
-
-            if(pages == null || pages.Count == 0)
-            {
-                await _insertSampleDataService.InsertPagesAsync();
-                pages = await _pageRepository.ToListAsync(skip, take, _ => _.CreatedAt);
-            }
-
-            return pages;
+            return await _pageRepository.ToListAsync(skip, take, _ => _.CreatedAt);
         }
 
         public async Task<Page> GetPageByIdAsync(int id)

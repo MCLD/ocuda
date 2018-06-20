@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops;
+using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Service
 {
@@ -21,6 +23,16 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(insertSampleDataService));
         }
 
+        public async Task<DataWithCount<ICollection<Post>>> GetPaginatedListAsync(BaseFilter filter)
+        {
+            return new DataWithCount<ICollection<Post>>
+            {
+                Count = await _postRepository.CountAsync(),
+                Data = await _postRepository.ToListAsync(filter.Skip.Value, filter.Take.Value,
+                _ => _.IsPinned == false, _ => _.CreatedAt)
+            };
+        }
+ 
         public async Task<int> GetPostCountAsync()
         {
             return await _postRepository.CountAsync();
@@ -29,15 +41,7 @@ namespace Ocuda.Ops.Service
         public async Task<ICollection<Post>> GetPostsAsync(int skip = 0, int take = 5)
         {
             // TODO modify this to do descending (most recent first)
-            var posts = await _postRepository.ToListAsync(skip, take, _ => _.CreatedAt);
-
-            if (posts == null || posts.Count == 0)
-            {
-                await _insertSampleDataService.InsertPostsAsync();
-                posts = await _postRepository.ToListAsync(skip, take, _ => _.CreatedAt);
-            }
-
-            return posts;
+            return await _postRepository.ToListAsync(skip, take, _ => _.CreatedAt);
         }
 
         public async Task<Post> GetPostByIdAsync(int id)

@@ -5,6 +5,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops
 {
     public interface ISectionRepository : IRepository<Section, int>
     {
-        Task<Models.Section> GetDefaultSectionAsync();
+        Task<Section> GetDefaultSectionAsync();
     }
 }

@@ -26,13 +26,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<ICollection<Link>> GetLinksAsync()
         {
-            var links = await _linkRepository.ToListAsync(_ => _.Name);
-            if (links == null || links.Count == 0)
-            {
-                await _insertSampleDataService.InsertLinks();
-                links = await _linkRepository.ToListAsync(_ => _.Name);
-            }
-            return links;
+            return await _linkRepository.ToListAsync(_ => _.Name);
         }
 
         public async Task<Link> GetLinkByIdAsync(int id)
