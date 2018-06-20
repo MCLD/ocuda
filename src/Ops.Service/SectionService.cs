@@ -34,6 +34,24 @@ namespace Ops.Service
             return sections.Where(_ => !string.IsNullOrEmpty(_.Path));
         }
 
+        public async Task<IEnumerable<Section>> GetSectionsAsync()
+        {
+            var sections = await _sectionRepository
+                .ToListAsync(_ => _.SortOrder);
+            if (sections == null || sections.Count == 0)
+            {
+                await _insertSampleDataService.InsertSections();
+                sections = await _sectionRepository.ToListAsync(_ => _.SortOrder);
+            }
+
+            return sections;
+        }
+
+        public async Task<int> GetSectionCountAsync()
+        {
+            return await _sectionRepository.CountAsync();
+        }
+
         public IEnumerable<Calendar> GetCalendars()
         {            
             // TODO repository/database
@@ -68,34 +86,33 @@ namespace Ops.Service
             };
         }
 
-        public Section GetSectionById(int id)
+        public async Task<Section> GetSectionByIdAsync(int id)
         {
-            return new Section
-            {
-                Id = id,
-                Icon = "fa-exclamation-triangle",
-                Name = "Security",
-                Path = null,
-                SortOrder = 9
-            };
+            return await _sectionRepository.FindAsync(id);
         }
 
         public async Task<Section> CreateSectionAsync(Section section)
         {
-            // call create method from repository
+            section.CreatedAt = DateTime.Now;
+            await _sectionRepository.AddAsync(section);
+            await _sectionRepository.SaveAsync();
+
             return section;
         }
 
         public async Task<Section> EditSectionAsync(Section section)
         {
-            // get existing item and update properties that changed
-            // call edit method on existing post
+            //TODO fix edit logic
+            var currentSection = await _sectionRepository.FindAsync(section.Id);
+            currentSection.Name = section.Name;
+            _sectionRepository.Update(currentSection);
             return section;
         }
 
         public async Task DeleteSectionAsync(int id)
         {
-            // call delete method from repository
+            _sectionRepository.Remove(id);
+            await _sectionRepository.SaveAsync();
         }
     }
 }

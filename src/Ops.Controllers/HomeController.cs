@@ -31,11 +31,18 @@ namespace Ocuda.Ops.Controllers
 
         public async Task<IActionResult> Index()
         {
+            var postList = await _postService.GetPostsAsync();
+
+            foreach (var post in postList)
+            {
+                post.Content = CommonMark.CommonMarkConverter.Convert(post.Content);
+            }
+
             var viewModel = new IndexViewModel
             {
                 Files = await _fileService.GetFilesAsync(),
                 Links = await _linkService.GetLinksAsync(),
-                Posts = await _postService.GetPostsAsync(),
+                Posts = postList,
                 Calendars = _sectionService.GetCalendars()
             };
 

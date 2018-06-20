@@ -4,29 +4,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Ocuda.Ops.Controllers.ViewModels.Section;
+using Ocuda.Ops.Controllers.ViewModels.Sections;
 using Ocuda.Utility.Models;
 using Ops.Service;
 
 namespace Ocuda.Ops.Controllers
 {
-    public class SectionController : Abstract.BaseController
+    public class SectionsController : Abstract.BaseController
     {
         private readonly SectionService _sectionService;
 
-        public SectionController(SectionService sectionService)
+        public SectionsController(SectionService sectionService)
         {
             _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(sectionService));
         }
 
-        public IActionResult Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var sectionList = _sectionService.GetAll();
+            var sectionList = await _sectionService.GetSectionsAsync();
 
             var paginateModel = new PaginateModel()
             {
-                ItemCount = sectionList.Count(),
+                ItemCount = await _sectionService.GetSectionCountAsync(),
                 CurrentPage = page,
                 ItemsPerPage = 2
             };
@@ -41,6 +41,36 @@ namespace Ocuda.Ops.Controllers
             }
 
             var viewModel = new SectionListViewModel
+            {
+                PaginateModel = paginateModel,
+                Sections = sectionList.Skip((page - 1) * paginateModel.ItemsPerPage)
+                                                .Take(paginateModel.ItemsPerPage)
+            };
+
+            return View(viewModel);
+        }
+
+        public async Task<IActionResult> AdminList(int page = 1)
+        {
+            var sectionList = await _sectionService.GetSectionsAsync();
+
+            var paginateModel = new PaginateModel()
+            {
+                ItemCount = await _sectionService.GetSectionCountAsync(),
+                CurrentPage = page,
+                ItemsPerPage = 2
+            };
+
+            if (paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
+            {
+                return RedirectToRoute(
+                    new
+                    {
+                        page = paginateModel.LastPage ?? 1
+                    });
+            }
+
+            var viewModel = new AdminListViewModel
             {
                 PaginateModel = paginateModel,
                 Sections = sectionList.Skip((page - 1) * paginateModel.ItemsPerPage)
@@ -70,7 +100,7 @@ namespace Ocuda.Ops.Controllers
                 {
                     var newSection = await _sectionService.CreateSectionAsync(model.Section);
                     ShowAlertSuccess($"Added section: {newSection.Name}");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(AdminList));
                 }
                 catch(Exception ex)
                 {
@@ -82,12 +112,12 @@ namespace Ocuda.Ops.Controllers
             return View("AdminDetail", model);
         }
 
-        public IActionResult AdminEdit(int id)
+        public async Task<IActionResult> AdminEdit(int id)
         {
             var viewModel = new AdminDetailViewModel
             {
                 Action = nameof(AdminEdit),
-                Section = _sectionService.GetSectionById(id),
+                Section = await _sectionService.GetSectionByIdAsync(id),
             };
 
             viewModel.IsReadonly = 
@@ -105,7 +135,7 @@ namespace Ocuda.Ops.Controllers
                 {
                     var section = await _sectionService.EditSectionAsync(model.Section);
                     ShowAlertSuccess($"Updated section: {section.Name}");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(AdminList));
                 }
                 catch(Exception ex)
                 {
@@ -118,7 +148,7 @@ namespace Ocuda.Ops.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AdminDelete(SectionListViewModel model)
+        public async Task<IActionResult> AdminDelete(AdminListViewModel model)
         {
             try
             {
@@ -130,7 +160,7 @@ namespace Ocuda.Ops.Controllers
                 ShowAlertDanger("Unable to delete section: ", ex.Message);
             }
 
-            return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
+            return RedirectToAction(nameof(AdminList), new { page = model.PaginateModel.CurrentPage });
         }
     }
 }

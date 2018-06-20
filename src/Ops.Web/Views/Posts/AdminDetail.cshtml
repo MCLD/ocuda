@@ -1,4 +1,4 @@
-﻿@model Ocuda.Ops.Controllers.ViewModels.Post.AdminDetailViewModel
+﻿@model Ocuda.Ops.Controllers.ViewModels.Posts.AdminDetailViewModel
 
 @section styles
     {
@@ -7,7 +7,7 @@
 
     <form asp-action="@Model.Action" method="post" role="form">
         <input asp-for="Post.Title" formgroup />
-        <input asp-for="Post.Stub" formgroup readonly="@(Model.Action == nameof(PostController.AdminEdit) ? "readonly" : null)" />
+        <input asp-for="Post.Stub" formgroup readonly="@(Model.Action == nameof(PostsController.AdminEdit) ? "readonly" : null)" />
 
         <div class="form-group row">
             <label asp-for="Post.Content" class="col-md-3 col-form-label text-md-right"></label>
@@ -63,16 +63,22 @@
         var editor = new Markdown.Editor({ allowUploads: true });
         editor.run();
 
-        $('#Post_Title').on("keyup", function () {
-            // From https://gist.github.com/mathewbyrne/1280286
-            var slug = $(this).val().toLowerCase()
-                .replace(/\s+/g, '-')
-                .replace(/&/g, '-and-')
-                .replace(/[^\w\-]+/g, '')
-                .replace(/\-\-+/g, '-')
-                .replace(/^-+/, '')
-                .replace(/-+$/, '');
-            $('#Post_Stub').val(slug);
-        });
+        @if(Model.Action == nameof(PostsController.AdminCreate))
+        {
+            <text>
+                $('#Post_Title').on("keyup", function () {
+                    // From https://gist.github.com/mathewbyrne/1280286
+                    var slug = $(this).val().toLowerCase()
+                        .replace(/\s+/g, '-')
+                        .replace(/&/g, '-and-')
+                        .replace(/[^\w\-]+/g, '')
+                        .replace(/\-\-+/g, '-')
+                        .replace(/^-+/, '')
+                        .replace(/-+$/, '');
+                    $('#Post_Stub').val(slug);
+                });
+            </text>
+        }
+
     </script>
 }

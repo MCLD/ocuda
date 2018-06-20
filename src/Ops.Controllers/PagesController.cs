@@ -1,30 +1,31 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Ocuda.Ops.Controllers.Abstract;
-using Ocuda.Ops.Controllers.ViewModels.Post;
+using Ocuda.Ops.Controllers.ViewModels.Pages;
 using Ocuda.Utility.Models;
 using Ops.Service;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Ocuda.Ops.Controllers
 {
-    public class PostController : BaseController
+    public class PagesController : Abstract.BaseController
     {
-        private readonly PostService _postService;
-
-        public PostController(PostService postService)
+        private readonly PageService _pageService;
+        
+        public PagesController(PageService pageService)
         {
-            _postService = postService ?? throw new ArgumentNullException(nameof(postService));
+            _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
         }
 
         public async Task<IActionResult> Index(int page = 1)
         {
-            var postList = await _postService.GetPostsAsync();
+            var pageList = await _pageService.GetPagesAsync();
 
-            var paginateModel = new PaginateModel()
+            var paginateModel = new PaginateModel
             {
-                ItemCount = await _postService.GetPostCountAsync(),
+                ItemCount = await _pageService.GetPageCountAsync(),
                 CurrentPage = page,
                 ItemsPerPage = 2
             };
@@ -38,23 +39,33 @@ namespace Ocuda.Ops.Controllers
                     });
             }
 
-            var viewModel = new PostListViewModel()
+            var viewModel = new PageListViewModel
             {
                 PaginateModel = paginateModel,
-                Posts = postList.Skip((page - 1) * paginateModel.ItemsPerPage)
-                                        .Take(paginateModel.ItemsPerPage)
+                Pages = pageList.Skip((page - 1) * paginateModel.ItemsPerPage)
+                                .Take(paginateModel.ItemsPerPage)
             };
 
             return View(viewModel);
         }
 
+        //TODO use stub instead of id
+        public async Task<IActionResult> View(int id)
+        {
+            var page = await _pageService.GetPageByIdAsync(id);
+
+            page.Content = CommonMark.CommonMarkConverter.Convert(page.Content);
+
+            return View(page);
+        }
+
         public async Task<IActionResult> AdminList(int page = 1)
         {
-            var postList = await _postService.GetPostsAsync();
+            var pageList = await _pageService.GetPagesAsync();
 
-            var paginateModel = new PaginateModel()
+            var paginateModel = new PaginateModel
             {
-                ItemCount = await _postService.GetPostCountAsync(),
+                ItemCount = await _pageService.GetPageCountAsync(),
                 CurrentPage = page,
                 ItemsPerPage = 2
             };
@@ -68,11 +79,11 @@ namespace Ocuda.Ops.Controllers
                     });
             }
 
-            var viewModel = new AdminListViewModel()
+            var viewModel = new AdminListViewModel
             {
                 PaginateModel = paginateModel,
-                Posts = postList.Skip((page - 1) * paginateModel.ItemsPerPage)
-                                        .Take(paginateModel.ItemsPerPage)
+                Pages = pageList.Skip((page - 1) * paginateModel.ItemsPerPage)
+                                .Take(paginateModel.ItemsPerPage)
             };
 
             return View(viewModel);
@@ -80,7 +91,7 @@ namespace Ocuda.Ops.Controllers
 
         public IActionResult AdminCreate()
         {
-            var viewModel = new AdminDetailViewModel()
+            var viewModel = new AdminDetailViewModel
             {
                 Action = nameof(AdminCreate)
             };
@@ -91,17 +102,20 @@ namespace Ocuda.Ops.Controllers
         [HttpPost]
         public async Task<IActionResult> AdminCreate(AdminDetailViewModel model)
         {
+            model.Page.SectionId = 1; //TODO: Fix SectionId, CreatedBy
+            model.Page.CreatedBy = 1;
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var newPost = await _postService.CreatePostAsync(model.Post);
-                    ShowAlertSuccess($"Added blog post: {newPost.Title}");
+                    var newPage = await _pageService.CreatePageAsync(model.Page);
+                    ShowAlertSuccess($"Added page: {newPage.Title}");
                     return RedirectToAction(nameof(AdminList));
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
-                    ShowAlertDanger("Unable to add blog post: ", ex.Message);
+                    ShowAlertDanger("Unable to add page: ", ex.Message);
                 }
             }
 
@@ -109,13 +123,12 @@ namespace Ocuda.Ops.Controllers
             return View("AdminDetail", model);
         }
 
-
         public async Task<IActionResult> AdminEdit(int id)
         {
-            var viewModel = new AdminDetailViewModel()
+            var viewModel = new AdminDetailViewModel
             {
                 Action = nameof(AdminEdit),
-                Post = await _postService.GetPostByIdAsync(id)
+                Page = await _pageService.GetPageByIdAsync(id)
             };
 
             return View("AdminDetail", viewModel);
@@ -128,13 +141,14 @@ namespace Ocuda.Ops.Controllers
             {
                 try
                 {
-                    var post = await _postService.EditPostAsync(model.Post);
-                    ShowAlertSuccess($"Updated blog post: {post.Title}");
+                    model.Page.SectionId = 1; //TODO: Use actual SectionId
+                    var page = await _pageService.EditPageAsync(model.Page);
+                    ShowAlertSuccess($"Updated page: {page.Title}");
                     return RedirectToAction(nameof(AdminList));
                 }
                 catch (Exception ex)
                 {
-                    ShowAlertDanger("Unable to update blog post: ", ex.Message);
+                    ShowAlertDanger("Unable to update page: ", ex.Message);
                 }
             }
 
@@ -147,12 +161,12 @@ namespace Ocuda.Ops.Controllers
         {
             try
             {
-                await _postService.DeletePostAsync(model.Post.Id);
-                ShowAlertSuccess("Post deleted successfully.");
+                await _pageService.DeletePageAsync(model.Page.Id);
+                ShowAlertSuccess("Page deleted successfully.");
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                ShowAlertDanger("Unable to delete blog post: ", ex.Message);
+                ShowAlertDanger("Unable to delete page: ", ex.Message);
             }
 
             return RedirectToAction(nameof(AdminList), new { page = model.PaginateModel.CurrentPage });

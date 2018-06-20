@@ -12,11 +12,14 @@ namespace Ops.Service
         private readonly PostRepository _postRepository;
         private readonly SectionRepository _sectionRepository;
         private readonly UserRepository _userRepository;
+        private readonly PageRepository _pageRepository;
+
         public InsertSampleDataService(FileRepository fileRepository,
             LinkRepository linkRepository,
             PostRepository postRepository,
             SectionRepository sectionRepository,
-            UserRepository userRepository)
+            UserRepository userRepository,
+            PageRepository pageRepository)
         {
             _fileRepository = fileRepository
                 ?? throw new ArgumentNullException(nameof(fileRepository));
@@ -28,6 +31,8 @@ namespace Ops.Service
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
             _userRepository = userRepository
                 ?? throw new ArgumentNullException(nameof(userRepository));
+            _pageRepository = pageRepository
+                ?? throw new ArgumentNullException(nameof(pageRepository));
         }
 
         private User _systemAdministrator;
@@ -177,7 +182,7 @@ namespace Ops.Service
 
         public async Task InsertSections()
         {
-            await GetDefaultSectionAsync();
+            await _sectionRepository.AddAsync(await GetDefaultSectionAsync());
 
             // insert some seed data
             await _sectionRepository.AddAsync(new Section
@@ -227,6 +232,51 @@ namespace Ops.Service
             });
 
             await _sectionRepository.SaveAsync();
+        }
+
+        public async Task InsertPagesAsync()
+        {
+            var defaultSection = await GetDefaultSectionAsync();
+
+            // seed data
+            await _pageRepository.AddAsync(new Page
+            {
+                Content = "Nam dignissim porta leo vitae sodales. Morbi mollis, libero vitae sagittis tincidunt, mi dui luctus metus, elementum tincidunt nisl nisl at elit. Nulla tellus elit, aliquam in pulvinar id, interdum in velit. Suspendisse non aliquam dolor, vestibulum lacinia est. Pellentesque placerat nibh blandit, gravida nulla sed, tristique nisi. Nunc volutpat ultrices augue et congue. In in lacus condimentum dui finibus sagittis nec ut neque. Aenean accumsan nisl quis convallis rutrum. Cras vel imperdiet est. Curabitur et sagittis dui.",
+                CreatedAt = DateTime.Parse("2018-06-04 15:00"),
+                CreatedBy = SystemAdministrator.Id,
+                Title = "Test Page 3",
+                Stub = "test-page-3",
+                SectionId = defaultSection.Id
+            });
+            await _pageRepository.AddAsync(new Page
+            {
+                Content = "Ut auctor risus diam, sed aliquam quam iaculis ac. Sed rutrum tortor eget ante consequat, ac malesuada ligula dictum. Phasellus non urna interdum, vehicula augue ac, egestas orci. Sed ut nisl ipsum. Donec hendrerit, nisl vitae interdum pretium, ligula lorem varius nisi, non cursus libero libero eu dolor. Fusce bibendum, lorem sed tempor condimentum, enim ante sollicitudin dolor, faucibus viverra quam erat ac neque. Integer sagittis magna eu augue eleifend, at pellentesque diam malesuada.",
+                CreatedAt = DateTime.Parse("2018-06-04 17:25"),
+                CreatedBy = SystemAdministrator.Id,
+                Title = "Test Page 4",
+                Stub = "test-page-4",
+                SectionId = defaultSection.Id
+            });
+            await _pageRepository.AddAsync(new Page
+            {
+                Content = "Pellentesque sit amet risus eu lorem elementum porttitor. Ut pretium facilisis finibus. Suspendisse potenti. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Duis vestibulum tortor blandit, imperdiet sem et, venenatis lectus. Sed id metus magna. Etiam vel congue sapien, nec blandit lectus. Etiam feugiat est ornare quam sollicitudin, et luctus neque efficitur. Nullam quis pretium ipsum. Pellentesque eleifend quam vitae laoreet varius. Integer fringilla velit in metus finibus, a aliquet lectus tincidunt. Pellentesque varius eleifend est, id maximus nunc tristique ac.",
+                CreatedAt = DateTime.Parse("2018-06-04 13:30"),
+                CreatedBy = SystemAdministrator.Id,
+                Title = "Test Page 2",
+                Stub = "test-page-2",
+                SectionId = defaultSection.Id
+            });
+            await _pageRepository.AddAsync(new Page
+            {
+                Content = "Sed semper, sapien quis luctus semper, nibh eros sollicitudin tellus, at tincidunt arcu odio a est. Nam nec nulla ex. Nullam et maximus ex, at porttitor velit. Sed ac justo ligula. Morbi sed lectus turpis. Aenean suscipit tellus nec risus aliquam, et dignissim urna mollis. Aliquam erat volutpat. Curabitur risus tellus, facilisis a tempus eu, hendrerit ut elit. Phasellus ut quam consequat, molestie mauris non, faucibus felis. Pellentesque finibus lobortis arcu, a tincidunt erat pulvinar vel. Proin in egestas magna, nec feugiat velit.",
+                CreatedAt = DateTime.Parse("2018-06-04 12:15"),
+                CreatedBy = SystemAdministrator.Id,
+                Title = "Test Page 1",
+                Stub = "test-page-1",
+                SectionId = defaultSection.Id
+            });
+
+            await _pageRepository.SaveAsync();
         }
     }
 }

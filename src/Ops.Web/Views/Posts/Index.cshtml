@@ -1,4 +1,4 @@
-﻿@model Ocuda.Ops.Controllers.ViewModels.Post.PostListViewModel
+﻿@model Ocuda.Ops.Controllers.ViewModels.Posts.PostListViewModel
 
 <div class="oc-blog">
     @foreach (var post in Model.Posts)
@@ -18,7 +18,7 @@
                 </div>
             }
             <div class="card-body">
-                @post.Content
+                @Html.Raw(post.Content)
             </div>
             <div class="card-footer d-flex">
                 <div class="flex-grow-1">Posted by <a href="#">@post.CreatedBy</a></div>

@@ -20,7 +20,7 @@
                     </div>
                 }
                 <div class="card-body">
-                    @post.Content
+                    @Html.Raw(post.Content)
                 </div>
                 <div class="card-footer d-flex">
                     <div class="flex-grow-1">Posted by <a href="#">@post.CreatedBy</a></div>
