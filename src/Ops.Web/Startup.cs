@@ -129,6 +129,19 @@ namespace Ocuda.Ops.Web
             {
                 routes.MapRoute(
                     name: null,
+                    template: "{area:exists}/{section}/{controller}/{action}/{id?}",
+                    defaults: new { controller = "Home", action = "Index" },
+                    constraints: new
+                    {
+                        section = new SectionRouteConstraint()
+                    });
+
+                routes.MapRoute(
+                    name: null,
+                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+                routes.MapRoute(
+                    name: null,
                     template: "{section}/{controller}/{action}/{id?}",
                     defaults: new { controller = "Home", action = "Index" },
                     constraints: new
@@ -136,7 +149,7 @@ namespace Ocuda.Ops.Web
                         section = new SectionRouteConstraint()
                     });
                 routes.MapRoute(
-                    name: "default",
+                    name: null,
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
         }

@@ -183,7 +183,7 @@ namespace Ocuda.Ops.Service
 
         public async Task InsertSections()
         {
-            await _sectionRepository.AddAsync(await GetDefaultSectionAsync());
+            await GetDefaultSectionAsync();
 
             // insert some seed data
             await _sectionRepository.AddAsync(new Section
