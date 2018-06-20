@@ -95,6 +95,7 @@ namespace Ocuda.Ops.Controllers
             {
                 try
                 {
+                    model.File.SectionId = 1; //TODO: Use actual SectionId
                     var newFile = await _fileService.CreateFileAsync(model.File);
                     ShowAlertSuccess($"Added file: {newFile.Name}");
                     return RedirectToAction(nameof(AdminList));
@@ -127,6 +128,7 @@ namespace Ocuda.Ops.Controllers
             {
                 try
                 {
+                    model.File.SectionId = 1; //TODO: Use actual SectionId
                     var file = await _fileService.EditFileAsync(model.File);
                     // Save file data logic here
                     ShowAlertSuccess($"Updated file: {file.Name}");

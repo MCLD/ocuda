@@ -1,6 +1,6 @@
-﻿@model Ocuda.Ops.Controllers.ViewModels.Section.SectionListViewModel
+﻿@model Ocuda.Ops.Controllers.ViewModels.Sections.AdminListViewModel
 
-<form asp-controller="Section" asp-action="AdminDelete" method="post" role="form">
+<form asp-controller="Sections" asp-action="AdminDelete" method="post" role="form">
     <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
     <input id="deleteName" asp-for="Section.Name" type="hidden" />
     <input id="deleteId" asp-for="Section.Id" type="hidden" />

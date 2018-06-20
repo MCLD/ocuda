@@ -95,6 +95,7 @@ namespace Ocuda.Ops.Controllers
             {
                 try
                 {
+                    model.Link.SectionId = 1; //TODO: Use actual SectionId
                     var newLink = await _linkService.CreateLinkAsync(model.Link);
                     ShowAlertSuccess($"Added link: {newLink.Name}");
                     return RedirectToAction(nameof(AdminList));
@@ -127,6 +128,7 @@ namespace Ocuda.Ops.Controllers
             {
                 try
                 {
+                    model.Link.SectionId = 1; //TODO: Use actual SectionId
                     var link = await _linkService.EditLinkAsync(model.Link);
                     ShowAlertSuccess($"Updated link: {link.Name}");
                     return RedirectToAction(nameof(AdminList));

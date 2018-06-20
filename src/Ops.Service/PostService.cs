@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Ocuda.Ops.Data.Ops;
 using Ocuda.Ops.Models;
@@ -55,6 +56,7 @@ namespace Ops.Service
 
         public async Task<Post> EditPostAsync(Post post)
         {
+            // TODO fix edit logic
             _postRepository.Update(post);
             await _postRepository.SaveAsync();
             return post;

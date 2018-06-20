@@ -76,24 +76,26 @@ namespace Ops.Service
 
         public async Task<Link> CreateLinkAsync(Link link)
         {
-            // TODO repository/database
-            // call create method from repository
+            link.CreatedAt = DateTime.Now;
+            await _linkRepository.AddAsync(link);
+            await _linkRepository.SaveAsync();
+
             return link;
         }
 
         public async Task<Link> EditLinkAsync(Link link)
         {
-            // TODO repository/database
-            // get existing item and update properties that changed
-            // call edit method on existing post
+            // TODO fix edit logic
+            _linkRepository.Update(link);
+            await _linkRepository.SaveAsync();
+
             return link;
         }
 
         public async Task DeleteLinkAsync(int id)
         {
-            // TODO repository/database
-            // call delete method from repository
-            throw new NotImplementedException();
+            _linkRepository.Remove(id);
+            await _linkRepository.SaveAsync();
         }
 
         public async Task<LinkCategory> CreateLinkCategoryAsync(LinkCategory linkCategory)

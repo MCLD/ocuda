@@ -50,6 +50,7 @@ namespace Ops.Service
 
         public async Task<File> EditFileAsync(File file)
         {
+            // TODO fix edit logic
             // get existing post and update properties that changed
             // call edit method on existing post
             _fileRepository.Update(file);
