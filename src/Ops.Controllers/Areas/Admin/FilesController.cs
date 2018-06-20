@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Files;
+using Ocuda.Ops.Service;
 using Ocuda.Utility.Models;
-using Ops.Service;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
 {
@@ -64,11 +62,13 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [HttpPost]
         public async Task<IActionResult> Create(DetailViewModel model)
         {
+            model.File.SectionId = 1; //TODO: Fix SectionId, CreatedBy
+            model.File.CreatedBy = 1;
+
             if (ModelState.IsValid)
             {
                 try
-                {
-                    model.File.SectionId = 1; //TODO: Use actual SectionId
+                {        
                     var newFile = await _fileService.CreateFileAsync(model.File);
                     ShowAlertSuccess($"Added file: {newFile.Name}");
                     return RedirectToAction(nameof(Index));

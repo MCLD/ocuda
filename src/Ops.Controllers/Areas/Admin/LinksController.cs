@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Links;
+using Ocuda.Ops.Service;
 using Ocuda.Utility.Models;
-using Ops.Service;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
 {
@@ -62,11 +62,13 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [HttpPost]
         public async Task<IActionResult> Create(DetailViewModel model)
         {
+            model.Link.SectionId = 1; //TODO: Fix SectionId, CreatedBy
+            model.Link.CreatedBy = 1;
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    model.Link.SectionId = 1; //TODO: Use actual SectionId
                     var newLink = await _linkService.CreateLinkAsync(model.Link);
                     ShowAlertSuccess($"Added link: {newLink.Name}");
                     return RedirectToAction(nameof(Index));

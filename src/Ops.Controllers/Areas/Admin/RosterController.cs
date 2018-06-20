@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Roster;
-using Ops.Service;
+using Ocuda.Ops.Service;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
 {

@@ -30,6 +30,7 @@ namespace Ocuda.Ops.Service
             var files = await _fileRepository.ToListAsync(_ => _.Name);
             if (files == null || files.Count == 0)
             {
+                await _insertSampleDataService.InsertFiles();
                 files = await _fileRepository.ToListAsync(_ => _.Name);
             }
             return files;
