@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Interfaces.Ops;
@@ -42,10 +41,12 @@ namespace Ocuda.Ops.Service
 
         public async Task<IEnumerable<Section>> GetNavigationAsync()
         {
-            var sections = await _sectionRepository
-                .ToListAsync(_ => _.SortOrder);
-            
-            return sections.Where(_ => !string.IsNullOrEmpty(_.Icon));
+            return await _sectionRepository.GetNavigationSectionsAsync();
+        }
+
+        public async Task<Section> GetSectionByPathAsync(string path)
+        {
+            return await _sectionRepository.GetSectionByPathAsync(path);
         }
 
         public async Task<IEnumerable<Section>> GetSectionsAsync()

@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Interfaces.Ops;
 
 namespace Ocuda.Ops.Data.Ops
@@ -14,14 +16,28 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
-        #region Initial setup methods
-        public Task<Models.Section> GetDefaultSectionAsync()
+        public Task<Section> GetDefaultSectionAsync()
         {
             return DbSet
                 .AsNoTracking()
                 .Where(_ => string.IsNullOrEmpty(_.Path))
                 .FirstOrDefaultAsync();
         }
-        #endregion Initial setup methods
+
+        public async Task<ICollection<Section>> GetNavigationSectionsAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => !string.IsNullOrWhiteSpace(_.Icon))
+                .OrderBy(_ => _.SortOrder)
+                .ToListAsync();
+        }
+
+        public async Task<Section> GetSectionByPathAsync(string path)
+        {
+            return await DbSet.AsNoTracking()
+                .Where(_ => _.Path == path)
+                .FirstOrDefaultAsync();
+        }
     }
 }
