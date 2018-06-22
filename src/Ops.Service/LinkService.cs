@@ -12,14 +12,18 @@ namespace Ocuda.Ops.Service
     {
         private readonly InsertSampleDataService _insertSampleDataService;
         private readonly ILinkRepository _linkRepository;
+        private readonly ICategoryRepository _categoryRepository;
 
         public LinkService(InsertSampleDataService insertSampleDataService,
-            ILinkRepository linkRepository)
+            ILinkRepository linkRepository,
+            ICategoryRepository categoryRepository)
         {
             _insertSampleDataService = insertSampleDataService
                 ?? throw new ArgumentNullException(nameof(insertSampleDataService));
             _linkRepository = linkRepository
                 ?? throw new ArgumentNullException(nameof(linkRepository));
+            _categoryRepository = categoryRepository
+                ?? throw new ArgumentNullException(nameof(categoryRepository));
         }
         public async Task<int> GetLinkCountAsync()
         {
@@ -105,23 +109,41 @@ namespace Ocuda.Ops.Service
 
         public async Task<LinkCategory> CreateLinkCategoryAsync(LinkCategory linkCategory)
         {
-            // TODO repository/database
-            // call create method from repository
-            return linkCategory;
+            return await _categoryRepository.ToListAsync(_ => _.Name);
         }
 
-        public async Task<LinkCategory> EditLinkCategoryAsync(LinkCategory linkCategory)
+        public async Task<Category> GetLinkCategoryByIdAsync(int id)
         {
+            return await _categoryRepository.FindAsync(id);
+        }
+
+        public async Task<int> GetLinkCategoryCountAsync()
+        {
+            return await _categoryRepository.CountAsync();
+        }
+
+        public async Task<Category> CreateLinkCategoryAsync(Category category)
+        {
+            category.CreatedAt = DateTime.Now;
+            await _categoryRepository.AddAsync(category);
+            await _categoryRepository.SaveAsync();
+            return category;
+        }
+
+        public async Task<Category> EditLinkCategoryAsync(Category category)
+        {
+            // TODO fix edit logic
             // get existing item and update properties that changed
-            // call edit method on existing post
-            return linkCategory;
+            // call edit method on existing category
+            _categoryRepository.Update(category);
+            await _categoryRepository.SaveAsync();
+            return category;
         }
 
         public async Task DeleteLinkCategoryAsync(int id)
         {
-            // TODO repository/database
-            // call delete method from repository
-            throw new NotImplementedException();
+            _categoryRepository.Remove(id);
+            await _categoryRepository.SaveAsync();
         }
     }
 }

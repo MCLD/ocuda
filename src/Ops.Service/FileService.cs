@@ -12,14 +12,18 @@ namespace Ocuda.Ops.Service
     {
         private readonly InsertSampleDataService _insertSampleDataService;
         private readonly IFileRepository _fileRepository;
+        private readonly ICategoryRepository _categoryRepository;
 
         public FileService(InsertSampleDataService insertSampleDataService,
-            IFileRepository fileRepository)
+            IFileRepository fileRepository,
+            ICategoryRepository categoryRepository)
         {
             _insertSampleDataService = insertSampleDataService
                 ?? throw new ArgumentNullException(nameof(insertSampleDataService));
             _fileRepository = fileRepository
                 ?? throw new ArgumentNullException(nameof(fileRepository));
+            _categoryRepository = categoryRepository 
+                ?? throw new ArgumentNullException(nameof(categoryRepository));
         }
 
         public async Task<int> GetFileCountAsync()
@@ -73,49 +77,45 @@ namespace Ocuda.Ops.Service
             _fileRepository.Remove(id);
             await _fileRepository.SaveAsync();
         }
-        public IEnumerable<FileCategory> GetFileCategories()
+
+        public async Task<ICollection<Category>> GetFileCategoriesAsync()
         {
             // TODO repository/database
-            return new List<FileCategory>
-            {
-                new FileCategory
-                {
-                    Id = 1,
-                    Name = "File Category 1",
-                },
-                new FileCategory
-                {
-                    Id = 2,
-                    Name = "File Category 2",
-                },
-                new FileCategory
-                {
-                    Id = 3,
-                    Name = "File Category 3",
-                },
-            };
+            return await _categoryRepository.ToListAsync(_ => _.Name);
         }
 
-        public async Task<FileCategory> CreateFileCategoryAsync(FileCategory fileCategory)
+        public async Task<Category> GetFileCategoryByIdAsync(int id)
         {
-            // TODO repository/database
-            // call create method from repository
-            return fileCategory;
+            return await _categoryRepository.FindAsync(id);
         }
 
-        public async Task<FileCategory> EditFileCategoryAsync(FileCategory fileCategory)
+        public async Task<int> GetFileCategoryCountAsync()
         {
-            // TODO repository/database
+            return await _categoryRepository.CountAsync();
+        }
+
+        public async Task<Category> CreateFileCategoryAsync(Category category)
+        {
+            category.CreatedAt = DateTime.Now;
+            await _categoryRepository.AddAsync(category);
+            await _categoryRepository.SaveAsync();
+            return category;
+        }
+
+        public async Task<Category> EditFileCategoryAsync(Category category)
+        {
+            // TODO fix edit logic
             // get existing item and update properties that changed
-            // call edit method on existing post
-            return fileCategory;
+            // call edit method on existing category
+            _categoryRepository.Update(category);
+            await _categoryRepository.SaveAsync();
+            return category;
         }
 
         public async Task DeleteFileCategoryAsync(int id)
         {
-            // TODO repository/database
-            // call delete method from repository
-            throw new NotImplementedException();
+            _categoryRepository.Remove(id);
+            await _categoryRepository.SaveAsync();
         }
     }
 }
