@@ -72,6 +72,7 @@ namespace Ocuda.Ops.Web
             // repositories
             services.AddScoped<Service.Interfaces.Ops.IFileRepository, Data.Ops.FileRepository>();
             services.AddScoped<Service.Interfaces.Ops.ILinkRepository, Data.Ops.LinkRepository>();
+            services.AddScoped<Service.Interfaces.Ops.ICategoryRepository, Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.IPageRepository, Data.Ops.PageRepository>();
             services.AddScoped<Service.Interfaces.Ops.IPostRepository, Data.Ops.PostRepository>();
             services.AddScoped<Service.Interfaces.Ops.ISectionRepository, Data.Ops.SectionRepository>();

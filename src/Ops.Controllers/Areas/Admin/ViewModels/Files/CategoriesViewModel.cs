@@ -8,8 +8,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Files
 {
     public class CategoriesViewModel
     {
-        public IEnumerable<FileCategory> Categories { get; set; }
-        public FileCategory Category { get; set; }
+        public IEnumerable<Category> Categories { get; set; }
+        public Category Category { get; set; }
         public PaginateModel PaginateModel { get; set; }
     }
 }
