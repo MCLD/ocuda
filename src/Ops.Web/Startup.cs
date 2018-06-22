@@ -22,7 +22,7 @@ namespace Ocuda.Ops.Web
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             var logger = Serilog.Log.Logger;
             // set a default culture of en-US if none is specified
@@ -93,9 +93,12 @@ namespace Ocuda.Ops.Web
             services.AddScoped<PostService>();
             services.AddScoped<UserService>();
             services.AddScoped<PageService>();
+
+            var serviceProvider = services.BuildServiceProvider();
+            return serviceProvider;
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider svc)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             // configure error page handling and development IDE linking
             if (env.IsDevelopment())
@@ -139,7 +142,7 @@ namespace Ocuda.Ops.Web
                     defaults: new { controller = "Home", action = "Index" },
                     constraints: new
                     {
-                        section = new SectionRouteConstraint(svc.GetRequiredService<ISectionPathValidator>())
+                        section = new SectionRouteConstraint(app.ApplicationServices.GetRequiredService<ISectionPathValidator>())
                     });
 
                 routes.MapRoute(
@@ -147,13 +150,14 @@ namespace Ocuda.Ops.Web
                     template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
                 routes.MapRoute(
-                    name: null,
-                    template: "{section}/{controller}/{action}/{id?}",
-                    defaults: new { controller = "Home", action = "Index" },
-                    constraints: new
-                    {
-                        section = new SectionRouteConstraint(svc.GetRequiredService<ISectionPathValidator>())
-                    });
+                   name: null,
+                   template: "{section}/{controller}/{action}/{id?}",
+                   defaults: new { controller = "Home", action = "Index" },
+                   constraints: new
+                   {
+                       section = new SectionRouteConstraint(app.ApplicationServices.GetRequiredService<ISectionPathValidator>())
+                   });
+
                 routes.MapRoute(
                     name: null,
                     template: "{controller=Home}/{action=Index}/{id?}");
