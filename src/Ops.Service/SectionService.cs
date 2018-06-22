@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops;
+using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Service
 {
@@ -44,9 +46,25 @@ namespace Ocuda.Ops.Service
             return await _sectionRepository.GetNavigationSectionsAsync();
         }
 
-        public async Task<Section> GetSectionByPathAsync(string path)
+        public async Task<Section> GetByIdAsync(int id)
         {
-            return await _sectionRepository.GetSectionByPathAsync(path);
+            return await _sectionRepository.FindAsync(id);
+        }
+
+        public async Task<bool> IsValidPathAsync(string path)
+        {
+            return await _sectionRepository.IsValidPathAsync(path);
+        }
+
+        public async Task<Section> GetByPathAsync(string path)
+        {
+            return await _sectionRepository.GetByPathAsync(path);
+        }
+
+        public async Task<DataWithCount<ICollection<Section>>> GetPaginatedListAsync(
+            BaseFilter filter)
+        {
+            return await _sectionRepository.GetPaginatedListAsync(filter);
         }
 
         public async Task<IEnumerable<Section>> GetSectionsAsync()
@@ -58,6 +76,35 @@ namespace Ocuda.Ops.Service
         public async Task<int> GetSectionCountAsync()
         {
             return await _sectionRepository.CountAsync();
+        }
+
+        public async Task<Section> CreateAsync(Section section)
+        {
+            section.CreatedAt = DateTime.Now;
+            // TODO Set CreatedBy Id
+            section.CreatedBy = 1;
+
+            await _sectionRepository.AddAsync(section);
+            await _sectionRepository.SaveAsync();
+            return section;
+        }
+
+        public async Task<Section> EditAsync(Section section)
+        {
+            //TODO check edit logic
+            var currentSection = await _sectionRepository.FindAsync(section.Id);
+            currentSection.Name = section.Name;
+            currentSection.Icon = section.Icon;
+
+            _sectionRepository.Update(currentSection);
+            await _sectionRepository.SaveAsync();
+            return section;
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            _sectionRepository.Remove(id);
+            await _sectionRepository.SaveAsync();
         }
 
         public IEnumerable<Calendar> GetCalendars()
@@ -92,35 +139,6 @@ namespace Ocuda.Ops.Service
                     CreatedAt = DateTime.Now,
                 }
             };
-        }
-
-        public async Task<Section> GetSectionByIdAsync(int id)
-        {
-            return await _sectionRepository.FindAsync(id);
-        }
-
-        public async Task<Section> CreateSectionAsync(Section section)
-        {
-            section.CreatedAt = DateTime.Now;
-            await _sectionRepository.AddAsync(section);
-            await _sectionRepository.SaveAsync();
-
-            return section;
-        }
-
-        public async Task<Section> EditSectionAsync(Section section)
-        {
-            //TODO fix edit logic
-            var currentSection = await _sectionRepository.FindAsync(section.Id);
-            currentSection.Name = section.Name;
-            _sectionRepository.Update(currentSection);
-            return section;
-        }
-
-        public async Task DeleteSectionAsync(int id)
-        {
-            _sectionRepository.Remove(id);
-            await _sectionRepository.SaveAsync();
         }
     }
 }

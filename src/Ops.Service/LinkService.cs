@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops;
+using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Service
 {
@@ -29,9 +31,43 @@ namespace Ocuda.Ops.Service
             return await _linkRepository.ToListAsync(_ => _.Name);
         }
 
-        public async Task<Link> GetLinkByIdAsync(int id)
+        public async Task<Link> GetByIdAsync(int id)
         {
             return await _linkRepository.FindAsync(id);
+        }
+
+        public async Task<DataWithCount<ICollection<Link>>> GetPaginatedListAsync(BlogFilter filter)
+        {
+            return await _linkRepository.GetPaginatedListAsync(filter);
+        }
+
+        public async Task<Link> CreateAsync(Link link)
+        {
+            link.CreatedAt = DateTime.Now;
+            // TODO Set CreatedBy Id
+            link.CreatedBy = 1;
+
+            await _linkRepository.AddAsync(link);
+            await _linkRepository.SaveAsync();
+            return link;
+        }
+
+        public async Task<Link> EditAsync(Link link)
+        {
+            // TODO check edit logic
+            var currentLink = await _linkRepository.FindAsync(link.Id);
+            currentLink.Name = link.Name;
+            currentLink.Url = link.Url;
+
+            _linkRepository.Update(currentLink);
+            await _linkRepository.SaveAsync();
+            return link;
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            _linkRepository.Remove(id);
+            await _linkRepository.SaveAsync();
         }
 
         public IEnumerable<LinkCategory> GetLinkCategories()
@@ -65,31 +101,6 @@ namespace Ocuda.Ops.Service
                 Id = id,
                 Name = $"Category {id}",
             };
-        }
-
-
-        public async Task<Link> CreateLinkAsync(Link link)
-        {
-            link.CreatedAt = DateTime.Now;
-            await _linkRepository.AddAsync(link);
-            await _linkRepository.SaveAsync();
-
-            return link;
-        }
-
-        public async Task<Link> EditLinkAsync(Link link)
-        {
-            // TODO fix edit logic
-            _linkRepository.Update(link);
-            await _linkRepository.SaveAsync();
-
-            return link;
-        }
-
-        public async Task DeleteLinkAsync(int id)
-        {
-            _linkRepository.Remove(id);
-            await _linkRepository.SaveAsync();
         }
 
         public async Task<LinkCategory> CreateLinkCategoryAsync(LinkCategory linkCategory)

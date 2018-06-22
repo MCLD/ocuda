@@ -69,7 +69,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 try
                 {
-                    var newLink = await _linkService.CreateLinkAsync(model.Link);
+                    var newLink = await _linkService.CreateAsync(model.Link);
                     ShowAlertSuccess($"Added link: {newLink.Name}");
                     return RedirectToAction(nameof(Index));
                 }
@@ -88,7 +88,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var viewModel = new DetailViewModel()
             {
                 Action = nameof(Edit),
-                Link = await _linkService.GetLinkByIdAsync(id)
+                Link = await _linkService.GetByIdAsync(id)
             };
 
             return View("Detail", viewModel);
@@ -102,7 +102,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 try
                 {
                     model.Link.SectionId = 1; //TODO: Use actual SectionId
-                    var link = await _linkService.EditLinkAsync(model.Link);
+                    var link = await _linkService.EditAsync(model.Link);
                     ShowAlertSuccess($"Updated link: {link.Name}");
                     return RedirectToAction(nameof(Index));
                 }
@@ -121,7 +121,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             try
             {
-                await _linkService.DeleteLinkAsync(model.Link.Id);
+                await _linkService.DeleteAsync(model.Link.Id);
                 ShowAlertSuccess("Link deleted successfully.");
             }
             catch (Exception ex)

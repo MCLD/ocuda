@@ -74,7 +74,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 try
                 {
-                    var newPost = await _postService.CreatePostAsync(model.Post);
+                    var newPost = await _postService.CreateAsync(model.Post);
                     ShowAlertSuccess($"Added blog post: {newPost.Title}");
                     return RedirectToAction(nameof(Index));
                 }
@@ -94,7 +94,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var viewModel = new DetailViewModel()
             {
                 Action = nameof(Edit),
-                Post = await _postService.GetPostByIdAsync(id)
+                Post = await _postService.GetByIdAsync(id)
             };
 
             return View("Detail", viewModel);
@@ -108,7 +108,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 try
                 {
                     model.Post.SectionId = 1; //TODO: Use actual SectionId
-                    var post = await _postService.EditPostAsync(model.Post);
+                    var post = await _postService.EditAsync(model.Post);
                     ShowAlertSuccess($"Updated blog post: {post.Title}");
                     return RedirectToAction(nameof(Index));
                 }
@@ -127,7 +127,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             try
             {
-                await _postService.DeletePostAsync(model.Post.Id);
+                await _postService.DeleteAsync(model.Post.Id);
                 ShowAlertSuccess("Post deleted successfully.");
             }
             catch (Exception ex)

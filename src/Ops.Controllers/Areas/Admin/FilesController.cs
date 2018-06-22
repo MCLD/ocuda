@@ -69,7 +69,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 try
                 {        
-                    var newFile = await _fileService.CreateFileAsync(model.File);
+                    var newFile = await _fileService.CreateAsync(model.File);
                     ShowAlertSuccess($"Added file: {newFile.Name}");
                     return RedirectToAction(nameof(Index));
                 }
@@ -88,7 +88,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var viewModel = new DetailViewModel()
             {
                 Action = nameof(Edit),
-                File = await _fileService.GetFileByIdAsync(id)
+                File = await _fileService.GetByIdAsync(id)
             };
 
             return View("Detail", viewModel);
@@ -102,7 +102,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 try
                 {
                     model.File.SectionId = 1; //TODO: Use actual SectionId
-                    var file = await _fileService.EditFileAsync(model.File);
+                    var file = await _fileService.EditAsync(model.File);
                     // Save file data logic here
                     ShowAlertSuccess($"Updated file: {file.Name}");
                     return RedirectToAction(nameof(Index));
@@ -122,7 +122,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             try
             {
-                await _fileService.DeleteFileAsync(model.File.Id);
+                await _fileService.DeleteAsync(model.File.Id);
                 ShowAlertSuccess("File deleted successfully.");
             }
             catch (Exception ex)

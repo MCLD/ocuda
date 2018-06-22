@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops
 {
@@ -8,6 +10,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops
     {
         Task<Section> GetDefaultSectionAsync();
         Task<ICollection<Section>> GetNavigationSectionsAsync();
-        Task<Section> GetSectionByPathAsync(string path);
+        Task<bool> IsValidPathAsync(string path);
+        Task<Section> GetByPathAsync(string path);
+        Task<DataWithCount<ICollection<Section>>> GetPaginatedListAsync(BaseFilter filter);
     }
 }

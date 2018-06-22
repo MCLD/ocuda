@@ -1,15 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Ocuda.Ops.Controllers.Validator;
 
 namespace Ocuda.Ops.Controllers.RouteConstraint
 {
     public class SectionRouteConstraint : IRouteConstraint
     {
-        public SectionRouteConstraint()
+        private readonly ISectionPathValidator _sectionPathValidator;
+        public SectionRouteConstraint(ISectionPathValidator sectionPathValidator)
         {
+            _sectionPathValidator = sectionPathValidator
+                ?? throw new ArgumentNullException(nameof(sectionPathValidator));
         }
 
         public bool Match(HttpContext httpContext,
@@ -18,15 +20,12 @@ namespace Ocuda.Ops.Controllers.RouteConstraint
             RouteValueDictionary values,
             RouteDirection routeDirection)
         {
-            var site = (string)values[routeKey];
-            if (site == "HumanResources" || site == "Communications")
+            var sectionPath = (string)values[routeKey];
+            if (!string.IsNullOrWhiteSpace(sectionPath))
             {
-                return true;
+                return _sectionPathValidator.IsValid(sectionPath);
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
     }
 }

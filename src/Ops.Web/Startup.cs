@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ocuda.Ops.Controllers.RouteConstraint;
+using Ocuda.Ops.Controllers.Validator;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Web.Middleware;
@@ -77,6 +78,10 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Interfaces.Ops.ISiteSettingRepository, Data.Ops.SiteSettingRepository>();
             services.AddScoped<Service.Interfaces.Ops.IUserRepository, Data.Ops.UserRepository>();
 
+            // path validator
+            services.AddScoped<Controllers.Validator.ISectionPathValidator,
+                Controllers.Validator.SectionPathValidator>();
+
             // services
             services.AddScoped<InitialSetupService>();
             services.AddScoped<InsertSampleDataService>();
@@ -89,7 +94,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<PageService>();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider svc)
         {
             // configure error page handling and development IDE linking
             if (env.IsDevelopment())
@@ -133,7 +138,7 @@ namespace Ocuda.Ops.Web
                     defaults: new { controller = "Home", action = "Index" },
                     constraints: new
                     {
-                        section = new SectionRouteConstraint()
+                        section = new SectionRouteConstraint(svc.GetRequiredService<ISectionPathValidator>())
                     });
 
                 routes.MapRoute(
@@ -146,7 +151,7 @@ namespace Ocuda.Ops.Web
                     defaults: new { controller = "Home", action = "Index" },
                     constraints: new
                     {
-                        section = new SectionRouteConstraint()
+                        section = new SectionRouteConstraint(svc.GetRequiredService<ISectionPathValidator>())
                     });
                 routes.MapRoute(
                     name: null,

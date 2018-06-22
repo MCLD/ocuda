@@ -70,7 +70,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 try
                 {
-                    var newSection = await _sectionService.CreateSectionAsync(model.Section);
+                    var newSection = await _sectionService.CreateAsync(model.Section);
                     ShowAlertSuccess($"Added section: {newSection.Name}");
                     return RedirectToAction(nameof(Index));
                 }
@@ -89,7 +89,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var viewModel = new DetailViewModel
             {
                 Action = nameof(Edit),
-                Section = await _sectionService.GetSectionByIdAsync(id),
+                Section = await _sectionService.GetByIdAsync(id),
             };
 
             viewModel.IsReadonly =
@@ -105,7 +105,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 try
                 {
-                    var section = await _sectionService.EditSectionAsync(model.Section);
+                    var section = await _sectionService.EditAsync(model.Section);
                     ShowAlertSuccess($"Updated section: {section.Name}");
                     return RedirectToAction(nameof(Index));
                 }
@@ -124,7 +124,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             try
             {
-                await _sectionService.DeleteSectionAsync(model.Section.Id);
+                await _sectionService.DeleteAsync(model.Section.Id);
                 ShowAlertSuccess("Section deleted successfully.");
             }
             catch (Exception ex)

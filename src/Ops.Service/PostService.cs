@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
@@ -23,16 +22,6 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(insertSampleDataService));
         }
 
-        public async Task<DataWithCount<ICollection<Post>>> GetPaginatedListAsync(BaseFilter filter)
-        {
-            return new DataWithCount<ICollection<Post>>
-            {
-                Count = await _postRepository.CountAsync(),
-                Data = await _postRepository.ToListAsync(filter.Skip.Value, filter.Take.Value,
-                _ => _.IsPinned == false, _ => _.CreatedAt)
-            };
-        }
- 
         public async Task<int> GetPostCountAsync()
         {
             return await _postRepository.CountAsync();
@@ -44,29 +33,40 @@ namespace Ocuda.Ops.Service
             return await _postRepository.ToListAsync(skip, take, _ => _.CreatedAt);
         }
 
-        public async Task<Post> GetPostByIdAsync(int id)
+        public async Task<Post> GetByIdAsync(int id)
         {
             return await _postRepository.FindAsync(id);
         }
 
-        public async Task<Post> CreatePostAsync(Post post)
+        public async Task<DataWithCount<ICollection<Post>>> GetPaginatedListAsync(BlogFilter filter)
+        {
+            return await _postRepository.GetPaginatedListAsync(filter);
+        }
+
+        public async Task<Post> CreateAsync(Post post)
         {
             post.CreatedAt = DateTime.Now;
+            // TODO Set CreatedBy Id
+            post.CreatedBy = 1;
             await _postRepository.AddAsync(post);
             await _postRepository.SaveAsync();
 
             return post;
         }
 
-        public async Task<Post> EditPostAsync(Post post)
+        public async Task<Post> EditAsync(Post post)
         {
-            // TODO fix edit logic
-            _postRepository.Update(post);
+            // TODO check edit logic
+            var currentPost = await _postRepository.FindAsync(post.Id);
+            currentPost.Title = post.Title;
+            currentPost.Content = post.Content;
+
+            _postRepository.Update(currentPost);
             await _postRepository.SaveAsync();
             return post;
         }
 
-        public async Task DeletePostAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             _postRepository.Remove(id);
             await _postRepository.SaveAsync();

@@ -69,7 +69,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 try
                 {
-                    var newPage = await _pageService.CreatePageAsync(model.Page);
+                    var newPage = await _pageService.CreateAsync(model.Page);
                     ShowAlertSuccess($"Added page: {newPage.Title}");
                     return RedirectToAction(nameof(Index));
                 }
@@ -88,7 +88,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var viewModel = new DetailViewModel
             {
                 Action = nameof(Edit),
-                Page = await _pageService.GetPageByIdAsync(id)
+                Page = await _pageService.GetByIdAsync(id)
             };
 
             return View("Detail", viewModel);
@@ -102,7 +102,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 try
                 {
                     model.Page.SectionId = 1; //TODO: Use actual SectionId
-                    var page = await _pageService.EditPageAsync(model.Page);
+                    var page = await _pageService.EditAsync(model.Page);
                     ShowAlertSuccess($"Updated page: {page.Title}");
                     return RedirectToAction(nameof(Index));
                 }
@@ -121,7 +121,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             try
             {
-                await _pageService.DeletePageAsync(model.Page.Id);
+                await _pageService.DeleteAsync(model.Page.Id);
                 ShowAlertSuccess("Page deleted successfully.");
             }
             catch (Exception ex)
