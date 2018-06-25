@@ -16,14 +16,7 @@ namespace Ocuda.Ops.Controllers.Validator
 
         public bool IsValid(string sectionPath)
         {
-            try
-            {
-                return Task.Run(() => _sectionService.IsValidPathAsync(sectionPath)).Result;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            return Task.Run(() => _sectionService.IsValidPathAsync(sectionPath)).Result;
         }
     }
 }
