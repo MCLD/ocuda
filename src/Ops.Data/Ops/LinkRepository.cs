@@ -23,7 +23,11 @@ namespace Ocuda.Ops.Data.Ops
         {
             var query = DbSet.AsNoTracking();
 
-            if (filter.SectionId.HasValue)
+            if (filter.CategoryId.HasValue)
+            {
+                query = query.Where(_ => _.CategoryId == filter.CategoryId);
+            }
+            else if (filter.SectionId.HasValue)
             {
                 query = query.Where(_ => _.SectionId == filter.SectionId);
             }
