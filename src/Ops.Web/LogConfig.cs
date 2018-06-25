@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.IO;
+using Microsoft.AspNetCore;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
@@ -19,11 +20,17 @@ namespace Ocuda.Ops.Web
         private const string InstanceEnrichment = "Instance";
         private const string RemoteAddressEnrichment = "RemoteAddress";
 
-        public LoggerConfiguration Build(IConfiguration config, 
-            string applicationName, 
+        public LoggerConfiguration Build(string applicationName, 
             Version version, 
-            int id)
+            int id,
+            string[] args)
         {
+            var config = (IConfiguration)WebHost
+                .CreateDefaultBuilder(args)
+                .Build()
+                .Services
+                .GetService(typeof(IConfiguration));
+
             var loggerConfig = new LoggerConfiguration()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
@@ -34,13 +41,13 @@ namespace Ocuda.Ops.Web
                 .Enrich.FromLogContext()
                 .WriteTo.Console();
 
-            var instance = config["Web.Instance"];
+            var instance = config[Utility.Keys.Configuration.OpsInstance] ?? "ops";
             if (!string.IsNullOrEmpty(instance))
             {
                 loggerConfig.Enrich.WithProperty(InstanceEnrichment, instance);
             }
 
-            var rollingLogLocation = config["Web.RollingLogLocation"];
+            var rollingLogLocation = config[Utility.Keys.Configuration.OpsRollingLogLocation];
             if (!string.IsNullOrEmpty(rollingLogLocation))
             {
                 if (!rollingLogLocation.EndsWith(Path.DirectorySeparatorChar))
@@ -55,10 +62,14 @@ namespace Ocuda.Ops.Web
                     .Filter.ByExcluding(Matching.FromSource(ErrorControllerName))
                     .WriteTo.RollingFile(rollingLogFile));
 
-                string httpErrorFileTag = config["Web.HttpErrorFileTag"];
+                string httpErrorFileTag = config[Utility.Keys.Configuration.OpsHttpErrorFileTag];
                 if (!string.IsNullOrEmpty(httpErrorFileTag))
                 {
-                    string httpLogFile = rollingLogLocation + instance + "-" + httpErrorFileTag + "-{Date}.txt";
+                    string httpLogFile = rollingLogLocation 
+                        + instance 
+                        + "-"
+                        + httpErrorFileTag 
+                        + "-{Date}.txt";
 
                     loggerConfig.WriteTo.Logger(_ => _
                         .Filter.ByIncludingOnly(Matching.FromSource(ErrorControllerName))
@@ -66,7 +77,7 @@ namespace Ocuda.Ops.Web
                 }
             }
 
-            var sqlSoftwareLogCs = config["ConnectionStrings:SerilogSoftwareLogs"];
+            var sqlSoftwareLogCs = config.GetConnectionString("SerilogSoftwareLogs");
             if (!string.IsNullOrEmpty(sqlSoftwareLogCs))
             {
                 loggerConfig

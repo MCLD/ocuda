@@ -6,5 +6,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops
     public interface IUserRepository : IRepository<User, int>
     {
         Task<User> GetSystemAdministratorAsync();
+        Task<User> FindByUsernameAsync(string username);
     }
 }

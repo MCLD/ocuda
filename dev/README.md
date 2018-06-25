@@ -59,15 +59,32 @@ _Eventually this should be moved to the user documentation._
 ### Ops
 
 #### Required
+##### Connection strings
+- `Ops`
+- `Promenade`
+
+##### Settings
 - `Ops.DatabaseProvider` - which database provider to use, must be one of: `SQLite`, `SqlServer`
 
 #### Optional
+##### Connection strings
+- `SerilogSoftwareLogs` - SQL Server connection string for writing application logs out, if unset logs are not written to SQL Server
+
+##### Settings
+- `OpsAuthBlankRequestRedirect` - *used only by Ops.Web.WindowsAuth* - if the authentication site is loaded with no id or directive then redirect to this URL
+- `Ops.AuthRedirect` - URL to the deployed Ops.Web.WindowsAuth site - if not specified authentication will not function
 - `Ops.Culture` - defaults to "en-US", the culture to use for displaying things like dates and times - for valid options see the language tags listed in the [Microsoft National Language Support (NLS) API Reference](http://go.microsoft.com/fwlink/?LinkId=200048)
+- `Ops.DistributedCache` - when unset, defaults to memory-based distributed cache - a cache strategy to use: currently either unset or 'Redis' are valid
+- `Ops.DistributedCache.RedisConfiguration` - *also used by Ops.Web.WindowsAuth* - if *Ops.DistributedCache* is set to 'Redis' this must be set with Redis configuration information, see the [RedisCacheOptions.Configuration property](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.caching.redis.rediscacheoptions.configuration)
+- `Ops.HttpErrorFileTag` - if *Ops.RollingLogLocation* is set, this will write out http error logs in the same location but with the value of this setting in the filename
+- `Ops.Instance` - configure an instance name for more specific logging
+- `Ops.RollingLogLocation` - path of where to write log files which rotate daily, if unset no rolling log is written
+- `Ops.SessionTimeoutMinutes` - defaults to 2 hours - amount of time in minutes for sessions to last
 
 ### Promenade
 
 #### Required
-- `Promenade.DatabaseProvider`* - which database provider to use, must be one of: `SQLite`, `SqlServer`
+- `Promenade.DatabaseProvider` - which database provider to use, must be one of: `SQLite`, `SqlServer`
 
 #### Optional
 - `Promenade.Culture` - defaults to "en-US", the culture to use for displaying things like dates and times - for valid options see the language tags listed in the [Microsoft National Language Support (NLS) API Reference](http://go.microsoft.com/fwlink/?LinkId=200048)

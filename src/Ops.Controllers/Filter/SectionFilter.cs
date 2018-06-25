@@ -6,12 +6,12 @@ using Ocuda.Ops.Service;
 
 namespace Ocuda.Ops.Controllers.Filter
 {
-    public class OpsFilter : Attribute, IAsyncResourceFilter
+    public class SectionFilter : Attribute, IAsyncResourceFilter
     {
-        private readonly ILogger<OpsFilter> _logger;
+        private readonly ILogger<SectionFilter> _logger;
         private readonly SectionService _sectionService;
 
-        public OpsFilter(ILogger<OpsFilter> logger, SectionService sectionService)
+        public SectionFilter(ILogger<SectionFilter> logger, SectionService sectionService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _sectionService = sectionService

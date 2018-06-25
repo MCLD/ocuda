@@ -3,7 +3,9 @@ using Ocuda.Ops.Controllers.Filter;
 
 namespace Ocuda.Ops.Controllers.Abstract
 {
-    [ServiceFilter(typeof(OpsFilter))]
+    [ServiceFilter(typeof(AuthenticationFilter))]
+    [ServiceFilter(typeof(UserFilter))]
+    [ServiceFilter(typeof(SectionFilter))]
     public abstract class BaseController : Microsoft.AspNetCore.Mvc.Controller
     {
         protected string AlertDanger

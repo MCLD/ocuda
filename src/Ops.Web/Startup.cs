@@ -1,73 +1,114 @@
 ﻿using System;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.RouteConstraint;
 using Ocuda.Ops.Controllers.Validator;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Service;
-using Ocuda.Ops.Web.Middleware;
 using Ocuda.Ops.Web.StartupHelper;
+using Ocuda.Utility.Web;
 
 namespace Ocuda.Ops.Web
 {
     public class Startup
     {
-        private readonly IConfiguration _config;
+        private const string DefaultCulture = "en-US";
 
-        public Startup(IConfiguration configuration)
+        private readonly IConfiguration _config;
+        private readonly ILogger _logger;
+
+        public Startup(IConfiguration configuration, ILogger<Startup> logger)
         {
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            var logger = Serilog.Log.Logger;
             // set a default culture of en-US if none is specified
-            string culture = _config["Ops.Culture"] ?? "en-US";
-            logger.Information($"Configuring for culture: {culture}");
+            string culture = _config[Utility.Keys.Configuration.OpsCulture] ?? DefaultCulture;
+            _logger.LogInformation($"Configuring for culture: {culture}");
             services.Configure<RequestLocalizationOptions>(_ =>
             {
                 _.DefaultRequestCulture
                     = new Microsoft.AspNetCore.Localization.RequestCulture(culture);
             });
 
-            services.AddDistributedMemoryCache();
-
-            switch (_config["Ops.DatabaseProvider"])
+            switch (_config[Utility.Keys.Configuration.OpsDistributedCache])
             {
-                case "SqlServer":
-                    logger.Information("Using SqlServer data provider");
-                    services.AddDbContextPool<OpsContext, DataProvider.SqlServer.Ops.Context>(_ =>
-                        _.UseSqlServer(@"Data Source=(LocalDb)\MSSQLLocalDB;Database=Ocuda.Ops;Trusted_Connection=True;MultipleActiveResultSets=True"));
-                    services.AddDbContextPool<PromenadeContext, DataProvider.SqlServer.Promenade.Context>(_ =>
-                        _.UseSqlServer(@"Data Source=(LocalDb)\MSSQLLocalDB;Database=Ocuda.Promenade;Trusted_Connection=True;MultipleActiveResultSets=True"));
-                    break;
-                case "SQLite":
-                    logger.Information("Using SQLite data provider");
-                    services.AddDbContextPool<OpsContext, DataProvider.SQLite.Ops.Context>(_ =>
-                        _.UseSqlite(@"Data Source=ops.db"));
-                    services.AddDbContextPool<PromenadeContext, DataProvider.SQLite.Promenade.Context>(_ =>
-                        _.UseSqlite(@"Data Source=promenade.db"));
+                case "Redis":
+                    string redisConfiguration 
+                        = _config[Utility.Keys.Configuration.OpsDistributedCacheRedisConfiguration]
+                        ?? throw new Exception($"{Utility.Keys.Configuration.OpsDistributedCache} has Redis selected but {Utility.Keys.Configuration.OpsDistributedCacheRedisConfiguration} is not set.");
+                    string instanceName = "Ocuda.Ops";
+                    _logger.LogInformation($"Using Redis distributed cache {redisConfiguration} instance {instanceName}");
+                    services.AddDistributedRedisCache(_ =>
+                    {
+                        _.Configuration = redisConfiguration;
+                        _.InstanceName = instanceName;
+                    });
                     break;
                 default:
-                    logger.Fatal("No Ops.DatabaseProvider configured in settings. Exiting.");
-                    throw new Exception("No Ops.DatabaseProvider configured.");
+                    _logger.LogInformation("Using memory-based distributed cache");
+                    services.AddDistributedMemoryCache();
+                    break;
+            }
+
+            string opsCs = _config.GetConnectionString("Ops")
+                ?? throw new Exception("ConnectionString:Ops not configured.");
+            string promCs = _config.GetConnectionString("Promenade")
+                ?? throw new Exception("ConnectionString:Promenade not configured.");
+
+            switch (_config[Utility.Keys.Configuration.OpsDatabaseProvider])
+            {
+                case "SqlServer":
+                    _logger.LogInformation("Using SqlServer data provider");
+                    services.AddDbContextPool<OpsContext, 
+                        DataProvider.SqlServer.Ops.Context>(_ =>_.UseSqlServer(opsCs));
+                    services.AddDbContextPool<PromenadeContext, 
+                        DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
+                    break;
+                case "SQLite":
+                    _logger.LogInformation("Using SQLite data provider");
+                    services.AddDbContextPool<OpsContext, 
+                        DataProvider.SQLite.Ops.Context>(_ => _.UseSqlite(opsCs));
+                    services.AddDbContextPool<PromenadeContext, 
+                        DataProvider.SQLite.Promenade.Context>(_ => _.UseSqlite(promCs));
+                    break;
+                default:
+                    _logger.LogCritical($"No {Utility.Keys.Configuration.OpsDatabaseProvider} configured in settings. Exiting.");
+                    throw new Exception($"No {Utility.Keys.Configuration.OpsDatabaseProvider} configured.");
+            }
+
+            var sessionTimeout = TimeSpan.FromHours(2 * 60);
+            if(int.TryParse(_config[Utility.Keys.Configuration.OpsSessionTimeoutMinutes], 
+                out int configuredTimeout))
+            {
+                _logger.LogInformation($"Session timeout configured for {configuredTimeout} minutes");
+                sessionTimeout = TimeSpan.FromMinutes(configuredTimeout);
             }
 
             services.AddSession(_ =>
             {
-                _.IdleTimeout = TimeSpan.FromHours(2);
+                _.IdleTimeout = sessionTimeout;
                 _.Cookie.HttpOnly = true;
             });
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie();
 
             services.AddMvc()
                 .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_1);
 
             // filters
-            services.AddScoped<Controllers.Filter.OpsFilter>();
+            services.AddScoped<Controllers.Filter.AuthenticationFilter>();
+            services.AddScoped<Controllers.Filter.UserFilter>();
+            services.AddScoped<Controllers.Filter.SectionFilter>();
 
             // repositories
             services.AddScoped<Service.Interfaces.Ops.IFileRepository, Data.Ops.FileRepository>();
@@ -75,8 +116,10 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Interfaces.Ops.ICategoryRepository, Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.IPageRepository, Data.Ops.PageRepository>();
             services.AddScoped<Service.Interfaces.Ops.IPostRepository, Data.Ops.PostRepository>();
-            services.AddScoped<Service.Interfaces.Ops.ISectionRepository, Data.Ops.SectionRepository>();
-            services.AddScoped<Service.Interfaces.Ops.ISiteSettingRepository, Data.Ops.SiteSettingRepository>();
+            services.AddScoped<Service.Interfaces.Ops.ISectionRepository, 
+                Data.Ops.SectionRepository>();
+            services.AddScoped<Service.Interfaces.Ops.ISiteSettingRepository, 
+                Data.Ops.SiteSettingRepository>();
             services.AddScoped<Service.Interfaces.Ops.IUserRepository, Data.Ops.UserRepository>();
 
             // path validator
@@ -132,7 +175,7 @@ namespace Ocuda.Ops.Web
 
             app.UseSession();
 
-            app.UseOpsAuthentication();
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {

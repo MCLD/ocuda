@@ -38,6 +38,15 @@
                         <span class="d-sm-none"> Insert Sample Data</span>
                     </a>
                 </li>
+                @if (Context.Items[ItemKey.Nickname] != null)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="#">
+                            <span class="fas fa-user"></span>
+                            @Context.Items[ItemKey.Nickname]
+                        </a>
+                    </li>
+                }
             </ul>
         </div>
     </div>
