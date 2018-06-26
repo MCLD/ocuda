@@ -46,8 +46,7 @@ namespace Ocuda.Ops.Service
         public async Task<Post> CreateAsync(Post post)
         {
             post.CreatedAt = DateTime.Now;
-            // TODO Set CreatedBy Id
-            post.CreatedBy = 1;
+            post.CreatedBy = 1; // TODO Set CreatedBy Id
             await _postRepository.AddAsync(post);
             await _postRepository.SaveAsync();
 
@@ -56,14 +55,16 @@ namespace Ocuda.Ops.Service
 
         public async Task<Post> EditAsync(Post post)
         {
-            // TODO check edit logic
             var currentPost = await _postRepository.FindAsync(post.Id);
             currentPost.Title = post.Title;
             currentPost.Content = post.Content;
+            currentPost.IsDraft = post.IsDraft;
+            currentPost.IsPinned = post.IsPinned;
+            currentPost.ShowOnHomepage = post.ShowOnHomepage;
 
             _postRepository.Update(currentPost);
             await _postRepository.SaveAsync();
-            return post;
+            return currentPost;
         }
 
         public async Task DeleteAsync(int id)

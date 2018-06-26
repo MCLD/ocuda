@@ -20,7 +20,7 @@ else
             {
             <tr>
                 <td class="rowlink-parent">
-                    <a asp-action="View" asp-route-id="@ocPage.Id" class="rowlink">
+                    <a asp-action="@(nameof(PagesController.View))" asp-route-id="@ocPage.Id" class="rowlink">
                         @ocPage.Title
                     </a>
                 </td>

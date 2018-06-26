@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Posts;
 using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
@@ -13,26 +14,30 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     public class PostsController : BaseController
     {
         private readonly PostService _postService;
+        private readonly SectionService _sectionService;
 
-        public PostsController(PostService postService)
+        public PostsController(PostService postService, SectionService sectionService)
         {
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
+            _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
         }
 
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(string section, int page = 1)
         {
-            var postList = await _postService.GetPostsAsync();
+            var currentSection = await _sectionService.GetByPathAsync(section);
 
-            foreach (var post in postList)
+            var filter = new BlogFilter(page)
             {
-                post.Content = CommonMark.CommonMarkConverter.Convert(post.Content);
-            }
+                SectionId = currentSection.Id
+            };
+
+            var postList = await _postService.GetPaginatedListAsync(filter);
 
             var paginateModel = new PaginateModel()
             {
-                ItemCount = await _postService.GetPostCountAsync(),
+                ItemCount = postList.Count,
                 CurrentPage = page,
-                ItemsPerPage = 2
+                ItemsPerPage = filter.Take.Value
             };
 
             if (paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
@@ -47,18 +52,20 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var viewModel = new IndexViewModel()
             {
                 PaginateModel = paginateModel,
-                Posts = postList.Skip((page - 1) * paginateModel.ItemsPerPage)
-                                        .Take(paginateModel.ItemsPerPage)
+                Posts = postList.Data
             };
 
             return View(viewModel);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create(string section)
         {
+            var currentSection = await _sectionService.GetByPathAsync(section);
+
             var viewModel = new DetailViewModel()
             {
-                Action = nameof(Create)
+                Action = nameof(Create),
+                SectionId = currentSection.Id
             };
 
             return View("Detail", viewModel);
@@ -67,13 +74,11 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [HttpPost]
         public async Task<IActionResult> Create(DetailViewModel model)
         {
-            model.Post.SectionId = 1; //TODO: Fix SectionId, CreatedBy
-            model.Post.CreatedBy = 1;
-
             if (ModelState.IsValid)
             {
                 try
                 {
+                    model.Post.SectionId = model.SectionId;
                     var newPost = await _postService.CreateAsync(model.Post);
                     ShowAlertSuccess($"Added blog post: {newPost.Title}");
                     return RedirectToAction(nameof(Index));
@@ -91,10 +96,13 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
         public async Task<IActionResult> Edit(int id)
         {
+            var post = await _postService.GetByIdAsync(id);
+
             var viewModel = new DetailViewModel()
             {
                 Action = nameof(Edit),
-                Post = await _postService.GetByIdAsync(id)
+                Post = post,
+                SectionId = post.SectionId
             };
 
             return View("Detail", viewModel);
@@ -107,7 +115,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 try
                 {
-                    model.Post.SectionId = 1; //TODO: Use actual SectionId
                     var post = await _postService.EditAsync(model.Post);
                     ShowAlertSuccess($"Updated blog post: {post.Title}");
                     return RedirectToAction(nameof(Index));

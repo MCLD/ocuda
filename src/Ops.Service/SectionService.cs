@@ -91,14 +91,15 @@ namespace Ocuda.Ops.Service
 
         public async Task<Section> EditAsync(Section section)
         {
-            //TODO check edit logic
             var currentSection = await _sectionRepository.FindAsync(section.Id);
             currentSection.Name = section.Name;
+            currentSection.Path = section.Path;
             currentSection.Icon = section.Icon;
+            currentSection.SortOrder = section.SortOrder;
 
             _sectionRepository.Update(currentSection);
             await _sectionRepository.SaveAsync();
-            return section;
+            return currentSection;
         }
 
         public async Task DeleteAsync(int id)

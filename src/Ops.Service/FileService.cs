@@ -12,18 +12,14 @@ namespace Ocuda.Ops.Service
     {
         private readonly InsertSampleDataService _insertSampleDataService;
         private readonly IFileRepository _fileRepository;
-        private readonly ICategoryRepository _categoryRepository;
 
         public FileService(InsertSampleDataService insertSampleDataService,
-            IFileRepository fileRepository,
-            ICategoryRepository categoryRepository)
+            IFileRepository fileRepository)
         {
             _insertSampleDataService = insertSampleDataService
                 ?? throw new ArgumentNullException(nameof(insertSampleDataService));
             _fileRepository = fileRepository
                 ?? throw new ArgumentNullException(nameof(fileRepository));
-            _categoryRepository = categoryRepository 
-                ?? throw new ArgumentNullException(nameof(categoryRepository));
         }
 
         public async Task<int> GetFileCountAsync()
@@ -61,13 +57,15 @@ namespace Ocuda.Ops.Service
 
         public async Task<File> EditAsync(File file)
         {
-            // TODO check edit logic
-            // TODO edit saved file
             var currentFile = await _fileRepository.FindAsync(file.Id);
-            currentFile.Description = file.Description;
             currentFile.Name = file.Name;
+            currentFile.Description = file.Description;
+            currentFile.CategoryId = file.CategoryId;
+            currentFile.FilePath = file.FilePath;
+            currentFile.Icon = file.Icon;
+            currentFile.IsFeatured = file.IsFeatured;
 
-            _fileRepository.Update(file);
+            _fileRepository.Update(currentFile);
             await _fileRepository.SaveAsync();
             return file;
         }
@@ -76,46 +74,6 @@ namespace Ocuda.Ops.Service
         {
             _fileRepository.Remove(id);
             await _fileRepository.SaveAsync();
-        }
-
-        public async Task<ICollection<Category>> GetFileCategoriesAsync()
-        {
-            // TODO repository/database
-            return await _categoryRepository.ToListAsync(_ => _.Name);
-        }
-
-        public async Task<Category> GetFileCategoryByIdAsync(int id)
-        {
-            return await _categoryRepository.FindAsync(id);
-        }
-
-        public async Task<int> GetFileCategoryCountAsync()
-        {
-            return await _categoryRepository.CountAsync();
-        }
-
-        public async Task<Category> CreateFileCategoryAsync(Category category)
-        {
-            category.CreatedAt = DateTime.Now;
-            await _categoryRepository.AddAsync(category);
-            await _categoryRepository.SaveAsync();
-            return category;
-        }
-
-        public async Task<Category> EditFileCategoryAsync(Category category)
-        {
-            // TODO fix edit logic
-            // get existing item and update properties that changed
-            // call edit method on existing category
-            _categoryRepository.Update(category);
-            await _categoryRepository.SaveAsync();
-            return category;
-        }
-
-        public async Task DeleteFileCategoryAsync(int id)
-        {
-            _categoryRepository.Remove(id);
-            await _categoryRepository.SaveAsync();
-        }
+        }  
     }
 }

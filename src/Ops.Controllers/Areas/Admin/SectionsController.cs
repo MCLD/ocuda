@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Sections;
 using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
@@ -16,19 +16,20 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
         public SectionsController(SectionService sectionService)
         {
-            _sectionService = sectionService
-                ?? throw new ArgumentNullException(nameof(sectionService));
+            _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
         }
 
         public async Task<IActionResult> Index(int page = 1)
         {
-            var sectionList = await _sectionService.GetSectionsAsync();
+            var filter = new BlogFilter(page);
+
+            var sectionList = await _sectionService.GetPaginatedListAsync(filter);
 
             var paginateModel = new PaginateModel()
             {
-                ItemCount = await _sectionService.GetSectionCountAsync(),
+                ItemCount = sectionList.Count,
                 CurrentPage = page,
-                ItemsPerPage = 2
+                ItemsPerPage = filter.Take.Value
             };
 
             if (paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
@@ -43,8 +44,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var viewModel = new IndexViewModel
             {
                 PaginateModel = paginateModel,
-                Sections = sectionList.Skip((page - 1) * paginateModel.ItemsPerPage)
-                                                .Take(paginateModel.ItemsPerPage)
+                Sections = sectionList.Data
             };
 
             return View(viewModel);
@@ -55,7 +55,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var viewModel = new DetailViewModel
             {
                 Action = nameof(Create),
-                IsReadonly = null
+                IsReadonly = false
             };
 
             return View("Detail", viewModel);
@@ -64,8 +64,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [HttpPost]
         public async Task<IActionResult> Create(DetailViewModel model)
         {
-            model.Section.CreatedBy = 1; //TODO fix CreatedBy
-
             if (ModelState.IsValid)
             {
                 try
@@ -92,8 +90,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 Section = await _sectionService.GetByIdAsync(id),
             };
 
-            viewModel.IsReadonly =
-                string.IsNullOrWhiteSpace(viewModel.Section.Path) ? "readonly" : null;
+            viewModel.IsReadonly = string.IsNullOrWhiteSpace(viewModel.Section.Path) ? true : false;
 
             return View("Detail", viewModel);
         }

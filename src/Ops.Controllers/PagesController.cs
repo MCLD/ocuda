@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Pages;
 using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers
@@ -12,21 +13,30 @@ namespace Ocuda.Ops.Controllers
     public class PagesController : BaseController
     {
         private readonly PageService _pageService;
-        
-        public PagesController(PageService pageService)
+        private readonly SectionService _sectionService;
+
+        public PagesController(PageService pageService, SectionService sectionService)
         {
             _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
+            _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
         }
 
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(string section, int page = 1)
         {
-            var pageList = await _pageService.GetPagesAsync();
+            var currentSection = await _sectionService.GetByPathAsync(section);
+
+            var filter = new BlogFilter(page)
+            {
+                SectionId = currentSection.Id
+            };
+
+            var pageList = await _pageService.GetPaginatedListAsync(filter);
 
             var paginateModel = new PaginateModel
             {
-                ItemCount = await _pageService.GetPageCountAsync(),
+                ItemCount = pageList.Count,
                 CurrentPage = page,
-                ItemsPerPage = 2
+                ItemsPerPage = filter.Take.Value
             };
 
             if (paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
@@ -41,8 +51,7 @@ namespace Ocuda.Ops.Controllers
             var viewModel = new IndexViewModel
             {
                 PaginateModel = paginateModel,
-                Pages = pageList.Skip((page - 1) * paginateModel.ItemsPerPage)
-                                .Take(paginateModel.ItemsPerPage)
+                Pages = pageList.Data
             };
 
             return View(viewModel);

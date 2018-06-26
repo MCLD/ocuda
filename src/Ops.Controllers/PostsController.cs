@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Posts;
 using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers
@@ -12,26 +13,30 @@ namespace Ocuda.Ops.Controllers
     public class PostsController : BaseController
     {
         private readonly PostService _postService;
+        private readonly SectionService _sectionService;
 
-        public PostsController(PostService postService)
+        public PostsController(PostService postService, SectionService sectionService)
         {
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
+            _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
         }
 
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(string section, int page = 1)
         {
-            var postList = await _postService.GetPostsAsync();
+            var currentSection = await _sectionService.GetByPathAsync(section);
 
-            foreach(var post in postList)
+            var filter = new BlogFilter(page)
             {
-                post.Content = CommonMark.CommonMarkConverter.Convert(post.Content);
-            }
+                SectionId = currentSection.Id
+            };
+
+            var postList = await _postService.GetPaginatedListAsync(filter);
 
             var paginateModel = new PaginateModel()
             {
-                ItemCount = await _postService.GetPostCountAsync(),
+                ItemCount = postList.Count,
                 CurrentPage = page,
-                ItemsPerPage = 2
+                ItemsPerPage = filter.Take.Value
             };
 
             if (paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
@@ -43,11 +48,15 @@ namespace Ocuda.Ops.Controllers
                     });
             }
 
+            foreach (var post in postList.Data)
+            {
+                post.Content = CommonMark.CommonMarkConverter.Convert(post.Content);
+            }
+
             var viewModel = new IndexViewModel()
             {
                 PaginateModel = paginateModel,
-                Posts = postList.Skip((page - 1) * paginateModel.ItemsPerPage)
-                                        .Take(paginateModel.ItemsPerPage)
+                Posts = postList.Data
             };
 
             return View(viewModel);

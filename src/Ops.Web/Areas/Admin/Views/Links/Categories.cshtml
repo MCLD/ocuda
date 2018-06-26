@@ -1,13 +1,14 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Links.CategoriesViewModel
 
-<form asp-controller="Links" asp-action="CreateCategory" method="post" role="form">
+<form asp-controller="Links" asp-action="@(nameof(LinksController.CreateCategory))" method="post" role="form">
+    <input asp-for="@Model.SectionId" type="hidden" />
     <input id="addCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
     <div modal id="addModal" name="Link Category" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addName" asp-for="Category.Name" formgroup />
     </div>
 </form>
 
-<form asp-controller="Links" asp-action="EditCategory" method="post" role="form">
+<form asp-controller="Links" asp-action="@(nameof(LinksController.EditCategory))" method="post" role="form">
     <input id="editCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
     <input id="editId" asp-for="Category.Id" type="hidden" />
     <div modal id="editModal" name="Link Category" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
@@ -15,7 +16,7 @@
     </div>
 </form>
 
-<form asp-controller="Links" asp-action="DeleteCategory" method="post" role="form">
+<form asp-controller="Links" asp-action="@(nameof(LinksController.DeleteCategory))" method="post" role="form">
     <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
     <input id="deleteName" asp-for="Category.Name" type="hidden" />
     <input id="deleteId" asp-for="Category.Id" type="hidden" />
@@ -28,6 +29,7 @@
             data-target="#addModal">
         Add New Category
     </button>
+    <a class="btn btn-secondary float-right" asp-action="@nameof(LinksController.Index)">Manage Links</a>
 </div>
 
 @if (Model.Categories.Count() == 0)

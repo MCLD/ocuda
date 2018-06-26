@@ -61,10 +61,10 @@ namespace Ocuda.Ops.Service
 
         public async Task<Page> EditAsync(Page page)
         {
-            // TODO check edit logic
             var currentPage = await _pageRepository.FindAsync(page.Id);
             currentPage.Title = page.Title;
             currentPage.Content = page.Content;
+            currentPage.IsDraft = page.IsDraft;
 
             _pageRepository.Update(currentPage);
             await _pageRepository.SaveAsync();

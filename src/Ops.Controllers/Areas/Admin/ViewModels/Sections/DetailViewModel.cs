@@ -9,6 +9,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Sections
     {
         public Section Section { get; set; }
         public string Action { get; set; }
-        public string IsReadonly { get; set; }
+        public bool IsReadonly { get; set; }
     }
 }

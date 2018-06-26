@@ -1,6 +1,6 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Links.IndexViewModel
 
-<form asp-controller="Links" asp-action="Delete" method="post" role="form">
+<form asp-controller="Links" asp-action="@nameof(LinksController.Delete)" method="post" role="form">
     <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
     <input id="deleteName" asp-for="Link.Name" type="hidden" />
     <input id="deleteId" asp-for="Link.Id" type="hidden" />
@@ -8,8 +8,25 @@
 </form>
 
 <div class="mb-2">
-    <a class="btn btn-outline-secondary text-dark" asp-action="Create">Add New Link</a>
-    <a class="btn btn-secondary float-right" asp-action="Categories">Manage Categories</a>
+    <a class="btn btn-outline-secondary text-dark" asp-action="@nameof(LinksController.Create)">Add New Link</a>
+    <a class="btn btn-secondary float-right" asp-action="@nameof(LinksController.Categories)">Manage Categories</a>
+</div>
+
+<div class="row mb-2">
+    <div class="col">
+        <span>Category: </span>
+        <a class="dropdown-toggle" href="#" role="button" id="dropdownCategory"
+           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            @(Model.CategoryName ?? "Show All")
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="dropdownCategory">
+            <li><a class="dropdown-item" asp-route-categoryId="">Show All</a></li>
+            @foreach (var category in Model.Categories)
+            {
+                <li><a class="dropdown-item" asp-route-categoryId="@category.Id">@category.Name</a></li>
+            }
+        </ul>
+    </div>
 </div>
 
 @if (Model.Links.Count() == 0)

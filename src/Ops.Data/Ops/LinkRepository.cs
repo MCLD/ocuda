@@ -32,6 +32,11 @@ namespace Ocuda.Ops.Data.Ops
                 query = query.Where(_ => _.SectionId == filter.SectionId);
             }
 
+            if (filter.CategoryId.HasValue)
+            {
+                query = query.Where(_ => _.CategoryId == filter.CategoryId);
+            }
+
             return new DataWithCount<ICollection<Link>>
             {
                 Count = await query.CountAsync(),

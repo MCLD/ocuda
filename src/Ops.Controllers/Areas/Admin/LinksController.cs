@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Links;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
@@ -13,21 +15,35 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     public class LinksController : BaseController
     {
         private readonly LinkService _linkService;
+        private readonly CategoryService _categoryService;
+        private readonly SectionService _sectionService;
 
-        public LinksController(LinkService linkService)
+        public LinksController(LinkService linkService, CategoryService categoryService, SectionService sectionService)
         {
             _linkService = linkService ?? throw new ArgumentNullException(nameof(linkService));
+            _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
+            _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
         }
 
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(string section, int? categoryId = null, int page = 1)
         {
-            var linkList = await _linkService.GetLinksAsync();
+            var currentSection = await _sectionService.GetByPathAsync(section);
+
+            var filter = new BlogFilter(page)
+            {
+                SectionId = currentSection.Id,
+                CategoryId = categoryId,
+                CategoryType = CategoryType.Link
+            };
+
+            var linkList = await _linkService.GetPaginatedListAsync(filter);
+            var categoryList = await _categoryService.GetBySectionIdAsync(filter);
 
             var paginateModel = new PaginateModel()
             {
-                ItemCount = await _linkService.GetLinkCountAsync(),
+                ItemCount = linkList.Count,
                 CurrentPage = page,
-                ItemsPerPage = 2
+                ItemsPerPage = filter.Take.Value
             };
 
             if (paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
@@ -42,18 +58,36 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var viewModel = new IndexViewModel()
             {
                 PaginateModel = paginateModel,
-                Links = linkList.Skip((page - 1) * paginateModel.ItemsPerPage)
-                                        .Take(paginateModel.ItemsPerPage)
+                Links = linkList.Data,
+                Categories = categoryList
             };
+
+            if (categoryId.HasValue)
+            {
+                viewModel.CategoryName =
+                    (await _categoryService.GetCategoryByIdAsync(categoryId.Value)).Name;
+            }
 
             return View(viewModel);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create(string section)
         {
+            var currentSection = await _sectionService.GetByPathAsync(section);
+
+            var filter = new BlogFilter()
+            {
+                SectionId = currentSection.Id,
+                CategoryType = CategoryType.Link
+            };
+
+            var categories = await _categoryService.GetBySectionIdAsync(filter);
+
             var viewModel = new DetailViewModel()
             {
-                Action = nameof(Create)
+                Action = nameof(Create),
+                SectionId = currentSection.Id,
+                Categories = categories
             };
 
             return View("Detail", viewModel);
@@ -62,13 +96,11 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [HttpPost]
         public async Task<IActionResult> Create(DetailViewModel model)
         {
-            model.Link.SectionId = 1; //TODO: Fix SectionId, CreatedBy
-            model.Link.CreatedBy = 1;
-
             if (ModelState.IsValid)
             {
                 try
                 {
+                    model.Link.SectionId = model.SectionId;
                     var newLink = await _linkService.CreateAsync(model.Link);
                     ShowAlertSuccess($"Added link: {newLink.Name}");
                     return RedirectToAction(nameof(Index));
@@ -85,10 +117,22 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
         public async Task<IActionResult> Edit(int id)
         {
+            var link = await _linkService.GetByIdAsync(id);
+
+            var filter = new BlogFilter()
+            {
+                SectionId = link.SectionId,
+                CategoryType = CategoryType.Link
+            };
+
+            var categories = await _categoryService.GetBySectionIdAsync(filter);
+
             var viewModel = new DetailViewModel()
             {
                 Action = nameof(Edit),
-                Link = await _linkService.GetByIdAsync(id)
+                SectionId = link.SectionId,
+                Link = link,
+                Categories = categories
             };
 
             return View("Detail", viewModel);
@@ -101,7 +145,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 try
                 {
-                    model.Link.SectionId = 1; //TODO: Use actual SectionId
                     var link = await _linkService.EditAsync(model.Link);
                     ShowAlertSuccess($"Updated link: {link.Name}");
                     return RedirectToAction(nameof(Index));
@@ -132,15 +175,23 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
         }
 
-        public IActionResult Categories(int page = 1)
+        public async Task<IActionResult> Categories(string section, int page = 1)
         {
-            var categoryList = _linkService.GetLinkCategories();
+            var currentSection = await _sectionService.GetByPathAsync(section);
+
+            var filter = new BlogFilter(page)
+            {
+                SectionId = currentSection.Id,
+                CategoryType = CategoryType.Link
+            };
+
+            var categoryList = await _categoryService.GetBySectionIdAsync(filter);
 
             var paginateModel = new PaginateModel()
             {
-                ItemCount = categoryList.Count(),
+                ItemCount = categoryList.Count,
                 CurrentPage = page,
-                ItemsPerPage = 2
+                ItemsPerPage = filter.Take.Value
             };
 
             if (paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
@@ -155,8 +206,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var viewModel = new CategoriesViewModel()
             {
                 PaginateModel = paginateModel,
-                Categories = categoryList.Skip((page - 1) * paginateModel.ItemsPerPage)
-                                            .Take(paginateModel.ItemsPerPage)
+                Categories = categoryList,
+                SectionId = currentSection.Id
             };
 
             return View(viewModel);
@@ -170,7 +221,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 try
                 {
-                    var newCategory = await _linkService.CreateLinkCategoryAsync(model.Category);
+                    model.Category.SectionId = model.SectionId;
+                    model.Category.CategoryType = CategoryType.Link;
+                    var newCategory = await _categoryService.CreateCategoryAsync(model.Category);
                     ShowAlertSuccess($"Added link category: {newCategory.Name}");
                 }
                 catch (Exception ex)
@@ -189,7 +242,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 try
                 {
-                    var category = await _linkService.EditLinkCategoryAsync(model.Category);
+                    var category = await _categoryService.EditCategoryAsync(model.Category);
                     ShowAlertSuccess($"Updated link category: {category.Name}");
                 }
                 catch (Exception ex)
@@ -206,7 +259,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             try
             {
-                await _linkService.DeleteLinkCategoryAsync(model.Category.Id);
+                await _categoryService.DeleteCategoryAsync(model.Category.Id);
                 ShowAlertSuccess("Link category deleted successfully.");
             }
             catch (Exception ex)

@@ -90,6 +90,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<SectionService>();
             services.AddScoped<FileService>();
             services.AddScoped<LinkService>();
+            services.AddScoped<CategoryService>();
             services.AddScoped<PostService>();
             services.AddScoped<UserService>();
             services.AddScoped<PageService>();
@@ -138,7 +139,7 @@ namespace Ocuda.Ops.Web
             {
                 routes.MapRoute(
                     name: null,
-                    template: "{area:exists}/{section}/{controller}/{action}/{id?}",
+                    template: "{area}/{section}/{controller}/{action}/{id?}",
                     defaults: new { controller = "Home", action = "Index" },
                     constraints: new
                     {
@@ -157,6 +158,10 @@ namespace Ocuda.Ops.Web
                    {
                        section = new SectionRouteConstraint(app.ApplicationServices.GetRequiredService<ISectionPathValidator>())
                    });
+
+                routes.MapRoute(
+                    name: null,
+                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
                 routes.MapRoute(
                     name: null,

@@ -1,6 +1,6 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Sections.IndexViewModel
 
-<form asp-controller="Sections" asp-action="Delete" method="post" role="form">
+<form asp-controller="Sections" asp-action="@(nameof(SectionsController.Delete))" method="post" role="form">
     <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
     <input id="deleteName" asp-for="Section.Name" type="hidden" />
     <input id="deleteId" asp-for="Section.Id" type="hidden" />
@@ -8,7 +8,7 @@
 </form>
 
 <div class="mb-2">
-    <a class="btn btn-outline-secondary text-dark" asp-action="Create">Add New Section</a>
+    <a class="btn btn-outline-secondary text-dark" asp-action="@(nameof(SectionsController.Create))">Add New Section</a>
 </div>
 
 @if (Model.Sections.Count() == 0)
@@ -32,7 +32,7 @@ else
             {
             <tr>
                 <td class="rowlink-parent">
-                    <a asp-action="Edit" asp-route-id="@sec.Id" class="rowlink">@sec.Name</a>
+                    <a asp-action="@(nameof(SectionsController.Edit))" asp-route-id="@sec.Id" class="rowlink">@sec.Name</a>
                 </td>
                 <td>@(string.IsNullOrWhiteSpace(sec.Path) ? "null" : sec.Path)</td>
                 @if (string.IsNullOrWhiteSpace(sec.Icon))
