@@ -8,8 +8,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Links
 {
     public class CategoriesViewModel
     {
-        public IEnumerable<LinkCategory> Categories { get; set; }
-        public LinkCategory Category { get; set; }
+        public IEnumerable<Category> Categories { get; set; }
+        public Category Category { get; set; }
         public PaginateModel PaginateModel { get; set; }
+        public int SectionId { get; set; }
     }
 }

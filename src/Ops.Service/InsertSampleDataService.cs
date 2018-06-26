@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Interfaces.Ops;
@@ -8,19 +9,23 @@ namespace Ocuda.Ops.Service
 {
     public class InsertSampleDataService
     {
+        private readonly ICategoryRepository _categoryRepository;
         private readonly IFileRepository _fileRepository;
         private readonly ILinkRepository _linkRepository;
         private readonly IPageRepository _pageRepository;
         private readonly IPostRepository _postRepository;
         private readonly ISectionRepository _sectionRepository;
         private readonly IUserRepository _userRepository;
-        public InsertSampleDataService(IFileRepository fileRepository,
+        public InsertSampleDataService(ICategoryRepository categoryRepository,
+            IFileRepository fileRepository,
             ILinkRepository linkRepository,
             IPageRepository pageRepository,
             IPostRepository postRepository,
             ISectionRepository sectionRepository,
             IUserRepository userRepository)
         {
+            _categoryRepository = categoryRepository
+                ?? throw new ArgumentNullException(nameof(categoryRepository));
             _fileRepository = fileRepository
                 ?? throw new ArgumentNullException(nameof(fileRepository));
             _linkRepository = linkRepository
@@ -168,18 +173,56 @@ namespace Ocuda.Ops.Service
                 Stub = "test-post-4",
                 SectionId = sectionId
             });
-            
+
             await _postRepository.SaveAsync();
         }
 
+
+        public async Task<ICollection<Category>> InsertLinkCategoriesAsync(int sectionId)
+        {
+            var categories = new List<Category>
+            {
+                new Category
+                {
+                    Name = "Link Category 1",
+                    CategoryType = CategoryType.Link,
+                    CreatedAt = DateTime.Parse("2018-05-20"),
+                    CreatedBy = SystemAdministrator.Id,
+                    SectionId = sectionId
+                },
+
+                new Category
+                {
+                    Name = "Link Category 2",
+                    CategoryType = CategoryType.Link,
+                    CreatedAt = DateTime.Parse("2018-06-04"),
+                    CreatedBy = SystemAdministrator.Id,
+                    SectionId = sectionId
+                }
+            };
+
+            foreach (var category in categories)
+            {
+                await _categoryRepository.AddAsync(category);
+            }
+
+            await _categoryRepository.SaveAsync();
+
+            return categories;
+        }
+
+
         public async Task InsertLinksAsync(int sectionId)
         {
+            var categories = await InsertLinkCategoriesAsync(sectionId);
+
             await _linkRepository.AddAsync(new Link
             {
                 Url = "https://maricopacountyreads.org/",
                 Name = "Summer Reading",
                 CreatedBy = SystemAdministrator.Id,
                 CreatedAt = DateTime.Now,
+                Category = categories.FirstOrDefault(),
                 SectionId = sectionId
             });
             await _linkRepository.AddAsync(new Link
@@ -188,6 +231,7 @@ namespace Ocuda.Ops.Service
                 Name = "Reading Adventure",
                 CreatedBy = SystemAdministrator.Id,
                 CreatedAt = DateTime.Now,
+                Category = categories.FirstOrDefault(),
                 SectionId = sectionId
             });
             await _linkRepository.AddAsync(new Link
@@ -196,14 +240,50 @@ namespace Ocuda.Ops.Service
                 Name = "Find Libraries",
                 CreatedBy = SystemAdministrator.Id,
                 CreatedAt = DateTime.Now,
+                Category = categories.LastOrDefault(),
                 SectionId = sectionId
             });
 
             await _linkRepository.SaveAsync();
         }
 
+        public async Task<ICollection<Category>> InsertFileCategoriesAsync(int sectionId)
+        {
+            var categories = new List<Category>
+            {
+                new Category
+                {
+                    Name = "File Category 1",
+                    CategoryType = CategoryType.File,
+                    CreatedAt = DateTime.Parse("2018-05-20"),
+                    CreatedBy = SystemAdministrator.Id,
+                    SectionId = sectionId
+                },
+
+                new Category
+                {
+                    Name = "File Category 2",
+                    CategoryType = CategoryType.File,
+                    CreatedAt = DateTime.Parse("2018-06-04"),
+                    CreatedBy = SystemAdministrator.Id,
+                    SectionId = sectionId
+                }
+            };
+
+            foreach (var category in categories)
+            {
+                await _categoryRepository.AddAsync(category);
+            }
+
+            await _categoryRepository.SaveAsync();
+
+            return categories;
+        }
+
         public async Task InsertFilesAsync(int sectionId)
         {
+            var categories = await InsertFileCategoriesAsync(sectionId);
+
             await _fileRepository.AddAsync(new File
             {
                 CreatedAt = DateTime.Parse("2018-05-20"),
@@ -211,6 +291,7 @@ namespace Ocuda.Ops.Service
                 Name = "New File 1",
                 Icon = "fa-file-pdf alert-danger",
                 CreatedBy = SystemAdministrator.Id,
+                Category = categories.FirstOrDefault(),
                 SectionId = sectionId
             });
             await _fileRepository.AddAsync(new File
@@ -220,6 +301,7 @@ namespace Ocuda.Ops.Service
                 Name = "New File 2",
                 Icon = "fa-file-excel alert-success",
                 CreatedBy = SystemAdministrator.Id,
+                Category = categories.FirstOrDefault(),
                 SectionId = sectionId
             });
             await _fileRepository.AddAsync(new File
@@ -230,9 +312,10 @@ namespace Ocuda.Ops.Service
                 Name = "Important File!",
                 Icon = "fa-file-word alert-primary",
                 CreatedBy = SystemAdministrator.Id,
+                Category = categories.LastOrDefault(),
                 SectionId = sectionId
             });
-            
+
             await _fileRepository.SaveAsync();
         }
 
@@ -275,7 +358,7 @@ namespace Ocuda.Ops.Service
                 Stub = "test-page-4",
                 SectionId = sectionId
             });
-            
+
             await _pageRepository.SaveAsync();
         }
     }

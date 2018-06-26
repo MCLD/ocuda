@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops;
+using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Service
 {
@@ -31,40 +33,45 @@ namespace Ocuda.Ops.Service
             return await _pageRepository.ToListAsync(skip, take, _ => _.CreatedAt);
         }
 
-        public async Task<Page> GetPageByIdAsync(int id)
+        public async Task<Page> GetByIdAsync(int id)
         {
             return await _pageRepository.FindAsync(id);
         }
 
-        public async Task<Page> GetPageByStubAsync(string stub)
+        public async Task<Page> GetByStubAsync(string stub)
         {
-            //TODO add repository method
-            throw new NotImplementedException();
+            return await _pageRepository.GetByStubAsync(stub);
         }
 
-        public async Task<Page> CreatePageAsync(Page page)
+        public async Task<DataWithCount<ICollection<Page>>> GetPaginatedListAsync(BlogFilter filter)
+        {
+            return await _pageRepository.GetPaginatedListAsync(filter);
+        }
+
+        public async Task<Page> CreateAsync(Page page)
         {
             page.CreatedAt = DateTime.Now;
+            // TODO Set CreatedBy Id
+            page.CreatedBy = 1;
+
             await _pageRepository.AddAsync(page);
             await _pageRepository.SaveAsync();
-
             return page;
         }
 
-        public async Task<Page> EditPageAsync(Page page)
+        public async Task<Page> EditAsync(Page page)
         {
-            // TODO fix edit logic
             var currentPage = await _pageRepository.FindAsync(page.Id);
             currentPage.Title = page.Title;
             currentPage.Content = page.Content;
+            currentPage.IsDraft = page.IsDraft;
 
             _pageRepository.Update(currentPage);
             await _pageRepository.SaveAsync();
-
             return page;
         }
 
-        public async Task DeletePageAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             _pageRepository.Remove(id);
             await _pageRepository.SaveAsync();

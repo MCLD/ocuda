@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ocuda.Ops.Controllers.RouteConstraint;
+using Ocuda.Ops.Controllers.Validator;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Web.Middleware;
@@ -21,7 +22,7 @@ namespace Ocuda.Ops.Web
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             var logger = Serilog.Log.Logger;
             // set a default culture of en-US if none is specified
@@ -71,11 +72,16 @@ namespace Ocuda.Ops.Web
             // repositories
             services.AddScoped<Service.Interfaces.Ops.IFileRepository, Data.Ops.FileRepository>();
             services.AddScoped<Service.Interfaces.Ops.ILinkRepository, Data.Ops.LinkRepository>();
+            services.AddScoped<Service.Interfaces.Ops.ICategoryRepository, Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.IPageRepository, Data.Ops.PageRepository>();
             services.AddScoped<Service.Interfaces.Ops.IPostRepository, Data.Ops.PostRepository>();
             services.AddScoped<Service.Interfaces.Ops.ISectionRepository, Data.Ops.SectionRepository>();
             services.AddScoped<Service.Interfaces.Ops.ISiteSettingRepository, Data.Ops.SiteSettingRepository>();
             services.AddScoped<Service.Interfaces.Ops.IUserRepository, Data.Ops.UserRepository>();
+
+            // path validator
+            services.AddScoped<Controllers.Validator.ISectionPathValidator,
+                Controllers.Validator.SectionPathValidator>();
 
             // services
             services.AddScoped<InitialSetupService>();
@@ -84,9 +90,13 @@ namespace Ocuda.Ops.Web
             services.AddScoped<SectionService>();
             services.AddScoped<FileService>();
             services.AddScoped<LinkService>();
+            services.AddScoped<CategoryService>();
             services.AddScoped<PostService>();
             services.AddScoped<UserService>();
             services.AddScoped<PageService>();
+
+            var serviceProvider = services.BuildServiceProvider();
+            return serviceProvider;
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -129,11 +139,11 @@ namespace Ocuda.Ops.Web
             {
                 routes.MapRoute(
                     name: null,
-                    template: "{area:exists}/{section}/{controller}/{action}/{id?}",
+                    template: "{area}/{section}/{controller}/{action}/{id?}",
                     defaults: new { controller = "Home", action = "Index" },
                     constraints: new
                     {
-                        section = new SectionRouteConstraint()
+                        section = new SectionRouteConstraint(app.ApplicationServices.GetRequiredService<ISectionPathValidator>())
                     });
 
                 routes.MapRoute(
@@ -141,13 +151,18 @@ namespace Ocuda.Ops.Web
                     template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
                 routes.MapRoute(
+                   name: null,
+                   template: "{section}/{controller}/{action}/{id?}",
+                   defaults: new { controller = "Home", action = "Index" },
+                   constraints: new
+                   {
+                       section = new SectionRouteConstraint(app.ApplicationServices.GetRequiredService<ISectionPathValidator>())
+                   });
+
+                routes.MapRoute(
                     name: null,
-                    template: "{section}/{controller}/{action}/{id?}",
-                    defaults: new { controller = "Home", action = "Index" },
-                    constraints: new
-                    {
-                        section = new SectionRouteConstraint()
-                    });
+                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
                 routes.MapRoute(
                     name: null,
                     template: "{controller=Home}/{action=Index}/{id?}");

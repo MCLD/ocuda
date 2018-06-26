@@ -1,6 +1,6 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Posts.IndexViewModel
 
-<form asp-controller="Posts" asp-action="Delete" method="post" role="form">
+<form asp-controller="Posts" asp-action="@(nameof(PostsController.Delete))" method="post" role="form">
     <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
     <input id="deleteName" asp-for="Post.Title" type="hidden" />
     <input id="deleteId" asp-for="Post.Id" type="hidden" />
@@ -8,7 +8,7 @@
 </form>
 
 <div class="mb-2">
-    <a class="btn btn-outline-secondary text-dark" asp-action="Create">Create Blog Post</a>
+    <a class="btn btn-outline-secondary text-dark" asp-action="@(nameof(PostsController.Create))">Create Blog Post</a>
 </div>
 
 @if (Model.Posts.Count() == 0)
@@ -32,7 +32,7 @@ else
             {
                 <tr>
                     <td class="rowlink-parent">
-                        <a asp-action="Edit" asp-route-id="@post.Id" class="rowlink">
+                        <a asp-action="@(nameof(PostsController.Edit))" asp-route-id="@post.Id" class="rowlink">
                             @post.Title
                         </a>
                     </td>

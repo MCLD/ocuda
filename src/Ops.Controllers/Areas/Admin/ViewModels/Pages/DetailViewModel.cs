@@ -9,5 +9,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages
     {
         public Page Page { get; set; }
         public string Action { get; set; }
+        public int SectionId { get; set; }
     }
 }

@@ -1,8 +1,13 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Data.Extensions;
+using Ocuda.Ops.Models;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops;
+using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
@@ -14,14 +19,51 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
-        #region Initial setup methods
-        public Task<Models.Section> GetDefaultSectionAsync()
+        public Task<Section> GetDefaultSectionAsync()
         {
             return DbSet
                 .AsNoTracking()
                 .Where(_ => string.IsNullOrEmpty(_.Path))
                 .FirstOrDefaultAsync();
         }
-        #endregion Initial setup methods
+
+        public async Task<ICollection<Section>> GetNavigationSectionsAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => !string.IsNullOrWhiteSpace(_.Icon))
+                .OrderBy(_ => _.SortOrder)
+                .ToListAsync();
+        }
+
+        public async Task<bool> IsValidPathAsync(string path)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Path == path)
+                .AnyAsync();
+        }
+
+        public async Task<Section> GetByPathAsync(string path)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Path == path)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<DataWithCount<ICollection<Section>>> GetPaginatedListAsync
+            (BaseFilter filter) {
+            var query = DbSet.AsNoTracking();
+
+            return new DataWithCount<ICollection<Section>>
+            {
+                Count = await query.CountAsync(),
+                Data = await query
+                    .OrderBy(_ => _.SortOrder)
+                    .ApplyPagination(filter)
+                    .ToListAsync()
+            };
+        }
     }
 }

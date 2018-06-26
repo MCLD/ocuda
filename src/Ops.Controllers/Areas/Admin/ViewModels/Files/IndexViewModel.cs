@@ -9,7 +9,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Files
     public class IndexViewModel
     {
         public IEnumerable<File> Files { get; set; }
+        public IEnumerable<Category> Categories { get; set; }
         public File File { get; set; }
         public PaginateModel PaginateModel { get; set; }
+        public string CategoryName { get; set; }
     }
 }
