@@ -1,0 +1,104 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Files.CategoriesViewModel
+
+<form asp-controller="Files" asp-action="@(nameof(FilesController.CreateCategory))" method="post" role="form">
+    <input asp-for="@Model.SectionId" type="hidden" />
+    <input id="addCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
+    <div modal id="addModal" name="File Category" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+        <input id="addName" asp-for="Category.Name" formgroup />
+    </div>
+</form>
+
+<form asp-controller="Files" asp-action="@(nameof(FilesController.EditCategory))" method="post" role="form">
+    <input id="editCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
+    <input id="editId" asp-for="Category.Id" type="hidden" />
+    <div modal id="editModal" name="File Category" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <input id="editName" asp-for="Category.Name" formgroup />
+    </div>
+</form>
+
+<form asp-controller="Files" asp-action="@(nameof(FilesController.DeleteCategory))" method="post" role="form">
+    <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
+    <input id="deleteName" asp-for="Category.Name" type="hidden" />
+    <input id="deleteId" asp-for="Category.Id" type="hidden" />
+    <div modal id="deleteModal" name="File Category" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+</form>
+
+<div class="mb-2">
+    <button class="btn btn-outline-secondary text-dark"
+            data-toggle="modal"
+            data-target="#addModal">
+        Add New Category
+    </button>
+    <a class="btn btn-secondary float-right" asp-action="@(nameof(FilesController.Index))">Manage Files</a>
+</div>
+
+@if (Model.Categories.Count() == 0)
+{
+    <div class="alert alert-warning">No Categories Found</div>
+}
+else
+{
+    <table class="table table-sm table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var category in Model.Categories)
+            {
+                <tr>
+                    <td>@category.Name</td>
+                    <td align="center">
+                        <button type="button"
+                                class="btn btn-info btn-xs"
+                                data-toggle="modal"
+                                data-target="#editModal"
+                                data-id="@category.Id"
+                                data-category="@category.Name">
+                            <span class="fa fa-pencil-alt" aria-hidden="true"></span>
+                        </button>
+                        <button type="button"
+                                class="btn btn-danger btn-xs"
+                                data-toggle="modal"
+                                data-target="#deleteModal"
+                                data-id="@category.Id"
+                                data-category="@category.Name">
+                            <span class="fa fa-times" aria-hidden="true"></span>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (Model.PaginateModel.MaxPage > 1)
+    {
+        <paginate paginateModel="@Model.PaginateModel"></paginate>
+    }
+}
+
+@section scripts
+    {
+    <script>
+        $("#editModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var category = button.data("category");
+            var modal = $(this);
+            $("#editId").val(id);
+            modal.find("#editName").val(category);
+        });
+
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var category = button.data("category");
+            var modal = $(this);
+            $("#deleteName").val(category);
+            $("#deleteId").val(id);
+            modal.find(".modal-text").text(" Are you sure you want to delete \"" + category + "\"?");
+        });
+    </script>
+}

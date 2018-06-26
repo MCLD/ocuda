@@ -11,7 +11,7 @@
 </head>
 <body>
     <div class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-dark">
-        <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+        <a class="navbar-brand" asp-area="" asp-route-section="" asp-controller="Home" asp-action="@(nameof(HomeController.Index))">
             <span class="fa fa-home"></span>
             Home
         </a>
@@ -26,12 +26,18 @@
                 @foreach (var sec in (IEnumerable<Section>)Context.Items[ItemKey.Sections])
                 {
                     <li class="nav-item">
-                        <a class="nav-link" href="@sec.Path">
+                        <a class="nav-link" asp-area="" asp-route-section="@sec.Path" asp-route-controller="Home">
                             <span class="fa @sec.Icon" title="@sec.Name"></span>
                             <span class="d-sm-none"> @sec.Name</span>
                         </a>
                     </li>
                 }
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Debug" asp-action="InsertSampleData">
+                        <span class="fas fa-database" title="Insert Sample Data"></span>
+                        <span class="d-sm-none"> Insert Sample Data</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>

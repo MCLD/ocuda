@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Ops.Models
 {
@@ -16,6 +17,11 @@ namespace Ocuda.Ops.Models
         [MaxLength(255)]
         public string Description { get; set; }
 
+        [DisplayName("Featured")]
         public bool IsFeatured { get; set; }
+
+        [DisplayName("Category")]
+        public int? CategoryId { get; set; }
+        public Category Category { get; set; }
     }
 }

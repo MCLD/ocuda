@@ -1,4 +1,21 @@
-﻿@model Ocuda.Ops.Controllers.ViewModels.Links.LinkListViewModel
+﻿@model Ocuda.Ops.Controllers.ViewModels.Links.IndexViewModel
+
+<div class="row mb-2">
+    <div class="col">
+        <span>Category: </span>
+        <a class="dropdown-toggle" href="#" role="button" id="dropdownCategory"
+           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            @(Model.CategoryName ?? "Show All")
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="dropdownCategory">
+            <li><a class="dropdown-item" asp-route-categoryId="">Show All</a></li>
+            @foreach (var category in Model.Categories)
+            {
+                <li><a class="dropdown-item" asp-route-categoryId="@category.Id">@category.Name</a></li>
+            }
+        </ul>
+    </div>
+</div>
 
 @if (Model.Links.Count() == 0)
 {
