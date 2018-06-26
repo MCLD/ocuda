@@ -76,6 +76,7 @@ _Eventually this should be moved to the user documentation._
 - `Ops.Culture` - defaults to "en-US", the culture to use for displaying things like dates and times - for valid options see the language tags listed in the [Microsoft National Language Support (NLS) API Reference](http://go.microsoft.com/fwlink/?LinkId=200048)
 - `Ops.DistributedCache` - when unset, defaults to memory-based distributed cache - a cache strategy to use: currently either unset or 'Redis' are valid
 - `Ops.DistributedCache.RedisConfiguration` - *also used by Ops.Web.WindowsAuth* - if *Ops.DistributedCache* is set to 'Redis' this must be set with Redis configuration information, see the [RedisCacheOptions.Configuration property](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.caching.redis.rediscacheoptions.configuration)
+- `Ops.DomainName` - an Active Directory domain name to remove from the beginning of authenticated users (do not include the slash)
 - `Ops.HttpErrorFileTag` - if *Ops.RollingLogLocation* is set, this will write out http error logs in the same location but with the value of this setting in the filename
 - `Ops.Instance` - configure an instance name for more specific logging
 - `Ops.RollingLogLocation` - path of where to write log files which rotate daily, if unset no rolling log is written
