@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Interfaces.Ops;
 
 namespace Ocuda.Ops.Service
@@ -13,26 +15,23 @@ namespace Ocuda.Ops.Service
         }
 
         /// <summary>
-        /// Ensure the sysadmin user exists. This is done synchronously so it can be called during
-        /// application setup.
+        /// Ensure the sysadmin user exists.
         /// </summary>
-        public void EnsureSysadminUser()
+        public async Task<User> EnsureSysadminUserAsync()
         {
-            var sysadminUser = _userRepository.GetSystemAdministrator();
+            var sysadminUser = await _userRepository.GetSystemAdministratorAsync();
             if (sysadminUser == null)
             {
-                var addTask = _userRepository.AddAsync(new Ocuda.Ops.Models.User
+                sysadminUser = new Ocuda.Ops.Models.User
                 {
                     Username = "sysadmin",
                     CreatedAt = DateTime.Now,
                     IsSysadmin = true
-                });
-                addTask.Wait();
-
-                var saveTask = _userRepository.SaveAsync();
-                saveTask.Wait();
+                };
+                await _userRepository.AddAsync(sysadminUser);
+                await _userRepository.SaveAsync();
             }
+            return sysadminUser;
         }
-
     }
 }

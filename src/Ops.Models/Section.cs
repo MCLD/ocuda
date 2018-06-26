@@ -12,10 +12,5 @@ namespace Ocuda.Ops.Models
         [MaxLength(32)]
         public string Icon { get; set; }
         public int SortOrder { get; set; }
-
-        public int PostsToShow { get; set; }
-        public int LinksToShow { get; set; }
-        public int ItemsToShow { get; set; }
-        public int CalendarItemsToShow { get; set; }
     }
 }

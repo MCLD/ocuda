@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Interfaces.Ops;
@@ -7,19 +9,23 @@ namespace Ocuda.Ops.Service
 {
     public class InsertSampleDataService
     {
+        private readonly ICategoryRepository _categoryRepository;
         private readonly IFileRepository _fileRepository;
         private readonly ILinkRepository _linkRepository;
         private readonly IPageRepository _pageRepository;
         private readonly IPostRepository _postRepository;
         private readonly ISectionRepository _sectionRepository;
         private readonly IUserRepository _userRepository;
-        public InsertSampleDataService(IFileRepository fileRepository,
+        public InsertSampleDataService(ICategoryRepository categoryRepository,
+            IFileRepository fileRepository,
             ILinkRepository linkRepository,
             IPageRepository pageRepository,
             IPostRepository postRepository,
             ISectionRepository sectionRepository,
             IUserRepository userRepository)
         {
+            _categoryRepository = categoryRepository
+                ?? throw new ArgumentNullException(nameof(categoryRepository));
             _fileRepository = fileRepository
                 ?? throw new ArgumentNullException(nameof(fileRepository));
             _linkRepository = linkRepository
@@ -43,54 +49,99 @@ namespace Ocuda.Ops.Service
             {
                 if (_systemAdministrator == null)
                 {
-                    _systemAdministrator = _userRepository.GetSystemAdministrator();
+                    _systemAdministrator = _userRepository.GetSystemAdministratorAsync().Result;
                 }
                 return _systemAdministrator;
             }
         }
 
-        private async Task<Section> GetDefaultSectionAsync()
+        public async Task InsertDataAsync()
         {
-            var defaultSection = await _sectionRepository.GetDefaultSectionAsync();
-            if (defaultSection == null)
-            {
-                await _sectionRepository.AddAsync(new Section
-                {
-                    CreatedAt = DateTime.Now,
-                    CreatedBy = SystemAdministrator.Id,
-                    Name = "Default"
-                });
-                await _sectionRepository.SaveAsync();
+            var sections = await InsertSectionsAsync();
 
-                defaultSection = await _sectionRepository.GetDefaultSectionAsync();
+            foreach (var section in sections)
+            {
+                await InsertPostsAsync(section.Id);
+                await InsertFilesAsync(section.Id);
+                await InsertLinksAsync(section.Id);
+                await InsertPagesAsync(section.Id);
             }
-            return defaultSection;
         }
 
-        public async Task InsertPostsAsync()
+        public async Task<ICollection<Section>> InsertSectionsAsync()
         {
-            var defaultSection = await GetDefaultSectionAsync();
+            // seed data
+            var sections = new List<Section>
+            {
+                new Section
+                {
+                    Icon = "fa-smile",
+                    Name = "Human Resources",
+                    Path = "HR",
+                    SortOrder = 1,
+                    CreatedBy = SystemAdministrator.Id,
+                    CreatedAt = DateTime.Now
+                },
+                new Section
+                {
+                    Icon = "fa-users",
+                    Name = "Operations",
+                    Path = "Operations",
+                    SortOrder = 2,
+                    CreatedBy = SystemAdministrator.Id,
+                    CreatedAt = DateTime.Now
+                },
+                new Section
+                {
+                    Icon = "fa-comments",
+                    Name = "Communications",
+                    Path = "Communications",
+                    SortOrder = 3,
+                    CreatedBy = SystemAdministrator.Id,
+                    CreatedAt = DateTime.Now
+                },
+                new Section
+                {
+                    Icon = "fa-thumbs-up",
+                    Name = "Services",
+                    Path = "Services",
+                    SortOrder = 4,
+                    CreatedBy = SystemAdministrator.Id,
+                    CreatedAt = DateTime.Now
+                },
+                new Section
+                {
+                    Icon = "fa-laptop",
+                    Name = "IT",
+                    Path = "IT",
+                    SortOrder = 5,
+                    CreatedBy = SystemAdministrator.Id,
+                    CreatedAt = DateTime.Now
+                }
+            };
 
+            foreach (var section in sections)
+            {
+                await _sectionRepository.AddAsync(section);
+            }
+
+            await _sectionRepository.SaveAsync();
+
+            return sections;
+        }
+
+        public async Task InsertPostsAsync(int sectionId)
+        {
             // seed data
             await _postRepository.AddAsync(new Post
             {
-                Content = "Nam dignissim porta leo vitae sodales. Morbi mollis, libero vitae sagittis tincidunt, mi dui luctus metus, elementum tincidunt nisl nisl at elit. Nulla tellus elit, aliquam in pulvinar id, interdum in velit. Suspendisse non aliquam dolor, vestibulum lacinia est. Pellentesque placerat nibh blandit, gravida nulla sed, tristique nisi. Nunc volutpat ultrices augue et congue. In in lacus condimentum dui finibus sagittis nec ut neque. Aenean accumsan nisl quis convallis rutrum. Cras vel imperdiet est. Curabitur et sagittis dui.",
-                CreatedAt = DateTime.Parse("2018-06-04 15:00"),
-                IsPinned = true,
-                CreatedBy = SystemAdministrator.Id,
-                Title = "Test Post 3",
-                Stub = "test-post-3",
-                SectionId = defaultSection.Id
-            });
-            await _postRepository.AddAsync(new Post
-            {
-                Content = "Ut auctor risus diam, sed aliquam quam iaculis ac. Sed rutrum tortor eget ante consequat, ac malesuada ligula dictum. Phasellus non urna interdum, vehicula augue ac, egestas orci. Sed ut nisl ipsum. Donec hendrerit, nisl vitae interdum pretium, ligula lorem varius nisi, non cursus libero libero eu dolor. Fusce bibendum, lorem sed tempor condimentum, enim ante sollicitudin dolor, faucibus viverra quam erat ac neque. Integer sagittis magna eu augue eleifend, at pellentesque diam malesuada.",
-                CreatedAt = DateTime.Parse("2018-06-04 17:25"),
+                Content = "Sed semper, sapien quis luctus semper, nibh eros sollicitudin tellus, at tincidunt arcu odio a est. Nam nec nulla ex. Nullam et maximus ex, at porttitor velit. Sed ac justo ligula. Morbi sed lectus turpis. Aenean suscipit tellus nec risus aliquam, et dignissim urna mollis. Aliquam erat volutpat. Curabitur risus tellus, facilisis a tempus eu, hendrerit ut elit. Phasellus ut quam consequat, molestie mauris non, faucibus felis. Pellentesque finibus lobortis arcu, a tincidunt erat pulvinar vel. Proin in egestas magna, nec feugiat velit.",
+                CreatedAt = DateTime.Parse("2018-06-04 12:15"),
                 IsPinned = false,
                 CreatedBy = SystemAdministrator.Id,
-                Title = "Test Post 4",
-                Stub = "test-post-4",
-                SectionId = defaultSection.Id
+                Title = "Test Post 1",
+                Stub = "test-post-1",
+                SectionId = sectionId
             });
             await _postRepository.AddAsync(new Post
             {
@@ -100,32 +151,79 @@ namespace Ocuda.Ops.Service
                 CreatedBy = SystemAdministrator.Id,
                 Title = "Test Post 2",
                 Stub = "test-post-2",
-                SectionId = defaultSection.Id
+                SectionId = sectionId
             });
             await _postRepository.AddAsync(new Post
             {
-                Content = "Sed semper, sapien quis luctus semper, nibh eros sollicitudin tellus, at tincidunt arcu odio a est. Nam nec nulla ex. Nullam et maximus ex, at porttitor velit. Sed ac justo ligula. Morbi sed lectus turpis. Aenean suscipit tellus nec risus aliquam, et dignissim urna mollis. Aliquam erat volutpat. Curabitur risus tellus, facilisis a tempus eu, hendrerit ut elit. Phasellus ut quam consequat, molestie mauris non, faucibus felis. Pellentesque finibus lobortis arcu, a tincidunt erat pulvinar vel. Proin in egestas magna, nec feugiat velit.",
-                CreatedAt = DateTime.Parse("2018-06-04 12:15"),
+                Content = "Nam dignissim porta leo vitae sodales. Morbi mollis, libero vitae sagittis tincidunt, mi dui luctus metus, elementum tincidunt nisl nisl at elit. Nulla tellus elit, aliquam in pulvinar id, interdum in velit. Suspendisse non aliquam dolor, vestibulum lacinia est. Pellentesque placerat nibh blandit, gravida nulla sed, tristique nisi. Nunc volutpat ultrices augue et congue. In in lacus condimentum dui finibus sagittis nec ut neque. Aenean accumsan nisl quis convallis rutrum. Cras vel imperdiet est. Curabitur et sagittis dui.",
+                CreatedAt = DateTime.Parse("2018-06-04 15:00"),
+                IsPinned = true,
+                CreatedBy = SystemAdministrator.Id,
+                Title = "Test Post 3",
+                Stub = "test-post-3",
+                SectionId = sectionId
+            });
+            await _postRepository.AddAsync(new Post
+            {
+                Content = "Ut auctor risus diam, sed aliquam quam iaculis ac. Sed rutrum tortor eget ante consequat, ac malesuada ligula dictum. Phasellus non urna interdum, vehicula augue ac, egestas orci. Sed ut nisl ipsum. Donec hendrerit, nisl vitae interdum pretium, ligula lorem varius nisi, non cursus libero libero eu dolor. Fusce bibendum, lorem sed tempor condimentum, enim ante sollicitudin dolor, faucibus viverra quam erat ac neque. Integer sagittis magna eu augue eleifend, at pellentesque diam malesuada.",
+                CreatedAt = DateTime.Parse("2018-06-04 17:25"),
                 IsPinned = false,
                 CreatedBy = SystemAdministrator.Id,
-                Title = "Test Post 1",
-                Stub = "test-post-1",
-                SectionId = defaultSection.Id
+                Title = "Test Post 4",
+                Stub = "test-post-4",
+                SectionId = sectionId
             });
 
             await _postRepository.SaveAsync();
         }
 
-        public async Task InsertLinks()
+
+        public async Task<ICollection<Category>> InsertLinkCategoriesAsync(int sectionId)
         {
-            var defaultSection = await GetDefaultSectionAsync();
+            var categories = new List<Category>
+            {
+                new Category
+                {
+                    Name = "Link Category 1",
+                    CategoryType = CategoryType.Link,
+                    CreatedAt = DateTime.Parse("2018-05-20"),
+                    CreatedBy = SystemAdministrator.Id,
+                    SectionId = sectionId
+                },
+
+                new Category
+                {
+                    Name = "Link Category 2",
+                    CategoryType = CategoryType.Link,
+                    CreatedAt = DateTime.Parse("2018-06-04"),
+                    CreatedBy = SystemAdministrator.Id,
+                    SectionId = sectionId
+                }
+            };
+
+            foreach (var category in categories)
+            {
+                await _categoryRepository.AddAsync(category);
+            }
+
+            await _categoryRepository.SaveAsync();
+
+            return categories;
+        }
+
+
+        public async Task InsertLinksAsync(int sectionId)
+        {
+            var categories = await InsertLinkCategoriesAsync(sectionId);
+
             await _linkRepository.AddAsync(new Link
             {
                 Url = "https://maricopacountyreads.org/",
                 Name = "Summer Reading",
                 CreatedBy = SystemAdministrator.Id,
                 CreatedAt = DateTime.Now,
-                SectionId = defaultSection.Id
+                Category = categories.FirstOrDefault(),
+                SectionId = sectionId
             });
             await _linkRepository.AddAsync(new Link
             {
@@ -133,7 +231,8 @@ namespace Ocuda.Ops.Service
                 Name = "Reading Adventure",
                 CreatedBy = SystemAdministrator.Id,
                 CreatedAt = DateTime.Now,
-                SectionId = defaultSection.Id
+                Category = categories.FirstOrDefault(),
+                SectionId = sectionId
             });
             await _linkRepository.AddAsync(new Link
             {
@@ -141,24 +240,59 @@ namespace Ocuda.Ops.Service
                 Name = "Find Libraries",
                 CreatedBy = SystemAdministrator.Id,
                 CreatedAt = DateTime.Now,
-                SectionId = defaultSection.Id
+                Category = categories.LastOrDefault(),
+                SectionId = sectionId
             });
 
             await _linkRepository.SaveAsync();
         }
 
-        public async Task InsertFiles()
+        public async Task<ICollection<Category>> InsertFileCategoriesAsync(int sectionId)
         {
-            var defaultSection = await GetDefaultSectionAsync();
+            var categories = new List<Category>
+            {
+                new Category
+                {
+                    Name = "File Category 1",
+                    CategoryType = CategoryType.File,
+                    CreatedAt = DateTime.Parse("2018-05-20"),
+                    CreatedBy = SystemAdministrator.Id,
+                    SectionId = sectionId
+                },
+
+                new Category
+                {
+                    Name = "File Category 2",
+                    CategoryType = CategoryType.File,
+                    CreatedAt = DateTime.Parse("2018-06-04"),
+                    CreatedBy = SystemAdministrator.Id,
+                    SectionId = sectionId
+                }
+            };
+
+            foreach (var category in categories)
+            {
+                await _categoryRepository.AddAsync(category);
+            }
+
+            await _categoryRepository.SaveAsync();
+
+            return categories;
+        }
+
+        public async Task InsertFilesAsync(int sectionId)
+        {
+            var categories = await InsertFileCategoriesAsync(sectionId);
+
             await _fileRepository.AddAsync(new File
             {
-                CreatedAt = DateTime.Parse("2018-05-01"),
-                IsFeatured = true,
+                CreatedAt = DateTime.Parse("2018-05-20"),
                 FilePath = "/file.txt",
-                Name = "Important File!",
-                Icon = "fa-file-word alert-primary",
+                Name = "New File 1",
+                Icon = "fa-file-pdf alert-danger",
                 CreatedBy = SystemAdministrator.Id,
-                SectionId = defaultSection.Id
+                Category = categories.FirstOrDefault(),
+                SectionId = sectionId
             });
             await _fileRepository.AddAsync(new File
             {
@@ -167,96 +301,35 @@ namespace Ocuda.Ops.Service
                 Name = "New File 2",
                 Icon = "fa-file-excel alert-success",
                 CreatedBy = SystemAdministrator.Id,
-                SectionId = defaultSection.Id
+                Category = categories.FirstOrDefault(),
+                SectionId = sectionId
             });
             await _fileRepository.AddAsync(new File
             {
-                CreatedAt = DateTime.Parse("2018-05-20"),
+                CreatedAt = DateTime.Parse("2018-05-01"),
+                IsFeatured = true,
                 FilePath = "/file.txt",
-                Name = "New File 1",
-                Icon = "fa-file-pdf alert-danger",
+                Name = "Important File!",
+                Icon = "fa-file-word alert-primary",
                 CreatedBy = SystemAdministrator.Id,
-                SectionId = defaultSection.Id
+                Category = categories.LastOrDefault(),
+                SectionId = sectionId
             });
+
             await _fileRepository.SaveAsync();
         }
 
-        public async Task InsertSections()
+        public async Task InsertPagesAsync(int sectionId)
         {
-            await _sectionRepository.AddAsync(await GetDefaultSectionAsync());
-
-            // insert some seed data
-            await _sectionRepository.AddAsync(new Section
-            {
-                Icon = "fa-smile",
-                Name = "Human Resources",
-                Path = "HumanResources",
-                SortOrder = 0,
-                CreatedBy = SystemAdministrator.Id,
-                CreatedAt = DateTime.Now
-            });
-            await _sectionRepository.AddAsync(new Section
-            {
-                Icon = "fa-users",
-                Name = "Operations",
-                Path = "Operations",
-                SortOrder = 1,
-                CreatedBy = SystemAdministrator.Id,
-                CreatedAt = DateTime.Now
-            });
-            await _sectionRepository.AddAsync(new Section
-            {
-                Icon = "fa-comments",
-                Name = "Communications",
-                Path = "Communications",
-                SortOrder = 2,
-                CreatedBy = SystemAdministrator.Id,
-                CreatedAt = DateTime.Now
-            });
-            await _sectionRepository.AddAsync(new Section
-            {
-                Icon = "fa-thumbs-up",
-                Name = "Services",
-                Path = "Services",
-                SortOrder = 3,
-                CreatedBy = SystemAdministrator.Id,
-                CreatedAt = DateTime.Now
-            });
-            await _sectionRepository.AddAsync(new Section
-            {
-                Icon = "fa-laptop",
-                Name = "IT",
-                Path = "IT",
-                SortOrder = 4,
-                CreatedBy = SystemAdministrator.Id,
-                CreatedAt = DateTime.Now
-            });
-
-            await _sectionRepository.SaveAsync();
-        }
-
-        public async Task InsertPagesAsync()
-        {
-            var defaultSection = await GetDefaultSectionAsync();
-
             // seed data
             await _pageRepository.AddAsync(new Page
             {
-                Content = "Nam dignissim porta leo vitae sodales. Morbi mollis, libero vitae sagittis tincidunt, mi dui luctus metus, elementum tincidunt nisl nisl at elit. Nulla tellus elit, aliquam in pulvinar id, interdum in velit. Suspendisse non aliquam dolor, vestibulum lacinia est. Pellentesque placerat nibh blandit, gravida nulla sed, tristique nisi. Nunc volutpat ultrices augue et congue. In in lacus condimentum dui finibus sagittis nec ut neque. Aenean accumsan nisl quis convallis rutrum. Cras vel imperdiet est. Curabitur et sagittis dui.",
-                CreatedAt = DateTime.Parse("2018-06-04 15:00"),
+                Content = "Sed semper, sapien quis luctus semper, nibh eros sollicitudin tellus, at tincidunt arcu odio a est. Nam nec nulla ex. Nullam et maximus ex, at porttitor velit. Sed ac justo ligula. Morbi sed lectus turpis. Aenean suscipit tellus nec risus aliquam, et dignissim urna mollis. Aliquam erat volutpat. Curabitur risus tellus, facilisis a tempus eu, hendrerit ut elit. Phasellus ut quam consequat, molestie mauris non, faucibus felis. Pellentesque finibus lobortis arcu, a tincidunt erat pulvinar vel. Proin in egestas magna, nec feugiat velit.",
+                CreatedAt = DateTime.Parse("2018-06-04 12:15"),
                 CreatedBy = SystemAdministrator.Id,
-                Title = "Test Page 3",
-                Stub = "test-page-3",
-                SectionId = defaultSection.Id
-            });
-            await _pageRepository.AddAsync(new Page
-            {
-                Content = "Ut auctor risus diam, sed aliquam quam iaculis ac. Sed rutrum tortor eget ante consequat, ac malesuada ligula dictum. Phasellus non urna interdum, vehicula augue ac, egestas orci. Sed ut nisl ipsum. Donec hendrerit, nisl vitae interdum pretium, ligula lorem varius nisi, non cursus libero libero eu dolor. Fusce bibendum, lorem sed tempor condimentum, enim ante sollicitudin dolor, faucibus viverra quam erat ac neque. Integer sagittis magna eu augue eleifend, at pellentesque diam malesuada.",
-                CreatedAt = DateTime.Parse("2018-06-04 17:25"),
-                CreatedBy = SystemAdministrator.Id,
-                Title = "Test Page 4",
-                Stub = "test-page-4",
-                SectionId = defaultSection.Id
+                Title = "Test Page 1",
+                Stub = "test-page-1",
+                SectionId = sectionId
             });
             await _pageRepository.AddAsync(new Page
             {
@@ -265,16 +338,25 @@ namespace Ocuda.Ops.Service
                 CreatedBy = SystemAdministrator.Id,
                 Title = "Test Page 2",
                 Stub = "test-page-2",
-                SectionId = defaultSection.Id
+                SectionId = sectionId
             });
             await _pageRepository.AddAsync(new Page
             {
-                Content = "Sed semper, sapien quis luctus semper, nibh eros sollicitudin tellus, at tincidunt arcu odio a est. Nam nec nulla ex. Nullam et maximus ex, at porttitor velit. Sed ac justo ligula. Morbi sed lectus turpis. Aenean suscipit tellus nec risus aliquam, et dignissim urna mollis. Aliquam erat volutpat. Curabitur risus tellus, facilisis a tempus eu, hendrerit ut elit. Phasellus ut quam consequat, molestie mauris non, faucibus felis. Pellentesque finibus lobortis arcu, a tincidunt erat pulvinar vel. Proin in egestas magna, nec feugiat velit.",
-                CreatedAt = DateTime.Parse("2018-06-04 12:15"),
+                Content = "Nam dignissim porta leo vitae sodales. Morbi mollis, libero vitae sagittis tincidunt, mi dui luctus metus, elementum tincidunt nisl nisl at elit. Nulla tellus elit, aliquam in pulvinar id, interdum in velit. Suspendisse non aliquam dolor, vestibulum lacinia est. Pellentesque placerat nibh blandit, gravida nulla sed, tristique nisi. Nunc volutpat ultrices augue et congue. In in lacus condimentum dui finibus sagittis nec ut neque. Aenean accumsan nisl quis convallis rutrum. Cras vel imperdiet est. Curabitur et sagittis dui.",
+                CreatedAt = DateTime.Parse("2018-06-04 15:00"),
                 CreatedBy = SystemAdministrator.Id,
-                Title = "Test Page 1",
-                Stub = "test-page-1",
-                SectionId = defaultSection.Id
+                Title = "Test Page 3",
+                Stub = "test-page-3",
+                SectionId = sectionId
+            });
+            await _pageRepository.AddAsync(new Page
+            {
+                Content = "Ut auctor risus diam, sed aliquam quam iaculis ac. Sed rutrum tortor eget ante consequat, ac malesuada ligula dictum. Phasellus non urna interdum, vehicula augue ac, egestas orci. Sed ut nisl ipsum. Donec hendrerit, nisl vitae interdum pretium, ligula lorem varius nisi, non cursus libero libero eu dolor. Fusce bibendum, lorem sed tempor condimentum, enim ante sollicitudin dolor, faucibus viverra quam erat ac neque. Integer sagittis magna eu augue eleifend, at pellentesque diam malesuada.",
+                CreatedAt = DateTime.Parse("2018-06-04 17:25"),
+                CreatedBy = SystemAdministrator.Id,
+                Title = "Test Page 4",
+                Stub = "test-page-4",
+                SectionId = sectionId
             });
 
             await _pageRepository.SaveAsync();

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops;
+using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Service
 {
@@ -12,7 +14,8 @@ namespace Ocuda.Ops.Service
         private readonly ILinkRepository _linkRepository;
 
         public LinkService(InsertSampleDataService insertSampleDataService,
-            ILinkRepository linkRepository)
+            ILinkRepository linkRepository,
+            ICategoryRepository categoryRepository)
         {
             _insertSampleDataService = insertSampleDataService
                 ?? throw new ArgumentNullException(nameof(insertSampleDataService));
@@ -26,97 +29,47 @@ namespace Ocuda.Ops.Service
 
         public async Task<ICollection<Link>> GetLinksAsync()
         {
-            var links = await _linkRepository.ToListAsync(_ => _.Name);
-            if (links == null || links.Count == 0)
-            {
-                await _insertSampleDataService.InsertLinks();
-                links = await _linkRepository.ToListAsync(_ => _.Name);
-            }
-            return links;
+            return await _linkRepository.ToListAsync(_ => _.Name);
         }
 
-        public async Task<Link> GetLinkByIdAsync(int id)
+        public async Task<Link> GetByIdAsync(int id)
         {
             return await _linkRepository.FindAsync(id);
         }
 
-        public IEnumerable<LinkCategory> GetLinkCategories()
+        public async Task<DataWithCount<ICollection<Link>>> GetPaginatedListAsync(BlogFilter filter)
         {
-            // TODO repository/database
-            return new List<LinkCategory>
-            {
-                new LinkCategory
-                {
-                    Id = 1,
-                    Name = "Link Category 1",
-                },
-                new LinkCategory
-                {
-                    Id = 2,
-                    Name = "Link Category 2",
-                },
-                new LinkCategory
-                {
-                    Id = 3,
-                    Name = "Link Category 3",
-                },
-            };
+            return await _linkRepository.GetPaginatedListAsync(filter);
         }
 
-        public LinkCategory GetLinkCategoryById(int id)
-        {
-            // TODO repository/database
-            return new LinkCategory
-            {
-                Id = id,
-                Name = $"Category {id}",
-            };
-        }
-
-
-        public async Task<Link> CreateLinkAsync(Link link)
+        public async Task<Link> CreateAsync(Link link)
         {
             link.CreatedAt = DateTime.Now;
+            // TODO Set CreatedBy Id
+            link.CreatedBy = 1;
+
             await _linkRepository.AddAsync(link);
             await _linkRepository.SaveAsync();
-
             return link;
         }
 
-        public async Task<Link> EditLinkAsync(Link link)
+        public async Task<Link> EditAsync(Link link)
         {
-            // TODO fix edit logic
-            _linkRepository.Update(link);
-            await _linkRepository.SaveAsync();
+            var currentLink = await _linkRepository.FindAsync(link.Id);
+            currentLink.Name = link.Name;
+            currentLink.Url = link.Url;
+            currentLink.CategoryId = link.CategoryId;
+            currentLink.IsFeatured = link.IsFeatured;
 
+            _linkRepository.Update(currentLink);
+            await _linkRepository.SaveAsync();
             return link;
         }
 
-        public async Task DeleteLinkAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             _linkRepository.Remove(id);
             await _linkRepository.SaveAsync();
-        }
-
-        public async Task<LinkCategory> CreateLinkCategoryAsync(LinkCategory linkCategory)
-        {
-            // TODO repository/database
-            // call create method from repository
-            return linkCategory;
-        }
-
-        public async Task<LinkCategory> EditLinkCategoryAsync(LinkCategory linkCategory)
-        {
-            // get existing item and update properties that changed
-            // call edit method on existing post
-            return linkCategory;
-        }
-
-        public async Task DeleteLinkCategoryAsync(int id)
-        {
-            // TODO repository/database
-            // call delete method from repository
-            throw new NotImplementedException();
         }
     }
 }
