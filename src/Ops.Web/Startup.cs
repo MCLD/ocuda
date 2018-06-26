@@ -94,7 +94,6 @@ namespace Ocuda.Ops.Web
             // configure error page handling and development IDE linking
             if (env.IsDevelopment())
             {
-                app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
             }
             else

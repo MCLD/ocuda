@@ -4,10 +4,10 @@
 
 Ocuda targets the ASP.NET Core 2.1 framework. For that to work currently you must:
 
-- Install the [.NET Core 2.1.0-rc1 SDK](https://www.microsoft.com/net/download/dotnet-core/sdk-2.1.300-rc1)
+- Install the [.NET Core 2.1 SDK](https://www.microsoft.com/net/download/dotnet-core/sdk-2.1.300)
 - Ensure you're using [Visual Studio Update 7](https://visualstudio.com/vs)
 
-For more details see the ASP.NET Blog post about [ASP.NET Core 2.1.0-rc1](https://blogs.msdn.microsoft.com/webdev/2018/05/07/asp-net-core-2-1-0-rc1-now-available/).
+For more details see the ASP.NET Blog post about [ASP.NET Core 2.1.0](https://blogs.msdn.microsoft.com/webdev/2018/05/30/asp-net-core-2-1-0-now-available/).
 
 ## Project layout
 
