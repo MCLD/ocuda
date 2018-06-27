@@ -7,7 +7,7 @@ COPY . ./
 RUN dotnet restore
 
 # Run tests on docker build
-RUN dotnet test
+RUN find UnitTests/ -path "*/bin/*Test.dll" |xargs dotnet vstest
 
 # Build and publish
 RUN dotnet publish -c Release -o "/app/publish/ops" "src/Ops.Web"
