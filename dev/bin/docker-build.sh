@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ $# -eq 0 ]
+then
+  echo Please specify which to build: ops or promenade
+  exit 1
+fi
+
 IMAGE="ocuda"
 
 pwd=${PWD##*/}
@@ -33,10 +39,7 @@ if [ "$#" -gt 1 ]; then
   TAG="$2"
 fi
 
-echo -e "\e[1mBuilding Ops branch \e[96m$BRANCH\e[39m commit \e[93m$COMMIT\e[0m"
+echo -e "\e[1mBuilding $1 branch \e[96m$BRANCH\e[39m commit \e[93m$COMMIT\e[0m"
 
-docker build -f Dockerfile_ops -t $IMAGE/ops:$TAG --build-arg commit="$COMMIT" .
+docker build -f Dockerfile_$1 -t $IMAGE/$1:$TAG --build-arg commit="$COMMIT" .
 
-echo -e "\e[1mBuilding Promenade branch \e[96m$BRANCH\e[39m commit \e[93m$COMMIT\e[0m"
-
-docker build -f Dockerfile_promenade -t $IMAGE/promenade:$TAG --build-arg commit="$COMMIT" .

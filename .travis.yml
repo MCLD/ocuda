@@ -12,7 +12,11 @@ git:
 services:
   - docker
 
-script: bash dev/bin/docker-build.sh
+env:
+  - IMAGE=ops
+  - IMAGE=promenade
+
+script: bash dev/bin/docker-build.sh $IMAGE
 
 after_success:
   - |
