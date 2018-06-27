@@ -10,14 +10,9 @@ namespace Ocuda.Ops.Service
 {
     public class SectionService
     {
-        private readonly InsertSampleDataService _insertSampleDataService;
         private readonly ISectionRepository _sectionRepository;
-        public SectionService(InsertSampleDataService insertSampleDataService,
-            ISectionRepository sectionRepository)
+        public SectionService(ISectionRepository sectionRepository)
         {
-            _insertSampleDataService = insertSampleDataService
-                ?? throw new ArgumentNullException(nameof(insertSampleDataService));
-
             _sectionRepository = sectionRepository
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
         }

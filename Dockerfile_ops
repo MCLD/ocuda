@@ -6,6 +6,9 @@ WORKDIR /app
 COPY . ./
 RUN dotnet restore
 
+# Run tests on docker build
+RUN dotnet test
+
 # Build and publish
 RUN dotnet publish -c Release -o "/app/publish/ops" "src/Ops.Web"
 
