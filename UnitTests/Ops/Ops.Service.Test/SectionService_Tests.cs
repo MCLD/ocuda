@@ -50,12 +50,12 @@ namespace Ocuda.UnitTests.Ops.Service.Test
 
             editedSection = await service.EditAsync(editedSection);
 
-            Assert.Equal(editedSection.Id, expectedSection.Id);
-            Assert.Equal(editedSection.CreatedAt, expectedSection.CreatedAt);
-            Assert.Equal(editedSection.CreatedBy, expectedSection.CreatedBy);
-            Assert.Equal(editedSection.Name, expectedSection.Name);
-            Assert.Equal(editedSection.Icon, expectedSection.Icon);
-            Assert.Equal(editedSection.Path, expectedSection.Path);
+            Assert.Equal(expectedSection.Id, editedSection.Id);
+            Assert.Equal(expectedSection.CreatedAt, editedSection.CreatedAt);
+            Assert.Equal(expectedSection.CreatedBy, editedSection.CreatedBy);
+            Assert.Equal(expectedSection.Name, editedSection.Name);
+            Assert.Equal(expectedSection.Icon, editedSection.Icon);
+            Assert.Equal(expectedSection.Path, editedSection.Path);
         }
     }
 }
