@@ -32,7 +32,9 @@ after_success:
           docker push ocuda/$PROJECT:$TRAVIS_BRANCH
           docker logout
         else
-          echo 'Not pushing image to Docker Hub'
+          echo 'Not pushing build for this branch to Docker Hub.'
         fi
+    else
+      echo 'Not pushing to Docker Hub: Docker username or password is not configured.'
     fi
 
