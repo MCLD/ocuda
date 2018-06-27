@@ -46,7 +46,7 @@ namespace Ocuda.Ops.Service
             var sysadminUser = await _userRepository.GetSystemAdministratorAsync();
             if (sysadminUser == null)
             {
-                sysadminUser = new Ocuda.Ops.Models.User
+                sysadminUser = new User
                 {
                     Username = "sysadmin",
                     CreatedAt = DateTime.Now,
@@ -56,6 +56,26 @@ namespace Ocuda.Ops.Service
                 await _userRepository.SaveAsync();
             }
             return sysadminUser;
+        }
+
+        public async Task<User> GetByIdAsync(int id)
+        {
+            return await _userRepository.FindAsync(id);
+        }
+
+        public async Task<User> GetByUsernameAsync(string username)
+        {
+            return await _userRepository.FindByUsernameAsync(username);
+        }
+
+        public async Task<User> EditNicknameAsync(User user)
+        {
+            var currentUser = await _userRepository.FindAsync(user.Id);
+            currentUser.Nickname = user.Nickname;
+
+            _userRepository.Update(currentUser);
+            await _userRepository.SaveAsync();
+            return currentUser;
         }
     }
 }
