@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -16,12 +17,12 @@ namespace Ocuda.Ops.Web
             var version = Assembly.GetExecutingAssembly().GetName().Version;
             var id = Process.GetCurrentProcess().Id;
 
+            Log.Logger = new LogConfig().Build(applicationName, version, id, args).CreateLogger();
+
             var webHost = CreateWebHostBuilder(args).Build();
-            var config = webHost.Services.GetService(typeof(IConfiguration)) as IConfiguration;
+            var config = (IConfiguration)webHost.Services.GetService(typeof(IConfiguration));
 
-            Log.Logger = new LogConfig().Build(config, applicationName, version, id).CreateLogger();
-
-            var instanceConfig = config["Ops.Instance"];
+            var instanceConfig = config[Utility.Keys.Configuration.OpsInstance];
             string instance = string.IsNullOrEmpty(instanceConfig) ? null : $" ({instanceConfig})";
 
             try

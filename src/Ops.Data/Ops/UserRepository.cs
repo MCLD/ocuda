@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Interfaces.Ops;
 
 namespace Ocuda.Ops.Data.Ops
@@ -12,6 +13,15 @@ namespace Ocuda.Ops.Data.Ops
         public UserRepository(OpsContext context, ILogger<UserRepository> logger)
             : base(context, logger)
         {
+        }
+
+        public async Task<User> FindByUsernameAsync(string username)
+        {
+            var sanitizedUsername = username.Trim();
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Username == sanitizedUsername)
+                .FirstOrDefaultAsync();
         }
 
         #region Initial setup methods

@@ -14,6 +14,30 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
+        public async Task<User> LookupUser(string username)
+        {
+            return await _userRepository.FindByUsernameAsync(username);
+        }
+
+        public async Task AddUser(User user, int? createdById = null)
+        {
+            user.Username = user.Username.Trim();
+            user.CreatedAt = DateTime.Now;
+            if(createdById != null)
+            {
+                user.CreatedBy = (int)createdById;
+            }
+            await _userRepository.AddAsync(user);
+            await _userRepository.SaveAsync();
+            if (createdById == null)
+            {
+                var createdUser = await _userRepository.FindByUsernameAsync(user.Username);
+                createdUser.CreatedBy = createdUser.Id;
+                _userRepository.Update(user);
+                await _userRepository.SaveAsync();
+            }
+        }
+
         /// <summary>
         /// Ensure the sysadmin user exists.
         /// </summary>

@@ -15,6 +15,7 @@
     <LangVersion>Latest</LangVersion>
     <AssemblyName>Ocuda.Ops.Web</AssemblyName>
     <RootNamespace>Ocuda.Ops.Web</RootNamespace>
+    <UserSecretsId>6c6caf47-6455-4913-81a0-5bc95b0b8612</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -36,6 +37,7 @@
   <ItemGroup>
     <PackageReference Include="BuildBundlerMinifier" Version="2.8.*" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" PrivateAssets="All" />
     <PackageReference Include="Serilog.AspNetCore" Version="2.1.*" />
@@ -3246,6 +3248,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Middleware\" />
     <Folder Include="Views\Error\" />
   </ItemGroup>
 
