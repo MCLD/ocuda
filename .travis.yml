@@ -22,13 +22,17 @@ after_success:
   - |
     if [[ "$DOCKER_USERNAME" != "" ]] && [[ "$DOCKER_PASSWORD" != "" ]]; then
         if [[ "$TRAVIS_BRANCH" == "master" ]]; then
+          echo "Pushing to Docker Hub: ocuda/$PROJECT:latest"
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
           docker push ocuda/$PROJECT:latest
           docker logout
         elif [[ "$TRAVIS_BRANCH" == "develop" ]]; then
+          echo "Pushing to Docker Hub: ocuda/$PROJECT:$TRAVIS_BRANCH"
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
           docker push ocuda/$PROJECT:$TRAVIS_BRANCH
           docker logout
+        else
+          echo 'Not pushing image to Docker Hub'
         fi
     fi
 
