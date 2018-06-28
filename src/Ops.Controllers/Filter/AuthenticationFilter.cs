@@ -101,7 +101,7 @@ namespace Ocuda.Ops.Controllers.Filter
                         }
 
                         var claims = new HashSet<Claim>();
-                        claims.Add(new Claim(Key.Claim.Username, username));
+                        claims.Add(new Claim(Key.ClaimType.Username, username));
                         int groupId = 1;
                         var adGroupName
                             = await _cache.GetStringAsync(string.Format(Cache.OpsGroup,
@@ -110,7 +110,7 @@ namespace Ocuda.Ops.Controllers.Filter
 
                         while (!string.IsNullOrEmpty(adGroupName))
                         {
-                            claims.Add(new Claim(Key.Claim.ADGroup, adGroupName));
+                            claims.Add(new Claim(Key.ClaimType.ADGroup, adGroupName));
                             await _cache.RemoveAsync(string.Format(Cache.OpsGroup, id, groupId));
                             groupId++;
                             adGroupName = await _cache.GetStringAsync(string.Format(Cache.OpsGroup,
@@ -118,8 +118,11 @@ namespace Ocuda.Ops.Controllers.Filter
                                 groupId));
                         }
 
+                        // TODO: probably change the role claim type to our roles and not AD groups
                         var identity = new ClaimsIdentity(claims,
-                            CookieAuthenticationDefaults.AuthenticationScheme);
+                            CookieAuthenticationDefaults.AuthenticationScheme,
+                            Key.ClaimType.Username,
+                            Key.ClaimType.ADGroup);
 
                         await httpContext.SignInAsync(new ClaimsPrincipal(identity));
 

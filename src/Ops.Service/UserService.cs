@@ -65,6 +65,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<User> GetByUsernameAsync(string username)
         {
+            // TODO throw exception if the username is null
             return await _userRepository.FindByUsernameAsync(username);
         }
 
