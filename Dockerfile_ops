@@ -9,7 +9,7 @@ COPY . ./
 RUN dotnet build -c Release
 
 # Run tests
-RUN find UnitTests/ -path "*/bin/*Test.dll" |xargs dotnet vstest --parallel
+RUN find test/Ops/ -path "*/bin/*Test.dll" |xargs dotnet vstest --parallel
 
 # Publish
 RUN dotnet publish -c Release -o "/app/publish/ops" "src/Ops.Web" --no-build

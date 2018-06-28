@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Moq;
 using Ocuda.Ops.Models;
@@ -8,7 +6,7 @@ using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops;
 using Xunit;
 
-namespace Ocuda.UnitTests.Ops.Service.Test
+namespace Ocuda.test.Ops.Service.Test
 {
     public class SectionService_Tests
     {
