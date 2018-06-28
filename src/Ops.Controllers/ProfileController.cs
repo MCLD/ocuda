@@ -36,9 +36,7 @@ namespace Ocuda.Ops.Controllers
             }
             else
             {
-                //TODO get the logged in user
-                var user = await _userService.GetByUsernameAsync(CurrentUsername);
-                viewModel.User = user;
+                viewModel.User = await _userService.GetByUsernameAsync(CurrentUsername);
             }
 
             if (viewModel.User.SupervisorId.HasValue)
@@ -47,7 +45,6 @@ namespace Ocuda.Ops.Controllers
                     await _userService.GetByIdAsync(viewModel.User.SupervisorId.Value);
             }
 
-            //TODO get the logged in user
             if (viewModel.User.Username == CurrentUsername)
             {
                 viewModel.CanEdit = true;
