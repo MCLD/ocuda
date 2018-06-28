@@ -8,6 +8,6 @@ namespace Ocuda.Ops.Service.Filters
         public int? SectionId { get; set; }
         public CategoryType? CategoryType { get; set; }
 
-        public BlogFilter(int? page = null, int? take = null) : base(page, take = 15) { }
+        public BlogFilter(int? page = null, int take = 15) : base(page, take) { }
     }
 }

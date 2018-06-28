@@ -67,11 +67,11 @@ namespace Ocuda.Ops.Controllers
 
             var viewModel = new IndexViewModel
             {
-                //TODO update calendars
                 Files = fileList.Data,
                 Links = linkList.Data,
                 Posts = postList.Data,
-                Calendars = _sectionService.GetCalendars()
+                Calendars = _sectionService.GetCalendars(), //TODO update calendars
+                PaginateModel = paginateModel
             };
 
             return View(viewModel);

@@ -30,24 +30,10 @@
         }
 
         <div class="d-flex justify-content-center">
-            <ul class="pagination">
-                <li class="page-item m-1 p-1">
-                    <a class="page-link" href="#" aria-label="Previous">
-                        <span aria-hidden="true"><</span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                </li>
-                <li class="input-group m-1 p-1">
-                    <input type="text" class="form-control" value="1" style="width:50px" />
-                    <span class="input-group-text">of 48</span>
-                </li>
-                <li class="page-item m-1 p-1">
-                    <a class="page-link" href="#" aria-label="Next">
-                        <span aria-hidden="true">></span>
-                        <span class="sr-only">Next</span>
-                    </a>
-                </li>
-            </ul>
+            @if (Model.PaginateModel.MaxPage > 1)
+            {
+                <paginate paginateModel="@Model.PaginateModel"></paginate>
+            }
         </div>
     </div>
     @* End Blog Content *@

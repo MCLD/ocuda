@@ -48,7 +48,10 @@ namespace Ocuda.Utility.TagHelpers
                                   : QueryBuilder(url, paginateModel.PreviousPage, asButtons);
             ulTag.InnerHtml.AppendHtml(PaginatorLi(previousPage, "backward", asButtons));
 
-            ulTag.InnerHtml.AppendHtml(PaginatorLi(paginateModel.CurrentPage.ToString(), asButtons));
+            ulTag.InnerHtml.AppendHtml(PaginatorInput(paginateModel));
+
+            ulTag.InnerHtml.AppendHtml(
+                PaginatorLi($"of {paginateModel.MaxPage.ToString()}", asButtons));
 
             string nextPage = paginateModel.NextPage == null
                               ? null
@@ -66,6 +69,34 @@ namespace Ocuda.Utility.TagHelpers
             navTag.TagRenderMode = TagRenderMode.Normal;
             navTag.InnerHtml.SetHtmlContent(ulTag);
             output.Content.SetHtmlContent(navTag);
+        }
+
+        public static TagBuilder PaginatorInput(PaginateModel model)
+        {
+            TagBuilder liTag = new TagBuilder("li");
+            liTag.TagRenderMode = TagRenderMode.Normal;
+            liTag.MergeAttribute("class", "page-item");
+
+            TagBuilder formTag = new TagBuilder("form");
+            formTag.MergeAttribute("role", "form");
+            formTag.MergeAttribute("method", "get");
+            formTag.TagRenderMode = TagRenderMode.Normal;
+
+            TagBuilder inputTag = new TagBuilder("input");
+            inputTag.MergeAttribute("name", "page");
+            inputTag.MergeAttribute("type", "number");
+            inputTag.MergeAttribute("min", "1");
+            inputTag.MergeAttribute("max", model.MaxPage.ToString());
+            inputTag.MergeAttribute("class", "form-control page-link");
+            inputTag.MergeAttribute("style", $"width:80px;");
+            inputTag.MergeAttribute("value", model.CurrentPage.ToString());
+            inputTag.TagRenderMode = TagRenderMode.Normal;
+
+            formTag.InnerHtml.AppendHtml(inputTag);
+
+            liTag.InnerHtml.SetHtmlContent(formTag);
+
+            return liTag;
         }
 
         private static TagBuilder PaginatorLi(string text, bool asButtons)
