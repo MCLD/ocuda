@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Filter;
 
 namespace Ocuda.Ops.Controllers.Abstract
@@ -74,6 +75,17 @@ namespace Ocuda.Ops.Controllers.Abstract
             else
             {
                 AlertInfo = $"{Fa("check-circle")} {message}";
+            }
+        }
+
+        protected string CurrentUsername
+        {
+            get
+            {
+                return HttpContext.User.Claims
+                    .Where(_ => _.Type == Key.ClaimType.Username)
+                    .FirstOrDefault()?
+                    .Value;
             }
         }
     }

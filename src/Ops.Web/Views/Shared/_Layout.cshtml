@@ -44,8 +44,7 @@
                         <a class="nav-link" asp-controller="Profile" 
                                             asp-action="@(nameof(ProfileController.Index))"
                                             asp-route-section=""
-                                            asp-route-area=""
-                                            asp-route-id="pearlm"> @* TODO: use current user *@
+                                            asp-route-area="">
                             <span class="fa fa-user-circle"></span>
                             @Context.Items[ItemKey.Nickname]
                         </a>
