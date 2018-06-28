@@ -2,12 +2,17 @@
 FROM microsoft/dotnet:2.1-sdk AS dotnet-sdk
 WORKDIR /app
 
-# Copy source and build
+# Copy source
 COPY . ./
-RUN dotnet restore
 
-# Build and publish
-RUN dotnet publish -c Release -o "/app/publish/ops" "src/Ops.Web"
+# Run restore and build
+RUN dotnet build -c Release
+
+# Run tests
+RUN find test/Ops/ -path "*/bin/*Test.dll" |xargs dotnet vstest --parallel
+
+# Publish
+RUN dotnet publish -c Release -o "/app/publish/ops" "src/Ops.Web" --no-build
 
 # Get runtime image
 FROM microsoft/dotnet:2.1-aspnetcore-runtime
