@@ -66,6 +66,8 @@ namespace Ocuda.Ops.Service
                 await InsertLinksAsync(section.Id);
                 await InsertPagesAsync(section.Id);
             }
+
+            await InsertUsersAsync();
         }
 
         public async Task<ICollection<Section>> InsertSectionsAsync()
@@ -360,6 +362,53 @@ namespace Ocuda.Ops.Service
             });
 
             await _pageRepository.SaveAsync();
+        }
+
+        public async Task InsertUsersAsync()
+        {
+            await _userRepository.AddAsync(new User
+            {
+                Username = "dumbledore",
+                CreatedAt = DateTime.Now,
+                CreatedBy = SystemAdministrator.Id,
+                IsSysadmin = false,
+                Name = "Albus Dumbledore",
+                Nickname = null,
+                Title = "Headmaster",
+                Email = "dumbledore@hogwarts.edu",
+                Phone = "(123) 456-7890",
+                SupervisorId = null
+            });
+
+            await _userRepository.AddAsync(new User
+            {
+                Username = "snape",
+                CreatedAt = DateTime.Now,
+                CreatedBy = SystemAdministrator.Id,
+                IsSysadmin = false,
+                Name = "Severus Snape",
+                Nickname = "Snape",
+                Title = "Potions Master",
+                Email = "snape@hogwarts.edu",
+                Phone = "(456) 789-0123",
+                SupervisorId = 3
+            });
+
+            await _userRepository.AddAsync(new User
+            {
+                Username = "potter",
+                CreatedAt = DateTime.Now,
+                CreatedBy = SystemAdministrator.Id,
+                IsSysadmin = false,
+                Name = "Harry Potter",
+                Nickname = "Harry",
+                Title = "Student",
+                Email = "potter@hogwarts.edu",
+                Phone = "(890) 123-4567",
+                SupervisorId = 4
+            });
+
+            await _userRepository.SaveAsync();
         }
     }
 }

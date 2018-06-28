@@ -41,8 +41,11 @@
                 @if (Context.Items[ItemKey.Nickname] != null)
                 {
                     <li class="nav-item">
-                        <a class="nav-link disabled" href="#">
-                            <span class="fas fa-user"></span>
+                        <a class="nav-link" asp-controller="Profile" 
+                                            asp-action="@(nameof(ProfileController.Index))"
+                                            asp-route-section=""
+                                            asp-route-area="">
+                            <span class="fa fa-user-circle"></span>
                             @Context.Items[ItemKey.Nickname]
                         </a>
                     </li>
