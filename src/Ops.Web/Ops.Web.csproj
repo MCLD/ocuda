@@ -3249,6 +3249,7 @@
 
   <ItemGroup>
     <Folder Include="Middleware\" />
+    <Folder Include="Shared\Content\BlogFiles\" />
     <Folder Include="Views\Error\" />
   </ItemGroup>
 

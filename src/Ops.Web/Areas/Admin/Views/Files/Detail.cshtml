@@ -2,6 +2,7 @@
 
 <form asp-action="@Model.Action" method="post" role="form" enctype="multipart/form-data">
     <input asp-for="@Model.SectionId" type="hidden" />
+    
     @if (Model.Action == nameof(FilesController.Edit))
     {
         <input asp-for="File.Id" type="hidden" />
@@ -15,7 +16,8 @@
         <div class="form-group row">
             <label class="col-md-3 col-form-label text-md-right">Current File</label>
             <div class="col-md-9">
-                <a class="form-vertical-alignment" asp-action="#" target="_blank">@Model.File.FilePath</a>
+                <a class="btn btn-info form-vertical-alignment" target="_blank"
+                   asp-action="ViewFile" asp-route-id="@Model.File.Id">View File</a>
             </div>
         </div>
     }
@@ -27,11 +29,11 @@
                 <div class="input-group-prepend">
                     <label class="btn btn-outline-secondary btn-file form-control">
                         <span class="far fa-file"></span> Select a File
-                        <input type="file" asp-for="File" hidden />
+                        <input type="file" asp-for="FileData" id="fileUpload" hidden />
                     </label>
                 </div>
                 <div class="custom-file">
-                    <input type="text" asp-for="File.FilePath" class="form-control" readonly id="selectedFile" />
+                    <input type="text" class="form-control" readonly id="selectedFile" />
                 </div>
             </div>
             <div>

@@ -10,10 +10,10 @@ namespace Ocuda.Ops.Models
         [Required]
         [MaxLength(255)]
         public string Name { get; set; }
-        [Required]
         [MaxLength(255)]
         public string FilePath { get; set; }
         public string Icon { get; set; }
+        public string Extension { get; set; }
         [MaxLength(255)]
         public string Description { get; set; }
 

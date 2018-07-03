@@ -26,24 +26,45 @@ $(".btn-spinner-no-validate").on("click", function (e) {
 });
 
 $(document).on('change', ':file', function () {
-    var input = $(this),
-        numFiles = input.get(0).files ? input.get(0).files.length : 1,
-        label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
-    input.trigger('fileselect', [numFiles, label]);
+    var fileInput = $(this),
+        filePath = fileInput.val().replace(/\\/g, '/').replace(/.*\//, '');
+    fileInput.trigger('fileselect', filePath);
 });
 
-$(':file').on('fileselect', function (evkent, numFiles, label) {
-    var input = $(this).parents('.input-group').find(':text'),
-        log = numFiles > 1 ? numFiles = ' files selected' : label;
+$(':file').on('fileselect', function (evkent, filePath) {
+    var file = $(this)[0].files[0],
+        fileData = new FormData(),
+        fileDisplay = $(this).parents('.input-group').find(':text');
 
-    if (input.length && label.length) {
-        input.val(log);
-        $('.btn-file').removeClass('btn-outline-secondary');
-        $('.btn-file').addClass('btn-success');
-    }
-    else {
-        input.val('');
-        $('.btn-file').addClass('btn-outline-secondary');
-        $('.btn-file').removeClass('btn-success');
-    }
+    fileData.append("fileName", file.name);
+    fileData.append("fileSize", file.size);
+
+    $.ajax({
+        url: '/Admin/Files/ValidateFileBeforeUpload',
+        type: 'POST',
+        contentType: false,
+        processData: false,
+        data: fileData,
+        async: true,
+        success: function (result) {
+            if (result == "Valid") {
+                fileDisplay.val(filePath);
+                $('.btn-file').removeClass('btn-outline-secondary');
+                $('.btn-file').addClass('btn-success');
+                return true;
+            }
+            else {
+                $(this).val('');
+                fileDisplay.val('');
+                $('.btn-file').addClass('btn-outline-secondary');
+                $('.btn-file').removeClass('btn-success');
+                alert(result);
+                return false;
+            }
+        },
+        error: function (err) {
+            alert(err.statusText);
+            return false;
+        }
+    });
 });

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Posts;
 using Ocuda.Ops.Controllers.Authorization;
@@ -18,11 +19,15 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     {
         private readonly PostService _postService;
         private readonly SectionService _sectionService;
+        private readonly ILogger<PostsController> _logger;
 
-        public PostsController(PostService postService, SectionService sectionService)
+        public PostsController(PostService postService, 
+            SectionService sectionService,
+            ILogger<PostsController> logger)
         {
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
             _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<IActionResult> Index(string section, int page = 1)
@@ -88,6 +93,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError($"Error adding post: {ex}", ex);
                     ShowAlertDanger("Unable to add blog post: ", ex.Message);
                 }
             }
@@ -124,6 +130,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError($"Error editing post: {ex}", ex);
                     ShowAlertDanger("Unable to update blog post: ", ex.Message);
                 }
             }
@@ -142,6 +149,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             catch (Exception ex)
             {
+                _logger.LogError($"Error deleting post: {ex}", ex);
                 ShowAlertDanger("Unable to delete blog post: ", ex.Message);
             }
 

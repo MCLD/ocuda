@@ -11,6 +11,7 @@ namespace Ocuda.Ops.Service
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IFileRepository _fileRepository;
+        private readonly IFileTypeRepository _fileTypeRepository;
         private readonly ILinkRepository _linkRepository;
         private readonly IPageRepository _pageRepository;
         private readonly IPostRepository _postRepository;
@@ -18,6 +19,7 @@ namespace Ocuda.Ops.Service
         private readonly IUserRepository _userRepository;
         public InsertSampleDataService(ICategoryRepository categoryRepository,
             IFileRepository fileRepository,
+            IFileTypeRepository fileTypeRepository,
             ILinkRepository linkRepository,
             IPageRepository pageRepository,
             IPostRepository postRepository,
@@ -28,6 +30,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(categoryRepository));
             _fileRepository = fileRepository
                 ?? throw new ArgumentNullException(nameof(fileRepository));
+            _fileTypeRepository = fileTypeRepository
+                ?? throw new ArgumentNullException(nameof(fileTypeRepository));
             _linkRepository = linkRepository
                 ?? throw new ArgumentNullException(nameof(linkRepository));
             _pageRepository = pageRepository
@@ -58,6 +62,8 @@ namespace Ocuda.Ops.Service
         public async Task InsertDataAsync()
         {
             var sections = await InsertSectionsAsync();
+
+            await InsertFileTypesAsync();
 
             foreach (var section in sections)
             {
@@ -282,16 +288,112 @@ namespace Ocuda.Ops.Service
             return categories;
         }
 
+        public async Task InsertFileTypesAsync()
+        {
+            await _fileTypeRepository.AddAsync(new FileType
+            {
+                CreatedAt = DateTime.Now,
+                CreatedBy = SystemAdministrator.Id,
+                Extension = null,
+                Icon = "far fa-file",
+                IsDefault = true
+            });
+            await _fileTypeRepository.AddAsync(new FileType
+            {
+                CreatedAt = DateTime.Now,
+                CreatedBy = SystemAdministrator.Id,
+                Extension = ".zip",
+                Icon = "fa fa-file-archive",
+                IsDefault = false
+            });
+            await _fileTypeRepository.AddAsync(new FileType
+            {
+                CreatedAt = DateTime.Now,
+                CreatedBy = SystemAdministrator.Id,
+                Extension = ".mp3",
+                Icon = "fa fa-file-audio",
+                IsDefault = false
+            });
+            await _fileTypeRepository.AddAsync(new FileType
+            {
+                CreatedAt = DateTime.Now,
+                CreatedBy = SystemAdministrator.Id,
+                Extension = ".cs",
+                Icon = "fa fa-file-code",
+                IsDefault = false
+            });
+            await _fileTypeRepository.AddAsync(new FileType
+            {
+                CreatedAt = DateTime.Now,
+                CreatedBy = SystemAdministrator.Id,
+                Extension = ".jpg",
+                Icon = "fa fa-file-image",
+                IsDefault = false
+            });
+            await _fileTypeRepository.AddAsync(new FileType
+            {
+                CreatedAt = DateTime.Now,
+                CreatedBy = SystemAdministrator.Id,
+                Extension = ".xlsx",
+                Icon = "fa fa-file-excel alert-success",
+                IsDefault = false
+            });
+            await _fileTypeRepository.AddAsync(new FileType
+            {
+                CreatedAt = DateTime.Now,
+                CreatedBy = SystemAdministrator.Id,
+                Extension = ".pptx",
+                Icon = "fa fa-file-powerpoint",
+                IsDefault = false
+            });
+            await _fileTypeRepository.AddAsync(new FileType
+            {
+                CreatedAt = DateTime.Now,
+                CreatedBy = SystemAdministrator.Id,
+                Extension = ".docx",
+                Icon = "fa fa-file-word alert-primary",
+                IsDefault = false
+            });
+            await _fileTypeRepository.AddAsync(new FileType
+            {
+                CreatedAt = DateTime.Now,
+                CreatedBy = SystemAdministrator.Id,
+                Extension = ".pdf",
+                Icon = "fa fa-file-pdf alert-danger",
+                IsDefault = false
+            });
+            await _fileTypeRepository.AddAsync(new FileType
+            {
+                CreatedAt = DateTime.Now,
+                CreatedBy = SystemAdministrator.Id,
+                Extension = ".txt",
+                Icon = "fa fa-file-alt",
+                IsDefault = false
+            });
+            await _fileTypeRepository.AddAsync(new FileType
+            {
+                CreatedAt = DateTime.Now,
+                CreatedBy = SystemAdministrator.Id,
+                Extension = ".mp4",
+                Icon = "fa fa-file-video",
+                IsDefault = false
+            });
+        }
+
         public async Task InsertFilesAsync(int sectionId)
         {
             var categories = await InsertFileCategoriesAsync(sectionId);
+            var wordFile = await _fileTypeRepository.GetByExtensionAsync(".docx");
+            var excelFile = await _fileTypeRepository.GetByExtensionAsync(".xlsx");
+            var pdfFile = await _fileTypeRepository.GetByExtensionAsync(".pdf");
 
             await _fileRepository.AddAsync(new File
             {
                 CreatedAt = DateTime.Parse("2018-05-20"),
-                FilePath = "/file.txt",
+                FilePath = "/file.docx",
                 Name = "New File 1",
-                Icon = "fa-file-pdf alert-danger",
+                Icon = wordFile.Icon,
+                Extension = ".docx",
                 CreatedBy = SystemAdministrator.Id,
                 Category = categories.FirstOrDefault(),
                 SectionId = sectionId
@@ -299,9 +401,10 @@ namespace Ocuda.Ops.Service
             await _fileRepository.AddAsync(new File
             {
                 CreatedAt = DateTime.Parse("2018-06-04"),
-                FilePath = "/file.txt",
+                FilePath = "/file.xlsx",
                 Name = "New File 2",
-                Icon = "fa-file-excel alert-success",
+                Icon = excelFile.Icon,
+                Extension = ".xlsx",
                 CreatedBy = SystemAdministrator.Id,
                 Category = categories.FirstOrDefault(),
                 SectionId = sectionId
@@ -310,9 +413,10 @@ namespace Ocuda.Ops.Service
             {
                 CreatedAt = DateTime.Parse("2018-05-01"),
                 IsFeatured = true,
-                FilePath = "/file.txt",
+                FilePath = "/file.pdf",
                 Name = "Important File!",
-                Icon = "fa-file-word alert-primary",
+                Icon = pdfFile.Icon,
+                Extension = ".pdf",
                 CreatedBy = SystemAdministrator.Id,
                 Category = categories.LastOrDefault(),
                 SectionId = sectionId

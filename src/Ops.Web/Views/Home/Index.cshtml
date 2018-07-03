@@ -91,7 +91,7 @@
                 </ul>
             </div>
             <div class="card-footer d-flex justify-content-center">
-                <a href="#" class="card-link">All Links for Department</a>
+                <a asp-controller="Links" asp-action="Index" class="card-link">All Links for Department</a>
             </div>
         </div>
 
@@ -104,13 +104,15 @@
                     @foreach (var file in Model.Files)
                     {
                         <li class="list-group-item">
-                            <a href="@file.FilePath" class="card-link"><span class="fa @file.Icon"></span> @file.Name</a>
+                            <a asp-controller="Files" asp-action="ViewFile" asp-route-id="@file.Id" target="_blank" class="card-link">
+                                <span class="@file.Icon"></span> @file.Name
+                            </a>
                         </li>
                     }
                 </ul>
             </div>
-            <div class="card-footer">
-                <a href="#" class="card-link d-flex justify-content-center">Department File Directory</a>
+            <div class="card-footer d-flex justify-content-center">
+                <a asp-controller="Files" asp-action="Index" class="card-link">Department File Directory</a>
             </div>
         </div>
     </div>

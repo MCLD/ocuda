@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Files;
 using Ocuda.Ops.Models;
@@ -16,20 +18,22 @@ namespace Ocuda.Ops.Controllers
         private readonly FileService _fileService;
         private readonly CategoryService _categoryService;
         private readonly SectionService _sectionService;
+        private readonly ILogger<FilesController> _logger;
 
         public FilesController(FileService fileService,
             CategoryService categoryService,
-            SectionService sectionService
-            )
+            SectionService sectionService,
+            ILogger<FilesController> logger)
         {
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
             _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<IActionResult> Index(string section, int? categoryId = null, int page = 1)
         {
-            var currentSection = await _sectionService.GetByPathAsync(section);             
+            var currentSection = await _sectionService.GetByPathAsync(section);
 
             var filter = new BlogFilter(page)
             {
@@ -71,6 +75,37 @@ namespace Ocuda.Ops.Controllers
             }
 
             return View(viewModel);
+        }
+
+        public async Task<IActionResult> ViewFile(int id)
+        {
+            var file = await _fileService.GetByIdAsync(id);
+            var extension = System.IO.Path.GetExtension(file.FilePath);
+            var fileName = $"{file.Name}{extension}";
+            byte[] fileBytes;
+
+            try
+            {
+                using (var fileStream = System.IO.File.OpenRead(file.FilePath))
+                {
+                    using (var ms = new System.IO.MemoryStream())
+                    {
+                        fileStream.CopyTo(ms);
+                        fileBytes = ms.ToArray();
+                    }
+                }
+
+                var typeProvider = new FileExtensionContentTypeProvider();
+                typeProvider.TryGetContentType(file.FilePath, out string fileType);
+
+                Response.Headers.Add("Content-Disposition", "inline; filename=" + fileName);
+                return File(fileBytes, fileType);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error viewing file {file.Id} : {ex.Message}", ex);
+                return StatusCode(404);
+            }
         }
     }
 }

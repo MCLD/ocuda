@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages;
 using Ocuda.Ops.Controllers.Authorization;
@@ -18,11 +19,15 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     {
         private readonly PageService _pageService;
         private readonly SectionService _sectionService;
+        private readonly ILogger<PagesController> _logger;
 
-        public PagesController(PageService pageService, SectionService sectionService)
+        public PagesController(PageService pageService, 
+            SectionService sectionService,
+            ILogger<PagesController> logger)
         {
             _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
             _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<IActionResult> Index(string section, int page = 1)
@@ -88,6 +93,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError($"Error adding page: {ex}", ex);
                     ShowAlertDanger("Unable to add page: ", ex.Message);
                 }
             }
@@ -120,6 +126,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError($"Error editing page: {ex}", ex);
                     ShowAlertDanger("Unable to update page: ", ex.Message);
                 }
             }
@@ -138,6 +145,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             catch (Exception ex)
             {
+                _logger.LogError($"Error deleting page: {ex}", ex);
                 ShowAlertDanger("Unable to delete page: ", ex.Message);
             }
 

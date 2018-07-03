@@ -128,6 +128,7 @@ namespace Ocuda.Ops.Web
 
             // repositories
             services.AddScoped<Service.Interfaces.Ops.IFileRepository, Data.Ops.FileRepository>();
+            services.AddScoped<Service.Interfaces.Ops.IFileTypeRepository, Data.Ops.FileTypeRepository>();
             services.AddScoped<Service.Interfaces.Ops.ILinkRepository, Data.Ops.LinkRepository>();
             services.AddScoped<Service.Interfaces.Ops.ICategoryRepository, Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.IPageRepository, Data.Ops.PageRepository>();
@@ -142,6 +143,7 @@ namespace Ocuda.Ops.Web
                 Data.Ops.SiteSettingRepository>();
             services.AddScoped<Service.Interfaces.Ops.IUserRepository, Data.Ops.UserRepository>();
 
+
             // path validator
             services.AddScoped<Controllers.Validator.ISectionPathValidator,
                 Controllers.Validator.SectionPathValidator>();
@@ -153,6 +155,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<RosterService>();
             services.AddScoped<SectionService>();
             services.AddScoped<FileService>();
+            services.AddScoped<FileTypeService>();
             services.AddScoped<LinkService>();
             services.AddScoped<CategoryService>();
             services.AddScoped<PostService>();

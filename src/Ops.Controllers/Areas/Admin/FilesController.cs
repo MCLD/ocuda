@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +9,9 @@ using Ocuda.Ops.Models;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Utility.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.Logging;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
 {
@@ -18,17 +20,27 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     public class FilesController : BaseController
     {
         private readonly FileService _fileService;
+        private readonly FileTypeService _fileTypeService;
         private readonly CategoryService _categoryService;
         private readonly SectionService _sectionService;
+        private readonly ILogger<FilesController> _logger;
 
-        public FilesController(FileService fileService, 
+        private const string FileValidationPassed = "Valid";
+        private const string FileValidationFailedType = "File is not a valid type.";
+        private const string FileValidationFailedSize = "File is too large to upload.";
+        private const int MaxFileSize = 2096000; //TODO get max filesize from config
+
+        public FilesController(FileService fileService,
+            FileTypeService fileTypeService,
             CategoryService categoryService,
-            SectionService sectionService
-            )
+            SectionService sectionService,
+            ILogger<FilesController> logger)
         {
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+            _fileTypeService = fileTypeService ?? throw new ArgumentNullException(nameof(fileTypeService));
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
             _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<IActionResult> Index(string section, int? categoryId = null, int page = 1)
@@ -107,12 +119,55 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 try
                 {
                     model.File.SectionId = model.SectionId;
-                    var newFile = await _fileService.CreateAsync(model.File);
-                    ShowAlertSuccess($"Added file: {newFile.Name}");
-                    return RedirectToAction(nameof(Index));
+
+                    if (model.FileData != null)
+                    {
+                        byte[] fileBytes;
+
+                        using (var fileStream = model.FileData.OpenReadStream())
+                        {
+                            using (var ms = new System.IO.MemoryStream())
+                            {
+                                fileStream.CopyTo(ms);
+                                fileBytes = ms.ToArray();
+                            }
+                        }
+
+                        if(model.FileData.Length < MaxFileSize)
+                        {
+                            var typeProvider = new FileExtensionContentTypeProvider();
+                            typeProvider.TryGetContentType(model.FileData.FileName, out string contentType);
+
+                            if (!string.IsNullOrWhiteSpace(contentType))
+                            {
+                                model.File.Extension = System.IO.Path.GetExtension(model.FileData.FileName);
+
+                                var fileType = await _fileTypeService.GetByExtensionAsync(model.File.Extension);
+                                model.File.Icon = fileType.Icon;
+
+                                var newFile = await _fileService.CreateAsync(model.File, fileBytes);
+
+                                ShowAlertSuccess($"Added file: {newFile.Name}");
+                                return RedirectToAction(nameof(Index));
+                            }
+                            else
+                            {
+                                ShowAlertDanger(FileValidationFailedType);
+                            } 
+                        }
+                        else
+                        {
+                            ShowAlertDanger(FileValidationFailedSize); 
+                        }
+                    }
+                    else
+                    {
+                        ShowAlertDanger("No file selected.");
+                    }
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError($"Error creating file: {ex}", ex);
                     ShowAlertDanger("Unable to add file: ", ex.Message);
                 }
             }
@@ -151,13 +206,57 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 try
                 {
-                    var file = await _fileService.EditAsync(model.File);
-                    // Save file data logic here
-                    ShowAlertSuccess($"Updated file: {file.Name}");
-                    return RedirectToAction(nameof(Index));
+                    File file;
+                    model.File.SectionId = model.SectionId;
+
+                    if (model.FileData != null)
+                    {
+                        byte[] fileBytes;
+
+                        using (var fileStream = model.FileData.OpenReadStream())
+                        {
+                            using (var ms = new System.IO.MemoryStream())
+                            {
+                                fileStream.CopyTo(ms);
+                                fileBytes = ms.ToArray();
+                            }
+                        }
+                        if (model.FileData.Length < MaxFileSize)
+                        {
+                            var typeProvider = new FileExtensionContentTypeProvider();
+                            typeProvider.TryGetContentType(model.FileData.FileName, out string contentType);
+
+                            if (!string.IsNullOrWhiteSpace(contentType))
+                            {
+                                model.File.Extension = System.IO.Path.GetExtension(model.FileData.FileName);
+
+                                var fileType = await _fileTypeService.GetByExtensionAsync(model.File.Extension);
+                                model.File.Icon = fileType.Icon;
+
+                                file = await _fileService.EditAsync(model.File, fileBytes);
+                                ShowAlertSuccess($"Updated file: {file.Name}");
+                                return RedirectToAction(nameof(Index));
+                            }
+                            else
+                            {
+                                ShowAlertDanger(FileValidationFailedType);
+                            }
+                        }
+                        else
+                        {
+                            ShowAlertDanger(FileValidationFailedSize);
+                        }
+                    }
+                    else
+                    {
+                        file = await _fileService.EditAsync(model.File);
+                        ShowAlertSuccess($"Updated file: {file.Name}");
+                        return RedirectToAction(nameof(Index));
+                    }                 
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError($"Error editing file: {ex}", ex);
                     ShowAlertDanger("Unable to update file: ", ex.Message);
                 }
             }
@@ -176,6 +275,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             catch (Exception ex)
             {
+                _logger.LogError($"Error deleting file: {ex}", ex);
                 ShowAlertDanger("Unable to delete file: ", ex.Message);
             }
 
@@ -235,6 +335,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError($"Error creating file category: {ex}", ex);
                     ShowAlertDanger("Unable to add category: ", ex.Message);
                 }
             }
@@ -254,6 +355,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError($"Error editing file: {ex}", ex);
                     ShowAlertDanger("Unable to update category: ", ex.Message);
                 }
             }
@@ -271,10 +373,70 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             catch (Exception ex)
             {
+                _logger.LogError($"Error deleting file category: {ex}", ex);
                 ShowAlertDanger("Unable to delete category: ", ex.Message);
             }
 
             return RedirectToAction(nameof(Categories), new { page = model.PaginateModel.CurrentPage });
+        }
+
+        public async Task<IActionResult> ViewFile(int id)
+        {
+            var file = await _fileService.GetByIdAsync(id);
+            var extension = System.IO.Path.GetExtension(file.FilePath);
+            var fileName = $"{file.Name}{extension}";
+            byte[] fileBytes;
+
+            try
+            {
+                using (var fileStream = System.IO.File.OpenRead(file.FilePath))
+                {
+                    using (var ms = new System.IO.MemoryStream())
+                    {
+                        fileStream.CopyTo(ms);
+                        fileBytes = ms.ToArray();
+                    }
+                }
+
+                var typeProvider = new FileExtensionContentTypeProvider();
+                typeProvider.TryGetContentType(file.FilePath, out string fileType);
+
+                Response.Headers.Add("Content-Disposition", "inline; filename=" + fileName);
+                return File(fileBytes, fileType);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error viewing file {file.Id} : {ex}", ex);
+                return StatusCode(StatusCodes.Status404NotFound);
+            }
+        }
+
+        public IActionResult ValidateFileBeforeUpload(string fileName, int fileSize)
+        {
+            var result = "";
+            var maxFileSize = MaxFileSize; //TODO get max filesize from config
+            
+            if(fileSize < maxFileSize)
+            {
+                var typeProvider = new FileExtensionContentTypeProvider();
+                typeProvider.TryGetContentType(fileName, out string fileType);
+
+                if (string.IsNullOrWhiteSpace(fileType))
+                {
+                    result = FileValidationFailedType;
+                }
+                else
+                {
+                    result = FileValidationPassed;
+                }
+            }
+            else
+            {
+                result = FileValidationFailedSize;
+            }
+            
+            _logger.LogInformation($"File type validation for \"{fileName}\": {result}", fileName, result);
+            return Json(result);
         }
     }
 }
