@@ -20,16 +20,24 @@ namespace Ocuda.Ops.Controllers.Filter
         private readonly ILogger<AuthenticationFilter> _logger;
         private readonly IConfiguration _config;
         private readonly IDistributedCache _cache;
+        private readonly AuthorizationService _authorizationService;
+        private readonly SectionService _sectionService;
         private readonly UserService _userService;
 
         public AuthenticationFilter(ILogger<AuthenticationFilter> logger,
             IConfiguration configuration,
             IDistributedCache cache,
+            AuthorizationService authorizationService,
+            SectionService sectionService,
             UserService userService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _authorizationService = authorizationService
+                ?? throw new ArgumentNullException(nameof(authorizationService));
+            _sectionService = sectionService
+                ?? throw new ArgumentNullException(nameof(SectionService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
@@ -79,6 +87,7 @@ namespace Ocuda.Ops.Controllers.Filter
                             new Helper().GetCurrentUrl(httpContext));
 
                         httpContext.Response.Redirect(string.Format(authRedirectUrl, id));
+                        return;
                     }
                     else
                     {
@@ -107,15 +116,67 @@ namespace Ocuda.Ops.Controllers.Filter
                             = await _cache.GetStringAsync(string.Format(Cache.OpsGroup,
                                 id,
                                 groupId));
-
+                        var adGroupNames = new List<string>();
                         while (!string.IsNullOrEmpty(adGroupName))
                         {
-                            claims.Add(new Claim(Key.ClaimType.ADGroup, adGroupName));
+                            adGroupNames.Add(adGroupName);
                             await _cache.RemoveAsync(string.Format(Cache.OpsGroup, id, groupId));
                             groupId++;
                             adGroupName = await _cache.GetStringAsync(string.Format(Cache.OpsGroup,
                                 id,
                                 groupId));
+                        }
+
+                        bool isSiteManager = false;
+
+                        var siteManagerGroups
+                            = await _authorizationService.SiteManagerGroupsAsync();
+                        var sectionManagerGroups
+                            = await _authorizationService.SectionManagerGroupsAsync();
+
+                        var sectionManagerOf = new List<string>();
+
+                        foreach (string groupName in adGroupNames)
+                        {
+                            claims.Add(new Claim(Key.ClaimType.ADGroup, groupName));
+                            if (!isSiteManager)
+                            {
+                                if (siteManagerGroups.Contains(groupName))
+                                {
+                                    isSiteManager = true;
+                                }
+                                else
+                                {
+                                    var sectionsManaged =
+                                        sectionManagerGroups.Where(_ => _.GroupName == groupName);
+
+                                    foreach (var sectionManaged in sectionsManaged)
+                                    {
+                                        if (!sectionManagerOf.Contains(sectionManaged.SectionName))
+                                        {
+                                            sectionManagerOf.Add(sectionManaged.SectionName);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (isSiteManager)
+                        {
+                            claims.Add(new Claim(Key.ClaimType.SiteManager, username));
+                            foreach (var section in await _sectionService.GetSectionsAsync())
+                            {
+                                claims.Add(new Claim(Key.ClaimType.SectionManager, 
+                                    section.Name.ToLower()));
+                            }
+                        }
+                        else
+                        {
+                            foreach (var sectionName in sectionManagerOf)
+                            {
+                                claims.Add(new Claim(Key.ClaimType.SectionManager, 
+                                    sectionName.ToLower()));
+                            }
                         }
 
                         // TODO: probably change the role claim type to our roles and not AD groups

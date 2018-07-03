@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -75,6 +76,29 @@ namespace Ocuda.Ops.Controllers
             };
 
             return View(viewModel);
+        }
+
+        public IActionResult Unauthorized(string returnUrl)
+        {
+            return View(new UnauthorizedViewModel
+            {
+                ReturnUrl = returnUrl,
+                Username = CurrentUsername
+            });
+        }
+
+        public IActionResult Authenticate(string returnUrl)
+        {
+            // by the time we get here the user is probably authenticated - if so we can take them
+            // back to their initial destination
+            if (HttpContext.Items[ItemKey.Nickname] != null)
+            {
+                return Redirect(returnUrl);
+            }
+
+            TempData[TempDataKey.AlertWarning]
+                = $"Could not authenticate you for access to {returnUrl}.";
+            return RedirectToAction("Index");
         }
     }
 }

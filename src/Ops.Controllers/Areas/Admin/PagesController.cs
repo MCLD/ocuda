@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages;
+using Ocuda.Ops.Controllers.Authorization;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Utility.Models;
@@ -11,6 +13,7 @@ using Ocuda.Utility.Models;
 namespace Ocuda.Ops.Controllers.Areas.Admin
 {
     [Area("Admin")]
+    [Authorize(Policy = nameof(SectionManagerRequirement))]
     public class PagesController : BaseController
     {
         private readonly PageService _pageService;

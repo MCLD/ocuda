@@ -81,6 +81,7 @@ _Eventually this should be moved to the user documentation._
 - `Ops.Instance` - configure an instance name for more specific logging
 - `Ops.RollingLogLocation` - path of where to write log files which rotate daily, if unset no rolling log is written
 - `Ops.SessionTimeoutMinutes` - defaults to 2 hours - amount of time in minutes for sessions to last
+- `Ops.SiteManagerGroup` - if specified, this authentication group (currently ADGroup) will be granted site manager access
 
 ### Promenade
 

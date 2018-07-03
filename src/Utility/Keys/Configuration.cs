@@ -12,6 +12,7 @@
         public static readonly string OpsDomainName = "Ops.DomainName";
         public static readonly string OpsHttpErrorFileTag = "Ops.HttpErrorFileTag";
         public static readonly string OpsInstance = "Ops.Instance";
+        public static readonly string OpsSiteManagerGroup = "Ops.SiteManagerGroup";
         public static readonly string OpsRollingLogLocation = "Ops.RollingLogLocation";
         public static readonly string OpsSessionTimeoutMinutes = "Ops.SessionTimeoutMinutes";
     }
