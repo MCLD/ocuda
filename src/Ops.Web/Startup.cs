@@ -46,7 +46,7 @@ namespace Ocuda.Ops.Web
                     string redisConfiguration
                         = _config[Utility.Keys.Configuration.OpsDistributedCacheRedisConfiguration]
                         ?? throw new Exception($"{Utility.Keys.Configuration.OpsDistributedCache} has Redis selected but {Utility.Keys.Configuration.OpsDistributedCacheRedisConfiguration} is not set.");
-                    string instanceName = "Ocuda.Ops";
+                    string instanceName = Utility.Keys.CacheInstance.OcudaOps;
                     _logger.LogInformation($"Using Redis distributed cache {redisConfiguration} instance {instanceName}");
                     services.AddDistributedRedisCache(_ =>
                     {

@@ -4,6 +4,7 @@
     {
         public static readonly string OpsAuthBlankRequestRedirect = "Ops.AuthBlankRequestRedirect";
         public static readonly string OpsAuthRedirect = "Ops.AuthRedirect";
+        public static readonly string OpsAuthTimeoutMinutes = "Ops.AuthTimeoutMinutes";
         public static readonly string OpsCulture = "Ops.Culture";
         public static readonly string OpsDatabaseProvider = "Ops.DatabaseProvider";
         public static readonly string OpsDistributedCache = "Ops.DistributedCache";
