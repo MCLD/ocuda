@@ -1,17 +1,18 @@
 ﻿using System;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Controllers.Authorization;
 using Ocuda.Ops.Controllers.RouteConstraint;
 using Ocuda.Ops.Controllers.Validator;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Web.StartupHelper;
-using Ocuda.Utility.Web;
 
 namespace Ocuda.Ops.Web
 {
@@ -42,10 +43,10 @@ namespace Ocuda.Ops.Web
             switch (_config[Utility.Keys.Configuration.OpsDistributedCache])
             {
                 case "Redis":
-                    string redisConfiguration 
+                    string redisConfiguration
                         = _config[Utility.Keys.Configuration.OpsDistributedCacheRedisConfiguration]
                         ?? throw new Exception($"{Utility.Keys.Configuration.OpsDistributedCache} has Redis selected but {Utility.Keys.Configuration.OpsDistributedCacheRedisConfiguration} is not set.");
-                    string instanceName = "Ocuda.Ops";
+                    string instanceName = Utility.Keys.CacheInstance.OcudaOps;
                     _logger.LogInformation($"Using Redis distributed cache {redisConfiguration} instance {instanceName}");
                     services.AddDistributedRedisCache(_ =>
                     {
@@ -68,16 +69,16 @@ namespace Ocuda.Ops.Web
             {
                 case "SqlServer":
                     _logger.LogInformation("Using SqlServer data provider");
-                    services.AddDbContextPool<OpsContext, 
-                        DataProvider.SqlServer.Ops.Context>(_ =>_.UseSqlServer(opsCs));
-                    services.AddDbContextPool<PromenadeContext, 
+                    services.AddDbContextPool<OpsContext,
+                        DataProvider.SqlServer.Ops.Context>(_ => _.UseSqlServer(opsCs));
+                    services.AddDbContextPool<PromenadeContext,
                         DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
                     break;
                 case "SQLite":
                     _logger.LogInformation("Using SQLite data provider");
-                    services.AddDbContextPool<OpsContext, 
+                    services.AddDbContextPool<OpsContext,
                         DataProvider.SQLite.Ops.Context>(_ => _.UseSqlite(opsCs));
-                    services.AddDbContextPool<PromenadeContext, 
+                    services.AddDbContextPool<PromenadeContext,
                         DataProvider.SQLite.Promenade.Context>(_ => _.UseSqlite(promCs));
                     break;
                 default:
@@ -86,7 +87,7 @@ namespace Ocuda.Ops.Web
             }
 
             var sessionTimeout = TimeSpan.FromHours(2 * 60);
-            if(int.TryParse(_config[Utility.Keys.Configuration.OpsSessionTimeoutMinutes], 
+            if (int.TryParse(_config[Utility.Keys.Configuration.OpsSessionTimeoutMinutes],
                 out int configuredTimeout))
             {
                 _logger.LogInformation($"Session timeout configured for {configuredTimeout} minutes");
@@ -100,7 +101,22 @@ namespace Ocuda.Ops.Web
             });
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie();
+                .AddCookie(_ =>
+                {
+                    _.AccessDeniedPath = "/Home/Unauthorized";
+                    _.LoginPath = "/Home/Authenticate";
+                });
+
+            services.AddSingleton<IAuthorizationHandler, SectionManagerHandler>();
+            services.AddSingleton<IAuthorizationHandler, SiteManagerHandler>();
+
+            services.AddAuthorization(_ =>
+            {
+                _.AddPolicy(nameof(SectionManagerRequirement),
+                    policy => policy.Requirements.Add(new SectionManagerRequirement()));
+                _.AddPolicy(nameof(SiteManagerRequirement),
+                    policy => policy.Requirements.Add(new SiteManagerRequirement()));
+            });
 
             services.AddMvc()
                 .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_1);
@@ -116,9 +132,13 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Interfaces.Ops.ICategoryRepository, Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.IPageRepository, Data.Ops.PageRepository>();
             services.AddScoped<Service.Interfaces.Ops.IPostRepository, Data.Ops.PostRepository>();
-            services.AddScoped<Service.Interfaces.Ops.ISectionRepository, 
+            services.AddScoped<Service.Interfaces.Ops.ISectionManagerGroupRepository,
+                Data.Ops.SectionManagerGroupRepository>();
+            services.AddScoped<Service.Interfaces.Ops.ISectionRepository,
                 Data.Ops.SectionRepository>();
-            services.AddScoped<Service.Interfaces.Ops.ISiteSettingRepository, 
+            services.AddScoped<Service.Interfaces.Ops.ISiteManagerGroupRepository,
+                Data.Ops.SiteManagerGroupRepository>();
+            services.AddScoped<Service.Interfaces.Ops.ISiteSettingRepository,
                 Data.Ops.SiteSettingRepository>();
             services.AddScoped<Service.Interfaces.Ops.IUserRepository, Data.Ops.UserRepository>();
 
@@ -127,6 +147,7 @@ namespace Ocuda.Ops.Web
                 Controllers.Validator.SectionPathValidator>();
 
             // services
+            services.AddScoped<AuthorizationService>();
             services.AddScoped<InitialSetupService>();
             services.AddScoped<InsertSampleDataService>();
             services.AddScoped<RosterService>();

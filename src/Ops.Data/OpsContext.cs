@@ -37,6 +37,8 @@ namespace Ocuda.Ops.Data
         public DbSet<Models.Page> Pages { get; set; }
         public DbSet<Models.Post> Posts { get; set; }
         public DbSet<Models.Section> Sections { get; set; }
+        public DbSet<Models.SectionManagerGroup> SectionManagerGroups { get; set; }
+        public DbSet<Models.SiteManagerGroup> SiteManagerGroups { get; set; }
         public DbSet<Models.SiteSetting> SiteSettings { get; set; }
         public DbSet<Models.User> Users { get; set; }
     }

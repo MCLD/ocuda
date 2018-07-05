@@ -73,6 +73,7 @@ _Eventually this should be moved to the user documentation._
 ##### Settings
 - `OpsAuthBlankRequestRedirect` - *used only by Ops.Web.WindowsAuth* - if the authentication site is loaded with no id or directive then redirect to this URL
 - `Ops.AuthRedirect` - URL to the deployed Ops.Web.WindowsAuth site - if not specified authentication will not function
+- `Ops.AuthTimeoutMinutes` - defaults to 2 minutes - timeout for authentication bits (cookie and distributed cache elements)
 - `Ops.Culture` - defaults to "en-US", the culture to use for displaying things like dates and times - for valid options see the language tags listed in the [Microsoft National Language Support (NLS) API Reference](http://go.microsoft.com/fwlink/?LinkId=200048)
 - `Ops.DistributedCache` - when unset, defaults to memory-based distributed cache - a cache strategy to use: currently either unset or 'Redis' are valid
 - `Ops.DistributedCache.RedisConfiguration` - *also used by Ops.Web.WindowsAuth* - if *Ops.DistributedCache* is set to 'Redis' this must be set with Redis configuration information, see the [RedisCacheOptions.Configuration property](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.caching.redis.rediscacheoptions.configuration)
@@ -81,6 +82,7 @@ _Eventually this should be moved to the user documentation._
 - `Ops.Instance` - configure an instance name for more specific logging
 - `Ops.RollingLogLocation` - path of where to write log files which rotate daily, if unset no rolling log is written
 - `Ops.SessionTimeoutMinutes` - defaults to 2 hours - amount of time in minutes for sessions to last
+- `Ops.SiteManagerGroup` - if specified, this authentication group (currently ADGroup) will be granted site manager access
 
 ### Promenade
 

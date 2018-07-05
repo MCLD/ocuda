@@ -32,7 +32,7 @@ namespace Ops.Web.WindowsAuth
             string redisConfiguration
                 = _config[Configuration.OpsDistributedCacheRedisConfiguration]
                 ?? throw new Exception($"{Configuration.OpsDistributedCacheRedisConfiguration} is not set.");
-            string instanceName = "Ocuda.Ops";
+            string instanceName = CacheInstance.OcudaOps;
             services.AddDistributedRedisCache(_ =>
             {
                 _.Configuration = redisConfiguration;
@@ -114,25 +114,36 @@ namespace Ops.Web.WindowsAuth
                     {
                         var cache = app.ApplicationServices.GetRequiredService<IDistributedCache>();
 
+                        // by default time out cookies and distributed cache in 2 minutes
+                        int authTimeoutMinutes = 2;
+
+                        var configuredAuthTimeout = _config[Configuration.OpsAuthTimeoutMinutes];
+                        if (configuredAuthTimeout != null)
+                        {
+                            if (!int.TryParse(configuredAuthTimeout, out authTimeoutMinutes))
+                            {
+                                _logger.LogWarning($"Configured {Configuration.OpsAuthTimeoutMinutes} could not be converted to a number. It should be a number of minutes (defaulting to 2).");
+                            }
+                        }
+
+                        var cacheExpiration = new DistributedCacheEntryOptions()
+                            .SetAbsoluteExpiration(new TimeSpan(0, authTimeoutMinutes, 0));
+
+
                         string referer
                         = await cache.GetStringAsync(string.Format(Cache.OpsReturn, id));
                         _logger.LogInformation($"Id {id} is user {identity.Name} with {roles.Count()} roles from {referer}");
 
-                        var options = new DistributedCacheEntryOptions
-                        {
-                            AbsoluteExpirationRelativeToNow = new TimeSpan(0, 5, 0)
-                        };
-
                         await cache.SetStringAsync(string.Format(Cache.OpsUsername, id),
                             identity.Name,
-                            options);
+                            cacheExpiration);
 
                         int groupId = 1;
                         foreach (string name in roleNames)
                         {
                             await cache.SetStringAsync(string.Format(Cache.OpsGroup, id, groupId),
                                 name,
-                                options);
+                                cacheExpiration);
                             groupId++;
                         }
 

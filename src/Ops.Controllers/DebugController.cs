@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Service;
 
@@ -17,6 +18,9 @@ namespace Ocuda.Ops.Controllers
         public async Task<IActionResult> InsertSampleData()
         {
             await _insertSampleDataService.InsertDataAsync();
+
+            // force user to re-load permissions now that there are new sections
+            await HttpContext.SignOutAsync();
 
             return RedirectToAction("Index", "Home");
         }
