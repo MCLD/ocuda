@@ -3249,7 +3249,7 @@
 
   <ItemGroup>
     <Folder Include="Middleware\" />
-    <Folder Include="Shared\Content\BlogFiles\" />
+    <Folder Include="Shared\Content\" />
     <Folder Include="Views\Error\" />
   </ItemGroup>
 

@@ -133,7 +133,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                             }
                         }
 
-                        if(model.FileData.Length < MaxFileSize)
+                        if (model.FileData.Length < MaxFileSize)
                         {
                             var typeProvider = new FileExtensionContentTypeProvider();
                             typeProvider.TryGetContentType(model.FileData.FileName, out string contentType);
@@ -153,11 +153,11 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                             else
                             {
                                 ShowAlertDanger(FileValidationFailedType);
-                            } 
+                            }
                         }
                         else
                         {
-                            ShowAlertDanger(FileValidationFailedSize); 
+                            ShowAlertDanger(FileValidationFailedSize);
                         }
                     }
                     else
@@ -221,6 +221,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                                 fileBytes = ms.ToArray();
                             }
                         }
+
                         if (model.FileData.Length < MaxFileSize)
                         {
                             var typeProvider = new FileExtensionContentTypeProvider();
@@ -252,7 +253,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                         file = await _fileService.EditAsync(model.File);
                         ShowAlertSuccess($"Updated file: {file.Name}");
                         return RedirectToAction(nameof(Index));
-                    }                 
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -413,10 +414,78 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
         public IActionResult ValidateFileBeforeUpload(string fileName, int fileSize)
         {
+            string result = ValidateFile(fileName, fileSize);
+            return Json(result);
+        }
+
+        public async Task<IActionResult> UploadAttachment(IFormFile fileData, int fileSize, int sectionId)
+        {
+            string result = FileValidationPassed;  //TODO File Validation
+
+            if (result == FileValidationPassed)
+            {
+                try
+                {
+                    if (fileData != null)
+                    {
+                        var section = await _sectionService.GetByIdAsync(sectionId);
+                        var category = await _categoryService.GetAttachmentCategoryAsync(section.Id);
+
+                        File file = new File
+                        {
+                            Name = fileData.FileName,
+                            Description = "Attachment",
+                            IsFeatured = false,
+                            SectionId = section.Id,
+                            CategoryId = category.Id 
+                        };
+                        
+                        byte[] fileBytes;
+
+                        using (var fileStream = fileData.OpenReadStream())
+                        {
+                            using (var ms = new System.IO.MemoryStream())
+                            {
+                                fileStream.CopyTo(ms);
+                                fileBytes = ms.ToArray();
+                            }
+
+                            file.Extension = System.IO.Path.GetExtension(fileData.FileName);
+
+                            var fileType = await _fileTypeService.GetByExtensionAsync(file.Extension);
+                            file.Icon = fileType.Icon;
+
+                            var newFile = await _fileService.CreateAsync(file, fileBytes);
+                            _logger.LogInformation($"Attached file: {newFile.FilePath}");
+
+                            string sectionPath = null;
+                            if(section.Path != null)
+                            {
+                                sectionPath = $"/{section.Path}";
+                            }
+
+                            var filePath = HttpContext.Request.Host + 
+                                $"{sectionPath}/Files/{nameof(FilesController.ViewFile)}/{newFile.Id}";
+                            result = filePath;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Error creating file: {ex}", ex);
+                    ShowAlertDanger("Unable to add file: ", ex.Message);
+                }
+            }
+
+            return Json(result);
+        }
+
+        private string ValidateFile(string fileName, int fileSize)
+        {
             var result = "";
             var maxFileSize = MaxFileSize; //TODO get max filesize from config
-            
-            if(fileSize < maxFileSize)
+
+            if (fileSize < maxFileSize)
             {
                 var typeProvider = new FileExtensionContentTypeProvider();
                 typeProvider.TryGetContentType(fileName, out string fileType);
@@ -434,9 +503,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 result = FileValidationFailedSize;
             }
-            
-            _logger.LogInformation($"File type validation for \"{fileName}\": {result}", fileName, result);
-            return Json(result);
+
+            _logger.LogInformation($"Validation for \"{fileName}\": {result}", fileName, result);
+
+            return result;
         }
     }
 }
