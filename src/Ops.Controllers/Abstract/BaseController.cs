@@ -97,13 +97,14 @@ namespace Ocuda.Ops.Controllers.Abstract
                     .Where(_ => _.Type == Key.ClaimType.UserId)
                     .FirstOrDefault()?
                     .Value;
-                if(!int.TryParse(userIdString, out int userId))
+                if (int.TryParse(userIdString, out int userId))
                 {
-                    throw new System.Exception("Could not determine user id");
+                    return userId;
                 }
                 else
                 {
-                    return userId;
+                    // TODO is this the right approach here?
+                    return -1;
                 }
             }
         }
