@@ -75,7 +75,18 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 {
                     await model.Roster.CopyToAsync(fileStream);
                 }
-                await _rosterService.UploadRosterAsync(tempFile);
+
+                try
+                {
+                    int insertedRecordCount
+                        = await _rosterService.UploadRosterAsync(CurrentUserId, tempFile);
+                    AlertInfo = $"Successfully inserted {insertedRecordCount} roster records.";
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error inserting roster data: {Message}", ex);
+                    AlertDanger = $"There was a problem inserting the roster data: {ex.Message}";
+                }
 
                 return RedirectToAction(nameof(Upload));
             }

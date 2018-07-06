@@ -19,7 +19,7 @@ namespace Ocuda.Ops.Service
             return await _userRepository.FindByUsernameAsync(username);
         }
 
-        public async Task AddUser(User user, int? createdById = null)
+        public async Task<User> AddUser(User user, int? createdById = null)
         {
             user.Username = user.Username.Trim();
             user.CreatedAt = DateTime.Now;
@@ -29,12 +29,16 @@ namespace Ocuda.Ops.Service
             }
             await _userRepository.AddAsync(user);
             await _userRepository.SaveAsync();
-            if (createdById == null)
+            if (createdById != null)
+            {
+                return user;
+            }
             {
                 var createdUser = await _userRepository.FindByUsernameAsync(user.Username);
                 createdUser.CreatedBy = createdUser.Id;
                 _userRepository.Update(user);
                 await _userRepository.SaveAsync();
+                return createdUser;
             }
         }
 

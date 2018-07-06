@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ExcelDataReader;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Service.Interfaces.Ops;
 
 namespace Ocuda.Ops.Service
 {
@@ -19,15 +21,31 @@ namespace Ocuda.Ops.Service
         public const string EmailHeading = "Email Address";
         public const string AsOfHeading = "As Of Date";
 
-        public async Task UploadRosterAsync(string filename)
+        private readonly ILogger _logger;
+        private readonly IRosterDetailRepository _rosterDetailRepository;
+        private readonly IRosterHeaderRepository _rosterHeaderRepository;
+
+        public RosterService(ILogger<RosterService> logger,
+            IRosterDetailRepository rosterDetailRepository,
+            IRosterHeaderRepository rosterHeaderRepository)
         {
-            var rosterDetail = new RosterDetail
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _rosterDetailRepository = rosterDetailRepository
+                ?? throw new ArgumentNullException(nameof(rosterDetailRepository));
+            _rosterHeaderRepository = rosterHeaderRepository
+                ?? throw new ArgumentNullException(nameof(rosterHeaderRepository));
+        }
+
+        public async Task<int> UploadRosterAsync(int currentUserId, string filename)
+        {
+            var createdAt = DateTime.Now;
+            var rosterHeader = new RosterHeader
             {
-                CreatedAt = DateTime.Now,
-                CreatedBy = 1
+                CreatedAt = createdAt,
+                CreatedBy = currentUserId
             };
 
-            var rosterList = new List<RosterEntry>();
+            var rosterDetails = new List<RosterDetail>();
             string filePath = Path.Combine(Path.GetTempPath(), filename);
             try
             {
@@ -85,27 +103,32 @@ namespace Ocuda.Ops.Service
                                 var name = excelReader.GetString(nameColId);
 
                                 // Skip over vacant positions
-                                if (string.Equals(name, "Vacant", StringComparison.OrdinalIgnoreCase))
+                                if (string.Equals(name, "Vacant",
+                                    StringComparison.OrdinalIgnoreCase))
                                 {
                                     continue;
                                 }
-                                var entry = new RosterEntry()
+                                var entry = new RosterDetail()
                                 {
-                                    RosterDetail = rosterDetail,
+                                    RosterHeader = rosterHeader,
                                     Name = name,
                                     EmployeeId = int.Parse(excelReader.GetString(employeeIdColId)),
                                     PositionNum = int.Parse(excelReader.GetString(positionColId)),
                                     JobTitle = excelReader.GetString(titleColId),
                                     ReportsToId = int.Parse(excelReader.GetString(reportToIdColId)),
-                                    ReportsToPos = int.Parse(excelReader.GetString(reportToPosColId)),
+                                    ReportsToPos
+                                        = int.Parse(excelReader.GetString(reportToPosColId)),
                                     EmailAddress = excelReader.GetString(emailColId),
-                                    AsOf = DateTime.Parse(excelReader.GetString(asOfColId))
+                                    AsOf = DateTime.Parse(excelReader.GetString(asOfColId)),
+                                    CreatedAt = createdAt,
+                                    CreatedBy = currentUserId
                                 };
 
                                 // Check if employee has already been added to the list
-                                if (rosterList.Select(_ => _.EmployeeId).Contains(entry.EmployeeId) == false)
+                                if (rosterDetails.Select(_ => _.EmployeeId)
+                                    .Contains(entry.EmployeeId) == false)
                                 {
-                                    rosterList.Add(entry);
+                                    rosterDetails.Add(entry);
                                 }
                             }
                         }
@@ -117,24 +140,26 @@ namespace Ocuda.Ops.Service
                 System.IO.File.Delete(filePath);
             }
 
-            // add rosterdetail
-            // addrange rosterentries
-            // save
+            await _rosterHeaderRepository.AddAsync(rosterHeader);
+            await _rosterDetailRepository.AddRangeAsync(rosterDetails);
+            await _rosterDetailRepository.SaveAsync();
+
+            return rosterDetails.Count();
         }
 
-        public async Task<(RosterDetail RosterDetail, 
-                           IEnumerable<RosterEntry> NewEmployees, 
-                           IEnumerable<RosterEntry> RemovedEmployees)> GetRosterChangesAsync()
+        public async Task<(RosterHeader RosterDetail,
+                           IEnumerable<RosterDetail> NewEmployees,
+                           IEnumerable<RosterDetail> RemovedEmployees)> GetRosterChangesAsync()
         {
-            var detail = new RosterDetail()
+            var detail = new RosterHeader()
             {
                 CreatedAt = DateTime.Now,
                 CreatedBy = 1
             };
 
-            var newEmployees = new List<RosterEntry>()
+            var newEmployees = new List<RosterDetail>()
             {
-                new RosterEntry
+                new RosterDetail
                 {
                     Id = 1,
                     Name = "Harry Potter",
@@ -142,7 +167,7 @@ namespace Ocuda.Ops.Service
                     JobTitle = "Student",
                     EmployeeId = 1,
                 },
-                new RosterEntry
+                new RosterDetail
                 {
                     Id = 2,
                     Name = "Hermione Granger",
@@ -150,7 +175,7 @@ namespace Ocuda.Ops.Service
                     JobTitle = "Student",
                     EmployeeId = 2,
                 },
-                new RosterEntry
+                new RosterDetail
                 {
                     Id = 3,
                     Name = "Ron Weasley",
@@ -160,9 +185,9 @@ namespace Ocuda.Ops.Service
                 }
             };
 
-            var removedEmployees = new List<RosterEntry>()
+            var removedEmployees = new List<RosterDetail>()
             {
-                new RosterEntry
+                new RosterDetail
                 {
                     Id = 4,
                     Name = "Severus Snape",
@@ -170,7 +195,7 @@ namespace Ocuda.Ops.Service
                     JobTitle = "Potions Master",
                     EmployeeId = 4,
                 },
-                new RosterEntry
+                new RosterDetail
                 {
                     Id = 5,
                     Name = "Albus Dumbledore",
@@ -178,7 +203,7 @@ namespace Ocuda.Ops.Service
                     JobTitle = "Headmaster",
                     EmployeeId = 5,
                 },
-                new RosterEntry
+                new RosterDetail
                 {
                     Id = 6,
                     Name = "Tom Riddle",

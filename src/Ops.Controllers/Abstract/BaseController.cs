@@ -88,5 +88,24 @@ namespace Ocuda.Ops.Controllers.Abstract
                     .Value;
             }
         }
+
+        protected int CurrentUserId
+        {
+            get
+            {
+                var userIdString = HttpContext.User.Claims
+                    .Where(_ => _.Type == Key.ClaimType.UserId)
+                    .FirstOrDefault()?
+                    .Value;
+                if(!int.TryParse(userIdString, out int userId))
+                {
+                    throw new System.Exception("Could not determine user id");
+                }
+                else
+                {
+                    return userId;
+                }
+            }
+        }
     }
 }
