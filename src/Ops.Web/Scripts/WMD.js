@@ -1026,19 +1026,24 @@ Markdown.HookCollection = HookCollection;
 
             if (isUpload && !isCancel) {
                 if (window.FormData !== undefined) {
-
                     var fileUpload = $("#FileUpload").get(0);
                     var files = fileUpload.files;
 
                     // Create FormData object  
                     var fileData = new FormData();
 
-                    fileData.append(files[0].name, files[0]);
+                    fileData.append("fileData", files[0]);
+                    //fileData.append("fileSize", files[0].size);
+
+                    if ($("#SectionId").length > 0) {
+                        var sectionId = $("#SectionId").val();
+                        fileData.append("sectionId", sectionId);
+                    }
 
                     // Adding one more key to FormData object   
 
                     $.ajax({
-                        url: '/Default/UploadFiles',
+                        url: '/../../Admin/Files/UploadAttachment', //TODO fix url
                         type: "POST",
                         contentType: false, // Not to set any content header  
                         processData: false, // Not to process data  

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Sections;
 using Ocuda.Ops.Controllers.Authorization;
@@ -16,10 +17,13 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     public class SectionsController : BaseController
     {
         private readonly SectionService _sectionService;
+        private readonly ILogger<SectionsController> _logger;
 
-        public SectionsController(SectionService sectionService)
+        public SectionsController(SectionService sectionService,
+            ILogger<SectionsController> logger)
         {
             _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<IActionResult> Index(int page = 1)
@@ -77,6 +81,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError($"Error adding section: {ex}", ex);
                     ShowAlertDanger("Unable to add section: ", ex.Message);
                 }
             }
@@ -111,6 +116,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError($"Error updating section: {ex}", ex);
                     ShowAlertDanger("Unable to update section: ", ex.Message);
                 }
             }
@@ -129,6 +135,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             catch (Exception ex)
             {
+                _logger.LogError($"Error deleting section: {ex}", ex);
                 ShowAlertDanger("Unable to delete section: ", ex.Message);
             }
 

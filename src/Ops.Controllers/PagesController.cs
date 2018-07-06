@@ -57,10 +57,9 @@ namespace Ocuda.Ops.Controllers
             return View(viewModel);
         }
 
-        //TODO use stub instead of id
-        public async Task<IActionResult> View(int id)
+        public new async Task<IActionResult> View(string id)
         {
-            var page = await _pageService.GetByIdAsync(id);
+            var page = await _pageService.GetByStubAsync(id);
 
             page.Content = CommonMark.CommonMarkConverter.Convert(page.Content);
 

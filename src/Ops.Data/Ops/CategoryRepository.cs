@@ -19,6 +19,22 @@ namespace Ocuda.Ops.Data.Ops
 
         }
 
+        public async Task<Category> GetByNameAsync(string name)
+        {
+            return await DbSet
+                    .AsNoTracking()
+                    .Where(_ => _.Name == name)
+                    .FirstOrDefaultAsync();
+        }
+
+        public async Task<Category> GetByNameAndSectionIdAsync(string name, int sectionId)
+        {
+            return await DbSet
+                    .AsNoTracking()
+                    .Where(_ => _.Name == name && _.SectionId == sectionId)
+                    .FirstOrDefaultAsync();
+        }
+
         public async Task<ICollection<Category>> GetBySectionIdAsync(BlogFilter filter)
         {
             var query = DbSet.AsNoTracking();

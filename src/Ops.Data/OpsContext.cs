@@ -33,6 +33,7 @@ namespace Ocuda.Ops.Data
         #endregion IMigratableContext
 
         public DbSet<Models.File> Files { get; set; }
+        public DbSet<Models.FileType> FileTypes { get; set; }
         public DbSet<Models.Link> Links { get; set; }
         public DbSet<Models.Page> Pages { get; set; }
         public DbSet<Models.Post> Posts { get; set; }

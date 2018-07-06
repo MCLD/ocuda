@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Links;
 using Ocuda.Ops.Controllers.Authorization;
@@ -20,12 +21,17 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         private readonly LinkService _linkService;
         private readonly CategoryService _categoryService;
         private readonly SectionService _sectionService;
+        private readonly ILogger<LinksController> _logger;
 
-        public LinksController(LinkService linkService, CategoryService categoryService, SectionService sectionService)
+        public LinksController(LinkService linkService, 
+            CategoryService categoryService, 
+            SectionService sectionService,
+            ILogger<LinksController> logger)
         {
             _linkService = linkService ?? throw new ArgumentNullException(nameof(linkService));
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
             _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<IActionResult> Index(string section, int? categoryId = null, int page = 1)
@@ -110,6 +116,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError($"Error creating link: {ex}", ex);
                     ShowAlertDanger("Unable to add link: ", ex.Message);
                 }
             }
@@ -154,6 +161,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError($"Error updating link: {ex}", ex);
                     ShowAlertDanger("Unable to update link: ", ex.Message);
                 }
             }
@@ -172,6 +180,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             catch (Exception ex)
             {
+                _logger.LogError($"Error deleting link: {ex}", ex);
                 ShowAlertDanger("Unable to delete link: ", ex.Message);
             }
 
@@ -231,6 +240,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError($"Error creating link category: {ex}", ex);
                     ShowAlertDanger("Unable to add category: ", ex.Message);
                 }
             }
@@ -250,6 +260,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError($"Error editing link category: {ex}", ex);
                     ShowAlertDanger("Unable to update category: ", ex.Message);
                 }
             }
@@ -267,6 +278,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             catch (Exception ex)
             {
+                _logger.LogError($"Error deleting link category: {ex}", ex);
                 ShowAlertDanger("Unable to delete category: ", ex.Message);
             }
 

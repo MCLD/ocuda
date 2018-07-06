@@ -37,8 +37,8 @@ else
             {
                 <tr>
                     <td class="rowlink-parent">
-                        <a href="@file.FilePath" class="rowlink">
-                            <span class="fa @file.Icon"></span> @file.Name
+                        <a asp-action="ViewFile" asp-route-id="@file.Id" target="_blank" class="rowlink">
+                            <span class="@file.Icon"></span> @file.Name
                         </a>
                     </td>
                     <td>@file.Description</td>
