@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Sections;
-using Ocuda.Ops.Controllers.Authorization;
+using Ocuda.Ops.Controllers.Key;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Utility.Models;
@@ -13,7 +13,7 @@ using Ocuda.Utility.Models;
 namespace Ocuda.Ops.Controllers.Areas.Admin
 {
     [Area("Admin")]
-    [Authorize(Policy = nameof(SiteManagerRequirement))]
+    [Authorize(Policy = nameof(ClaimType.SiteManager))]
     public class SectionsController : BaseController
     {
         private readonly SectionService _sectionService;

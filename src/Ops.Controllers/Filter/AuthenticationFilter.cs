@@ -77,10 +77,10 @@ namespace Ocuda.Ops.Controllers.Filter
                     // by default time out cookies and distributed cache in 2 minutes
                     int authTimeoutMinutes = 2;
 
-                    var configuredAuthTimeout = _config[Configuration.OpsAuthTimeoutMinutes];                   
-                    if(configuredAuthTimeout != null)
+                    var configuredAuthTimeout = _config[Configuration.OpsAuthTimeoutMinutes];
+                    if (configuredAuthTimeout != null)
                     {
-                        if(!int.TryParse(configuredAuthTimeout, out authTimeoutMinutes))
+                        if (!int.TryParse(configuredAuthTimeout, out authTimeoutMinutes))
                         {
                             _logger.LogWarning($"Configured {Configuration.OpsAuthTimeoutMinutes} could not be converted to a number. It should be a number of minutes (defaulting to 2).");
                         }
@@ -153,7 +153,6 @@ namespace Ocuda.Ops.Controllers.Filter
                             new Claim(Key.ClaimType.Username, username),
                             new Claim(Key.ClaimType.UserId, userId)
                         };
-                        //claims.Add(new Claim(Key.ClaimType.Username, username));
 
                         // loop through groups in the distributed cache from authentication
                         // prime the loop
@@ -177,35 +176,45 @@ namespace Ocuda.Ops.Controllers.Filter
                         bool isSiteManager = false;
 
                         // pull lists of AD groups that should be site and section managers
-                        var siteManagerGroups
-                            = await _authorizationService.SiteManagerGroupsAsync();
+                        var claimGroups = await _authorizationService.GetClaimGroupsAsync();
                         var sectionManagerGroups
-                            = await _authorizationService.SectionManagerGroupsAsync();
+                            = await _authorizationService.GetSectionManagerGroupsAsync();
 
                         var sectionManagerOf = new List<string>();
+                        var claimantOf = new Dictionary<string, string>();
 
+                        // loop through group names and look up if each group provides claims
+                        // claims can be provided via ClaimGroups or SectionManagerGroups
                         foreach (string groupName in adGroupNames)
                         {
                             claims.Add(new Claim(Key.ClaimType.ADGroup, groupName));
+
                             // once the user is a site manager, we can stop looking up more rights
                             if (!isSiteManager)
                             {
-                                if (siteManagerGroups.Contains(groupName))
+                                var claimList = claimGroups.Where(_ => _.GroupName == groupName);
+                                foreach (var claim in claimList)
+                                {
+                                    if (!claimantOf.ContainsKey(claim.ClaimType))
+                                    {
+                                        claimantOf.Add(claim.ClaimType, groupName);
+                                    }
+                                }
+
+                                var sectionsManaged =
+                                    sectionManagerGroups.Where(_ => _.GroupName == groupName);
+
+                                foreach (var sectionManaged in sectionsManaged)
+                                {
+                                    if (!sectionManagerOf.Contains(sectionManaged.SectionName))
+                                    {
+                                        sectionManagerOf.Add(sectionManaged.SectionName);
+                                    }
+                                }
+
+                                if (claimantOf.ContainsKey(Key.ClaimType.SiteManager))
                                 {
                                     isSiteManager = true;
-                                }
-                                else
-                                {
-                                    var sectionsManaged =
-                                        sectionManagerGroups.Where(_ => _.GroupName == groupName);
-
-                                    foreach (var sectionManaged in sectionsManaged)
-                                    {
-                                        if (!sectionManagerOf.Contains(sectionManaged.SectionName))
-                                        {
-                                            sectionManagerOf.Add(sectionManaged.SectionName);
-                                        }
-                                    }
                                 }
                             }
                         }
@@ -213,8 +222,17 @@ namespace Ocuda.Ops.Controllers.Filter
                         if (isSiteManager)
                         {
                             // if the user is a site manager, add the site manager claim
+                            claims.Add(new Claim(Key.ClaimType.SiteManager,
+                                Key.ClaimType.SiteManager));
+
+                            // also add each individual permission claim
+                            foreach (var claimType in claimGroups)
+                            {
+                                claims.Add(new Claim(claimType.ClaimType,
+                                    Key.ClaimType.SiteManager));
+                            }
+
                             // also add each individual section management claim
-                            claims.Add(new Claim(Key.ClaimType.SiteManager, username));
                             foreach (var section in await _sectionService.GetSectionsAsync())
                             {
                                 claims.Add(new Claim(Key.ClaimType.SectionManager,
@@ -223,6 +241,12 @@ namespace Ocuda.Ops.Controllers.Filter
                         }
                         else
                         {
+                            // add permission claims
+                            foreach (var claim in claimantOf)
+                            {
+                                claims.Add(new Claim(claim.Key, claim.Value));
+                            }
+
                             // add section management claims
                             foreach (var sectionName in sectionManagerOf)
                             {

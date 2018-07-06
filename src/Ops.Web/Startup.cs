@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Authorization;
+using Ocuda.Ops.Controllers.Key;
 using Ocuda.Ops.Controllers.RouteConstraint;
 using Ocuda.Ops.Controllers.Validator;
 using Ocuda.Ops.Data;
@@ -108,14 +109,13 @@ namespace Ocuda.Ops.Web
                 });
 
             services.AddSingleton<IAuthorizationHandler, SectionManagerHandler>();
-            services.AddSingleton<IAuthorizationHandler, SiteManagerHandler>();
 
             services.AddAuthorization(_ =>
             {
                 _.AddPolicy(nameof(SectionManagerRequirement),
                     policy => policy.Requirements.Add(new SectionManagerRequirement()));
-                _.AddPolicy(nameof(SiteManagerRequirement),
-                    policy => policy.Requirements.Add(new SiteManagerRequirement()));
+                _.AddPolicy(nameof(ClaimType.SiteManager),
+                    policy => policy.RequireClaim(nameof(ClaimType.SiteManager)));
             });
 
             services.AddMvc()
@@ -133,16 +133,16 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Interfaces.Ops.ICategoryRepository, Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.IPageRepository, Data.Ops.PageRepository>();
             services.AddScoped<Service.Interfaces.Ops.IPostRepository, Data.Ops.PostRepository>();
-            services.AddScoped<Service.Interfaces.Ops.IRosterDetailRepository, 
+            services.AddScoped<Service.Interfaces.Ops.IRosterDetailRepository,
                 Data.Ops.RosterDetailRepository>();
-            services.AddScoped<Service.Interfaces.Ops.IRosterHeaderRepository, 
+            services.AddScoped<Service.Interfaces.Ops.IRosterHeaderRepository,
                 Data.Ops.RosterHeaderRepository>();
             services.AddScoped<Service.Interfaces.Ops.ISectionManagerGroupRepository,
                 Data.Ops.SectionManagerGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.ISectionRepository,
                 Data.Ops.SectionRepository>();
-            services.AddScoped<Service.Interfaces.Ops.ISiteManagerGroupRepository,
-                Data.Ops.SiteManagerGroupRepository>();
+            services.AddScoped<Service.Interfaces.Ops.IClaimGroupRepository,
+                Data.Ops.ClaimGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.ISiteSettingRepository,
                 Data.Ops.SiteSettingRepository>();
             services.AddScoped<Service.Interfaces.Ops.IUserRepository, Data.Ops.UserRepository>();

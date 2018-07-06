@@ -32,6 +32,7 @@ namespace Ocuda.Ops.Data
         public new string GetCurrentMigration() => Database.GetAppliedMigrations().Last();
         #endregion IMigratableContext
 
+        public DbSet<Models.ClaimGroup> ClaimGroup { get; set; }
         public DbSet<Models.File> Files { get; set; }
         public DbSet<Models.FileType> FileTypes { get; set; }
         public DbSet<Models.Link> Links { get; set; }
@@ -41,7 +42,6 @@ namespace Ocuda.Ops.Data
         public DbSet<Models.RosterDetail> RosterDetails { get; set; }
         public DbSet<Models.Section> Sections { get; set; }
         public DbSet<Models.SectionManagerGroup> SectionManagerGroups { get; set; }
-        public DbSet<Models.SiteManagerGroup> SiteManagerGroups { get; set; }
         public DbSet<Models.SiteSetting> SiteSettings { get; set; }
         public DbSet<Models.User> Users { get; set; }
     }
