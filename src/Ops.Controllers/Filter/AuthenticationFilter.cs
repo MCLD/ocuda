@@ -139,16 +139,19 @@ namespace Ocuda.Ops.Controllers.Filter
                         var user = await _userService.LookupUser(username);
                         if (user == null)
                         {
-                            await _userService.AddUser(new Models.User
+                            user = await _userService.AddUser(new Models.User
                             {
                                 Username = username
                             });
                         }
 
+                        string userId = user.Id.ToString();
+
                         // start creating the user's claims with their username
                         var claims = new HashSet<Claim>
                         {
-                            new Claim(Key.ClaimType.Username, username)
+                            new Claim(Key.ClaimType.Username, username),
+                            new Claim(Key.ClaimType.UserId, userId)
                         };
                         //claims.Add(new Claim(Key.ClaimType.Username, username));
 

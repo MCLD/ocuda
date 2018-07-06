@@ -88,5 +88,25 @@ namespace Ocuda.Ops.Controllers.Abstract
                     .Value;
             }
         }
+
+        protected int CurrentUserId
+        {
+            get
+            {
+                var userIdString = HttpContext.User.Claims
+                    .Where(_ => _.Type == Key.ClaimType.UserId)
+                    .FirstOrDefault()?
+                    .Value;
+                if (int.TryParse(userIdString, out int userId))
+                {
+                    return userId;
+                }
+                else
+                {
+                    // TODO is this the right approach here?
+                    return -1;
+                }
+            }
+        }
     }
 }

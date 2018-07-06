@@ -133,6 +133,10 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Interfaces.Ops.ICategoryRepository, Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.IPageRepository, Data.Ops.PageRepository>();
             services.AddScoped<Service.Interfaces.Ops.IPostRepository, Data.Ops.PostRepository>();
+            services.AddScoped<Service.Interfaces.Ops.IRosterDetailRepository, 
+                Data.Ops.RosterDetailRepository>();
+            services.AddScoped<Service.Interfaces.Ops.IRosterHeaderRepository, 
+                Data.Ops.RosterHeaderRepository>();
             services.AddScoped<Service.Interfaces.Ops.ISectionManagerGroupRepository,
                 Data.Ops.SectionManagerGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.ISectionRepository,

@@ -5,8 +5,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Roster
 {
     public class ChangesViewModel
     {
-        public RosterDetail RosterDetail { get; set; }
-        public IEnumerable<RosterEntry> NewEmployees { get; set; }
-        public IEnumerable<RosterEntry> RemovedEmployees { get; set; }
+        public RosterHeader RosterDetail { get; set; }
+        public IEnumerable<RosterDetail> NewEmployees { get; set; }
+        public IEnumerable<RosterDetail> RemovedEmployees { get; set; }
     }
 }
