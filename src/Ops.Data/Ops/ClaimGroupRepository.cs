@@ -28,19 +28,5 @@ namespace Ocuda.Ops.Data.Ops
                 .Where(_ => _.GroupName == group.Trim() && _.ClaimType == claim)
                 .AnyAsync();
         }
-
-        public async Task<ICollection<string>> GroupsForClaim(string group)
-        {
-            if (string.IsNullOrEmpty(group))
-            {
-                return null;
-            }
-
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.GroupName == group.Trim())
-                .Select(_ => _.ClaimType)
-                .ToListAsync();
-        }
     }
 }

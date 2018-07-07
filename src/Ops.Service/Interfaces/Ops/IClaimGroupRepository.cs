@@ -8,6 +8,5 @@ namespace Ocuda.Ops.Service.Interfaces.Ops
 
     {
         Task<bool> IsClaimGroup(string claim, string group);
-        Task<ICollection<string>> GroupsToListAsync(string claim);
     }
 }
