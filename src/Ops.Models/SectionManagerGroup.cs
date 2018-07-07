@@ -6,8 +6,10 @@ namespace Ocuda.Ops.Models
     public class SectionManagerGroup : BaseEntity
     {
         [Required]
+        [MaxLength(255)]
         public string SectionName { get; set; }
         [Required]
+        [MaxLength(255)]
         public string GroupName { get; set; }
 
     }
