@@ -1,4 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Interfaces.Ops;
 
 namespace Ocuda.Ops.Data.Ops
@@ -9,6 +13,14 @@ namespace Ocuda.Ops.Data.Ops
         public SiteSettingRepository(OpsContext context, ILogger<SiteSettingRepository> logger)
             : base(context, logger)
         {
+        }
+
+        public async Task<SiteSetting> FindByKeyAsync(string key)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Key == key)
+                .FirstOrDefaultAsync();
         }
     }
 }

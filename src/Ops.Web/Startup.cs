@@ -165,6 +165,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<PostService>();
             services.AddScoped<UserService>();
             services.AddScoped<PageService>();
+            services.AddScoped<SiteSettingService>();
 
             var serviceProvider = services.BuildServiceProvider();
             return serviceProvider;

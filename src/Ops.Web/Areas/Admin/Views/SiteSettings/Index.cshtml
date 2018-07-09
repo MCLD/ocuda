@@ -1,0 +1,120 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.SiteSettings.IndexViewModel
+
+<form asp-controller="SiteSettings" asp-action="@(nameof(SiteSettingsController.Update))"
+      method="post" role="form">
+    <input id="editId" asp-for="SiteSetting.Id" type="hidden" />
+    <input id="editKey" asp-for="SiteSetting.Key" type="hidden" />
+    <input id="editType" asp-for="SiteSetting.Type" type="hidden" />
+    <div modal id="editModal" name="Site Setting" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <div class="row align-items-center">
+            <div class="col-md-4">
+                <label id="editName" asp-for="SiteSetting.Name" class="col-form-label"></label>
+            </div>
+            <div class="col-md-8">
+                <div id="evBool">
+                    <select id="editValueBool" asp-for="ValueBool" class="form-control">
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                    </select>
+                    <span asp-validation-for="ValueBool" class="text-danger"></span>
+                </div>
+                <div id="evInt">
+                    <input id="editValueInt" asp-for="ValueInt" type="number" class="form-control" />
+                    <span asp-validation-for="ValueInt" class="text-danger"></span>
+                </div>
+                <div id="evString">
+                    <input id="editValueString" asp-for="ValueString" class="form-control" />
+                    <span asp-validation-for="ValueString" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+@if (Model.SiteSettingsByCategory.Count() == 0)
+{
+    <div class="alert alert-warning">No Site Settings Found</div>
+}
+else
+{
+    @foreach (var category in Model.SiteSettingsByCategory.Keys)
+    {
+        <div class="row justify-content-center">
+            <h2>@category</h2>
+        </div>
+
+        @foreach (var setting in Model.SiteSettingsByCategory[category])
+        {
+            <div class="form-group row">
+                <label asp-for="@setting.Name" class="col-md-3 col-form-label text-md-right">@setting.Name</label>
+                <div class="d-flex col-md-9">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <button type="button"
+                                    class="btn btn-info"
+                                    data-toggle="modal"
+                                    data-target="#editModal"
+                                    data-id="@setting.Id"
+                                    data-key="@setting.Key"
+                                    data-name="@setting.Name"
+                                    data-value="@setting.Value"
+                                    data-type="@setting.Type">
+                                <span class="fa fa-pencil-alt" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                        @if (setting.Type == "bool")
+                        {
+                            <select class="form-control" asp-for="@setting.Value" disabled>
+                                <option value="false">No</option>
+                                <option value="true">Yes</option>
+                            </select>
+                        }
+                        else
+                        {
+                            <input class="form-control" asp-for="@setting.Value" disabled />
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}
+
+@section scripts
+    {
+    <script>
+        $("#editModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var key = button.data("key");
+            var name = button.data("name");
+            var value = button.data("value");
+            var type = button.data("type");
+            var modal = $(this);
+            $("#editId").val(id);
+            $("#editKey").val(key);
+            $("#editName").text(name);
+            $('#editType').val(type);
+
+            if (type == "bool") {
+                $("#evBool").toggle(true);
+                $("#evInt").toggle(false);
+                $("#evString").toggle(false);
+                modal.find("#editValueBool").val(value);
+            }
+            else if (type == "int") {
+                $("#evBool").toggle(false);
+                $("#evInt").toggle(true);
+                $("#evString").toggle(false);
+                modal.find("#editValueInt").val(value);
+            }
+            else {
+                $("#evBool").toggle(false);
+                $("#evInt").toggle(false);
+                $("#evString").toggle(true);
+                modal.find("#editValueString").val(value);
+            }
+        });
+    </script>
+}
