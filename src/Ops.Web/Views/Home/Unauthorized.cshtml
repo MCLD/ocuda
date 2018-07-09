@@ -1,8 +1,20 @@
 ﻿@model Ocuda.Ops.Controllers.ViewModels.Home.UnauthorizedViewModel
 
-<p>You are not authorized to access that link.</p>
+<div class="d-flex justify-content-center">
+    <div class="card border border-secondary w-auto">
+        <div class="card-header d-flex justify-content-center alert-danger">
+            <div class="card-title">You are not authorized to access that link.</div>
+        </div>
 
-<p>User: @Model.Username</p>
-<p>Link: @Model.ReturnUrl</p>
+        <div class="card-body">
+            <p>User: @Model.Username</p>
+            <p>Link: @Model.ReturnUrl</p>
+        </div>
 
-<button onclick="alert('soon.')">Request access to this area</button>
+        <div class="card-footer d-flex justify-content-center">
+            <button class="btn btn-primary" onclick="alert('soon.')">Request access to this area.</button>
+        </div>
+    </div>
+</div>
+
+

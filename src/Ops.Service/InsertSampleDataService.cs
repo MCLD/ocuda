@@ -17,6 +17,7 @@ namespace Ocuda.Ops.Service
         private readonly IPostRepository _postRepository;
         private readonly ISectionRepository _sectionRepository;
         private readonly IUserRepository _userRepository;
+        private readonly ISiteSettingRepository _siteSettingRepository;
         public InsertSampleDataService(ICategoryRepository categoryRepository,
             IFileRepository fileRepository,
             IFileTypeRepository fileTypeRepository,
@@ -24,7 +25,8 @@ namespace Ocuda.Ops.Service
             IPageRepository pageRepository,
             IPostRepository postRepository,
             ISectionRepository sectionRepository,
-            IUserRepository userRepository)
+            IUserRepository userRepository,
+            ISiteSettingRepository siteSettingRepository)
         {
             _categoryRepository = categoryRepository
                 ?? throw new ArgumentNullException(nameof(categoryRepository));
@@ -44,6 +46,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(userRepository));
             _pageRepository = pageRepository
                 ?? throw new ArgumentNullException(nameof(pageRepository));
+            _siteSettingRepository = siteSettingRepository
+                ?? throw new ArgumentNullException(nameof(siteSettingRepository));
         }
 
         private User _systemAdministrator;
@@ -74,6 +78,8 @@ namespace Ocuda.Ops.Service
             }
 
             await InsertUsersAsync();
+
+            await InsertSiteSettingsAsync();
         }
 
         public async Task<ICollection<Section>> InsertSectionsAsync()
@@ -136,6 +142,135 @@ namespace Ocuda.Ops.Service
             await _sectionRepository.SaveAsync();
 
             return sections;
+        }
+
+        public async Task InsertSiteSettingsAsync()
+        {
+            await _siteSettingRepository.AddAsync(new SiteSetting
+            {
+                //TODO create keys
+                Key = "FileUpload.SizeLimit",
+                Name = "Size Limit",
+                Description = "The maximum file size for uploading files.",
+                Category = "File Uploads",
+                Value = "2096000",
+                Type = "int",
+                CreatedBy = SystemAdministrator.Id,
+                CreatedAt = DateTime.Now
+            });
+            await _siteSettingRepository.AddAsync(new SiteSetting
+            {
+                //TODO create keys
+                Key = "EmailService.FromAddress",
+                Name = "From Address",
+                Description = "The email address displayed on outgoing emails.",
+                Category = "Email Service",
+                Value = "staff@mcldaz.org",
+                Type = "string",
+                CreatedBy = SystemAdministrator.Id,
+                CreatedAt = DateTime.Now
+            });
+            await _siteSettingRepository.AddAsync(new SiteSetting
+            {
+                //TODO create keys
+                Key = "FileUpload.Test1",
+                Name = "File Test 1",
+                Description = "A file upload setting for testing.",
+                Category = "File Uploads",
+                Value = "Test 1",
+                Type = "string",
+                CreatedBy = SystemAdministrator.Id,
+                CreatedAt = DateTime.Now
+            });
+            await _siteSettingRepository.AddAsync(new SiteSetting
+            {
+                //TODO create keys
+                Key = "FileUpload.Test2",
+                Name = "File Test 2",
+                Description = "A file upload setting for testing.",
+                Category = "File Uploads",
+                Value = "2",
+                Type = "int",
+                CreatedBy = SystemAdministrator.Id,
+                CreatedAt = DateTime.Now
+            });
+            await _siteSettingRepository.AddAsync(new SiteSetting
+            {
+                //TODO create keys
+                Key = "FileUpload.Test3",
+                Name = "File Test 3",
+                Description = "A file upload setting for testing.",
+                Category = "File Uploads",
+                Value = "false",
+                Type = "bool",
+                CreatedBy = SystemAdministrator.Id,
+                CreatedAt = DateTime.Now
+            });
+
+            await _siteSettingRepository.AddAsync(new SiteSetting
+            {
+                //TODO create keys
+                Key = "EmailService.Test1",
+                Name = "Email Test 1",
+                Description = "An email service setting for testing",
+                Category = "Email Service",
+                Value = "Test 1",
+                Type = "string",
+                CreatedBy = SystemAdministrator.Id,
+                CreatedAt = DateTime.Now
+            });
+            await _siteSettingRepository.AddAsync(new SiteSetting
+            {
+                //TODO create keys
+                Key = "EmailService.Test2",
+                Name = "Email Test 2",
+                Description = "An email service setting for testing",
+                Category = "Email Service",
+                Value = "2",
+                Type = "int",
+                CreatedBy = SystemAdministrator.Id,
+                CreatedAt = DateTime.Now
+            });
+            await _siteSettingRepository.AddAsync(new SiteSetting
+            {
+                //TODO create keys
+                Key = "EmailService.Test3",
+                Name = "Email Test 3",
+                Description = "An email service setting for testing",
+                Category = "Email Service",
+                Value = "true",
+                Type = "bool",
+                CreatedBy = SystemAdministrator.Id,
+                CreatedAt = DateTime.Now
+            });
+
+            await _siteSettingRepository.AddAsync(new SiteSetting
+            {
+                //TODO create keys
+                Key = "Test.Test1",
+                Name = "Test 1",
+                Description = "A setting for testing.",
+                Category = "Test Category",
+                Value = "1",
+                Type = "int",
+                CreatedBy = SystemAdministrator.Id,
+                CreatedAt = DateTime.Now
+            });
+
+            await _siteSettingRepository.AddAsync(new SiteSetting
+            {
+                //TODO create keys
+                Key = "Test.Test2",
+                Name = "Test 2",
+                Description = "A setting for testing",
+                Category = "Test Category",
+                Value = "true",
+                Type = "bool",
+                CreatedBy = SystemAdministrator.Id,
+                CreatedAt = DateTime.Now
+            });
+
+            await _siteSettingRepository.SaveAsync();
         }
 
         public async Task InsertPostsAsync(int sectionId)

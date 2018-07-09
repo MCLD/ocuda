@@ -2,16 +2,26 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Ocuda.Ops.Models.Abstract;
 
 namespace Ocuda.Ops.Models
 {
-    public class SiteSetting
+    public class SiteSetting : BaseEntity
     {
         [Required]
-        public int Id { get; set; }
+        [MaxLength(255)]
+        public string Key { get; set; }
+        [MaxLength(8)]
+        public string Type { get; set; }
 
-        [Required]
+        // shown to user:
         [MaxLength(255)]
         public string Name { get; set; }
+        public string Description { get; set; }
+        [MaxLength(255)]
+        public string Value { get; set; }
+        [MaxLength(255)]
+        public string Category { get; set; }
     }
+
 }
