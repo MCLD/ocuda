@@ -13,22 +13,23 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers
 {
-    public class FilesController : BaseController
+    public class FilesController : BaseController<FilesController>
     {
-        private readonly FileService _fileService;
         private readonly CategoryService _categoryService;
+        private readonly FileService _fileService;
         private readonly SectionService _sectionService;
-        private readonly ILogger<FilesController> _logger;
 
-        public FilesController(FileService fileService,
+        public FilesController(ServiceFacade.Controller<FilesController> context,
             CategoryService categoryService,
-            SectionService sectionService,
-            ILogger<FilesController> logger)
+            FileService fileService,
+            SectionService sectionService
+            ) : base(context)
         {
+            _categoryService = categoryService
+                ?? throw new ArgumentNullException(nameof(categoryService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
-            _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
-            _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _sectionService = sectionService
+                ?? throw new ArgumentNullException(nameof(sectionService));
         }
 
         public async Task<IActionResult> Index(string section, int? categoryId = null, int page = 1)

@@ -16,22 +16,20 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 {
     [Area("Admin")]
     [Authorize(Policy = nameof(SectionManagerRequirement))]
-    public class LinksController : BaseController
+    public class LinksController : BaseController<LinksController>
     {
-        private readonly LinkService _linkService;
         private readonly CategoryService _categoryService;
+        private readonly LinkService _linkService;
         private readonly SectionService _sectionService;
-        private readonly ILogger<LinksController> _logger;
 
-        public LinksController(LinkService linkService, 
-            CategoryService categoryService, 
-            SectionService sectionService,
-            ILogger<LinksController> logger)
+        public LinksController(ServiceFacade.Controller<LinksController> context,
+            CategoryService categoryService,
+            LinkService linkService,
+            SectionService sectionService) : base(context)
         {
             _linkService = linkService ?? throw new ArgumentNullException(nameof(linkService));
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
             _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<IActionResult> Index(string section, int? categoryId = null, int page = 1)

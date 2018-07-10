@@ -15,19 +15,18 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 {
     [Area("Admin")]
     [Authorize(Policy = nameof(SectionManagerRequirement))]
-    public class PagesController : BaseController
+    public class PagesController : BaseController<PagesController>
     {
         private readonly PageService _pageService;
         private readonly SectionService _sectionService;
-        private readonly ILogger<PagesController> _logger;
 
-        public PagesController(PageService pageService, 
-            SectionService sectionService,
-            ILogger<PagesController> logger)
+        public PagesController(ServiceFacade.Controller<PagesController> context,
+            PageService pageService,
+            SectionService sectionService) : base(context)
         {
             _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
-            _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _sectionService = sectionService
+                ?? throw new ArgumentNullException(nameof(sectionService));
         }
 
         public async Task<IActionResult> Index(string section, int page = 1)

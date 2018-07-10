@@ -11,17 +11,15 @@ using Ocuda.Ops.Service;
 namespace Ocuda.Ops.Controllers.Areas.Admin
 {
     [Area("Admin")]
-    public class RosterController : BaseController
+    public class RosterController : BaseController<RosterController>
     {
         private RosterService _rosterService;
-        private ILogger<RosterController> _logger;
 
-        public RosterController(RosterService rosterService, ILogger<RosterController> logger)
+        public RosterController(ServiceFacade.Controller<RosterController> context,
+            RosterService rosterService) : base(context)
         {
             _rosterService = rosterService
                 ?? throw new ArgumentNullException(nameof(rosterService));
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<IActionResult> Changes()

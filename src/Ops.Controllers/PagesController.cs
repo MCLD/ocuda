@@ -10,15 +10,18 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers
 {
-    public class PagesController : BaseController
+    public class PagesController : BaseController<PagesController>
     {
         private readonly PageService _pageService;
         private readonly SectionService _sectionService;
 
-        public PagesController(PageService pageService, SectionService sectionService)
+        public PagesController(ServiceFacade.Controller<PagesController> context,
+            PageService pageService, 
+            SectionService sectionService) : base(context)
         {
             _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
-            _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
+            _sectionService = sectionService 
+                ?? throw new ArgumentNullException(nameof(sectionService));
         }
 
         public async Task<IActionResult> Index(string section, int page = 1)
