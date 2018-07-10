@@ -16,12 +16,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
     public class SiteSettingsController : BaseController
     {
-        private SiteSettingService _siteSettingService;
-
-        public SiteSettingsController(SiteSettingService siteSettingService)
+        public SiteSettingsController(ServiceFacade.Controller context) : base(context)
         {
-            _siteSettingService = siteSettingService
-                ?? throw new ArgumentNullException(nameof(siteSettingService));
         }
 
         public async Task<IActionResult> Index()
@@ -30,7 +26,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var categories = siteSettings.Select(_ => _.Category).Distinct();
             var siteSettingsByCategory = new Dictionary<string, List<SiteSetting>>();
 
-            foreach(var category in categories)
+            foreach (var category in categories)
             {
                 var settings = siteSettings.Where(_ => _.Category == category).ToList();
                 siteSettingsByCategory.Add(category, settings);
@@ -60,7 +56,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     break;
             }
 
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {
@@ -69,7 +65,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     var siteSetting = await _siteSettingService.UpdateAsync(key, value);
                     ShowAlertSuccess($"Updated {siteSetting.Name}");
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     ShowAlertDanger("Unable to update site settings: ", ex.Message);
                 }

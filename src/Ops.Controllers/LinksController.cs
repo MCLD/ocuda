@@ -13,14 +13,18 @@ namespace Ocuda.Ops.Controllers
 {
     public class LinksController : BaseController
     {
-        private readonly LinkService _linkService;
         private readonly CategoryService _categoryService;
+        private readonly LinkService _linkService;
         private readonly SectionService _sectionService;
 
-        public LinksController(LinkService linkService, CategoryService categoryService, SectionService sectionService)
+        public LinksController(ServiceFacade.Controller context,
+            LinkService linkService,
+            CategoryService categoryService,
+            SectionService sectionService) : base(context)
         {
             _linkService = linkService ?? throw new ArgumentNullException(nameof(linkService));
-            _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
+            _categoryService = categoryService
+                ?? throw new ArgumentNullException(nameof(categoryService));
             _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
         }
 

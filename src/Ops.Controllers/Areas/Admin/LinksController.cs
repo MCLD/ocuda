@@ -18,15 +18,16 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Authorize(Policy = nameof(SectionManagerRequirement))]
     public class LinksController : BaseController
     {
-        private readonly LinkService _linkService;
-        private readonly CategoryService _categoryService;
-        private readonly SectionService _sectionService;
         private readonly ILogger<LinksController> _logger;
+        private readonly CategoryService _categoryService;
+        private readonly LinkService _linkService;
+        private readonly SectionService _sectionService;
 
-        public LinksController(LinkService linkService, 
-            CategoryService categoryService, 
-            SectionService sectionService,
-            ILogger<LinksController> logger)
+        public LinksController(ILogger<LinksController> logger,
+            ServiceFacade.Controller context,
+            CategoryService categoryService,
+            LinkService linkService,
+            SectionService sectionService) : base(context)
         {
             _linkService = linkService ?? throw new ArgumentNullException(nameof(linkService));
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));

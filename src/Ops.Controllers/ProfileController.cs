@@ -11,7 +11,8 @@ namespace Ocuda.Ops.Controllers
     {
         private readonly UserService _userService;
 
-        public ProfileController(UserService userService)
+        public ProfileController(ServiceFacade.Controller context,
+            UserService userService) : base(context)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }

@@ -16,7 +16,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         private RosterService _rosterService;
         private ILogger<RosterController> _logger;
 
-        public RosterController(RosterService rosterService, ILogger<RosterController> logger)
+        public RosterController(ILogger<RosterController> logger,
+            ServiceFacade.Controller context,
+            RosterService rosterService) : base(context)
         {
             _rosterService = rosterService
                 ?? throw new ArgumentNullException(nameof(rosterService));

@@ -19,22 +19,23 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Authorize(Policy = nameof(SectionManagerRequirement))]
     public class FilesController : BaseController
     {
+        private readonly ILogger<FilesController> _logger;
+        private readonly CategoryService _categoryService;
         private readonly FileService _fileService;
         private readonly FileTypeService _fileTypeService;
-        private readonly CategoryService _categoryService;
         private readonly SectionService _sectionService;
-        private readonly ILogger<FilesController> _logger;
 
         private const string FileValidationPassed = "Valid";
         private const string FileValidationFailedType = "File is not a valid type.";
         private const string FileValidationFailedSize = "File is too large to upload.";
         private const int MaxFileSize = 2096000; //TODO get max filesize from config
 
-        public FilesController(FileService fileService,
-            FileTypeService fileTypeService,
+        public FilesController(ILogger<FilesController> logger,
+            ServiceFacade.Controller context,
             CategoryService categoryService,
-            SectionService sectionService,
-            ILogger<FilesController> logger)
+            FileTypeService fileTypeService,
+            FileService fileService,
+            SectionService sectionService) : base(context)
         {
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _fileTypeService = fileTypeService ?? throw new ArgumentNullException(nameof(fileTypeService));
@@ -437,9 +438,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                             Description = "Attachment",
                             IsFeatured = false,
                             SectionId = section.Id,
-                            CategoryId = category.Id 
+                            CategoryId = category.Id
                         };
-                        
+
                         byte[] fileBytes;
 
                         using (var fileStream = fileData.OpenReadStream())
@@ -459,12 +460,12 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                             _logger.LogInformation($"Attached file: {newFile.FilePath}");
 
                             string sectionPath = null;
-                            if(section.Path != null)
+                            if (section.Path != null)
                             {
                                 sectionPath = $"/{section.Path}";
                             }
 
-                            var filePath = HttpContext.Request.Host + 
+                            var filePath = HttpContext.Request.Host +
                                 $"{sectionPath}/Files/{nameof(FilesController.ViewFile)}/{newFile.Id}";
                             result = filePath;
                         }

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Filter;
+using Ocuda.Ops.Service;
 
 namespace Ocuda.Ops.Controllers.Abstract
 {
@@ -9,6 +10,12 @@ namespace Ocuda.Ops.Controllers.Abstract
     [ServiceFilter(typeof(SectionFilter))]
     public abstract class BaseController : Microsoft.AspNetCore.Mvc.Controller
     {
+        protected readonly SiteSettingService _siteSettingService;
+        public BaseController(ServiceFacade.Controller context)
+        {
+            _siteSettingService = context.SiteSettingService;
+        }
+
         protected string AlertDanger
         {
             set

@@ -14,16 +14,17 @@ namespace Ocuda.Ops.Controllers
     public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly SectionService _sectionService;
         private readonly FileService _fileService;
         private readonly LinkService _linkService;
         private readonly PostService _postService;
+        private readonly SectionService _sectionService;
 
         public HomeController(ILogger<HomeController> logger,
-                              SectionService sectionService,
-                              FileService fileService,
-                              LinkService linkService,
-                              PostService postService)
+            ServiceFacade.Controller context,
+            FileService fileService,
+            LinkService linkService,
+            PostService postService,
+            SectionService sectionService) : base(context)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));

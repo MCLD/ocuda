@@ -12,7 +12,9 @@ namespace Ocuda.Ops.Controllers
     {
         private readonly ILogger<ErrorController> _logger;
 
-        public ErrorController(ILogger<ErrorController> logger)
+        public ErrorController(ILogger<ErrorController> logger, 
+            ServiceFacade.Controller context)
+            : base(context)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }

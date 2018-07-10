@@ -16,14 +16,16 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
     public class SectionsController : BaseController
     {
-        private readonly SectionService _sectionService;
         private readonly ILogger<SectionsController> _logger;
+        private readonly SectionService _sectionService;
 
-        public SectionsController(SectionService sectionService,
-            ILogger<SectionsController> logger)
+        public SectionsController(ILogger<SectionsController> logger,
+            ServiceFacade.Controller context,
+            SectionService sectionService) : base(context)
         {
-            _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _sectionService = sectionService 
+                ?? throw new ArgumentNullException(nameof(sectionService));
         }
 
         public async Task<IActionResult> Index(int page = 1)
