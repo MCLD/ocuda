@@ -11,7 +11,7 @@ namespace Ocuda.Ops.Controllers.Abstract
     public abstract class BaseController : Microsoft.AspNetCore.Mvc.Controller
     {
         protected readonly SiteSettingService _siteSettingService;
-        public BaseController(ServiceFacade.Controller context)
+        protected BaseController(ServiceFacade.Controller context)
         {
             _siteSettingService = context.SiteSettingService;
         }
