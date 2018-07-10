@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Filter;
 using Ocuda.Ops.Service;
 
@@ -8,11 +9,13 @@ namespace Ocuda.Ops.Controllers.Abstract
     [ServiceFilter(typeof(AuthenticationFilter))]
     [ServiceFilter(typeof(UserFilter))]
     [ServiceFilter(typeof(SectionFilter))]
-    public abstract class BaseController : Microsoft.AspNetCore.Mvc.Controller
+    public abstract class BaseController<T> : Controller
     {
+        protected readonly ILogger _logger;
         protected readonly SiteSettingService _siteSettingService;
-        protected BaseController(ServiceFacade.Controller context)
+        protected BaseController(ServiceFacade.Controller<T> context)
         {
+            _logger = context.Logger;
             _siteSettingService = context.SiteSettingService;
         }
 

@@ -8,15 +8,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Ocuda.Ops.Controllers
 {
-    public class ErrorController : BaseController
+    public class ErrorController : BaseController<ErrorController>
     {
-        private readonly ILogger<ErrorController> _logger;
-
-        public ErrorController(ILogger<ErrorController> logger, 
-            ServiceFacade.Controller context)
+        public ErrorController(ServiceFacade.Controller<ErrorController> context)
             : base(context)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public IActionResult Index(int id)

@@ -17,9 +17,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 {
     [Area("Admin")]
     [Authorize(Policy = nameof(SectionManagerRequirement))]
-    public class FilesController : BaseController
+    public class FilesController : BaseController<FilesController>
     {
-        private readonly ILogger<FilesController> _logger;
         private readonly CategoryService _categoryService;
         private readonly FileService _fileService;
         private readonly FileTypeService _fileTypeService;
@@ -30,8 +29,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         private const string FileValidationFailedSize = "File is too large to upload.";
         private const int MaxFileSize = 2096000; //TODO get max filesize from config
 
-        public FilesController(ILogger<FilesController> logger,
-            ServiceFacade.Controller context,
+        public FilesController(ServiceFacade.Controller<FilesController> context,
             CategoryService categoryService,
             FileTypeService fileTypeService,
             FileService fileService,
@@ -41,7 +39,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             _fileTypeService = fileTypeService ?? throw new ArgumentNullException(nameof(fileTypeService));
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
             _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<IActionResult> Index(string section, int? categoryId = null, int page = 1)

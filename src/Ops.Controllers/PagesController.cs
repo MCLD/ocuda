@@ -10,12 +10,12 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers
 {
-    public class PagesController : BaseController
+    public class PagesController : BaseController<PagesController>
     {
         private readonly PageService _pageService;
         private readonly SectionService _sectionService;
 
-        public PagesController(ServiceFacade.Controller context,
+        public PagesController(ServiceFacade.Controller<PagesController> context,
             PageService pageService, 
             SectionService sectionService) : base(context)
         {

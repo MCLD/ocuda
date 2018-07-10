@@ -121,6 +121,9 @@ namespace Ocuda.Ops.Web
             services.AddMvc()
                 .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_1);
 
+            // service facades
+            services.AddScoped(typeof(Controllers.ServiceFacade.Controller<>));
+
             // filters
             services.AddScoped<Controllers.Filter.AuthenticationFilter>();
             services.AddScoped<Controllers.Filter.UserFilter>();

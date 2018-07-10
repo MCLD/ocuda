@@ -13,21 +13,18 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers
 {
-    public class FilesController : BaseController
+    public class FilesController : BaseController<FilesController>
     {
-        private readonly ILogger<FilesController> _logger;
         private readonly CategoryService _categoryService;
         private readonly FileService _fileService;
         private readonly SectionService _sectionService;
 
-        public FilesController(ILogger<FilesController> logger,
-            ServiceFacade.Controller context,
+        public FilesController(ServiceFacade.Controller<FilesController> context,
             CategoryService categoryService,
             FileService fileService,
             SectionService sectionService
             ) : base(context)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _categoryService = categoryService
                 ?? throw new ArgumentNullException(nameof(categoryService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));

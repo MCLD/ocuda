@@ -7,11 +7,11 @@ using Ocuda.Ops.Service;
 
 namespace Ocuda.Ops.Controllers
 {
-    public class ProfileController : BaseController
+    public class ProfileController : BaseController<PagesController>
     {
         private readonly UserService _userService;
 
-        public ProfileController(ServiceFacade.Controller context,
+        public ProfileController(ServiceFacade.Controller<PagesController> context,
             UserService userService) : base(context)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));

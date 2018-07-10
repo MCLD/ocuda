@@ -11,13 +11,13 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers
 {
-    public class LinksController : BaseController
+    public class LinksController : BaseController<LinksController>
     {
         private readonly CategoryService _categoryService;
         private readonly LinkService _linkService;
         private readonly SectionService _sectionService;
 
-        public LinksController(ServiceFacade.Controller context,
+        public LinksController(ServiceFacade.Controller<LinksController> context,
             LinkService linkService,
             CategoryService categoryService,
             SectionService sectionService) : base(context)

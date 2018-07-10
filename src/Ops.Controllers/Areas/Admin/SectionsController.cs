@@ -14,16 +14,13 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 {
     [Area("Admin")]
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
-    public class SectionsController : BaseController
+    public class SectionsController : BaseController<SectionsController>
     {
-        private readonly ILogger<SectionsController> _logger;
         private readonly SectionService _sectionService;
 
-        public SectionsController(ILogger<SectionsController> logger,
-            ServiceFacade.Controller context,
+        public SectionsController(ServiceFacade.Controller<SectionsController> context,
             SectionService sectionService) : base(context)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _sectionService = sectionService 
                 ?? throw new ArgumentNullException(nameof(sectionService));
         }
