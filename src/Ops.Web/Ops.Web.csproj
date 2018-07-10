@@ -3248,7 +3248,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Middleware\" />
     <Folder Include="Shared\Content\" />
     <Folder Include="Views\Error\" />
   </ItemGroup>
