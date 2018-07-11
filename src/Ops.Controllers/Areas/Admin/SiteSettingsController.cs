@@ -8,7 +8,6 @@ using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.SiteSettings;
 using Ocuda.Ops.Controllers.Key;
 using Ocuda.Ops.Models;
-using Ocuda.Ops.Service;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
 {
@@ -44,6 +43,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [HttpPost]
         public async Task<IActionResult> Update(IndexViewModel model)
         {
+            // TODO move these hardcoded strings to constants
             switch (model.SiteSetting.Type)
             {
                 case "bool":

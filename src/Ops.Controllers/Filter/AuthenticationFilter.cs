@@ -44,6 +44,7 @@ namespace Ocuda.Ops.Controllers.Filter
         public async Task OnResourceExecutionAsync(ResourceExecutingContext context,
             ResourceExecutionDelegate next)
         {
+            var now = DateTime.Now;
             var authRedirectUrl = _config[Configuration.OpsAuthRedirect];
 
             if (!string.IsNullOrEmpty(authRedirectUrl))
@@ -120,7 +121,13 @@ namespace Ocuda.Ops.Controllers.Filter
                             new Helper().GetCurrentUrl(httpContext),
                             cacheExpiration);
 
-                        httpContext.Response.Redirect(string.Format(authRedirectUrl, id));
+                        string cacheDiscriminator
+                            = _config[Configuration.OpsDistributedCacheInstanceDiscriminator]
+                            ?? string.Empty;
+
+                        var url = string.Format(authRedirectUrl, id, cacheDiscriminator);
+
+                        httpContext.Response.Redirect(url);
                         return;
                     }
                     else
@@ -141,8 +148,13 @@ namespace Ocuda.Ops.Controllers.Filter
                         {
                             user = await _userService.AddUser(new Models.User
                             {
-                                Username = username
+                                Username = username,
+                                LastSeen = now
                             });
+                        }
+                        else
+                        {
+                            await _userService.LoggedInAsync(username);
                         }
 
                         string userId = user.Id.ToString();
@@ -151,7 +163,8 @@ namespace Ocuda.Ops.Controllers.Filter
                         var claims = new HashSet<Claim>
                         {
                             new Claim(Key.ClaimType.Username, username),
-                            new Claim(Key.ClaimType.UserId, userId)
+                            new Claim(Key.ClaimType.UserId, userId),
+                            new Claim(Key.ClaimType.AuthenticatedAt, now.ToString("O"))
                         };
 
                         // loop through groups in the distributed cache from authentication

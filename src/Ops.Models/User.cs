@@ -28,5 +28,6 @@ namespace Ocuda.Ops.Models
 
         public int? SupervisorId { get; set; }
         public User Supervisor { get; set; }
+        public DateTime? LastSeen { get; set; }
     }
 }

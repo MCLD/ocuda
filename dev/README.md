@@ -50,7 +50,7 @@ Use the following scripts:
 
 Or perform the steps manually, such as:
 
-1. `Web.csproj --context Ocuda.Ops.DataProvider.<provider>.Ops.Context develop`
+1. `cd src/Ops.DataProvider.<provider>.Ops && dotnet ef migrations add -s ../Ops.Web/Ops.Web.Web.csproj --context Ocuda.Ops.DataProvider.<provider>.Ops.Context develop`
 2. `cd ../Ops.DataProvider.<provider>.Promenade && dotnet ef migrations add -s ../Ops.Web/Ops.Web.csproj --context Ocuda.Ops.DataProvider.<provider>.Promenade.Context develop`
 
 ## Application settings
@@ -76,6 +76,7 @@ _Eventually this should be moved to the user documentation._
 - `Ops.AuthTimeoutMinutes` - defaults to 2 minutes - timeout for authentication bits (cookie and distributed cache elements)
 - `Ops.Culture` - defaults to "en-US", the culture to use for displaying things like dates and times - for valid options see the language tags listed in the [Microsoft National Language Support (NLS) API Reference](http://go.microsoft.com/fwlink/?LinkId=200048)
 - `Ops.DistributedCache` - when unset, defaults to memory-based distributed cache - a cache strategy to use: currently either unset or 'Redis' are valid
+- `Ops.DistributedCacheInstanceDiscriminator` - if set, appends the string to distributed cache keys in order to isolate them from other instances (e.g. if multiple developers are using the same distributed cache)
 - `Ops.DistributedCache.RedisConfiguration` - *also used by Ops.Web.WindowsAuth* - if *Ops.DistributedCache* is set to 'Redis' this must be set with Redis configuration information, see the [RedisCacheOptions.Configuration property](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.caching.redis.rediscacheoptions.configuration)
 - `Ops.DomainName` - an Active Directory domain name to remove from the beginning of authenticated users (do not include the slash)
 - `Ops.HttpErrorFileTag` - if *Ops.RollingLogLocation* is set, this will write out http error logs in the same location but with the value of this setting in the filename
@@ -83,6 +84,7 @@ _Eventually this should be moved to the user documentation._
 - `Ops.RollingLogLocation` - path of where to write log files which rotate daily, if unset no rolling log is written
 - `Ops.SessionTimeoutMinutes` - defaults to 2 hours - amount of time in minutes for sessions to last
 - `Ops.SiteManagerGroup` - if specified, this authentication group (currently ADGroup) will be granted site manager access
+- `Ops.SiteSettingCacheMinutes` - defaults to 60 minutes - how long to cache site setting values
 
 ### Promenade
 

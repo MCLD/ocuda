@@ -16,5 +16,9 @@
         /// enumerated all of the available groups.
         /// </summary>
         public static readonly string OpsGroup = ".auth.{0}.group{1}";
+        /// <summary>
+        /// Cached site settings, {0} is the site setting key
+        /// </summary>
+        public static readonly string OpsSiteSetting = ".sitesetting.{0}";
     }
 }

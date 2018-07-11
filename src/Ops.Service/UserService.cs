@@ -82,5 +82,14 @@ namespace Ocuda.Ops.Service
             await _userRepository.SaveAsync();
             return currentUser;
         }
+
+        public async Task LoggedInAsync(string username)
+        {
+            var user = await GetByUsernameAsync(username);
+            user.ReauthenticateUser = false;
+            user.LastSeen = DateTime.Now;
+            _userRepository.Update(user);
+            await _userRepository.SaveAsync();
+        }
     }
 }
