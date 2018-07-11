@@ -63,6 +63,7 @@ namespace Ocuda.Ops.Service
         {
             var currentPage = await _pageRepository.FindAsync(page.Id);
             currentPage.Title = page.Title;
+            currentPage.Stub = page.Stub;
             currentPage.Content = page.Content;
             currentPage.IsDraft = page.IsDraft;
 
@@ -75,6 +76,11 @@ namespace Ocuda.Ops.Service
         {
             _pageRepository.Remove(id);
             await _pageRepository.SaveAsync();
+        }
+
+        public async Task<bool> StubInUseAsync(string stub, int sectionId)
+        {
+            return await _pageRepository.StubInUseAsync(stub, sectionId);
         }
     }
 }

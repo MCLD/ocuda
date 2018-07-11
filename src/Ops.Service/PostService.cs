@@ -57,6 +57,7 @@ namespace Ocuda.Ops.Service
         {
             var currentPost = await _postRepository.FindAsync(post.Id);
             currentPost.Title = post.Title;
+            currentPost.Stub = post.Stub;
             currentPost.Content = post.Content;
             currentPost.IsDraft = post.IsDraft;
             currentPost.IsPinned = post.IsPinned;
@@ -71,6 +72,11 @@ namespace Ocuda.Ops.Service
         {
             _postRepository.Remove(id);
             await _postRepository.SaveAsync();
+        }
+
+        public async Task<bool> StubInUseAsync(string stub, int sectionId)
+        {
+            return await _postRepository.StubInUseAsync(stub, sectionId);
         }
     }
 }

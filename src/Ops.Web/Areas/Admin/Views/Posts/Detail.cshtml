@@ -9,10 +9,11 @@
     <input asp-for="SectionId" type="hidden" />
     @if (Model.Action == nameof(PostsController.Edit))
     {
-        <input asp-for="Post.Id" type="hidden" />
+        <input id="contentId" asp-for="Post.Id" type="hidden" />
+        <input id="contentType" value="@(nameof(Post))" type="hidden" />
     }
     <input asp-for="Post.Title" formgroup />
-    <input asp-for="Post.Stub" formgroup readonly="@(Model.Action == nameof(PostsController.Edit) ? "readonly" : null)" />
+    <input asp-for="Post.Stub" formgroup readonly="@(Model.IsDraft == false ? "readonly" : null)" />
 
     <div class="form-group row">
         <label asp-for="Post.Content" class="col-md-3 col-form-label text-md-right"></label>
@@ -34,7 +35,7 @@
         </div>
     </div>
 
-    <select class="w-auto" asp-for="Post.IsDraft" formgroup>
+    <select class="w-auto" asp-for="Post.IsDraft" disabled="@(Model.IsDraft == false ? true : false)" formgroup>
         <option value="false">No</option>
         <option value="true">Yes</option>
     </select>
@@ -68,22 +69,47 @@
         var editor = new Markdown.Editor({ allowUploads: true });
         editor.run();
 
-        @if(Model.Action == nameof(PostsController.Create))
+        @if(Model.Post.IsDraft == true)
         {
             <text>
-                $('#Post_Title').on("keyup", function () {
-                    // From https://gist.github.com/mathewbyrne/1280286
-                    var slug = $(this).val().toLowerCase()
-                        .replace(/\s+/g, '-')
-                        .replace(/&/g, '-and-')
-                        .replace(/[^\w\-]+/g, '')
-                        .replace(/\-\-+/g, '-')
-                        .replace(/^-+/, '')
-                        .replace(/-+$/, '');
-                    $('#Post_Stub').val(slug);
+                var title = $('#Post_Title');
+                var stub = $("#Post_Stub");
+                var currentStub;
+                var stubCheckUrl = "@Url.Action("StubInUse", "Posts", new { Area = "Admin" })";
+
+                $(document).ready(function () {
+                    validateStub(stub, stubCheckUrl);
+                    currentStub = stub.val();
+                });
+
+                title.on("keyup", function () {
+                    updateStub(stub, title.val());
+                    if (stub.val() != currentStub) {
+                        clearStubValidation(stub);
+                    }
+                });
+
+                title.on("blur", function () {
+                    setTimeout(function () {
+                        validateStub(stub, stubCheckUrl);
+                        currentStub = stub.val();
+                    }, 200);      
+                });
+
+                stub.on("keyup", function () {
+                    if (stub.val() != currentStub) {
+                        clearStubValidation(stub);
+                    }
+                });
+
+                stub.on("blur", function () {
+                    updateStub(stub, stub.val());
+                    setTimeout(function () {
+                        validateStub(stub, stubCheckUrl);
+                        currentStub = stub.val();
+                    }, 200);   
                 });
             </text>
         }
-
     </script>
 }

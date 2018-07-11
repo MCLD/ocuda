@@ -7,5 +7,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Posts
         public Post Post { get; set; }
         public string Action { get; set; }
         public int SectionId { get; set; }
+        public bool IsDraft { get; set; }
     }
 }

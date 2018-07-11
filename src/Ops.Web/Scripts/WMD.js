@@ -1033,11 +1033,17 @@ Markdown.HookCollection = HookCollection;
                     var fileData = new FormData();
 
                     fileData.append("fileData", files[0]);
-                    //fileData.append("fileSize", files[0].size);
 
                     if ($("#SectionId").length > 0) {
                         var sectionId = $("#SectionId").val();
                         fileData.append("sectionId", sectionId);
+                    }
+
+                    if ($("#contentId").length > 0) {
+                        var contentId = $("#contentId").val();
+                        var contentType = $("#contentType").val();
+                        fileData.append("contentId", contentId);
+                        fileData.append("contentType", contentType)
                     }
 
                     // Adding one more key to FormData object   

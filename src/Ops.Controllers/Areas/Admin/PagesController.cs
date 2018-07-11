@@ -59,27 +59,15 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var viewModel = new IndexViewModel
             {
                 PaginateModel = paginateModel,
-                Pages = pageList.Data
+                Pages = pageList.Data,
+                SectionId = currentSection.Id
             };
 
             return View(viewModel);
         }
 
-        public async Task<IActionResult> Create(string section)
-        {
-            var currentSection = await _sectionService.GetByPathAsync(section);
-
-            var viewModel = new DetailViewModel
-            {
-                Action = nameof(Create),
-                SectionId = currentSection.Id
-            };
-
-            return View("Detail", viewModel);
-        }
-
         [HttpPost]
-        public async Task<IActionResult> Create(DetailViewModel model)
+        public async Task<IActionResult> Create(IndexViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -87,8 +75,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 {
                     model.Page.SectionId = model.SectionId;
                     var newPage = await _pageService.CreateAsync(model.Page);
-                    ShowAlertSuccess($"Added page: {newPage.Title}");
-                    return RedirectToAction(nameof(Index));
+
+                    return RedirectToAction(nameof(Edit), new { id = newPage.Id });
                 }
                 catch (Exception ex)
                 {
@@ -97,16 +85,19 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
             }
 
-            model.Action = nameof(Create);
-            return View("Detail", model);
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Edit(int id)
         {
+            var page = await _pageService.GetByIdAsync(id);
+
             var viewModel = new DetailViewModel
             {
                 Action = nameof(Edit),
-                Page = await _pageService.GetByIdAsync(id)
+                Page = page,
+                SectionId = page.SectionId,
+                IsDraft = page.IsDraft
             };
 
             return View("Detail", viewModel);
@@ -115,6 +106,19 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [HttpPost]
         public async Task<IActionResult> Edit(DetailViewModel model)
         {
+            var currentPost = await _pageService.GetByIdAsync(model.Page.Id);
+
+            if (currentPost.IsDraft == true && model.Page.IsDraft == false)
+            {
+                var stubInUse = await _pageService.StubInUseAsync(model.Page.Stub, currentPost.SectionId);
+
+                if (stubInUse)
+                {
+                    ModelState.AddModelError("Page_IsDraft", string.Empty);
+                    ShowAlertDanger("The chosen stub is already in use. Please choose a different stub.");
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 try
@@ -131,7 +135,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
 
             model.Action = nameof(Edit);
-            return View("Detail", model);
+            model.IsDraft = currentPost.IsDraft;
+            return RedirectToAction(nameof(Edit), new { id = model.Page.Id });
         }
 
         [HttpPost]
@@ -149,6 +154,12 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
 
             return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> StubInUse(string stub, int sectionId)
+        {
+            return Json(await _pageService.StubInUseAsync(stub, sectionId));
         }
     }
 }
