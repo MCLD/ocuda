@@ -8,6 +8,8 @@
         public static readonly string OpsCulture = "Ops.Culture";
         public static readonly string OpsDatabaseProvider = "Ops.DatabaseProvider";
         public static readonly string OpsDistributedCache = "Ops.DistributedCache";
+        public static readonly string OpsDistributedCacheInstanceDiscriminator 
+            = "Ops.DistributedCacheInstanceDiscriminator";
         public static readonly string OpsDistributedCacheRedisConfiguration
             = "Ops.DistributedCache.RedisConfiguration";
         public static readonly string OpsDomainName = "Ops.DomainName";

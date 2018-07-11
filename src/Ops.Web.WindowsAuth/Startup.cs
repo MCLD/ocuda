@@ -41,6 +41,11 @@ namespace Ops.Web.WindowsAuth
 
         }
 
+        private const string IdUrlBit = "/id/";
+        private const string DUrlBit = "/d/";
+
+        private string CacheDiscriminator { get; set; }
+
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
@@ -54,9 +59,24 @@ namespace Ops.Web.WindowsAuth
                 var id = string.Empty;
                 bool whoami = false;
 
-                if (context.Request.Path.Value.StartsWith("/id/"))
+                var path = context.Request.Path.Value;
+
+                if (path.StartsWith(IdUrlBit))
                 {
-                    id = context.Request.Path.Value.Substring(4);
+                    var dUrlBitStart = path.IndexOf(DUrlBit);
+                    if (dUrlBitStart < IdUrlBit.Length)
+                    {
+                        id = path.Substring(IdUrlBit.Length);
+                        if (id.Contains("/"))
+                        {
+                            id = id.Substring(0, id.IndexOf("/"));
+                        }
+                    }
+                    else
+                    {
+                        id = path.Substring(IdUrlBit.Length, dUrlBitStart - IdUrlBit.Length);
+                        CacheDiscriminator = path.Substring(dUrlBitStart + DUrlBit.Length);
+                    }
                 }
                 else
                 {
@@ -129,19 +149,25 @@ namespace Ops.Web.WindowsAuth
                         var cacheExpiration = new DistributedCacheEntryOptions()
                             .SetAbsoluteExpiration(new TimeSpan(0, authTimeoutMinutes, 0));
 
-
                         string referer
-                        = await cache.GetStringAsync(string.Format(Cache.OpsReturn, id));
-                        _logger.LogInformation($"Id {id} is user {identity.Name} with {roles.Count()} roles from {referer}");
+                            = await cache.GetStringAsync(CacheKey(Cache.OpsReturn, id));
 
-                        await cache.SetStringAsync(string.Format(Cache.OpsUsername, id),
+                        var discriminatorNote = string.Empty;
+                        if (!string.IsNullOrEmpty(CacheDiscriminator))
+                        {
+                            discriminatorNote = $" using cache discriminator {CacheDiscriminator}";
+                        }
+
+                        _logger.LogInformation($"Id {id} is user {identity.Name} with {roles.Count()} roles from {referer}{discriminatorNote}");
+
+                        await cache.SetStringAsync(CacheKey(Cache.OpsUsername, id),
                             identity.Name,
                             cacheExpiration);
 
                         int groupId = 1;
                         foreach (string name in roleNames)
                         {
-                            await cache.SetStringAsync(string.Format(Cache.OpsGroup, id, groupId),
+                            await cache.SetStringAsync(CacheKey(Cache.OpsGroup, id, groupId),
                                 name,
                                 cacheExpiration);
                             groupId++;
@@ -151,6 +177,18 @@ namespace Ops.Web.WindowsAuth
                     }
                 }
             });
+        }
+
+        private string CacheKey(string key, params object[] parameters)
+        {
+            if (string.IsNullOrEmpty(CacheDiscriminator))
+            {
+                return string.Format(key, parameters);
+            }
+            else
+            {
+                return $".{CacheDiscriminator}{string.Format(key, parameters)}";
+            }
         }
     }
 }

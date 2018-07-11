@@ -50,7 +50,7 @@ Use the following scripts:
 
 Or perform the steps manually, such as:
 
-1. `Web.csproj --context Ocuda.Ops.DataProvider.<provider>.Ops.Context develop`
+1. `cd src/Ops.DataProvider.<provider>.Ops && dotnet ef migrations add -s ../Ops.Web/Ops.Web.Web.csproj --context Ocuda.Ops.DataProvider.<provider>.Ops.Context develop`
 2. `cd ../Ops.DataProvider.<provider>.Promenade && dotnet ef migrations add -s ../Ops.Web/Ops.Web.csproj --context Ocuda.Ops.DataProvider.<provider>.Promenade.Context develop`
 
 ## Application settings
