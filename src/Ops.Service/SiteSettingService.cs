@@ -30,7 +30,7 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(siteSettingRepository));
 
             string timeoutSetting
-                = _config[Utility.Keys.Configuration.OpsSiteSettingCacheMinutes] ?? "0";
+                = _config[Utility.Keys.Configuration.OpsSiteSettingCacheMinutes] ?? "60";
             int.TryParse(timeoutSetting, out int timeout);
             CacheMinutes = timeout;
         }
