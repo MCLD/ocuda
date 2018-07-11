@@ -41,10 +41,6 @@ namespace Ocuda.Ops.Web
                     = new Microsoft.AspNetCore.Localization.RequestCulture(culture);
             });
 
-            string cacheDiscriminator 
-                = _config[Utility.Keys.Configuration.OpsDistributedCacheInstanceDiscriminator]
-                ?? string.Empty;
-
             switch (_config[Utility.Keys.Configuration.OpsDistributedCache])
             {
                 case "Redis":
@@ -52,7 +48,10 @@ namespace Ocuda.Ops.Web
                         = _config[Utility.Keys.Configuration.OpsDistributedCacheRedisConfiguration]
                         ?? throw new Exception($"{Utility.Keys.Configuration.OpsDistributedCache} has Redis selected but {Utility.Keys.Configuration.OpsDistributedCacheRedisConfiguration} is not set.");
                     string instanceName = Utility.Keys.CacheInstance.OcudaOps;
-                    if(!string.IsNullOrEmpty(cacheDiscriminator))
+                    string cacheDiscriminator
+                        = _config[Utility.Keys.Configuration.OpsDistributedCacheInstanceDiscriminator]
+                        ?? string.Empty;
+                    if (!string.IsNullOrEmpty(cacheDiscriminator))
                     {
                         instanceName = $"{instanceName}.{cacheDiscriminator}";
                     }
