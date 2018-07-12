@@ -31,7 +31,7 @@ $(document).on('change', ':file', function () {
     fileInput.trigger('fileselect', filePath);
 });
 
-$(':file').on('fileselect', function (evkent, filePath) {
+$(document).on('fileselect', ':file', function (evkent, filePath) {
     var file = $(this)[0].files[0],
         fileData = new FormData(),
         fileDisplay = $(this).parents('.input-group').find(':text');
@@ -67,4 +67,64 @@ $(':file').on('fileselect', function (evkent, filePath) {
             return false;
         }
     });
+});
+
+function updateStub(stub, text) {
+    // From https://gist.github.com/mathewbyrne/1280286
+    var slug = text.toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/&/g, '-and-')
+        .replace(/[^\w\-]+/g, '')
+        .replace(/\-\-+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '');
+    stub.val(slug);
+}
+
+function validateStub(stub, stubCheckUrl) {
+    var stubValidation = stub.parent().find('span');
+    if (stub.val().trim() != "") {
+        stub.val(stub.val().trim());
+
+        stubValidation.removeClass("text-danger text-success");
+        stubValidation.text("Checking stub availability...")
+
+        $.post(stubCheckUrl, {
+            stub: stub.val(),
+            sectionId: $("#SectionId").val()
+        }, function (response) {
+            if (response) {
+                stub.removeClass("valid");
+                stub.addClass("input-validation-error");
+                stubValidation.removeClass("field-validation-valid text-success");
+                stubValidation.addClass("field-validation-error");
+                stubValidation.text("The stub is already in use.");
+            }
+            else {
+                stub.removeClass("input-validation-error");
+                stub.addClass("valid");
+                stubValidation.removeClass("field-validation-error");
+                stubValidation.addClass("field-validation-valid text-success");
+                stubValidation.text("The stub is available.");
+            }
+        });
+    }
+    else {
+        stub.removeClass("valid");
+        stub.addClass("input-validation-error");
+        stubValidation.removeClass("field-validation-valid text-success");
+        stubValidation.addClass("field-validation-error");
+        stubValidation.text("The Stub field is required.");
+    }
+}
+
+function clearStubValidation(stub) {
+    if (stub.val().trim() != "") {
+        var stubValidation = stub.parent().find('span');
+        stubValidation.text("");
+    }
+}
+
+$.validator.setDefaults({
+    ignore: ".validation-ignore"
 });

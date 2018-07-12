@@ -23,5 +23,8 @@ namespace Ocuda.Ops.Models
         [DisplayName("Category")]
         public int? CategoryId { get; set; }
         public Category Category { get; set; }
+
+        public int? PostId { get; set; }
+        public int? PageId { get; set; }
     }
 }

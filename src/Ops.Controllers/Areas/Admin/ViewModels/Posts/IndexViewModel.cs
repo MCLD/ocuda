@@ -9,5 +9,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Posts
         public IEnumerable<Post> Posts { get; set; }
         public Post Post { get; set; }
         public PaginateModel PaginateModel { get; set; }
+        public int SectionId { get; set; }
     }
 }

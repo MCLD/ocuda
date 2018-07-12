@@ -149,3 +149,12 @@ a.rowlink {
         background-color: #fff;
         border-color: #ddd;
     }
+
+.field-validation-error {
+    color: #f00;
+}
+
+.input-validation-error {
+    border: 1px solid #f00;
+    background-color: #fee;
+}

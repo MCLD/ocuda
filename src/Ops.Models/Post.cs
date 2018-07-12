@@ -13,7 +13,7 @@ namespace Ocuda.Ops.Models
         [Required]
         [MaxLength(255)]
         public string Stub { get; set; }
-        [Required]
+
         [MaxLength(2000)]
         public string Content { get; set; }
 

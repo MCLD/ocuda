@@ -17,12 +17,14 @@ namespace Ocuda.Utility.TagHelpers
     {
         private const string attributeName = "formgroup";
         private const string forAttributeName = "asp-for";
+        private const string ignoreValidationAttributeName = "ignore-validation";
         private const string defaultWraperDivClass = "form-group row";
         private const string defaultRowDivClass = "row";
         private const string defaultLabelClass = "col-md-3 col-form-label text-md-right";
         private const string defaultInputClass = "form-control";
         private const string defaultInnerDivClass = "col-md-9";
         private const string defaultValidationMessageClass = "text-danger";
+        private const string validationIgnoreClass = "validation-ignore";
 
         private readonly IHtmlGenerator _htmlGenerator;
         public FormGroupTagHelper(IHtmlGenerator htmlGenerator)
@@ -32,6 +34,8 @@ namespace Ocuda.Utility.TagHelpers
 
         [HtmlAttributeName(forAttributeName)]
         public ModelExpression For { get; set; }
+        [HtmlAttributeName(ignoreValidationAttributeName)]
+        public bool IgnoreValidation { get; set; }
 
         [ViewContext]
         [HtmlAttributeNotBound]
@@ -125,8 +129,15 @@ namespace Ocuda.Utility.TagHelpers
 
             TagHelperOutput validationMessageOutput = CreateTagHelperOutput("span");
 
+            var validatorClass = defaultValidationMessageClass;
+
+            if(IgnoreValidation)
+            {
+                validatorClass += $" {validationIgnoreClass}";
+            }
+
             validationMessageOutput.Attributes.Add(
-                new TagHelperAttribute("class", defaultValidationMessageClass));
+                new TagHelperAttribute("class", validatorClass));
 
             await validationMessageTagHelper.ProcessAsync(context, validationMessageOutput);        
 

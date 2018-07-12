@@ -1,5 +1,14 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages.IndexViewModel
 
+<form asp-controller="Pages" asp-action="@(nameof(PagesController.Create))" method="post" role="form">
+    <input asp-for="@Model.SectionId" type="hidden" />
+    <input id="editDraft" asp-for="Page.IsDraft" type="hidden" value="true" />
+    <input id="editStub" asp-for="Page.Stub" type="hidden" readonly />
+    <div modal id="addModal" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+        <input id="editTitle" asp-for="Page.Title" formgroup />
+    </div>
+</form>
+
 <form asp-controller="Pages" asp-action="@(nameof(PagesController.Delete))" method="post" role="form">
     <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
     <input id="deleteName" asp-for="Page.Title" type="hidden" />
@@ -8,7 +17,11 @@
 </form>
 
 <div class="mb-2">
-    <a class="btn btn-outline-secondary text-dark" asp-action="@(nameof(PagesController.Create))">Create Page</a>
+    <button class="btn btn-outline-secondary text-dark"
+            data-toggle="modal"
+            data-target="#addModal">
+        Create Page
+    </button>
 </div>
 
 @if (Model.Pages.Count() == 0)
@@ -39,7 +52,7 @@ else
                 </td>
                 <td>@ocPage.CreatedBy</td>
                 <td>@ocPage.CreatedAt</td>
-                <td>@ocPage.IsDraft</td>
+                <td>@(ocPage.IsDraft == true ? "Yes" : null)</td>
                 <td align="center" class="on-top">
                     <button type="button"
                             class="btn btn-danger btn-xs"
@@ -64,6 +77,9 @@ else
 @section scripts
     {
     <script>
+        var title = $('#editTitle');
+        var stub = $("#editStub");
+
         $(document).ready(function () {
             $('.rowlink-parent').each(function () {
                 $(this).children('a.rowlink').height($(this).height() + 12);
@@ -73,6 +89,10 @@ else
             $('.rowlink-parent').each(function () {
                 $(this).children('a.rowlink').height($(this).height() + 12);
             });
+        });
+
+        title.on("keyup", function () {
+            updateStub(stub, title.val());
         });
 
         $("#deleteModal").on("show.bs.modal", function (e) {

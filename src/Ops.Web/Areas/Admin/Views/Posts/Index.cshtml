@@ -1,5 +1,14 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Posts.IndexViewModel
 
+<form asp-controller="Posts" asp-action="@(nameof(PostsController.Create))" method="post" role="form">
+    <input asp-for="@Model.SectionId" type="hidden" />
+    <input id="editDraft" asp-for="Post.IsDraft" type="hidden" value="true" />
+    <input id="editStub" asp-for="Post.Stub" type="hidden" readonly />
+    <div modal id="addModal" name="Post" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+        <input id="editTitle" asp-for="Post.Title" formgroup />
+    </div>
+</form>
+
 <form asp-controller="Posts" asp-action="@(nameof(PostsController.Delete))" method="post" role="form">
     <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
     <input id="deleteName" asp-for="Post.Title" type="hidden" />
@@ -8,7 +17,11 @@
 </form>
 
 <div class="mb-2">
-    <a class="btn btn-outline-secondary text-dark" asp-action="@(nameof(PostsController.Create))">Create Blog Post</a>
+    <button class="btn btn-outline-secondary text-dark"
+            data-toggle="modal"
+            data-target="#addModal">
+        Create Blog Post
+    </button>
 </div>
 
 @if (Model.Posts.Count() == 0)
@@ -23,6 +36,7 @@ else
                 <th>Title</th>
                 <th>Author</th>
                 <th>Date</th>
+                <th>Draft</th>
                 <th>Pinned</th>
                 <th>&nbsp;</th>
             </tr>
@@ -38,6 +52,7 @@ else
                     </td>
                     <td>@post.CreatedBy</td>
                     <td>@post.CreatedAt</td>
+                    <td>@(post.IsDraft == true ? "Yes" : null)</td>
                     <td align="center">
                         @if (post.IsPinned)
                         {
@@ -68,6 +83,9 @@ else
 @section scripts
     {
     <script>
+        var title = $('#editTitle');
+        var stub = $("#editStub");
+
         $(document).ready(function () {
             $('.rowlink-parent').each(function () {
                 $(this).children('a.rowlink').height($(this).height() + 12);
@@ -77,6 +95,10 @@ else
             $('.rowlink-parent').each(function () {
                 $(this).children('a.rowlink').height($(this).height() + 12);
             });
+        });
+
+        title.on("keyup", function () {
+            updateStub(stub, title.val());
         });
 
         $("#deleteModal").on("show.bs.modal", function (e) {

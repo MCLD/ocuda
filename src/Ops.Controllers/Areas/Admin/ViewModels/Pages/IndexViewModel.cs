@@ -11,5 +11,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages
         public IEnumerable<Page> Pages { get; set; }
         public Page Page { get; set; }
         public PaginateModel PaginateModel { get; set; }
+        public int SectionId { get; set; }
     }
 }
