@@ -25,12 +25,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         private readonly SectionService _sectionService;
         private readonly PostService _postService;
         private readonly PageService _pageService;
-        private readonly ILogger<FilesController> _logger;
 
         private const string FileValidationPassed = "Valid";
         private const string FileValidationFailedType = "File is not a valid type.";
         private const string FileValidationFailedSize = "File is too large to upload.";
-        private const int MaxFileSize = 2096000; //TODO get max filesize from config
 
         public FilesController(ServiceFacade.Controller<FilesController> context,
             FileService fileService,
@@ -38,8 +36,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             CategoryService categoryService,
             SectionService sectionService,
             PostService postService,
-            PageService pageService,
-            ILogger<FilesController> logger
+            PageService pageService
             ):base(context)
         {
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
@@ -48,7 +45,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
             _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<IActionResult> Index(string section, int? categoryId = null, int page = 1)
@@ -141,7 +137,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                             }
                         }
 
-                        if (model.FileData.Length < MaxFileSize)
+                        var siteSetting = await _siteSettingService.GetSetting(SiteSettingKey.FileUpload.MaxFileSize);
+                        int.TryParse(siteSetting, out int maxFileSize);
+
+                        if (model.FileData.Length < maxFileSize)
                         {
                             var typeProvider = new FileExtensionContentTypeProvider();
                             typeProvider.TryGetContentType(model.FileData.FileName, out string contentType);
@@ -230,7 +229,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                             }
                         }
 
-                        if (model.FileData.Length < MaxFileSize)
+                        var siteSetting = await _siteSettingService.GetSetting(SiteSettingKey.FileUpload.MaxFileSize);
+                        int.TryParse(siteSetting, out int maxFileSize);
+
+                        if (model.FileData.Length < maxFileSize)
                         {
                             var typeProvider = new FileExtensionContentTypeProvider();
                             typeProvider.TryGetContentType(model.FileData.FileName, out string contentType);
@@ -420,9 +422,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
         }
 
-        public IActionResult ValidateFileBeforeUpload(string fileName, long fileSize)
+        public async Task<IActionResult> ValidateFileBeforeUpload(string fileName, long fileSize)
         {
-            string result = ValidateFile(fileName, fileSize);
+            string result = await ValidateFile(fileName, fileSize);
             return Json(result);
         }
 
@@ -431,7 +433,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             int contentId,
             string contentType)
         {
-            string result = ValidateFile(fileData.FileName, fileData.Length);
+            string result = await ValidateFile(fileData.FileName, fileData.Length);
 
             if (result == FileValidationPassed)
             {
@@ -502,14 +504,23 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     ShowAlertDanger("Unable to add file: ", ex.Message);
                 }
             }
+            else if(result == FileValidationFailedSize)
+            {
+                result = "FailedSize";
+            }
+            else if (result == FileValidationFailedType)
+            {
+                result = "FailedType";
+            }
 
             return Json(result);
         }
 
-        private string ValidateFile(string fileName, long fileSize)
+        private async Task<string> ValidateFile(string fileName, long fileSize)
         {
             var result = "";
-            var maxFileSize = MaxFileSize; //TODO get max filesize from config
+            var siteSetting = await _siteSettingService.GetSetting(SiteSettingKey.FileUpload.MaxFileSize);
+            int.TryParse(siteSetting, out int maxFileSize);
 
             if (fileSize < maxFileSize)
             {

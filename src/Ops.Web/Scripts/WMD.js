@@ -1063,7 +1063,15 @@ Markdown.HookCollection = HookCollection;
                             isCancel = true;
                         }
                     });
-                    if (text == "Empty" || text == "Error") {
+                    if (text == "FailedSize") {
+                        alert("Error: File is too large to upload.");
+                        isCancel = true;
+                    }
+                    if (text == "FailedType") {
+                        alert("Error: File is not a valid type.");
+                        isCancel = true;
+                    }
+                    else if (text == "Empty" || text == "Error") {
                         isCancel = true;
                     }
                     else if (text == "UnAuth") {
