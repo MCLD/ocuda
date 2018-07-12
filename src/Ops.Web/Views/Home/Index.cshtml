@@ -3,38 +3,45 @@
 <div class="row">
     @* Blog Content *@
     <div class="col-sm-8 oc-blog">
-        @foreach (var post in Model.Posts)
+        @if (Model.Posts.Count() == 0)
         {
-            <div class="card">
-                @if (post.IsPinned)
-                {
-                    <div class="card-header oc-pinned d-flex">
-                        <h1 class="card-title flex-grow-1">@post.Title</h1>
-                        <span class="fa fa-thumbtack align-self-center"></span>
+            <div class="alert alert-warning">No Blog Posts Found</div>
+        }
+        else
+        {
+            @foreach (var post in Model.Posts)
+            {
+                <div class="card">
+                    @if (post.IsPinned)
+                    {
+                        <div class="card-header oc-pinned d-flex">
+                            <h1 class="card-title flex-grow-1">@post.Title</h1>
+                            <span class="fa fa-thumbtack align-self-center"></span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="card-header d-flex">
+                            <h1 class="card-title flex-grow-1">@post.Title</h1>
+                        </div>
+                    }
+                    <div class="card-body">
+                        @Html.Raw(post.Content)
                     </div>
-                }
-                else
-                {
-                    <div class="card-header d-flex">
-                        <h1 class="card-title flex-grow-1">@post.Title</h1>
+                    <div class="card-footer d-flex">
+                        <div class="flex-grow-1">Posted by <a href="#">@post.CreatedBy</a></div>
+                        <div>@post.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")</div>
                     </div>
+                </div>
+            }
+
+            <div class="d-flex justify-content-center">
+                @if (Model.PaginateModel.MaxPage > 1)
+                {
+                    <paginate paginateModel="@Model.PaginateModel"></paginate>
                 }
-                <div class="card-body">
-                    @Html.Raw(post.Content)
-                </div>
-                <div class="card-footer d-flex">
-                    <div class="flex-grow-1">Posted by <a href="#">@post.CreatedBy</a></div>
-                    <div>@post.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")</div>
-                </div>
             </div>
         }
-
-        <div class="d-flex justify-content-center">
-            @if (Model.PaginateModel.MaxPage > 1)
-            {
-                <paginate paginateModel="@Model.PaginateModel"></paginate>
-            }
-        </div>
     </div>
     @* End Blog Content *@
 

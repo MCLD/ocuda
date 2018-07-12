@@ -59,27 +59,15 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var viewModel = new IndexViewModel()
             {
                 PaginateModel = paginateModel,
-                Posts = postList.Data
+                Posts = postList.Data,
+                SectionId = currentSection.Id
             };
 
             return View(viewModel);
         }
 
-        public async Task<IActionResult> Create(string section)
-        {
-            var currentSection = await _sectionService.GetByPathAsync(section);
-
-            var viewModel = new DetailViewModel()
-            {
-                Action = nameof(Create),
-                SectionId = currentSection.Id
-            };
-
-            return View("Detail", viewModel);
-        }
-
         [HttpPost]
-        public async Task<IActionResult> Create(DetailViewModel model)
+        public async Task<IActionResult> Create(IndexViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -87,8 +75,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 {
                     model.Post.SectionId = model.SectionId;
                     var newPost = await _postService.CreateAsync(model.Post);
-                    ShowAlertSuccess($"Added blog post: {newPost.Title}");
-                    return RedirectToAction(nameof(Index));
+
+                    return RedirectToAction(nameof(Edit), new { id = newPost.Id });
                 }
                 catch (Exception ex)
                 {
@@ -97,10 +85,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
             }
 
-            model.Action = nameof(Create);
-            return View("Detail", model);
+            return RedirectToAction(nameof(Index));
         }
-
 
         public async Task<IActionResult> Edit(int id)
         {
@@ -110,7 +96,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 Action = nameof(Edit),
                 Post = post,
-                SectionId = post.SectionId
+                SectionId = post.SectionId,
+                IsDraft = post.IsDraft
             };
 
             return View("Detail", viewModel);
@@ -119,6 +106,19 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [HttpPost]
         public async Task<IActionResult> Edit(DetailViewModel model)
         {
+            var currentPost = await _postService.GetByIdAsync(model.Post.Id);
+
+            if (currentPost.IsDraft == true && model.Post.IsDraft == false)
+            {
+                var stubInUse = await _postService.StubInUseAsync(model.Post.Stub, currentPost.SectionId);
+
+                if (stubInUse)
+                {
+                    ModelState.AddModelError("Post_IsDraft", string.Empty);
+                    ShowAlertDanger("The chosen stub is already in use. Please choose a different stub.");
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 try
@@ -135,7 +135,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
 
             model.Action = nameof(Edit);
-            return View("Detail", model);
+            model.IsDraft = currentPost.IsDraft;
+            return RedirectToAction(nameof(Edit), new { id = model.Post.Id });
         }
 
         [HttpPost]
@@ -153,6 +154,12 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
 
             return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> StubInUse(string stub, int sectionId)
+        {
+            return Json(await _postService.StubInUseAsync(stub, sectionId));
         }
     }
 }

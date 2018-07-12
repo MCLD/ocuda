@@ -9,5 +9,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops
     public interface IPostRepository : IRepository<Post, int>
     {
         Task<DataWithCount<ICollection<Post>>> GetPaginatedListAsync(BlogFilter filter);
+        Task<bool> StubInUseAsync(string stub, int sectionId);
     }
 }

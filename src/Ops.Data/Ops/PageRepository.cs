@@ -45,5 +45,13 @@ namespace Ocuda.Ops.Data.Ops
                     .ToListAsync()
             };
         }
+
+        public async Task<bool> StubInUseAsync(string stub, int sectionId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Stub == stub && _.SectionId == sectionId && _.IsDraft == false)
+                .AnyAsync();
+        }
     }
 }

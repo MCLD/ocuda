@@ -149,8 +149,8 @@ namespace Ocuda.Ops.Service
             await _siteSettingRepository.AddAsync(new SiteSetting
             {
                 //TODO create keys
-                Key = "FileUpload.SizeLimit",
-                Name = "Size Limit",
+                Key = "FileUpload.MaxFileSize",
+                Name = "Maximum File Size",
                 Description = "The maximum file size for uploading files.",
                 Category = "File Uploads",
                 Value = "2096000",
