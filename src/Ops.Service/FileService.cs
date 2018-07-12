@@ -11,8 +11,6 @@ namespace Ocuda.Ops.Service
 {
     public class FileService
     {
-        private readonly string PathSeparator = System.IO.Path.DirectorySeparatorChar.ToString();
-       
         private readonly ILogger<FileService> _logger;
         private readonly IFileRepository _fileRepository;
         private readonly InsertSampleDataService _insertSampleDataService;

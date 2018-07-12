@@ -69,7 +69,7 @@ namespace Ocuda.Ops.Service
             {
                 _logger.LogError(ex, "Unable to create {0} file directory {1}: {2}",
                     publicPrivateRoot, path, ex.Message);
-                throw ex;
+                throw;
             }
 
             foreach (var element in pathElement)
@@ -84,7 +84,7 @@ namespace Ocuda.Ops.Service
                 {
                     _logger.LogError(ex, "Unable to create {0} file directory {1}: {2}",
                         publicPrivateRoot, path, ex.Message);
-                    throw ex;
+                    throw;
                 }
             }
 

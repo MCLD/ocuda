@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.IO;
 
 namespace Ocuda.Utility.File
 {
-    public class SharedPath
+    public static class SharedPath
     {
         private const string DefaultSharedDirectoryPath = "shared";
 
