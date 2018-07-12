@@ -72,7 +72,6 @@ namespace Ocuda.Ops.Service
             foreach (var section in sections)
             {
                 await InsertPostsAsync(section.Id);
-                await InsertFilesAsync(section.Id);
                 await InsertLinksAsync(section.Id);
                 await InsertPagesAsync(section.Id);
             }
@@ -513,51 +512,6 @@ namespace Ocuda.Ops.Service
                 Icon = "fa fa-file-video",
                 IsDefault = false
             });
-        }
-
-        public async Task InsertFilesAsync(int sectionId)
-        {
-            var categories = await InsertFileCategoriesAsync(sectionId);
-            var wordFile = await _fileTypeRepository.GetByExtensionAsync(".docx");
-            var excelFile = await _fileTypeRepository.GetByExtensionAsync(".xlsx");
-            var pdfFile = await _fileTypeRepository.GetByExtensionAsync(".pdf");
-
-            await _fileRepository.AddAsync(new File
-            {
-                CreatedAt = DateTime.Parse("2018-05-20"),
-                FilePath = "/file.docx",
-                Name = "New File 1",
-                Icon = wordFile.Icon,
-                Extension = ".docx",
-                CreatedBy = SystemAdministrator.Id,
-                Category = categories.FirstOrDefault(),
-                SectionId = sectionId
-            });
-            await _fileRepository.AddAsync(new File
-            {
-                CreatedAt = DateTime.Parse("2018-06-04"),
-                FilePath = "/file.xlsx",
-                Name = "New File 2",
-                Icon = excelFile.Icon,
-                Extension = ".xlsx",
-                CreatedBy = SystemAdministrator.Id,
-                Category = categories.FirstOrDefault(),
-                SectionId = sectionId
-            });
-            await _fileRepository.AddAsync(new File
-            {
-                CreatedAt = DateTime.Parse("2018-05-01"),
-                IsFeatured = true,
-                FilePath = "/file.pdf",
-                Name = "Important File!",
-                Icon = pdfFile.Icon,
-                Extension = ".pdf",
-                CreatedBy = SystemAdministrator.Id,
-                Category = categories.LastOrDefault(),
-                SectionId = sectionId
-            });
-
-            await _fileRepository.SaveAsync();
         }
 
         public async Task InsertPagesAsync(int sectionId)

@@ -11,7 +11,7 @@ namespace Ocuda.Ops.Models
         [MaxLength(255)]
         public string Name { get; set; }
         [MaxLength(255)]
-        public string FilePath { get; set; }
+        public string Type { get; set; }
         public string Icon { get; set; }
         public string Extension { get; set; }
         [MaxLength(255)]

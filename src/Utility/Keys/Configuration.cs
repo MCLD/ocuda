@@ -13,11 +13,13 @@
         public static readonly string OpsDistributedCacheRedisConfiguration
             = "Ops.DistributedCache.RedisConfiguration";
         public static readonly string OpsDomainName = "Ops.DomainName";
+        public static readonly string OpsFileShared = "Ops.FileShared";
         public static readonly string OpsHttpErrorFileTag = "Ops.HttpErrorFileTag";
         public static readonly string OpsInstance = "Ops.Instance";
         public static readonly string OpsSiteManagerGroup = "Ops.SiteManagerGroup";
         public static readonly string OpsSiteSettingCacheMinutes = "Ops.SiteSettingCacheMinutes";
         public static readonly string OpsRollingLogLocation = "Ops.RollingLogLocation";
         public static readonly string OpsSessionTimeoutMinutes = "Ops.SessionTimeoutMinutes";
+        public static readonly string OpsUrlSharedContent = "Ops.UrlSharedContent";
     }
 }

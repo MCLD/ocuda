@@ -11,20 +11,23 @@ namespace Ocuda.Ops.Service
 {
     public class FileService
     {
-        private readonly InsertSampleDataService _insertSampleDataService;
-        private readonly IFileRepository _fileRepository;
         private readonly ILogger<FileService> _logger;
+        private readonly IFileRepository _fileRepository;
+        private readonly InsertSampleDataService _insertSampleDataService;
+        private readonly PathResolverService _pathResolver;
 
-        public FileService(InsertSampleDataService insertSampleDataService,
+        public FileService(ILogger<FileService> logger,
             IFileRepository fileRepository,
-            ILogger<FileService> logger)
+            InsertSampleDataService insertSampleDataService,
+            PathResolverService pathResolver)
         {
-            _insertSampleDataService = insertSampleDataService
-                ?? throw new ArgumentNullException(nameof(insertSampleDataService));
-            _fileRepository = fileRepository
-                ?? throw new ArgumentNullException(nameof(fileRepository));
             _logger = logger
                 ?? throw new ArgumentNullException(nameof(logger));
+            _fileRepository = fileRepository
+                ?? throw new ArgumentNullException(nameof(fileRepository));
+            _insertSampleDataService = insertSampleDataService
+                ?? throw new ArgumentNullException(nameof(insertSampleDataService));
+            _pathResolver = pathResolver ?? throw new ArgumentNullException(nameof(pathResolver));
         }
 
         public async Task<int> GetFileCountAsync()
@@ -47,7 +50,7 @@ namespace Ocuda.Ops.Service
             return await _fileRepository.GetPaginatedListAsync(filter);
         }
 
-        public async Task<File> CreateAsync(File file, byte[] fileData)
+        public async Task<File> CreatePrivateFileAsync(File file, byte[] fileData)
         {
             file.CreatedAt = DateTime.Now;
             file.CreatedBy = 1; // TODO Set CreatedBy Id
@@ -55,52 +58,45 @@ namespace Ocuda.Ops.Service
             await _fileRepository.AddAsync(file);
             await _fileRepository.SaveAsync();
 
-            file.FilePath = WriteFileData(file, fileData, false);
+            file = WritePrivateFile(file, fileData, false);
             _fileRepository.Update(file);
             await _fileRepository.SaveAsync();
 
             return file;
         }
-
-        private string WriteFileData(File file, byte[] fileData, bool isEdit)
+        public string GetSharedFilePath(File file)
         {
-            var sectionId = file.SectionId;
-            string fileName = $"file{file.Id}{file.Extension}";
-            string fullFilePath = GetFilePath(fileName, sectionId);
+            return _pathResolver.GetPublicContentFilePath($"file{file.Id}{file.Extension}",
+                file.Type,
+                $"section{file.SectionId}");
+        }
 
-            if(isEdit)
+        public string GetPrivateFilePath(File file)
+        {
+            return _pathResolver.GetPrivateContentFilePath($"file{file.Id}{file.Extension}",
+                file.Type,
+                $"section{file.SectionId}");
+        }
+
+        private File WritePrivateFile(File file, byte[] fileData, bool isEdit)
+        {
+            string filePath = GetPrivateFilePath(file);
+
+            if (isEdit)
             {
-                _logger.LogInformation($"Editing File (Create): {fullFilePath}");
+                _logger.LogInformation($"Editing File (Create): {filePath}");
             }
             else
             {
-                _logger.LogInformation($"Writing file: {fullFilePath}");
-            }
-            
-            System.IO.File.WriteAllBytes(fullFilePath, fileData);
-            return GetUrlPath(fileName, sectionId);
-        }
-
-        private string GetFilePath(string fileName, int sectionId)
-        {
-            //TODO path resolution
-            string contentDir = $"Shared\\Content\\BlogFiles\\{ sectionId }";
-
-            if (!System.IO.Directory.Exists(contentDir))
-            {
-                System.IO.Directory.CreateDirectory(contentDir);
+                _logger.LogInformation($"Writing file: {filePath}");
             }
 
-            return System.IO.Path.Combine(contentDir, fileName);
+            //TODO refactor to WriteAllBytesAsync
+            System.IO.File.WriteAllBytes(filePath, fileData);
+            return file;
         }
 
-        private string GetUrlPath(string fileName, int sectionId)
-        {
-            //TODO path resolution
-            return $"Shared\\Content\\BlogFiles\\{ sectionId }\\{ fileName }";
-        }
-
-        public async Task<File> EditAsync(File file, byte[] fileData = null)
+        public async Task<File> EditPrivateFileAsync(File file, byte[] fileData = null)
         {
             var currentFile = await _fileRepository.FindAsync(file.Id);
             currentFile.Name = file.Name;
@@ -108,16 +104,18 @@ namespace Ocuda.Ops.Service
             currentFile.CategoryId = file.CategoryId;
             currentFile.IsFeatured = file.IsFeatured;
 
+            string filePath = GetPrivateFilePath(file);
+
             if (fileData != null)
             {
-                if(System.IO.File.Exists(currentFile.FilePath))
+                if(System.IO.File.Exists(filePath))
                 {
-                    _logger.LogInformation($"Editing File (Delete): {currentFile.FilePath}");
-                    System.IO.File.Delete(currentFile.FilePath);
+                    _logger.LogInformation($"Editing File (Delete): {filePath}");
+                    System.IO.File.Delete(filePath);
                 }
 
-                currentFile.FilePath = WriteFileData(file, fileData, true);
-                currentFile.Extension = System.IO.Path.GetExtension(currentFile.FilePath);
+                var newFile = WritePrivateFile(file, fileData, true);
+                currentFile.Extension = newFile.Extension;
                 currentFile.Icon = file.Icon;
             }
 
@@ -126,18 +124,34 @@ namespace Ocuda.Ops.Service
             return currentFile;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeletePrivateFileAsync(int id)
         {
             var file = await _fileRepository.FindAsync(id);
 
-            if (System.IO.File.Exists(file.FilePath))
+            string filePath = GetPrivateFilePath(file);
+
+            if (System.IO.File.Exists(filePath))
             {
-                _logger.LogInformation($"Deleting file: {file.FilePath}");
-                System.IO.File.Delete(file.FilePath);
+                _logger.LogInformation($"Deleting file: {filePath}");
+                System.IO.File.Delete(filePath);
             }
 
             _fileRepository.Remove(id);
             await _fileRepository.SaveAsync();
+        }
+
+        public async Task<byte[]> ReadPrivateFileAsync(File file)
+        {
+            string filePath = GetPrivateFilePath(file);
+
+            using (var fileStream = System.IO.File.OpenRead(filePath))
+            {
+                using (var ms = new System.IO.MemoryStream())
+                {
+                    await fileStream.CopyToAsync(ms);
+                    return ms.ToArray();
+                }
+            }
         }
     }
 }
