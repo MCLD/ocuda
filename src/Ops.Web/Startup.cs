@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,12 +15,15 @@ using Ocuda.Ops.Controllers.Validator;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Web.StartupHelper;
+using StackExchange.Redis;
 
 namespace Ocuda.Ops.Web
 {
     public class Startup
     {
         private const string DefaultCulture = "en-US";
+        private const string CacheInstanceInternal = "ocuda.internal.ops";
+        private const string DataProtectionKeyKey = "dpk";
 
         private readonly IConfiguration _config;
         private readonly ILogger _logger;
@@ -34,7 +38,7 @@ namespace Ocuda.Ops.Web
         {
             // set a default culture of en-US if none is specified
             string culture = _config[Utility.Keys.Configuration.OpsCulture] ?? DefaultCulture;
-            _logger.LogInformation($"Configuring for culture: {culture}");
+            _logger.LogInformation("Configuring for culture: {0}", culture);
             services.Configure<RequestLocalizationOptions>(_ =>
             {
                 _.DefaultRequestCulture
@@ -55,16 +59,28 @@ namespace Ocuda.Ops.Web
                     {
                         instanceName = $"{instanceName}.{cacheDiscriminator}";
                     }
-                    _logger.LogInformation($"Using Redis distributed cache {redisConfiguration} instance {instanceName}");
+                    _logger.LogInformation("Using Redis distributed cache {0} instance {1}", 
+                        redisConfiguration, 
+                        instanceName);
                     services.AddDistributedRedisCache(_ =>
                     {
                         _.Configuration = redisConfiguration;
                         _.InstanceName = instanceName;
                     });
+                    var redis = ConnectionMultiplexer.Connect(redisConfiguration);
+                    services.AddDataProtection()
+                        .PersistKeysToRedis(redis, 
+                            $"{CacheInstanceInternal}.{DataProtectionKeyKey}");
                     break;
                 default:
                     _logger.LogInformation("Using memory-based distributed cache");
                     services.AddDistributedMemoryCache();
+                    var sharedPath = string.Format("{0}{1}{2}",
+                        Utility.File.SharedPath.Get(_config[Utility.Keys.Configuration.OpsFileShared]),
+                        System.IO.Path.DirectorySeparatorChar,
+                        DataProtectionKeyKey);
+                    services.AddDataProtection()
+                        .PersistKeysToFileSystem(new System.IO.DirectoryInfo(sharedPath));
                     break;
             }
 
@@ -73,24 +89,26 @@ namespace Ocuda.Ops.Web
             string promCs = _config.GetConnectionString("Promenade")
                 ?? throw new Exception("ConnectionString:Promenade not configured.");
 
-            switch (_config[Utility.Keys.Configuration.OpsDatabaseProvider])
+            var provider = _config[Utility.Keys.Configuration.OpsDatabaseProvider];
+            switch (provider)
             {
                 case "SqlServer":
-                    _logger.LogInformation("Using SqlServer data provider");
+                    _logger.LogInformation("Using {0} data provider", provider);
                     services.AddDbContextPool<OpsContext,
                         DataProvider.SqlServer.Ops.Context>(_ => _.UseSqlServer(opsCs));
                     services.AddDbContextPool<PromenadeContext,
                         DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
                     break;
                 case "SQLite":
-                    _logger.LogInformation("Using SQLite data provider");
+                    _logger.LogInformation("Using {0} data provider", provider);
                     services.AddDbContextPool<OpsContext,
                         DataProvider.SQLite.Ops.Context>(_ => _.UseSqlite(opsCs));
                     services.AddDbContextPool<PromenadeContext,
                         DataProvider.SQLite.Promenade.Context>(_ => _.UseSqlite(promCs));
                     break;
                 default:
-                    _logger.LogCritical($"No {Utility.Keys.Configuration.OpsDatabaseProvider} configured in settings. Exiting.");
+                    _logger.LogCritical("No {0} configured in settings. Exiting.",
+                        Utility.Keys.Configuration.OpsDatabaseProvider);
                     throw new Exception($"No {Utility.Keys.Configuration.OpsDatabaseProvider} configured.");
             }
 
@@ -98,7 +116,8 @@ namespace Ocuda.Ops.Web
             if (int.TryParse(_config[Utility.Keys.Configuration.OpsSessionTimeoutMinutes],
                 out int configuredTimeout))
             {
-                _logger.LogInformation($"Session timeout configured for {configuredTimeout} minutes");
+                _logger.LogInformation("Session timeout configured for {0} minutes",
+                    configuredTimeout);
                 sessionTimeout = TimeSpan.FromMinutes(configuredTimeout);
             }
 
@@ -126,7 +145,8 @@ namespace Ocuda.Ops.Web
             });
 
             services.AddMvc()
-                .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_1);
+                .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_1)
+                .AddSessionStateTempDataProvider();
 
             // service facades
             services.AddScoped(typeof(Controllers.ServiceFacade.Controller<>));
@@ -136,11 +156,18 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Controllers.Filter.UserFilter>();
             services.AddScoped<Controllers.Filter.SectionFilter>();
 
+            // section path validator
+            services.AddScoped<ISectionPathValidator, SectionPathValidator>();
+
             // repositories
+            services.AddScoped<Service.Interfaces.Ops.ICategoryRepository,
+                Data.Ops.CategoryRepository>();
+            services.AddScoped<Service.Interfaces.Ops.IClaimGroupRepository,
+                Data.Ops.ClaimGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.IFileRepository, Data.Ops.FileRepository>();
-            services.AddScoped<Service.Interfaces.Ops.IFileTypeRepository, Data.Ops.FileTypeRepository>();
+            services.AddScoped<Service.Interfaces.Ops.IFileTypeRepository,
+                Data.Ops.FileTypeRepository>();
             services.AddScoped<Service.Interfaces.Ops.ILinkRepository, Data.Ops.LinkRepository>();
-            services.AddScoped<Service.Interfaces.Ops.ICategoryRepository, Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.IPageRepository, Data.Ops.PageRepository>();
             services.AddScoped<Service.Interfaces.Ops.IPostRepository, Data.Ops.PostRepository>();
             services.AddScoped<Service.Interfaces.Ops.IRosterDetailRepository,
@@ -151,37 +178,33 @@ namespace Ocuda.Ops.Web
                 Data.Ops.SectionManagerGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.ISectionRepository,
                 Data.Ops.SectionRepository>();
-            services.AddScoped<Service.Interfaces.Ops.IClaimGroupRepository,
-                Data.Ops.ClaimGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.ISiteSettingRepository,
                 Data.Ops.SiteSettingRepository>();
             services.AddScoped<Service.Interfaces.Ops.IUserRepository, Data.Ops.UserRepository>();
 
-
-            // path validator
-            services.AddScoped<Controllers.Validator.ISectionPathValidator,
-                Controllers.Validator.SectionPathValidator>();
-
             // services
             services.AddScoped<AuthorizationService>();
-            services.AddScoped<InitialSetupService>();
-            services.AddScoped<InsertSampleDataService>();
-            services.AddScoped<RosterService>();
-            services.AddScoped<SectionService>();
+            services.AddScoped<CategoryService>();
             services.AddScoped<FileService>();
             services.AddScoped<FileTypeService>();
+            services.AddScoped<InitialSetupService>();
+            services.AddScoped<InsertSampleDataService>();
             services.AddScoped<LinkService>();
-            services.AddScoped<CategoryService>();
-            services.AddScoped<PostService>();
-            services.AddScoped<UserService>();
+            services.AddScoped<PathResolverService>();
             services.AddScoped<PageService>();
+            services.AddScoped<PostService>();
+            services.AddScoped<RosterService>();
+            services.AddScoped<SectionService>();
             services.AddScoped<SiteSettingService>();
+            services.AddScoped<UserService>();
 
             var serviceProvider = services.BuildServiceProvider();
             return serviceProvider;
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app,
+            IHostingEnvironment env,
+            PathResolverService pathResolver)
         {
             // configure error page handling and development IDE linking
             if (env.IsDevelopment())
@@ -211,6 +234,21 @@ namespace Ocuda.Ops.Web
             app.UseRequestLocalization();
 
             app.UseStaticFiles();
+
+            // configure shared content directory
+            var contentFilePath = pathResolver.GetPublicContentFilePath();
+            var contentUrl = pathResolver.GetPublicContentUrl();
+            if (!contentUrl.StartsWith("/"))
+            {
+                contentUrl = $"/{contentUrl}";
+            }
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider
+                    = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(contentFilePath),
+                RequestPath = new Microsoft.AspNetCore.Http.PathString(contentUrl)
+            });
 
             app.UseSession();
 

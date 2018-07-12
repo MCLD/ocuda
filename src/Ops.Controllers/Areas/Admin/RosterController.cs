@@ -68,6 +68,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             if (ModelState.IsValid)
             {
+                // TODO we create the file here but delete it in the service, bad practice
                 var tempFile = Path.GetTempFileName();
                 using (var fileStream = new FileStream(tempFile, FileMode.Create))
                 {

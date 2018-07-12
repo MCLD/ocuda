@@ -22,6 +22,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         private readonly CategoryService _categoryService;
         private readonly FileService _fileService;
         private readonly FileTypeService _fileTypeService;
+        private readonly PathResolverService _pathResolver;
         private readonly SectionService _sectionService;
 
         private const string FileValidationPassed = "Valid";
@@ -33,12 +34,17 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             CategoryService categoryService,
             FileTypeService fileTypeService,
             FileService fileService,
+            PathResolverService pathResolver,
             SectionService sectionService) : base(context)
         {
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
-            _fileTypeService = fileTypeService ?? throw new ArgumentNullException(nameof(fileTypeService));
-            _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
-            _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
+            _fileTypeService = fileTypeService 
+                ?? throw new ArgumentNullException(nameof(fileTypeService));
+            _categoryService = categoryService 
+                ?? throw new ArgumentNullException(nameof(categoryService));
+            _pathResolver = pathResolver ?? throw new ArgumentNullException(nameof(pathResolver));
+            _sectionService = sectionService 
+                ?? throw new ArgumentNullException(nameof(sectionService));
         }
 
         public async Task<IActionResult> Index(string section, int? categoryId = null, int page = 1)
@@ -143,7 +149,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                                 var fileType = await _fileTypeService.GetByExtensionAsync(model.File.Extension);
                                 model.File.Icon = fileType.Icon;
 
-                                var newFile = await _fileService.CreateAsync(model.File, fileBytes);
+                                // TODO add logic to this, make it constants
+                                model.File.Type = "postattachment";
+
+                                var newFile = await _fileService.CreatePrivateFileAsync(model.File, fileBytes);
 
                                 ShowAlertSuccess($"Added file: {newFile.Name}");
                                 return RedirectToAction(nameof(Index));
@@ -232,7 +241,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                                 var fileType = await _fileTypeService.GetByExtensionAsync(model.File.Extension);
                                 model.File.Icon = fileType.Icon;
 
-                                file = await _fileService.EditAsync(model.File, fileBytes);
+                                file = await _fileService.EditPrivateFileAsync(model.File, fileBytes);
                                 ShowAlertSuccess($"Updated file: {file.Name}");
                                 return RedirectToAction(nameof(Index));
                             }
@@ -248,7 +257,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     }
                     else
                     {
-                        file = await _fileService.EditAsync(model.File);
+                        file = await _fileService.EditPrivateFileAsync(model.File);
                         ShowAlertSuccess($"Updated file: {file.Name}");
                         return RedirectToAction(nameof(Index));
                     }
@@ -269,7 +278,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             try
             {
-                await _fileService.DeleteAsync(model.File.Id);
+                await _fileService.DeletePrivateFileAsync(model.File.Id);
                 ShowAlertSuccess("File deleted successfully.");
             }
             catch (Exception ex)
@@ -379,26 +388,15 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             return RedirectToAction(nameof(Categories), new { page = model.PaginateModel.CurrentPage });
         }
 
-        public async Task<IActionResult> ViewFile(int id)
+        public async Task<IActionResult> ViewPrivateFile(int id)
         {
             var file = await _fileService.GetByIdAsync(id);
-            var extension = System.IO.Path.GetExtension(file.FilePath);
-            var fileName = $"{file.Name}{extension}";
-            byte[] fileBytes;
-
+            var fileBytes = await _fileService.ReadPrivateFileAsync(file);
+            string fileName = $"{file.Name}{file.Extension}";
             try
             {
-                using (var fileStream = System.IO.File.OpenRead(file.FilePath))
-                {
-                    using (var ms = new System.IO.MemoryStream())
-                    {
-                        fileStream.CopyTo(ms);
-                        fileBytes = ms.ToArray();
-                    }
-                }
-
                 var typeProvider = new FileExtensionContentTypeProvider();
-                typeProvider.TryGetContentType(file.FilePath, out string fileType);
+                typeProvider.TryGetContentType(fileName, out string fileType);
 
                 Response.Headers.Add("Content-Disposition", "inline; filename=" + fileName);
                 return File(fileBytes, fileType);
@@ -453,8 +451,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                             var fileType = await _fileTypeService.GetByExtensionAsync(file.Extension);
                             file.Icon = fileType.Icon;
 
-                            var newFile = await _fileService.CreateAsync(file, fileBytes);
-                            _logger.LogInformation($"Attached file: {newFile.FilePath}");
+                            // TODO make this constant
+                            file.Type = "postattachment";
+                            var newFile = await _fileService.CreatePrivateFileAsync(file, fileBytes);
+                            _logger.LogInformation($"Attached file: {newFile.Name}{newFile.Extension}");
 
                             string sectionPath = null;
                             if (section.Path != null)
@@ -463,7 +463,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                             }
 
                             var filePath = HttpContext.Request.Host +
-                                $"{sectionPath}/Files/{nameof(FilesController.ViewFile)}/{newFile.Id}";
+                                $"{sectionPath}/Files/{nameof(FilesController.ViewPrivateFile)}/{newFile.Id}";
                             result = filePath;
                         }
                     }

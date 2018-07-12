@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
@@ -78,34 +79,23 @@ namespace Ocuda.Ops.Controllers
             return View(viewModel);
         }
 
-        public async Task<IActionResult> ViewFile(int id)
+        public async Task<IActionResult> ViewPrivateFile(int id)
         {
             var file = await _fileService.GetByIdAsync(id);
-            var extension = System.IO.Path.GetExtension(file.FilePath);
-            var fileName = $"{file.Name}{extension}";
-            byte[] fileBytes;
-
+            var fileBytes = await _fileService.ReadPrivateFileAsync(file);
+            string fileName = $"{file.Name}{file.Extension}";
             try
             {
-                using (var fileStream = System.IO.File.OpenRead(file.FilePath))
-                {
-                    using (var ms = new System.IO.MemoryStream())
-                    {
-                        fileStream.CopyTo(ms);
-                        fileBytes = ms.ToArray();
-                    }
-                }
-
                 var typeProvider = new FileExtensionContentTypeProvider();
-                typeProvider.TryGetContentType(file.FilePath, out string fileType);
+                typeProvider.TryGetContentType(fileName, out string fileType);
 
                 Response.Headers.Add("Content-Disposition", "inline; filename=" + fileName);
                 return File(fileBytes, fileType);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error viewing file {file.Id} : {ex.Message}", ex);
-                return StatusCode(404);
+                _logger.LogError($"Error viewing file {file.Id} : {ex}", ex);
+                return StatusCode(StatusCodes.Status404NotFound);
             }
         }
     }

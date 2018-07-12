@@ -137,6 +137,8 @@ namespace Ocuda.Ops.Service
             }
             finally
             {
+                //TODO we didn't create this file here, we shouldn't be responsbile for deleting it here
+                //either modify this to create the file here or move deletion to where the file is created
                 System.IO.File.Delete(filePath);
             }
 

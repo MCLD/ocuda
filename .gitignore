@@ -244,7 +244,7 @@ ModelManifest.xml
 
 ##### Project-specific #####
 src/Ops.Web/logs/*
-src/Ops.Web/Shared/*
+src/Ops.Web/shared/*
 src/Ops.Web.WindowsAuth/logs/*
 src/Promenade.Web/logs/*
 
