@@ -35,20 +35,20 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             CategoryService categoryService,
             FileService fileService,
             FileTypeService fileTypeService,
-            SectionService sectionService,
             PageService pageService,
             PathResolverService pathResolver,
             PostService postService,
             SectionService sectionService) : base(context)
         {
-            _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
+            _categoryService = categoryService
+                ?? throw new ArgumentNullException(nameof(categoryService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
-            _fileTypeService = fileTypeService ?? throw new ArgumentNullException(nameof(fileTypeService));
-            _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
+            _fileTypeService = fileTypeService
+                ?? throw new ArgumentNullException(nameof(fileTypeService));
             _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
             _pathResolver = pathResolver ?? throw new ArgumentNullException(nameof(pathResolver));
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
-            _sectionService = sectionService 
+            _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(sectionService));
         }
 
@@ -502,7 +502,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     ShowAlertDanger("Unable to add file: ", ex.Message);
                 }
             }
-            else if(result == FileValidationFailedSize)
+            else if (result == FileValidationFailedSize)
             {
                 result = "FailedSize";
             }
