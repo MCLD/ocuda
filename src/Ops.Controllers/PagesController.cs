@@ -75,7 +75,7 @@ namespace Ocuda.Ops.Controllers
             else
             {
                 ShowAlertDanger($"Could not find page '{id}' in '{currentSection.Name}'.");
-                return RedirectToAction(nameof(PagesController.Index), new { section = section });
+                return RedirectToAction(nameof(PagesController.Index));
             }
 
             

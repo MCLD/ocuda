@@ -80,7 +80,7 @@ namespace Ocuda.Ops.Controllers
             else
             {
                 ShowAlertDanger($"Could not find post '{id}' in '{currentSection.Name}'.");
-                return RedirectToAction(nameof(PostsController.Index), new { section = section });
+                return RedirectToAction(nameof(PostsController.Index));
             }
         }
     }
