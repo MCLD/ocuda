@@ -35,6 +35,16 @@ namespace Ocuda.Ops.Data.Ops
                     .FirstOrDefaultAsync();
         }
 
+        public async Task<Category> GetDefaultAsync(BlogFilter filter)
+        {
+            return await DbSet
+                    .AsNoTracking()
+                    .Where(_ => _.CategoryType == filter.CategoryType
+                             && _.SectionId == filter.SectionId
+                             && _.IsDefault == true)
+                    .FirstOrDefaultAsync();
+        }
+
         public async Task<ICollection<Category>> GetBySectionIdAsync(BlogFilter filter)
         {
             var query = DbSet.AsNoTracking();
@@ -49,12 +59,16 @@ namespace Ocuda.Ops.Data.Ops
                 query = query.Where(_ => _.SectionId == filter.SectionId);
             }
 
-            return await query.ToListAsync();
+            return await query
+                    .OrderByDescending(_ => _.IsDefault)
+                    .ThenBy(_ => _.Name)
+                    .ToListAsync();
         }
 
         public async Task<DataWithCount<ICollection<Category>>> GetPaginatedListAsync(BlogFilter filter)
         {
-            var query = DbSet.AsNoTracking();
+            var query = DbSet.AsNoTracking()
+                             .Where(_ => _.IsDefault == false);
 
             if (filter.CategoryType.HasValue)
             {

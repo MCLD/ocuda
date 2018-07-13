@@ -13,6 +13,8 @@ namespace Ocuda.Ops.Models
 
         [Column(TypeName = "int")]
         public CategoryType CategoryType { get; set; }
+
+        public bool IsDefault { get; set; }
     }
 
     public enum CategoryType
