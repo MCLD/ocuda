@@ -27,6 +27,14 @@ namespace Ocuda.Ops.Data.Ops
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<Page> GetByStubAndSectionIdAsync(string stub, int sectionId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Stub == stub && _.SectionId == sectionId)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<DataWithCount<ICollection<Page>>> GetPaginatedListAsync(BlogFilter filter)
         {
             var query = DbSet.AsNoTracking();

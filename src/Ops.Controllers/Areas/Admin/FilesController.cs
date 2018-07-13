@@ -55,8 +55,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         public async Task<IActionResult> Index(string section, int? categoryId = null, int page = 1)
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
+            var itemsPerPage = await _siteSettingService.GetSetting(SiteSettingKey.Pagination.ItemsPerPage);
+            int.TryParse(itemsPerPage, out int take);
 
-            var filter = new BlogFilter(page)
+            var filter = new BlogFilter(page, take)
             {
                 SectionId = currentSection.Id,
                 CategoryId = categoryId,
@@ -160,7 +162,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                                 // TODO add logic to this, make it constants
                                 model.File.Type = "postattachment";
 
-                                var newFile = await _fileService.CreatePrivateFileAsync(model.File, fileBytes);
+                                var newFile = await _fileService.CreatePrivateFileAsync(CurrentUserId, model.File, fileBytes);
 
                                 ShowAlertSuccess($"Added file: {newFile.Name}");
                                 return RedirectToAction(nameof(Index));
@@ -304,14 +306,16 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         public async Task<IActionResult> Categories(string section, int page = 1)
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
+            var itemsPerPage = await _siteSettingService.GetSetting(SiteSettingKey.Pagination.ItemsPerPage);
+            int.TryParse(itemsPerPage, out int take);
 
-            var filter = new BlogFilter(page)
+            var filter = new BlogFilter(page, take)
             {
                 SectionId = currentSection.Id,
                 CategoryType = CategoryType.File
             };
 
-            var categoryList = await _categoryService.GetBySectionIdAsync(filter);
+            var categoryList = await _categoryService.GetPaginatedCategoryListAsync(filter);
 
             var paginateModel = new PaginateModel()
             {
@@ -332,7 +336,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var viewModel = new CategoriesViewModel()
             {
                 PaginateModel = paginateModel,
-                Categories = categoryList,
+                Categories = categoryList.Data,
                 SectionId = currentSection.Id
             };
 
@@ -349,7 +353,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 {
                     model.Category.SectionId = model.SectionId;
                     model.Category.CategoryType = CategoryType.File;
-                    var newCategory = await _categoryService.CreateCategoryAsync(model.Category);
+                    var newCategory = await _categoryService.CreateCategoryAsync(CurrentUserId, model.Category);
                     ShowAlertSuccess($"Added file category: {newCategory.Name}");
                 }
                 catch (Exception ex)
@@ -439,7 +443,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     if (fileData != null)
                     {
                         var section = await _sectionService.GetByIdAsync(sectionId);
-                        var category = await _categoryService.GetAttachmentCategoryAsync(section.Id);
+                        var category = 
+                            await _categoryService.GetAttachmentCategoryAsync(CurrentUserId, section.Id);
 
                         File file = new File
                         {
@@ -481,7 +486,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
                             // TODO make this constant
                             file.Type = "postattachment";
-                            var newFile = await _fileService.CreatePrivateFileAsync(file, fileBytes);
+                            var newFile = await _fileService.CreatePrivateFileAsync(CurrentUserId, file, fileBytes);
                             _logger.LogInformation($"Attached file: {newFile.Name}{newFile.Extension}");
 
                             string sectionPath = null;

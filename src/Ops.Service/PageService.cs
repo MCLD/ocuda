@@ -43,16 +43,20 @@ namespace Ocuda.Ops.Service
             return await _pageRepository.GetByStubAsync(stub);
         }
 
+        public async Task<Page> GetByStubAndSectionIdAsync(string stub, int sectionId)
+        {
+            return await _pageRepository.GetByStubAndSectionIdAsync(stub, sectionId);
+        }
+
         public async Task<DataWithCount<ICollection<Page>>> GetPaginatedListAsync(BlogFilter filter)
         {
             return await _pageRepository.GetPaginatedListAsync(filter);
         }
 
-        public async Task<Page> CreateAsync(Page page)
+        public async Task<Page> CreateAsync(int currentUserId, Page page)
         {
             page.CreatedAt = DateTime.Now;
-            // TODO Set CreatedBy Id
-            page.CreatedBy = 1;
+            page.CreatedBy = currentUserId;
 
             await _pageRepository.AddAsync(page);
             await _pageRepository.SaveAsync();

@@ -13,16 +13,26 @@ else
             <div class="card">
                 @if (post.IsPinned)
                 {
-                    <div class="card-header oc-pinned d-flex">
-                        <h1 class="card-title flex-grow-1">@post.Title</h1>
-                        <span class="fa fa-thumbtack align-self-center"></span>
-                    </div>
+                    <a class="card-link flex-grow-1"
+                       asp-controller="Posts"
+                       asp-action="@nameof(PostsController.Display)"
+                       asp-route-id="@post.Stub">
+                        <div class="card-header oc-pinned d-flex">
+                            <h1 class="card-title">@post.Title</h1>
+                            <span class="card-title fa fa-thumbtack ml-auto align-self-center"></span>
+                        </div>
+                    </a>
                 }
                 else
                 {
-                    <div class="card-header d-flex">
-                        <h1 class="card-title flex-grow-1">@post.Title</h1>
-                    </div>
+                    <a class="card-link flex-grow-1"
+                       asp-controller="Posts"
+                       asp-action="@nameof(PostsController.Display)"
+                       asp-route-id="@post.Stub">
+                        <div class="card-header d-flex">
+                            <h1 class="card-title">@post.Title</h1>
+                        </div>
+                    </a>
                 }
                 <div class="card-body">
                     @Html.Raw(post.Content)

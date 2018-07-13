@@ -15,6 +15,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
     public class SiteSettingsController : BaseController<SiteSettingsController>
     {
+        private const string TypeBool = "bool";
+        private const string TypeInt = "int";
+
         public SiteSettingsController(ServiceFacade.Controller<SiteSettingsController> context)
             : base(context)
         {
@@ -43,13 +46,12 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [HttpPost]
         public async Task<IActionResult> Update(IndexViewModel model)
         {
-            // TODO move these hardcoded strings to constants
             switch (model.SiteSetting.Type)
             {
-                case "bool":
+                case TypeBool:
                     model.SiteSetting.Value = model.ValueBool;
                     break;
-                case "int":
+                case TypeInt:
                     model.SiteSetting.Value = model.ValueInt;
                     break;
                 default:

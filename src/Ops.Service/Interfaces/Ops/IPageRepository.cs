@@ -9,6 +9,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops
     public interface IPageRepository : IRepository<Page, int>
     {
         Task<Page> GetByStubAsync(string stub);
+        Task<Page> GetByStubAndSectionIdAsync(string stub, int sectionId);
         Task<DataWithCount<ICollection<Page>>> GetPaginatedListAsync(BlogFilter filter);
         Task<bool> StubInUseAsync(string stub, int sectionId);
     }

@@ -15,5 +15,10 @@ namespace Ocuda.Ops.Controllers
         {
             public const string ItemsPerPage = "Pagination.ItemsPerPage";
         }
+
+        public struct EmailService
+        {
+            public const string FromAddress = "EmailService.FromAddress";
+        }
     }
 }

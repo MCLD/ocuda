@@ -35,8 +35,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         public async Task<IActionResult> Index(string section, int? categoryId = null, int page = 1)
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
+            var itemsPerPage = await _siteSettingService.GetSetting(SiteSettingKey.Pagination.ItemsPerPage);
+            int.TryParse(itemsPerPage, out int take);
 
-            var filter = new BlogFilter(page)
+            var filter = new BlogFilter(page, take)
             {
                 SectionId = currentSection.Id,
                 CategoryId = categoryId,
@@ -108,7 +110,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 try
                 {
                     model.Link.SectionId = model.SectionId;
-                    var newLink = await _linkService.CreateAsync(model.Link);
+                    var newLink = await _linkService.CreateAsync(CurrentUserId, model.Link);
                     ShowAlertSuccess($"Added link: {newLink.Name}");
                     return RedirectToAction(nameof(Index));
                 }
@@ -189,13 +191,16 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
 
-            var filter = new BlogFilter(page)
+            var itemsPerPage = await _siteSettingService.GetSetting(SiteSettingKey.Pagination.ItemsPerPage);
+            int.TryParse(itemsPerPage, out int take);
+
+            var filter = new BlogFilter(page, take)
             {
                 SectionId = currentSection.Id,
                 CategoryType = CategoryType.Link
             };
 
-            var categoryList = await _categoryService.GetBySectionIdAsync(filter);
+            var categoryList = await _categoryService.GetPaginatedCategoryListAsync(filter);
 
             var paginateModel = new PaginateModel()
             {
@@ -216,7 +221,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var viewModel = new CategoriesViewModel()
             {
                 PaginateModel = paginateModel,
-                Categories = categoryList,
+                Categories = categoryList.Data,
                 SectionId = currentSection.Id
             };
 
@@ -233,7 +238,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 {
                     model.Category.SectionId = model.SectionId;
                     model.Category.CategoryType = CategoryType.Link;
-                    var newCategory = await _categoryService.CreateCategoryAsync(model.Category);
+                    var newCategory = await _categoryService.CreateCategoryAsync(CurrentUserId, model.Category);
                     ShowAlertSuccess($"Added link category: {newCategory.Name}");
                 }
                 catch (Exception ex)
