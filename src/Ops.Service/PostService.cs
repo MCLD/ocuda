@@ -38,15 +38,25 @@ namespace Ocuda.Ops.Service
             return await _postRepository.FindAsync(id);
         }
 
+        public async Task<Post> GetByStubAsync(string stub)
+        {
+            return await _postRepository.GetByStubAsync(stub);
+        }
+
+        public async Task<Post> GetByStubAndSectionIdAsync(string stub, int sectionId)
+        {
+            return await _postRepository.GetByStubAndSectionIdAsync(stub, sectionId);
+        }
+
         public async Task<DataWithCount<ICollection<Post>>> GetPaginatedListAsync(BlogFilter filter)
         {
             return await _postRepository.GetPaginatedListAsync(filter);
         }
 
-        public async Task<Post> CreateAsync(Post post)
+        public async Task<Post> CreateAsync(int currentUserId, Post post)
         {
             post.CreatedAt = DateTime.Now;
-            post.CreatedBy = 1; // TODO Set CreatedBy Id
+            post.CreatedBy = currentUserId;
             await _postRepository.AddAsync(post);
             await _postRepository.SaveAsync();
 

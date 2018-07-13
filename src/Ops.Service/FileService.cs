@@ -50,10 +50,10 @@ namespace Ocuda.Ops.Service
             return await _fileRepository.GetPaginatedListAsync(filter);
         }
 
-        public async Task<File> CreatePrivateFileAsync(File file, byte[] fileData)
+        public async Task<File> CreatePrivateFileAsync(int currentUserId, File file, byte[] fileData)
         {
             file.CreatedAt = DateTime.Now;
-            file.CreatedBy = 1; // TODO Set CreatedBy Id
+            file.CreatedBy = currentUserId;
 
             await _fileRepository.AddAsync(file);
             await _fileRepository.SaveAsync();
@@ -104,7 +104,7 @@ namespace Ocuda.Ops.Service
             currentFile.CategoryId = file.CategoryId;
             currentFile.IsFeatured = file.IsFeatured;
 
-            string filePath = GetPrivateFilePath(file);
+            string filePath = GetPrivateFilePath(currentFile);
 
             if (fileData != null)
             {
@@ -114,9 +114,10 @@ namespace Ocuda.Ops.Service
                     System.IO.File.Delete(filePath);
                 }
 
-                var newFile = WritePrivateFile(file, fileData, true);
-                currentFile.Extension = newFile.Extension;
+                currentFile.Extension = file.Extension;
                 currentFile.Icon = file.Icon;
+
+                var newFile = WritePrivateFile(currentFile, fileData, true);
             }
 
             _fileRepository.Update(currentFile);

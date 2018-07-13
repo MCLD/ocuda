@@ -32,8 +32,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         public async Task<IActionResult> Index(string section, int page = 1)
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
+            var itemsPerPage = await _siteSettingService.GetSetting(SiteSettingKey.Pagination.ItemsPerPage);
+            int.TryParse(itemsPerPage, out int take);
 
-            var filter = new BlogFilter(page)
+            var filter = new BlogFilter(page, take)
             {
                 SectionId = currentSection.Id
             };
@@ -74,8 +76,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 try
                 {
                     model.Post.SectionId = model.SectionId;
-                    var newPost = await _postService.CreateAsync(model.Post);
-
+                    var newPost = await _postService.CreateAsync(CurrentUserId, model.Post);
                     return RedirectToAction(nameof(Edit), new { id = newPost.Id });
                 }
                 catch (Exception ex)

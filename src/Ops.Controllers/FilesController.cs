@@ -36,8 +36,10 @@ namespace Ocuda.Ops.Controllers
         public async Task<IActionResult> Index(string section, int? categoryId = null, int page = 1)
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
+            var itemsPerPage = await _siteSettingService.GetSetting(SiteSettingKey.Pagination.ItemsPerPage);
+            int.TryParse(itemsPerPage, out int take);
 
-            var filter = new BlogFilter(page)
+            var filter = new BlogFilter(page, take)
             {
                 SectionId = currentSection.Id,
                 CategoryId = categoryId,

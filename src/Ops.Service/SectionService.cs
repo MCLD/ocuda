@@ -73,11 +73,10 @@ namespace Ocuda.Ops.Service
             return await _sectionRepository.CountAsync();
         }
 
-        public async Task<Section> CreateAsync(Section section)
+        public async Task<Section> CreateAsync(int currentUserId, Section section)
         {
             section.CreatedAt = DateTime.Now;
-            // TODO Set CreatedBy Id
-            section.CreatedBy = 1;
+            section.CreatedBy = currentUserId;
 
             await _sectionRepository.AddAsync(section);
             await _sectionRepository.SaveAsync();

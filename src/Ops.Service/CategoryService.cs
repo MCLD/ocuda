@@ -50,7 +50,7 @@ namespace Ocuda.Ops.Service
             return await _categoryRepository.GetByNameAndSectionIdAsync(name, sectionId);
         }
 
-        public async Task<Category> GetAttachmentCategoryAsync(int sectionId)
+        public async Task<Category> GetAttachmentCategoryAsync(int currentUserId, int sectionId)
         {
             var category = await GetByNameAndSectionIdAsync("Attachments", sectionId);
 
@@ -63,7 +63,7 @@ namespace Ocuda.Ops.Service
                     CategoryType = CategoryType.File
                 };
 
-                category = await CreateCategoryAsync(newCategory);
+                category = await CreateCategoryAsync(currentUserId, newCategory);
             }
 
             return category;
@@ -74,10 +74,10 @@ namespace Ocuda.Ops.Service
             return await _categoryRepository.CountAsync();
         }
 
-        public async Task<Category> CreateCategoryAsync(Category category)
+        public async Task<Category> CreateCategoryAsync(int currentUserId, Category category)
         {
             category.CreatedAt = DateTime.Now;
-            category.CreatedBy = 1; //TODO fix CreatedBy
+            category.CreatedBy = currentUserId;
             await _categoryRepository.AddAsync(category);
             await _categoryRepository.SaveAsync();
             return category;

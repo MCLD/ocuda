@@ -27,8 +27,10 @@ namespace Ocuda.Ops.Controllers
         public async Task<IActionResult> Index(string section, int page = 1)
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
+            var itemsPerPage = await _siteSettingService.GetSetting(SiteSettingKey.Pagination.ItemsPerPage);
+            int.TryParse(itemsPerPage, out int take);
 
-            var filter = new BlogFilter(page)
+            var filter = new BlogFilter(page, take)
             {
                 SectionId = currentSection.Id
             };
@@ -60,13 +62,23 @@ namespace Ocuda.Ops.Controllers
             return View(viewModel);
         }
 
-        public new async Task<IActionResult> View(string id)
+        public new async Task<IActionResult> Display(string section, string id)
         {
-            var page = await _pageService.GetByStubAsync(id);
+            var currentSection = await _sectionService.GetByPathAsync(section);
+            var page = await _pageService.GetByStubAndSectionIdAsync(id, currentSection.Id);
 
-            page.Content = CommonMark.CommonMarkConverter.Convert(page.Content);
+            if(page != null)
+            {
+                page.Content = CommonMark.CommonMarkConverter.Convert(page.Content);
+                return View(page);
+            }
+            else
+            {
+                ShowAlertDanger($"Could not find page '{id}' in '{currentSection.Name}'.");
+                return RedirectToAction(nameof(PagesController.Index), new { section = section });
+            }
 
-            return View(page);
+            
         }
     }
 }

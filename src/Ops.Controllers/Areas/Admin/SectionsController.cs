@@ -27,7 +27,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
         public async Task<IActionResult> Index(int page = 1)
         {
-            var filter = new BlogFilter(page);
+            var itemsPerPage = await _siteSettingService.GetSetting(SiteSettingKey.Pagination.ItemsPerPage);
+            int.TryParse(itemsPerPage, out int take);
+
+            var filter = new BlogFilter(page, take);
 
             var sectionList = await _sectionService.GetPaginatedListAsync(filter);
 
@@ -74,7 +77,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 try
                 {
-                    var newSection = await _sectionService.CreateAsync(model.Section);
+                    var newSection = await _sectionService.CreateAsync(CurrentUserId, model.Section);
                     ShowAlertSuccess($"Added section: {newSection.Name}");
                     return RedirectToAction(nameof(Index));
                 }

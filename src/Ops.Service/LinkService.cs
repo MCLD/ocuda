@@ -42,11 +42,10 @@ namespace Ocuda.Ops.Service
             return await _linkRepository.GetPaginatedListAsync(filter);
         }
 
-        public async Task<Link> CreateAsync(Link link)
+        public async Task<Link> CreateAsync(int currentUserId, Link link)
         {
             link.CreatedAt = DateTime.Now;
-            // TODO Set CreatedBy Id
-            link.CreatedBy = 1;
+            link.CreatedBy = currentUserId;
 
             await _linkRepository.AddAsync(link);
             await _linkRepository.SaveAsync();

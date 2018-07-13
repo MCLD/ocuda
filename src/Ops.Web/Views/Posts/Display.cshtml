@@ -1,0 +1,26 @@
+﻿@model Ocuda.Ops.Models.Post
+
+<div class="oc-blog">
+    <div class="card">
+        @if (Model.IsPinned)
+        {
+            <div class="card-header oc-pinned d-flex">
+                <h1 class="card-title flex-grow-1">@Model.Title</h1>
+                <span class="fa fa-thumbtack align-self-center"></span>
+            </div>
+        }
+        else
+        {
+            <div class="card-header d-flex">
+                <h1 class="card-title flex-grow-1">@Model.Title</h1>
+            </div>
+        }
+        <div class="card-body">
+            @Html.Raw(Model.Content)
+        </div>
+        <div class="card-footer d-flex">
+            <div class="flex-grow-1">Posted by <a href="#">@Model.CreatedBy</a></div>
+            <div>@Model.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")</div>
+        </div>
+    </div>
+</div>

@@ -160,6 +160,18 @@ namespace Ocuda.Ops.Service
             await _siteSettingRepository.AddAsync(new SiteSetting
             {
                 //TODO create keys
+                Key = "Pagination.ItemsPerPage",
+                Name = "Items Per Page",
+                Description = "The number of items displayed on each page.",
+                Category = "Pagination",
+                Value = "10",
+                Type = "int",
+                CreatedBy = SystemAdministrator.Id,
+                CreatedAt = DateTime.Now
+            });
+            await _siteSettingRepository.AddAsync(new SiteSetting
+            {
+                //TODO create keys
                 Key = "EmailService.FromAddress",
                 Name = "From Address",
                 Description = "The email address displayed on outgoing emails.",
