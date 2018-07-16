@@ -10,6 +10,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops
     {
         Task<Category> GetByNameAsync(string name);
         Task<Category> GetByNameAndSectionIdAsync(string name, int sectionId);
+        Task<Category> GetDefaultAsync(BlogFilter filter);
         Task<ICollection<Category>> GetBySectionIdAsync(BlogFilter filter);
         Task<DataWithCount<ICollection<Category>>> GetPaginatedListAsync(BlogFilter filter);
     }

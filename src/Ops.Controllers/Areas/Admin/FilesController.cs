@@ -31,6 +31,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         private const string FileValidationFailedType = "File is not a valid type.";
         private const string FileValidationFailedSize = "File is too large to upload.";
 
+        public const string DefaultCategoryDisplayName = "[No Category]";
+
         public FilesController(ServiceFacade.Controller<FilesController> context,
             CategoryService categoryService,
             FileService fileService,
@@ -93,8 +95,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
             if (categoryId.HasValue)
             {
-                viewModel.CategoryName =
-                    (await _categoryService.GetCategoryByIdAsync(categoryId.Value)).Name;
+                var name = (await _categoryService.GetCategoryByIdAsync(categoryId.Value)).Name;
+                viewModel.CategoryName = 
+                    string.IsNullOrWhiteSpace(name) ? DefaultCategoryDisplayName : name;
             }
 
             return View(viewModel);

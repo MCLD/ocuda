@@ -34,7 +34,8 @@ $(document).on('change', ':file', function () {
 $(document).on('fileselect', ':file', function (evkent, filePath) {
     var file = $(this)[0].files[0],
         fileData = new FormData(),
-        fileDisplay = $(this).parents('.input-group').find(':text');
+        fileDisplay = $(this).parents('.input-group').find(':text')
+        fileNameField = $('#File_Name');
 
     fileData.append("fileName", file.name);
     fileData.append("fileSize", file.size);
@@ -49,6 +50,11 @@ $(document).on('fileselect', ':file', function (evkent, filePath) {
         success: function (result) {
             if (result == "Valid") {
                 fileDisplay.val(filePath);
+
+                if (fileNameField.val().length == 0) {
+                    fileNameField.val(file.name.split('.')[0]);
+                }
+                
                 $('.btn-file').removeClass('btn-outline-secondary');
                 $('.btn-file').addClass('btn-success');
                 return true;
@@ -56,6 +62,7 @@ $(document).on('fileselect', ':file', function (evkent, filePath) {
             else {
                 $(this).val('');
                 fileDisplay.val('');
+                fileNameField.val('');
                 $('.btn-file').addClass('btn-outline-secondary');
                 $('.btn-file').removeClass('btn-success');
                 alert(result);

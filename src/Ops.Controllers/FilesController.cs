@@ -20,6 +20,8 @@ namespace Ocuda.Ops.Controllers
         private readonly FileService _fileService;
         private readonly SectionService _sectionService;
 
+        public const string DefaultCategoryDisplayName = "[No Category]";
+
         public FilesController(ServiceFacade.Controller<FilesController> context,
             CategoryService categoryService,
             FileService fileService,
@@ -74,8 +76,9 @@ namespace Ocuda.Ops.Controllers
 
             if (categoryId.HasValue)
             {
+                var name = (await _categoryService.GetCategoryByIdAsync(categoryId.Value)).Name;
                 viewModel.CategoryName =
-                    (await _categoryService.GetCategoryByIdAsync(categoryId.Value)).Name;
+                    string.IsNullOrWhiteSpace(name) ? DefaultCategoryDisplayName : name;
             }
 
             return View(viewModel);
