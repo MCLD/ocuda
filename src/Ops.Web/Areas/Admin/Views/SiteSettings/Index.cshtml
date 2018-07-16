@@ -47,7 +47,11 @@ else
         @foreach (var setting in Model.SiteSettingsByCategory[category])
         {
             <div class="form-group row">
-                <label asp-for="@setting.Name" class="col-md-3 col-form-label text-md-right">@setting.Name</label>
+                <label asp-for="@setting.Name" class="col-md-3 col-form-label text-md-right">
+                    @setting.Name
+                    <span class="far fa-question-circle ml-1" title="@setting.Description"
+                          data-toggle="tooltip" data-placement="top"></span>
+                </label>
                 <div class="d-flex col-md-9">
                     <div class="input-group">
                         <div class="input-group-prepend">
@@ -84,6 +88,10 @@ else
 @section scripts
     {
     <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        }) 
+
         $("#editModal").on("show.bs.modal", function (e) {
             var button = $(e.relatedTarget);
             var id = button.data("id");
