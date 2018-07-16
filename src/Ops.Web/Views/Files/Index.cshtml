@@ -11,7 +11,13 @@
             <li><a class="dropdown-item" asp-route-categoryId="">Show All</a></li>
             @foreach (var category in Model.Categories)
             {
-                <li><a class="dropdown-item" asp-route-categoryId="@category.Id">@category.Name</a></li>
+            <li>
+                <a class="dropdown-item" asp-route-categoryId="@category.Id">
+                    @(string.IsNullOrWhiteSpace(category.Name)
+                                ? FilesController.DefaultCategoryDisplayName
+                                : category.Name)
+                </a>
+            </li>
             }
         </ul>
     </div>

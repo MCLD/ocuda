@@ -22,6 +22,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         private readonly LinkService _linkService;
         private readonly SectionService _sectionService;
 
+        public const string DefaultCategoryDisplayName = "[No Category]";
+
         public LinksController(ServiceFacade.Controller<LinksController> context,
             CategoryService categoryService,
             LinkService linkService,
@@ -73,8 +75,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
             if (categoryId.HasValue)
             {
-                viewModel.CategoryName =
-                    (await _categoryService.GetCategoryByIdAsync(categoryId.Value)).Name;
+                var name = (await _categoryService.GetCategoryByIdAsync(categoryId.Value)).Name;
+                viewModel.CategoryName = 
+                    string.IsNullOrWhiteSpace(name) ? DefaultCategoryDisplayName : name;
             }
 
             return View(viewModel);

@@ -2,24 +2,10 @@
 
 <form asp-action="@Model.Action" method="post" role="form" enctype="multipart/form-data">
     <input asp-for="@Model.SectionId" type="hidden" />
-    
+
     @if (Model.Action == nameof(FilesController.Edit))
     {
         <input asp-for="File.Id" type="hidden" />
-    }
-
-    <input asp-for="File.Name" formgroup />
-    <input asp-for="File.Description" formgroup />
-
-    @if (Model.Action == nameof(FilesController.Edit))
-    {
-        <div class="form-group row">
-            <label class="col-md-3 col-form-label text-md-right">Current File</label>
-            <div class="col-md-9">
-                <a class="btn btn-info form-vertical-alignment" target="_blank"
-                   asp-action="ViewPrivateFile" asp-route-id="@Model.File.Id">View File</a>
-            </div>
-        </div>
     }
 
     <div class="form-group row">
@@ -41,6 +27,20 @@
             </div>
         </div>
     </div>
+
+    <input asp-for="File.Name" formgroup />
+    <input asp-for="File.Description" formgroup />
+
+    @if (Model.Action == nameof(FilesController.Edit))
+    {
+        <div class="form-group row">
+            <label class="col-md-3 col-form-label text-md-right">Current File</label>
+            <div class="col-md-9">
+                <a class="btn btn-info form-vertical-alignment" target="_blank"
+                   asp-action="ViewPrivateFile" asp-route-id="@Model.File.Id">View File</a>
+            </div>
+        </div>
+    }
 
     @if (Model.Categories != null && Model.Categories.Count() > 0)
     {
