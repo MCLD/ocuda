@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops;
 
 namespace Ocuda.Ops.Service
@@ -66,11 +67,15 @@ namespace Ocuda.Ops.Service
         public async Task InsertDataAsync()
         {
             var sections = await InsertSectionsAsync();
+            var defaultSection = await _sectionRepository.GetDefaultSectionAsync();
+            sections.Add(defaultSection);
 
             await InsertFileTypesAsync();
 
             foreach (var section in sections)
             {
+                await InsertFileCategoriesAsync(section);
+                await InsertLinkCategoriesAsync(section);
                 await InsertPostsAsync(section.Id);
                 await InsertLinksAsync(section.Id);
                 await InsertPagesAsync(section.Id);
@@ -332,26 +337,28 @@ namespace Ocuda.Ops.Service
         }
 
 
-        public async Task<ICollection<Category>> InsertLinkCategoriesAsync(int sectionId)
+        public async Task<ICollection<Category>> InsertLinkCategoriesAsync(Section section)
         {
             var categories = new List<Category>
             {
                 new Category
                 {
-                    Name = "Link Category 1",
+                    Name = string.Empty,
                     CategoryType = CategoryType.Link,
                     CreatedAt = DateTime.Parse("2018-05-20"),
                     CreatedBy = SystemAdministrator.Id,
-                    SectionId = sectionId
+                    SectionId = section.Id,
+                    IsDefault = true
                 },
 
                 new Category
                 {
-                    Name = "Link Category 2",
+                    Name = $"{section.Name} Link Category 2",
                     CategoryType = CategoryType.Link,
                     CreatedAt = DateTime.Parse("2018-06-04"),
                     CreatedBy = SystemAdministrator.Id,
-                    SectionId = sectionId
+                    SectionId = section.Id,
+                    IsDefault = false
                 }
             };
 
@@ -365,10 +372,15 @@ namespace Ocuda.Ops.Service
             return categories;
         }
 
-
         public async Task InsertLinksAsync(int sectionId)
         {
-            var categories = await InsertLinkCategoriesAsync(sectionId);
+            var filter = new BlogFilter
+            {
+                CategoryType = CategoryType.Link,
+                SectionId = sectionId
+            };
+
+            var defaultCategory = await _categoryRepository.GetDefaultAsync(filter);
 
             await _linkRepository.AddAsync(new Link
             {
@@ -376,7 +388,7 @@ namespace Ocuda.Ops.Service
                 Name = "Summer Reading",
                 CreatedBy = SystemAdministrator.Id,
                 CreatedAt = DateTime.Now,
-                Category = categories.FirstOrDefault(),
+                Category = defaultCategory,
                 SectionId = sectionId
             });
             await _linkRepository.AddAsync(new Link
@@ -385,7 +397,7 @@ namespace Ocuda.Ops.Service
                 Name = "Reading Adventure",
                 CreatedBy = SystemAdministrator.Id,
                 CreatedAt = DateTime.Now,
-                Category = categories.FirstOrDefault(),
+                Category = defaultCategory,
                 SectionId = sectionId
             });
             await _linkRepository.AddAsync(new Link
@@ -394,33 +406,35 @@ namespace Ocuda.Ops.Service
                 Name = "Find Libraries",
                 CreatedBy = SystemAdministrator.Id,
                 CreatedAt = DateTime.Now,
-                Category = categories.LastOrDefault(),
+                Category = defaultCategory,
                 SectionId = sectionId
             });
 
             await _linkRepository.SaveAsync();
         }
 
-        public async Task<ICollection<Category>> InsertFileCategoriesAsync(int sectionId)
+        public async Task<ICollection<Category>> InsertFileCategoriesAsync(Section section)
         {
             var categories = new List<Category>
             {
                 new Category
                 {
-                    Name = "File Category 1",
+                    Name = string.Empty,
                     CategoryType = CategoryType.File,
                     CreatedAt = DateTime.Parse("2018-05-20"),
                     CreatedBy = SystemAdministrator.Id,
-                    SectionId = sectionId
+                    SectionId = section.Id,
+                    IsDefault = true
                 },
 
                 new Category
                 {
-                    Name = "File Category 2",
+                    Name = $"{section.Name} File Category 2",
                     CategoryType = CategoryType.File,
                     CreatedAt = DateTime.Parse("2018-06-04"),
                     CreatedBy = SystemAdministrator.Id,
-                    SectionId = sectionId
+                    SectionId = section.Id,
+                    IsDefault = false
                 }
             };
 
