@@ -98,5 +98,32 @@ namespace Ocuda.Ops.Service
             _categoryRepository.Remove(id);
             await _categoryRepository.SaveAsync();
         }
+
+        public async Task CreateDefaultCategories(int currentUserId, int sectionId)
+        {
+            var defaultFileCategory = new Category
+            {
+                CreatedBy = currentUserId,
+                CreatedAt = DateTime.Now,
+                CategoryType = CategoryType.File,
+                IsDefault = true,
+                Name = string.Empty,
+                SectionId = sectionId
+            };
+
+            var defaultLinkCategory = new Category
+            {
+                CreatedBy = currentUserId,
+                CreatedAt = DateTime.Now,
+                CategoryType = CategoryType.Link,
+                IsDefault = true,
+                Name = string.Empty,
+                SectionId = sectionId
+            };
+
+            await _categoryRepository.AddAsync(defaultFileCategory);
+            await _categoryRepository.AddAsync(defaultLinkCategory);
+            await _categoryRepository.SaveAsync();
+        }
     }
 }

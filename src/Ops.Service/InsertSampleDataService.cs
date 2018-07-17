@@ -19,6 +19,7 @@ namespace Ocuda.Ops.Service
         private readonly ISectionRepository _sectionRepository;
         private readonly IUserRepository _userRepository;
         private readonly ISiteSettingRepository _siteSettingRepository;
+        private readonly CategoryService _categoryService;
         public InsertSampleDataService(ICategoryRepository categoryRepository,
             IFileRepository fileRepository,
             IFileTypeRepository fileTypeRepository,
@@ -27,7 +28,8 @@ namespace Ocuda.Ops.Service
             IPostRepository postRepository,
             ISectionRepository sectionRepository,
             IUserRepository userRepository,
-            ISiteSettingRepository siteSettingRepository)
+            ISiteSettingRepository siteSettingRepository,
+            CategoryService categoryService)
         {
             _categoryRepository = categoryRepository
                 ?? throw new ArgumentNullException(nameof(categoryRepository));
@@ -49,6 +51,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(pageRepository));
             _siteSettingRepository = siteSettingRepository
                 ?? throw new ArgumentNullException(nameof(siteSettingRepository));
+            _categoryService = categoryService
+                ?? throw new ArgumentNullException(nameof(categoryService));
         }
 
         private User _systemAdministrator;
@@ -141,9 +145,9 @@ namespace Ocuda.Ops.Service
             foreach (var section in sections)
             {
                 await _sectionRepository.AddAsync(section);
+                await _categoryService.CreateDefaultCategories(SystemAdministrator.Id, section.Id);
+                await _sectionRepository.SaveAsync();
             }
-
-            await _sectionRepository.SaveAsync();
 
             return sections;
         }
@@ -343,19 +347,19 @@ namespace Ocuda.Ops.Service
             {
                 new Category
                 {
-                    Name = string.Empty,
+                    Name = $"{section.Name} Link Category 1",
                     CategoryType = CategoryType.Link,
-                    CreatedAt = DateTime.Parse("2018-05-20"),
+                    CreatedAt = DateTime.Parse("2018-06-04"),
                     CreatedBy = SystemAdministrator.Id,
                     SectionId = section.Id,
-                    IsDefault = true
+                    IsDefault = false
                 },
 
                 new Category
                 {
                     Name = $"{section.Name} Link Category 2",
                     CategoryType = CategoryType.Link,
-                    CreatedAt = DateTime.Parse("2018-06-04"),
+                    CreatedAt = DateTime.Parse("2018-06-05"),
                     CreatedBy = SystemAdministrator.Id,
                     SectionId = section.Id,
                     IsDefault = false
@@ -388,7 +392,7 @@ namespace Ocuda.Ops.Service
                 Name = "Summer Reading",
                 CreatedBy = SystemAdministrator.Id,
                 CreatedAt = DateTime.Now,
-                Category = defaultCategory,
+                CategoryId = defaultCategory.Id,
                 SectionId = sectionId
             });
             await _linkRepository.AddAsync(new Link
@@ -397,7 +401,7 @@ namespace Ocuda.Ops.Service
                 Name = "Reading Adventure",
                 CreatedBy = SystemAdministrator.Id,
                 CreatedAt = DateTime.Now,
-                Category = defaultCategory,
+                CategoryId = defaultCategory.Id,
                 SectionId = sectionId
             });
             await _linkRepository.AddAsync(new Link
@@ -406,7 +410,7 @@ namespace Ocuda.Ops.Service
                 Name = "Find Libraries",
                 CreatedBy = SystemAdministrator.Id,
                 CreatedAt = DateTime.Now,
-                Category = defaultCategory,
+                CategoryId = defaultCategory.Id,
                 SectionId = sectionId
             });
 
@@ -419,19 +423,19 @@ namespace Ocuda.Ops.Service
             {
                 new Category
                 {
-                    Name = string.Empty,
+                    Name = $"{section.Name} File Category 1",
                     CategoryType = CategoryType.File,
-                    CreatedAt = DateTime.Parse("2018-05-20"),
+                    CreatedAt = DateTime.Parse("2018-06-04"),
                     CreatedBy = SystemAdministrator.Id,
                     SectionId = section.Id,
-                    IsDefault = true
+                    IsDefault = false
                 },
 
                 new Category
                 {
                     Name = $"{section.Name} File Category 2",
                     CategoryType = CategoryType.File,
-                    CreatedAt = DateTime.Parse("2018-06-04"),
+                    CreatedAt = DateTime.Parse("2018-06-05"),
                     CreatedBy = SystemAdministrator.Id,
                     SectionId = section.Id,
                     IsDefault = false

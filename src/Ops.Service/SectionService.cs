@@ -11,10 +11,15 @@ namespace Ocuda.Ops.Service
     public class SectionService
     {
         private readonly ISectionRepository _sectionRepository;
-        public SectionService(ISectionRepository sectionRepository)
+        private readonly CategoryService _categoryService;
+
+        public SectionService(ISectionRepository sectionRepository,
+            CategoryService categoryService)
         {
             _sectionRepository = sectionRepository
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
+            _categoryService = categoryService
+                ?? throw new ArgumentNullException(nameof(categoryService));
         }
 
         /// <summary>
@@ -25,14 +30,15 @@ namespace Ocuda.Ops.Service
             var defaultSection = await _sectionRepository.GetDefaultSectionAsync();
             if (defaultSection == null)
             {
-                await _sectionRepository.AddAsync(new Ocuda.Ops.Models.Section
+                defaultSection = new Section
                 {
                     Name = "Default Section",
                     CreatedAt = DateTime.Now,
                     CreatedBy = sysadminId,
                     SortOrder = 0
-                });
-                await _sectionRepository.SaveAsync();
+                };
+
+                await CreateAsync(sysadminId, defaultSection);
             }
         }
 
@@ -80,6 +86,8 @@ namespace Ocuda.Ops.Service
 
             await _sectionRepository.AddAsync(section);
             await _sectionRepository.SaveAsync();
+            await _categoryService.CreateDefaultCategories(currentUserId, section.Id);
+            
             return section;
         }
 

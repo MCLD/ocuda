@@ -44,7 +44,10 @@ namespace Ocuda.test.Ops.Service.Test
             var sectionRepository = new Mock<ISectionRepository>();
             sectionRepository.Setup(_ => _.FindAsync(5)).Returns(Task.FromResult(currentSection));
 
-            var service = new SectionService(sectionRepository.Object);
+            var categoryRepository = new Mock<ICategoryRepository>();
+            var categoryService = new CategoryService(categoryRepository.Object);
+
+            var service = new SectionService(sectionRepository.Object, categoryService);
 
             editedSection = await service.EditAsync(editedSection);
 
