@@ -14,7 +14,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Area("Admin")]
     public class RosterController : BaseController<RosterController>
     {
-        private IRosterService _rosterService;
+        private readonly IRosterService _rosterService;
 
         public RosterController(ServiceFacade.Controller<RosterController> context,
             IRosterService rosterService) : base(context)
