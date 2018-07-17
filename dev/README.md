@@ -82,6 +82,11 @@ _Eventually this should be moved to the user documentation._
 - `Ops.FileShared` - defaults to "shared" - a file location shared among any instances of the site which are running for handling site assets
 - `Ops.HttpErrorFileTag` - if *Ops.RollingLogLocation* is set, this will write out http error logs in the same location but with the value of this setting in the filename
 - `Ops.Instance` - configure an instance name for more specific logging
+- `Ops.LDAPDN` - Distinguished name of an LDAP user for performing lookups, similar to "CN=Users Real Name,OU=Organizational Unit,DC=domain,DC=tld"
+- `Ops.LDAPPassword` - Password for the LDAPDN user
+- `Ops.LDAPPort` - Port to connect to for LDAP, defaults to 389
+- `Ops.LDAPSearchBase` - Search base for querying usernames, similar to "OU=Users,OU=Organizational Unit,DC=domain,DC=tld"
+- `Ops.LDAPServer` - LDAP server to query for information based on the user's username
 - `Ops.RollingLogLocation` - path of where to write log files which rotate daily, if unset no rolling log is written
 - `Ops.SessionTimeoutMinutes` - defaults to 2 hours - amount of time in minutes for sessions to last
 - `Ops.SiteManagerGroup` - if specified, this authentication group (currently ADGroup) will be granted site manager access

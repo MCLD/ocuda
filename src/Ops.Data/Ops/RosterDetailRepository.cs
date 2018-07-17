@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
@@ -16,6 +18,14 @@ namespace Ocuda.Ops.Data.Ops
 
         public async Task AddRangeAsync(IEnumerable<RosterDetail> rosterDetails) {
             await DbSet.AddRangeAsync(rosterDetails);
+        }
+
+        public async Task<RosterDetail> GetAsync(int rosterId, string email)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.RosterHeaderId == rosterId && _.EmailAddress == email)
+                .FirstOrDefaultAsync();
         }
     }
 }

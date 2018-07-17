@@ -14,6 +14,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<User> GetByIdAsync(int id);
         Task<User> GetByUsernameAsync(string username);
         Task<User> EditNicknameAsync(User user);
-        Task LoggedInAsync(string username);
+        Task LoggedInUpdateAsync(User user);
     }
 }

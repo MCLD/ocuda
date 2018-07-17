@@ -14,6 +14,8 @@ namespace Ocuda.Ops.Models
         public string Username { get; set; }
         public bool IsSysadmin { get; set; }
         public DateTime? LastRosterUpdate { get; set; }
+        public DateTime? LastLdapUpdate { get; set; }
+
         public bool ReauthenticateUser { get; set; }
 
         [MaxLength(255)]
