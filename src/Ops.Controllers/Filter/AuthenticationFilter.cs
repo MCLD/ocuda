@@ -9,10 +9,11 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Controllers.Helper;
 using Ocuda.Ops.Service;
+using Ocuda.Utility.Helper;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
-using Ocuda.Utility.Web;
 
 namespace Ocuda.Ops.Controllers.Filter
 {
@@ -21,22 +22,32 @@ namespace Ocuda.Ops.Controllers.Filter
         private readonly ILogger<AuthenticationFilter> _logger;
         private readonly IConfiguration _config;
         private readonly IDistributedCache _cache;
+        private readonly LdapHelper _ldapHelper;
+        private readonly WebHelper _webHelper;
         private readonly IAuthorizationService _authorizationService;
+        private readonly IRosterService _rosterService;
         private readonly ISectionService _sectionService;
         private readonly IUserService _userService;
 
         public AuthenticationFilter(ILogger<AuthenticationFilter> logger,
             IConfiguration configuration,
             IDistributedCache cache,
+            LdapHelper ldapHelper,
+            WebHelper webHelper,
             IAuthorizationService authorizationService,
+            IRosterService rosterService,
             ISectionService sectionService,
             IUserService userService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _ldapHelper = ldapHelper ?? throw new ArgumentNullException(nameof(ldapHelper));
+            _webHelper = webHelper ?? throw new ArgumentNullException(nameof(webHelper));
             _authorizationService = authorizationService
                 ?? throw new ArgumentNullException(nameof(authorizationService));
+            _rosterService = rosterService 
+                ?? throw new ArgumentNullException(nameof(rosterService));
             _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(SectionService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
@@ -119,7 +130,7 @@ namespace Ocuda.Ops.Controllers.Filter
                     {
                         // if there is no username: set a return url and redirect to authentication
                         await _cache.SetStringAsync(string.Format(Cache.OpsReturn, id),
-                            new Helper().GetCurrentUrl(httpContext),
+                            _webHelper.GetCurrentUrl(httpContext),
                             cacheExpiration);
 
                         string cacheDiscriminator
@@ -143,19 +154,40 @@ namespace Ocuda.Ops.Controllers.Filter
                             username = username.Substring(domainName.Length + 1);
                         }
 
-                        // look up the user in the user database - if they aren't present, add
                         var user = await _userService.LookupUser(username);
-                        if (user == null)
+                        var newUser = user == null;
+                        if (newUser)
                         {
-                            user = await _userService.AddUser(new Models.User
+                            user = new Models.User
                             {
                                 Username = username,
                                 LastSeen = now
-                            });
+                            };
+                        }
+
+                        // perform ldap update of user object
+                        user = _ldapHelper.Lookup(user);
+
+                        // look up user in roster
+                        if(!string.IsNullOrEmpty(user.Email))
+                        {
+                            var details = await _rosterService.GetLatestDetailsAsync(user.Email);
+                            if(details != null)
+                            {
+                                user.Title = details.JobTitle;
+                                //user.SupervisorId = details.ReportsToId;
+                                user.LastRosterUpdate = now;
+                            }
+                        }
+
+                        // if the user is new, add them to the database
+                        if (newUser)
+                        {
+                            user = await _userService.AddUser(user);
                         }
                         else
                         {
-                            await _userService.LoggedInAsync(username);
+                            await _userService.LoggedInUpdateAsync(user);
                         }
 
                         string userId = user.Id.ToString();
@@ -283,7 +315,7 @@ namespace Ocuda.Ops.Controllers.Filter
                         httpContext.Response.Cookies.Delete(Cookie.OpsAuthId);
 
                         // TODO set a reasonable initial nickname
-                        httpContext.Items[ItemKey.Nickname] = username;
+                        httpContext.Items[ItemKey.Nickname] = user.Nickname ?? username;
                     }
                 }
             }

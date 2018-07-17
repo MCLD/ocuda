@@ -12,6 +12,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<(RosterHeader RosterDetail,
               IEnumerable<RosterDetail> NewEmployees,
               IEnumerable<RosterDetail> RemovedEmployees)> GetRosterChangesAsync();
+        Task<RosterDetail> GetLatestDetailsAsync(string email);
         Task<bool> ApproveRosterChanges(int rosterEntryId);
     }
 }

@@ -160,6 +160,10 @@ namespace Ocuda.Ops.Web
             // section path validator
             services.AddScoped<ISectionPathValidator, SectionPathValidator>();
 
+            // helpers
+            services.AddScoped<Controllers.Helper.LdapHelper>();
+            services.AddScoped<Utility.Helper.WebHelper>();
+
             // repositories
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
                 Data.Ops.CategoryRepository>();

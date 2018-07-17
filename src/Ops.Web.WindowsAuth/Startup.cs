@@ -10,7 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Ocuda.Utility.Keys;
-using Ocuda.Utility.Web;
 
 namespace Ops.Web.WindowsAuth
 {

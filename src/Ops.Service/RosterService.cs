@@ -150,6 +150,20 @@ namespace Ocuda.Ops.Service
             return rosterDetails.Count();
         }
 
+        public async Task<RosterDetail> GetLatestDetailsAsync(string email)
+        {
+            // todo we probably need some sort of approval on who is the latest roster
+            var currentRosterId = await _rosterHeaderRepository.GetLatestIdAsync();
+            if (currentRosterId != null)
+            {
+                return await _rosterDetailRepository.GetAsync((int)currentRosterId, email);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public async Task<(RosterHeader RosterDetail,
                            IEnumerable<RosterDetail> NewEmployees,
                            IEnumerable<RosterDetail> RemovedEmployees)> GetRosterChangesAsync()

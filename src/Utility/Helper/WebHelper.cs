@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 
-namespace Ocuda.Utility.Web
+namespace Ocuda.Utility.Helper
 {
-    public class Helper
+    public class WebHelper
     {
         public string GetCurrentUrl(HttpContext context)
         {

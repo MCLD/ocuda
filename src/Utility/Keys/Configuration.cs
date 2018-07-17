@@ -16,6 +16,11 @@
         public static readonly string OpsFileShared = "Ops.FileShared";
         public static readonly string OpsHttpErrorFileTag = "Ops.HttpErrorFileTag";
         public static readonly string OpsInstance = "Ops.Instance";
+        public static readonly string OpsLdapDn = "Ops.LDAPDN";
+        public static readonly string OpsLdapPassword = "Ops.LDAPPassword";
+        public static readonly string OpsLdapPort = "Ops.LDAPPort";
+        public static readonly string OpsLdapSearchBase = "Ops.LDAPSearchBase";
+        public static readonly string OpsLdapServer = "Ops.LDAPServer";
         public static readonly string OpsSiteManagerGroup = "Ops.SiteManagerGroup";
         public static readonly string OpsSiteSettingCacheMinutes = "Ops.SiteSettingCacheMinutes";
         public static readonly string OpsRollingLogLocation = "Ops.RollingLogLocation";
