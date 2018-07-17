@@ -3,15 +3,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Controllers.Filter
 {
     public class SectionFilter : Attribute, IAsyncResourceFilter
     {
         private readonly ILogger<SectionFilter> _logger;
-        private readonly SectionService _sectionService;
+        private readonly ISectionService _sectionService;
 
-        public SectionFilter(ILogger<SectionFilter> logger, SectionService sectionService)
+        public SectionFilter(ILogger<SectionFilter> logger, ISectionService sectionService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _sectionService = sectionService

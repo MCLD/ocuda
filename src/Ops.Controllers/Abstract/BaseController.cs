@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Filter;
 using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Controllers.Abstract
 {
@@ -12,7 +13,7 @@ namespace Ocuda.Ops.Controllers.Abstract
     public abstract class BaseController<T> : Controller
     {
         protected readonly ILogger _logger;
-        protected readonly SiteSettingService _siteSettingService;
+        protected readonly ISiteSettingService _siteSettingService;
         protected BaseController(ServiceFacade.Controller<T> context)
         {
             _logger = context.Logger;

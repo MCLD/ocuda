@@ -10,22 +10,23 @@ using Ocuda.Ops.Controllers.ViewModels.Files;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers
 {
     public class FilesController : BaseController<FilesController>
     {
-        private readonly CategoryService _categoryService;
-        private readonly FileService _fileService;
-        private readonly SectionService _sectionService;
+        private readonly ICategoryService _categoryService;
+        private readonly IFileService _fileService;
+        private readonly ISectionService _sectionService;
 
         public const string DefaultCategoryDisplayName = "[No Category]";
 
         public FilesController(ServiceFacade.Controller<FilesController> context,
-            CategoryService categoryService,
-            FileService fileService,
-            SectionService sectionService
+            ICategoryService categoryService,
+            IFileService fileService,
+            ISectionService sectionService
             ) : base(context)
         {
             _categoryService = categoryService

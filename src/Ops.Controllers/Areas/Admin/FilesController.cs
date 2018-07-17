@@ -12,6 +12,7 @@ using Ocuda.Utility.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
 {
@@ -19,13 +20,13 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Authorize(Policy = nameof(SectionManagerRequirement))]
     public class FilesController : BaseController<FilesController>
     {
-        private readonly CategoryService _categoryService;
-        private readonly FileService _fileService;
-        private readonly FileTypeService _fileTypeService;
-        private readonly PageService _pageService;
-        private readonly PathResolverService _pathResolver;
-        private readonly PostService _postService;
-        private readonly SectionService _sectionService;
+        private readonly ICategoryService _categoryService;
+        private readonly IFileService _fileService;
+        private readonly IFileTypeService _fileTypeService;
+        private readonly IPageService _pageService;
+        private readonly IPathResolverService _pathResolver;
+        private readonly IPostService _postService;
+        private readonly ISectionService _sectionService;
 
         private const string FileValidationPassed = "Valid";
         private const string FileValidationFailedType = "File is not a valid type.";
@@ -34,13 +35,13 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         public const string DefaultCategoryDisplayName = "[No Category]";
 
         public FilesController(ServiceFacade.Controller<FilesController> context,
-            CategoryService categoryService,
-            FileService fileService,
-            FileTypeService fileTypeService,
-            PageService pageService,
-            PathResolverService pathResolver,
-            PostService postService,
-            SectionService sectionService) : base(context)
+            ICategoryService categoryService,
+            IFileService fileService,
+            IFileTypeService fileTypeService,
+            IPageService pageService,
+            IPathResolverService pathResolver,
+            IPostService postService,
+            ISectionService sectionService) : base(context)
         {
             _categoryService = categoryService
                 ?? throw new ArgumentNullException(nameof(categoryService));

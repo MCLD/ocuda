@@ -8,6 +8,7 @@ using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Sections;
 using Ocuda.Ops.Controllers.Key;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
@@ -16,10 +17,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
     public class SectionsController : BaseController<SectionsController>
     {
-        private readonly SectionService _sectionService;
+        private readonly ISectionService _sectionService;
 
         public SectionsController(ServiceFacade.Controller<SectionsController> context,
-            SectionService sectionService) : base(context)
+            ISectionService sectionService) : base(context)
         {
             _sectionService = sectionService 
                 ?? throw new ArgumentNullException(nameof(sectionService));

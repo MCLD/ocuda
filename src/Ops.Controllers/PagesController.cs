@@ -6,18 +6,19 @@ using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Pages;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers
 {
     public class PagesController : BaseController<PagesController>
     {
-        private readonly PageService _pageService;
-        private readonly SectionService _sectionService;
+        private readonly IPageService _pageService;
+        private readonly ISectionService _sectionService;
 
         public PagesController(ServiceFacade.Controller<PagesController> context,
-            PageService pageService, 
-            SectionService sectionService) : base(context)
+            IPageService pageService, 
+            ISectionService sectionService) : base(context)
         {
             _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
             _sectionService = sectionService 

@@ -10,6 +10,7 @@ using Ocuda.Ops.Controllers.Authorization;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
@@ -18,16 +19,16 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Authorize(Policy = nameof(SectionManagerRequirement))]
     public class LinksController : BaseController<LinksController>
     {
-        private readonly CategoryService _categoryService;
-        private readonly LinkService _linkService;
-        private readonly SectionService _sectionService;
+        private readonly ICategoryService _categoryService;
+        private readonly ILinkService _linkService;
+        private readonly ISectionService _sectionService;
 
         public const string DefaultCategoryDisplayName = "[No Category]";
 
         public LinksController(ServiceFacade.Controller<LinksController> context,
-            CategoryService categoryService,
-            LinkService linkService,
-            SectionService sectionService) : base(context)
+            ICategoryService categoryService,
+            ILinkService linkService,
+            ISectionService sectionService) : base(context)
         {
             _linkService = linkService ?? throw new ArgumentNullException(nameof(linkService));
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));

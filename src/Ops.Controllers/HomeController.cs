@@ -7,22 +7,23 @@ using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Home;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers
 {
     public class HomeController : BaseController<HomeController>
     {
-        private readonly FileService _fileService;
-        private readonly LinkService _linkService;
-        private readonly PostService _postService;
-        private readonly SectionService _sectionService;
+        private readonly IFileService _fileService;
+        private readonly ILinkService _linkService;
+        private readonly IPostService _postService;
+        private readonly ISectionService _sectionService;
 
         public HomeController(ServiceFacade.Controller<HomeController> context,
-            FileService fileService,
-            LinkService linkService,
-            PostService postService,
-            SectionService sectionService) : base(context)
+            IFileService fileService,
+            ILinkService linkService,
+            IPostService postService,
+            ISectionService sectionService) : base(context)
         {
             _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
@@ -69,7 +70,7 @@ namespace Ocuda.Ops.Controllers
                 Files = fileList.Data,
                 Links = linkList.Data,
                 Posts = postList.Data,
-                Calendars = _sectionService.GetCalendars(), //TODO update calendars
+                //Calendars = _sectionService.GetCalendars(), //TODO update calendars
                 PaginateModel = paginateModel
             };
 

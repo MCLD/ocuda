@@ -9,6 +9,7 @@ using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Posts;
 using Ocuda.Ops.Controllers.Authorization;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
@@ -17,12 +18,12 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Authorize(Policy = nameof(SectionManagerRequirement))]
     public class PostsController : BaseController<PostsController>
     {
-        private readonly PostService _postService;
-        private readonly SectionService _sectionService;
+        private readonly IPostService _postService;
+        private readonly ISectionService _sectionService;
 
         public PostsController(ServiceFacade.Controller<PostsController> context,
-            PostService postService,
-            SectionService sectionService) : base(context)
+            IPostService postService,
+            ISectionService sectionService) : base(context)
         {
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
             _sectionService = sectionService

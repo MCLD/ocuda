@@ -14,6 +14,7 @@ using Ocuda.Ops.Controllers.RouteConstraint;
 using Ocuda.Ops.Controllers.Validator;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Web.StartupHelper;
 using StackExchange.Redis;
 
@@ -160,43 +161,48 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ISectionPathValidator, SectionPathValidator>();
 
             // repositories
-            services.AddScoped<Service.Interfaces.Ops.ICategoryRepository,
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
                 Data.Ops.CategoryRepository>();
-            services.AddScoped<Service.Interfaces.Ops.IClaimGroupRepository,
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,
                 Data.Ops.ClaimGroupRepository>();
-            services.AddScoped<Service.Interfaces.Ops.IFileRepository, Data.Ops.FileRepository>();
-            services.AddScoped<Service.Interfaces.Ops.IFileTypeRepository,
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IFileRepository, 
+                Data.Ops.FileRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IFileTypeRepository,
                 Data.Ops.FileTypeRepository>();
-            services.AddScoped<Service.Interfaces.Ops.ILinkRepository, Data.Ops.LinkRepository>();
-            services.AddScoped<Service.Interfaces.Ops.IPageRepository, Data.Ops.PageRepository>();
-            services.AddScoped<Service.Interfaces.Ops.IPostRepository, Data.Ops.PostRepository>();
-            services.AddScoped<Service.Interfaces.Ops.IRosterDetailRepository,
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository, 
+                Data.Ops.LinkRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPageRepository, 
+                Data.Ops.PageRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPostRepository, 
+                Data.Ops.PostRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterDetailRepository,
                 Data.Ops.RosterDetailRepository>();
-            services.AddScoped<Service.Interfaces.Ops.IRosterHeaderRepository,
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterHeaderRepository,
                 Data.Ops.RosterHeaderRepository>();
-            services.AddScoped<Service.Interfaces.Ops.ISectionManagerGroupRepository,
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ISectionManagerGroupRepository,
                 Data.Ops.SectionManagerGroupRepository>();
-            services.AddScoped<Service.Interfaces.Ops.ISectionRepository,
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ISectionRepository,
                 Data.Ops.SectionRepository>();
-            services.AddScoped<Service.Interfaces.Ops.ISiteSettingRepository,
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ISiteSettingRepository,
                 Data.Ops.SiteSettingRepository>();
-            services.AddScoped<Service.Interfaces.Ops.IUserRepository, Data.Ops.UserRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IUserRepository,
+                Data.Ops.UserRepository>();
 
             // services
-            services.AddScoped<AuthorizationService>();
-            services.AddScoped<CategoryService>();
-            services.AddScoped<FileService>();
-            services.AddScoped<FileTypeService>();
-            services.AddScoped<InitialSetupService>();
-            services.AddScoped<InsertSampleDataService>();
-            services.AddScoped<LinkService>();
-            services.AddScoped<PathResolverService>();
-            services.AddScoped<PageService>();
-            services.AddScoped<PostService>();
-            services.AddScoped<RosterService>();
-            services.AddScoped<SectionService>();
-            services.AddScoped<SiteSettingService>();
-            services.AddScoped<UserService>();
+            services.AddScoped<Service.Interfaces.Ops.Services.IAuthorizationService, AuthorizationService>();
+            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IFileService, FileService>();
+            services.AddScoped<IFileTypeService, FileTypeService>();
+            services.AddScoped<IInitialSetupService, InitialSetupService>();
+            services.AddScoped<IInsertSampleDataService, InsertSampleDataService>();
+            services.AddScoped<ILinkService, LinkService>();
+            services.AddScoped<IPathResolverService, PathResolverService>();
+            services.AddScoped<IPageService, PageService>();
+            services.AddScoped<IPostService, PostService>();
+            services.AddScoped<IRosterService, RosterService>();
+            services.AddScoped<ISectionService, SectionService>();
+            services.AddScoped<ISiteSettingService, SiteSettingService>();
+            services.AddScoped<IUserService, UserService>();
 
             var serviceProvider = services.BuildServiceProvider();
             return serviceProvider;
@@ -204,7 +210,7 @@ namespace Ocuda.Ops.Web
 
         public void Configure(IApplicationBuilder app,
             IHostingEnvironment env,
-            PathResolverService pathResolver)
+            IPathResolverService pathResolver)
         {
             // configure error page handling and development IDE linking
             if (env.IsDevelopment())

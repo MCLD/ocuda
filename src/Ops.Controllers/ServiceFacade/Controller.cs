@@ -1,13 +1,14 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Controllers.ServiceFacade
 {
     public class Controller<T>
     {
         private readonly ILogger _logger;
-        private readonly SiteSettingService _siteSettingService;
+        private readonly ISiteSettingService _siteSettingService;
 
         public ILogger Logger
         {
@@ -17,7 +18,7 @@ namespace Ocuda.Ops.Controllers.ServiceFacade
             }
         }
 
-        public SiteSettingService SiteSettingService
+        public ISiteSettingService SiteSettingService
         {
             get
             {
@@ -25,7 +26,7 @@ namespace Ocuda.Ops.Controllers.ServiceFacade
             }
         }
 
-        public Controller(SiteSettingService siteSettingService, ILogger<T> logger)
+        public Controller(ISiteSettingService siteSettingService, ILogger<T> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _siteSettingService = siteSettingService

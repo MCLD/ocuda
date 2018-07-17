@@ -7,16 +7,17 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Roster;
 using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
 {
     [Area("Admin")]
     public class RosterController : BaseController<RosterController>
     {
-        private RosterService _rosterService;
+        private IRosterService _rosterService;
 
         public RosterController(ServiceFacade.Controller<RosterController> context,
-            RosterService rosterService) : base(context)
+            IRosterService rosterService) : base(context)
         {
             _rosterService = rosterService
                 ?? throw new ArgumentNullException(nameof(rosterService));
