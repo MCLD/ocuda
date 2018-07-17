@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
-using Ocuda.Ops.Service.Interfaces.Ops;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Service
 {
-    public class UserService
+    public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
         public UserService(IUserRepository userRepository)

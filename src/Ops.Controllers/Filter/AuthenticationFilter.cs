@@ -10,6 +10,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Web;
 
@@ -20,16 +21,16 @@ namespace Ocuda.Ops.Controllers.Filter
         private readonly ILogger<AuthenticationFilter> _logger;
         private readonly IConfiguration _config;
         private readonly IDistributedCache _cache;
-        private readonly AuthorizationService _authorizationService;
-        private readonly SectionService _sectionService;
-        private readonly UserService _userService;
+        private readonly IAuthorizationService _authorizationService;
+        private readonly ISectionService _sectionService;
+        private readonly IUserService _userService;
 
         public AuthenticationFilter(ILogger<AuthenticationFilter> logger,
             IConfiguration configuration,
             IDistributedCache cache,
-            AuthorizationService authorizationService,
-            SectionService sectionService,
-            UserService userService)
+            IAuthorizationService authorizationService,
+            ISectionService sectionService,
+            IUserService userService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));

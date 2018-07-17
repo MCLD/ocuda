@@ -3,10 +3,11 @@ using System.IO;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Service
 {
-    public class PathResolverService
+    public class PathResolverService : IPathResolverService
     {
         private const string DefaultPublicDirectory = "public";
         private const string DefaultPrivateDirectory = "private";

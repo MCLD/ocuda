@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace Ocuda.Ops.Service.Interfaces.Ops
+namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
     public interface IRepository<TEntity, TKeyType>
         where TEntity : class

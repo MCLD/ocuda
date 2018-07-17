@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
-using Ocuda.Ops.Service.Interfaces.Ops;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Service
 {
-    public class AuthorizationService
+    public class AuthorizationService : IAuthorizationService
     {
         private readonly ISectionManagerGroupRepository _sectionManagerGroupRepository;
         private readonly IClaimGroupRepository _claimGroupRepository;

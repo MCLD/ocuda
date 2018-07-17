@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
-using Ocuda.Ops.Service.Interfaces.Ops;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Service
 {
-    public class SectionService
+    public class SectionService : ISectionService
     {
         private readonly ISectionRepository _sectionRepository;
-        private readonly CategoryService _categoryService;
+        private readonly ICategoryService _categoryService;
 
         public SectionService(ISectionRepository sectionRepository,
-            CategoryService categoryService)
+            ICategoryService categoryService)
         {
             _sectionRepository = sectionRepository
                 ?? throw new ArgumentNullException(nameof(sectionRepository));

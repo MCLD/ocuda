@@ -2,22 +2,23 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Service
 {
-    public class InitialSetupService
+    public class InitialSetupService : IInitialSetupService
     {
         private readonly ILogger _logger;
         private readonly IConfiguration _config;
-        private readonly AuthorizationService _authorizationService;
-        private readonly SectionService _sectionService;
-        private readonly UserService _userService;
+        private readonly IAuthorizationService _authorizationService;
+        private readonly ISectionService _sectionService;
+        private readonly IUserService _userService;
 
         public InitialSetupService(ILogger<InitialSetupService> logger,
             IConfiguration configuration,
-            AuthorizationService authorizationService,
-            SectionService sectionService,
-            UserService userService)
+            IAuthorizationService authorizationService,
+            ISectionService sectionService,
+            IUserService userService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));

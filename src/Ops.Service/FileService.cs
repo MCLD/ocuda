@@ -4,22 +4,23 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
-using Ocuda.Ops.Service.Interfaces.Ops;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Service
 {
-    public class FileService
+    public class FileService : IFileService
     {
         private readonly ILogger<FileService> _logger;
         private readonly IFileRepository _fileRepository;
-        private readonly InsertSampleDataService _insertSampleDataService;
-        private readonly PathResolverService _pathResolver;
+        private readonly IInsertSampleDataService _insertSampleDataService;
+        private readonly IPathResolverService _pathResolver;
 
         public FileService(ILogger<FileService> logger,
             IFileRepository fileRepository,
-            InsertSampleDataService insertSampleDataService,
-            PathResolverService pathResolver)
+            IInsertSampleDataService insertSampleDataService,
+            IPathResolverService pathResolver)
         {
             _logger = logger
                 ?? throw new ArgumentNullException(nameof(logger));

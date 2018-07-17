@@ -3,13 +3,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Controllers
 {
     public class DebugController : ControllerBase
     {
-        private readonly InsertSampleDataService _insertSampleDataService;
-        public DebugController(InsertSampleDataService insertSampleDataService)
+        private readonly IInsertSampleDataService _insertSampleDataService;
+        public DebugController(IInsertSampleDataService insertSampleDataService)
         {
             _insertSampleDataService = insertSampleDataService 
                 ?? throw new ArgumentNullException(nameof(insertSampleDataService));

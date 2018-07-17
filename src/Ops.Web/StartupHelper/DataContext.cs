@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Web.StartupHelper
 {
@@ -37,7 +38,7 @@ namespace Ocuda.Ops.Web.StartupHelper
                 }
 
                 // verify initial setup data is accurate
-                var initialSetup = scope.ServiceProvider.GetRequiredService<InitialSetupService>();
+                var initialSetup = scope.ServiceProvider.GetRequiredService<IInitialSetupService>();
                 Task.Run(() => initialSetup.VerifyInitialSetupAsync()).Wait();
             }
 

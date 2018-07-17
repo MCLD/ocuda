@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Moq;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service;
-using Ocuda.Ops.Service.Interfaces.Ops;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Xunit;
 
 namespace Ocuda.test.Ops.Service.Test

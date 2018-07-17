@@ -3,23 +3,20 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
-using Ocuda.Ops.Service.Interfaces.Ops;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Service
 {
-    public class PostService
+    public class PostService : IPostService
     {
-        private readonly InsertSampleDataService _insertSampleDataService;
         private readonly IPostRepository _postRepository;
 
-        public PostService(InsertSampleDataService insertSampleDataService,
-            IPostRepository postRepository)
+        public PostService(IPostRepository postRepository)
         {
             _postRepository = postRepository 
                 ?? throw new ArgumentNullException(nameof(postRepository));
-            _insertSampleDataService = insertSampleDataService
-                ?? throw new ArgumentNullException(nameof(insertSampleDataService));
         }
 
         public async Task<int> GetPostCountAsync()

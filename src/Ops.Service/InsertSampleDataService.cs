@@ -4,11 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
-using Ocuda.Ops.Service.Interfaces.Ops;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Service
 {
-    public class InsertSampleDataService
+    public class InsertSampleDataService : IInsertSampleDataService
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IFileRepository _fileRepository;
@@ -19,7 +20,8 @@ namespace Ocuda.Ops.Service
         private readonly ISectionRepository _sectionRepository;
         private readonly IUserRepository _userRepository;
         private readonly ISiteSettingRepository _siteSettingRepository;
-        private readonly CategoryService _categoryService;
+        private readonly ICategoryService _categoryService;
+
         public InsertSampleDataService(ICategoryRepository categoryRepository,
             IFileRepository fileRepository,
             IFileTypeRepository fileTypeRepository,
@@ -29,7 +31,7 @@ namespace Ocuda.Ops.Service
             ISectionRepository sectionRepository,
             IUserRepository userRepository,
             ISiteSettingRepository siteSettingRepository,
-            CategoryService categoryService)
+            ICategoryService categoryService)
         {
             _categoryRepository = categoryRepository
                 ?? throw new ArgumentNullException(nameof(categoryRepository));

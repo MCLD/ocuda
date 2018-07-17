@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
-using Ocuda.Ops.Service.Interfaces.Ops;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Service
 {
-    public class LinkService
+    public class LinkService : ILinkService
     {
-        private readonly InsertSampleDataService _insertSampleDataService;
+        private readonly IInsertSampleDataService _insertSampleDataService;
         private readonly ILinkRepository _linkRepository;
 
-        public LinkService(InsertSampleDataService insertSampleDataService,
+        public LinkService(IInsertSampleDataService insertSampleDataService,
             ILinkRepository linkRepository,
             ICategoryRepository categoryRepository)
         {

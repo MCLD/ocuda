@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Data.Extensions;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
-using Ocuda.Ops.Service.Interfaces.Ops;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Data.Ops

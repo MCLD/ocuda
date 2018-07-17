@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Service.Interfaces.Ops;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 
 namespace Ocuda.Ops.Data.Ops
 {

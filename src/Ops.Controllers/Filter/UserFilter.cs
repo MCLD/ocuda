@@ -4,15 +4,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Controllers.Filter
 {
     public class UserFilter : Attribute, IAsyncResourceFilter
     {
         private readonly ILogger<UserFilter> _logger;
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
 
-        public UserFilter(ILogger<UserFilter> logger, UserService userService)
+        public UserFilter(ILogger<UserFilter> logger, IUserService userService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _userService = userService

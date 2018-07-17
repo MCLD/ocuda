@@ -4,15 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Profile;
 using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Controllers
 {
     public class ProfileController : BaseController<PagesController>
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
 
         public ProfileController(ServiceFacade.Controller<PagesController> context,
-            UserService userService) : base(context)
+            IUserService userService) : base(context)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }

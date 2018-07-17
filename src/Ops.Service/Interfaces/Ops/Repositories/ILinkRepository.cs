@@ -4,7 +4,7 @@ using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Models;
 
-namespace Ocuda.Ops.Service.Interfaces.Ops
+namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
     public interface ILinkRepository : IRepository<Link, int>
     {

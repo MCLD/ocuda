@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 using ExcelDataReader;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models;
-using Ocuda.Ops.Service.Interfaces.Ops;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Service
 {
-    public class RosterService
+    public class RosterService : IRosterService
     {
         public const string NameHeading = "Name";
         public const string EmployeeIdHeading = "ID";
