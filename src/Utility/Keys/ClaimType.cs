@@ -3,6 +3,7 @@
     public struct ClaimType
     {
         public const string ADGroup = "ADGroup";
+        public const string AuthenticatedAt = "AuthenticatedAt";
         public const string SectionManager = "SectionManager";
         public const string SiteManager = "SiteManager";
         public const string UserId = "UserId";

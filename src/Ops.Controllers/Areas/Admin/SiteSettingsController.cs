@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.SiteSettings;
-using Ocuda.Ops.Controllers.Key;
 using Ocuda.Ops.Models;
+using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
 {
@@ -15,9 +15,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
     public class SiteSettingsController : BaseController<SiteSettingsController>
     {
-        private const string TypeBool = "bool";
-        private const string TypeInt = "int";
-
         public SiteSettingsController(ServiceFacade.Controller<SiteSettingsController> context)
             : base(context)
         {
@@ -46,18 +43,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [HttpPost]
         public async Task<IActionResult> Update(IndexViewModel model)
         {
-            switch (model.SiteSetting.Type)
-            {
-                case TypeBool:
-                    model.SiteSetting.Value = model.ValueBool;
-                    break;
-                case TypeInt:
-                    model.SiteSetting.Value = model.ValueInt;
-                    break;
-                default:
-                    model.SiteSetting.Value = model.ValueString;
-                    break;
-            }
+            ModelState.Remove("SiteSetting.Description");
+            ModelState.Remove("SiteSetting.Name");
 
             if (ModelState.IsValid)
             {

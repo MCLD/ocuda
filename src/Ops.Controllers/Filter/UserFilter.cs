@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Filter
 {
@@ -25,7 +26,7 @@ namespace Ocuda.Ops.Controllers.Filter
         {
             var usernameClaim = context.HttpContext.User
                 .Claims
-                .Where(_ => _.Type == Key.ClaimType.Username)
+                .Where(_ => _.Type == ClaimType.Username)
                 .FirstOrDefault();
 
             if (usernameClaim != null)

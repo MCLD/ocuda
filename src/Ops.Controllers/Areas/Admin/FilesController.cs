@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Files;
 using Ocuda.Ops.Controllers.Authorization;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Filters;
+using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
@@ -58,10 +62,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         public async Task<IActionResult> Index(string section, int? categoryId = null, int page = 1)
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
-            var itemsPerPage = await _siteSettingService.GetSetting(SiteSettingKey.Pagination.ItemsPerPage);
-            int.TryParse(itemsPerPage, out int take);
+            var itemsPerPage = await _siteSettingService
+                .GetSettingIntAsync(SiteSettingKey.Pagination.ItemsPerPage);
 
-            var filter = new BlogFilter(page, take)
+            var filter = new BlogFilter(page, itemsPerPage)
             {
                 SectionId = currentSection.Id,
                 CategoryId = categoryId,
@@ -148,8 +152,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                             }
                         }
 
-                        var siteSetting = await _siteSettingService.GetSetting(SiteSettingKey.FileUpload.MaxFileSize);
-                        int.TryParse(siteSetting, out int maxFileSize);
+                        var maxFileSize = await _siteSettingService
+                            .GetSettingIntAsync(SiteSettingKey.FileUpload.MaxFileSize);
 
                         if (model.FileData.Length < maxFileSize)
                         {
@@ -243,8 +247,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                             }
                         }
 
-                        var siteSetting = await _siteSettingService.GetSetting(SiteSettingKey.FileUpload.MaxFileSize);
-                        int.TryParse(siteSetting, out int maxFileSize);
+                        var maxFileSize = await _siteSettingService
+                            .GetSettingIntAsync(SiteSettingKey.FileUpload.MaxFileSize);
 
                         if (model.FileData.Length < maxFileSize)
                         {
@@ -310,10 +314,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         public async Task<IActionResult> Categories(string section, int page = 1)
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
-            var itemsPerPage = await _siteSettingService.GetSetting(SiteSettingKey.Pagination.ItemsPerPage);
-            int.TryParse(itemsPerPage, out int take);
+            var itemsPerPage = await _siteSettingService
+                .GetSettingIntAsync(SiteSettingKey.Pagination.ItemsPerPage);
 
-            var filter = new BlogFilter(page, take)
+            var filter = new BlogFilter(page, itemsPerPage)
             {
                 SectionId = currentSection.Id,
                 CategoryType = CategoryType.File
@@ -526,8 +530,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         private async Task<string> ValidateFile(string fileName, long fileSize)
         {
             var result = "";
-            var siteSetting = await _siteSettingService.GetSetting(SiteSettingKey.FileUpload.MaxFileSize);
-            int.TryParse(siteSetting, out int maxFileSize);
+            var maxFileSize = await _siteSettingService
+                .GetSettingIntAsync(SiteSettingKey.FileUpload.MaxFileSize);
 
             if (fileSize < maxFileSize)
             {

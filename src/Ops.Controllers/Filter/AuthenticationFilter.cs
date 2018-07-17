@@ -66,7 +66,7 @@ namespace Ocuda.Ops.Controllers.Filter
                 // check the current user's Username claim to see if they're authenticated
                 var usernameClaim = httpContext.User
                     .Claims
-                    .Where(_ => _.Type == Key.ClaimType.Username)
+                    .Where(_ => _.Type == ClaimType.Username)
                     .FirstOrDefault();
 
                 bool authenticateUser = usernameClaim == null;
@@ -194,9 +194,9 @@ namespace Ocuda.Ops.Controllers.Filter
                         // start creating the user's claims with their username
                         var claims = new HashSet<Claim>
                         {
-                            new Claim(Key.ClaimType.Username, username),
-                            new Claim(Key.ClaimType.UserId, userId),
-                            new Claim(Key.ClaimType.AuthenticatedAt, now.ToString("O"))
+                            new Claim(ClaimType.Username, username),
+                            new Claim(ClaimType.UserId, userId),
+                            new Claim(ClaimType.AuthenticatedAt, now.ToString("O"))
                         };
 
                         // loop through groups in the distributed cache from authentication
@@ -232,7 +232,7 @@ namespace Ocuda.Ops.Controllers.Filter
                         // claims can be provided via ClaimGroups or SectionManagerGroups
                         foreach (string groupName in adGroupNames)
                         {
-                            claims.Add(new Claim(Key.ClaimType.ADGroup, groupName));
+                            claims.Add(new Claim(ClaimType.ADGroup, groupName));
 
                             // once the user is a site manager, we can stop looking up more rights
                             if (!isSiteManager)
@@ -257,7 +257,7 @@ namespace Ocuda.Ops.Controllers.Filter
                                     }
                                 }
 
-                                if (claimantOf.ContainsKey(Key.ClaimType.SiteManager))
+                                if (claimantOf.ContainsKey(ClaimType.SiteManager))
                                 {
                                     isSiteManager = true;
                                 }
@@ -267,20 +267,20 @@ namespace Ocuda.Ops.Controllers.Filter
                         if (isSiteManager)
                         {
                             // if the user is a site manager, add the site manager claim
-                            claims.Add(new Claim(Key.ClaimType.SiteManager,
-                                Key.ClaimType.SiteManager));
+                            claims.Add(new Claim(ClaimType.SiteManager,
+                                ClaimType.SiteManager));
 
                             // also add each individual permission claim
                             foreach (var claimType in claimGroups)
                             {
                                 claims.Add(new Claim(claimType.ClaimType,
-                                    Key.ClaimType.SiteManager));
+                                    ClaimType.SiteManager));
                             }
 
                             // also add each individual section management claim
                             foreach (var section in await _sectionService.GetSectionsAsync())
                             {
-                                claims.Add(new Claim(Key.ClaimType.SectionManager,
+                                claims.Add(new Claim(ClaimType.SectionManager,
                                     section.Name.ToLower()));
                             }
                         }
@@ -295,7 +295,7 @@ namespace Ocuda.Ops.Controllers.Filter
                             // add section management claims
                             foreach (var sectionName in sectionManagerOf)
                             {
-                                claims.Add(new Claim(Key.ClaimType.SectionManager,
+                                claims.Add(new Claim(ClaimType.SectionManager,
                                     sectionName.ToLower()));
                             }
                         }
@@ -303,8 +303,8 @@ namespace Ocuda.Ops.Controllers.Filter
                         // TODO: probably change the role claim type to our roles and not AD groups
                         var identity = new ClaimsIdentity(claims,
                             CookieAuthenticationDefaults.AuthenticationScheme,
-                            Key.ClaimType.Username,
-                            Key.ClaimType.ADGroup);
+                            ClaimType.Username,
+                            ClaimType.ADGroup);
 
                         await httpContext.SignInAsync(new ClaimsPrincipal(identity));
 
