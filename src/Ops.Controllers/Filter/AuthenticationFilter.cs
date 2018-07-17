@@ -175,7 +175,6 @@ namespace Ocuda.Ops.Controllers.Filter
                             if(details != null)
                             {
                                 user.Title = details.JobTitle;
-                                //user.SupervisorId = details.ReportsToId;
                                 user.LastRosterUpdate = now;
                             }
                         }

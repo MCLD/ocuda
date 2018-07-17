@@ -9,6 +9,24 @@ namespace Ocuda.Ops.Controllers.Helper
 {
     public class LdapHelper
     {
+        private const int LDAPSearchResponse = 4;
+
+        private const string ADsAMAccountName = "sAMAccountName";
+        private const string ADDisplayName = "displayName";
+        private const string ADTelephoneNumber = "telephoneNumber";
+        private const string ADTitle = "title";
+        private const string ADMail = "mail";
+        private const string ADGivenName = "givenName";
+
+        private readonly string[] AttributesToReturn = {
+            ADsAMAccountName,
+            ADDisplayName,
+            ADTelephoneNumber,
+            ADTitle,
+            ADMail,
+            ADGivenName
+        };
+
         private readonly ILogger _logger;
         private readonly IConfiguration _config;
 
@@ -40,12 +58,6 @@ namespace Ocuda.Ops.Controllers.Helper
                 {
                     try
                     {
-                        string[] attributesToReturn = {
-                                        "sAMAccountName",
-                                        "displayName",
-                                        "objectGUID",
-                                        "logonCount"
-                                    };
                         var constraints = new LdapSearchConstraints
                         {
                             MaxResults = 1
@@ -55,14 +67,14 @@ namespace Ocuda.Ops.Controllers.Helper
 
                         LdapSearchQueue queue = cn.Search(ldapSearchBase,
                             LdapConnection.SCOPE_SUB,
-                            $"(sAMAccountName={user.Username})",
-                            null,
+                            $"({ADsAMAccountName}={user.Username})",
+                            AttributesToReturn,
                             false,
                             null,
                             constraints);
 
-                        LdapMessage message;
-                        while ((message = queue.getResponse()).Type == 4)
+                        LdapMessage message = queue.getResponse();
+                        while (message.Type == LDAPSearchResponse)
                         {
                             var entry = ((LdapSearchResult)message).Entry;
                             var attributes = entry.getAttributeSet().GetEnumerator();
@@ -71,32 +83,32 @@ namespace Ocuda.Ops.Controllers.Helper
                                 var attribute = (LdapAttribute)attributes.Current;
                                 switch (attribute.Name)
                                 {
-                                    case "displayName":
+                                    case ADDisplayName:
                                         user.Name = attribute.StringValue;
                                         break;
-                                    case "telephoneNumber":
+                                    case ADTelephoneNumber:
                                         user.Phone = attribute.StringValue;
                                         break;
-                                    case "title":
+                                    case ADTitle:
                                         if (string.IsNullOrEmpty(user.Title))
                                         {
                                             user.Title = attribute.StringValue;
                                         }
                                         break;
-                                    case "mail":
+                                    case ADMail:
                                         user.Email = attribute.StringValue;
                                         break;
-                                    case "givenName":
+                                    case ADGivenName:
                                         if (string.IsNullOrWhiteSpace(user.Nickname))
                                         {
                                             user.Nickname = attribute.StringValue;
                                         }
                                         break;
-                                    default:
-                                        break;
                                 }
                             }
+                            message = queue.getResponse();
                         }
+                        user.LastLdapUpdate = DateTime.Now;
                         cn.Disconnect();
                     }
                     catch (Exception ex)
