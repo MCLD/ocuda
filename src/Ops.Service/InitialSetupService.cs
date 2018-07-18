@@ -12,12 +12,14 @@ namespace Ocuda.Ops.Service
         private readonly IConfiguration _config;
         private readonly IAuthorizationService _authorizationService;
         private readonly ISectionService _sectionService;
+        private readonly ISiteSettingService _siteSettingService;
         private readonly IUserService _userService;
 
         public InitialSetupService(ILogger<InitialSetupService> logger,
             IConfiguration configuration,
             IAuthorizationService authorizationService,
             ISectionService sectionService,
+            ISiteSettingService siteSettingService,
             IUserService userService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

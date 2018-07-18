@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Helpers;
 using Ocuda.Utility.Keys;
 
@@ -12,9 +12,9 @@ namespace Ocuda.Ops.Controllers.Filter
     public class RestoreModelStateAttribute : ActionFilterAttribute
     {
         private readonly ILogger<RestoreModelStateAttribute> _logger;
-        private readonly SiteSettingService _siteSettingService;
+        private readonly ISiteSettingService _siteSettingService;
         public RestoreModelStateAttribute(ILogger<RestoreModelStateAttribute> logger,
-            SiteSettingService siteSettingService)
+            ISiteSettingService siteSettingService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _siteSettingService = siteSettingService 

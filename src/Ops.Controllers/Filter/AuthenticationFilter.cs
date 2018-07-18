@@ -10,9 +10,8 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Helper;
-using Ocuda.Ops.Service;
-using Ocuda.Utility.Helper;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Helper;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Filter
@@ -49,7 +48,7 @@ namespace Ocuda.Ops.Controllers.Filter
             _rosterService = rosterService 
                 ?? throw new ArgumentNullException(nameof(rosterService));
             _sectionService = sectionService
-                ?? throw new ArgumentNullException(nameof(SectionService));
+                ?? throw new ArgumentNullException(nameof(sectionService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 

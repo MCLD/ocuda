@@ -10,7 +10,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
     {
         Task InsertDataAsync();
         Task<ICollection<Section>> InsertSectionsAsync();
-        Task InsertSiteSettingsAsync();
         Task InsertPostsAsync(int sectionId);
         Task<ICollection<Category>> InsertLinkCategoriesAsync(Section section);
         Task InsertLinksAsync(int sectionId);
