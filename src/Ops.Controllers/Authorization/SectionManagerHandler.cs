@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Controllers.Key;
-using Ocuda.Ops.Service;
+using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Authorization
 {

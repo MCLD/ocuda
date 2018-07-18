@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Pages;
-using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers
@@ -28,10 +27,10 @@ namespace Ocuda.Ops.Controllers
         public async Task<IActionResult> Index(string section, int page = 1)
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
-            var itemsPerPage = await _siteSettingService.GetSetting(SiteSettingKey.Pagination.ItemsPerPage);
-            int.TryParse(itemsPerPage, out int take);
+            var itemsPerPage = await _siteSettingService
+                .GetSettingIntAsync(SiteSettingKey.Pagination.ItemsPerPage);
 
-            var filter = new BlogFilter(page, take)
+            var filter = new BlogFilter(page, itemsPerPage)
             {
                 SectionId = currentSection.Id
             };

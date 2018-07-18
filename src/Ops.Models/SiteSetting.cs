@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using Ocuda.Ops.Models.Abstract;
 
@@ -11,17 +12,28 @@ namespace Ocuda.Ops.Models
         [Required]
         [MaxLength(255)]
         public string Key { get; set; }
-        [MaxLength(8)]
-        public string Type { get; set; }
+        [Column(TypeName = "int")]
+        public SiteSettingType Type { get; set; }
 
         // shown to user:
+        [Required]
         [MaxLength(255)]
         public string Name { get; set; }
+        [Required]
+        [MaxLength(1000)]
         public string Description { get; set; }
+        [Required]
         [MaxLength(255)]
         public string Value { get; set; }
         [MaxLength(255)]
         public string Category { get; set; }
+    }
+
+    public enum SiteSettingType
+    {
+        Bool,
+        Int,
+        String
     }
 
 }

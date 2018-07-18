@@ -10,6 +10,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         where TKeyType : struct
     {
         Task AddAsync(TEntity entity);
+        Task AddRangeAsync(ICollection<TEntity> entities);
         Task<int> CountAsync();
         Task<TEntity> FindAsync(TKeyType id);
         void Remove(TEntity entity);
@@ -18,5 +19,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         Task<ICollection<TEntity>> ToListAsync(int skip, int take, params Expression<Func<TEntity, IComparable>>[] orderBys);
         Task<ICollection<TEntity>> ToListAsync(params Expression<Func<TEntity, IComparable>>[] orderBys);
         void Update(TEntity entity);
+        void UpdateRange(ICollection<TEntity> entities);
     }
 }

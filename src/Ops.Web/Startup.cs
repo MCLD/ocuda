@@ -9,13 +9,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Authorization;
-using Ocuda.Ops.Controllers.Key;
 using Ocuda.Ops.Controllers.RouteConstraint;
 using Ocuda.Ops.Controllers.Validator;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Web.StartupHelper;
+using Ocuda.Utility.Keys;
 using StackExchange.Redis;
 
 namespace Ocuda.Ops.Web

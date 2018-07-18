@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Filter;
-using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Abstract
 {
@@ -94,7 +94,7 @@ namespace Ocuda.Ops.Controllers.Abstract
             get
             {
                 return HttpContext.User.Claims
-                    .Where(_ => _.Type == Key.ClaimType.Username)
+                    .Where(_ => _.Type == ClaimType.Username)
                     .FirstOrDefault()?
                     .Value;
             }
@@ -105,7 +105,7 @@ namespace Ocuda.Ops.Controllers.Abstract
             get
             {
                 var userIdString = HttpContext.User.Claims
-                    .Where(_ => _.Type == Key.ClaimType.UserId)
+                    .Where(_ => _.Type == ClaimType.UserId)
                     .FirstOrDefault()?
                     .Value;
                 if (int.TryParse(userIdString, out int userId))

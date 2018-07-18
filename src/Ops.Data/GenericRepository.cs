@@ -38,6 +38,11 @@ namespace Ocuda.Ops.Data
             await DbSet.AddAsync(entity);
         }
 
+        public virtual async Task AddRangeAsync(ICollection<TEntity> entities)
+        {
+            await DbSet.AddRangeAsync(entities);
+        }
+
         public virtual void Remove(TEntity entity)
         {
             DbSet.Remove(entity);
@@ -51,6 +56,11 @@ namespace Ocuda.Ops.Data
         public virtual void Update(TEntity entity)
         {
             DbSet.Update(entity);
+        }
+
+        public virtual void UpdateRange(ICollection<TEntity> entities)
+        {
+            DbSet.UpdateRange(entities);
         }
 
         public virtual async Task<ICollection<TEntity>> 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Controllers.Validator

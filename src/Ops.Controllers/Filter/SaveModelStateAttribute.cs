@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Ocuda.Utility.Helpers;
 
-namespace Ocuda.Utility.Filters
+namespace Ocuda.Ops.Controllers.Filter
 {
     public class SaveModelStateAttribute : ActionFilterAttribute
     {

@@ -8,8 +8,5 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.SiteSettings
     {
         public SiteSetting SiteSetting { get; set; }
         public Dictionary<string, List<SiteSetting>> SiteSettingsByCategory { get; set; }
-        public string ValueBool { get; set; }
-        public string ValueInt { get; set; }
-        public string ValueString { get; set; }
     }
 }
