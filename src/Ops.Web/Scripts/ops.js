@@ -1,4 +1,8 @@
 ﻿window.onunload = function () {
+    ResetSpinners();
+}
+
+function ResetSpinners() {
     $(".btn-spinner, .btn-spinner-no-validate").removeClass("disabled");
     $(".btn-spinner, .btn-spinner-no-validate").children(".fa-spinner").addClass("d-none");
 }

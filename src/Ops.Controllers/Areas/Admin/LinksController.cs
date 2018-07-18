@@ -76,7 +76,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             if (categoryId.HasValue)
             {
                 var name = (await _categoryService.GetCategoryByIdAsync(categoryId.Value)).Name;
-                viewModel.CategoryName = 
+                viewModel.CategoryName =
                     string.IsNullOrWhiteSpace(name) ? DefaultCategoryDisplayName : name;
             }
 
@@ -233,45 +233,43 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
 
         [HttpPost]
-        public async Task<IActionResult> CreateCategory(CategoriesViewModel model)
+        public async Task<IActionResult> CreateCategory(string value, int sectionId)
         {
-            if (ModelState.IsValid)
+            var category = new Category
             {
-                try
-                {
-                    model.Category.SectionId = model.SectionId;
-                    model.Category.CategoryType = CategoryType.Link;
-                    var newCategory = await _categoryService.CreateCategoryAsync(CurrentUserId, model.Category);
-                    ShowAlertSuccess($"Added link category: {newCategory.Name}");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"Error creating link category: {ex}", ex);
-                    ShowAlertDanger("Unable to add category: ", ex.Message);
-                }
-            }
+                CategoryType = CategoryType.Link,
+                IsDefault = false,
+                Name = value,
+                SectionId = sectionId
+            };
 
-            return RedirectToAction(nameof(Categories), new { page = model.PaginateModel.CurrentPage });
+            try
+            {
+                var newCategory = await _categoryService.CreateCategoryAsync(CurrentUserId, category);
+                ShowAlertSuccess($"Added link category: {newCategory.Name}");
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error creating link category: {ex}", ex);
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditCategory(CategoriesViewModel model)
+        public async Task<IActionResult> EditCategory(int id, string value)
         {
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    var category = await _categoryService.EditCategoryAsync(model.Category);
-                    ShowAlertSuccess($"Updated link category: {category.Name}");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"Error editing link category: {ex}", ex);
-                    ShowAlertDanger("Unable to update category: ", ex.Message);
-                }
+                var category = await _categoryService.EditCategoryAsync(id, value);
+                ShowAlertSuccess($"Updated link category: {category.Name}");
+                return Json(new { success = true });
             }
-
-            return RedirectToAction(nameof(Categories), new { page = model.PaginateModel.CurrentPage });
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error editing link category: {ex}", ex);
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         [HttpPost]

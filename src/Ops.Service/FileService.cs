@@ -14,20 +14,16 @@ namespace Ocuda.Ops.Service
     {
         private readonly ILogger<FileService> _logger;
         private readonly IFileRepository _fileRepository;
-        private readonly IInsertSampleDataService _insertSampleDataService;
         private readonly IPathResolverService _pathResolver;
 
         public FileService(ILogger<FileService> logger,
             IFileRepository fileRepository,
-            IInsertSampleDataService insertSampleDataService,
             IPathResolverService pathResolver)
         {
             _logger = logger
                 ?? throw new ArgumentNullException(nameof(logger));
             _fileRepository = fileRepository
                 ?? throw new ArgumentNullException(nameof(fileRepository));
-            _insertSampleDataService = insertSampleDataService
-                ?? throw new ArgumentNullException(nameof(insertSampleDataService));
             _pathResolver = pathResolver ?? throw new ArgumentNullException(nameof(pathResolver));
         }
 

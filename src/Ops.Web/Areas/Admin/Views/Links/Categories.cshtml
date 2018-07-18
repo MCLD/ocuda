@@ -1,6 +1,6 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Links.CategoriesViewModel
 
-<form asp-controller="Links" asp-action="@(nameof(LinksController.CreateCategory))" method="post" role="form">
+<form id="addForm" role="form">
     <input asp-for="@Model.SectionId" type="hidden" />
     <input id="addCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
     <div modal id="addModal" name="Link Category" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
@@ -8,7 +8,7 @@
     </div>
 </form>
 
-<form asp-controller="Links" asp-action="@(nameof(LinksController.EditCategory))" method="post" role="form">
+<form id="editForm" role="form">
     <input id="editCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
     <input id="editId" asp-for="Category.Id" type="hidden" />
     <div modal id="editModal" name="Link Category" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
@@ -16,7 +16,7 @@
     </div>
 </form>
 
-<form asp-controller="Links" asp-action="@(nameof(LinksController.DeleteCategory))" method="post" role="form">
+<form id="deleteForm" asp-controller="Links" asp-action="@(nameof(LinksController.DeleteCategory))" method="post" role="form">
     <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
     <input id="deleteName" asp-for="Category.Name" type="hidden" />
     <input id="deleteId" asp-for="Category.Id" type="hidden" />
@@ -82,6 +82,42 @@ else
 @section scripts
     {
     <script>
+        $("#addForm").submit(function (e) {
+            e.preventDefault();
+            var value = $('#addName').val();
+            var sectionId = $('#SectionId').val();
+
+            $.post("@(Url.Action("CreateCategory", "Links"))",
+                { value: value, sectionId: sectionId },
+                function (response) {
+                    if (response.success == true) {
+                        location.reload();
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners();
+                    }
+                });
+        });
+
+        $("#editForm").submit(function (e) {
+            e.preventDefault();
+            var id = $("#editId").val();
+            var value = $('#editName').val();
+
+            $.post("@(Url.Action("EditCategory", "Links"))",
+                { id: id, value: value },
+                function (response) {
+                    if (response.success == true) {
+                        location.reload();
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners();
+                    }
+                });
+        });
+
         $("#editModal").on("show.bs.modal", function (e) {
             var button = $(e.relatedTarget);
             var id = button.data("id");

@@ -9,15 +9,11 @@ namespace Ocuda.Ops.Service
     public class FileTypeService : IFileTypeService
     {
         private readonly IFileTypeRepository _fileTypeRepository;
-        private readonly IInsertSampleDataService _insertSampleDataService;
 
-        public FileTypeService(IFileTypeRepository fileTypeRepository,
-            IInsertSampleDataService insertSampleDataService)
+        public FileTypeService(IFileTypeRepository fileTypeRepository)
         {
             _fileTypeRepository = fileTypeRepository 
                 ?? throw new ArgumentNullException(nameof(fileTypeRepository));
-            _insertSampleDataService = insertSampleDataService
-                ?? throw new ArgumentNullException(nameof(insertSampleDataService));
         }
 
         public async Task<FileType> GetByExtensionAsync(string extension)

@@ -97,13 +97,14 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             if (categoryId.HasValue)
             {
                 var name = (await _categoryService.GetCategoryByIdAsync(categoryId.Value)).Name;
-                viewModel.CategoryName = 
+                viewModel.CategoryName =
                     string.IsNullOrWhiteSpace(name) ? DefaultCategoryDisplayName : name;
             }
 
             return View(viewModel);
         }
 
+        [RestoreModelState]
         public async Task<IActionResult> Create(string section)
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
@@ -127,6 +128,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
+        [SaveModelState]
         public async Task<IActionResult> Create(DetailViewModel model)
         {
             if (ModelState.IsValid)
@@ -197,6 +199,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             return View("Detail", model);
         }
 
+        [RestoreModelState]
         public async Task<IActionResult> Edit(int id)
         {
             var file = await _fileService.GetByIdAsync(id);
@@ -221,6 +224,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
+        [SaveModelState]
         public async Task<IActionResult> Edit(DetailViewModel model)
         {
             if (ModelState.IsValid)
@@ -347,47 +351,44 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             return View(viewModel);
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> CreateCategory(CategoriesViewModel model)
+        public async Task<IActionResult> CreateCategory(string value, int sectionId)
         {
-            if (ModelState.IsValid)
+            var category = new Category
             {
-                try
-                {
-                    model.Category.SectionId = model.SectionId;
-                    model.Category.CategoryType = CategoryType.File;
-                    var newCategory = await _categoryService.CreateCategoryAsync(CurrentUserId, model.Category);
-                    ShowAlertSuccess($"Added file category: {newCategory.Name}");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"Error creating file category: {ex}", ex);
-                    ShowAlertDanger("Unable to add category: ", ex.Message);
-                }
-            }
+                CategoryType = CategoryType.File,
+                IsDefault = false,
+                Name = value,
+                SectionId = sectionId
+            };
 
-            return RedirectToAction(nameof(Categories), new { page = model.PaginateModel.CurrentPage });
+            try
+            {
+                var newCategory = await _categoryService.CreateCategoryAsync(CurrentUserId, category);
+                ShowAlertSuccess($"Added file category: {newCategory.Name}");
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error creating file category: {ex}", ex);
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditCategory(CategoriesViewModel model)
+        public async Task<IActionResult> EditCategory(int id, string value)
         {
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    var category = await _categoryService.EditCategoryAsync(model.Category);
-                    ShowAlertSuccess($"Updated file category: {category.Name}");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"Error editing file: {ex}", ex);
-                    ShowAlertDanger("Unable to update category: ", ex.Message);
-                }
+                var category = await _categoryService.EditCategoryAsync(id, value);
+                ShowAlertSuccess($"Updated file category: {category.Name}");
+                return Json(new { success = true });
             }
-
-            return RedirectToAction(nameof(Categories), new { page = model.PaginateModel.CurrentPage });
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error editing file: {ex}", ex);
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         [HttpPost]
@@ -447,7 +448,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     if (fileData != null)
                     {
                         var section = await _sectionService.GetByIdAsync(sectionId);
-                        var category = 
+                        var category =
                             await _categoryService.GetAttachmentCategoryAsync(CurrentUserId, section.Id);
 
                         File file = new File

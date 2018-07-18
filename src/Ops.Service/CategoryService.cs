@@ -77,6 +77,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<Category> CreateCategoryAsync(int currentUserId, Category category)
         {
+            await ValidateCategoryAsync(category);
+
             category.CreatedAt = DateTime.Now;
             category.CreatedBy = currentUserId;
             await _categoryRepository.AddAsync(category);
@@ -84,10 +86,12 @@ namespace Ocuda.Ops.Service
             return category;
         }
 
-        public async Task<Category> EditCategoryAsync(Category category)
+        public async Task<Category> EditCategoryAsync(int id, string name)
         {
-            var currentCategory = await _categoryRepository.FindAsync(category.Id);
-            currentCategory.Name = category.Name;
+            var currentCategory = await _categoryRepository.FindAsync(id);
+            currentCategory.Name = name;
+
+            await ValidateCategoryAsync(currentCategory);
 
             _categoryRepository.Update(currentCategory);
             await _categoryRepository.SaveAsync();
@@ -125,6 +129,20 @@ namespace Ocuda.Ops.Service
             await _categoryRepository.AddAsync(defaultFileCategory);
             await _categoryRepository.AddAsync(defaultLinkCategory);
             await _categoryRepository.SaveAsync();
+        }
+
+        private async Task ValidateCategoryAsync(Category category)
+        {
+            //TODO Change to OcudaExceptions
+            if (string.IsNullOrWhiteSpace(category.Name))
+            {
+                throw new Exception("Category name cannot be empty.");
+            }
+ 
+            if (await _categoryRepository.CategoryExistsAsync(category))
+            {
+                throw new Exception($"Category '{category.Name}' already exists.");
+            }
         }
     }
 }

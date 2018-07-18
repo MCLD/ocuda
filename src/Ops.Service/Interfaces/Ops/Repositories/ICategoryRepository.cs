@@ -13,5 +13,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         Task<Category> GetDefaultAsync(BlogFilter filter);
         Task<ICollection<Category>> GetBySectionIdAsync(BlogFilter filter);
         Task<DataWithCount<ICollection<Category>>> GetPaginatedListAsync(BlogFilter filter);
+        Task<bool> CategoryExistsAsync(Category category);
     }
 }
