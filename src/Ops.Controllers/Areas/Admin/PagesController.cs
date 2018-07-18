@@ -93,6 +93,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
         }
 
+        [RestoreModelState]
         public async Task<IActionResult> Edit(int id)
         {
             var page = await _pageService.GetByIdAsync(id);
@@ -109,6 +110,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
+        [SaveModelState]
         public async Task<IActionResult> Edit(DetailViewModel model)
         {
             var currentPost = await _pageService.GetByIdAsync(model.Page.Id);
@@ -139,8 +141,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
             }
 
-            model.Action = nameof(Edit);
-            model.IsDraft = currentPost.IsDraft;
             return RedirectToAction(nameof(Edit), new { id = model.Page.Id });
         }
 

@@ -59,6 +59,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             return View(viewModel);
         }
 
+        [RestoreModelState]
         public IActionResult Create()
         {
             var viewModel = new DetailViewModel
@@ -71,6 +72,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
+        [SaveModelState]
         public async Task<IActionResult> Create(DetailViewModel model)
         {
             if (ModelState.IsValid)
@@ -88,10 +90,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
             }
 
-            model.Action = nameof(Create);
-            return View("Detail", model);
+            return RedirectToAction(nameof(Create));
         }
 
+        [RestoreModelState]
         public async Task<IActionResult> Edit(int id)
         {
             var viewModel = new DetailViewModel
@@ -106,6 +108,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
+        [SaveModelState]
         public async Task<IActionResult> Edit(DetailViewModel model)
         {
             if (ModelState.IsValid)
@@ -123,8 +126,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
             }
 
-            model.Action = nameof(Edit);
-            return View("Detail", model);
+            return RedirectToAction(nameof(Edit));
         }
 
         [HttpPost]
