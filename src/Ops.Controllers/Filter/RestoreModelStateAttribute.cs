@@ -35,7 +35,8 @@ namespace Ocuda.Ops.Controllers.Filter
                 var timeDifference = DateTimeOffset.Now.ToUnixTimeSeconds() - storage.time;
                 var modelstateTimeOut = await _siteSettingService
                     .GetSettingIntAsync(SiteSettingKey.ModelState.TimeOutMinutes);
-                if (TimeSpan.FromSeconds(timeDifference).Minutes < modelstateTimeOut)
+                if (TimeSpan.FromSeconds(timeDifference).Minutes < modelstateTimeOut 
+                    || modelstateTimeOut < 1)
                 {
                     //Only Import if we are viewing
                     if (context.Result is ViewResult)
@@ -45,7 +46,7 @@ namespace Ocuda.Ops.Controllers.Filter
                 }
                 else
                 {
-
+                    _logger.LogError($"ModelState timed out for key {key}.");
                 }
             }
 
