@@ -44,7 +44,7 @@ namespace Ocuda.Ops.Service
         {
             var settingsToAdd = new List<SiteSetting>();
 
-            var defaultSiteSettings = DefaultSiteSettings.SiteSettings;
+            var defaultSiteSettings = SiteSettings.Get;
             foreach (var defaultSetting in defaultSiteSettings)
             {
                 var siteSetting = await _siteSettingRepository.FindByKeyAsync(defaultSetting.Key);

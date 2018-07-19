@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
-namespace Ocuda.Ops.Controllers.Validator
+namespace Ocuda.Ops.Controllers.Validators
 {
     public class SectionPathValidator : ISectionPathValidator
     {

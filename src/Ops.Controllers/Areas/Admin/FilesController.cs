@@ -9,6 +9,7 @@ using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Files;
 using Ocuda.Ops.Controllers.Authorization;
 using Ocuda.Ops.Controllers.Filter;
+using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -36,7 +37,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
         public const string DefaultCategoryDisplayName = "[No Category]";
 
-        public FilesController(ServiceFacade.Controller<FilesController> context,
+        public FilesController(ServiceFacades.Controller<FilesController> context,
             ICategoryService categoryService,
             IFileService fileService,
             IFileTypeService fileTypeService,
@@ -61,7 +62,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
             var itemsPerPage = await _siteSettingService
-                .GetSettingIntAsync(SiteSettingKey.Pagination.ItemsPerPage);
+                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
 
             var filter = new BlogFilter(page, itemsPerPage)
             {
@@ -141,7 +142,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             else
             { 
                 var maxFileSize = await _siteSettingService
-                    .GetSettingIntAsync(SiteSettingKey.FileUpload.MaxFileSize);
+                    .GetSettingIntAsync(Models.Keys.SiteSetting.FileManagement.MaxUploadBytes);
 
                 if (model.FileData.Length > maxFileSize)
                 {
@@ -237,7 +238,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             else
             { 
                 var maxFileSize = await _siteSettingService
-                    .GetSettingIntAsync(SiteSettingKey.FileUpload.MaxFileSize);
+                    .GetSettingIntAsync(Models.Keys.SiteSetting.FileManagement.MaxUploadBytes);
 
                 if (model.FileData.Length > maxFileSize)
                 {
@@ -324,7 +325,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
             var itemsPerPage = await _siteSettingService
-                .GetSettingIntAsync(SiteSettingKey.Pagination.ItemsPerPage);
+                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
 
             var filter = new BlogFilter(page, itemsPerPage)
             {
@@ -537,7 +538,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             var result = "";
             var maxFileSize = await _siteSettingService
-                .GetSettingIntAsync(SiteSettingKey.FileUpload.MaxFileSize);
+                .GetSettingIntAsync(Models.Keys.SiteSetting.FileManagement.MaxUploadBytes);
 
             if (fileSize < maxFileSize)
             {

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Roster;
 using Ocuda.Ops.Controllers.Filter;
+using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
@@ -16,7 +17,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     {
         private readonly IRosterService _rosterService;
 
-        public RosterController(ServiceFacade.Controller<RosterController> context,
+        public RosterController(ServiceFacades.Controller<RosterController> context,
             IRosterService rosterService) : base(context)
         {
             _rosterService = rosterService

@@ -15,7 +15,7 @@ namespace Ocuda.Ops.Controllers
         private readonly IPostService _postService;
         private readonly ISectionService _sectionService;
 
-        public PostsController(ServiceFacade.Controller<PagesController> context,
+        public PostsController(ServiceFacades.Controller<PagesController> context,
             IPostService postService, 
             ISectionService sectionService) : base(context)
         {
@@ -28,7 +28,7 @@ namespace Ocuda.Ops.Controllers
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
             var itemsPerPage = await _siteSettingService
-                .GetSettingIntAsync(SiteSettingKey.Pagination.ItemsPerPage);
+                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
 
             var filter = new BlogFilter(page, itemsPerPage)
             {

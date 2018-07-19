@@ -15,7 +15,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
     public class SiteSettingsController : BaseController<SiteSettingsController>
     {
-        public SiteSettingsController(ServiceFacade.Controller<SiteSettingsController> context)
+        public SiteSettingsController(ServiceFacades.Controller<SiteSettingsController> context)
             : base(context)
         {
         }

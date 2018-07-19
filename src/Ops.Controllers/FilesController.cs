@@ -22,7 +22,7 @@ namespace Ocuda.Ops.Controllers
 
         public const string DefaultCategoryDisplayName = "[No Category]";
 
-        public FilesController(ServiceFacade.Controller<FilesController> context,
+        public FilesController(ServiceFacades.Controller<FilesController> context,
             ICategoryService categoryService,
             IFileService fileService,
             ISectionService sectionService
@@ -39,7 +39,7 @@ namespace Ocuda.Ops.Controllers
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
             var itemsPerPage = await _siteSettingService
-                .GetSettingIntAsync(SiteSettingKey.Pagination.ItemsPerPage);
+                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
 
             var filter = new BlogFilter(page, itemsPerPage)
             {

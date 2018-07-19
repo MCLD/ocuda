@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Ocuda.Utility.Helpers;
 
-namespace Ocuda.Ops.Controllers.Filter
+namespace Ocuda.Ops.Controllers.Filters
 {
     public class SaveModelStateAttribute : ActionFilterAttribute
     {
@@ -19,8 +19,8 @@ namespace Ocuda.Ops.Controllers.Filter
                     var controller = context.Controller as Controller;
                     if (controller != null && context.ModelState != null)
                     {
-                        var key = ModelStateHelpers.GetModelStateKey(context.RouteData.Values);
-                        controller.TempData[key] = ModelStateHelpers
+                        var key = ModelStateHelper.GetModelStateKey(context.RouteData.Values);
+                        controller.TempData[key] = ModelStateHelper
                             .SerializeModelState(context.ModelState);
                     }
                 }

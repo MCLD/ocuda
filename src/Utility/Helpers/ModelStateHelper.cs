@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
@@ -8,7 +7,7 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Utility.Helpers
 {
-    public static class ModelStateHelpers
+    public static class ModelStateHelper
     {
         public static string SerializeModelState(ModelStateDictionary modelState)
         {

@@ -16,7 +16,7 @@ namespace Ocuda.Ops.Controllers
         private readonly IPostService _postService;
         private readonly ISectionService _sectionService;
 
-        public HomeController(ServiceFacade.Controller<HomeController> context,
+        public HomeController(ServiceFacades.Controller<HomeController> context,
             IFileService fileService,
             ILinkService linkService,
             IPostService postService,

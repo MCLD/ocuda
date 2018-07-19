@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Ocuda.Ops.Controllers.Validator;
+using Ocuda.Ops.Controllers.Validators;
 
-namespace Ocuda.Ops.Controllers.RouteConstraint
+namespace Ocuda.Ops.Controllers.RouteConstraints
 {
     public class SectionRouteConstraint : IRouteConstraint
     {

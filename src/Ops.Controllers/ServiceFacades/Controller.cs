@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
-namespace Ocuda.Ops.Controllers.ServiceFacade
+namespace Ocuda.Ops.Controllers.ServiceFacades
 {
     public class Controller<T>
     {

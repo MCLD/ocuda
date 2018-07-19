@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
-namespace Ocuda.Ops.Controllers.Filter
+namespace Ocuda.Ops.Controllers.Filters
 {
     public class SectionFilter : Attribute, IAsyncResourceFilter
     {
