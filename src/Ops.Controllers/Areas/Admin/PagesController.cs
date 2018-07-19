@@ -7,6 +7,7 @@ using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages;
 using Ocuda.Ops.Controllers.Authorization;
 using Ocuda.Ops.Controllers.Filter;
+using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -22,7 +23,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         private readonly IPageService _pageService;
         private readonly ISectionService _sectionService;
 
-        public PagesController(ServiceFacade.Controller<PagesController> context,
+        public PagesController(ServiceFacades.Controller<PagesController> context,
             IPageService pageService,
             ISectionService sectionService) : base(context)
         {
@@ -35,7 +36,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
             var itemsPerPage = await _siteSettingService
-                .GetSettingIntAsync(SiteSettingKey.Pagination.ItemsPerPage);
+                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
 
             var filter = new BlogFilter(page, itemsPerPage)
             {

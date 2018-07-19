@@ -9,12 +9,12 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Controllers.Helper;
+using Ocuda.Ops.Controllers.Helpers;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Utility.Helper;
+using Ocuda.Utility.Helpers;
 using Ocuda.Utility.Keys;
 
-namespace Ocuda.Ops.Controllers.Filter
+namespace Ocuda.Ops.Controllers.Filters
 {
     public class AuthenticationFilter : Attribute, IAsyncResourceFilter
     {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace Ocuda.Utility.Helper
+namespace Ocuda.Utility.Helpers
 {
     public class WebHelper
     {

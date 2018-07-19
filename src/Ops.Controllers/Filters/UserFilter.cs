@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
 
-namespace Ocuda.Ops.Controllers.Filter
+namespace Ocuda.Ops.Controllers.Filters
 {
     public class UserFilter : Attribute, IAsyncResourceFilter
     {

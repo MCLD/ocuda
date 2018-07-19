@@ -1,4 +1,4 @@
-﻿namespace Ocuda.Ops.Controllers.Validator
+﻿namespace Ocuda.Ops.Controllers.Validators
 {
     public interface ISectionPathValidator
     {

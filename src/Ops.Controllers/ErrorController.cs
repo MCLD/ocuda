@@ -10,7 +10,7 @@ namespace Ocuda.Ops.Controllers
 {
     public class ErrorController : BaseController<ErrorController>
     {
-        public ErrorController(ServiceFacade.Controller<ErrorController> context)
+        public ErrorController(ServiceFacades.Controller<ErrorController> context)
             : base(context)
         {
         }

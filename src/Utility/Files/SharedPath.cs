@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Ocuda.Utility.File
+namespace Ocuda.Utility.Files
 {
     public static class SharedPath
     {

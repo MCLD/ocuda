@@ -9,8 +9,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Authorization;
-using Ocuda.Ops.Controllers.RouteConstraint;
-using Ocuda.Ops.Controllers.Validator;
+using Ocuda.Ops.Controllers.RouteConstraints;
+using Ocuda.Ops.Controllers.Validators;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -77,7 +77,7 @@ namespace Ocuda.Ops.Web
                     _logger.LogInformation("Using memory-based distributed cache");
                     services.AddDistributedMemoryCache();
                     var sharedPath = string.Format("{0}{1}{2}",
-                        Utility.File.SharedPath.Get(_config[Utility.Keys.Configuration.OpsFileShared]),
+                        Utility.Files.SharedPath.Get(_config[Utility.Keys.Configuration.OpsFileShared]),
                         System.IO.Path.DirectorySeparatorChar,
                         DataProtectionKeyKey);
                     services.AddDataProtection()
@@ -150,19 +150,19 @@ namespace Ocuda.Ops.Web
                 .AddSessionStateTempDataProvider();
 
             // service facades
-            services.AddScoped(typeof(Controllers.ServiceFacade.Controller<>));
+            services.AddScoped(typeof(Controllers.ServiceFacades.Controller<>));
 
             // filters
-            services.AddScoped<Controllers.Filter.AuthenticationFilter>();
-            services.AddScoped<Controllers.Filter.UserFilter>();
-            services.AddScoped<Controllers.Filter.SectionFilter>();
+            services.AddScoped<Controllers.Filters.AuthenticationFilter>();
+            services.AddScoped<Controllers.Filters.UserFilter>();
+            services.AddScoped<Controllers.Filters.SectionFilter>();
 
             // section path validator
             services.AddScoped<ISectionPathValidator, SectionPathValidator>();
 
             // helpers
-            services.AddScoped<Controllers.Helper.LdapHelper>();
-            services.AddScoped<Utility.Helper.WebHelper>();
+            services.AddScoped<Controllers.Helpers.LdapHelper>();
+            services.AddScoped<Utility.Helpers.WebHelper>();
 
             // repositories
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,

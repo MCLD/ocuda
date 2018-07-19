@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Sections;
 using Ocuda.Ops.Controllers.Filter;
+using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
@@ -19,7 +20,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     {
         private readonly ISectionService _sectionService;
 
-        public SectionsController(ServiceFacade.Controller<SectionsController> context,
+        public SectionsController(ServiceFacades.Controller<SectionsController> context,
             ISectionService sectionService) : base(context)
         {
             _sectionService = sectionService 
@@ -29,7 +30,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         public async Task<IActionResult> Index(int page = 1)
         {
             var itemsPerPage = await _siteSettingService.
-                GetSettingIntAsync(SiteSettingKey.Pagination.ItemsPerPage);
+                GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
 
             var filter = new BlogFilter(page, itemsPerPage);
 

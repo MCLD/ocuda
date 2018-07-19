@@ -59,7 +59,7 @@ namespace Ocuda.Ops.Service
                 : DefaultPublicDirectory;
 
             string path
-                = Utility.File.SharedPath.Get(_config[Utility.Keys.Configuration.OpsFileShared]);
+                = Utility.Files.SharedPath.Get(_config[Utility.Keys.Configuration.OpsFileShared]);
 
             try
             {

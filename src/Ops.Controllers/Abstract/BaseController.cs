@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Controllers.Filter;
+using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
 
@@ -14,7 +14,7 @@ namespace Ocuda.Ops.Controllers.Abstract
     {
         protected readonly ILogger _logger;
         protected readonly ISiteSettingService _siteSettingService;
-        protected BaseController(ServiceFacade.Controller<T> context)
+        protected BaseController(ServiceFacades.Controller<T> context)
         {
             _logger = context.Logger;
             _siteSettingService = context.SiteSettingService;

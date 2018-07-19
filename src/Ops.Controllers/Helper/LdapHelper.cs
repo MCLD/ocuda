@@ -5,7 +5,7 @@ using Novell.Directory.Ldap;
 using Ocuda.Ops.Models;
 using Ocuda.Utility.Keys;
 
-namespace Ocuda.Ops.Controllers.Helper
+namespace Ocuda.Ops.Controllers.Helpers
 {
     public class LdapHelper
     {
