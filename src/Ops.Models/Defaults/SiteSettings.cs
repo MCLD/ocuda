@@ -3,7 +3,7 @@ namespace Ocuda.Ops.Models.Defaults
 {
     public static class SiteSettings
     {
-        public static IEnumerable<SiteSetting> Get { get; } = new SiteSetting[]
+        public static IEnumerable<SiteSetting> Get { get; } = new []
         {
             new SiteSetting
             {
