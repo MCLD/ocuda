@@ -17,11 +17,9 @@ namespace Ocuda.Ops.Controllers.Filter
             var resultContext = await next();
 
             var controller = context.Controller as Controller;
-
             var key = ModelStateHelpers.GetModelStateKey(context.RouteData.Values);
 
             var modelStateStorage = controller?.TempData[key] as string;
-
             if (modelStateStorage != null)
             {
                 var storage = ModelStateHelpers.DeserializeModelState(modelStateStorage);
@@ -34,7 +32,6 @@ namespace Ocuda.Ops.Controllers.Filter
                 if (TimeSpan.FromSeconds(timeDifference).Minutes < modelstateTimeOut 
                     || modelstateTimeOut < 1)
                 {
-                    
                     //Only Import if we are viewing
                     if (resultContext.Result is ViewResult)
                     {
