@@ -38,7 +38,7 @@ namespace Ocuda.Ops.Controllers.Filter
                     //Only Import if we are viewing
                     if (resultContext.Result is ViewResult)
                     {
-                        resultContext.ModelState.Merge(storage.modelState);
+                        context.ModelState.Merge(storage.modelState);
                     }
                 }
                 else
