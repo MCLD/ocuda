@@ -11,15 +11,12 @@ namespace Ocuda.Ops.Service
 {
     public class PageService : IPageService
     {
-        private readonly InsertSampleDataService _insertSampleDataService;
         private IPageRepository _pageRepository;
 
-        public PageService(IPageRepository pageRepository, InsertSampleDataService insertSampleDataService)
+        public PageService(IPageRepository pageRepository)
         {
             _pageRepository = pageRepository 
                 ?? throw new ArgumentNullException(nameof(pageRepository));
-            _insertSampleDataService = insertSampleDataService
-                ?? throw new ArgumentNullException(nameof(insertSampleDataService));
         }
 
         public async Task<int> GetPageCountAsync()

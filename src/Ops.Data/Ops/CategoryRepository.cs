@@ -89,5 +89,16 @@ namespace Ocuda.Ops.Data.Ops
                     .ToListAsync()
             };
         }
+
+        public async Task<bool> CategoryExistsAsync(Category category)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Id != category.Id
+                    && _.CategoryType == category.CategoryType
+                    && _.Name == category.Name
+                    && _.SectionId == category.SectionId)
+                .AnyAsync();
+        }
     }
 }

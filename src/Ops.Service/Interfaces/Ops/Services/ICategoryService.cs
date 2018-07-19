@@ -19,7 +19,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<Category> GetAttachmentCategoryAsync(int currentUserId, int sectionId);
         Task<int> GetCategoryCountAsync();
         Task<Category> CreateCategoryAsync(int currentUserId, Category category);
-        Task<Category> EditCategoryAsync(Category category);
+        Task<Category> EditCategoryAsync(int id, string name);
         Task DeleteCategoryAsync(int id);
         Task CreateDefaultCategories(int currentUserId, int sectionId);
     }

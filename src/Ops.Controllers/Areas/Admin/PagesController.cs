@@ -6,6 +6,8 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages;
 using Ocuda.Ops.Controllers.Authorization;
+using Ocuda.Ops.Controllers.Filter;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
@@ -69,26 +71,30 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(IndexViewModel model)
+        public async Task<IActionResult> Create(string title, string stub, int sectionId)
         {
-            if (ModelState.IsValid)
+            var page = new Page
             {
-                try
-                {
-                    model.Page.SectionId = model.SectionId;
-                    var newPage = await _pageService.CreateAsync(CurrentUserId, model.Page);
-                    return RedirectToAction(nameof(Edit), new { id = newPage.Id });
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"Error adding page: {ex}", ex);
-                    ShowAlertDanger("Unable to add page: ", ex.Message);
-                }
-            }
+                IsDraft = true,
+                SectionId = sectionId,
+                Stub = stub,
+                Title = title
+            };
 
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                var newPage = await _pageService.CreateAsync(CurrentUserId, page);
+                return Json(new { success = true, id = newPage.Id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error adding page: {ex}", ex);
+                ShowAlertDanger("Unable to add page: ", ex.Message);
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
+        [RestoreModelState]
         public async Task<IActionResult> Edit(int id)
         {
             var page = await _pageService.GetByIdAsync(id);
@@ -105,6 +111,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
+        [SaveModelState]
         public async Task<IActionResult> Edit(DetailViewModel model)
         {
             var currentPost = await _pageService.GetByIdAsync(model.Page.Id);
@@ -135,8 +142,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
             }
 
-            model.Action = nameof(Edit);
-            model.IsDraft = currentPost.IsDraft;
             return RedirectToAction(nameof(Edit), new { id = model.Page.Id });
         }
 

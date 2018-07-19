@@ -1,11 +1,11 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Posts.IndexViewModel
 
-<form asp-controller="Posts" asp-action="@(nameof(PostsController.Create))" method="post" role="form">
+<form id="addForm" role="form">
     <input asp-for="@Model.SectionId" type="hidden" />
-    <input id="editDraft" asp-for="Post.IsDraft" type="hidden" value="true" />
-    <input id="editStub" asp-for="Post.Stub" type="hidden" readonly />
+    <input id="addDraft" asp-for="Post.IsDraft" type="hidden" value="true" />
+    <input id="addStub" asp-for="Post.Stub" type="hidden" readonly />
     <div modal id="addModal" name="Post" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
-        <input id="editTitle" asp-for="Post.Title" formgroup />
+        <input id="addTitle" asp-for="Post.Title" formgroup />
     </div>
 </form>
 
@@ -83,8 +83,25 @@ else
 @section scripts
     {
     <script>
-        var title = $('#editTitle');
-        var stub = $("#editStub");
+        var title = $("#addTitle");
+        var stub = $("#addStub");
+
+        $("#addForm").submit(function (e) {
+            e.preventDefault();
+            var sectionId = $("#SectionId").val();
+
+            $.post("@(Url.Action("Create", "Posts"))",
+                { title: title.val(), stub: stub.val(), sectionId: sectionId },
+                function (response) {
+                    if (response.success == true) {
+                        var url = "@(Url.Action("Edit", "Posts"))/" + response.id;
+                        location.href = url;
+                    }
+                    else {
+                        alert(response.message);
+                    }
+                });
+        });
 
         $(document).ready(function () {
             $('.rowlink-parent').each(function () {

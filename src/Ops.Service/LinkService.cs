@@ -11,15 +11,10 @@ namespace Ocuda.Ops.Service
 {
     public class LinkService : ILinkService
     {
-        private readonly IInsertSampleDataService _insertSampleDataService;
         private readonly ILinkRepository _linkRepository;
 
-        public LinkService(IInsertSampleDataService insertSampleDataService,
-            ILinkRepository linkRepository,
-            ICategoryRepository categoryRepository)
+        public LinkService(ILinkRepository linkRepository)
         {
-            _insertSampleDataService = insertSampleDataService
-                ?? throw new ArgumentNullException(nameof(insertSampleDataService));
             _linkRepository = linkRepository
                 ?? throw new ArgumentNullException(nameof(linkRepository));
         }

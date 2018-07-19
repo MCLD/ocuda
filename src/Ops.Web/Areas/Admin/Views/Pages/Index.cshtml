@@ -1,11 +1,10 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages.IndexViewModel
 
-<form asp-controller="Pages" asp-action="@(nameof(PagesController.Create))" method="post" role="form">
+<form id="addForm" role="form">
     <input asp-for="@Model.SectionId" type="hidden" />
-    <input id="editDraft" asp-for="Page.IsDraft" type="hidden" value="true" />
-    <input id="editStub" asp-for="Page.Stub" type="hidden" readonly />
+    <input id="addStub" asp-for="Page.Stub" type="hidden" readonly />
     <div modal id="addModal" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
-        <input id="editTitle" asp-for="Page.Title" formgroup />
+        <input id="addTitle" asp-for="Page.Title" formgroup />
     </div>
 </form>
 
@@ -77,8 +76,25 @@ else
 @section scripts
     {
     <script>
-        var title = $('#editTitle');
-        var stub = $("#editStub");
+        var title = $("#addTitle");
+        var stub = $("#addStub");
+
+        $("#addForm").submit(function (e) {
+            e.preventDefault();
+            var sectionId = $("#SectionId").val();
+
+            $.post("@(Url.Action("Create", "Pages"))",
+                { title: title.val(), stub: stub.val(), sectionId: sectionId },
+                function (response) {
+                    if (response.success == true) {
+                        var url = "@(Url.Action("Edit", "Pages"))/" + response.id;
+                        location.href = url;
+                    }
+                    else {
+                        alert(response.message);
+                    }
+                });
+        });
 
         $(document).ready(function () {
             $('.rowlink-parent').each(function () {

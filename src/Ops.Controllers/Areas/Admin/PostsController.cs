@@ -6,6 +6,8 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Posts;
 using Ocuda.Ops.Controllers.Authorization;
+using Ocuda.Ops.Controllers.Filter;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
@@ -69,26 +71,31 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(IndexViewModel model)
+        public async Task<IActionResult> Create(string title, string stub, int sectionId)
         {
-            if (ModelState.IsValid)
+            var post = new Post
             {
-                try
-                {
-                    model.Post.SectionId = model.SectionId;
-                    var newPost = await _postService.CreateAsync(CurrentUserId, model.Post);
-                    return RedirectToAction(nameof(Edit), new { id = newPost.Id });
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"Error adding post: {ex}", ex);
-                    ShowAlertDanger("Unable to add blog post: ", ex.Message);
-                }
-            }
+                IsDraft = true,
+                SectionId = sectionId,
+                Stub = stub,
+                Title = title
+            };
 
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                var newPost = await _postService.CreateAsync(CurrentUserId, post);
+                return Json(new { success = true, id = newPost.Id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error adding post: {ex}", ex);
+                ShowAlertDanger("Unable to add blog post: ", ex.Message);
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
+
+        [RestoreModelState]
         public async Task<IActionResult> Edit(int id)
         {
             var post = await _postService.GetByIdAsync(id);
@@ -105,6 +112,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
+        [SaveModelState]
         public async Task<IActionResult> Edit(DetailViewModel model)
         {
             var currentPost = await _postService.GetByIdAsync(model.Post.Id);
@@ -135,9 +143,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
             }
 
-            model.Action = nameof(Edit);
-            model.IsDraft = currentPost.IsDraft;
-            return RedirectToAction(nameof(Edit), new { id = model.Post.Id });
+            return RedirectToAction(nameof(Edit));
         }
 
         [HttpPost]

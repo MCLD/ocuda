@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Roster;
+using Ocuda.Ops.Controllers.Filter;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
@@ -58,12 +59,14 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             });
         }
 
+        [RestoreModelState]
         public IActionResult Upload()
         {
             return View();
         }
 
         [HttpPost]
+        [SaveModelState]
         public async Task<IActionResult> Upload(UploadViewModel model)
         {
             if (ModelState.IsValid)
@@ -101,7 +104,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
             }
 
-            return View(model);
+            return RedirectToAction(nameof(Upload));
         }
     }
 }
