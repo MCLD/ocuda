@@ -11,18 +11,11 @@ namespace Ocuda.Ops.Controllers.Filter
 {
     public class RestoreModelStateAttribute : ActionFilterAttribute
     {
-        private readonly ILogger<RestoreModelStateAttribute> _logger;
-        private readonly ISiteSettingService _siteSettingService;
-        public RestoreModelStateAttribute(ILogger<RestoreModelStateAttribute> logger,
-            ISiteSettingService siteSettingService)
-        {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _siteSettingService = siteSettingService 
-                ?? throw new ArgumentNullException(nameof(siteSettingService));
-        }
         public override async Task OnActionExecutionAsync(ActionExecutingContext context,
                                          ActionExecutionDelegate next)
         {
+            var resultContext = await next();
+
             var controller = context.Controller as Controller;
 
             var key = ModelStateHelpers.GetModelStateKey(context.RouteData.Values);
@@ -33,24 +26,28 @@ namespace Ocuda.Ops.Controllers.Filter
             {
                 var storage = ModelStateHelpers.DeserializeModelState(modelStateStorage);
                 var timeDifference = DateTimeOffset.Now.ToUnixTimeSeconds() - storage.time;
+
+                var _siteSettingService = (ISiteSettingService)context.HttpContext.RequestServices
+                    .GetService(typeof(ISiteSettingService));
                 var modelstateTimeOut = await _siteSettingService
                     .GetSettingIntAsync(SiteSettingKey.ModelState.TimeOutMinutes);
                 if (TimeSpan.FromSeconds(timeDifference).Minutes < modelstateTimeOut 
                     || modelstateTimeOut < 1)
                 {
+                    
                     //Only Import if we are viewing
-                    if (context.Result is ViewResult)
+                    if (resultContext.Result is ViewResult)
                     {
-                        context.ModelState.Merge(storage.modelState);
+                        resultContext.ModelState.Merge(storage.modelState);
                     }
                 }
                 else
                 {
+                    var _logger = (ILogger<RestoreModelStateAttribute>)context.HttpContext
+                        .RequestServices.GetService(typeof(ILogger<RestoreModelStateAttribute>));
                     _logger.LogError($"ModelState timed out for key {key}.");
                 }
             }
-
-            await next();
         }
     }
 }

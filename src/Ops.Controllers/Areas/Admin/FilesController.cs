@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Files;
 using Ocuda.Ops.Controllers.Authorization;
+using Ocuda.Ops.Controllers.Filter;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -139,8 +140,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             else
             { 
-                var siteSetting = await _siteSettingService.GetSetting(SiteSettingKey.FileUpload.MaxFileSize);
-                int.TryParse(siteSetting, out int maxFileSize);
+                var maxFileSize = await _siteSettingService
+                    .GetSettingIntAsync(SiteSettingKey.FileUpload.MaxFileSize);
 
                 if (model.FileData.Length > maxFileSize)
                 {
@@ -235,8 +236,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             else
             { 
-                var siteSetting = await _siteSettingService.GetSetting(SiteSettingKey.FileUpload.MaxFileSize);
-                int.TryParse(siteSetting, out int maxFileSize);
+                var maxFileSize = await _siteSettingService
+                    .GetSettingIntAsync(SiteSettingKey.FileUpload.MaxFileSize);
 
                 if (model.FileData.Length > maxFileSize)
                 {
