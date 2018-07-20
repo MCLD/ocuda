@@ -1,16 +1,23 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
     public class UserService : IUserService
     {
+        private readonly ILogger<UserService> _logger;
         private readonly IUserRepository _userRepository;
-        public UserService(IUserRepository userRepository)
+
+        public UserService(ILogger<UserService> logger,
+            IUserRepository userRepository)
         {
+            _logger = logger
+               ?? throw new ArgumentNullException(nameof(logger));
             _userRepository = userRepository 
                 ?? throw new ArgumentNullException(nameof(userRepository));
         }
@@ -28,6 +35,9 @@ namespace Ocuda.Ops.Service
             {
                 user.CreatedBy = (int)createdById;
             }
+
+            await ValidateUser(user);
+
             await _userRepository.AddAsync(user);
             await _userRepository.SaveAsync();
             if (createdById != null)
@@ -70,7 +80,15 @@ namespace Ocuda.Ops.Service
 
         public async Task<User> GetByUsernameAsync(string username)
         {
-            // TODO throw exception if the username is null
+            var message = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                message = $"Username name cannot be empty.";
+                _logger.LogWarning(message);
+                throw new OcudaException(message);
+            }
+
             return await _userRepository.FindByUsernameAsync(username);
         }
 
@@ -78,6 +96,8 @@ namespace Ocuda.Ops.Service
         {
             var currentUser = await _userRepository.FindAsync(user.Id);
             currentUser.Nickname = user.Nickname;
+
+            await ValidateUser(currentUser);
 
             _userRepository.Update(currentUser);
             await _userRepository.SaveAsync();
@@ -97,6 +117,37 @@ namespace Ocuda.Ops.Service
             dbUser.SupervisorId = user.SupervisorId;
             _userRepository.Update(dbUser);
             await _userRepository.SaveAsync();
+        }
+
+        public async Task<bool> UsernameExistsAsync(User user)
+        {
+            var existingUser = await GetByUsernameAsync(user.Username);
+
+            if (existingUser != null)
+            {
+                return existingUser.Id != user.Id ? true : false;
+            }
+
+            return false;
+        }
+
+        public async Task ValidateUser(User user)
+        {
+            var message = string.Empty;
+
+            if(string.IsNullOrWhiteSpace(user.Username))
+            {
+                message = $"Username name cannot be empty.";
+                _logger.LogWarning(message);
+                throw new OcudaException(message);
+            }
+
+            if (await UsernameExistsAsync(user))
+            {
+                message = $"User '{user.Username}' already exists.";
+                _logger.LogWarning(message, user.Username);
+                throw new OcudaException(message);
+            }
         }
     }
 }

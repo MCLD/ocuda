@@ -71,7 +71,7 @@ namespace Ocuda.Ops.Controllers
 
             if (categoryId.HasValue)
             {
-                var name = (await _categoryService.GetCategoryByIdAsync(categoryId.Value)).Name;
+                var name = (await _categoryService.GetByIdAsync(categoryId.Value)).Name;
                 viewModel.CategoryName =
                     string.IsNullOrWhiteSpace(name) ? DefaultCategoryDisplayName : name;
             }

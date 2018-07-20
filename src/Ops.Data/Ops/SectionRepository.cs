@@ -44,6 +44,14 @@ namespace Ocuda.Ops.Data.Ops
                 .AnyAsync();
         }
 
+        public async Task<Section> GetByNameAsync(string name)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Name == name)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<Section> GetByPathAsync(string path)
         {
             return await DbSet

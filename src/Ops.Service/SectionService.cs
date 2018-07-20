@@ -1,22 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Models;
+using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
     public class SectionService : ISectionService
     {
+        private readonly ILogger<SectionService> _logger;
         private readonly ISectionRepository _sectionRepository;
         private readonly ICategoryService _categoryService;
 
-        public SectionService(ISectionRepository sectionRepository,
+        public SectionService(ILogger<SectionService> logger,
+            ISectionRepository sectionRepository,
             ICategoryService categoryService)
         {
+            _logger = logger
+               ?? throw new ArgumentNullException(nameof(logger));
             _sectionRepository = sectionRepository
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
             _categoryService = categoryService
@@ -58,6 +64,11 @@ namespace Ocuda.Ops.Service
             return await _sectionRepository.IsValidPathAsync(path);
         }
 
+        public async Task<Section> GetByNameAsync(string name)
+        {
+            return await _sectionRepository.GetByNameAsync(name);
+        }
+
         public async Task<Section> GetByPathAsync(string path)
         {
             return await _sectionRepository.GetByPathAsync(path);
@@ -85,10 +96,12 @@ namespace Ocuda.Ops.Service
             section.CreatedAt = DateTime.Now;
             section.CreatedBy = currentUserId;
 
+            await ValidateSection(section);
+
             await _sectionRepository.AddAsync(section);
             await _sectionRepository.SaveAsync();
             await _categoryService.CreateDefaultCategories(currentUserId, section.Id);
-            
+
             return section;
         }
 
@@ -100,6 +113,8 @@ namespace Ocuda.Ops.Service
             currentSection.Icon = section.Icon;
             currentSection.SortOrder = section.SortOrder;
             currentSection.FeaturedVideoUrl = section.FeaturedVideoUrl;
+
+            await ValidateSection(currentSection);
 
             _sectionRepository.Update(currentSection);
             await _sectionRepository.SaveAsync();
@@ -123,38 +138,68 @@ namespace Ocuda.Ops.Service
             await _sectionRepository.SaveAsync();
         }
 
-        public IEnumerable<Calendar> GetCalendars()
-        {            
-            // TODO repository/database
-            // TODO move this somewhere more appropriate
-            return new List<Calendar>
+        public async Task<bool> NameExistsAsync(Section section)
+        {
+            var existingSection = await GetByNameAsync(section.Name);
+
+            if (existingSection != null)
             {
-                new Calendar
+                return existingSection.Id != section.Id ? true : false;
+            }
+
+            return false;
+        }
+
+        public async Task<bool> PathExistsAsync(Section section)
+        {
+            var existingSection = await GetByPathAsync(section.Path);
+
+            if (existingSection != null)
+            {
+                return existingSection.Id != section.Id ? true : false;
+            }
+
+            return false;
+        }
+
+        private async Task ValidateSection(Section section)
+        {
+            var message = string.Empty;
+            var defaultSection = await _sectionRepository.GetDefaultSectionAsync();
+
+            if (defaultSection != null)
+            {
+                if (section.Id != defaultSection.Id)
                 {
-                    IsPinned = true,
-                    Name = "Staff Training",
-                    Url = "https://www.google.com/",
-                    When = DateTime.Parse("2018-06-19 10:00"),
-                    CreatedBy = 1,
-                    CreatedAt = DateTime.Now,
-                },
-                new Calendar
-                {
-                    Name = "Fun Event!",
-                    Url = "https://www.google.com/",
-                    When = DateTime.Parse("2018-06-08 12:00"),
-                    CreatedBy = 1,
-                    CreatedAt = DateTime.Now,
-                },
-                new Calendar
-                {
-                    Name = "Important Date Reminder",
-                    Url = "https://www.google.com/",
-                    When = DateTime.Parse("2018-06-12 9:00"),
-                    CreatedBy = 1,
-                    CreatedAt = DateTime.Now,
+                    if (string.IsNullOrWhiteSpace(section.Name))
+                    {
+                        message = $"Section name cannot be empty.";
+                        _logger.LogWarning(message);
+                        throw new OcudaException(message);
+                    }
+
+                    if (string.IsNullOrWhiteSpace(section.Path))
+                    {
+                        message = $"Section path cannot be empty.";
+                        _logger.LogWarning(message);
+                        throw new OcudaException(message);
+                    }
                 }
-            };
+
+                if (await NameExistsAsync(section))
+                {
+                    message = $"Section '{section.Name}' already exists.";
+                    _logger.LogWarning(message, section.Name);
+                    throw new OcudaException(message);
+                }
+
+                if (await PathExistsAsync(section))
+                {
+                    message = $"Section path '{section.Path }' already exists.";
+                    _logger.LogWarning(message, section.Path);
+                    throw new OcudaException(message);
+                }
+            }
         }
     }
 }
