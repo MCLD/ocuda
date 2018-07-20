@@ -189,7 +189,7 @@ namespace Ops.Web.WindowsAuth
             }
             else
             {
-                return $".{CacheDiscriminator}{string.Format(key, parameters)}";
+                return $"{CacheDiscriminator}.{string.Format(key, parameters)}";
             }
         }
     }
