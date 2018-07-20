@@ -32,12 +32,15 @@ namespace Ops.Web.WindowsAuth
                 = _config[Configuration.OpsDistributedCacheRedisConfiguration]
                 ?? throw new Exception($"{Configuration.OpsDistributedCacheRedisConfiguration} is not set.");
             string instanceName = CacheInstance.OcudaOps;
+            if (!instanceName.EndsWith("."))
+            {
+                instanceName += ".";
+            }
             services.AddDistributedRedisCache(_ =>
             {
                 _.Configuration = redisConfiguration;
                 _.InstanceName = instanceName;
             });
-
         }
 
         private const string IdUrlBit = "/id/";

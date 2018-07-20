@@ -38,7 +38,7 @@ namespace Ocuda.Ops.Web
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             // set a default culture of en-US if none is specified
-            string culture = _config[Utility.Keys.Configuration.OpsCulture] ?? DefaultCulture;
+            string culture = _config[Configuration.OpsCulture] ?? DefaultCulture;
             _logger.LogInformation("Configuring for culture: {0}", culture);
             services.Configure<RequestLocalizationOptions>(_ =>
             {
@@ -46,22 +46,26 @@ namespace Ocuda.Ops.Web
                     = new Microsoft.AspNetCore.Localization.RequestCulture(culture);
             });
 
-            switch (_config[Utility.Keys.Configuration.OpsDistributedCache])
+            switch (_config[Configuration.OpsDistributedCache])
             {
                 case "Redis":
                     string redisConfiguration
-                        = _config[Utility.Keys.Configuration.OpsDistributedCacheRedisConfiguration]
-                        ?? throw new Exception($"{Utility.Keys.Configuration.OpsDistributedCache} has Redis selected but {Utility.Keys.Configuration.OpsDistributedCacheRedisConfiguration} is not set.");
-                    string instanceName = Utility.Keys.CacheInstance.OcudaOps;
+                        = _config[Configuration.OpsDistributedCacheRedisConfiguration]
+                        ?? throw new Exception($"{Configuration.OpsDistributedCache} has Redis selected but {Configuration.OpsDistributedCacheRedisConfiguration} is not set.");
+                    string instanceName = CacheInstance.OcudaOps;
+                    if(!instanceName.EndsWith("."))
+                    {
+                        instanceName += ".";
+                    }
                     string cacheDiscriminator
-                        = _config[Utility.Keys.Configuration.OpsDistributedCacheInstanceDiscriminator]
+                        = _config[Configuration.OpsDistributedCacheInstanceDiscriminator]
                         ?? string.Empty;
                     if (!string.IsNullOrEmpty(cacheDiscriminator))
                     {
-                        instanceName = $"{instanceName}.{cacheDiscriminator}";
+                        instanceName = $"{instanceName}{cacheDiscriminator}.";
                     }
-                    _logger.LogInformation("Using Redis distributed cache {0} instance {1}", 
-                        redisConfiguration, 
+                    _logger.LogInformation("Using Redis distributed cache {0} instance {1}",
+                        redisConfiguration,
                         instanceName);
                     services.AddDistributedRedisCache(_ =>
                     {
@@ -70,14 +74,14 @@ namespace Ocuda.Ops.Web
                     });
                     var redis = ConnectionMultiplexer.Connect(redisConfiguration);
                     services.AddDataProtection()
-                        .PersistKeysToRedis(redis, 
+                        .PersistKeysToRedis(redis,
                             $"{CacheInstanceInternal}.{DataProtectionKeyKey}");
                     break;
                 default:
                     _logger.LogInformation("Using memory-based distributed cache");
                     services.AddDistributedMemoryCache();
                     var sharedPath = string.Format("{0}{1}{2}",
-                        Utility.Files.SharedPath.Get(_config[Utility.Keys.Configuration.OpsFileShared]),
+                        Utility.Files.SharedPath.Get(_config[Configuration.OpsFileShared]),
                         System.IO.Path.DirectorySeparatorChar,
                         DataProtectionKeyKey);
                     services.AddDataProtection()
@@ -90,7 +94,7 @@ namespace Ocuda.Ops.Web
             string promCs = _config.GetConnectionString("Promenade")
                 ?? throw new Exception("ConnectionString:Promenade not configured.");
 
-            var provider = _config[Utility.Keys.Configuration.OpsDatabaseProvider];
+            var provider = _config[Configuration.OpsDatabaseProvider];
             switch (provider)
             {
                 case "SqlServer":
@@ -109,12 +113,12 @@ namespace Ocuda.Ops.Web
                     break;
                 default:
                     _logger.LogCritical("No {0} configured in settings. Exiting.",
-                        Utility.Keys.Configuration.OpsDatabaseProvider);
-                    throw new Exception($"No {Utility.Keys.Configuration.OpsDatabaseProvider} configured.");
+                        Configuration.OpsDatabaseProvider);
+                    throw new Exception($"No {Configuration.OpsDatabaseProvider} configured.");
             }
 
             var sessionTimeout = TimeSpan.FromHours(2 * 60);
-            if (int.TryParse(_config[Utility.Keys.Configuration.OpsSessionTimeoutMinutes],
+            if (int.TryParse(_config[Configuration.OpsSessionTimeoutMinutes],
                 out int configuredTimeout))
             {
                 _logger.LogInformation("Session timeout configured for {0} minutes",
@@ -169,15 +173,15 @@ namespace Ocuda.Ops.Web
                 Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,
                 Data.Ops.ClaimGroupRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IFileRepository, 
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IFileRepository,
                 Data.Ops.FileRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileTypeRepository,
                 Data.Ops.FileTypeRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository, 
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository,
                 Data.Ops.LinkRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IPageRepository, 
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPageRepository,
                 Data.Ops.PageRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IPostRepository, 
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPostRepository,
                 Data.Ops.PostRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterDetailRepository,
                 Data.Ops.RosterDetailRepository>();
@@ -193,7 +197,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.UserRepository>();
 
             // services
-            services.AddScoped<Service.Interfaces.Ops.Services.IAuthorizationService, AuthorizationService>();
+            services.AddScoped<Service.Interfaces.Ops.Services.IAuthorizationService,
+                AuthorizationService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IFileTypeService, FileTypeService>();
@@ -272,7 +277,8 @@ namespace Ocuda.Ops.Web
                     defaults: new { controller = "Home", action = "Index" },
                     constraints: new
                     {
-                        section = new SectionRouteConstraint(app.ApplicationServices.GetRequiredService<ISectionPathValidator>())
+                        section = new SectionRouteConstraint(app
+                            .ApplicationServices.GetRequiredService<ISectionPathValidator>())
                     });
 
                 routes.MapRoute(
@@ -285,7 +291,8 @@ namespace Ocuda.Ops.Web
                    defaults: new { controller = "Home", action = "Index" },
                    constraints: new
                    {
-                       section = new SectionRouteConstraint(app.ApplicationServices.GetRequiredService<ISectionPathValidator>())
+                       section = new SectionRouteConstraint(app
+                           .ApplicationServices.GetRequiredService<ISectionPathValidator>())
                    });
 
                 routes.MapRoute(
