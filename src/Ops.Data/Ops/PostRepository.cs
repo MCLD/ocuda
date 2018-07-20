@@ -35,6 +35,14 @@ namespace Ocuda.Ops.Data.Ops
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<Post> GetByTitleAndSectionIdAsync(string name, int sectionId)
+        {
+            return await DbSet
+                    .AsNoTracking()
+                    .Where(_ => _.Title == name && _.SectionId == sectionId)
+                    .FirstOrDefaultAsync();
+        }
+
         public async Task<DataWithCount<ICollection<Post>>> GetPaginatedListAsync(BlogFilter filter)
         {
             var query = DbSet.AsNoTracking();

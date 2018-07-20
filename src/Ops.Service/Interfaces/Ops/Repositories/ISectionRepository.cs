@@ -11,6 +11,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         Task<Section> GetDefaultSectionAsync();
         Task<ICollection<Section>> GetNavigationSectionsAsync();
         Task<bool> IsValidPathAsync(string path);
+        Task<Section> GetByNameAsync(string name);
         Task<Section> GetByPathAsync(string path);
         Task<DataWithCount<ICollection<Section>>> GetPaginatedListAsync(BaseFilter filter);
     }

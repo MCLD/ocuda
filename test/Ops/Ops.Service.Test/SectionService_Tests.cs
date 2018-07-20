@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Xunit;
 
 namespace Ocuda.test.Ops.Service.Test
@@ -44,10 +46,13 @@ namespace Ocuda.test.Ops.Service.Test
             var sectionRepository = new Mock<ISectionRepository>();
             sectionRepository.Setup(_ => _.FindAsync(5)).Returns(Task.FromResult(currentSection));
 
+            var categoryLogger = new Mock<ILogger<CategoryService>>();
+            var sectionLogger = new Mock<ILogger<SectionService>>();
             var categoryRepository = new Mock<ICategoryRepository>();
-            var categoryService = new CategoryService(categoryRepository.Object);
 
-            var service = new SectionService(sectionRepository.Object, categoryService);
+            var categoryService = new CategoryService(categoryLogger.Object, categoryRepository.Object, sectionRepository.Object);
+
+            var service = new SectionService(sectionLogger.Object, sectionRepository.Object, categoryService);
 
             editedSection = await service.EditAsync(editedSection);
 

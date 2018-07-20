@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -7,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.SiteSettings;
 using Ocuda.Ops.Models;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
@@ -55,7 +55,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     var siteSetting = await _siteSettingService.UpdateAsync(key, value);
                     ShowAlertSuccess($"Updated {siteSetting.Name}");
                 }
-                catch (Exception ex)
+                catch (OcudaException ex)
                 {
                     ShowAlertDanger("Unable to update site settings: ", ex.Message);
                 }

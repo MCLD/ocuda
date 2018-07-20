@@ -13,14 +13,14 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<DataWithCount<ICollection<Category>>> GetPaginatedCategoryListAsync(BlogFilter filter);
         Task<ICollection<Category>> GetCategoriesAsync();
         Task<ICollection<Category>> GetBySectionIdAsync(BlogFilter filter);
-        Task<Category> GetCategoryByIdAsync(int id);
+        Task<Category> GetByIdAsync(int id);
         Task<Category> GetByNameAsync(string name);
-        Task<Category> GetByNameAndSectionIdAsync(string name, int sectionId);
-        Task<Category> GetAttachmentCategoryAsync(int currentUserId, int sectionId);
+        Task<Category> GetByNameAndFilterAsync(string name, BlogFilter filter);
         Task<int> GetCategoryCountAsync();
         Task<Category> CreateCategoryAsync(int currentUserId, Category category);
         Task<Category> EditCategoryAsync(int id, string name);
         Task DeleteCategoryAsync(int id);
         Task CreateDefaultCategories(int currentUserId, int sectionId);
+        Task<Category> GetDefaultAsync(BlogFilter filter);
     }
 }

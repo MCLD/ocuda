@@ -27,11 +27,13 @@ namespace Ocuda.Ops.Data.Ops
                     .FirstOrDefaultAsync();
         }
 
-        public async Task<Category> GetByNameAndSectionIdAsync(string name, int sectionId)
+        public async Task<Category> GetByNameAndFilterAsync(string name, BlogFilter filter)
         {
             return await DbSet
                     .AsNoTracking()
-                    .Where(_ => _.Name == name && _.SectionId == sectionId)
+                    .Where(_ => _.Name == name 
+                             && _.CategoryType == filter.CategoryType 
+                             && _.SectionId == filter.SectionId)
                     .FirstOrDefaultAsync();
         }
 
@@ -88,17 +90,6 @@ namespace Ocuda.Ops.Data.Ops
                     .ApplyPagination(filter)
                     .ToListAsync()
             };
-        }
-
-        public async Task<bool> CategoryExistsAsync(Category category)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.Id != category.Id
-                    && _.CategoryType == category.CategoryType
-                    && _.Name == category.Name
-                    && _.SectionId == category.SectionId)
-                .AnyAsync();
         }
     }
 }

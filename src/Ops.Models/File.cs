@@ -21,10 +21,10 @@ namespace Ocuda.Ops.Models
         public bool IsFeatured { get; set; }
 
         [DisplayName("Category")]
-        public int CategoryId { get; set; }
+        public int? CategoryId { get; set; }
         public Category Category { get; set; }
 
-        public int? PostId { get; set; }
         public int? PageId { get; set; }
+        public int? PostId { get; set; }
     }
 }

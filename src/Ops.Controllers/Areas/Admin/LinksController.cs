@@ -12,6 +12,7 @@ using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
@@ -77,7 +78,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
             if (categoryId.HasValue)
             {
-                var name = (await _categoryService.GetCategoryByIdAsync(categoryId.Value)).Name;
+                var name = (await _categoryService.GetByIdAsync(categoryId.Value)).Name;
                 viewModel.CategoryName =
                     string.IsNullOrWhiteSpace(name) ? DefaultCategoryDisplayName : name;
             }
@@ -121,9 +122,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     ShowAlertSuccess($"Added link: {newLink.Name}");
                     return RedirectToAction(nameof(Index));
                 }
-                catch (Exception ex)
+                catch (OcudaException ex)
                 {
-                    _logger.LogError($"Error creating link: {ex}", ex);
                     ShowAlertDanger("Unable to add link: ", ex.Message);
                 }
             }
@@ -167,9 +167,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     ShowAlertSuccess($"Updated link: {link.Name}");
                     return RedirectToAction(nameof(Index));
                 }
-                catch (Exception ex)
+                catch (OcudaException ex)
                 {
-                    _logger.LogError($"Error updating link: {ex}", ex);
                     ShowAlertDanger("Unable to update link: ", ex.Message);
                 }
             }
@@ -253,9 +252,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ShowAlertSuccess($"Added link category: {newCategory.Name}");
                 return Json(new { success = true });
             }
-            catch (Exception ex)
+            catch (OcudaException ex)
             {
-                _logger.LogError($"Error creating link category: {ex}", ex);
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -269,9 +267,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ShowAlertSuccess($"Updated link category: {category.Name}");
                 return Json(new { success = true });
             }
-            catch (Exception ex)
+            catch (OcudaException ex)
             {
-                _logger.LogError($"Error editing link category: {ex}", ex);
                 return Json(new { success = false, message = ex.Message });
             }
         }

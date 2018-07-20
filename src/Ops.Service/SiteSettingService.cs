@@ -8,6 +8,7 @@ using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Defaults;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
@@ -78,7 +79,7 @@ namespace Ocuda.Ops.Service
             }
             else
             {
-                throw new Exception($"Invalid value for boolean setting {key}: {settingValue}");
+                throw new OcudaException($"Invalid value for boolean setting {key}: {settingValue}");
             }
         }
 
@@ -92,7 +93,7 @@ namespace Ocuda.Ops.Service
             }
             else
             {
-                throw new Exception($"Invalid value for integer setting {key}: {settingValue}");
+                throw new OcudaException($"Invalid value for integer setting {key}: {settingValue}");
             }
         }
 
@@ -132,7 +133,7 @@ namespace Ocuda.Ops.Service
                 if (!bool.TryParse(value, out bool result))
                 {
                     _logger.LogError($"Invalid format for boolean key {key}: {value}");
-                    throw new Exception("Invald format.");
+                    throw new OcudaException("Invald format.");
                 }
             }
             else if (currentSetting.Type == SiteSettingType.Int)
@@ -140,11 +141,13 @@ namespace Ocuda.Ops.Service
                 if (!int.TryParse(value, out int result))
                 {
                     _logger.LogError($"Invalid format for integer key {key}: {value}");
-                    throw new Exception("Invald format.");
+                    throw new OcudaException("Invald format.");
                 }
             }
 
             currentSetting.Value = value;
+
+            await ValidateSiteSetting(currentSetting);
 
             _siteSettingRepository.Update(currentSetting);
             await _siteSettingRepository.SaveAsync();
@@ -157,6 +160,57 @@ namespace Ocuda.Ops.Service
             }
 
             return currentSetting;
+        }
+
+        public async Task<bool> KeyExistsAsync(SiteSetting siteSetting)
+        {
+            var existingSetting = await _siteSettingRepository.FindByKeyAsync(siteSetting.Key);
+
+            if (existingSetting != null)
+            {
+                return existingSetting.Id != siteSetting.Id ? true : false;
+            }
+
+            return false;
+        }
+
+        public async Task ValidateSiteSetting(SiteSetting siteSetting)
+        {
+            var message = string.Empty;
+
+            if (await KeyExistsAsync(siteSetting))
+            {
+                message = $"SiteSetting with key '{siteSetting.Key}' already exists.";
+                _logger.LogWarning(message, siteSetting.Key);
+                throw new OcudaException(message);
+            }
+
+            if (string.IsNullOrWhiteSpace(siteSetting.Value))
+            {
+                message = $"{siteSetting.Name} cannot be empty.";
+                _logger.LogWarning(message);
+                throw new OcudaException(message);
+            }
+
+            if (siteSetting.Type == SiteSettingType.Bool)
+            {
+                if (!bool.TryParse(siteSetting.Value, out bool result))
+                {
+                    message = $"{siteSetting.Name} requires a value of type {siteSetting.Type}.";
+                    _logger.LogWarning(message, siteSetting.Value, result);
+                    throw new OcudaException(message);
+                }
+            }
+
+            else if (siteSetting.Type == SiteSettingType.Int)
+            {
+                if (!int.TryParse(siteSetting.Value, out int result))
+                {
+                    message = $"{siteSetting.Name} requires a value of type {siteSetting.Type}.";
+                    _logger.LogWarning(message, siteSetting.Value, result);
+                    throw new OcudaException(message);
+                }
+            }       
         }
     }
 }

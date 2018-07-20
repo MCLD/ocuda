@@ -2,22 +2,32 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Models;
+using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
     public class CategoryService : ICategoryService
     {
+        private readonly ILogger<CategoryService> _logger;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly ISectionRepository _sectionRepository;
 
-        public CategoryService(ICategoryRepository categoryRepository)
+        public CategoryService(ILogger<CategoryService> logger,
+            ICategoryRepository categoryRepository,
+            ISectionRepository sectionRepository)
         {
+            _logger = logger
+                ?? throw new ArgumentNullException(nameof(logger));
             _categoryRepository = categoryRepository
                 ?? throw new ArgumentNullException(nameof(categoryRepository));
+            _sectionRepository = sectionRepository
+                ?? throw new ArgumentNullException(nameof(sectionRepository));
         }
 
         public async Task<DataWithCount<ICollection<Category>>>
@@ -36,7 +46,7 @@ namespace Ocuda.Ops.Service
             return await _categoryRepository.GetBySectionIdAsync(filter);
         }
 
-        public async Task<Category> GetCategoryByIdAsync(int id)
+        public async Task<Category> GetByIdAsync(int id)
         {
             return await _categoryRepository.FindAsync(id);
         }
@@ -46,28 +56,9 @@ namespace Ocuda.Ops.Service
             return await _categoryRepository.GetByNameAsync(name);
         }
 
-        public async Task<Category> GetByNameAndSectionIdAsync(string name, int sectionId)
+        public async Task<Category> GetByNameAndFilterAsync(string name, BlogFilter filter)
         {
-            return await _categoryRepository.GetByNameAndSectionIdAsync(name, sectionId);
-        }
-
-        public async Task<Category> GetAttachmentCategoryAsync(int currentUserId, int sectionId)
-        {
-            var category = await GetByNameAndSectionIdAsync("Attachments", sectionId);
-
-            if (category == null)
-            {
-                var newCategory = new Category()
-                {
-                    SectionId = sectionId,
-                    Name = "Attachments",
-                    CategoryType = CategoryType.File
-                };
-
-                category = await CreateCategoryAsync(currentUserId, newCategory);
-            }
-
-            return category;
+            return await _categoryRepository.GetByNameAndFilterAsync(name, filter);
         }
 
         public async Task<int> GetCategoryCountAsync()
@@ -76,11 +67,12 @@ namespace Ocuda.Ops.Service
         }
 
         public async Task<Category> CreateCategoryAsync(int currentUserId, Category category)
-        {
-            await ValidateCategoryAsync(category);
-
+        { 
             category.CreatedAt = DateTime.Now;
             category.CreatedBy = currentUserId;
+
+            await ValidateCategoryAsync(category);
+
             await _categoryRepository.AddAsync(category);
             await _categoryRepository.SaveAsync();
             return category;
@@ -131,17 +123,55 @@ namespace Ocuda.Ops.Service
             await _categoryRepository.SaveAsync();
         }
 
+        public async Task<Category> GetDefaultAsync(BlogFilter filter)
+        {
+            return await _categoryRepository.GetDefaultAsync(filter);
+        }
+
+        public async Task<bool> NameExistsAsync(Category category, BlogFilter filter)
+        {
+            var existingCategory = await GetByNameAndFilterAsync(category.Name, filter);
+
+            if (existingCategory != null)
+            {
+                return existingCategory.Id != category.Id ? true : false;
+            }
+
+            return false;
+        }
+
         private async Task ValidateCategoryAsync(Category category)
         {
-            //TODO Change to OcudaExceptions
+            var message = string.Empty;
+            var section = await _sectionRepository.FindAsync(category.SectionId);
+
+            if(section == null)
+            {
+                message = $"SectionId '{category.SectionId}' is not a valid section.";
+                _logger.LogWarning(message, category.SectionId);
+                throw new OcudaException(message);
+            }
+
+            //TODO Category.CategoryType validation?
+
             if (string.IsNullOrWhiteSpace(category.Name))
             {
-                throw new Exception("Category name cannot be empty.");
+                message = $"Category name cannot be empty.";
+                _logger.LogWarning(message);
+                throw new OcudaException(message);
             }
- 
-            if (await _categoryRepository.CategoryExistsAsync(category))
+
+            BlogFilter filter = new BlogFilter
             {
-                throw new Exception($"Category '{category.Name}' already exists.");
+                CategoryType = category.CategoryType,
+                SectionId = category.SectionId
+            };
+
+            if (await NameExistsAsync(category, filter))
+            {
+                message = $"Category '{category.Name}' already exists in '{section.Name}'.";
+                _logger.LogWarning(message, category.Name, category.SectionId);
+                throw new OcudaException(message);
             }
         }
     }

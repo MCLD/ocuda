@@ -9,6 +9,7 @@ using Ocuda.Ops.Controllers.Filter;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 
@@ -85,7 +86,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     ShowAlertSuccess($"Added section: {newSection.Name}");
                     return RedirectToAction(nameof(Index));
                 }
-                catch (Exception ex)
+                catch (OcudaException ex)
                 {
                     _logger.LogError($"Error adding section: {ex}", ex);
                     ShowAlertDanger("Unable to add section: ", ex.Message);
@@ -121,7 +122,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     ShowAlertSuccess($"Updated section: {section.Name}");
                     return RedirectToAction(nameof(Index));
                 }
-                catch (Exception ex)
+                catch (OcudaException ex)
                 {
                     _logger.LogError($"Error updating section: {ex}", ex);
                     ShowAlertDanger("Unable to update section: ", ex.Message);
