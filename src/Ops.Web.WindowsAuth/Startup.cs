@@ -17,6 +17,8 @@ namespace Ops.Web.WindowsAuth
     {
         private const string HtmlDocumentHeader = "<!doctype html><html><head><style>* { font-family: sans-serif; }</style></head><body>";
         private const string HtmlDocumentFooter = "</body></html>";
+        private const string BadConfig = "Configured {0} could not be converted to a number. It should be a number of minutes (defaulting to 2).";
+
         private readonly ILogger _logger;
         private readonly IConfiguration _config;
 
@@ -117,7 +119,7 @@ namespace Ops.Web.WindowsAuth
 
                     if (whoami)
                     {
-                        _logger.LogInformation($"Displaying whoami for {identity.Name}");
+                        _logger.LogInformation("Displaying whoami for {0}", identity.Name);
                         context.Response.ContentType = "text/html";
                         context.Response.Headers.Add("X-Robots-Tag", "noindex");
                         await context.Response.WriteAsync(HtmlDocumentHeader);
@@ -144,7 +146,7 @@ namespace Ops.Web.WindowsAuth
                         {
                             if (!int.TryParse(configuredAuthTimeout, out authTimeoutMinutes))
                             {
-                                _logger.LogWarning($"Configured {Configuration.OpsAuthTimeoutMinutes} could not be converted to a number. It should be a number of minutes (defaulting to 2).");
+                                _logger.LogWarning(BadConfig, Configuration.OpsAuthTimeoutMinutes);
                             }
                         }
 
@@ -154,13 +156,23 @@ namespace Ops.Web.WindowsAuth
                         string referer
                             = await cache.GetStringAsync(CacheKey(Cache.OpsReturn, id));
 
-                        var discriminatorNote = string.Empty;
-                        if (!string.IsNullOrEmpty(CacheDiscriminator))
+                        if (string.IsNullOrEmpty(CacheDiscriminator))
                         {
-                            discriminatorNote = $" using cache discriminator {CacheDiscriminator}";
+                            _logger.LogInformation("Id {0} user {1} has {2} roles from {3}",
+                                id,
+                                identity.Name,
+                                roles.Count(),
+                                referer);
                         }
-
-                        _logger.LogInformation($"Id {id} is user {identity.Name} with {roles.Count()} roles from {referer}{discriminatorNote}");
+                        else
+                        {
+                            _logger.LogInformation("Id {0} user {1} has {2} roles from {3} cd {4}",
+                                id,
+                                identity.Name,
+                                roles.Count(),
+                                referer,
+                                CacheDiscriminator);
+                        }
 
                         await cache.SetStringAsync(CacheKey(Cache.OpsUsername, id),
                             identity.Name,
@@ -189,7 +201,7 @@ namespace Ops.Web.WindowsAuth
             }
             else
             {
-                return $".{CacheDiscriminator}{string.Format(key, parameters)}";
+                return $"{CacheDiscriminator}.{string.Format(key, parameters)}";
             }
         }
     }
