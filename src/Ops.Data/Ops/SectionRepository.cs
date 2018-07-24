@@ -23,7 +23,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return DbSet
                 .AsNoTracking()
-                .Where(_ => string.IsNullOrEmpty(_.Path))
+                .Where(_ => string.IsNullOrEmpty(_.Path) && _.IsDeleted == false)
                 .FirstOrDefaultAsync();
         }
 
@@ -31,7 +31,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => !string.IsNullOrWhiteSpace(_.Icon))
+                .Where(_ => !string.IsNullOrWhiteSpace(_.Icon) && _.IsDeleted == false)
                 .OrderBy(_ => _.SortOrder)
                 .ToListAsync();
         }
@@ -40,7 +40,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Path == path)
+                .Where(_ => _.Path == path && _.IsDeleted == false)
                 .AnyAsync();
         }
 
@@ -48,13 +48,13 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Path == path)
+                .Where(_ => _.Path == path && _.IsDeleted == false)
                 .FirstOrDefaultAsync();
         }
 
         public async Task<DataWithCount<ICollection<Section>>> GetPaginatedListAsync
             (BaseFilter filter) {
-            var query = DbSet.AsNoTracking();
+            var query = DbSet.AsNoTracking().Where(_ => _.IsDeleted == false);
 
             return new DataWithCount<ICollection<Section>>
             {
