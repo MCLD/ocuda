@@ -24,6 +24,24 @@ namespace Ocuda.Ops.Data.Ops
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<bool> IsDuplicateUsername(string username)
+        {
+            var sanitizedUsername = username.Trim();
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Username == sanitizedUsername)
+                .AnyAsync();
+        }
+
+        public async Task<bool> IsDuplicateEmail(string email)
+        {
+            var sanitizedEmail = email.Trim();
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Email == sanitizedEmail)
+                .AnyAsync();
+        }
+
         #region Initial setup methods
         // this cannot be async becuase Configure() in Startup.cs is not async
         public async Task<Models.User> GetSystemAdministratorAsync()

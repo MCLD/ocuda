@@ -16,10 +16,12 @@ namespace Ocuda.Ops.Service
         private readonly ILogger _logger;
         private IPageRepository _pageRepository;
         private readonly ISectionRepository _sectionRepository;
+        private readonly IUserRepository _userRepository;
 
         public PageService(ILogger<PageService> logger,
             IPageRepository pageRepository,
-            ISectionRepository sectionRepository)
+            ISectionRepository sectionRepository,
+            IUserRepository userRepository)
         {
             _logger = logger
                 ?? throw new ArgumentNullException(nameof(logger));
@@ -27,6 +29,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(pageRepository));
             _sectionRepository = sectionRepository
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
+            _userRepository = userRepository
+                ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
         public async Task<int> GetPageCountAsync()
@@ -122,12 +126,27 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException(message);
             }
 
-            var stubInUse = await StubInUseAsync(page.Stub, page.SectionId);
+            if (string.IsNullOrWhiteSpace(page.Stub))
+            {
+                message = $"Page stub cannot be empty.";
+                _logger.LogWarning(message);
+                throw new OcudaException(message);
+            }
+
+            var stubInUse = await _pageRepository.StubInUseAsync(page.Stub, page.SectionId);
 
             if (!page.IsDraft && stubInUse)
             {
                 message = $"Stub '{page.Stub}' already exists in '{section.Name}'.";
                 _logger.LogWarning(message, page.Title, page.SectionId);
+                throw new OcudaException(message);
+            }
+
+            var creator = await _userRepository.FindAsync(page.CreatedBy);
+            if (creator == null)
+            {
+                message = $"Created by invalid User Id: {page.CreatedBy}";
+                _logger.LogWarning(message, page.CreatedBy);
                 throw new OcudaException(message);
             }
         }

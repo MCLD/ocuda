@@ -18,19 +18,23 @@ namespace Ocuda.Ops.Service
         private readonly IDistributedCache _cache;
         private readonly IConfiguration _config;
         private readonly ISiteSettingRepository _siteSettingRepository;
+        private readonly IUserRepository _userRepository;
 
         private int CacheMinutes { get; set; }
 
         public SiteSettingService(ILogger<SiteSettingService> logger,
             IDistributedCache cache,
             IConfiguration config,
-            ISiteSettingRepository siteSettingRepository)
+            ISiteSettingRepository siteSettingRepository,
+            IUserRepository userRepository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _siteSettingRepository = siteSettingRepository
                 ?? throw new ArgumentNullException(nameof(siteSettingRepository));
+            _userRepository = userRepository
+                ?? throw new ArgumentNullException(nameof(userRepository));
 
             string timeoutSetting
                 = _config[Utility.Keys.Configuration.OpsSiteSettingCacheMinutes] ?? "60";
@@ -147,7 +151,7 @@ namespace Ocuda.Ops.Service
 
             currentSetting.Value = value;
 
-            await ValidateSiteSetting(currentSetting);
+            await ValidateSiteSettingAsync(currentSetting);
 
             _siteSettingRepository.Update(currentSetting);
             await _siteSettingRepository.SaveAsync();
@@ -162,33 +166,42 @@ namespace Ocuda.Ops.Service
             return currentSetting;
         }
 
-        public async Task<bool> KeyExistsAsync(SiteSetting siteSetting)
-        {
-            var existingSetting = await _siteSettingRepository.FindByKeyAsync(siteSetting.Key);
-
-            if (existingSetting != null)
-            {
-                return existingSetting.Id != siteSetting.Id ? true : false;
-            }
-
-            return false;
-        }
-
-        public async Task ValidateSiteSetting(SiteSetting siteSetting)
+        public async Task ValidateSiteSettingAsync(SiteSetting siteSetting)
         {
             var message = string.Empty;
 
-            if (await KeyExistsAsync(siteSetting))
+            if (await _siteSettingRepository.IsDuplicateKey(siteSetting.Key))
             {
-                message = $"SiteSetting with key '{siteSetting.Key}' already exists.";
+                message = $"Site Setting with key '{siteSetting.Key}' already exists.";
                 _logger.LogWarning(message, siteSetting.Key);
+                throw new OcudaException(message);
+            }
+
+            if (string.IsNullOrWhiteSpace(siteSetting.Key))
+            {
+                message = $"Site Setting must have a key.";
+                _logger.LogWarning(message);
+                throw new OcudaException(message);
+            }
+
+            if (string.IsNullOrWhiteSpace(siteSetting.Name))
+            {
+                message = $"Site Setting must have a name.";
+                _logger.LogWarning(message);
                 throw new OcudaException(message);
             }
 
             if (string.IsNullOrWhiteSpace(siteSetting.Value))
             {
-                message = $"{siteSetting.Name} cannot be empty.";
+                message = $"Site Setting value cannot be empty.";
                 _logger.LogWarning(message);
+                throw new OcudaException(message);
+            }
+
+            if (!Enum.IsDefined(typeof(SiteSettingType), siteSetting.Type))
+            {
+                message = $"Site Setting type is invalid.";
+                _logger.LogWarning(message, siteSetting.Type);
                 throw new OcudaException(message);
             }
 
@@ -210,7 +223,15 @@ namespace Ocuda.Ops.Service
                     _logger.LogWarning(message, siteSetting.Value, result);
                     throw new OcudaException(message);
                 }
-            }       
+            }
+
+            var creator = await _userRepository.FindAsync(siteSetting.CreatedBy);
+            if (creator == null)
+            {
+                message = $"Created by invalid User Id: {siteSetting.CreatedBy}";
+                _logger.LogWarning(message, siteSetting.CreatedBy);
+                throw new OcudaException(message);
+            }
         }
     }
 }

@@ -17,11 +17,13 @@ namespace Ocuda.Ops.Service
         private readonly ICategoryRepository _categoryRepository;
         private readonly ILinkRepository _linkRepository;
         private readonly ISectionRepository _sectionRepository;
+        private readonly IUserRepository _userRepository;
 
         public LinkService(ILogger<LinkService> logger,
             ICategoryRepository categoryRepository,
             ILinkRepository linkRepository,
-            ISectionRepository sectionRepository)
+            ISectionRepository sectionRepository,
+            IUserRepository userRepository)
         {
             _logger = logger
                 ?? throw new ArgumentNullException(nameof(logger));
@@ -31,6 +33,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(linkRepository));
             _sectionRepository = sectionRepository
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
+            _userRepository = userRepository
+                ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
         public async Task<int> GetLinkCountAsync()
@@ -91,7 +95,7 @@ namespace Ocuda.Ops.Service
             await _linkRepository.SaveAsync();
         }
 
-        private async Task ValidateLinkAsync(Link link)
+        public async Task ValidateLinkAsync(Link link)
         {
             var message = string.Empty;
             var section = await _sectionRepository.FindAsync(link.SectionId);
@@ -126,6 +130,14 @@ namespace Ocuda.Ops.Service
                     _logger.LogWarning(message);
                     throw new OcudaException(message);
                 }
+            }
+
+            var creator = await _userRepository.FindAsync(link.CreatedBy);
+            if (creator == null)
+            {
+                message = $"Created by invalid User Id: {link.CreatedBy}";
+                _logger.LogWarning(message, link.CreatedBy);
+                throw new OcudaException(message);
             }
         }
     }
