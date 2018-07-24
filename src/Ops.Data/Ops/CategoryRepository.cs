@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ namespace Ocuda.Ops.Data.Ops
     public class CategoryRepository : GenericRepository<Models.Category, int>, ICategoryRepository
     {
         public CategoryRepository(OpsContext context, ILogger<CategoryRepository> logger)
-            :base(context, logger)
+            : base(context, logger)
         {
 
         }
@@ -24,16 +25,6 @@ namespace Ocuda.Ops.Data.Ops
             return await DbSet
                     .AsNoTracking()
                     .Where(_ => _.Name == name)
-                    .FirstOrDefaultAsync();
-        }
-
-        public async Task<Category> GetByNameAndFilterAsync(string name, BlogFilter filter)
-        {
-            return await DbSet
-                    .AsNoTracking()
-                    .Where(_ => _.Name == name 
-                             && _.CategoryType == filter.CategoryType 
-                             && _.SectionId == filter.SectionId)
                     .FirstOrDefaultAsync();
         }
 
@@ -90,6 +81,17 @@ namespace Ocuda.Ops.Data.Ops
                     .ApplyPagination(filter)
                     .ToListAsync()
             };
+        }
+
+        public async Task<bool> IsDuplicateAsync(Category category)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => string.Equals(_.Name, category.Name, StringComparison.OrdinalIgnoreCase)
+                            && _.SectionId == category.SectionId
+                            && _.CategoryType == category.CategoryType
+                            && _.Id != category.Id)
+                .AnyAsync();
         }
     }
 }

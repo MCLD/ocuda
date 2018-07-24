@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -72,6 +73,22 @@ namespace Ocuda.Ops.Data.Ops
                     .ApplyPagination(filter)
                     .ToListAsync()
             };
+        }
+
+        public async Task<bool> IsDuplicateNameAsync(string name)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Name == name)
+                .AnyAsync();
+        }
+
+        public async Task<bool> IsDuplicatePathAsync(string path)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Path == path)
+                .AnyAsync();
         }
     }
 }

@@ -7,5 +7,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
     {
         Task<User> GetSystemAdministratorAsync();
         Task<User> FindByUsernameAsync(string username);
+        Task<bool> IsDuplicateUsername(string username);
+        Task<bool> IsDuplicateEmail(string email);
     }
 }

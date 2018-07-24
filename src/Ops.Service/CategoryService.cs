@@ -17,10 +17,12 @@ namespace Ocuda.Ops.Service
         private readonly ILogger<CategoryService> _logger;
         private readonly ICategoryRepository _categoryRepository;
         private readonly ISectionRepository _sectionRepository;
+        private readonly IUserRepository _userRepository;
 
         public CategoryService(ILogger<CategoryService> logger,
             ICategoryRepository categoryRepository,
-            ISectionRepository sectionRepository)
+            ISectionRepository sectionRepository,
+            IUserRepository userRepository)
         {
             _logger = logger
                 ?? throw new ArgumentNullException(nameof(logger));
@@ -28,6 +30,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(categoryRepository));
             _sectionRepository = sectionRepository
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
+            _userRepository = userRepository
+                ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
         public async Task<DataWithCount<ICollection<Category>>>
@@ -54,11 +58,6 @@ namespace Ocuda.Ops.Service
         public async Task<Category> GetByNameAsync(string name)
         {
             return await _categoryRepository.GetByNameAsync(name);
-        }
-
-        public async Task<Category> GetByNameAndFilterAsync(string name, BlogFilter filter)
-        {
-            return await _categoryRepository.GetByNameAndFilterAsync(name, filter);
         }
 
         public async Task<int> GetCategoryCountAsync()
@@ -128,19 +127,7 @@ namespace Ocuda.Ops.Service
             return await _categoryRepository.GetDefaultAsync(filter);
         }
 
-        public async Task<bool> NameExistsAsync(Category category, BlogFilter filter)
-        {
-            var existingCategory = await GetByNameAndFilterAsync(category.Name, filter);
-
-            if (existingCategory != null)
-            {
-                return existingCategory.Id != category.Id ? true : false;
-            }
-
-            return false;
-        }
-
-        private async Task ValidateCategoryAsync(Category category)
+        public async Task ValidateCategoryAsync(Category category)
         {
             var message = string.Empty;
             var section = await _sectionRepository.FindAsync(category.SectionId);
@@ -152,7 +139,12 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException(message);
             }
 
-            //TODO Category.CategoryType validation?
+            if(!Enum.IsDefined(typeof(CategoryType), category.CategoryType))
+            {
+                message = $"Category type is invalid.";
+                _logger.LogWarning(message, category.CategoryType);
+                throw new OcudaException(message);
+            }
 
             if (string.IsNullOrWhiteSpace(category.Name))
             {
@@ -161,16 +153,18 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException(message);
             }
 
-            BlogFilter filter = new BlogFilter
-            {
-                CategoryType = category.CategoryType,
-                SectionId = category.SectionId
-            };
-
-            if (await NameExistsAsync(category, filter))
+            if (await _categoryRepository.IsDuplicateAsync(category))
             {
                 message = $"Category '{category.Name}' already exists in '{section.Name}'.";
                 _logger.LogWarning(message, category.Name, category.SectionId);
+                throw new OcudaException(message);
+            }
+
+            var creator = await _userRepository.FindAsync(category.CreatedBy);
+            if (creator == null)
+            {
+                message = $"Created by invalid User Id: {category.CreatedBy}";
+                _logger.LogWarning(message, category.CreatedBy);
                 throw new OcudaException(message);
             }
         }

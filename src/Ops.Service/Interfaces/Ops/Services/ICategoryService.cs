@@ -15,7 +15,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<ICollection<Category>> GetBySectionIdAsync(BlogFilter filter);
         Task<Category> GetByIdAsync(int id);
         Task<Category> GetByNameAsync(string name);
-        Task<Category> GetByNameAndFilterAsync(string name, BlogFilter filter);
         Task<int> GetCategoryCountAsync();
         Task<Category> CreateCategoryAsync(int currentUserId, Category category);
         Task<Category> EditCategoryAsync(int id, string name);

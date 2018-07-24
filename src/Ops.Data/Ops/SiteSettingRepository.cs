@@ -22,5 +22,13 @@ namespace Ocuda.Ops.Data.Ops
                 .Where(_ => _.Key == key)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<bool> IsDuplicateKey(string key)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Key == key)
+                .AnyAsync();
+        }
     }
 }

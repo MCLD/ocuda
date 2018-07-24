@@ -19,6 +19,7 @@ namespace Ocuda.Ops.Service
         private readonly IPageRepository _pageRepository;
         private readonly IPostRepository _postRepository;
         private readonly ISectionRepository _sectionRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IPathResolverService _pathResolver;
 
 
@@ -28,6 +29,7 @@ namespace Ocuda.Ops.Service
             IPageRepository pageRepository,
             IPostRepository postRepository,
             ISectionRepository sectionRepository,
+            IUserRepository userRepository,
             IPathResolverService pathResolver)
         {
             _logger = logger
@@ -42,6 +44,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(postRepository));
             _sectionRepository = sectionRepository
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
+            _userRepository = userRepository
+                ?? throw new ArgumentNullException(nameof(userRepository));
             _pathResolver = pathResolver
                 ?? throw new ArgumentNullException(nameof(pathResolver));
         }
@@ -73,10 +77,10 @@ namespace Ocuda.Ops.Service
 
         public async Task<File> CreatePrivateFileAsync(int currentUserId, File file, byte[] fileData)
         {
-            await ValidateFileAsync(file);
-
             file.CreatedAt = DateTime.Now;
             file.CreatedBy = currentUserId;
+
+            await ValidateFileAsync(file);
 
             await _fileRepository.AddAsync(file);
             await _fileRepository.SaveAsync();
@@ -180,7 +184,7 @@ namespace Ocuda.Ops.Service
             }
         }
 
-        private async Task ValidateFileAsync(File file)
+        public async Task ValidateFileAsync(File file)
         {
             var message = string.Empty;
             var section = await _sectionRepository.FindAsync(file.SectionId);
@@ -195,7 +199,21 @@ namespace Ocuda.Ops.Service
             if (string.IsNullOrWhiteSpace(file.Name))
             {
                 message = $"File name cannot be empty.";
-                _logger.LogWarning(message);
+                _logger.LogWarning(message, file);
+                throw new OcudaException(message);
+            }
+
+            if (string.IsNullOrWhiteSpace(file.Extension))
+            {
+                message = $"File must have a type extension.";
+                _logger.LogWarning(message, file);
+                throw new OcudaException(message);
+            }
+
+            if (string.IsNullOrWhiteSpace(file.Type))
+            {
+                message = $"File must have a type.";
+                _logger.LogWarning(message, file);
                 throw new OcudaException(message);
             }
 
@@ -205,7 +223,7 @@ namespace Ocuda.Ops.Service
                 if (category == null)
                 {
                     message = $"CategoryId '{file.CategoryId}' is not valid.";
-                    _logger.LogWarning(message);
+                    _logger.LogWarning(message, file.CategoryId);
                     throw new OcudaException(message);
                 }
             }
@@ -216,7 +234,7 @@ namespace Ocuda.Ops.Service
                 if (page == null)
                 {
                     message = $"PageId '{file.PageId}' is not valid.";
-                    _logger.LogWarning(message);
+                    _logger.LogWarning(message, file.PageId);
                     throw new OcudaException(message);
                 }
             }
@@ -227,7 +245,7 @@ namespace Ocuda.Ops.Service
                 if (post == null)
                 {
                     message = $"PostId '{file.PostId}' is not valid.";
-                    _logger.LogWarning(message);
+                    _logger.LogWarning(message, file.PostId);
                     throw new OcudaException(message);
                 }
             }
@@ -235,7 +253,15 @@ namespace Ocuda.Ops.Service
             if (!file.CategoryId.HasValue && !file.PageId.HasValue && !file.PostId.HasValue)
             {
                 message = $"File must be assigned to a Category, Page, or Post";
-                _logger.LogWarning(message);
+                _logger.LogWarning(message, file);
+                throw new OcudaException(message);
+            }
+
+            var creator = await _userRepository.FindAsync(file.CreatedBy);
+            if (creator == null)
+            {
+                message = $"Created by invalid User Id: {file.CreatedBy}";
+                _logger.LogWarning(message, file.CreatedBy);
                 throw new OcudaException(message);
             }
         }

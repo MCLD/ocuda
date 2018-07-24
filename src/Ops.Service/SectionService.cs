@@ -16,15 +16,19 @@ namespace Ocuda.Ops.Service
         private readonly ILogger<SectionService> _logger;
         private readonly ISectionRepository _sectionRepository;
         private readonly ICategoryService _categoryService;
+        private readonly IUserRepository _userRepository;
 
         public SectionService(ILogger<SectionService> logger,
             ISectionRepository sectionRepository,
+            IUserRepository userRepository,
             ICategoryService categoryService)
         {
             _logger = logger
                ?? throw new ArgumentNullException(nameof(logger));
             _sectionRepository = sectionRepository
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
+            _userRepository = userRepository
+                ?? throw new ArgumentNullException(nameof(userRepository));
             _categoryService = categoryService
                 ?? throw new ArgumentNullException(nameof(categoryService));
         }
@@ -96,7 +100,7 @@ namespace Ocuda.Ops.Service
             section.CreatedAt = DateTime.Now;
             section.CreatedBy = currentUserId;
 
-            await ValidateSection(section);
+            await ValidateSectionAsync(section);
 
             await _sectionRepository.AddAsync(section);
             await _sectionRepository.SaveAsync();
@@ -113,7 +117,7 @@ namespace Ocuda.Ops.Service
             currentSection.Icon = section.Icon;
             currentSection.SortOrder = section.SortOrder;
 
-            await ValidateSection(currentSection);
+            await ValidateSectionAsync(currentSection);
 
             _sectionRepository.Update(currentSection);
             await _sectionRepository.SaveAsync();
@@ -126,67 +130,48 @@ namespace Ocuda.Ops.Service
             await _sectionRepository.SaveAsync();
         }
 
-        public async Task<bool> NameExistsAsync(Section section)
-        {
-            var existingSection = await GetByNameAsync(section.Name);
-
-            if (existingSection != null)
-            {
-                return existingSection.Id != section.Id ? true : false;
-            }
-
-            return false;
-        }
-
-        public async Task<bool> PathExistsAsync(Section section)
-        {
-            var existingSection = await GetByPathAsync(section.Path);
-
-            if (existingSection != null)
-            {
-                return existingSection.Id != section.Id ? true : false;
-            }
-
-            return false;
-        }
-
-        private async Task ValidateSection(Section section)
+        public async Task ValidateSectionAsync(Section section)
         {
             var message = string.Empty;
             var defaultSection = await _sectionRepository.GetDefaultSectionAsync();
 
-            if (defaultSection != null)
+            if (defaultSection != null && defaultSection.Id != section.Id)
             {
-                if (section.Id != defaultSection.Id)
+                if (string.IsNullOrWhiteSpace(section.Path))
                 {
-                    if (string.IsNullOrWhiteSpace(section.Name))
-                    {
-                        message = $"Section name cannot be empty.";
-                        _logger.LogWarning(message);
-                        throw new OcudaException(message);
-                    }
-
-                    if (string.IsNullOrWhiteSpace(section.Path))
-                    {
-                        message = $"Section path cannot be empty.";
-                        _logger.LogWarning(message);
-                        throw new OcudaException(message);
-                    }
-                }
-
-                if (await NameExistsAsync(section))
-                {
-                    message = $"Section '{section.Name}' already exists.";
-                    _logger.LogWarning(message, section.Name);
+                    message = $"Section path cannot be empty.";
+                    _logger.LogWarning(message);
                     throw new OcudaException(message);
                 }
+            }
 
-                if (await PathExistsAsync(section))
-                {
-                    message = $"Section path '{section.Path }' already exists.";
-                    _logger.LogWarning(message, section.Path);
-                    throw new OcudaException(message);
-                }
+            if (string.IsNullOrWhiteSpace(section.Name))
+            {
+                message = $"Section name cannot be empty.";
+                _logger.LogWarning(message);
+                throw new OcudaException(message);
+            }
+
+            if (await _sectionRepository.IsDuplicateNameAsync(section.Name))
+            {
+                message = $"Section '{section.Name}' already exists.";
+                _logger.LogWarning(message, section.Name);
+                throw new OcudaException(message);
+            }
+
+            if (await _sectionRepository.IsDuplicatePathAsync(section.Path))
+            {
+                message = $"Section path '{section.Path }' already exists.";
+                _logger.LogWarning(message, section.Path);
+                throw new OcudaException(message);
+            }
+
+            var creator = await _userRepository.FindAsync(section.CreatedBy);
+            if (creator == null)
+            {
+                message = $"Created by invalid User Id: {section.CreatedBy}";
+                _logger.LogWarning(message, section.CreatedBy);
+                throw new OcudaException(message);
             }
         }
     }

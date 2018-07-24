@@ -16,10 +16,12 @@ namespace Ocuda.Ops.Service
         private readonly ILogger _logger;
         private readonly IPostRepository _postRepository;
         private readonly ISectionRepository _sectionRepository;
+        private readonly IUserRepository _userRepository;
 
         public PostService(ILogger<PostService> logger,
             IPostRepository postRepository,
-            ISectionRepository sectionRepository)
+            ISectionRepository sectionRepository,
+            IUserRepository userRepository)
         {
             _logger = logger
                 ?? throw new ArgumentNullException(nameof(logger));
@@ -27,6 +29,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(postRepository));
             _sectionRepository = sectionRepository
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
+            _userRepository = userRepository
+                ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
         public async Task<int> GetPostCountAsync()
@@ -125,12 +129,27 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException(message);
             }
 
-            var stubInUse = await StubInUseAsync(post.Stub, post.SectionId);
+            if (string.IsNullOrWhiteSpace(post.Stub))
+            {
+                message = $"Post stub cannot be empty.";
+                _logger.LogWarning(message);
+                throw new OcudaException(message);
+            }
+
+            var stubInUse = await _postRepository.StubInUseAsync(post.Stub, post.SectionId);
 
             if (!post.IsDraft && stubInUse)
             {
                 message = $"Stub '{post.Stub}' already exists in '{section.Name}'.";
                 _logger.LogWarning(message, post.Title, post.SectionId);
+                throw new OcudaException(message);
+            }
+
+            var creator = await _userRepository.FindAsync(post.CreatedBy);
+            if (creator == null)
+            {
+                message = $"Created by invalid User Id: {post.CreatedBy}";
+                _logger.LogWarning(message, post.CreatedBy);
                 throw new OcudaException(message);
             }
         }

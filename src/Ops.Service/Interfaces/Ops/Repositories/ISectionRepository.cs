@@ -14,5 +14,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         Task<Section> GetByNameAsync(string name);
         Task<Section> GetByPathAsync(string path);
         Task<DataWithCount<ICollection<Section>>> GetPaginatedListAsync(BaseFilter filter);
+        Task<bool> IsDuplicateNameAsync(string name);
+        Task<bool> IsDuplicatePathAsync(string path);
     }
 }
