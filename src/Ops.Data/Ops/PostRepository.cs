@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == stub)
+                .Where(_ => string.Equals(_.Stub, stub, StringComparison.OrdinalIgnoreCase))
                 .FirstOrDefaultAsync();
         }
 
@@ -31,15 +32,17 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == stub && _.SectionId == sectionId)
+                .Where(_ => string.Equals(_.Stub, stub, StringComparison.OrdinalIgnoreCase)
+                         && _.SectionId == sectionId)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<Post> GetByTitleAndSectionIdAsync(string name, int sectionId)
+        public async Task<Post> GetByTitleAndSectionIdAsync(string title, int sectionId)
         {
             return await DbSet
                     .AsNoTracking()
-                    .Where(_ => _.Title == name && _.SectionId == sectionId)
+                    .Where(_ => string.Equals(_.Title, title, StringComparison.OrdinalIgnoreCase) 
+                             && _.SectionId == sectionId)
                     .FirstOrDefaultAsync();
         }
 
@@ -67,7 +70,9 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == stub && _.SectionId == sectionId && _.IsDraft == false)
+                .Where(_ => string.Equals(_.Stub, stub, StringComparison.OrdinalIgnoreCase)
+                         && _.SectionId == sectionId 
+                         && _.IsDraft == false)
                 .AnyAsync();
         }
     }

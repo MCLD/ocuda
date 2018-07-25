@@ -85,7 +85,8 @@ namespace Ocuda.Ops.Service
             await _fileRepository.AddAsync(file);
             await _fileRepository.SaveAsync();
 
-            file = WritePrivateFile(file, fileData, false);
+            await WritePrivateFileAsync(file, fileData, false);
+
             _fileRepository.Update(file);
             await _fileRepository.SaveAsync();
 
@@ -105,7 +106,7 @@ namespace Ocuda.Ops.Service
                 $"section{file.SectionId}");
         }
 
-        private File WritePrivateFile(File file, byte[] fileData, bool isEdit)
+        private async Task WritePrivateFileAsync(File file, byte[] fileData, bool isEdit)
         {
             string filePath = GetPrivateFilePath(file);
 
@@ -118,9 +119,7 @@ namespace Ocuda.Ops.Service
                 _logger.LogInformation($"Writing file: {filePath}");
             }
 
-            //TODO refactor to WriteAllBytesAsync
-            System.IO.File.WriteAllBytes(filePath, fileData);
-            return file;
+            await System.IO.File.WriteAllBytesAsync(filePath, fileData);
         }
 
         public async Task<File> EditPrivateFileAsync(File file, byte[] fileData = null)
@@ -129,24 +128,28 @@ namespace Ocuda.Ops.Service
             currentFile.Name = file.Name;
             currentFile.Description = file.Description;
             currentFile.CategoryId = file.CategoryId;
-            currentFile.IsFeatured = file.IsFeatured;
-
-            string filePath = GetPrivateFilePath(currentFile);
-
-            await ValidateFileAsync(file);
+            currentFile.IsFeatured = file.IsFeatured;        
 
             if (fileData != null)
             {
-                if (System.IO.File.Exists(filePath))
-                {
-                    _logger.LogInformation($"Editing File (Delete): {filePath}");
-                    System.IO.File.Delete(filePath);
-                }
+                string oldFilePath = GetPrivateFilePath(currentFile);
 
                 currentFile.Extension = file.Extension;
                 currentFile.Icon = file.Icon;
 
-                var newFile = WritePrivateFile(currentFile, fileData, true);
+                await ValidateFileAsync(currentFile);
+
+                if (System.IO.File.Exists(oldFilePath))
+                {
+                    _logger.LogInformation($"Editing File (Delete): {oldFilePath}");
+                    System.IO.File.Delete(oldFilePath);
+                }              
+
+                await WritePrivateFileAsync(currentFile, fileData, true);
+            }
+            else
+            {
+                await ValidateFileAsync(currentFile);
             }
 
             _fileRepository.Update(currentFile);

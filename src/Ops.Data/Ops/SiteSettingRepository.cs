@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -19,7 +20,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Key == key)
+                .Where(_ => string.Equals(_.Key, key, StringComparison.OrdinalIgnoreCase))
                 .FirstOrDefaultAsync();
         }
 
@@ -27,7 +28,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Key == key)
+                .Where(_ => string.Equals(_.Key, key, StringComparison.OrdinalIgnoreCase))
                 .AnyAsync();
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,8 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                     .AsNoTracking()
-                    .Where(_ => _.Name == name && _.SectionId == sectionId)
+                    .Where(_ => string.Equals(_.Name, name, StringComparison.OrdinalIgnoreCase)
+                             && _.SectionId == sectionId)
                     .FirstOrDefaultAsync();
         }
 

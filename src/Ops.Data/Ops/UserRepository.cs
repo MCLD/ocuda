@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -20,7 +21,7 @@ namespace Ocuda.Ops.Data.Ops
             var sanitizedUsername = username.Trim();
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Username == sanitizedUsername)
+                .Where(_ => string.Equals(_.Username, sanitizedUsername, StringComparison.OrdinalIgnoreCase))
                 .FirstOrDefaultAsync();
         }
 
@@ -29,7 +30,7 @@ namespace Ocuda.Ops.Data.Ops
             var sanitizedUsername = username.Trim();
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Username == sanitizedUsername)
+                .Where(_ => string.Equals(_.Username, sanitizedUsername, StringComparison.OrdinalIgnoreCase))
                 .AnyAsync();
         }
 
@@ -38,7 +39,7 @@ namespace Ocuda.Ops.Data.Ops
             var sanitizedEmail = email.Trim();
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Email == sanitizedEmail)
+                .Where(_ => string.Equals(_.Email, sanitizedEmail, StringComparison.OrdinalIgnoreCase))
                 .AnyAsync();
         }
 
