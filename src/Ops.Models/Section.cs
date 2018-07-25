@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Ops.Models
 {
@@ -12,5 +13,8 @@ namespace Ocuda.Ops.Models
         [MaxLength(32)]
         public string Icon { get; set; }
         public int SortOrder { get; set; }
+
+        [DisplayName("Video URL")]
+        public string FeaturedVideoUrl { get; set; }
     }
 }
