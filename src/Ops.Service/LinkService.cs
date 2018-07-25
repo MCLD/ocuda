@@ -52,11 +52,6 @@ namespace Ocuda.Ops.Service
             return await _linkRepository.FindAsync(id);
         }
 
-        public async Task<Link> GetByNameAndSectionIdAsync(string name, int sectionId)
-        {
-            return await _linkRepository.GetByNameAndSectionIdAsync(name, sectionId);
-        }
-
         public async Task<DataWithCount<ICollection<Link>>> GetPaginatedListAsync(BlogFilter filter)
         {
             return await _linkRepository.GetPaginatedListAsync(filter);
@@ -64,6 +59,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<Link> CreateAsync(int currentUserId, Link link)
         {
+            link.Name = link.Name.Trim();
             link.CreatedAt = DateTime.Now;
             link.CreatedBy = currentUserId;
 
@@ -77,7 +73,7 @@ namespace Ocuda.Ops.Service
         public async Task<Link> EditAsync(Link link)
         {
             var currentLink = await _linkRepository.FindAsync(link.Id);
-            currentLink.Name = link.Name;
+            currentLink.Name = link.Name.Trim();
             currentLink.Url = link.Url;
             currentLink.CategoryId = link.CategoryId;
             currentLink.IsFeatured = link.IsFeatured;

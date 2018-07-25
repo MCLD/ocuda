@@ -24,12 +24,14 @@ namespace Ocuda.Ops.Service
 
         public async Task<User> LookupUser(string username)
         {
+            username = username.Trim().ToLower();
             return await _userRepository.FindByUsernameAsync(username);
         }
 
         public async Task<User> AddUser(User user, int? createdById = null)
         {
-            user.Username = user.Username.Trim();
+            user.Username = user.Username.Trim().ToLower();
+            user.Email = user.Email.Trim().ToLower();
             user.CreatedAt = DateTime.Now;
             if(createdById != null)
             {
@@ -80,6 +82,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<User> GetByUsernameAsync(string username)
         {
+            username = username.Trim().ToLower();
             return await _userRepository.FindByUsernameAsync(username);
         }
 

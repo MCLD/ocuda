@@ -51,17 +51,17 @@ namespace Ocuda.Ops.Service
 
         public async Task<Page> GetByStubAsync(string stub)
         {
-            return await _pageRepository.GetByStubAsync(stub);
+            return await _pageRepository.GetByStubAsync(stub.Trim().ToLower());
         }
 
         public async Task<Page> GetByStubAndSectionIdAsync(string stub, int sectionId)
         {
-            return await _pageRepository.GetByStubAndSectionIdAsync(stub, sectionId);
+            return await _pageRepository.GetByStubAndSectionIdAsync(stub.Trim().ToLower(), sectionId);
         }
 
         public async Task<Page> GetByTitleAndSectionIdAsync(string title, int sectionId)
         {
-            return await _pageRepository.GetByTitleAndSectionIdAsync(title, sectionId);
+            return await _pageRepository.GetByTitleAndSectionIdAsync(title.Trim(), sectionId);
         }
 
         public async Task<DataWithCount<ICollection<Page>>> GetPaginatedListAsync(BlogFilter filter)
@@ -71,6 +71,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<Page> CreateAsync(int currentUserId, Page page)
         {
+            page.Title = page.Title.Trim();
+            page.Stub = page.Stub.Trim().ToLower();
             page.CreatedAt = DateTime.Now;
             page.CreatedBy = currentUserId;
 
@@ -84,8 +86,8 @@ namespace Ocuda.Ops.Service
         public async Task<Page> EditAsync(Page page)
         {
             var currentPage = await _pageRepository.FindAsync(page.Id);
-            currentPage.Title = page.Title;
-            currentPage.Stub = page.Stub;
+            currentPage.Title = page.Title.Trim();
+            currentPage.Stub = page.Stub.Trim().ToLower();
             currentPage.Content = page.Content;
             currentPage.IsDraft = page.IsDraft;
 
@@ -104,7 +106,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<bool> StubInUseAsync(string stub, int sectionId)
         {
-            return await _pageRepository.StubInUseAsync(stub, sectionId);
+            return await _pageRepository.StubInUseAsync(stub.Trim().ToLower(), sectionId);
         }
 
         public async Task ValidatePageAsync(Page page)

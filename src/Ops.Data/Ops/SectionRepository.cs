@@ -49,7 +49,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => string.Equals(_.Name, name, StringComparison.OrdinalIgnoreCase))
+                .Where(_ => _.Name == name)
                 .FirstOrDefaultAsync();
         }
 
@@ -87,7 +87,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => string.Equals(_.Name, name, StringComparison.OrdinalIgnoreCase))
+                .Where(_ => _.Name == name)
                 .AnyAsync();
         }
 
@@ -95,7 +95,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => string.Equals(_.Path, path, StringComparison.OrdinalIgnoreCase))
+                .Where(_ => _.Path == path)
                 .AnyAsync();
         }
     }

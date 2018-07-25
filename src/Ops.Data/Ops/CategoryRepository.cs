@@ -24,7 +24,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                     .AsNoTracking()
-                    .Where(_ => string.Equals(_.Name, name, StringComparison.OrdinalIgnoreCase))
+                    .Where(_ => _.Name == name)
                     .FirstOrDefaultAsync();
         }
 
@@ -60,8 +60,7 @@ namespace Ocuda.Ops.Data.Ops
 
         public async Task<DataWithCount<ICollection<Category>>> GetPaginatedListAsync(BlogFilter filter)
         {
-            var query = DbSet.AsNoTracking()
-                             .Where(_ => _.IsDefault == false);
+            var query = DbSet.AsNoTracking().Where(_ => _.IsDefault == false);
 
             if (filter.CategoryType.HasValue)
             {
@@ -87,10 +86,10 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => string.Equals(_.Name, category.Name, StringComparison.OrdinalIgnoreCase)
-                            && _.SectionId == category.SectionId
-                            && _.CategoryType == category.CategoryType
-                            && _.Id != category.Id)
+                .Where(_ => _.Name == category.Name
+                         && _.SectionId == category.SectionId
+                         && _.CategoryType == category.CategoryType
+                         && _.Id != category.Id)
                 .AnyAsync();
         }
     }

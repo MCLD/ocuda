@@ -43,7 +43,7 @@ namespace Ocuda.test.Ops.Service.Test
                 CreatedBy = 1,
                 Name = "New Name",
                 Icon = "fa-test2",
-                Path = "TestPath"
+                Path = "testpath"
             };
 
             var sectionRepository = new Mock<ISectionRepository>();

@@ -21,8 +21,7 @@ namespace Ocuda.Ops.Service
         private readonly ISectionRepository _sectionRepository;
         private readonly IUserRepository _userRepository;
         private readonly IPathResolverService _pathResolver;
-
-
+        
         public FileService(ILogger<FileService> logger,
             ICategoryRepository categoryRepository,
             IFileRepository fileRepository,
@@ -65,11 +64,6 @@ namespace Ocuda.Ops.Service
             return await _fileRepository.FindAsync(id);
         }
 
-        public async Task<File> GetByNameAndSectionIdAsync(string name, int sectionId)
-        {
-            return await _fileRepository.GetByNameAndSectionIdAsync(name, sectionId);
-        }
-
         public async Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter)
         {
             return await _fileRepository.GetPaginatedListAsync(filter);
@@ -77,6 +71,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<File> CreatePrivateFileAsync(int currentUserId, File file, byte[] fileData)
         {
+            file.Name = file.Name.Trim();
             file.CreatedAt = DateTime.Now;
             file.CreatedBy = currentUserId;
 
@@ -125,7 +120,7 @@ namespace Ocuda.Ops.Service
         public async Task<File> EditPrivateFileAsync(File file, byte[] fileData = null)
         {
             var currentFile = await _fileRepository.FindAsync(file.Id);
-            currentFile.Name = file.Name;
+            currentFile.Name = file.Name.Trim();
             currentFile.Description = file.Description;
             currentFile.CategoryId = file.CategoryId;
             currentFile.IsFeatured = file.IsFeatured;        

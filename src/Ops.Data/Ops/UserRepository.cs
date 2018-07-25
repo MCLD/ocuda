@@ -18,28 +18,25 @@ namespace Ocuda.Ops.Data.Ops
 
         public async Task<User> FindByUsernameAsync(string username)
         {
-            var sanitizedUsername = username.Trim();
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => string.Equals(_.Username, sanitizedUsername, StringComparison.OrdinalIgnoreCase))
+                .Where(_ => _.Username == username)
                 .FirstOrDefaultAsync();
         }
 
         public async Task<bool> IsDuplicateUsername(string username)
         {
-            var sanitizedUsername = username.Trim();
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => string.Equals(_.Username, sanitizedUsername, StringComparison.OrdinalIgnoreCase))
+                .Where(_ => _.Username == username)
                 .AnyAsync();
         }
 
         public async Task<bool> IsDuplicateEmail(string email)
         {
-            var sanitizedEmail = email.Trim();
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => string.Equals(_.Email, sanitizedEmail, StringComparison.OrdinalIgnoreCase))
+                .Where(_ => _.Email == email)
                 .AnyAsync();
         }
 

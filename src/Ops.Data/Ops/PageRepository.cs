@@ -24,7 +24,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => string.Equals(_.Stub, stub, StringComparison.OrdinalIgnoreCase))
+                .Where(_ => _.Stub == stub)
                 .FirstOrDefaultAsync();
         }
 
@@ -32,7 +32,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => string.Equals(_.Stub, stub, StringComparison.OrdinalIgnoreCase)
+                .Where(_ => _.Stub == stub
                          && _.SectionId == sectionId)
                 .FirstOrDefaultAsync();
         }
@@ -41,7 +41,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                     .AsNoTracking()
-                    .Where(_ => string.Equals(_.Title, title, StringComparison.OrdinalIgnoreCase)
+                    .Where(_ => _.Title == title
                              && _.SectionId == sectionId)
                     .FirstOrDefaultAsync();
         }
@@ -69,7 +69,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => string.Equals(_.Stub, stub, StringComparison.OrdinalIgnoreCase)
+                .Where(_ => _.Stub == stub
                          && _.SectionId == sectionId 
                          && _.IsDraft == false)
                 .AnyAsync();

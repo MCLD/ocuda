@@ -57,7 +57,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<Category> GetByNameAsync(string name)
         {
-            return await _categoryRepository.GetByNameAsync(name);
+            return await _categoryRepository.GetByNameAsync(name.Trim());
         }
 
         public async Task<int> GetCategoryCountAsync()
@@ -66,7 +66,8 @@ namespace Ocuda.Ops.Service
         }
 
         public async Task<Category> CreateCategoryAsync(int currentUserId, Category category)
-        { 
+        {
+            category.Name = category.Name.Trim();
             category.CreatedAt = DateTime.Now;
             category.CreatedBy = currentUserId;
 
@@ -80,7 +81,7 @@ namespace Ocuda.Ops.Service
         public async Task<Category> EditCategoryAsync(int id, string name)
         {
             var currentCategory = await _categoryRepository.FindAsync(id);
-            currentCategory.Name = name;
+            currentCategory.Name = name.Trim();
 
             await ValidateCategoryAsync(currentCategory);
 
