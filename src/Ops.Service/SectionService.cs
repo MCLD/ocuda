@@ -117,7 +117,9 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteAsync(int id)
         {
-            _sectionRepository.Remove(id);
+            var section = await _sectionRepository.FindAsync(id);
+            section.IsDeleted = true;
+            _sectionRepository.Update(section);
             await _sectionRepository.SaveAsync();
         }
 
