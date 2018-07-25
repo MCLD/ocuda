@@ -65,5 +65,14 @@ namespace Ocuda.Ops.Data.Ops
                     .ToListAsync()
             };
         }
+
+        public override async Task<Section> FindAsync(int id)
+        {
+            var section = await DbSet
+                .Where(_ => _.Id == id && _.IsDeleted == false)
+                .FirstOrDefaultAsync();
+            _context.Entry(section).State = EntityState.Detached;
+            return section;
+        }
     }
 }
