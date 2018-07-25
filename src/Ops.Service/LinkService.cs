@@ -52,6 +52,11 @@ namespace Ocuda.Ops.Service
             return await _linkRepository.FindAsync(id);
         }
 
+        public async Task<Link> GetByNameAndSectionIdAsync(string name, int sectionId)
+        {
+            return await _linkRepository.GetByNameAndSectionIdAsync(name, sectionId);
+        }
+
         public async Task<DataWithCount<ICollection<Link>>> GetPaginatedListAsync(BlogFilter filter)
         {
             return await _linkRepository.GetPaginatedListAsync(filter);

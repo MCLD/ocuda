@@ -8,6 +8,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
     public interface IFileRepository : IRepository<File, int>
     {
+        Task<File> GetByNameAndSectionIdAsync(string name, int sectionId);
         Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter);
     }
 }

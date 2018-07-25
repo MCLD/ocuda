@@ -82,7 +82,6 @@ namespace Ocuda.Ops.Service
 
         public async Task<User> GetByUsernameAsync(string username)
         {
-            username = username.Trim().ToLower();
             return await _userRepository.FindByUsernameAsync(username);
         }
 

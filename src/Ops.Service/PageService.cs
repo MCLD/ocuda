@@ -64,6 +64,11 @@ namespace Ocuda.Ops.Service
             return await _pageRepository.GetByTitleAndSectionIdAsync(title.Trim(), sectionId);
         }
 
+        public async Task<Page> GetByTitleAndSectionIdAsync(string title, int sectionId)
+        {
+            return await _pageRepository.GetByTitleAndSectionIdAsync(title, sectionId);
+        }
+
         public async Task<DataWithCount<ICollection<Page>>> GetPaginatedListAsync(BlogFilter filter)
         {
             return await _pageRepository.GetPaginatedListAsync(filter);
@@ -107,6 +112,50 @@ namespace Ocuda.Ops.Service
         public async Task<bool> StubInUseAsync(string stub, int sectionId)
         {
             return await _pageRepository.StubInUseAsync(stub.Trim().ToLower(), sectionId);
+        }
+
+        public async Task ValidatePageAsync(Page page)
+        {
+            var message = string.Empty;
+            var section = await _sectionRepository.FindAsync(page.SectionId);
+
+            if (section == null)
+            {
+                message = $"SectionId '{page.SectionId}' is not a valid section.";
+                _logger.LogWarning(message, page.SectionId);
+                throw new OcudaException(message);
+            }
+
+            if (string.IsNullOrWhiteSpace(page.Title))
+            {
+                message = $"Page name cannot be empty.";
+                _logger.LogWarning(message);
+                throw new OcudaException(message);
+            }
+
+            if (string.IsNullOrWhiteSpace(page.Stub))
+            {
+                message = $"Page stub cannot be empty.";
+                _logger.LogWarning(message);
+                throw new OcudaException(message);
+            }
+
+            var stubInUse = await _pageRepository.StubInUseAsync(page.Stub, page.SectionId);
+
+            if (!page.IsDraft && stubInUse)
+            {
+                message = $"Stub '{page.Stub}' already exists in '{section.Name}'.";
+                _logger.LogWarning(message, page.Title, page.SectionId);
+                throw new OcudaException(message);
+            }
+
+            var creator = await _userRepository.FindAsync(page.CreatedBy);
+            if (creator == null)
+            {
+                message = $"Created by invalid User Id: {page.CreatedBy}";
+                _logger.LogWarning(message, page.CreatedBy);
+                throw new OcudaException(message);
+            }
         }
 
         public async Task ValidatePageAsync(Page page)

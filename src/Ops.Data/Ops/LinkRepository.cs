@@ -20,6 +20,15 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
+        public async Task<Link> GetByNameAndSectionIdAsync(string name, int sectionId)
+        {
+            return await DbSet
+                    .AsNoTracking()
+                    .Where(_ => string.Equals(_.Name, name, StringComparison.OrdinalIgnoreCase)
+                             && _.SectionId == sectionId)
+                    .FirstOrDefaultAsync();
+        }
+
         public async Task<DataWithCount<ICollection<Link>>> GetPaginatedListAsync(BlogFilter filter)
         {
             var query = DbSet.AsNoTracking();

@@ -64,6 +64,11 @@ namespace Ocuda.Ops.Service
             return await _postRepository.GetByTitleAndSectionIdAsync(title.Trim(), sectionId);
         }
 
+        public async Task<Post> GetByTitleAndSectionIdAsync(string title, int sectionId)
+        {
+            return await _postRepository.GetByTitleAndSectionIdAsync(title, sectionId);
+        }
+
         public async Task<DataWithCount<ICollection<Post>>> GetPaginatedListAsync(BlogFilter filter)
         {
             return await _postRepository.GetPaginatedListAsync(filter);
@@ -110,6 +115,50 @@ namespace Ocuda.Ops.Service
         public async Task<bool> StubInUseAsync(string stub, int sectionId)
         {
             return await _postRepository.StubInUseAsync(stub.Trim().ToLower(), sectionId);
+        }
+
+        public async Task ValidatePostAsync(Post post)
+        {
+            var message = string.Empty;
+            var section = await _sectionRepository.FindAsync(post.SectionId);
+
+            if (section == null)
+            {
+                message = $"SectionId '{post.SectionId}' is not a valid section.";
+                _logger.LogWarning(message, post.SectionId);
+                throw new OcudaException(message);
+            }
+
+            if (string.IsNullOrWhiteSpace(post.Title))
+            {
+                message = $"Post title cannot be empty.";
+                _logger.LogWarning(message);
+                throw new OcudaException(message);
+            }
+
+            if (string.IsNullOrWhiteSpace(post.Stub))
+            {
+                message = $"Post stub cannot be empty.";
+                _logger.LogWarning(message);
+                throw new OcudaException(message);
+            }
+
+            var stubInUse = await _postRepository.StubInUseAsync(post.Stub, post.SectionId);
+
+            if (!post.IsDraft && stubInUse)
+            {
+                message = $"Stub '{post.Stub}' already exists in '{section.Name}'.";
+                _logger.LogWarning(message, post.Title, post.SectionId);
+                throw new OcudaException(message);
+            }
+
+            var creator = await _userRepository.FindAsync(post.CreatedBy);
+            if (creator == null)
+            {
+                message = $"Created by invalid User Id: {post.CreatedBy}";
+                _logger.LogWarning(message, post.CreatedBy);
+                throw new OcudaException(message);
+            }
         }
 
         public async Task ValidatePostAsync(Post post)
