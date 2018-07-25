@@ -68,11 +68,10 @@ namespace Ocuda.Ops.Data.Ops
 
         public override async Task<Section> FindAsync(int id)
         {
-            var section = await DbSet
+            return await DbSet
+                .AsNoTracking()
                 .Where(_ => _.Id == id && _.IsDeleted == false)
                 .FirstOrDefaultAsync();
-            _context.Entry(section).State = EntityState.Detached;
-            return section;
         }
     }
 }
