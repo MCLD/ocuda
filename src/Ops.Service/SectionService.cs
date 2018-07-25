@@ -73,11 +73,6 @@ namespace Ocuda.Ops.Service
             return await _sectionRepository.GetByNameAsync(name.Trim());
         }
 
-        public async Task<Section> GetByNameAsync(string name)
-        {
-            return await _sectionRepository.GetByNameAsync(name);
-        }
-
         public async Task<Section> GetByPathAsync(string path)
         {
             return await _sectionRepository.GetByPathAsync(path.Trim().ToLower());

@@ -49,7 +49,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Name == name)
+                .Where(_ => _.Name == name && _.IsDeleted == false)
                 .FirstOrDefaultAsync();
         }
 
@@ -87,7 +87,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Name == name)
+                .Where(_ => _.Name == name && _.IsDeleted == false)
                 .AnyAsync();
         }
 
@@ -95,7 +95,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Path == path)
+                .Where(_ => _.Path == path && _.IsDeleted == false)
                 .AnyAsync();
         }
     }

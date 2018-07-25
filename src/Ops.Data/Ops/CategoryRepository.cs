@@ -24,7 +24,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                     .AsNoTracking()
-                    .Where(_ => string.Equals(_.Name, name, StringComparison.OrdinalIgnoreCase))
+                    .Where(_ => _.Name == name)
                     .FirstOrDefaultAsync();
         }
 

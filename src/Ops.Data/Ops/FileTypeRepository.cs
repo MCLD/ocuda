@@ -21,7 +21,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             var query = DbSet
                     .AsNoTracking()
-                    .Where(_ => string.Equals(_.Extension, extension, StringComparison.OrdinalIgnoreCase));
+                    .Where(_ => _.Extension == extension);
 
             if (query.Count() == 0)
             {
