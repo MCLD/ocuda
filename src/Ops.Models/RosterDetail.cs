@@ -13,11 +13,9 @@ namespace Ocuda.Ops.Models
         public string Name { get; set; }
 
         [MaxLength(255)]
-        [Required]
         public string EmailAddress { get; set; }
 
         [MaxLength(255)]
-        [Required]
         public string JobTitle { get; set; }
 
         public int EmployeeId { get; set; }
@@ -26,5 +24,7 @@ namespace Ocuda.Ops.Models
         public int? ReportsToPos { get; set; }
 
         public DateTime AsOf { get; set; }
+
+        public bool IsVacant { get; set; }
     }
 }

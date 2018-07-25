@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Ocuda.Ops.Models;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
@@ -7,6 +8,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
     {
         Task<User> GetSystemAdministratorAsync();
         Task<User> FindByUsernameAsync(string username);
+        Task<User> FindByEmailAsync(string email);
+        Task<ICollection<User>> GetAllAsync();
         Task<bool> IsDuplicateUsername(string username);
         Task<bool> IsDuplicateEmail(string email);
     }

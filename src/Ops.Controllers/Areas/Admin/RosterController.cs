@@ -24,42 +24,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ?? throw new ArgumentNullException(nameof(rosterService));
         }
 
-        public async Task<IActionResult> Changes()
-        {
-            var rosterChanges = await _rosterService.GetRosterChangesAsync();
-
-            var viewModel = new ChangesViewModel
-            {
-                RosterDetail = rosterChanges.RosterDetail,
-                NewEmployees = rosterChanges.NewEmployees,
-                RemovedEmployees = rosterChanges.RemovedEmployees
-            };
-
-            return View(viewModel);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> ApproveChange(int rosterId)
-        {
-            var result = false;
-            var message = string.Empty;
-
-            try
-            {
-                result = await _rosterService.ApproveRosterChanges(rosterId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Error approving roster entry: ", ex);
-                message = "An error occured while trying to approve the change: " + ex.Message;
-            }
-            return Json(new
-            {
-                success = result,
-                message = message
-            });
-        }
-
         [RestoreModelState]
         public IActionResult Upload()
         {
@@ -72,7 +36,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             if (ModelState.IsValid)
             {
-                // TODO we create the file here but delete it in the service, bad practice
                 var tempFile = Path.GetTempFileName();
                 using (var fileStream = new FileStream(tempFile, FileMode.Create))
                 {
@@ -82,13 +45,17 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 try
                 {
                     int insertedRecordCount
-                        = await _rosterService.UploadRosterAsync(CurrentUserId, tempFile);
+                        = await _rosterService.ImportRosterAsync(CurrentUserId, tempFile);
                     AlertInfo = $"Successfully inserted {insertedRecordCount} roster records.";
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error inserting roster data: {Message}", ex);
-                    AlertDanger = $"There was a problem inserting the roster data: {ex.Message}";
+                    AlertDanger = "An error occured while uploading the roster.";
+                }
+                finally
+                {
+                    System.IO.File.Delete(Path.Combine(Path.GetTempPath(), tempFile));
                 }
 
                 return RedirectToAction(nameof(Upload));
