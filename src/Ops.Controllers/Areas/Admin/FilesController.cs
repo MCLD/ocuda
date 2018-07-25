@@ -231,11 +231,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             if (model.FileData != null)
             {
-                ModelState.AddModelError("File", FileValidationFailedNoFile);
-                ShowAlertDanger(FileValidationFailedNoFile);
-            }
-            else
-            { 
                 var maxFileSize = await _siteSettingService
                     .GetSettingIntAsync(Models.Keys.SiteSetting.FileManagement.MaxUploadBytes);
 
@@ -261,9 +256,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 try
                 {
-                    File file;
-                    model.File.SectionId = model.SectionId;
-
                     if (model.FileData != null)
                     {
                         byte[] fileBytes;
@@ -282,13 +274,13 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                         var fileType = await _fileTypeService.GetByExtensionAsync(model.File.Extension);
                         model.File.Icon = fileType.Icon;
 
-                        file = await _fileService.EditPrivateFileAsync(model.File, fileBytes);
+                        var file = await _fileService.EditPrivateFileAsync(model.File, fileBytes);
                         ShowAlertSuccess($"Updated file: {file.Name}");
                         return RedirectToAction(nameof(Index));
                     }
                     else
                     {
-                        file = await _fileService.EditPrivateFileAsync(model.File);
+                        var file = await _fileService.EditPrivateFileAsync(model.File);
                         ShowAlertSuccess($"Updated file: {file.Name}");
                         return RedirectToAction(nameof(Index));
                     }
