@@ -11,5 +11,6 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
         public IEnumerable<File> Files { get; set; }
         public IEnumerable<Calendar> Calendars { get; set; }
         public PaginateModel PaginateModel { get; set; }
+        public Section Section { get; set; }
     }
 }

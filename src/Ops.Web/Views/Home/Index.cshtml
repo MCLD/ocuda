@@ -1,5 +1,12 @@
 ﻿@model Ocuda.Ops.Controllers.ViewModels.Home.IndexViewModel
 
+<form id="editForm" role="form">
+    <input id="editId" asp-for="Section.Id" type="hidden" />
+    <div modal id="editModal" name="Featured Video" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <input id="editUrl" asp-for="Section.FeaturedVideoUrl" formgroup />
+    </div>
+</form>
+
 <div class="row">
     @* Blog Content *@
     <div class="col-sm-8 oc-blog">
@@ -11,38 +18,33 @@
         {
             @foreach (var post in Model.Posts)
             {
-            <div class="card">
-                @if (post.IsPinned)
-                {
+                <div class="card">
                     <a class="card-link flex-grow-1"
                        asp-controller="Posts"
                        asp-action="@nameof(PostsController.Display)"
                        asp-route-id="@post.Stub">
-                        <div class="card-header oc-pinned d-flex">
-                            <h1 class="card-title">@post.Title</h1>
-                            <span class="card-title fa fa-thumbtack ml-auto align-self-center"></span>
-                        </div>
+                        @if (post.IsPinned)
+                        {
+                            <div class="card-header oc-pinned d-flex">
+                                <h1 class="card-title">@post.Title</h1>
+                                <span class="card-title fa fa-thumbtack ml-auto align-self-center"></span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="card-header d-flex">
+                                <h1 class="card-title">@post.Title</h1>
+                            </div>
+                        }
                     </a>
-                }
-                else
-                {
-                    <a class="card-link flex-grow-1"
-                       asp-controller="Posts"
-                       asp-action="@nameof(PostsController.Display)"
-                       asp-route-id="@post.Stub">
-                        <div class="card-header d-flex">
-                            <h1 class="card-title">@post.Title</h1>
-                        </div>
-                    </a>
-                }
-                <div class="card-body">
-                    @Html.Raw(post.Content)
+                    <div class="card-body">
+                        @Html.Raw(post.Content)
+                    </div>
+                    <div class="card-footer d-flex">
+                        <div class="flex-grow-1">Posted by <a href="#">@post.CreatedBy</a></div>
+                        <div>@post.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")</div>
+                    </div>
                 </div>
-                <div class="card-footer d-flex">
-                    <div class="flex-grow-1">Posted by <a href="#">@post.CreatedBy</a></div>
-                    <div>@post.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")</div>
-                </div>
-            </div>
             }
 
             <div class="d-flex justify-content-center">
@@ -57,41 +59,75 @@
 
     @* Sidebar *@
     <div class="col-sm-4 oc-sidebar">
-        <div class="card">
-            <div class="card-header d-flex justify-content-center">
-                <h2 class="card-title">Department Staff</h2>
-            </div>
-            <div class="card-body">
-                <div id="carouselDepartmentStaff" class="carousel slide" data-ride="carousel" data-interval="false">
-                    <ul class="carousel-indicators">
-                        <li data-target="#carouselDepartmentStaff" data-slide-to="0" class="active"></li>
-                        <li data-target="#carouselDepartmentStaff" data-slide-to="1"></li>
-                    </ul>
-                    <div class="carousel-inner bg-secondary">
-                        <div class="carousel-item active">
-                            <div class="d-flex justify-content-center bg-danger" style="height:250px">
-                                <span class="fa fa-smile mt-3" style="font-size:150px"></span>
-                                <h5 class="carousel-caption">Harry Potter</h5>
-                            </div>
-                        </div>
-                        <div class="carousel-item">
-                            <div class="d-flex justify-content-center bg-success" style="height:250px">
-                                <span class="fa fa-frown mt-3" style="font-size:150px"></span>
-                                <h5 class="carousel-caption">Draco Malfoy</h5>
-                            </div>
+        @if (!string.IsNullOrWhiteSpace(Model.Section.FeaturedVideoUrl))
+        {
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <span class="card-title fa fa-video align-self-center"></span>
+                    <h2 class="card-title">Featured Video</h2>
+                    <div class="card-title align-self-center dropdown">
+                        <a href="#" class="card-title" role="button" id="dropdownConfigureVideo"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="fa fa-cog"></span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownConfigureVideo">
+                            <button type="button"
+                                    class="dropdown-item"
+                                    data-toggle="modal"
+                                    data-target="#editModal"
+                                    data-id="@Model.Section.Id"
+                                    data-url="@Model.Section.FeaturedVideoUrl">
+                                Edit
+                            </button>
                         </div>
                     </div>
-                    <a class="carousel-control-prev" href="#carouselDepartmentStaff" role="button" data-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" href="#carouselDepartmentStaff" role="button" data-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Next</span>
-                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe src="@Model.Section.FeaturedVideoUrl"
+                                frameborder="0"
+                                allow="autoplay; encrypted-media"
+                                allowfullscreen></iframe>
+                    </div>
                 </div>
             </div>
-        </div>
+        }
+
+        @*<div class="card">
+                <div class="card-header d-flex justify-content-center">
+                    <h2 class="card-title">Department Staff</h2>
+                </div>
+                <div class="card-body">
+                    <div id="carouselDepartmentStaff" class="carousel slide" data-ride="carousel" data-interval="false">
+                        <ul class="carousel-indicators">
+                            <li data-target="#carouselDepartmentStaff" data-slide-to="0" class="active"></li>
+                            <li data-target="#carouselDepartmentStaff" data-slide-to="1"></li>
+                        </ul>
+                        <div class="carousel-inner bg-secondary">
+                            <div class="carousel-item active">
+                                <div class="d-flex justify-content-center bg-danger" style="height:250px">
+                                    <span class="fa fa-smile mt-3" style="font-size:150px"></span>
+                                    <h5 class="carousel-caption">Harry Potter</h5>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="d-flex justify-content-center bg-success" style="height:250px">
+                                    <span class="fa fa-frown mt-3" style="font-size:150px"></span>
+                                    <h5 class="carousel-caption">Draco Malfoy</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <a class="carousel-control-prev" href="#carouselDepartmentStaff" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselDepartmentStaff" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+                </div>
+            </div>*@
 
         <div class="card">
             <div class="card-header d-flex justify-content-center">
@@ -135,3 +171,35 @@
     </div>
     @* End Sidebar *@
 </div>
+
+@section scripts
+    {
+    <script>
+        $("#editForm").submit(function (e) {
+            e.preventDefault();
+            var id = $("#editId").val();
+            var url = $('#editUrl').val();
+
+            $.post("@(Url.Action("EditFeaturedVideoUrl", new { Area = "Admin", Controller = "Sections" }))",
+                { sectionId: id, url: url },
+                function (response) {
+                    if (response.success == true) {
+                        location.reload();
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners();
+                    }
+                });
+        });
+
+        $("#editModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var url = button.data("url");
+            var modal = $(this);
+            $("#editId").val(id);
+            modal.find("#editUrl").val(url);
+        });
+    </script>
+}

@@ -132,6 +132,31 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
+        public async Task<IActionResult> EditFeaturedVideoUrl(int sectionId, string url)
+        {
+            try
+            {
+                await _sectionService.EditFeaturedVideoUrlAsync(sectionId, url);
+
+                if(string.IsNullOrWhiteSpace(url))
+                {
+                    ShowAlertSuccess("Removed featured video.");
+                }
+                else
+                {
+                    ShowAlertSuccess("Updated featured video.");
+                }
+                
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error updating featured video: {ex}", ex);
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
         public async Task<IActionResult> Delete(IndexViewModel model)
         {
             try

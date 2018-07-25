@@ -99,10 +99,20 @@ namespace Ocuda.Ops.Service
             currentSection.Path = section.Path;
             currentSection.Icon = section.Icon;
             currentSection.SortOrder = section.SortOrder;
+            currentSection.FeaturedVideoUrl = section.FeaturedVideoUrl;
 
             _sectionRepository.Update(currentSection);
             await _sectionRepository.SaveAsync();
             return currentSection;
+        }
+
+        public async Task EditFeaturedVideoUrlAsync(int sectionId, string url)
+        {
+            var currentSection = await _sectionRepository.FindAsync(sectionId);
+            currentSection.FeaturedVideoUrl = url;
+
+            _sectionRepository.Update(currentSection);
+            await _sectionRepository.SaveAsync();
         }
 
         public async Task DeleteAsync(int id)
