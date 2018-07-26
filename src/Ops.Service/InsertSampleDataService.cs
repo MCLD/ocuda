@@ -492,5 +492,38 @@ namespace Ocuda.Ops.Service
 
             await _userRepository.SaveAsync();
         }
+
+        public IEnumerable<Calendar> GetCalendars()
+        {
+            // TODO repository/database
+            return new List<Calendar>
+            {
+                new Calendar
+                {
+                    IsPinned = true,
+                    Name = "Staff Training",
+                    Url = "https://www.google.com/",
+                    When = DateTime.Parse("2018-06-19 10:00"),
+                    CreatedBy = 1,
+                    CreatedAt = DateTime.Now,
+                },
+                new Calendar
+                {
+                    Name = "Fun Event!",
+                    Url = "https://www.google.com/",
+                    When = DateTime.Parse("2018-06-08 12:00"),
+                    CreatedBy = 1,
+                    CreatedAt = DateTime.Now,
+                },
+                new Calendar
+                {
+                    Name = "Important Date Reminder",
+                    Url = "https://www.google.com/",
+                    When = DateTime.Parse("2018-06-12 9:00"),
+                    CreatedBy = 1,
+                    CreatedAt = DateTime.Now,
+                }
+            };
+        }
     }
 }

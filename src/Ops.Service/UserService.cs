@@ -1,33 +1,45 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
     public class UserService : IUserService
     {
+        private readonly ILogger<UserService> _logger;
         private readonly IUserRepository _userRepository;
-        public UserService(IUserRepository userRepository)
+
+        public UserService(ILogger<UserService> logger,
+            IUserRepository userRepository)
         {
+            _logger = logger
+               ?? throw new ArgumentNullException(nameof(logger));
             _userRepository = userRepository 
                 ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
         public async Task<User> LookupUser(string username)
         {
+            username = username.Trim().ToLower();
             return await _userRepository.FindByUsernameAsync(username);
         }
 
         public async Task<User> AddUser(User user, int? createdById = null)
         {
-            user.Username = user.Username.Trim();
+            user.Username = user.Username.Trim().ToLower();
+            user.Email = user.Email.Trim().ToLower();
             user.CreatedAt = DateTime.Now;
             if(createdById != null)
             {
                 user.CreatedBy = (int)createdById;
             }
+
+            await ValidateUserAsync(user);
+
             await _userRepository.AddAsync(user);
             await _userRepository.SaveAsync();
             if (createdById != null)
@@ -70,7 +82,6 @@ namespace Ocuda.Ops.Service
 
         public async Task<User> GetByUsernameAsync(string username)
         {
-            // TODO throw exception if the username is null
             return await _userRepository.FindByUsernameAsync(username);
         }
 
@@ -78,6 +89,8 @@ namespace Ocuda.Ops.Service
         {
             var currentUser = await _userRepository.FindAsync(user.Id);
             currentUser.Nickname = user.Nickname;
+
+            await ValidateUserAsync(currentUser);
 
             _userRepository.Update(currentUser);
             await _userRepository.SaveAsync();
@@ -97,6 +110,65 @@ namespace Ocuda.Ops.Service
             dbUser.SupervisorId = user.SupervisorId;
             _userRepository.Update(dbUser);
             await _userRepository.SaveAsync();
+        }
+
+        public async Task ValidateUserAsync(User user)
+        {
+            var message = string.Empty;
+
+            if(string.IsNullOrWhiteSpace(user.Username))
+            {
+                message = $"Username cannot be empty.";
+                _logger.LogWarning(message);
+                throw new OcudaException(message);
+            }
+
+            if (string.IsNullOrWhiteSpace(user.Email))
+            {
+                message = $"Email cannot be empty.";
+                _logger.LogWarning(message);
+                throw new OcudaException(message);
+            }
+
+            if (string.IsNullOrWhiteSpace(user.Name))
+            {
+                message = $"Name cannot be empty.";
+                _logger.LogWarning(message);
+                throw new OcudaException(message);
+            }
+
+            if (await _userRepository.IsDuplicateUsername(user.Username))
+            {
+                message = $"User '{user.Username}' already exists.";
+                _logger.LogWarning(message, user.Username);
+                throw new OcudaException(message);
+            }
+
+            if (await _userRepository.IsDuplicateEmail(user.Email))
+            {
+                message = $"User with email '{user.Email}' already exists.";
+                _logger.LogWarning(message, user.Email);
+                throw new OcudaException(message);
+            }
+
+            if(user.SupervisorId.HasValue)
+            {
+                var supervisor = await _userRepository.FindAsync(user.SupervisorId.Value);
+                if (supervisor == null)
+                {
+                    message = $"SupervisorId '{user.SupervisorId}' is not valid.";
+                    _logger.LogWarning(message, user.SupervisorId);
+                    throw new OcudaException(message);
+                }
+            }
+
+            var creator = await _userRepository.FindAsync(user.CreatedBy);
+            if (creator == null)
+            {
+                message = $"Created by invalid User Id: {user.CreatedBy}";
+                _logger.LogWarning(message, user.CreatedBy);
+                throw new OcudaException(message);
+            }
         }
     }
 }

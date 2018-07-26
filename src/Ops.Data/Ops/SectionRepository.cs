@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +45,14 @@ namespace Ocuda.Ops.Data.Ops
                 .AnyAsync();
         }
 
+        public async Task<Section> GetByNameAsync(string name)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Name == name && _.IsDeleted == false)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<Section> GetByPathAsync(string path)
         {
             return await DbSet
@@ -72,6 +81,22 @@ namespace Ocuda.Ops.Data.Ops
                 .AsNoTracking()
                 .Where(_ => _.Id == id && _.IsDeleted == false)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> IsDuplicateNameAsync(string name)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Name == name && _.IsDeleted == false)
+                .AnyAsync();
+        }
+
+        public async Task<bool> IsDuplicatePathAsync(string path)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Path == path && _.IsDeleted == false)
+                .AnyAsync();
         }
     }
 }

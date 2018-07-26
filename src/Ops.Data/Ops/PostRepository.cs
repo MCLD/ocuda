@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -31,8 +32,18 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == stub && _.SectionId == sectionId)
+                .Where(_ => _.Stub == stub
+                         && _.SectionId == sectionId)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<Post> GetByTitleAndSectionIdAsync(string title, int sectionId)
+        {
+            return await DbSet
+                    .AsNoTracking()
+                    .Where(_ => _.Title == title
+                             && _.SectionId == sectionId)
+                    .FirstOrDefaultAsync();
         }
 
         public async Task<DataWithCount<ICollection<Post>>> GetPaginatedListAsync(BlogFilter filter)
@@ -59,7 +70,9 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == stub && _.SectionId == sectionId && _.IsDraft == false)
+                .Where(_ => _.Stub == stub
+                         && _.SectionId == sectionId 
+                         && _.IsDraft == false)
                 .AnyAsync();
         }
     }

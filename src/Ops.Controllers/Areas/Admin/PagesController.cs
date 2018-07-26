@@ -12,6 +12,7 @@ using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
@@ -87,7 +88,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 var newPage = await _pageService.CreateAsync(CurrentUserId, page);
                 return Json(new { success = true, id = newPage.Id });
             }
-            catch (Exception ex)
+            catch (OcudaException ex)
             {
                 _logger.LogError($"Error adding page: {ex}", ex);
                 ShowAlertDanger("Unable to add page: ", ex.Message);
@@ -136,7 +137,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     ShowAlertSuccess($"Updated page: {page.Title}");
                     return RedirectToAction(nameof(Index));
                 }
-                catch (Exception ex)
+                catch (OcudaException ex)
                 {
                     _logger.LogError($"Error editing page: {ex}", ex);
                     ShowAlertDanger("Unable to update page: ", ex.Message);

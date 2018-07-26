@@ -13,7 +13,7 @@ using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Utility.Keys;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
@@ -99,7 +99,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
             if (categoryId.HasValue)
             {
-                var name = (await _categoryService.GetCategoryByIdAsync(categoryId.Value)).Name;
+                var name = (await _categoryService.GetByIdAsync(categoryId.Value)).Name;
                 viewModel.CategoryName =
                     string.IsNullOrWhiteSpace(name) ? DefaultCategoryDisplayName : name;
             }
@@ -192,9 +192,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     ShowAlertSuccess($"Added file: {newFile.Name}");
                     return RedirectToAction(nameof(Index));
                 }
-                catch (Exception ex)
+                catch (OcudaException ex)
                 {
-                    _logger.LogError($"Error creating file: {ex}", ex);
                     ShowAlertDanger("Unable to add file: ", ex.Message);
                 }
             }
@@ -230,13 +229,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [SaveModelState]
         public async Task<IActionResult> Edit(DetailViewModel model)
         {
-            if (model.FileData == null)
+            if (model.FileData != null)
             {
-                ModelState.AddModelError("File", FileValidationFailedNoFile);
-                ShowAlertDanger(FileValidationFailedNoFile);
-            }
-            else
-            { 
                 var maxFileSize = await _siteSettingService
                     .GetSettingIntAsync(Models.Keys.SiteSetting.FileManagement.MaxUploadBytes);
 
@@ -262,9 +256,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 try
                 {
-                    File file;
-                    model.File.SectionId = model.SectionId;
-
                     if (model.FileData != null)
                     {
                         byte[] fileBytes;
@@ -283,20 +274,19 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                         var fileType = await _fileTypeService.GetByExtensionAsync(model.File.Extension);
                         model.File.Icon = fileType.Icon;
 
-                        file = await _fileService.EditPrivateFileAsync(model.File, fileBytes);
+                        var file = await _fileService.EditPrivateFileAsync(model.File, fileBytes);
                         ShowAlertSuccess($"Updated file: {file.Name}");
                         return RedirectToAction(nameof(Index));
                     }
                     else
                     {
-                        file = await _fileService.EditPrivateFileAsync(model.File);
+                        var file = await _fileService.EditPrivateFileAsync(model.File);
                         ShowAlertSuccess($"Updated file: {file.Name}");
                         return RedirectToAction(nameof(Index));
                     }
                 }
-                catch (Exception ex)
+                catch (OcudaException ex)
                 {
-                    _logger.LogError($"Error editing file: {ex}", ex);
                     ShowAlertDanger("Unable to update file: ", ex.Message);
                 }
             }
@@ -378,9 +368,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ShowAlertSuccess($"Added file category: {newCategory.Name}");
                 return Json(new { success = true });
             }
-            catch (Exception ex)
+            catch (OcudaException ex)
             {
-                _logger.LogError($"Error creating file category: {ex}", ex);
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -394,9 +383,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ShowAlertSuccess($"Updated file category: {category.Name}");
                 return Json(new { success = true });
             }
-            catch (Exception ex)
+            catch (OcudaException ex)
             {
-                _logger.LogError($"Error editing file: {ex}", ex);
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -458,8 +446,14 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     if (fileData != null)
                     {
                         var section = await _sectionService.GetByIdAsync(sectionId);
-                        var category =
-                            await _categoryService.GetAttachmentCategoryAsync(CurrentUserId, section.Id);
+
+                        BlogFilter filter = new BlogFilter
+                        {
+                            CategoryType = CategoryType.File,
+                            SectionId = section.Id
+                        };
+
+                        var category = await _categoryService.GetDefaultAsync(filter);
 
                         File file = new File
                         {

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -17,11 +18,26 @@ namespace Ocuda.Ops.Data.Ops
 
         public async Task<User> FindByUsernameAsync(string username)
         {
-            var sanitizedUsername = username.Trim();
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Username == sanitizedUsername)
+                .Where(_ => _.Username == username)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> IsDuplicateUsername(string username)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Username == username)
+                .AnyAsync();
+        }
+
+        public async Task<bool> IsDuplicateEmail(string email)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Email == email)
+                .AnyAsync();
         }
 
         #region Initial setup methods
