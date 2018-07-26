@@ -12,6 +12,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         Task<Post> GetByStubAndSectionIdAsync(string stub, int sectionId);
         Task<Post> GetByTitleAndSectionIdAsync(string title, int sectionId);
         Task<DataWithCount<ICollection<Post>>> GetPaginatedListAsync(BlogFilter filter);
-        Task<bool> StubInUseAsync(string stub, int sectionId);
+        Task<bool> StubInUseAsync(Post post);
     }
 }

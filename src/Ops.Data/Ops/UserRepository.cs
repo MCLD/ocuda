@@ -29,7 +29,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.IsDeleted == false && _.Username == username)
+                .Where(_ => _.IsDeleted == false && _.Username == username && _.IsSysadmin == false)
                 .FirstOrDefaultAsync();
         }
 
@@ -37,7 +37,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.IsDeleted == false && _.Email == email)
+                .Where(_ => _.IsDeleted == false && _.Email == email && _.IsSysadmin == false)
                 .FirstOrDefaultAsync();
         }
 
@@ -53,7 +53,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.IsDeleted == false && _.Username == username)
+                .Where(_ => _.IsDeleted == false && _.Username == username && _.IsSysadmin == false)
                 .AnyAsync();
         }
 
@@ -61,7 +61,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.IsDeleted == false && _.Email == email)
+                .Where(_ => _.IsDeleted == false && _.Email == email && _.IsSysadmin == false)
                 .AnyAsync();
         }
 

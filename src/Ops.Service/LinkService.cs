@@ -59,7 +59,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<Link> CreateAsync(int currentUserId, Link link)
         {
-            link.Name = link.Name.Trim();
+            link.Name = link.Name?.Trim();
             link.CreatedAt = DateTime.Now;
             link.CreatedBy = currentUserId;
 
@@ -73,7 +73,7 @@ namespace Ocuda.Ops.Service
         public async Task<Link> EditAsync(Link link)
         {
             var currentLink = await _linkRepository.FindAsync(link.Id);
-            currentLink.Name = link.Name.Trim();
+            currentLink.Name = link.Name?.Trim();
             currentLink.Url = link.Url;
             currentLink.CategoryId = link.CategoryId;
             currentLink.IsFeatured = link.IsFeatured;

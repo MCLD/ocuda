@@ -92,8 +92,9 @@ function updateStub(stub, text) {
     stub.val(slug);
 }
 
-function validateStub(stub, stubCheckUrl) {
+function validateStub(stub, id, stubCheckUrl) {
     var stubValidation = stub.parent().find('span');
+    var sectionId = $("#SectionId");
     if (stub.val().trim() != "") {
         stub.val(stub.val().trim());
 
@@ -101,8 +102,11 @@ function validateStub(stub, stubCheckUrl) {
         stubValidation.text("Checking stub availability...")
 
         $.post(stubCheckUrl, {
-            stub: stub.val(),
-            sectionId: $("#SectionId").val()
+            item: {
+                id: id.val(),
+                stub: stub.val(),
+                sectionId: sectionId.val()
+            }
         }, function (response) {
             if (response) {
                 stub.removeClass("valid");

@@ -9,6 +9,8 @@
     <input asp-for="SectionId" type="hidden" />
     @if (Model.Action == nameof(PostsController.Edit))
     {
+        <input asp-for="Post.SectionId" type="hidden" />
+        <input asp-for="Post.CreatedBy" type="hidden" />
         <input id="contentId" asp-for="Post.Id" type="hidden" />
         <input id="contentType" value="@(nameof(Post))" type="hidden" />
     }
@@ -74,11 +76,12 @@
             <text>
                 var title = $('#Post_Title');
                 var stub = $("#Post_Stub");
+                var id = $("#contentId");
                 var currentStub;
                 var stubCheckUrl = "@Url.Action("StubInUse", "Posts", new { Area = "Admin" })";
 
                 $(document).ready(function () {
-                    validateStub(stub, stubCheckUrl);
+                    validateStub(stub, id, stubCheckUrl);
                     currentStub = stub.val();
                 });
 
@@ -91,7 +94,7 @@
 
                 title.on("blur", function () {
                     setTimeout(function () {
-                        validateStub(stub, stubCheckUrl);
+                        validateStub(stub, id, stubCheckUrl);
                         currentStub = stub.val();
                     }, 200);      
                 });
@@ -105,7 +108,7 @@
                 stub.on("blur", function () {
                     updateStub(stub, stub.val());
                     setTimeout(function () {
-                        validateStub(stub, stubCheckUrl);
+                        validateStub(stub, id, stubCheckUrl);
                         currentStub = stub.val();
                     }, 200);   
                 });

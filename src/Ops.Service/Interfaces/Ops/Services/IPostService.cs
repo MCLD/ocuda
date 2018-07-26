@@ -19,6 +19,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<Post> CreateAsync(int currentUserId, Post post);
         Task<Post> EditAsync(Post post);
         Task DeleteAsync(int id);
-        Task<bool> StubInUseAsync(string stub, int sectionId);
+        Task<bool> StubInUseAsync(Post post);
     }
 }

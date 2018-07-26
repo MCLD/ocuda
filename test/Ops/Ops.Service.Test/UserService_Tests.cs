@@ -17,10 +17,7 @@ namespace Ocuda.test.Ops.Service.Test
         [Theory]
         [InlineData(true, false, false, 1, "test@email.com", "Name", 2, "Username")]    //Valid with SupervisorId
         [InlineData(true, false, false, 1, "test@email.com", "Name", null, "Username")] //Valid null SupervisorId
-        [InlineData(false, false, false, 1, null, "Name", 2, "Username")]               //Invalid null Email
-        [InlineData(false, false, false, 1, "test@email.com", null, 2, "Username")]     //Invalid null Name
         [InlineData(false, false, false, 1, "test@email.com", "Name", 2, null)]         //Invalid null Username
-        [InlineData(false, false, false, -1, "test@email.com", "Name", 2, "Username")]  //Invalid CreatedBy
         [InlineData(false, false, false, 1, "test@email.com", "Name", -1, "Username")]  //Invalid SupervisorId
         [InlineData(false, false, true, 1, "test@email.com", "Name", 2, "Username")]    //Invalid duplicate Email
         [InlineData(false, true, false, 1, "test@email.com", "Name", 2, "Username")]    //Invalid duplicate Username

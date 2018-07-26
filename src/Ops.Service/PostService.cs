@@ -51,17 +51,17 @@ namespace Ocuda.Ops.Service
 
         public async Task<Post> GetByStubAsync(string stub)
         {
-            return await _postRepository.GetByStubAsync(stub.Trim().ToLower());
+            return await _postRepository.GetByStubAsync(stub?.Trim().ToLower());
         }
 
         public async Task<Post> GetByStubAndSectionIdAsync(string stub, int sectionId)
         {
-            return await _postRepository.GetByStubAndSectionIdAsync(stub.Trim().ToLower(), sectionId);
+            return await _postRepository.GetByStubAndSectionIdAsync(stub?.Trim().ToLower(), sectionId);
         }
 
         public async Task<Post> GetByTitleAndSectionIdAsync(string title, int sectionId)
         {
-            return await _postRepository.GetByTitleAndSectionIdAsync(title.Trim(), sectionId);
+            return await _postRepository.GetByTitleAndSectionIdAsync(title?.Trim(), sectionId);
         }
 
         public async Task<DataWithCount<ICollection<Post>>> GetPaginatedListAsync(BlogFilter filter)
@@ -71,8 +71,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<Post> CreateAsync(int currentUserId, Post post)
         {
-            post.Title = post.Title.Trim();
-            post.Stub = post.Stub.Trim().ToLower();
+            post.Title = post.Title?.Trim();
+            post.Stub = post.Stub?.Trim().ToLower();
             post.CreatedAt = DateTime.Now;
             post.CreatedBy = currentUserId;
 
@@ -87,8 +87,8 @@ namespace Ocuda.Ops.Service
         public async Task<Post> EditAsync(Post post)
         {
             var currentPost = await _postRepository.FindAsync(post.Id);
-            currentPost.Title = post.Title.Trim();
-            currentPost.Stub = post.Stub.Trim().ToLower();
+            currentPost.Title = post.Title?.Trim();
+            currentPost.Stub = post.Stub?.Trim().ToLower();
             currentPost.Content = post.Content;
             currentPost.IsDraft = post.IsDraft;
             currentPost.IsPinned = post.IsPinned;
@@ -107,9 +107,9 @@ namespace Ocuda.Ops.Service
             await _postRepository.SaveAsync();
         }
 
-        public async Task<bool> StubInUseAsync(string stub, int sectionId)
+        public async Task<bool> StubInUseAsync(Post post)
         {
-            return await _postRepository.StubInUseAsync(stub.Trim().ToLower(), sectionId);
+            return await _postRepository.StubInUseAsync(post);
         }
 
         public async Task ValidatePostAsync(Post post)
@@ -138,7 +138,7 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException(message);
             }
 
-            var stubInUse = await _postRepository.StubInUseAsync(post.Stub, post.SectionId);
+            var stubInUse = await _postRepository.StubInUseAsync(post);
 
             if (!post.IsDraft && stubInUse)
             {
