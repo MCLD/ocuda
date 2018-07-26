@@ -13,7 +13,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<User> AddUser(User user, int? createdById = null);
         Task<User> EnsureSysadminUserAsync();
         Task<User> GetByIdAsync(int id);
-        Task<User> GetByUsernameAsync(string username);
         Task<User> EditNicknameAsync(User user);
         Task LoggedInUpdateAsync(User user);
         Task<User> UpdateRosterUserAsync(int rosterUserId, User user);

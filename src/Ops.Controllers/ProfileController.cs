@@ -23,7 +23,7 @@ namespace Ocuda.Ops.Controllers
             
             if(!string.IsNullOrWhiteSpace(id))
             {
-                var user = await _userService.GetByUsernameAsync(id);
+                var user = await _userService.LookupUserAsync(id);
 
                 if(user != null)
                 {
@@ -37,7 +37,7 @@ namespace Ocuda.Ops.Controllers
             }
             else
             {
-                viewModel.User = await _userService.GetByUsernameAsync(CurrentUsername);
+                viewModel.User = await _userService.LookupUserAsync(CurrentUsername);
             }
 
             if (viewModel.User.SupervisorId.HasValue)

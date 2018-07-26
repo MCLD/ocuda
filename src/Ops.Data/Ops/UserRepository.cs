@@ -29,20 +29,15 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.IsDeleted == false 
-                    && string.Equals(_.Username, sanitizedUsername, 
-                        StringComparison.OrdinalIgnoreCase))
+                .Where(_ => _.IsDeleted == false && _.Username == username)
                 .FirstOrDefaultAsync();
         }
 
         public async Task<User> FindByEmailAsync(string email)
         {
-            var sanitizedEmail = email.Trim();
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.IsDeleted == false 
-                    && string.Equals(_.Email, sanitizedEmail,
-                        StringComparison.OrdinalIgnoreCase))
+                .Where(_ => _.IsDeleted == false && _.Email == email)
                 .FirstOrDefaultAsync();
         }
 
@@ -58,7 +53,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Username == username)
+                .Where(_ => _.IsDeleted == false && _.Username == username)
                 .AnyAsync();
         }
 
@@ -66,7 +61,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Email == email)
+                .Where(_ => _.IsDeleted == false && _.Email == email)
                 .AnyAsync();
         }
 

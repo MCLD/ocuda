@@ -30,6 +30,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<User> LookupUserByEmailAsync(string email)
         {
+            email = email?.Trim().ToLower();
             return await _userRepository.FindByEmailAsync(email);
         }
 
@@ -83,11 +84,6 @@ namespace Ocuda.Ops.Service
         public async Task<User> GetByIdAsync(int id)
         {
             return await _userRepository.FindAsync(id);
-        }
-
-        public async Task<User> GetByUsernameAsync(string username)
-        {
-            return await _userRepository.FindByUsernameAsync(username);
         }
 
         public async Task<User> EditNicknameAsync(User user)
