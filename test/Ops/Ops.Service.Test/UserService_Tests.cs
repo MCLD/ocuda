@@ -53,8 +53,8 @@ namespace Ocuda.test.Ops.Service.Test
 
             var logger = new Mock<ILogger<UserService>>();
             var userRepository = new Mock<IUserRepository>();
-            userRepository.Setup(m => m.IsDuplicateUsername(user.Username)).ReturnsAsync(isDuplicateUsername);
-            userRepository.Setup(m => m.IsDuplicateEmail(user.Email)).ReturnsAsync(isDuplicateEmail);
+            userRepository.Setup(m => m.IsDuplicateUsername(user)).ReturnsAsync(isDuplicateUsername);
+            userRepository.Setup(m => m.IsDuplicateEmail(user)).ReturnsAsync(isDuplicateEmail);
             userRepository.Setup(
                 m => m.FindAsync(1))
                     .ReturnsAsync(new User

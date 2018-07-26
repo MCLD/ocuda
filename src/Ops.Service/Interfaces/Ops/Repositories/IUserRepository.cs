@@ -10,7 +10,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         Task<User> FindByUsernameAsync(string username);
         Task<User> FindByEmailAsync(string email);
         Task<ICollection<User>> GetAllAsync();
-        Task<bool> IsDuplicateUsername(string username);
-        Task<bool> IsDuplicateEmail(string email);
+        Task<bool> IsDuplicateUsername(User user);
+        Task<bool> IsDuplicateEmail(User user);
     }
 }

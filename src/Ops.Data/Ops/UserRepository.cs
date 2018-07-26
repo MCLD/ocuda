@@ -49,19 +49,25 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
-        public async Task<bool> IsDuplicateUsername(string username)
+        public async Task<bool> IsDuplicateUsername(User user)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.IsDeleted == false && _.Username == username && _.IsSysadmin == false)
+                .Where(_ => _.Username == user.Username
+                         && _.Id != user.Id
+                         && _.IsDeleted == false
+                         && _.IsSysadmin == false)
                 .AnyAsync();
         }
 
-        public async Task<bool> IsDuplicateEmail(string email)
+        public async Task<bool> IsDuplicateEmail(User user)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.IsDeleted == false && _.Email == email && _.IsSysadmin == false)
+                .Where(_ => _.Email == user.Email
+                         && _.Id != user.Id
+                         && _.IsDeleted == false
+                         && _.IsSysadmin == false)
                 .AnyAsync();
         }
 

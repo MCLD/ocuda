@@ -132,7 +132,7 @@ namespace Ocuda.Ops.Service
 
             if (!string.IsNullOrWhiteSpace(user.Username))
             {
-                if (await _userRepository.IsDuplicateUsername(user.Username))
+                if (await _userRepository.IsDuplicateUsername(user))
                 {
                     message = $"User '{user.Username}' already exists.";
                     _logger.LogWarning(message, user.Username);
@@ -148,7 +148,7 @@ namespace Ocuda.Ops.Service
 
             if (!string.IsNullOrWhiteSpace(user.Email))
             {
-                if (await _userRepository.IsDuplicateEmail(user.Email))
+                if (await _userRepository.IsDuplicateEmail(user))
                 {
                     message = $"User with email '{user.Email}' already exists.";
                     _logger.LogWarning(message, user.Email);
