@@ -22,10 +22,16 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
-        public async Task<User> LookupUser(string username)
+        public async Task<User> LookupUserAsync(string username)
         {
             username = username.Trim().ToLower();
             return await _userRepository.FindByUsernameAsync(username);
+        }
+
+        public async Task<User> LookupUserByEmailAsync(string email)
+        {
+            email = email?.Trim().ToLower();
+            return await _userRepository.FindByEmailAsync(email);
         }
 
         public async Task<User> AddUser(User user, int? createdById = null)
@@ -80,11 +86,6 @@ namespace Ocuda.Ops.Service
             return await _userRepository.FindAsync(id);
         }
 
-        public async Task<User> GetByUsernameAsync(string username)
-        {
-            return await _userRepository.FindByUsernameAsync(username);
-        }
-
         public async Task<User> EditNicknameAsync(User user)
         {
             var currentUser = await _userRepository.FindAsync(user.Id);
@@ -110,6 +111,21 @@ namespace Ocuda.Ops.Service
             dbUser.SupervisorId = user.SupervisorId;
             _userRepository.Update(dbUser);
             await _userRepository.SaveAsync();
+        }
+
+        public async Task<User> UpdateRosterUserAsync(int rosterUserId, User user)
+        {
+            var rosterUser = await GetByIdAsync(rosterUserId);
+            rosterUser.Email = user.Email;
+            rosterUser.Name = user.Name;
+            rosterUser.Nickname = user.Nickname;
+            rosterUser.Phone = user.Phone;
+            rosterUser.Username = user.Username;
+
+            _userRepository.Update(rosterUser);
+            await _userRepository.SaveAsync();
+
+            return rosterUser;
         }
 
         public async Task ValidateUserAsync(User user)

@@ -3,11 +3,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Novell.Directory.Ldap;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
 
-namespace Ocuda.Ops.Controllers.Helpers
+namespace Ocuda.Ops.Service
 {
-    public class LdapHelper
+    public class LdapService : ILdapService
     {
         private const int LDAPSearchResponse = 4;
 
@@ -30,14 +31,28 @@ namespace Ocuda.Ops.Controllers.Helpers
         private readonly ILogger _logger;
         private readonly IConfiguration _config;
 
-        public LdapHelper(ILogger<LdapHelper> logger,
+        public LdapService(ILogger<LdapService> logger,
             IConfiguration config)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
-        public User Lookup(User user)
+        public User LookupByUsername(User user)
+        {
+            // Lookup non-disabled account by username
+            var filter = $"(&({ADsAMAccountName}={user.Username})(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))";
+            return Lookup(user, filter);
+        }
+
+        public User LookupByEmail(User user)
+        {
+            // Lookup non-disabled account by email
+            var filter = $"(&({ADMail}={user.Email})(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))";
+            return Lookup(user, filter);
+        }
+
+        private User Lookup(User user, string filter)
         {
             string ldapServer = _config[Configuration.OpsLdapServer];
             string ldapDn = _config[Configuration.OpsLdapDn];
@@ -67,13 +82,14 @@ namespace Ocuda.Ops.Controllers.Helpers
 
                         LdapSearchQueue queue = cn.Search(ldapSearchBase,
                             LdapConnection.SCOPE_SUB,
-                            $"({ADsAMAccountName}={user.Username})",
+                            filter,
                             AttributesToReturn,
                             false,
                             null,
                             constraints);
 
                         LdapMessage message = queue.getResponse();
+                        var now = DateTime.Now;
                         while (message.Type == LDAPSearchResponse)
                         {
                             var entry = ((LdapSearchResult)message).Entry;
@@ -83,6 +99,12 @@ namespace Ocuda.Ops.Controllers.Helpers
                                 var attribute = (LdapAttribute)attributes.Current;
                                 switch (attribute.Name)
                                 {
+                                    case ADsAMAccountName:
+                                        if (string.IsNullOrEmpty(user.Username))
+                                        {
+                                            user.Username = attribute.StringValue;
+                                        }
+                                        break;
                                     case ADDisplayName:
                                         user.Name = attribute.StringValue;
                                         break;
@@ -106,9 +128,10 @@ namespace Ocuda.Ops.Controllers.Helpers
                                         break;
                                 }
                             }
+                            user.LastLdapUpdate = now;
                             message = queue.getResponse();
                         }
-                        user.LastLdapUpdate = DateTime.Now;
+                        user.LastLdapCheck = now;
                         cn.Disconnect();
                     }
                     catch (Exception ex)

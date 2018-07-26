@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 using Ocuda.Ops.Models;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
-    public interface IRosterService
+    public interface ILdapService
     {
-        Task<int> ImportRosterAsync(int currentUserId, string filename);
+        User LookupByEmail(User user);
+        User LookupByUsername(User user);
     }
 }

@@ -8,12 +8,13 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IUserService
     {
-        Task<User> LookupUser(string username);
+        Task<User> LookupUserAsync(string username);
+        Task<User> LookupUserByEmailAsync(string email);
         Task<User> AddUser(User user, int? createdById = null);
         Task<User> EnsureSysadminUserAsync();
         Task<User> GetByIdAsync(int id);
-        Task<User> GetByUsernameAsync(string username);
         Task<User> EditNicknameAsync(User user);
         Task LoggedInUpdateAsync(User user);
+        Task<User> UpdateRosterUserAsync(int rosterUserId, User user);
     }
 }

@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Controllers.Helpers;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Helpers;
 using Ocuda.Utility.Keys;
@@ -21,9 +20,9 @@ namespace Ocuda.Ops.Controllers.Filters
         private readonly ILogger<AuthenticationFilter> _logger;
         private readonly IConfiguration _config;
         private readonly IDistributedCache _cache;
-        private readonly LdapHelper _ldapHelper;
         private readonly WebHelper _webHelper;
         private readonly IAuthorizationService _authorizationService;
+        private readonly ILdapService _ldapService;
         private readonly IRosterService _rosterService;
         private readonly ISectionService _sectionService;
         private readonly IUserService _userService;
@@ -31,9 +30,9 @@ namespace Ocuda.Ops.Controllers.Filters
         public AuthenticationFilter(ILogger<AuthenticationFilter> logger,
             IConfiguration configuration,
             IDistributedCache cache,
-            LdapHelper ldapHelper,
             WebHelper webHelper,
             IAuthorizationService authorizationService,
+            ILdapService ldapService,
             IRosterService rosterService,
             ISectionService sectionService,
             IUserService userService)
@@ -41,11 +40,12 @@ namespace Ocuda.Ops.Controllers.Filters
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            _ldapHelper = ldapHelper ?? throw new ArgumentNullException(nameof(ldapHelper));
             _webHelper = webHelper ?? throw new ArgumentNullException(nameof(webHelper));
             _authorizationService = authorizationService
                 ?? throw new ArgumentNullException(nameof(authorizationService));
-            _rosterService = rosterService 
+            _ldapService = ldapService
+                ?? throw new ArgumentNullException(nameof(ldapService));
+            _rosterService = rosterService
                 ?? throw new ArgumentNullException(nameof(rosterService));
             _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(sectionService));
@@ -75,7 +75,7 @@ namespace Ocuda.Ops.Controllers.Filters
                     // user is logged in, ensure they exist in the database
                     // TODO probably figure out how to make this use the database less
                     string username = usernameClaim.Value;
-                    var user = await _userService.LookupUser(username);
+                    var user = await _userService.LookupUserAsync(username);
                     if (user == null || user.ReauthenticateUser)
                     {
                         // user does not exist in the database or needs to be reauthenticated
@@ -153,7 +153,7 @@ namespace Ocuda.Ops.Controllers.Filters
                             username = username.Substring(domainName.Length + 1);
                         }
 
-                        var user = await _userService.LookupUser(username);
+                        var user = await _userService.LookupUserAsync(username);
                         var newUser = user == null;
                         if (newUser)
                         {
@@ -165,23 +165,20 @@ namespace Ocuda.Ops.Controllers.Filters
                         }
 
                         // perform ldap update of user object
-                        user = _ldapHelper.Lookup(user);
-
-                        // look up user in roster
-                        if(!string.IsNullOrEmpty(user.Email))
-                        {
-                            var details = await _rosterService.GetLatestDetailsAsync(user.Email);
-                            if(details != null)
-                            {
-                                user.Title = details.JobTitle;
-                                user.LastRosterUpdate = now;
-                            }
-                        }
+                        user = _ldapService.LookupByUsername(user);
 
                         // if the user is new, add them to the database
                         if (newUser)
                         {
-                            user = await _userService.AddUser(user);
+                            var rosterUser = await _userService.LookupUserByEmailAsync(user.Email);
+                            if (rosterUser != null)
+                            {
+                                user = await _userService.UpdateRosterUserAsync(rosterUser.Id, user);
+                            }
+                            else
+                            {
+                                user = await _userService.AddUser(user);
+                            }
                         }
                         else
                         {

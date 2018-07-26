@@ -30,7 +30,7 @@ namespace Ocuda.Ops.Controllers.Filters
 
             if (usernameClaim != null)
             {
-                var user = await _userService.LookupUser(usernameClaim.Value);
+                var user = await _userService.LookupUserAsync(usernameClaim.Value);
                 if (user != null)
                 {
                     context.HttpContext.Items[ItemKey.Nickname] = user.Nickname ?? user.Username;
