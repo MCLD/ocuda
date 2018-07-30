@@ -28,12 +28,20 @@ namespace Ocuda.Ops.Data.Ops
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<ICollection<Section>> GetNavigationSectionsAsync()
+        public async Task<ICollection<SectionWithNavigation>> GetNavigationSectionsAsync()
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => !string.IsNullOrWhiteSpace(_.Icon) && _.IsDeleted == false)
-                .OrderBy(_ => _.SortOrder)
+                .GroupJoin(_context.Links
+                                .Where(_ => _.Category.IsNavigation)
+                                .OrderBy(_ => _.Name),
+                      section => section.Id,
+                      links => links.SectionId,
+                      (section, links) => new { section, links })
+                .Where(_ => _.section.IsNavigation
+                         && _.section.IsDeleted == false)
+                .Select(_ => new SectionWithNavigation { Section = _.section, NavigationLinks = _.links })
+                .OrderBy(_ => _.Section.SortOrder)
                 .ToListAsync();
         }
 

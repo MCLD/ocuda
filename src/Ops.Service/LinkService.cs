@@ -77,6 +77,7 @@ namespace Ocuda.Ops.Service
             currentLink.Url = link.Url;
             currentLink.CategoryId = link.CategoryId;
             currentLink.IsFeatured = link.IsFeatured;
+            currentLink.Icon = link.Icon;
 
             await ValidateLinkAsync(currentLink);
 

@@ -138,7 +138,12 @@
                     @foreach (var link in Model.Links)
                     {
                         <li class="list-group-item">
-                            <a href="@link.Url" class="card-link">@link.Name</a>
+                            <a class="card-link pl-0" href="@link.Url">
+                                <div class="d-flex">
+                                    <span class="col-1 align-self-center fa @link.Icon"></span>
+                                    <div class="col-11">@link.Name</div>
+                                </div>
+                            </a>
                         </li>
                     }
                 </ul>
