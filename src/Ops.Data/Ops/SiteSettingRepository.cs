@@ -24,11 +24,12 @@ namespace Ocuda.Ops.Data.Ops
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<bool> IsDuplicateKey(string key)
+        public async Task<bool> IsDuplicateKey(SiteSetting siteSetting)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Key == key)
+                .Where(_ => _.Key == siteSetting.Key
+                         && _.Id != siteSetting.Id)
                 .AnyAsync();
         }
     }

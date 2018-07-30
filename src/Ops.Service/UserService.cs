@@ -24,20 +24,18 @@ namespace Ocuda.Ops.Service
 
         public async Task<User> LookupUserAsync(string username)
         {
-            username = username.Trim().ToLower();
-            return await _userRepository.FindByUsernameAsync(username);
+            return await _userRepository.FindByUsernameAsync(username?.Trim().ToLower());
         }
 
         public async Task<User> LookupUserByEmailAsync(string email)
         {
-            email = email?.Trim().ToLower();
-            return await _userRepository.FindByEmailAsync(email);
+            return await _userRepository.FindByEmailAsync(email?.Trim().ToLower());
         }
 
         public async Task<User> AddUser(User user, int? createdById = null)
         {
-            user.Username = user.Username.Trim().ToLower();
-            user.Email = user.Email.Trim().ToLower();
+            user.Username = user.Username?.Trim().ToLower();
+            user.Email = user.Email?.Trim().ToLower();
             user.CreatedAt = DateTime.Now;
             if(createdById != null)
             {
@@ -132,41 +130,32 @@ namespace Ocuda.Ops.Service
         {
             var message = string.Empty;
 
-            if(string.IsNullOrWhiteSpace(user.Username))
+            if (!string.IsNullOrWhiteSpace(user.Username))
             {
+                if (await _userRepository.IsDuplicateUsername(user))
+                {
+                    message = $"User '{user.Username}' already exists.";
+                    _logger.LogWarning(message, user.Username);
+                    throw new OcudaException(message);
+                }
+            }
+            else
+            { 
                 message = $"Username cannot be empty.";
                 _logger.LogWarning(message);
                 throw new OcudaException(message);
             }
 
-            if (string.IsNullOrWhiteSpace(user.Email))
+            if (!string.IsNullOrWhiteSpace(user.Email))
             {
-                message = $"Email cannot be empty.";
-                _logger.LogWarning(message);
-                throw new OcudaException(message);
-            }
-
-            if (string.IsNullOrWhiteSpace(user.Name))
-            {
-                message = $"Name cannot be empty.";
-                _logger.LogWarning(message);
-                throw new OcudaException(message);
-            }
-
-            if (await _userRepository.IsDuplicateUsername(user.Username))
-            {
-                message = $"User '{user.Username}' already exists.";
-                _logger.LogWarning(message, user.Username);
-                throw new OcudaException(message);
-            }
-
-            if (await _userRepository.IsDuplicateEmail(user.Email))
-            {
-                message = $"User with email '{user.Email}' already exists.";
-                _logger.LogWarning(message, user.Email);
-                throw new OcudaException(message);
-            }
-
+                if (await _userRepository.IsDuplicateEmail(user))
+                {
+                    message = $"User with email '{user.Email}' already exists.";
+                    _logger.LogWarning(message, user.Email);
+                    throw new OcudaException(message);
+                }
+            }         
+ 
             if(user.SupervisorId.HasValue)
             {
                 var supervisor = await _userRepository.FindAsync(user.SupervisorId.Value);
@@ -176,14 +165,6 @@ namespace Ocuda.Ops.Service
                     _logger.LogWarning(message, user.SupervisorId);
                     throw new OcudaException(message);
                 }
-            }
-
-            var creator = await _userRepository.FindAsync(user.CreatedBy);
-            if (creator == null)
-            {
-                message = $"Created by invalid User Id: {user.CreatedBy}";
-                _logger.LogWarning(message, user.CreatedBy);
-                throw new OcudaException(message);
             }
         }
     }

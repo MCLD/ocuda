@@ -83,19 +83,23 @@ namespace Ocuda.Ops.Data.Ops
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<bool> IsDuplicateNameAsync(string name)
+        public async Task<bool> IsDuplicateNameAsync(Section section)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Name == name && _.IsDeleted == false)
+                .Where(_ => _.Name == section.Name 
+                         && _.Id != section.Id
+                         && _.IsDeleted == false)
                 .AnyAsync();
         }
 
-        public async Task<bool> IsDuplicatePathAsync(string path)
+        public async Task<bool> IsDuplicatePathAsync(Section section)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Path == path && _.IsDeleted == false)
+                .Where(_ => _.Path == section.Path
+                         && _.Id != section.Id
+                         && _.IsDeleted == false)
                 .AnyAsync();
         }
     }

@@ -65,17 +65,17 @@ namespace Ocuda.Ops.Service
 
         public async Task<bool> IsValidPathAsync(string path)
         {
-            return await _sectionRepository.IsValidPathAsync(path.Trim().ToLower());
+            return await _sectionRepository.IsValidPathAsync(path?.Trim().ToLower());
         }
 
         public async Task<Section> GetByNameAsync(string name)
         {
-            return await _sectionRepository.GetByNameAsync(name.Trim());
+            return await _sectionRepository.GetByNameAsync(name?.Trim());
         }
 
         public async Task<Section> GetByPathAsync(string path)
         {
-            return await _sectionRepository.GetByPathAsync(path.Trim().ToLower());
+            return await _sectionRepository.GetByPathAsync(path?.Trim().ToLower());
         }
 
         public async Task<DataWithCount<ICollection<Section>>> GetPaginatedListAsync(
@@ -97,8 +97,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<Section> CreateAsync(int currentUserId, Section section)
         {
-            section.Name = section.Name.Trim();
-            section.Path = section.Path.Trim().ToLower();
+            section.Name = section.Name?.Trim();
+            section.Path = section.Path?.Trim().ToLower();
             section.CreatedAt = DateTime.Now;
             section.CreatedBy = currentUserId;
 
@@ -114,13 +114,11 @@ namespace Ocuda.Ops.Service
         public async Task<Section> EditAsync(Section section)
         {
             var currentSection = await _sectionRepository.FindAsync(section.Id);
-            currentSection.Name = section.Name.Trim();
-            currentSection.Path = section.Path.Trim().ToLower();
+            currentSection.Name = section.Name?.Trim();
+            currentSection.Path = section.Path?.Trim().ToLower();
             currentSection.Icon = section.Icon;
             currentSection.SortOrder = section.SortOrder;
             currentSection.FeaturedVideoUrl = section.FeaturedVideoUrl;
-
-            await ValidateSectionAsync(currentSection);
 
             await ValidateSectionAsync(currentSection);
 
@@ -168,14 +166,14 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException(message);
             }
 
-            if (await _sectionRepository.IsDuplicateNameAsync(section.Name))
+            if (await _sectionRepository.IsDuplicateNameAsync(section))
             {
                 message = $"Section '{section.Name}' already exists.";
                 _logger.LogWarning(message, section.Name);
                 throw new OcudaException(message);
             }
 
-            if (await _sectionRepository.IsDuplicatePathAsync(section.Path))
+            if (await _sectionRepository.IsDuplicatePathAsync(section))
             {
                 message = $"Section path '{section.Path }' already exists.";
                 _logger.LogWarning(message, section.Path);

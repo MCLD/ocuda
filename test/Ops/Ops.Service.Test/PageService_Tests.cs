@@ -47,7 +47,7 @@ namespace Ocuda.test.Ops.Service.Test
             var logger = new Mock<ILogger<PageService>>();
 
             var pageRepository = new Mock<IPageRepository>();
-            pageRepository.Setup(m => m.StubInUseAsync(page.Stub, page.SectionId)).ReturnsAsync(stubInUse);
+            pageRepository.Setup(m => m.StubInUseAsync(page)).ReturnsAsync(stubInUse);
 
             var sectionRepository = new Mock<ISectionRepository>();
             sectionRepository.Setup(

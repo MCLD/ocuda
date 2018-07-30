@@ -71,7 +71,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<File> CreatePrivateFileAsync(int currentUserId, File file, byte[] fileData)
         {
-            file.Name = file.Name.Trim();
+            file.Name = file.Name?.Trim();
             file.CreatedAt = DateTime.Now;
             file.CreatedBy = currentUserId;
 
@@ -120,7 +120,7 @@ namespace Ocuda.Ops.Service
         public async Task<File> EditPrivateFileAsync(File file, byte[] fileData = null)
         {
             var currentFile = await _fileRepository.FindAsync(file.Id);
-            currentFile.Name = file.Name.Trim();
+            currentFile.Name = file.Name?.Trim();
             currentFile.Description = file.Description;
             currentFile.CategoryId = file.CategoryId;
             currentFile.IsFeatured = file.IsFeatured;        

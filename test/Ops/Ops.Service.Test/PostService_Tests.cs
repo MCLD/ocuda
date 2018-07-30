@@ -47,7 +47,7 @@ namespace Ocuda.test.Ops.Service.Test
             var logger = new Mock<ILogger<PostService>>();
 
             var postRepository = new Mock<IPostRepository>();
-            postRepository.Setup(m => m.StubInUseAsync(post.Stub, post.SectionId)).ReturnsAsync(stubInUse);
+            postRepository.Setup(m => m.StubInUseAsync(post)).ReturnsAsync(stubInUse);
 
             var sectionRepository = new Mock<ISectionRepository>();
             sectionRepository.Setup(

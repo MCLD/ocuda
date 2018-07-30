@@ -134,8 +134,8 @@ namespace Ocuda.test.Ops.Service.Test
                         });
             }
 
-            sectionRepository.Setup(m => m.IsDuplicateNameAsync(section.Name)).ReturnsAsync(isDuplicateName);
-            sectionRepository.Setup(m => m.IsDuplicatePathAsync(section.Path)).ReturnsAsync(isDuplicatePath);
+            sectionRepository.Setup(m => m.IsDuplicateNameAsync(section)).ReturnsAsync(isDuplicateName);
+            sectionRepository.Setup(m => m.IsDuplicatePathAsync(section)).ReturnsAsync(isDuplicatePath);
 
             var userRepository = new Mock<IUserRepository>();
             userRepository.Setup(

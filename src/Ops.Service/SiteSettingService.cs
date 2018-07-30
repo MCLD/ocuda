@@ -170,15 +170,17 @@ namespace Ocuda.Ops.Service
         {
             var message = string.Empty;
 
-            if (await _siteSettingRepository.IsDuplicateKey(siteSetting.Key))
+            if (!string.IsNullOrWhiteSpace(siteSetting.Key))
             {
-                message = $"Site Setting with key '{siteSetting.Key}' already exists.";
-                _logger.LogWarning(message, siteSetting.Key);
-                throw new OcudaException(message);
+                if (await _siteSettingRepository.IsDuplicateKey(siteSetting))
+                {
+                    message = $"Site Setting with key '{siteSetting.Key}' already exists.";
+                    _logger.LogWarning(message, siteSetting.Key);
+                    throw new OcudaException(message);
+                }
             }
-
-            if (string.IsNullOrWhiteSpace(siteSetting.Key))
-            {
+            else
+            { 
                 message = $"Site Setting must have a key.";
                 _logger.LogWarning(message);
                 throw new OcudaException(message);

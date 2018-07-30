@@ -120,7 +120,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
             if (currentPost.IsDraft == true && model.Page.IsDraft == false)
             {
-                var stubInUse = await _pageService.StubInUseAsync(model.Page.Stub, currentPost.SectionId);
+                var stubInUse = await _pageService.StubInUseAsync(model.Page);
 
                 if (stubInUse)
                 {
@@ -165,9 +165,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
-        public async Task<JsonResult> StubInUse(string stub, int sectionId)
+        public async Task<JsonResult> StubInUse(Page item)
         {
-            return Json(await _pageService.StubInUseAsync(stub, sectionId));
+            return Json(await _pageService.StubInUseAsync(item));
         }
     }
 }

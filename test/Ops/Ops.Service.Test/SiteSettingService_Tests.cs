@@ -56,7 +56,7 @@ namespace Ocuda.test.Ops.Service.Test
             var cache = new Mock<IDistributedCache>();
             var config = new Mock<IConfiguration>();
             var siteSettingRepository = new Mock<ISiteSettingRepository>();
-            siteSettingRepository.Setup(m => m.IsDuplicateKey(siteSetting.Key)).ReturnsAsync(isDuplicateKey);
+            siteSettingRepository.Setup(m => m.IsDuplicateKey(siteSetting)).ReturnsAsync(isDuplicateKey);
 
             var userRepository = new Mock<IUserRepository>();
             userRepository.Setup(

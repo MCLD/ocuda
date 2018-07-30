@@ -65,12 +65,13 @@ namespace Ocuda.Ops.Data.Ops
             };
         }
 
-        public async Task<bool> StubInUseAsync(string stub, int sectionId)
+        public async Task<bool> StubInUseAsync(Page page)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == stub
-                         && _.SectionId == sectionId 
+                .Where(_ => _.Stub == page.Stub
+                         && _.SectionId == page.SectionId 
+                         && _.Id != page.Id
                          && _.IsDraft == false)
                 .AnyAsync();
         }

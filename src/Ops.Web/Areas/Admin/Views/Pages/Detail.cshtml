@@ -9,6 +9,8 @@
         <input asp-for="@Model.SectionId" type="hidden" />
         @if (Model.Action == nameof(PagesController.Edit))
         {
+            <input asp-for="Page.SectionId" type="hidden" />
+            <input asp-for="Page.CreatedBy" type="hidden" />
             <input id="contentId" asp-for="Page.Id" type="hidden" />
             <input id="contentType" value="@(nameof(Page))" type="hidden" />
         }
@@ -66,11 +68,12 @@
             <text>
                 var title = $('#Page_Title');
                 var stub = $("#Page_Stub");
+                var id = $("#contentId");
                 var currentStub;
                 var stubCheckUrl = "@Url.Action("StubInUse", "Pages", new { Area = "Admin" })";
 
                 $(document).ready(function () {
-                    validateStub(stub, stubCheckUrl);
+                    validateStub(stub, id, stubCheckUrl);
                     currentStub = stub.val();
                 });
 
@@ -83,7 +86,7 @@
 
                 title.on("blur", function () {
                     setTimeout(function () {
-                        validateStub(stub, stubCheckUrl);
+                        validateStub(stub, id, stubCheckUrl);
                         currentStub = stub.val();
                     }, 200);      
                 });
@@ -97,7 +100,7 @@
                 stub.on("blur", function () {
                     updateStub(stub, stub.val());
                     setTimeout(function () {
-                        validateStub(stub, stubCheckUrl);
+                        validateStub(stub, id, stubCheckUrl);
                         currentStub = stub.val();
                     }, 200);   
                 });

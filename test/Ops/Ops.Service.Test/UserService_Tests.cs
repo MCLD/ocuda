@@ -17,10 +17,7 @@ namespace Ocuda.test.Ops.Service.Test
         [Theory]
         [InlineData(true, false, false, 1, "test@email.com", "Name", 2, "Username")]    //Valid with SupervisorId
         [InlineData(true, false, false, 1, "test@email.com", "Name", null, "Username")] //Valid null SupervisorId
-        [InlineData(false, false, false, 1, null, "Name", 2, "Username")]               //Invalid null Email
-        [InlineData(false, false, false, 1, "test@email.com", null, 2, "Username")]     //Invalid null Name
         [InlineData(false, false, false, 1, "test@email.com", "Name", 2, null)]         //Invalid null Username
-        [InlineData(false, false, false, -1, "test@email.com", "Name", 2, "Username")]  //Invalid CreatedBy
         [InlineData(false, false, false, 1, "test@email.com", "Name", -1, "Username")]  //Invalid SupervisorId
         [InlineData(false, false, true, 1, "test@email.com", "Name", 2, "Username")]    //Invalid duplicate Email
         [InlineData(false, true, false, 1, "test@email.com", "Name", 2, "Username")]    //Invalid duplicate Username
@@ -56,8 +53,8 @@ namespace Ocuda.test.Ops.Service.Test
 
             var logger = new Mock<ILogger<UserService>>();
             var userRepository = new Mock<IUserRepository>();
-            userRepository.Setup(m => m.IsDuplicateUsername(user.Username)).ReturnsAsync(isDuplicateUsername);
-            userRepository.Setup(m => m.IsDuplicateEmail(user.Email)).ReturnsAsync(isDuplicateEmail);
+            userRepository.Setup(m => m.IsDuplicateUsername(user)).ReturnsAsync(isDuplicateUsername);
+            userRepository.Setup(m => m.IsDuplicateEmail(user)).ReturnsAsync(isDuplicateEmail);
             userRepository.Setup(
                 m => m.FindAsync(1))
                     .ReturnsAsync(new User
