@@ -1,7 +1,6 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Posts.DetailViewModel
 
-@section styles
-    {
+@section styles {
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
 
@@ -20,10 +19,14 @@
     <div class="form-group row">
         <label asp-for="Post.Content" class="col-md-3 col-form-label text-md-right"></label>
         <div class="col-md-9">
-            <nav class="nav nav-tabs">
-                <a class="nav-link active" data-toggle="tab" href="#md-edit" role="tab">Edit</a>
-                <a class="nav-link" data-toggle="tab" href="#md-preview" role="tab">Preview</a>
-            </nav>
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#md-edit" role="tab">Edit</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#md-preview" role="tab">Preview</a>
+                </li>
+            </ul>
             <div class="tab-content" id="md-edit-preview">
                 <div class="tab-pane show active" id="md-edit" role="tabpanel">
                     <div id="wmd-button-bar" class="wmd-button-row"></div>
@@ -63,8 +66,7 @@
 </form>
 
 
-@section scripts
-    {
+@section scripts {
     <script src="~/js/md.min.js" asp-append-version="true"></script>
 
     <script>
@@ -96,7 +98,7 @@
                     setTimeout(function () {
                         validateStub(stub, id, stubCheckUrl);
                         currentStub = stub.val();
-                    }, 200);      
+                    }, 200);
                 });
 
                 stub.on("keyup", function () {
@@ -110,7 +112,7 @@
                     setTimeout(function () {
                         validateStub(stub, id, stubCheckUrl);
                         currentStub = stub.val();
-                    }, 200);   
+                    }, 200);
                 });
             </text>
         }
