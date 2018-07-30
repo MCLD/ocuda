@@ -12,6 +12,11 @@
     <input asp-for="Section.SortOrder" formgroup />
     <input asp-for="Section.FeaturedVideoUrl" formgroup />
 
+    <select class="w-auto" asp-for="Section.IsNavigation" formgroup>
+        <option value="false">No</option>
+        <option value="true">Yes</option>
+    </select>
+
     <div class="row">
         <div class="offset-md-3 col-md-9">
             <a class="btn btn-outline-secondary text-dark" asp-action="@nameof(SectionsController.Index)">Cancel</a>

@@ -118,8 +118,20 @@ namespace Ocuda.Ops.Service
                 SectionId = sectionId
             };
 
+            var navigationCategory = new Category
+            {
+                CreatedBy = currentUserId,
+                CreatedAt = DateTime.Now,
+                CategoryType = CategoryType.Link,
+                IsDefault = false,
+                IsNavigation = true,
+                Name = "Navigation",
+                SectionId = sectionId
+            };
+
             await _categoryRepository.AddAsync(defaultFileCategory);
             await _categoryRepository.AddAsync(defaultLinkCategory);
+            await _categoryRepository.AddAsync(navigationCategory);
             await _categoryRepository.SaveAsync();
         }
 

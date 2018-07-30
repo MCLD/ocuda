@@ -23,14 +23,49 @@
 
         <div class="collapse navbar-collapse justify-content-end">
             <ul class="navbar-nav">
-                @foreach (var sec in (IEnumerable<Section>)Context.Items[ItemKey.Sections])
+                @foreach (var sec in (IEnumerable<SectionWithNavigation>)Context.Items[ItemKey.Sections])
                 {
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-route-section="@sec.Path" asp-route-controller="Home">
-                            <span class="fa @sec.Icon" title="@sec.Name"></span>
-                            <span class="d-sm-none"> @sec.Name</span>
-                        </a>
-                    </li>
+                    @if (sec.NavigationLinks.Count() == 0)
+                    {
+                        <li class="nav-item" ActiveBy routeKey="Section" value="@sec.Section.Path">
+                            <a class="nav-link"
+                               asp-area="" asp-route-controller="Home"
+                               asp-route-section="@sec.Section.Path" asp-action="@(nameof(HomeController.Index))">
+                                <span class="fa @sec.Section.Icon" title="@sec.Section.Name"></span>
+                                <span class="d-sm-none"> @sec.Section.Name </span>
+                            </a>
+                        </li>
+                    }
+                    else 
+                    {
+                        <li class="nav-item dropdown" ActiveBy routeKey="Section" value="@sec.Section.Path">
+                            <a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" href="#">
+                                <span class="fa @sec.Section.Icon" title="@sec.Section.Name"></span>
+                                <span class="d-sm-none"> @sec.Section.Name </span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right w-auto border-0 bg-dark">
+                                <div class="navbar navbar-dark">
+                                    <a class="dropdown-item nav-link pl-0"
+                                       asp-area="" asp-route-section="@sec.Section.Path"
+                                       asp-route-controller="Home">
+                                        <div class="d-flex">
+                                            <span class="col-1 align-self-center fa @sec.Section.Icon"></span>
+                                            <div class="col-auto">@sec.Section.Name Home</div>
+                                        </div>
+                                    </a>
+                                    @foreach (var link in sec.NavigationLinks)
+                                    {
+                                        <a class="dropdown-item nav-link pl-0" href="@link.Url">
+                                            <div class="d-flex">
+                                                <span class="col-1 align-self-center fa @link.Icon"></span>
+                                                <div class="col-auto">@link.Name</div>
+                                            </div>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </li>
+                    }
                 }
                 <li class="nav-item">
                     <a class="nav-link" asp-controller="Debug" asp-action="InsertSampleData">
@@ -40,12 +75,12 @@
                 </li>
                 @if (Context.Items[ItemKey.Nickname] != null)
                 {
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Profile" 
-                                            asp-action="@(nameof(ProfileController.Index))"
-                                            asp-route-section=""
-                                            asp-route-area=""
-                                            asp-route-id="">
+                    <li class="nav-item" ActiveBy routeKey="Controller" value="Profile">
+                        <a class="nav-link" asp-controller="Profile"
+                           asp-action="@(nameof(ProfileController.Index))"
+                           asp-route-section=""
+                           asp-route-area=""
+                           asp-route-id="">
                             <span class="fa fa-user-circle"></span>
                             @Context.Items[ItemKey.Nickname]
                         </a>

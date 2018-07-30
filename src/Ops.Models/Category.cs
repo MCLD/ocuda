@@ -15,6 +15,7 @@ namespace Ocuda.Ops.Models
         public CategoryType CategoryType { get; set; }
 
         public bool IsDefault { get; set; }
+        public bool IsNavigation { get; set; }
     }
 
     public enum CategoryType

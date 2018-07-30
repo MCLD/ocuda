@@ -15,8 +15,8 @@ namespace Ocuda.Ops.Service
     {
         private readonly ILogger<SectionService> _logger;
         private readonly ISectionRepository _sectionRepository;
-        private readonly ICategoryService _categoryService;
         private readonly IUserRepository _userRepository;
+        private readonly ICategoryService _categoryService;
 
         public SectionService(ILogger<SectionService> logger,
             ISectionRepository sectionRepository,
@@ -53,7 +53,7 @@ namespace Ocuda.Ops.Service
             }
         }
 
-        public async Task<IEnumerable<Section>> GetNavigationAsync()
+        public async Task<IEnumerable<SectionWithNavigation>> GetNavigationAsync()
         {
             return await _sectionRepository.GetNavigationSectionsAsync();
         }
@@ -119,6 +119,7 @@ namespace Ocuda.Ops.Service
             currentSection.Icon = section.Icon;
             currentSection.SortOrder = section.SortOrder;
             currentSection.FeaturedVideoUrl = section.FeaturedVideoUrl;
+            currentSection.IsNavigation = section.IsNavigation;
 
             await ValidateSectionAsync(currentSection);
 

@@ -23,5 +23,7 @@ namespace Ocuda.Ops.Models
         [DisplayName("Category")]
         public int? CategoryId { get; set; }
         public Category Category { get; set; }
+
+        public string Icon { get; set; }
     }
 }
