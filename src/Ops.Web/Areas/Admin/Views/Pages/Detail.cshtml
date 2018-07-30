@@ -1,62 +1,64 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages.DetailViewModel
 
-@section styles
-    {
+@section styles {
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
 
-    <form asp-action="@Model.Action" method="post" role="form">
-        <input asp-for="@Model.SectionId" type="hidden" />
-        @if (Model.Action == nameof(PagesController.Edit))
-        {
-            <input asp-for="Page.SectionId" type="hidden" />
-            <input asp-for="Page.CreatedBy" type="hidden" />
-            <input id="contentId" asp-for="Page.Id" type="hidden" />
-            <input id="contentType" value="@(nameof(Page))" type="hidden" />
-        }
-
-        <input asp-for="Page.Title" formgroup />
-        <input asp-for="Page.Stub" formgroup readonly="@(Model.IsDraft == false ? "readonly" : null)" />
-
-        <div class="form-group row">
-            <label asp-for="Page.Content" class="col-md-3 col-form-label text-md-right"></label>
-            <div class="col-md-9">
-                <nav class="nav nav-tabs">
-                    <a class="nav-link active" data-toggle="tab" href="#md-edit" role="tab">Edit</a>
-                    <a class="nav-link" data-toggle="tab" href="#md-preview" role="tab">Preview</a>
-                </nav>
-                <div class="tab-content" id="md-edit-preview">
-                    <div class="tab-pane show active" id="md-edit" role="tabpanel">
-                        <div id="wmd-button-bar" class="wmd-button-row"></div>
-                        <textarea asp-for="Page.Content" class="form-control wmd-input" id="wmd-input"></textarea>
-                    </div>
-                    <div class="tab-pane" id="md-preview" role="tabpanel">
-                        <div id="preview" class="wmd-preview"></div>
-                    </div>
-                    <span asp-validation-for="Page.Content" class="text-danger"></span>
-                </div>
-            </div>
-        </div>
-
-        <select class="w-auto" asp-for="Page.IsDraft" disabled="@(Model.IsDraft == false ? true : false)" formgroup>
-            <option value="false">No</option>
-            <option value="true">Yes</option>
-        </select>
-
-        <div class="row">
-            <div class="offset-md-3 col-md-9">
-                <a class="btn btn-outline-secondary text-dark" asp-action="@(nameof(PagesController.Index))">Cancel</a>
-                <button type="submit" class="btn btn-success btn-spinner" aria-label="Confirm">
-                    <span class="fa fa-save" aria-hidden="true"></span>
-                    Save
-                    <span class="fa fa-spinner fa-pulse fa-fw d-none"></span>
-                </button>
-            </div>
-        </div>
-    </form>
-
-@section scripts
+<form asp-action="@Model.Action" method="post" role="form">
+    <input asp-for="@Model.SectionId" type="hidden" />
+    @if (Model.Action == nameof(PagesController.Edit))
     {
+        <input asp-for="Page.SectionId" type="hidden" />
+        <input asp-for="Page.CreatedBy" type="hidden" />
+        <input id="contentId" asp-for="Page.Id" type="hidden" />
+        <input id="contentType" value="@(nameof(Page))" type="hidden" />
+    }
+
+    <input asp-for="Page.Title" formgroup />
+    <input asp-for="Page.Stub" formgroup readonly="@(Model.IsDraft == false ? "readonly" : null)" />
+
+    <div class="form-group row">
+        <label asp-for="Page.Content" class="col-md-3 col-form-label text-md-right"></label>
+        <div class="col-md-9">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#md-edit" role="tab">Edit</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#md-preview" role="tab">Preview</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="md-edit-preview">
+                <div class="tab-pane show active" id="md-edit" role="tabpanel">
+                    <div id="wmd-button-bar" class="wmd-button-row"></div>
+                    <textarea asp-for="Page.Content" class="form-control wmd-input" id="wmd-input"></textarea>
+                </div>
+                <div class="tab-pane" id="md-preview" role="tabpanel">
+                    <div id="preview" class="wmd-preview"></div>
+                </div>
+                <span asp-validation-for="Page.Content" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <select class="w-auto" asp-for="Page.IsDraft" disabled="@(Model.IsDraft == false ? true : false)" formgroup>
+        <option value="false">No</option>
+        <option value="true">Yes</option>
+    </select>
+
+    <div class="row">
+        <div class="offset-md-3 col-md-9">
+            <a class="btn btn-outline-secondary text-dark" asp-action="@(nameof(PagesController.Index))">Cancel</a>
+            <button type="submit" class="btn btn-success btn-spinner" aria-label="Confirm">
+                <span class="fa fa-save" aria-hidden="true"></span>
+                Save
+                <span class="fa fa-spinner fa-pulse fa-fw d-none"></span>
+            </button>
+        </div>
+    </div>
+</form>
+
+@section scripts {
     <script src="~/js/md.min.js" asp-append-version="true"></script>
 
     <script>
@@ -88,7 +90,7 @@
                     setTimeout(function () {
                         validateStub(stub, id, stubCheckUrl);
                         currentStub = stub.val();
-                    }, 200);      
+                    }, 200);
                 });
 
                 stub.on("keyup", function () {
@@ -102,7 +104,7 @@
                     setTimeout(function () {
                         validateStub(stub, id, stubCheckUrl);
                         currentStub = stub.val();
-                    }, 200);   
+                    }, 200);
                 });
             </text>
         }
