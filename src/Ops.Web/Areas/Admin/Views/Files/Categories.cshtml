@@ -5,6 +5,10 @@
     <input id="addCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
     <div modal id="addModal" name="File Category" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addName" asp-for="Category.Name" formgroup />
+        <select id="addThumbnail" class="w-auto" asp-for="Category.ThumbnailRequired" formgroup>
+            <option value="False">No</option>
+            <option value="True">Yes</option>
+        </select>
     </div>
 </form>
 
@@ -13,6 +17,10 @@
     <input id="editId" asp-for="Category.Id" type="hidden" />
     <div modal id="editModal" name="File Category" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
         <input id="editName" asp-for="Category.Name" formgroup />
+        <select id="editThumbnail" class="w-auto" asp-for="Category.ThumbnailRequired" formgroup>
+            <option value="False">No</option>
+            <option value="True">Yes</option>
+        </select>
     </div>
 </form>
 
@@ -56,7 +64,8 @@ else
                                 data-toggle="modal"
                                 data-target="#editModal"
                                 data-id="@category.Id"
-                                data-category="@category.Name">
+                                data-category="@category.Name"
+                                data-thumbnail="@category.ThumbnailRequired">
                             <span class="fa fa-pencil-alt" aria-hidden="true"></span>
                         </button>
                         <button type="button"
@@ -64,7 +73,8 @@ else
                                 data-toggle="modal"
                                 data-target="#deleteModal"
                                 data-id="@category.Id"
-                                data-category="@category.Name">
+                                data-category="@category.Name"
+                                data-thumbnail="@category.ThumbnailRequired">
                             <span class="fa fa-times" aria-hidden="true"></span>
                         </button>
                     </td>
@@ -84,11 +94,12 @@ else
     <script>
         $("#addForm").submit(function (e) {
             e.preventDefault();
-            var value = $('#addName').val();
+            var name = $('#addName').val();
+            var thumbnail = $('#addThumbnail').val();
             var sectionId = $('#SectionId').val();
 
             $.post("@(Url.Action("CreateCategory", "Files"))",
-                { value: value, sectionId: sectionId },
+                { name: name, thumbnail: thumbnail, sectionId: sectionId },
                 function (response) {
                     if (response.success == true) {
                         location.reload();
@@ -103,10 +114,11 @@ else
         $("#editForm").submit(function (e) {
             e.preventDefault();
             var id = $("#editId").val();
-            var value = $('#editName').val();
+            var name = $('#editName').val();
+            var thumbnail = $('#editThumbnail').val();
 
             $.post("@(Url.Action("EditCategory", "Files"))",
-                { id: id, value: value },
+                { id: id, name: name, thumbnail: thumbnail },
                 function (response) {
                     if (response.success == true) {
                         location.reload();
@@ -122,9 +134,11 @@ else
             var button = $(e.relatedTarget);
             var id = button.data("id");
             var category = button.data("category");
+            var thumbnail = button.data("thumbnail");
             var modal = $(this);
             $("#editId").val(id);
             modal.find("#editName").val(category);
+            modal.find("#editThumbnail").val(thumbnail);
         });
 
         $("#deleteModal").on("show.bs.modal", function (e) {

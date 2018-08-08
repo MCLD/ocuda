@@ -15,6 +15,8 @@
         public struct FileManagement
         {
             public const string MaxUploadBytes = "FileManagement.MaxFileSizeBytes";
+            public const string MaxThumbnailCount = "FileManagement.MaxThumbnailCount";
+            public const string ThumbnailTypes = "FileManagement.ThumbnailTypes";
         }
 
         public struct UserInterface

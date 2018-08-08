@@ -17,7 +17,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<Category> GetByNameAsync(string name);
         Task<int> GetCategoryCountAsync();
         Task<Category> CreateCategoryAsync(int currentUserId, Category category);
-        Task<Category> EditCategoryAsync(int id, string name);
+        Task<Category> EditCategoryAsync(int id, string value);
+        Task<Category> EditCategoryAsync(int id, string name, bool thumbnail);
         Task DeleteCategoryAsync(int id);
         Task CreateDefaultCategories(int currentUserId, int sectionId);
         Task<Category> GetDefaultAsync(BlogFilter filter);

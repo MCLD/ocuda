@@ -257,3 +257,69 @@ a.rowlink {
             font-size: 18px;
         }
 }
+
+
+.oc-gallery {
+    justify-content: center;
+}
+
+    .oc-gallery .card {
+        border-color: #77787a;
+        border-width: thin;
+        margin-bottom: 1.5rem;
+        width: 310px;
+    }
+
+    .oc-gallery .card-header {
+        padding: 0.25rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        background-color: #307fe2;
+        color: white;
+    }
+
+    .oc-gallery .card-title {
+        margin: 0;
+        color: white;
+    }
+
+    .oc-gallery .card-body {
+        padding: 0;
+    }
+
+    .oc-gallery .carousel-inner {
+        height: 310px;
+    }
+
+    .oc-gallery .carousel-indicators li {
+        background-color: #888b8d;
+        border: solid;
+        border-color: #77787a;
+        border-radius: 50%;
+        border-width: medium;
+        position: relative;
+        height: 20px;
+        width: 20px;
+    }
+
+    .oc-gallery .carousel-indicators .active {
+        background-color: #cfd1d1;
+    }
+
+.thumbnail-input {
+    margin-bottom: 0px;
+}
+
+    .thumbnail-input .card {
+        margin-bottom: 1rem;
+        width: 150px;
+    }
+
+    .thumbnail-input .card-body {
+        height: 150px;
+    }
+
+    .thumbnail-input img {
+        max-height: 150px;
+        max-width: 150px;
+    }

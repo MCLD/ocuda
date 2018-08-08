@@ -29,16 +29,36 @@ $(".btn-spinner-no-validate").on("click", function (e) {
     }
 });
 
-$(document).on('change', ':file', function () {
+$(document).on('change', ':file', function (e) {
     var fileInput = $(this),
         filePath = fileInput.val().replace(/\\/g, '/').replace(/.*\//, '');
-    fileInput.trigger('fileselect', filePath);
+
+    if (fileInput.hasClass("btn-thumbnail")) {
+        validateThumbnail(e, filePath);
+    }
+    else {
+        validateFile(e, filePath);
+    }
+
 });
 
-$(document).on('fileselect', ':file', function (evkent, filePath) {
-    var file = $(this)[0].files[0],
+$(document).on('fileselect', ':file', function (e) {
+    var fileInput = $(this),
+        filePath = fileInput.val().replace(/\\/g, '/').replace(/.*\//, '');
+
+    if (fileInput.hasClass("btn-thumbnail")) {
+        validateThumbnail(e, filePath);
+    }
+    else {
+        validateFile(e, filePath);
+    }
+});
+
+function validateFile(e, filePath) {
+    var file = $(e.target)[0].files[0],
+        fileButton = e.target.parentElement,
         fileData = new FormData(),
-        fileDisplay = $(this).parents('.input-group').find(':text')
+        fileDisplay = $(e.target).parents('.input-group').find(':text'),
         fileNameField = $('#File_Name');
 
     fileData.append("fileName", file.name);
@@ -58,17 +78,16 @@ $(document).on('fileselect', ':file', function (evkent, filePath) {
                 if (fileNameField.val().length == 0) {
                     fileNameField.val(file.name.split('.')[0]);
                 }
-                
-                $('.btn-file').removeClass('btn-outline-secondary');
-                $('.btn-file').addClass('btn-success');
+
+                $(fileButton).removeClass('btn-outline-secondary');
+                $(fileButton).addClass('btn-success');
                 return true;
             }
             else {
-                $(this).val('');
+                $(e.target).val('');
                 fileDisplay.val('');
-                fileNameField.val('');
-                $('.btn-file').addClass('btn-outline-secondary');
-                $('.btn-file').removeClass('btn-success');
+                $(fileButton).addClass('btn-outline-secondary');
+                $(fileButton).removeClass('btn-success');
                 alert(result);
                 return false;
             }
@@ -78,7 +97,78 @@ $(document).on('fileselect', ':file', function (evkent, filePath) {
             return false;
         }
     });
-});
+}
+
+function validateThumbnail(e, filePath) {
+    var fileInput = $(e.target),
+        file = fileInput[0].files[0],
+        fileData = new FormData(),
+        fileDisplay = fileInput.parents('.input-group').find(':text'),
+        fileButton = fileInput.parents('.form-control'),
+        fileIcon = fileButton.find('span'),
+        img = new Image();
+
+    img.src = window.URL.createObjectURL(file);
+
+    img.onload = function () {
+        var imgHeight = img.naturalHeight,
+            imgWidth = img.naturalWidth;
+
+        fileData.append("fileName", file.name);
+        fileData.append("fileSize", file.size);
+        fileData.append("imgHeight", imgHeight);
+        fileData.append("imgWidth", imgWidth);
+
+        $.ajax({
+            url: '/Admin/Files/ValidateThumbnailBeforeUpload',
+            type: 'POST',
+            contentType: false,
+            processData: false,
+            data: fileData,
+            async: true,
+            success: function (result) {
+                if (result == "Valid") {
+                    fileDisplay.val(filePath);
+                    fileButton.removeClass('btn-outline-secondary');
+                    fileButton.addClass('btn-success');
+                    fileIcon.removeClass('fa-file-medical');
+                    fileIcon.addClass('fa-file-image');
+                    return true;
+                }
+                else {
+                    clearThumbnailInput(e);
+                    alert(result);
+                    return false;
+                }
+            },
+            error: function (err) {
+                clearThumbnailInput(e);
+                alert(err.statusText);
+                return false;
+            }
+        });
+    }
+
+    img.onerror = function () {
+        clearThumbnailInput(e);
+        alert("Error: Failed to load image.");
+        return false;
+    }
+}
+
+function clearThumbnailInput(e) {
+    var fileInput = $(e.target),
+        fileDisplay = fileInput.parents('.input-group').find(':text'),
+        fileButton = fileInput.parents('.form-control'),
+        fileIcon = fileButton.find('span');
+
+    fileInput.val('');
+    fileDisplay.val('');
+    fileButton.addClass('btn-outline-secondary');
+    fileButton.removeClass('btn-success');
+    fileIcon.removeClass('fa-file-image');
+    fileIcon.addClass('fa-file-medical');
+}
 
 function updateStub(stub, text) {
     // From https://gist.github.com/mathewbyrne/1280286

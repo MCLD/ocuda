@@ -90,6 +90,19 @@ namespace Ocuda.Ops.Service
             return currentCategory;
         }
 
+        public async Task<Category> EditCategoryAsync(int id, string name, bool thumbnail)
+        {
+            var currentCategory = await _categoryRepository.FindAsync(id);
+            currentCategory.Name = name?.Trim();
+            currentCategory.ThumbnailRequired = thumbnail;
+
+            await ValidateCategoryAsync(currentCategory);
+
+            _categoryRepository.Update(currentCategory);
+            await _categoryRepository.SaveAsync();
+            return currentCategory;
+        }
+
         public async Task DeleteCategoryAsync(int id)
         {
             _categoryRepository.Remove(id);

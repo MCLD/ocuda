@@ -3249,6 +3249,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Shared\" />
     <Folder Include="Views\Error\" />
   </ItemGroup>
 

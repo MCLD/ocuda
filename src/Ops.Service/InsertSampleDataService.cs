@@ -297,7 +297,8 @@ namespace Ocuda.Ops.Service
                     CreatedAt = DateTime.Parse("2018-06-05"),
                     CreatedBy = SystemAdministrator.Id,
                     SectionId = section.Id,
-                    IsDefault = false
+                    IsDefault = false,
+                    ThumbnailRequired = true
                 }
             };
 

@@ -7,6 +7,10 @@
     @*<title>@ViewData[Ocuda.Ops.Controllers.ViewDataKey.Title]</title>*@
     <link rel="stylesheet" href="~/css/main.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    <environment include="Development">
+        <link rel="stylesheet" href="~/devstyles/ops.css" asp-append-version="true" />
+    </environment>
+
     @RenderSection("Styles", required: false)
 </head>
 <body>
@@ -38,8 +42,8 @@
                     {
                         <li class="nav-item" ActiveBy routeKey="Section" value="@sec.Section.Path">
                             <a class="nav-link"
-                               asp-area="" asp-route-controller="Home"
-                               asp-route-section="@sec.Section.Path" asp-action="@(nameof(HomeController.Index))">
+                               asp-area="" asp-route-section="@sec.Section.Path"
+                               asp-route-controller="Home" asp-action="@(nameof(HomeController.Index))">
                                 <span class="fa @sec.Section.Icon" title="@sec.Section.Name"></span>
                                 <span class="d-sm-none"> @sec.Section.Name </span>
                             </a>
@@ -56,7 +60,7 @@
                                 <div class="navbar navbar-dark">
                                     <a class="dropdown-item nav-link pl-0"
                                        asp-area="" asp-route-section="@sec.Section.Path"
-                                       asp-route-controller="Home">
+                                       asp-route-controller="Home" asp-action="@(nameof(HomeController.Index))">
                                         <div class="d-flex">
                                             <span class="col-1 align-self-center fa @sec.Section.Icon"></span>
                                             <div class="col-auto">@sec.Section.Name Home</div>
@@ -197,7 +201,17 @@
         @RenderBody()
     </div>
 
-    <script src="~/js/main.min.js" asp-append-version="true"></script>
+    <environment include="Production">
+        <script src="~/js/main.min.js" asp-append-version="true"></script>
+    </environment>
+    <environment include="Development">
+        <script src="~/devbower/jquery/dist/jquery.js" asp-append-version="true"></script>
+        <script src="~/devbower/popper.js/dist/umd/popper.js" asp-append-version="true"></script>
+        <script src="~/devbower/bootstrap/dist/js/bootstrap.js" asp-append-version="true"></script>
+        <script src="~/devbower/jquery-validation/dist/jquery.validate.js" asp-append-version="true"></script>
+        <script src="~/devbower/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js" asp-append-version="true"></script>
+        <script src="~/devscripts/ops.js" asp-append-version="true"></script>
+    </environment>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

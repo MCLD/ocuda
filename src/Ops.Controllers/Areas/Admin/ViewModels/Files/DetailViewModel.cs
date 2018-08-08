@@ -11,5 +11,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Files
         public string Action { get; set; }
         public int SectionId { get; set; }
         public IFormFile FileData { get; set; }
+        public ICollection<IFormFile> ThumbnailFiles { get; set; }
+        public int MaxThumbnailCount { get; set; }
+        public int[] ThumbnailIds { get; set; }
     }
 }

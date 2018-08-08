@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +16,7 @@ using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Helpers;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 
@@ -30,9 +33,11 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         private readonly IPathResolverService _pathResolver;
         private readonly IPostService _postService;
         private readonly ISectionService _sectionService;
+        private readonly IThumbnailService _thumbnailService;
 
         private const string FileValidationPassed = "Valid";
         private const string FileValidationFailedNoFile = "No file selected.";
+        private const string FileValidationFailedNoThumbnail = "Selected category requires a thumbnail.";
         private const string FileValidationFailedType = "File is not a valid type.";
         private const string FileValidationFailedSize = "File is too large to upload.";
 
@@ -45,7 +50,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             IPageService pageService,
             IPathResolverService pathResolver,
             IPostService postService,
-            ISectionService sectionService) : base(context)
+            ISectionService sectionService,
+            IThumbnailService thumbnailService) : base(context)
         {
             _categoryService = categoryService
                 ?? throw new ArgumentNullException(nameof(categoryService));
@@ -57,6 +63,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
             _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(sectionService));
+            _thumbnailService = thumbnailService
+                ?? throw new ArgumentNullException(nameof(thumbnailService));
         }
 
         public async Task<IActionResult> Index(string section, int? categoryId = null, int page = 1)
@@ -121,11 +129,15 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
             var categories = await _categoryService.GetBySectionIdAsync(filter);
 
+            var maxThumbnailCount = await _siteSettingService.GetSettingIntAsync(
+                Models.Keys.SiteSetting.FileManagement.MaxThumbnailCount);
+
             var viewModel = new DetailViewModel()
             {
                 Action = nameof(Create),
                 SectionId = currentSection.Id,
-                Categories = categories
+                Categories = categories,
+                MaxThumbnailCount = maxThumbnailCount
             };
 
             return View("Detail", viewModel);
@@ -141,7 +153,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ShowAlertDanger(FileValidationFailedNoFile);
             }
             else
-            { 
+            {
                 var maxFileSize = await _siteSettingService
                     .GetSettingIntAsync(Models.Keys.SiteSetting.FileManagement.MaxUploadBytes);
 
@@ -163,32 +175,28 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
             }
 
+            if (model.File.CategoryId.HasValue && model.ThumbnailFiles == null)
+            {
+                var category = await _categoryService.GetByIdAsync(model.File.CategoryId.Value);
+
+                if (category.ThumbnailRequired)
+                {
+                    ModelState.AddModelError("Thumbnails", FileValidationFailedNoThumbnail);
+                    ShowAlertDanger(FileValidationFailedNoThumbnail);
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 try
                 {
                     model.File.SectionId = model.SectionId;
 
-                    byte[] fileBytes;
-
-                    using (var fileStream = model.FileData.OpenReadStream())
-                    {
-                        using (var ms = new System.IO.MemoryStream())
-                        {
-                            fileStream.CopyTo(ms);
-                            fileBytes = ms.ToArray();
-                        }
-                    }
-
-                    model.File.Extension = System.IO.Path.GetExtension(model.FileData.FileName);
-
-                    var fileType = await _fileTypeService.GetByExtensionAsync(model.File.Extension);
-                    model.File.Icon = fileType.Icon;
-
                     // TODO add logic to this, make it constants
                     model.File.Type = "postattachment";
 
-                    var newFile = await _fileService.CreatePrivateFileAsync(CurrentUserId, model.File, fileBytes);
+                    var newFile = await _fileService.CreatePrivateFileAsync(CurrentUserId, 
+                        model.File, model.FileData, model.ThumbnailFiles);
 
                     ShowAlertSuccess($"Added file: {newFile.Name}");
                     return RedirectToAction(nameof(Index));
@@ -207,6 +215,14 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             var file = await _fileService.GetByIdAsync(id);
 
+            if (file.Thumbnails.Count > 0)
+            {
+                foreach(var thumbnail in file.Thumbnails)
+                {
+                    thumbnail.Url = _thumbnailService.GetUrl(thumbnail);
+                }
+            }
+
             var filter = new BlogFilter()
             {
                 SectionId = file.SectionId,
@@ -215,12 +231,16 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
             var categories = await _categoryService.GetBySectionIdAsync(filter);
 
+            var maxThumbnailCount = await _siteSettingService.GetSettingIntAsync(
+                Models.Keys.SiteSetting.FileManagement.MaxThumbnailCount);
+
             var viewModel = new DetailViewModel()
             {
                 Action = nameof(Edit),
                 SectionId = file.SectionId,
                 File = file,
-                Categories = categories
+                Categories = categories,
+                MaxThumbnailCount = maxThumbnailCount
             };
 
             return View("Detail", viewModel);
@@ -253,38 +273,25 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
             }
 
+            if (model.File.CategoryId.HasValue)
+            {
+                var category = await _categoryService.GetByIdAsync(model.File.CategoryId.Value);
+
+                if (category.ThumbnailRequired && model.ThumbnailFiles == null && model.ThumbnailIds == null)
+                {
+                    ModelState.AddModelError("Thumbnails", FileValidationFailedNoThumbnail);
+                    ShowAlertDanger(FileValidationFailedNoThumbnail);
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    if (model.FileData != null)
-                    {
-                        byte[] fileBytes;
-
-                        using (var fileStream = model.FileData.OpenReadStream())
-                        {
-                            using (var ms = new System.IO.MemoryStream())
-                            {
-                                fileStream.CopyTo(ms);
-                                fileBytes = ms.ToArray();
-                            }
-                        }
-
-                        model.File.Extension = System.IO.Path.GetExtension(model.FileData.FileName);
-
-                        var fileType = await _fileTypeService.GetByExtensionAsync(model.File.Extension);
-                        model.File.Icon = fileType.Icon;
-
-                        var file = await _fileService.EditPrivateFileAsync(model.File, fileBytes);
-                        ShowAlertSuccess($"Updated file: {file.Name}");
-                        return RedirectToAction(nameof(Index));
-                    }
-                    else
-                    {
-                        var file = await _fileService.EditPrivateFileAsync(model.File);
-                        ShowAlertSuccess($"Updated file: {file.Name}");
-                        return RedirectToAction(nameof(Index));
-                    }
+                    var file = await _fileService.EditPrivateFileAsync(CurrentUserId, 
+                        model.File, model.FileData, model.ThumbnailFiles, model.ThumbnailIds ?? new int[] { });
+                    ShowAlertSuccess($"Updated file: {file.Name}");
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (OcudaException ex)
                 {
@@ -356,14 +363,15 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
         [HttpPost]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        public async Task<IActionResult> CreateCategory(string value, int sectionId)
+        public async Task<IActionResult> CreateCategory(string name, bool thumbnail, int sectionId)
         {
             var category = new Category
             {
                 CategoryType = CategoryType.File,
                 IsDefault = false,
-                Name = value,
-                SectionId = sectionId
+                Name = name,
+                SectionId = sectionId,
+                ThumbnailRequired = thumbnail
             };
 
             try
@@ -380,11 +388,11 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
         [HttpPost]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        public async Task<IActionResult> EditCategory(int id, string value)
+        public async Task<IActionResult> EditCategory(int id, string name, bool thumbnail)
         {
             try
             {
-                var category = await _categoryService.EditCategoryAsync(id, value);
+                var category = await _categoryService.EditCategoryAsync(id, name, thumbnail);
                 ShowAlertSuccess($"Updated file category: {category.Name}");
                 return Json(new { success = true });
             }
@@ -433,12 +441,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
         }
 
-        public async Task<IActionResult> ValidateFileBeforeUpload(string fileName, long fileSize)
-        {
-            string result = await ValidateFile(fileName, fileSize);
-            return Json(result);
-        }
-
         public async Task<IActionResult> UploadAttachment(IFormFile fileData,
             int sectionId,
             int contentId,
@@ -464,7 +466,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
                         File file = new File
                         {
-                            Name = fileData.FileName,
+                            Name = System.IO.Path.GetFileNameWithoutExtension(fileData.FileName),
                             IsFeatured = false,
                             SectionId = section.Id,
                             CategoryId = category.Id,
@@ -485,36 +487,14 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                             file.PostId = null;
                         }
 
-                        byte[] fileBytes;
+                        // TODO make this constant
+                        file.Type = "postattachment";
+                        var newFile = await _fileService.CreatePrivateFileAsync(
+                            CurrentUserId, file, fileData, null);
+                        _logger.LogInformation(
+                            $"Attached file '{newFile.Name}{newFile.Extension}' to {contentType}Id: {contentId}");
 
-                        using (var fileStream = fileData.OpenReadStream())
-                        {
-                            using (var ms = new System.IO.MemoryStream())
-                            {
-                                fileStream.CopyTo(ms);
-                                fileBytes = ms.ToArray();
-                            }
-
-                            file.Extension = System.IO.Path.GetExtension(fileData.FileName);
-
-                            var fileType = await _fileTypeService.GetByExtensionAsync(file.Extension);
-                            file.Icon = fileType.Icon;
-
-                            // TODO make this constant
-                            file.Type = "postattachment";
-                            var newFile = await _fileService.CreatePrivateFileAsync(CurrentUserId, file, fileBytes);
-                            _logger.LogInformation($"Attached file: {newFile.Name}{newFile.Extension}");
-
-                            string sectionPath = null;
-                            if (section.Path != null)
-                            {
-                                sectionPath = $"/{section.Path}";
-                            }
-
-                            var filePath = HttpContext.Request.Host +
-                                $"{sectionPath}/Files/{nameof(FilesController.ViewPrivateFile)}/{newFile.Id}";
-                            result = filePath;
-                        }
+                        result = _pathResolver.GetPublicContentUrl();
                     }
                 }
                 catch (Exception ex)
@@ -532,6 +512,12 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 result = "FailedType";
             }
 
+            return Json(result);
+        }
+
+        public async Task<IActionResult> ValidateFileBeforeUpload(string fileName, long fileSize)
+        {
+            string result = await ValidateFile(fileName, fileSize);
             return Json(result);
         }
 
@@ -564,5 +550,57 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
             return result;
         }
+
+        public async Task<IActionResult> ValidateThumbnailBeforeUpload(
+            string fileName, long fileSize, int imgHeight, int imgWidth)
+        {
+            string result = await ValidateThumbnail(fileName, fileSize, imgHeight, imgWidth);
+            return Json(result);
+        }
+
+        private async Task<string> ValidateThumbnail(
+            string fileName, long fileSize, int imgHeight, int imgWidth)
+        {
+            var result = "";
+            var maxHeight = 300;
+            var maxWidth = 300;
+
+            if (imgHeight <= maxHeight && imgWidth <= maxWidth)
+            {
+                var maxFileSize = await _siteSettingService
+                    .GetSettingIntAsync(Models.Keys.SiteSetting.FileManagement.MaxUploadBytes);
+
+                if (fileSize < maxFileSize)
+                {
+                    var extension = System.IO.Path.GetExtension(fileName);
+                    var thumbnailTypes = (await _siteSettingService
+                                            .GetSettingStringAsync(
+                                                Models.Keys.SiteSetting.FileManagement.ThumbnailTypes))
+                                            .Split(',').Select(_ => _.Trim());
+
+                    if (!thumbnailTypes.Contains(extension))
+                    {
+                        result = FileValidationFailedType;
+                    }
+                    else
+                    {
+                        result = FileValidationPassed;
+                    }
+                }
+                else
+                {
+                    result = FileValidationFailedSize;
+                }
+            }
+            else
+            {
+                result = $"Thumbnail cannot be greater than {maxHeight}x{maxWidth} pixels.";
+            }
+
+            _logger.LogInformation($"Validation for \"{fileName}\": {result}", fileName, result);
+
+            return result;
+        }
+
     }
 }

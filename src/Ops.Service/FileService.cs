@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
@@ -8,6 +10,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Models;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Helpers;
 
 namespace Ocuda.Ops.Service
 {
@@ -20,8 +23,10 @@ namespace Ocuda.Ops.Service
         private readonly IPostRepository _postRepository;
         private readonly ISectionRepository _sectionRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IFileTypeService _fileTypeService;
+        private readonly IThumbnailService _thumbnailService;
         private readonly IPathResolverService _pathResolver;
-        
+
         public FileService(ILogger<FileService> logger,
             ICategoryRepository categoryRepository,
             IFileRepository fileRepository,
@@ -29,6 +34,8 @@ namespace Ocuda.Ops.Service
             IPostRepository postRepository,
             ISectionRepository sectionRepository,
             IUserRepository userRepository,
+            IFileTypeService fileTypeService,
+            IThumbnailService thumbnailService,
             IPathResolverService pathResolver)
         {
             _logger = logger
@@ -45,6 +52,10 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
             _userRepository = userRepository
                 ?? throw new ArgumentNullException(nameof(userRepository));
+            _fileTypeService = fileTypeService
+                ?? throw new ArgumentNullException(nameof(fileTypeService));
+            _thumbnailService = thumbnailService
+               ?? throw new ArgumentNullException(nameof(thumbnailService));
             _pathResolver = pathResolver
                 ?? throw new ArgumentNullException(nameof(pathResolver));
         }
@@ -69,24 +80,120 @@ namespace Ocuda.Ops.Service
             return await _fileRepository.GetPaginatedListAsync(filter);
         }
 
-        public async Task<File> CreatePrivateFileAsync(int currentUserId, File file, byte[] fileData)
+        public async Task<DataWithCount<ICollection<File>>> GetPaginatedGalleryListAsync(BlogFilter filter)
+        {
+            return await _fileRepository.GetPaginatedGalleryListAsync(filter);
+        }
+
+        public async Task<File> CreatePrivateFileAsync(int currentUserId, 
+            File file, IFormFile fileData, ICollection<IFormFile> thumbnailFiles)
         {
             file.Name = file.Name?.Trim();
             file.CreatedAt = DateTime.Now;
             file.CreatedBy = currentUserId;
+            file.Extension = System.IO.Path.GetExtension(fileData.FileName);
+            var fileType = await _fileTypeService.GetByExtensionAsync(file.Extension);
+            file.Icon = fileType.Icon;
+
+            if (thumbnailFiles != null)
+            {
+                var thumbnailList = new List<Thumbnail>();
+
+                foreach (var thumbnail in thumbnailFiles)
+                {
+                    thumbnailList.Add(new Thumbnail
+                    {
+                        Name = thumbnail.FileName,
+                        CreatedAt = file.CreatedAt,
+                        CreatedBy = file.CreatedBy
+                    });
+                }
+
+                file.Thumbnails = thumbnailList;
+            }
 
             await ValidateFileAsync(file);
 
             await _fileRepository.AddAsync(file);
             await _fileRepository.SaveAsync();
 
-            await WritePrivateFileAsync(file, fileData, false);
+            await WritePrivateFileAsync(file, fileData);
 
-            _fileRepository.Update(file);
-            await _fileRepository.SaveAsync();
+            if(thumbnailFiles != null)
+            {
+                await _thumbnailService.CreateThumbnailsAsync(file.Thumbnails, thumbnailFiles);
+            }
 
             return file;
         }
+
+        public async Task<File> EditPrivateFileAsync(int currentUserId,
+            File file, IFormFile fileData, ICollection<IFormFile> thumbnailFiles, int[] thumbnailIdsToKeep)
+        {
+            var currentFile = await _fileRepository.FindAsync(file.Id);
+            var currentFilePath = GetPrivateFilePath(currentFile);
+
+            currentFile.Name = file.Name?.Trim();
+            currentFile.Description = file.Description;
+            currentFile.CategoryId = file.CategoryId;
+            currentFile.IsFeatured = file.IsFeatured;
+
+            if (fileData != null)
+            {
+                currentFile.Extension = System.IO.Path.GetExtension(fileData.FileName);
+                var fileType = await _fileTypeService.GetByExtensionAsync(file.Extension);
+                currentFile.Icon = fileType.Icon;
+            }
+
+            var thumbnailsToRemove = currentFile.Thumbnails
+                .Where(_ => thumbnailIdsToKeep.Contains(_.Id) == false).ToList();
+
+            foreach (var thumbnail in thumbnailsToRemove)
+            {
+                currentFile.Thumbnails.Remove(thumbnail);
+            }
+
+            var thumbnailsToAdd = new List<Thumbnail>();
+
+            if (thumbnailFiles != null)
+            {
+                foreach (var thumbnail in thumbnailFiles)
+                {
+                    var newThumbnail = new Thumbnail
+                    {
+                        Name = thumbnail.FileName,
+                        CreatedAt = DateTime.Now,
+                        CreatedBy = currentUserId
+                    };
+
+                    thumbnailsToAdd.Add(newThumbnail);
+                    currentFile.Thumbnails.Add(newThumbnail);
+                }
+            }
+
+            await ValidateFileAsync(currentFile);
+
+            _fileRepository.Update(currentFile);
+            await _fileRepository.SaveAsync();
+
+            if (fileData != null)
+            {
+                await WritePrivateFileAsync(currentFile, fileData, currentFilePath);
+            }
+
+            if (thumbnailsToRemove.Count > 0)
+            {
+                await _thumbnailService.DeleteThumbnailsAsync(thumbnailsToRemove);
+            }
+
+            if (thumbnailsToAdd.Count > 0)
+            {
+                await _thumbnailService.CreateThumbnailsAsync(thumbnailsToAdd, thumbnailFiles);
+            }
+
+            return currentFile;
+        }
+
         public string GetSharedFilePath(File file)
         {
             return _pathResolver.GetPublicContentFilePath($"file{file.Id}{file.Extension}",
@@ -101,60 +208,37 @@ namespace Ocuda.Ops.Service
                 $"section{file.SectionId}");
         }
 
-        private async Task WritePrivateFileAsync(File file, byte[] fileData, bool isEdit)
+        private async Task WritePrivateFileAsync(File file, IFormFile fileData, string oldFilePath = null)
         {
             string filePath = GetPrivateFilePath(file);
+            byte[] fileBytes = IFormFileHelper.GetFileBytes(fileData);
 
-            if (isEdit)
-            {
-                _logger.LogInformation($"Editing File (Create): {filePath}");
-            }
-            else
+            if (string.IsNullOrWhiteSpace(oldFilePath))
             {
                 _logger.LogInformation($"Writing file: {filePath}");
             }
-
-            await System.IO.File.WriteAllBytesAsync(filePath, fileData);
-        }
-
-        public async Task<File> EditPrivateFileAsync(File file, byte[] fileData = null)
-        {
-            var currentFile = await _fileRepository.FindAsync(file.Id);
-            currentFile.Name = file.Name?.Trim();
-            currentFile.Description = file.Description;
-            currentFile.CategoryId = file.CategoryId;
-            currentFile.IsFeatured = file.IsFeatured;        
-
-            if (fileData != null)
+            else
             {
-                string oldFilePath = GetPrivateFilePath(currentFile);
-
-                currentFile.Extension = file.Extension;
-                currentFile.Icon = file.Icon;
-
-                await ValidateFileAsync(currentFile);
-
                 if (System.IO.File.Exists(oldFilePath))
                 {
                     _logger.LogInformation($"Editing File (Delete): {oldFilePath}");
                     System.IO.File.Delete(oldFilePath);
-                }              
+                }
 
-                await WritePrivateFileAsync(currentFile, fileData, true);
-            }
-            else
-            {
-                await ValidateFileAsync(currentFile);
+                _logger.LogInformation($"Editing File (Create): {filePath}");
             }
 
-            _fileRepository.Update(currentFile);
-            await _fileRepository.SaveAsync();
-            return currentFile;
+            await System.IO.File.WriteAllBytesAsync(filePath, fileBytes);
         }
 
         public async Task DeletePrivateFileAsync(int id)
         {
             var file = await _fileRepository.FindAsync(id);
+
+            if(file.Thumbnails.Count > 0)
+            {
+                await _thumbnailService.DeleteThumbnailsAsync(file.Thumbnails);
+            }
 
             string filePath = GetPrivateFilePath(file);
 
@@ -184,6 +268,7 @@ namespace Ocuda.Ops.Service
 
         public async Task ValidateFileAsync(File file)
         {
+            // TODO Update Validation
             var message = string.Empty;
             var section = await _sectionRepository.FindAsync(file.SectionId);
 

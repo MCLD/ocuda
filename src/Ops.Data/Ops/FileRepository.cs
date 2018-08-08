@@ -20,6 +20,15 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
+        public override Task<File> FindAsync(int id)
+        {
+            return DbSet
+                .AsNoTracking()
+                .Include(_ => _.Thumbnails)
+                .Where(_ => _.Id == id)
+                .SingleOrDefaultAsync();
+        }
+
         public async Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter)
         {
             var query = DbSet.AsNoTracking();
@@ -38,6 +47,31 @@ namespace Ocuda.Ops.Data.Ops
                 Count = await query.CountAsync(),
                 Data = await query
                     .OrderByDescending(_ => _.CreatedAt)
+                    .ApplyPagination(filter)
+                    .ToListAsync()
+            };
+        }
+
+        public async Task<DataWithCount<ICollection<File>>> GetPaginatedGalleryListAsync(BlogFilter filter)
+        {
+            var query = DbSet.AsNoTracking();
+
+            if (filter.CategoryId.HasValue)
+            {
+                query = query.Where(_ => _.CategoryId == filter.CategoryId);
+            }
+            else if (filter.SectionId.HasValue)
+            {
+                query = query.Where(_ => _.SectionId == filter.SectionId);
+            }
+
+            query = query.Include(_ => _.Thumbnails).Where(_ => _.Thumbnails.Count > 0);
+
+            return new DataWithCount<ICollection<File>>
+            {
+                Count = await query.CountAsync(),
+                Data = await query
+                    .OrderBy(_ => _.Name)
                     .ApplyPagination(filter)
                     .ToListAsync()
             };

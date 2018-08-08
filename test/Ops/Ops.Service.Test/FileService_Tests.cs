@@ -115,16 +115,20 @@ namespace Ocuda.test.Ops.Service.Test
                         Name = "Test User 1"
                     });
 
+            var fileTypeService = new Mock<IFileTypeService>();
+            var thumbnailService = new Mock<IThumbnailService>();
             var pathResolver = new Mock<IPathResolverService>();
 
             var fileService = new FileService(
-                logger.Object, 
+                logger.Object,
                 categoryRepository.Object,
-                fileRepository.Object, 
+                fileRepository.Object,
                 pageRepository.Object,
                 postRepository.Object,
                 sectionRepository.Object,
                 userRepository.Object,
+                fileTypeService.Object,
+                thumbnailService.Object,
                 pathResolver.Object);
 
             //Act

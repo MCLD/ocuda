@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
@@ -16,6 +17,9 @@ namespace Ocuda.Ops.Models
 
         public bool IsDefault { get; set; }
         public bool IsNavigation { get; set; }
+
+        [DisplayName("Thumbnail Required")]
+        public bool ThumbnailRequired { get; set; }
     }
 
     public enum CategoryType

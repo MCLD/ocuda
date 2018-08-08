@@ -13,8 +13,8 @@
         <div class="col-md-9">
             <div class="input-group">
                 <div class="input-group-prepend">
-                    <label class="btn btn-outline-secondary btn-file form-control">
-                        <span class="far fa-file"></span> Select a File
+                    <label class="btn btn-outline-secondary form-control">
+                        <span class="fa fa-file-medical"></span> Select a File
                         <input type="file" asp-for="FileData" id="fileUpload" hidden />
                     </label>
                 </div>
@@ -42,20 +42,60 @@
         </div>
     }
 
+    <select class="w-auto" asp-for="File.IsFeatured" formgroup>
+        <option value="false">No</option>
+        <option value="true">Yes</option>
+    </select>
+
     @if (Model.Categories != null && Model.Categories.Count() > 0)
     {
         <select class="w-auto" asp-for="File.CategoryId" formgroup>
             @foreach (var category in Model.Categories)
             {
-                <option value="@category.Id">@category.Name</option>
+                <option value="@category.Id" data-thumbnail="@category.ThumbnailRequired">
+                    @category.Name
+                </option>
             }
         </select>
     }
 
-    <select class="w-auto" asp-for="File.IsFeatured" formgroup>
-        <option value="false">No</option>
-        <option value="true">Yes</option>
-    </select>
+    <div class="form-group row d-none" id="thumbnailInputRow">
+        <label class="col-md-3 col-form-label text-md-right">Thumbnails</label>
+        <div class="col-md-9">
+            <div id="thumbnailInputList">
+                @if (Model?.File?.Thumbnails != null)
+                {
+                    <div class="card-deck mb-2">
+                        @foreach(var thumbnail in Model.File.Thumbnails)
+                        {
+                            <div class="thumbnail-input">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="d-flex h-100 justify-content-center align-items-center">
+                                            <img src="@thumbnail.Url" />
+                                            <input name ="ThumbnailIds" value="@thumbnail.Id" type="hidden" />
+                                        </div>
+                                    </div>
+                                    <div class="card-footer p-0">
+                                        <label class="m-0 w-100 btn btn-outline-danger btn-thumbnail-remove disabled">
+                                            <span class="fa fa-minus-circle"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                @* Thumbnail Inputs are inserted here *@
+            </div>
+            <label id="addThumbnail" class=" btn btn-thumbnail-add btn-info form-control w-auto">
+                <span class="fa fa-plus-circle"></span> Additional Thumbnail
+            </label>
+            <div class="container row">
+                <span asp-validation-for="ThumbnailFiles" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <div class="offset-md-3 col-md-9">
@@ -68,3 +108,105 @@
         </div>
     </div>
 </form>
+
+
+@* Thumbnail Input Template *@
+<div id="thumbnailInput" class="d-none" hidden>
+    <div class="thumbnail-input">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <label class="btn btn-outline-secondary form-control">
+                    <span class="fa fa-file-medical"></span>
+                    <input class="btn-thumbnail" name="ThumbnailFiles" type="file" hidden />
+                </label>
+            </div>
+            <div class="custom-file">
+                <input type="text" class="form-control" readonly />
+            </div>
+            <div class="input-group-append">
+                <label class="btn btn-outline-secondary btn-thumbnail-remove disabled">
+                    <span class="fa fa-minus-circle"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        var maxThumbnailCount = @(Model.MaxThumbnailCount);
+        var thumbnailsRequired = false;
+
+        //Toggle Thumbnail Input Row
+        $(document).ready(function () {
+            toggleThumbnailInputRow();
+            checkThumbnailButtons();
+        });
+
+        $(document).on("change", "#File_CategoryId", function () {
+            toggleThumbnailInputRow();
+        });
+
+        function toggleThumbnailInputRow() {
+            var selectedOption = $("#File_CategoryId")[0].selectedOptions[0];
+            thumbnailsRequired = $(selectedOption).data("thumbnail");
+
+            if (thumbnailsRequired == "True") {
+                var thumbnailCount = $("#thumbnailInputList").find(".thumbnail-input").length;
+                if (thumbnailCount < 1) {
+                    addThumbnailInput();
+                }
+                $("#thumbnailInputRow").removeClass("d-none");
+            }
+            else {
+                $("#thumbnailInputRow").addClass("d-none");
+            }
+        }
+
+        //Add Thumbnail Input
+        $(document).on("click", ".btn-thumbnail-add", function () {
+            addThumbnailInput();
+        });
+
+        function addThumbnailInput() {
+            var input = $("#thumbnailInput").find(".thumbnail-input");
+            $(input).clone().appendTo("#thumbnailInputList");
+            checkThumbnailButtons();
+        }
+
+        //Remove Thumbnail Input
+        $(document).on("click", ".btn-thumbnail-remove", function (e) {
+            var isDisabled = $(e.currentTarget).hasClass("disabled");
+            if (isDisabled != true) {
+                removeThumbnailInput(e);
+            }
+        });
+
+        function removeThumbnailInput(e) {
+            var thumbnailInput = $(e.target).parents(".thumbnail-input");
+            thumbnailInput.remove();
+            checkThumbnailButtons();
+        }
+
+        //Check Thumbnail Buttons
+        function checkThumbnailButtons() {
+            var thumbnailCount = $("#thumbnailInputList").find(".thumbnail-input").length;
+
+            if (thumbnailCount <= 1) {
+                $(".btn-thumbnail-remove").addClass("btn-outline-secondary disabled");
+                $(".btn-thumbnail-remove").removeClass("btn-outline-danger");
+            }
+            else {
+                $(".btn-thumbnail-remove").addClass("btn-outline-danger");
+                $(".btn-thumbnail-remove").removeClass("btn-outline-secondary disabled");
+            }
+
+            if (thumbnailCount >= maxThumbnailCount) {
+                $(".btn-thumbnail-add").addClass("d-none");
+            }
+            else {
+                $(".btn-thumbnail-add").removeClass("d-none");
+            }
+        }
+    </script>
+}

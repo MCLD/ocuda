@@ -1,5 +1,7 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Ops.Models
 {
@@ -26,5 +28,7 @@ namespace Ocuda.Ops.Models
 
         public int? PageId { get; set; }
         public int? PostId { get; set; }
+
+        public ICollection<Thumbnail> Thumbnails { get; set; }
     }
 }
