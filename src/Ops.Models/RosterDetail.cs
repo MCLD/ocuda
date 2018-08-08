@@ -20,6 +20,8 @@ namespace Ocuda.Ops.Models
 
         public int EmployeeId { get; set; }
         public int PositionNum { get; set; }
+        public DateTime? HireDate { get; set; }
+        public DateTime? RehireDate { get; set; }
         public int? ReportsToId { get; set; }
         public int? ReportsToPos { get; set; }
 
