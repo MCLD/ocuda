@@ -3,8 +3,9 @@ namespace Ocuda.Ops.Models.Defaults
 {
     public static class SiteSettings
     {
-        public static IEnumerable<SiteSetting> Get { get; } = new []
+        public static IEnumerable<SiteSetting> Get { get; } = new[]
         {
+            #region Email
             new SiteSetting
             {
                 Key = Keys.SiteSetting.Email.FromAddress,
@@ -16,6 +17,53 @@ namespace Ocuda.Ops.Models.Defaults
             },
             new SiteSetting
             {
+                Key = Keys.SiteSetting.Email.FromName,
+                Name = "Email from name",
+                Description = "Name that outgoing system mails are from",
+                Category = "Email",
+                Value = "ocuda",
+                Type = SiteSettingType.String
+            },
+            new SiteSetting
+            {
+                Key = Keys.SiteSetting.Email.OutgoingHost,
+                Name = "Email outgoing host",
+                Description = "Outgoing host name for emails",
+                Category = "Email",
+                Value = "ocuda",
+                Type = SiteSettingType.String
+            },
+            new SiteSetting
+            {
+                Key = Keys.SiteSetting.Email.OutgoingLogin,
+                Name = "Email outgoing login",
+                Description = "Login name for the outgoing host",
+                Category = "Email",
+                Value = "",
+                Type = SiteSettingType.String_Emptiable
+            },
+            new SiteSetting
+            {
+                Key = Keys.SiteSetting.Email.OutgoingPassword,
+                Name = "Email outgoing password",
+                Description = "Password for the outgoing host",
+                Category = "Email",
+                Value = "",
+                Type = SiteSettingType.String_Emptiable
+            },
+            new SiteSetting
+            {
+                Key = Keys.SiteSetting.Email.OutgoingPort,
+                Name = "Email outgoing port",
+                Description = "Port used for outgoing emails",
+                Category = "Email",
+                Value = "25",
+                Type = SiteSettingType.Int
+            },
+            #endregion
+            #region FileManagement
+            new SiteSetting
+            {
                 Key = Keys.SiteSetting.FileManagement.MaxUploadBytes,
                 Name = "Maximum file size",
                 Description = "Maximum file upload size (in bytes)",
@@ -23,6 +71,8 @@ namespace Ocuda.Ops.Models.Defaults
                 Value = "2097152",
                 Type = SiteSettingType.Int
             },
+            #endregion
+            #region UserInterface
             new SiteSetting
             {
                 Key = Keys.SiteSetting.UserInterface.ModelStateTimeoutMinutes,
@@ -41,6 +91,7 @@ namespace Ocuda.Ops.Models.Defaults
                 Value = "10",
                 Type = SiteSettingType.Int
             }
+            #endregion
         };
     }
 }

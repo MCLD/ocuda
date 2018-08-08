@@ -199,6 +199,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Interfaces.Ops.Services.IAuthorizationService,
                 AuthorizationService>();
             services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IFileTypeService, FileTypeService>();
             services.AddScoped<IInitialSetupService, InitialSetupService>();

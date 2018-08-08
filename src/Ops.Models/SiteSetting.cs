@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 using Ocuda.Ops.Models.Abstract;
 
 namespace Ocuda.Ops.Models
@@ -22,7 +19,6 @@ namespace Ocuda.Ops.Models
         [Required]
         [MaxLength(1000)]
         public string Description { get; set; }
-        [Required]
         [MaxLength(255)]
         public string Value { get; set; }
         [MaxLength(255)]
@@ -33,7 +29,8 @@ namespace Ocuda.Ops.Models
     {
         Bool,
         Int,
-        String
+        String,
+        String_Emptiable
     }
 
 }

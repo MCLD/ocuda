@@ -4,7 +4,12 @@
     {
         public struct Email
         {
+            public const string FromName = "Email.FromName";
             public const string FromAddress = "Email.FromAddress";
+            public const string OutgoingHost = "Email.OutgoingHost";
+            public const string OutgoingLogin = "Email.OutgoingLogin";
+            public const string OutgoingPassword = "Email.OutgoingPassword";
+            public const string OutgoingPort = "Email.OutgoingPort";
         }
 
         public struct FileManagement
