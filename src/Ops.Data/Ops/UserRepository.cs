@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -7,7 +9,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class UserRepository 
+    public class UserRepository
         : GenericRepository<Models.User, int>, IUserRepository
     {
         public UserRepository(OpsContext context, ILogger<UserRepository> logger)
@@ -15,17 +17,61 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
-        public async Task<User> FindByUsernameAsync(string username)
+        public override async Task<User> FindAsync(int id)
         {
-            var sanitizedUsername = username.Trim();
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Username == sanitizedUsername)
+                .Where(_ => _.IsDeleted == false && _.Id == id)
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<User> FindByUsernameAsync(string username)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.IsDeleted == false && _.Username == username && _.IsSysadmin == false)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<User> FindByEmailAsync(string email)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.IsDeleted == false && _.Email == email && _.IsSysadmin == false)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<ICollection<User>> GetAllAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.IsDeleted == false && _.IsSysadmin == false)
+                .ToListAsync();
+        }
+
+        public async Task<bool> IsDuplicateUsername(User user)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Username == user.Username
+                         && _.Id != user.Id
+                         && _.IsDeleted == false
+                         && _.IsSysadmin == false)
+                .AnyAsync();
+        }
+
+        public async Task<bool> IsDuplicateEmail(User user)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Email == user.Email
+                         && _.Id != user.Id
+                         && _.IsDeleted == false
+                         && _.IsSysadmin == false)
+                .AnyAsync();
+        }
+
         #region Initial setup methods
-        // this cannot be async becuase Configure() in Startup.cs is not async
         public async Task<Models.User> GetSystemAdministratorAsync()
         {
             return await DbSet

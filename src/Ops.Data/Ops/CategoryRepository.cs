@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ namespace Ocuda.Ops.Data.Ops
     public class CategoryRepository : GenericRepository<Models.Category, int>, ICategoryRepository
     {
         public CategoryRepository(OpsContext context, ILogger<CategoryRepository> logger)
-            :base(context, logger)
+            : base(context, logger)
         {
 
         }
@@ -24,14 +25,6 @@ namespace Ocuda.Ops.Data.Ops
             return await DbSet
                     .AsNoTracking()
                     .Where(_ => _.Name == name)
-                    .FirstOrDefaultAsync();
-        }
-
-        public async Task<Category> GetByNameAndSectionIdAsync(string name, int sectionId)
-        {
-            return await DbSet
-                    .AsNoTracking()
-                    .Where(_ => _.Name == name && _.SectionId == sectionId)
                     .FirstOrDefaultAsync();
         }
 
@@ -67,8 +60,7 @@ namespace Ocuda.Ops.Data.Ops
 
         public async Task<DataWithCount<ICollection<Category>>> GetPaginatedListAsync(BlogFilter filter)
         {
-            var query = DbSet.AsNoTracking()
-                             .Where(_ => _.IsDefault == false);
+            var query = DbSet.AsNoTracking().Where(_ => _.IsDefault == false);
 
             if (filter.CategoryType.HasValue)
             {
@@ -90,14 +82,14 @@ namespace Ocuda.Ops.Data.Ops
             };
         }
 
-        public async Task<bool> CategoryExistsAsync(Category category)
+        public async Task<bool> IsDuplicateAsync(Category category)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id != category.Id
-                    && _.CategoryType == category.CategoryType
-                    && _.Name == category.Name
-                    && _.SectionId == category.SectionId)
+                .Where(_ => _.Name == category.Name
+                         && _.SectionId == category.SectionId
+                         && _.CategoryType == category.CategoryType
+                         && _.Id != category.Id)
                 .AnyAsync();
         }
     }

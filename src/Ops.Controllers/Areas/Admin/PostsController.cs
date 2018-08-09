@@ -12,6 +12,7 @@ using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
@@ -87,7 +88,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 var newPost = await _postService.CreateAsync(CurrentUserId, post);
                 return Json(new { success = true, id = newPost.Id });
             }
-            catch (Exception ex)
+            catch (OcudaException ex)
             {
                 _logger.LogError($"Error adding post: {ex}", ex);
                 ShowAlertDanger("Unable to add blog post: ", ex.Message);
@@ -120,7 +121,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
             if (currentPost.IsDraft == true && model.Post.IsDraft == false)
             {
-                var stubInUse = await _postService.StubInUseAsync(model.Post.Stub, currentPost.SectionId);
+                var stubInUse = await _postService.StubInUseAsync(model.Post);
 
                 if (stubInUse)
                 {
@@ -137,7 +138,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     ShowAlertSuccess($"Updated blog post: {post.Title}");
                     return RedirectToAction(nameof(Index));
                 }
-                catch (Exception ex)
+                catch (OcudaException ex)
                 {
                     _logger.LogError($"Error editing post: {ex}", ex);
                     ShowAlertDanger("Unable to update blog post: ", ex.Message);
@@ -165,9 +166,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
-        public async Task<JsonResult> StubInUse(string stub, int sectionId)
+        public async Task<JsonResult> StubInUse(Post item)
         {
-            return Json(await _postService.StubInUseAsync(stub, sectionId));
+            return Json(await _postService.StubInUseAsync(item));
         }
     }
 }

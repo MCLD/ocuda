@@ -1,24 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Models;
+using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
     public class SectionService : ISectionService
     {
+        private readonly ILogger<SectionService> _logger;
         private readonly ISectionRepository _sectionRepository;
+        private readonly IUserRepository _userRepository;
         private readonly ICategoryService _categoryService;
 
-        public SectionService(ISectionRepository sectionRepository,
+        public SectionService(ILogger<SectionService> logger,
+            ISectionRepository sectionRepository,
+            IUserRepository userRepository,
             ICategoryService categoryService)
         {
+            _logger = logger
+               ?? throw new ArgumentNullException(nameof(logger));
             _sectionRepository = sectionRepository
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
+            _userRepository = userRepository
+                ?? throw new ArgumentNullException(nameof(userRepository));
             _categoryService = categoryService
                 ?? throw new ArgumentNullException(nameof(categoryService));
         }
@@ -43,7 +53,7 @@ namespace Ocuda.Ops.Service
             }
         }
 
-        public async Task<IEnumerable<Section>> GetNavigationAsync()
+        public async Task<IEnumerable<SectionWithNavigation>> GetNavigationAsync()
         {
             return await _sectionRepository.GetNavigationSectionsAsync();
         }
@@ -55,12 +65,17 @@ namespace Ocuda.Ops.Service
 
         public async Task<bool> IsValidPathAsync(string path)
         {
-            return await _sectionRepository.IsValidPathAsync(path);
+            return await _sectionRepository.IsValidPathAsync(path?.Trim().ToLower());
+        }
+
+        public async Task<Section> GetByNameAsync(string name)
+        {
+            return await _sectionRepository.GetByNameAsync(name?.Trim());
         }
 
         public async Task<Section> GetByPathAsync(string path)
         {
-            return await _sectionRepository.GetByPathAsync(path);
+            return await _sectionRepository.GetByPathAsync(path?.Trim().ToLower());
         }
 
         public async Task<DataWithCount<ICollection<Section>>> GetPaginatedListAsync(
@@ -82,67 +97,97 @@ namespace Ocuda.Ops.Service
 
         public async Task<Section> CreateAsync(int currentUserId, Section section)
         {
+            section.Name = section.Name?.Trim();
+            section.Path = section.Path?.Trim().ToLower();
             section.CreatedAt = DateTime.Now;
             section.CreatedBy = currentUserId;
+
+            await ValidateSectionAsync(section);
 
             await _sectionRepository.AddAsync(section);
             await _sectionRepository.SaveAsync();
             await _categoryService.CreateDefaultCategories(currentUserId, section.Id);
-            
+
             return section;
         }
 
         public async Task<Section> EditAsync(Section section)
         {
             var currentSection = await _sectionRepository.FindAsync(section.Id);
-            currentSection.Name = section.Name;
-            currentSection.Path = section.Path;
+            currentSection.Name = section.Name?.Trim();
+            currentSection.Path = section.Path?.Trim().ToLower();
             currentSection.Icon = section.Icon;
             currentSection.SortOrder = section.SortOrder;
+            currentSection.FeaturedVideoUrl = section.FeaturedVideoUrl;
+            currentSection.IsNavigation = section.IsNavigation;
+
+            await ValidateSectionAsync(currentSection);
 
             _sectionRepository.Update(currentSection);
             await _sectionRepository.SaveAsync();
             return currentSection;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task EditFeaturedVideoUrlAsync(int sectionId, string url)
         {
-            _sectionRepository.Remove(id);
+            var currentSection = await _sectionRepository.FindAsync(sectionId);
+            currentSection.FeaturedVideoUrl = url;
+
+            _sectionRepository.Update(currentSection);
             await _sectionRepository.SaveAsync();
         }
 
-        public IEnumerable<Calendar> GetCalendars()
-        {            
-            // TODO repository/database
-            // TODO move this somewhere more appropriate
-            return new List<Calendar>
+        public async Task DeleteAsync(int id)
+        {
+            var section = await _sectionRepository.FindAsync(id);
+            section.IsDeleted = true;
+            _sectionRepository.Update(section);
+            await _sectionRepository.SaveAsync();
+        }
+
+        public async Task ValidateSectionAsync(Section section)
+        {
+            var message = string.Empty;
+            var defaultSection = await _sectionRepository.GetDefaultSectionAsync();
+
+            if (defaultSection != null && defaultSection.Id != section.Id)
             {
-                new Calendar
+                if (string.IsNullOrWhiteSpace(section.Path))
                 {
-                    IsPinned = true,
-                    Name = "Staff Training",
-                    Url = "https://www.google.com/",
-                    When = DateTime.Parse("2018-06-19 10:00"),
-                    CreatedBy = 1,
-                    CreatedAt = DateTime.Now,
-                },
-                new Calendar
-                {
-                    Name = "Fun Event!",
-                    Url = "https://www.google.com/",
-                    When = DateTime.Parse("2018-06-08 12:00"),
-                    CreatedBy = 1,
-                    CreatedAt = DateTime.Now,
-                },
-                new Calendar
-                {
-                    Name = "Important Date Reminder",
-                    Url = "https://www.google.com/",
-                    When = DateTime.Parse("2018-06-12 9:00"),
-                    CreatedBy = 1,
-                    CreatedAt = DateTime.Now,
+                    message = $"Section path cannot be empty.";
+                    _logger.LogWarning(message);
+                    throw new OcudaException(message);
                 }
-            };
+            }
+
+            if (string.IsNullOrWhiteSpace(section.Name))
+            {
+                message = $"Section name cannot be empty.";
+                _logger.LogWarning(message);
+                throw new OcudaException(message);
+            }
+
+            if (await _sectionRepository.IsDuplicateNameAsync(section))
+            {
+                message = $"Section '{section.Name}' already exists.";
+                _logger.LogWarning(message, section.Name);
+                throw new OcudaException(message);
+            }
+
+            if (await _sectionRepository.IsDuplicatePathAsync(section))
+            {
+                message = $"Section path '{section.Path }' already exists.";
+                _logger.LogWarning(message, section.Path);
+                throw new OcudaException(message);
+            }
+
+            var creator = await _userRepository.FindAsync(section.CreatedBy);
+            if (creator == null)
+            {
+                message = $"Created by invalid User Id: {section.CreatedBy}";
+                _logger.LogWarning(message, section.CreatedBy);
+                throw new OcudaException(message);
+            }
         }
     }
 }

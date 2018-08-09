@@ -1,7 +1,6 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Posts.DetailViewModel
 
-@section styles
-    {
+@section styles {
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
 
@@ -9,6 +8,8 @@
     <input asp-for="SectionId" type="hidden" />
     @if (Model.Action == nameof(PostsController.Edit))
     {
+        <input asp-for="Post.SectionId" type="hidden" />
+        <input asp-for="Post.CreatedBy" type="hidden" />
         <input id="contentId" asp-for="Post.Id" type="hidden" />
         <input id="contentType" value="@(nameof(Post))" type="hidden" />
     }
@@ -18,10 +19,14 @@
     <div class="form-group row">
         <label asp-for="Post.Content" class="col-md-3 col-form-label text-md-right"></label>
         <div class="col-md-9">
-            <nav class="nav nav-tabs">
-                <a class="nav-link active" data-toggle="tab" href="#md-edit" role="tab">Edit</a>
-                <a class="nav-link" data-toggle="tab" href="#md-preview" role="tab">Preview</a>
-            </nav>
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#md-edit" role="tab">Edit</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#md-preview" role="tab">Preview</a>
+                </li>
+            </ul>
             <div class="tab-content" id="md-edit-preview">
                 <div class="tab-pane show active" id="md-edit" role="tabpanel">
                     <div id="wmd-button-bar" class="wmd-button-row"></div>
@@ -61,8 +66,7 @@
 </form>
 
 
-@section scripts
-    {
+@section scripts {
     <script src="~/js/md.min.js" asp-append-version="true"></script>
 
     <script>
@@ -74,11 +78,12 @@
             <text>
                 var title = $('#Post_Title');
                 var stub = $("#Post_Stub");
+                var id = $("#contentId");
                 var currentStub;
                 var stubCheckUrl = "@Url.Action("StubInUse", "Posts", new { Area = "Admin" })";
 
                 $(document).ready(function () {
-                    validateStub(stub, stubCheckUrl);
+                    validateStub(stub, id, stubCheckUrl);
                     currentStub = stub.val();
                 });
 
@@ -91,9 +96,9 @@
 
                 title.on("blur", function () {
                     setTimeout(function () {
-                        validateStub(stub, stubCheckUrl);
+                        validateStub(stub, id, stubCheckUrl);
                         currentStub = stub.val();
-                    }, 200);      
+                    }, 200);
                 });
 
                 stub.on("keyup", function () {
@@ -105,9 +110,9 @@
                 stub.on("blur", function () {
                     updateStub(stub, stub.val());
                     setTimeout(function () {
-                        validateStub(stub, stubCheckUrl);
+                        validateStub(stub, id, stubCheckUrl);
                         currentStub = stub.val();
-                    }, 200);   
+                    }, 200);
                 });
             </text>
         }

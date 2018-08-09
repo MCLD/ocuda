@@ -158,3 +158,8 @@ a.rowlink {
     border: 1px solid #f00;
     background-color: #fee;
 }
+
+.navbar .dropdown-item:hover {
+    color:inherit;
+    background:inherit;
+}

@@ -11,7 +11,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
     public interface ISectionService
     {
         Task EnsureDefaultSectionAsync(int sysadminId);
-        Task<IEnumerable<Section>> GetNavigationAsync();
+        Task<IEnumerable<SectionWithNavigation>> GetNavigationAsync();
         Task<Section> GetByIdAsync(int id);
         Task<bool> IsValidPathAsync(string path);
         Task<Section> GetByPathAsync(string path);
@@ -20,6 +20,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<int> GetSectionCountAsync();
         Task<Section> CreateAsync(int currentUserId, Section section);
         Task<Section> EditAsync(Section section);
+        Task EditFeaturedVideoUrlAsync(int sectionId, string url);
         Task DeleteAsync(int id);
     }
 }

@@ -14,12 +14,12 @@ namespace Ocuda.Ops.Data
         where TEntity : class
         where TKeyType : struct
     {
-        protected readonly DbContextBase _context;
+        protected readonly OpsContext _context;
         protected readonly ILogger _logger;
 
         private DbSet<TEntity> _dbSet;
 
-        internal GenericRepository(DbContextBase context, ILogger logger)
+        internal GenericRepository(OpsContext context, ILogger logger)
         {
             _context = context ?? throw new ArgumentNullException();
             _logger = logger ?? throw new ArgumentNullException();

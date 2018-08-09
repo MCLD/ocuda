@@ -165,7 +165,6 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ISectionPathValidator, SectionPathValidator>();
 
             // helpers
-            services.AddScoped<Controllers.Helpers.LdapHelper>();
             services.AddScoped<Utility.Helpers.WebHelper>();
 
             // repositories
@@ -204,6 +203,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IFileTypeService, FileTypeService>();
             services.AddScoped<IInitialSetupService, InitialSetupService>();
             services.AddScoped<IInsertSampleDataService, InsertSampleDataService>();
+            services.AddScoped<ILdapService, LdapService>();
             services.AddScoped<ILinkService, LinkService>();
             services.AddScoped<IPathResolverService, PathResolverService>();
             services.AddScoped<IPageService, PageService>();

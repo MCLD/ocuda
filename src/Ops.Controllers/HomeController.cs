@@ -68,7 +68,8 @@ namespace Ocuda.Ops.Controllers
                 Links = linkList.Data,
                 Posts = postList.Data,
                 //Calendars = _sectionService.GetCalendars(), //TODO update calendars
-                PaginateModel = paginateModel
+                PaginateModel = paginateModel,
+                Section = currentSection
             };
 
             return View(viewModel);
