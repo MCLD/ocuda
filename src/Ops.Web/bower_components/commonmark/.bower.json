@@ -30,7 +30,6 @@
     "commit": "fe6ce5a3d266ae3e320bb2329967f6368c690335"
   },
   "_source": "https://github.com/jgm/commonmark.js.git",
-  "_target": "0.28.1",
-  "_originalSource": "commonmark",
-  "_direct": true
+  "_target": "^0.28.1",
+  "_originalSource": "commonmark"
 }
