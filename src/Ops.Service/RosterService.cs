@@ -17,6 +17,8 @@ namespace Ocuda.Ops.Service
         public const string EmployeeIdHeading = "ID";
         public const string PositionHeading = "Position #";
         public const string TitleHeading = "Working Title";
+        public const string HireDateHeading = "Orig Hire Date";
+        public const string RehireDateHeading = "Rehire Date";
         public const string ReportsToIdHeading = "Reports to ID";
         public const string ReportsToPosHeading = "Reports to Position";
         public const string EmailHeading = "Email Address";
@@ -60,6 +62,8 @@ namespace Ocuda.Ops.Service
                 int employeeIdColId = 0;
                 int positionColId = 0;
                 int titleColId = 0;
+                int hireDateColId = 0;
+                int rehireDateColId = 0;
                 int reportToIdColId = 0;
                 int reportToPosColId = 0;
                 int emailColId = 0;
@@ -87,6 +91,12 @@ namespace Ocuda.Ops.Service
                                         break;
                                     case TitleHeading:
                                         titleColId = i;
+                                        break;
+                                    case HireDateHeading:
+                                        hireDateColId = i;
+                                        break;
+                                    case RehireDateHeading:
+                                        rehireDateColId = i;
                                         break;
                                     case ReportsToIdHeading:
                                         reportToIdColId = i;
@@ -130,6 +140,17 @@ namespace Ocuda.Ops.Service
                             {
                                 entry.EmployeeId = int.Parse(excelReader.GetString(employeeIdColId));
                                 entry.EmailAddress = excelReader.GetString(emailColId)?.Trim();
+
+                                var hireDate = excelReader.GetString(hireDateColId);
+                                if (DateTime.TryParse(hireDate, out DateTime hireDateTime))
+                                {
+                                    entry.HireDate = hireDateTime;
+                                }
+                                var rehireDate = excelReader.GetString(rehireDateColId);
+                                if (DateTime.TryParse(rehireDate, out DateTime rehireDateTime))
+                                {
+                                    entry.RehireDate = rehireDateTime;
+                                }
                             }
 
                             // Check if position has already been added to the list
@@ -174,6 +195,7 @@ namespace Ocuda.Ops.Service
                 }
                 if (user != null)
                 {
+                    user.ServiceStartDate = rosterDetail.RehireDate ?? rosterDetail.HireDate;
                     user.Title = rosterDetail.JobTitle;
                     user.LastRosterUpdate = now;
                     user.IsInLatestRoster = true;
@@ -190,6 +212,7 @@ namespace Ocuda.Ops.Service
                         EmployeeId = rosterDetail.EmployeeId,
                         LastRosterUpdate = now,
                         Name = rosterDetail.Name,
+                        ServiceStartDate = rosterDetail.RehireDate ?? rosterDetail.HireDate,
                         Title = rosterDetail.JobTitle,
                         IsInLatestRoster = true
                     };

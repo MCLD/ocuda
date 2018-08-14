@@ -193,6 +193,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
         }
 
+        #region Categories
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> Categories(string section, int page = 1)
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
@@ -236,6 +238,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
 
         [HttpPost]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> CreateCategory(string value, int sectionId)
         {
             var category = new Category
@@ -259,6 +262,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> EditCategory(int id, string value)
         {
             try
@@ -274,6 +278,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> DeleteCategory(CategoriesViewModel model)
         {
             try
@@ -289,5 +294,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
             return RedirectToAction(nameof(Categories), new { page = model.PaginateModel.CurrentPage });
         }
+        #endregion
     }
 }

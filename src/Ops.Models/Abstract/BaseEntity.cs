@@ -8,8 +8,8 @@ namespace Ocuda.Ops.Models.Abstract
         public int Id { get; set; }
         public DateTime CreatedAt { get; set; }
 
-        [ForeignKey(nameof(User))]
+        [ForeignKey(nameof(CreatedByUser))]
         public int CreatedBy { get; set; }
-        public User User { get; set; }
+        public User CreatedByUser { get; set; }
     }
 }

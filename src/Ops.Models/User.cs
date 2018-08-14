@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Ops.Models
@@ -28,6 +27,7 @@ namespace Ocuda.Ops.Models
         public string Email { get; set; }
         public string Phone { get; set; }
         public int? EmployeeId { get; set; }
+        public DateTime? ServiceStartDate { get; set; }
 
         public int? SupervisorId { get; set; }
         public User Supervisor { get; set; }
