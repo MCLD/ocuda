@@ -11,6 +11,15 @@
 </head>
 <body>
     <div class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-dark">
+        @{
+            var navigationRows = (List<NavigationRow>)Context.Items[ItemKey.NavColumn];
+            if (navigationRows?.Count > 0)
+            {
+                <a id="openNavColumn" href="#" style="margin-right: 1rem; padding: 0.5rem">
+                    <span class="fas fa-ellipsis-v fa-inverse"></span>
+                </a>
+            }
+        }
         <a class="navbar-brand" asp-area="" asp-route-section="" asp-controller="Home" asp-action="@(nameof(HomeController.Index))">
             <span class="fa fa-home"></span>
             Home
@@ -36,7 +45,7 @@
                             </a>
                         </li>
                     }
-                    else 
+                    else
                     {
                         <li class="nav-item dropdown" ActiveBy routeKey="Section" value="@sec.Section.Path">
                             <a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" href="#">
@@ -91,6 +100,57 @@
     </div>
 
     <div class="container-fluid">
+        @{
+            if (navigationRows?.Count > 0)
+            {
+                <div id="closeNavColumn" class="navcolumn-overlay"></div>
+                <div id="navColumn" class="navcolumn">
+                    @foreach (var row in navigationRows)
+                    {
+                        <div class="card">
+                            @if (row.Rows?.Count > 0 == false)
+                            {
+                                <a class="navcolumn-item" href="@row.Url">@Html.Raw(row.Name)</a>
+                            }
+                            else
+                            {
+                                <div class="navcolumn-item navcolumn-collapsible">
+                                    @Html.Raw(row.Name)
+                                    <span class="fas fa-chevron-right float-right"></span>
+                                </div>
+                                <div class="collapse navcolumn-collapse">
+                                    @foreach (var childRow in row.Rows)
+                                    {
+                                        <div class="card">
+                                            @if (childRow.Rows?.Count > 0 == false)
+                                            {
+                                                <a class="navcolumn-item navcolumn-child" href="@childRow.Url">@Html.Raw(childRow.Name)</a>
+                                            }
+                                            else
+                                            {
+                                                <div class="navcolumn-item navcolumn-child navcolumn-collapsible">
+                                                    @Html.Raw(childRow.Name)
+                                                    <span class="fas fa-chevron-right float-right"></span>
+                                                </div>
+                                                <div class="collapse navcolumn-collapse">
+                                                    @foreach (var grandchildRow in childRow.Rows)
+                                                    {
+                                                        <div class="card">
+                                                            <a class="navcolumn-item navcolumn-grandchild" href="@grandchildRow.Url">@Html.Raw(grandchildRow.Name)</a>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        }
+
         @if (TempData[Ocuda.Ops.Controllers.TempDataKey.AlertDanger] != null)
         {
             <div class="row">
