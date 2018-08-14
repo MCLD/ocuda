@@ -158,6 +158,7 @@ namespace Ocuda.Ops.Web
 
             // filters
             services.AddScoped<Controllers.Filters.AuthenticationFilter>();
+            services.AddScoped<Controllers.Filters.NavigationFilter>();
             services.AddScoped<Controllers.Filters.UserFilter>();
             services.AddScoped<Controllers.Filters.SectionFilter>();
 
