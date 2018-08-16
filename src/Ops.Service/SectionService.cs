@@ -106,7 +106,7 @@ namespace Ocuda.Ops.Service
 
             await _sectionRepository.AddAsync(section);
             await _sectionRepository.SaveAsync();
-            await _categoryService.CreateDefaultCategories(currentUserId, section.Id);
+            await _categoryService.CreateDefaultCategories(currentUserId, section);
 
             return section;
         }

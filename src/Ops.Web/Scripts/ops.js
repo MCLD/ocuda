@@ -64,6 +64,10 @@ function validateFile(e, filePath) {
     fileData.append("fileName", file.name);
     fileData.append("fileSize", file.size);
 
+    if ($("#AcceptedFileExtensions").length > 0) {
+        fileData.append("fileExtensions", $("#AcceptedFileExtensions").val());
+    }
+
     $.ajax({
         url: '/Admin/Files/ValidateFileBeforeUpload',
         type: 'POST',
@@ -233,3 +237,20 @@ function clearStubValidation(stub) {
 $.validator.setDefaults({
     ignore: ".validation-ignore"
 });
+
+function removeAttachmentItem(url, id) {
+    $.post(url, { id: id }, function (response) {
+        if (response.success == true) {
+            var attachmentItemId = "#attachmentItem_" + id;
+            $(attachmentItemId).remove();
+
+            var itemCount = $("#attachmentItemList").children().length;
+            if (itemCount < 1) {
+                $("#attachmentsInputRow").remove();
+            }
+        }
+        else {
+            alert(response.message);
+        }
+    });
+}

@@ -5,6 +5,7 @@ using Moq;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Exceptions;
 using Xunit;
 
@@ -51,6 +52,7 @@ namespace Ocuda.test.Ops.Service.Test
             var logger = new Mock<ILogger<CategoryService>>();
 
             var categoryRepository = new Mock<ICategoryRepository>();
+            var categoryFileTypeRepository = new Mock<ICategoryFileTypeRepository>();
             categoryRepository.Setup(m => m.IsDuplicateAsync(category)).ReturnsAsync(isDuplicate);
 
             var sectionRepository = new Mock<ISectionRepository>();
@@ -73,7 +75,8 @@ namespace Ocuda.test.Ops.Service.Test
 
             var categoryService = new CategoryService(
                 logger.Object, 
-                categoryRepository.Object, 
+                categoryRepository.Object,
+                categoryFileTypeRepository.Object, 
                 sectionRepository.Object,
                 userRepository.Object);
 

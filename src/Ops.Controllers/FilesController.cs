@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -54,7 +55,7 @@ namespace Ocuda.Ops.Controllers
             };
 
             var fileList = await _fileService.GetPaginatedListAsync(filter);
-            var categoryList = await _categoryService.GetBySectionIdAsync(filter);
+            var categories = await _categoryService.GetBySectionIdAsync(filter);
 
             var paginateModel = new PaginateModel()
             {
@@ -76,7 +77,7 @@ namespace Ocuda.Ops.Controllers
             {
                 PaginateModel = paginateModel,
                 Files = fileList.Data,
-                Categories = categoryList
+                Categories = categories
             };
 
             if (categoryId.HasValue)
@@ -122,8 +123,8 @@ namespace Ocuda.Ops.Controllers
                 CategoryType = CategoryType.File
             };
 
-            var fileList = await _fileService.GetPaginatedGalleryListAsync(filter);
-            var categoryList = await _categoryService.GetBySectionIdAsync(filter);
+            var fileList = await _fileService.GetPaginatedListAsync(filter, true);
+            var categories = await _categoryService.GetBySectionIdAsync(filter, true);
 
             var paginateModel = new PaginateModel()
             {
@@ -153,7 +154,7 @@ namespace Ocuda.Ops.Controllers
             {
                 PaginateModel = paginateModel,
                 Files = fileList.Data,
-                Categories = categoryList
+                Categories = categories
             };
 
             if (categoryId.HasValue)

@@ -15,6 +15,13 @@ namespace Ocuda.Ops.Data.Ops
         public ThumbnailRepository(OpsContext context, ILogger<ThumbnailRepository> logger)
             : base (context, logger)
         {
+
+        }
+
+        public void RemoveByFileId(int fileId)
+        {
+            var elements = DbSet.Where(_ => _.FileId == fileId);
+            DbSet.RemoveRange(elements);
         }
     }
 }

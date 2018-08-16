@@ -44,7 +44,7 @@ namespace Ocuda.Ops.Service
             return url;
         }
 
-        public async Task CreateThumbnailsAsync(
+        public async Task CreateThumbnailFilesAsync(
             ICollection<Thumbnail> thumbnails, ICollection<IFormFile> thumbnailFiles)
         {
             foreach (var thumbnail in thumbnails)
@@ -72,7 +72,7 @@ namespace Ocuda.Ops.Service
                 $"file{thumbnail.FileId}");
         }
 
-        public async Task DeleteThumbnailsAsync(IEnumerable<Thumbnail> thumbnailsToRemove)
+        public void DeleteThumbnailFiles(IEnumerable<Thumbnail> thumbnailsToRemove)
         {
             foreach (var thumbnail in thumbnailsToRemove)
             {
@@ -83,9 +83,6 @@ namespace Ocuda.Ops.Service
                     _logger.LogInformation($"Deleting thumbnail: {filePath}");
                     System.IO.File.Delete(filePath);
                 }
-
-                _thumbnailRepository.Remove(thumbnail.Id);
-                await _thumbnailRepository.SaveAsync();
             }
         }
 

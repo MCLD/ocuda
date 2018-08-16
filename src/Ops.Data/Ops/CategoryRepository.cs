@@ -20,6 +20,15 @@ namespace Ocuda.Ops.Data.Ops
 
         }
 
+        public override async Task<Category> FindAsync(int id)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Include(_ => _.CategoryFileTypes)
+                .Where(_ => _.Id == id)
+                .SingleOrDefaultAsync();
+        }
+
         public async Task<Category> GetByNameAsync(string name)
         {
             return await DbSet
@@ -34,13 +43,27 @@ namespace Ocuda.Ops.Data.Ops
                     .AsNoTracking()
                     .Where(_ => _.CategoryType == filter.CategoryType
                              && _.SectionId == filter.SectionId
+                             && _.IsAttachment == false
                              && _.IsDefault == true)
                     .FirstOrDefaultAsync();
         }
 
-        public async Task<ICollection<Category>> GetBySectionIdAsync(BlogFilter filter)
+        public async Task<Category> GetAttachmentAsync(BlogFilter filter)
+        {
+            return await DbSet
+                    .AsNoTracking()
+                    .Where(_ => _.CategoryType == filter.CategoryType
+                             && _.SectionId == filter.SectionId
+                             && _.IsAttachment == true)
+                    .FirstOrDefaultAsync();
+        }
+
+        public async Task<ICollection<Category>> GetBySectionIdAsync(
+            BlogFilter filter, bool isGallery)
         {
             var query = DbSet.AsNoTracking();
+
+            query = query.Where(_ => _.IsAttachment == false);
 
             if (filter.CategoryType.HasValue)
             {
@@ -52,15 +75,24 @@ namespace Ocuda.Ops.Data.Ops
                 query = query.Where(_ => _.SectionId == filter.SectionId);
             }
 
+            if (isGallery)
+            {
+                query = query.Where(_ => _.ThumbnailRequired == true);
+            }
+
             return await query
                     .OrderByDescending(_ => _.IsDefault)
+                    .ThenByDescending(_ => _.IsNavigation)
                     .ThenBy(_ => _.Name)
                     .ToListAsync();
         }
 
         public async Task<DataWithCount<ICollection<Category>>> GetPaginatedListAsync(BlogFilter filter)
         {
-            var query = DbSet.AsNoTracking().Where(_ => _.IsDefault == false);
+            var query = DbSet
+                .AsNoTracking()
+                .Where(_ => _.IsDefault == false
+                         && _.IsAttachment == false);
 
             if (filter.CategoryType.HasValue)
             {
@@ -91,6 +123,16 @@ namespace Ocuda.Ops.Data.Ops
                          && _.CategoryType == category.CategoryType
                          && _.Id != category.Id)
                 .AnyAsync();
+        }
+
+        public async Task<Category> GetCategoryAndFileTypesByCategoryIdAsync(int categoryId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Include(_ => _.CategoryFileTypes)
+                    .ThenInclude(_ => _.FileType)
+                .Where(_ => _.Id == categoryId)
+                .SingleOrDefaultAsync();
         }
     }
 }

@@ -14,15 +14,20 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<int> GetFileCountAsync();
         Task<ICollection<File>> GetFilesAsync();
         Task<File> GetByIdAsync(int id);
-        Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter);
-        Task<DataWithCount<ICollection<File>>> GetPaginatedGalleryListAsync(BlogFilter filter);
+        Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync( 
+            BlogFilter filter, bool isGallery = false);
         Task<File> CreatePrivateFileAsync(int currentUserId, 
             File file, IFormFile fileData, ICollection<IFormFile> thumbnailFiles);
         Task<File> EditPrivateFileAsync(int currentUserId, 
             File file, IFormFile fileData, ICollection<IFormFile> thumbnailFiles, int[] thumbnailIds);
-        string GetSharedFilePath(File file);
+        Task<File> CreatePublicFileAsync(int currentUserId, File file, IFormFile fileData);
+        string GetPublicFilePath(File file);
         string GetPrivateFilePath(File file);
         Task DeletePrivateFileAsync(int id);
         Task<byte[]> ReadPrivateFileAsync(File file);
+        Task<IEnumerable<int>> GetFileTypeIdsInUseByCategoryIdAsync(int categoryId);
+        Task<IEnumerable<File>> GetByPageIdAsync(int pageId);
+        Task<IEnumerable<File>> GetByPostIdAsync(int postId);
+        Task DeletePublicFileAsync(int id);
     }
 }

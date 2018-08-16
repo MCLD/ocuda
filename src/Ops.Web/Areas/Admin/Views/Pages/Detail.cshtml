@@ -41,6 +41,30 @@
         </div>
     </div>
 
+    @if (Model.Action == nameof(PagesController.Edit) && Model.Attachments != null && Model.Attachments.Count() > 0)
+    {
+        <div id="attachmentsInputRow" class="form-group row">
+            <label class="col-md-3 col-form-label text-md-right">Attachments</label>
+            <div id="attachmentItemList" class="col-md-9">
+                @foreach (var attachment in Model.Attachments)
+                {
+                    <div id="attachmentItem_@(attachment.Id)" class="input-group">
+                        <input asp-for="@attachment.Id" type="hidden" />
+                        <div class="input-group-prepend col-md-9 px-0">
+                            <label class="form-control h-auto mb-0 mb-md-auto">@(attachment.Name)@(attachment.Extension)</label>
+                        </div>
+                        <div class="input-group-append col-md-3 px-0">
+                            <label class="form-control rounded-0">file@(attachment.Id)@(attachment.Extension)</label>
+                            <label class="btn btn-outline-danger">
+                                <span class="fa fa-minus-circle"></span>
+                            </label>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
     <select class="w-auto" asp-for="Page.IsDraft" disabled="@(Model.IsDraft == false ? true : false)" formgroup>
         <option value="false">No</option>
         <option value="true">Yes</option>
@@ -108,5 +132,19 @@
                 });
             </text>
         }
+
+        $("#attachmentItemList").find(".btn").on("click", function (e) {
+            var fileName = $(e.currentTarget).parents(".input-group")
+                .find(".input-group-prepend")
+                .find("label").text();
+
+            var removeAttachment = confirm("Remove attachment '" + fileName + "'?");
+
+            if (removeAttachment == true) {
+                var url = "@(Url.Action("DeleteAttachment", "Files"))";
+                var id = $(e.currentTarget).parents(".input-group").find("input").val();
+                removeAttachmentItem(url, id);
+            }
+        });
     </script>
 }

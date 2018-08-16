@@ -12,9 +12,6 @@ namespace Ocuda.Ops.Models
         [Required]
         [MaxLength(255)]
         public string Name { get; set; }
-        [MaxLength(255)]
-        public string Type { get; set; }
-        public string Icon { get; set; }
         public string Extension { get; set; }
         [MaxLength(255)]
         public string Description { get; set; }
@@ -25,6 +22,9 @@ namespace Ocuda.Ops.Models
         [DisplayName("Category")]
         public int? CategoryId { get; set; }
         public Category Category { get; set; }
+
+        public int FileTypeId { get; set; }
+        public FileType FileType { get; set; }
 
         public int? PageId { get; set; }
         public int? PostId { get; set; }

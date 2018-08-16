@@ -1,4 +1,5 @@
-﻿using Ocuda.Ops.Models;
+﻿using System.Collections.Generic;
+using Ocuda.Ops.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Posts
 {
@@ -8,5 +9,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Posts
         public string Action { get; set; }
         public int SectionId { get; set; }
         public bool IsDraft { get; set; }
+        public IEnumerable<File> Attachments { get; set; }
     }
 }

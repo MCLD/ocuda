@@ -6,8 +6,14 @@
     <div modal id="addModal" name="File Category" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addName" asp-for="Category.Name" formgroup />
         <select id="addThumbnail" class="w-auto" asp-for="Category.ThumbnailRequired" formgroup>
-            <option value="False">No</option>
-            <option value="True">Yes</option>
+            <option value="False">Not Required</option>
+            <option value="True">Required</option>
+        </select>
+        <select id="addFileTypes" name="addFileTypes[]" asp-for="FileTypes" multiple="multiple" formgroup>
+            @foreach (var fileType in Model.FileTypes)
+            {
+                <option value="@fileType.Id">@fileType.Extension</option>
+            }
         </select>
     </div>
 </form>
@@ -18,8 +24,14 @@
     <div modal id="editModal" name="File Category" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
         <input id="editName" asp-for="Category.Name" formgroup />
         <select id="editThumbnail" class="w-auto" asp-for="Category.ThumbnailRequired" formgroup>
-            <option value="False">No</option>
-            <option value="True">Yes</option>
+            <option value="False">Not Required</option>
+            <option value="True">Required</option>
+        </select>
+        <select id="editFileTypes" name="editFileTypes[]" asp-for="FileTypes" multiple="multiple" formgroup>
+            @foreach (var fileType in Model.FileTypes)
+            {
+                <option value="@fileType.Id">@fileType.Extension</option>
+            }
         </select>
     </div>
 </form>
@@ -73,8 +85,7 @@ else
                                 data-toggle="modal"
                                 data-target="#deleteModal"
                                 data-id="@category.Id"
-                                data-category="@category.Name"
-                                data-thumbnail="@category.ThumbnailRequired">
+                                data-category="@category.Name">
                             <span class="fa fa-times" aria-hidden="true"></span>
                         </button>
                     </td>
@@ -92,14 +103,32 @@ else
 @section scripts
     {
     <script>
+        $(document).ready(function () {
+            $('#addFileTypes').multiselect({
+                maxHeight: 200,
+                includeSelectAllOption: true
+            });
+            $('#editFileTypes').multiselect({
+                maxHeight: 200,
+                includeSelectAllOption: true,
+                selectedClass: 'multiselect-selected'
+            });
+        });
+
         $("#addForm").submit(function (e) {
             e.preventDefault();
             var name = $('#addName').val();
             var thumbnail = $('#addThumbnail').val();
             var sectionId = $('#SectionId').val();
+            var selectedTypes = $('#addFileTypes')[0].selectedOptions;
+            var selectedTypeIds = [];
+
+            $.each(selectedTypes, function (index) {
+                selectedTypeIds[index] = $(selectedTypes[index]).val();
+            });
 
             $.post("@(Url.Action("CreateCategory", "Files"))",
-                { name: name, thumbnail: thumbnail, sectionId: sectionId },
+                { name: name, sectionId: sectionId, thumbnail: thumbnail, fileTypeIds: selectedTypeIds },
                 function (response) {
                     if (response.success == true) {
                         location.reload();
@@ -116,9 +145,15 @@ else
             var id = $("#editId").val();
             var name = $('#editName').val();
             var thumbnail = $('#editThumbnail').val();
+            var selectedTypes = $('#editFileTypes')[0].selectedOptions;
+            var selectedTypeIds = [];
+
+            $.each(selectedTypes, function (index) {
+                selectedTypeIds[index] = $(selectedTypes[index]).val();
+            });
 
             $.post("@(Url.Action("EditCategory", "Files"))",
-                { id: id, name: name, thumbnail: thumbnail },
+                { id: id, name: name, thumbnail: thumbnail, fileTypeIds: selectedTypeIds },
                 function (response) {
                     if (response.success == true) {
                         location.reload();
@@ -135,10 +170,40 @@ else
             var id = button.data("id");
             var category = button.data("category");
             var thumbnail = button.data("thumbnail");
+            var editFileTypes = $('#editFileTypes');
             var modal = $(this);
             $("#editId").val(id);
             modal.find("#editName").val(category);
             modal.find("#editThumbnail").val(thumbnail);
+            editFileTypes.multiselect('deselectAll', false);
+            editFileTypes.multiselect('updateButtonText');
+
+            var inputs = editFileTypes.parent(".multiselect-native-select").find("input");
+            $.each(inputs, function (index) {
+                var input = $(inputs[index]);
+                input.prop("disabled", false);
+                input.parent("li").removeClass("disabled");
+            });
+
+            $.post("@(Url.Action("GetCategoryFileTypes", "Files"))",
+                { categoryId: id },
+                function (response) {
+                    if (response.success == true) {
+                        editFileTypes.multiselect('select', response.fileTypeIds);
+                        var typesInUse = response.fileTypeIdsInUse;
+                        $.each(typesInUse, function (index) {
+                            var input = editFileTypes.parent(".multiselect-native-select")
+                                .find(".multiselect-selected")
+                                .find("input[value=\"" + typesInUse[index] + "\"]");
+                            input.prop("disabled", true);
+                            input.parent("li").addClass("disabled");
+                         });
+                    }
+                    else {
+                        alert(response.message);
+                    }
+                });
+
         });
 
         $("#deleteModal").on("show.bs.modal", function (e) {

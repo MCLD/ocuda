@@ -162,8 +162,9 @@
                     @foreach (var file in Model.Files)
                     {
                         <li class="list-group-item">
-                            <a asp-controller="Files" asp-action="ViewPrivateFile" asp-route-id="@file.Id" target="_blank" class="card-link">
-                                <span class="@file.Icon"></span> @file.Name
+                            <a asp-controller="Files" asp-action="ViewPrivateFile" 
+                               asp-route-id="@file.Id" target="_blank" class="card-link">
+                                <span class="@file.FileType.Icon"></span> @file.Name
                             </a>
                         </li>
                     }

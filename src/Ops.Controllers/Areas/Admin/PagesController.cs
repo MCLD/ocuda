@@ -21,13 +21,16 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Authorize(Policy = nameof(SectionManagerRequirement))]
     public class PagesController : BaseController<PagesController>
     {
+        private readonly IFileService _fileService;
         private readonly IPageService _pageService;
         private readonly ISectionService _sectionService;
 
         public PagesController(ServiceFacades.Controller<PagesController> context,
+            IFileService fileService,
             IPageService pageService,
             ISectionService sectionService) : base(context)
         {
+            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
             _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(sectionService));
@@ -100,13 +103,15 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         public async Task<IActionResult> Edit(int id)
         {
             var page = await _pageService.GetByIdAsync(id);
+            var attachments = await _fileService.GetByPageIdAsync(id);
 
             var viewModel = new DetailViewModel
             {
                 Action = nameof(Edit),
                 Page = page,
                 SectionId = page.SectionId,
-                IsDraft = page.IsDraft
+                IsDraft = page.IsDraft,
+                Attachments = attachments
             };
 
             return View("Detail", viewModel);

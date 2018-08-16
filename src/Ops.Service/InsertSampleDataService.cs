@@ -145,7 +145,7 @@ namespace Ocuda.Ops.Service
             foreach (var section in sections)
             {
                 await _sectionRepository.AddAsync(section);
-                await _categoryService.CreateDefaultCategories(SystemAdministrator.Id, section.Id);
+                await _categoryService.CreateDefaultCategories(SystemAdministrator.Id, section);
                 await _sectionRepository.SaveAsync();
             }
 

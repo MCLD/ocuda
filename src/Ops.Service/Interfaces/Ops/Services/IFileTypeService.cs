@@ -8,6 +8,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IFileTypeService
     {
+        Task<ICollection<FileType>> GetAllAsync();
+        Task<ICollection<FileType>> GetAllExtensionsAsync();
         Task<FileType> GetByExtensionAsync(string extension);
+        Task<int> GetIdByExtensionAsync(string extension);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
@@ -16,9 +17,24 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(fileTypeRepository));
         }
 
+        public async Task<ICollection<FileType>> GetAllAsync()
+        {
+            return await _fileTypeRepository.ToListAsync(_ => _.Extension);
+        }
+
+        public async Task<ICollection<FileType>> GetAllExtensionsAsync()
+        {
+            return await _fileTypeRepository.GetAllExtensionsAsync();
+        }
+
         public async Task<FileType> GetByExtensionAsync(string extension)
         {
             return await _fileTypeRepository.GetByExtensionAsync(extension);
+        }
+
+        public async Task<int> GetIdByExtensionAsync(string extension)
+        {
+            return await _fileTypeRepository.GetIdByExtensionAsync(extension);
         }
     }
 }

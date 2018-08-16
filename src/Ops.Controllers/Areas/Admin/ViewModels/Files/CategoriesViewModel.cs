@@ -10,5 +10,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Files
         public Category Category { get; set; }
         public PaginateModel PaginateModel { get; set; }
         public int SectionId { get; set; }
+        public ICollection<FileType> FileTypes { get; set; }
     }
 }

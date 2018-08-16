@@ -20,18 +20,22 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
-        public override Task<File> FindAsync(int id)
+        public override async Task<File> FindAsync(int id)
         {
-            return DbSet
+            return await DbSet
                 .AsNoTracking()
                 .Include(_ => _.Thumbnails)
                 .Where(_ => _.Id == id)
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter)
+        public async Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(
+            BlogFilter filter, bool isGallery)
         {
             var query = DbSet.AsNoTracking();
+
+            query = query.Include(_ => _.Category);
+            query = query.Where(_ => _.Category.IsAttachment == false);
 
             if (filter.CategoryId.HasValue)
             {
@@ -40,6 +44,14 @@ namespace Ocuda.Ops.Data.Ops
             else if (filter.SectionId.HasValue)
             {
                 query = query.Where(_ => _.SectionId == filter.SectionId);
+            }
+
+            query = query.Include(_ => _.FileType);
+            query = query.Include(_ => _.Thumbnails);
+
+            if (isGallery)
+            {
+                query = query.Where(_ => _.Thumbnails.Count > 0);
             }
 
             return new DataWithCount<ICollection<File>>
@@ -52,29 +64,30 @@ namespace Ocuda.Ops.Data.Ops
             };
         }
 
-        public async Task<DataWithCount<ICollection<File>>> GetPaginatedGalleryListAsync(BlogFilter filter)
+        public async Task<IEnumerable<int>> GetFileTypeIdsInUseByCategoryId(int categoryId)
         {
-            var query = DbSet.AsNoTracking();
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.CategoryId == categoryId)
+                .Select(_ => _.FileTypeId)
+                .Distinct()
+                .ToListAsync();
+        }
 
-            if (filter.CategoryId.HasValue)
-            {
-                query = query.Where(_ => _.CategoryId == filter.CategoryId);
-            }
-            else if (filter.SectionId.HasValue)
-            {
-                query = query.Where(_ => _.SectionId == filter.SectionId);
-            }
+        public async Task<IEnumerable<File>> GetByPageIdAsync(int pageId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.PageId == pageId)
+                .ToListAsync();
+        }
 
-            query = query.Include(_ => _.Thumbnails).Where(_ => _.Thumbnails.Count > 0);
-
-            return new DataWithCount<ICollection<File>>
-            {
-                Count = await query.CountAsync(),
-                Data = await query
-                    .OrderBy(_ => _.Name)
-                    .ApplyPagination(filter)
-                    .ToListAsync()
-            };
+        public async Task<IEnumerable<File>> GetByPostIdAsync(int postId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.PostId == postId)
+                .ToListAsync();
         }
     }
 }

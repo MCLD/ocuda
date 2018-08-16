@@ -21,13 +21,16 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Authorize(Policy = nameof(SectionManagerRequirement))]
     public class PostsController : BaseController<PostsController>
     {
+        private readonly IFileService _fileService;
         private readonly IPostService _postService;
         private readonly ISectionService _sectionService;
 
         public PostsController(ServiceFacades.Controller<PostsController> context,
+            IFileService fileService,
             IPostService postService,
             ISectionService sectionService) : base(context)
         {
+            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
             _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(sectionService));
@@ -101,13 +104,15 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         public async Task<IActionResult> Edit(int id)
         {
             var post = await _postService.GetByIdAsync(id);
+            var attachments = await _fileService.GetByPostIdAsync(id);
 
             var viewModel = new DetailViewModel()
             {
                 Action = nameof(Edit),
                 Post = post,
                 SectionId = post.SectionId,
-                IsDraft = post.IsDraft
+                IsDraft = post.IsDraft,
+                Attachments = attachments
             };
 
             return View("Detail", viewModel);

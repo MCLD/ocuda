@@ -5,6 +5,7 @@
       "bower_components/jquery/dist/jquery.js",
       "bower_components/popper.js/dist/umd/popper.js",
       "bower_components/bootstrap/dist/js/bootstrap.js",
+      "bower_components/bootstrap-multiselect/dist/js/bootstrap-multiselect.js",
       "bower_components/jquery-validation/dist/jquery.validate.js",
       "bower_components/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js",
       "Scripts/Layout.js",
@@ -40,6 +41,7 @@
     "outputFileName": "wwwroot/css/main.min.css",
     "inputFiles": [
       "Scripts/Bootstrap/bootstrap.css",
+      "bower_components/bootstrap-multiselect/dist/css/bootstrap-multiselect.css",
       "bower_components/fontawesome/web-fonts-with-css/css/fontawesome-all.css",
       "Styles/ops.css"
     ],

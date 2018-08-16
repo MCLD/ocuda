@@ -170,6 +170,8 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Utility.Helpers.WebHelper>();
 
             // repositories
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryFileTypeRepository,
+                Data.Ops.CategoryFileTypeRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
                 Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,

@@ -8,5 +8,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
     public interface IThumbnailRepository : IRepository<Thumbnail, int>
     {
+        void RemoveByFileId(int fileId);
     }
 }

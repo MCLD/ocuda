@@ -267,7 +267,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             try
             {
-                var category = await _categoryService.EditCategoryAsync(id, value);
+                var category = await _categoryService.EditCategoryAsync(CurrentUserId, id, value);
                 ShowAlertSuccess($"Updated link category: {category.Name}");
                 return Json(new { success = true });
             }

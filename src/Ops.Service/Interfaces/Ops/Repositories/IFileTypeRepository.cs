@@ -8,6 +8,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
     public interface IFileTypeRepository : IRepository<FileType, int>
     {
+        Task<ICollection<FileType>> GetAllExtensionsAsync();
         Task<FileType> GetByExtensionAsync(string extension);
+        Task<int> GetIdByExtensionAsync(string extension);
     }
 }
