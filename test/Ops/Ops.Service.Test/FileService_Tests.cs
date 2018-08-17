@@ -128,6 +128,14 @@ namespace Ocuda.test.Ops.Service.Test
                     });
 
             var fileTypeService = new Mock<IFileTypeService>();
+            fileTypeService.Setup(
+                m => m.GetByIdAsync(1))
+                    .ReturnsAsync(new FileType
+                    {
+                        Id = 1,
+                        Extension = ".test"
+                    });
+
             var thumbnailService = new Mock<IThumbnailService>();
             var pathResolver = new Mock<IPathResolverService>();
 

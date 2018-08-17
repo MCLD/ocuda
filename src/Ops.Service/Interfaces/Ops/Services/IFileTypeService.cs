@@ -12,5 +12,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<ICollection<FileType>> GetAllExtensionsAsync();
         Task<FileType> GetByExtensionAsync(string extension);
         Task<int> GetIdByExtensionAsync(string extension);
+        Task<FileType> GetByIdAsync(int id);
     }
 }

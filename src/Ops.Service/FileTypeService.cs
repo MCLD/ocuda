@@ -32,6 +32,11 @@ namespace Ocuda.Ops.Service
             return await _fileTypeRepository.GetByExtensionAsync(extension);
         }
 
+        public async Task<FileType> GetByIdAsync(int id)
+        {
+            return await _fileTypeRepository.FindAsync(id);
+        }
+
         public async Task<int> GetIdByExtensionAsync(string extension)
         {
             return await _fileTypeRepository.GetIdByExtensionAsync(extension);

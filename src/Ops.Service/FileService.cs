@@ -291,12 +291,13 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException(message);
             }
 
-            //if (file.FileTypeId)
-            //{
-            //    message = $"File must have a type.";
-            //    _logger.LogWarning(message, file);
-            //    throw new OcudaException(message);
-            //}
+            var fileType = await _fileTypeService.GetByIdAsync(file.FileTypeId);
+            if (fileType == null)
+            {
+                message = $"File must have a type.";
+                _logger.LogWarning(message, file);
+                throw new OcudaException(message);
+            }
 
             if (file.CategoryId.HasValue)
             {
