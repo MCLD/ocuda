@@ -1,4 +1,4 @@
-﻿@model Ocuda.Ops.Controllers.ViewModels.Home.IndexViewModel
+@model Ocuda.Ops.Controllers.ViewModels.Home.IndexViewModel
 
 <form id="editForm" role="form">
     <input id="editId" asp-for="Section.Id" type="hidden" />
@@ -41,8 +41,15 @@
                         @Html.Raw(post.Content)
                     </div>
                     <div class="card-footer d-flex">
-                        <div class="flex-grow-1">Posted by <a href="#">@post.CreatedBy</a></div>
-                        <div>@post.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")</div>
+                        <div class="flex-grow-1 mr-2">
+                            Posted by
+                            <a asp-controller="Profile"
+                               asp-action="@nameof(ProfileController.Index)"
+                               asp-route-id="@post.CreatedByUsername">
+                                @post.CreatedByName
+                            </a>
+                        </div>
+                        @post.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")
                     </div>
                 </div>
             }
@@ -162,7 +169,7 @@
                     @foreach (var file in Model.Files)
                     {
                         <li class="list-group-item">
-                            <a asp-controller="Files" asp-action="ViewPrivateFile" 
+                            <a asp-controller="Files" asp-action="ViewPrivateFile"
                                asp-route-id="@file.Id" target="_blank" class="card-link">
                                 <span class="@file.FileType.Icon"></span> @file.Name
                             </a>

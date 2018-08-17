@@ -32,6 +32,11 @@ namespace Ocuda.Ops.Service
             return await _userRepository.FindByEmailAsync(email?.Trim().ToLower());
         }
 
+        public async Task<Tuple<string,string>> GetUserInfoById(int id)
+        {
+            return await _userRepository.GetUserInfoById(id);
+        }
+
         public async Task<User> AddUser(User user, int? createdById = null)
         {
             user.Username = user.Username?.Trim().ToLower();

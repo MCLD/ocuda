@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -69,6 +69,16 @@ namespace Ocuda.Ops.Data.Ops
                          && _.IsDeleted == false
                          && _.IsSysadmin == false)
                 .AnyAsync();
+        }
+
+        public async Task<Tuple<string, string>> GetUserInfoById(int id)
+        {
+            var user = await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Id == id)
+                .FirstOrDefaultAsync();
+
+            return new Tuple<string, string>(user.Name, user.Username);
         }
 
         #region Initial setup methods

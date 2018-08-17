@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
 
@@ -12,5 +13,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         Task<ICollection<User>> GetAllAsync();
         Task<bool> IsDuplicateUsername(User user);
         Task<bool> IsDuplicateEmail(User user);
+        Task<Tuple<string, string>> GetUserInfoById(int id);
     }
 }

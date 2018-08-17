@@ -15,17 +15,20 @@ namespace Ocuda.Ops.Controllers
         private readonly ILinkService _linkService;
         private readonly IPostService _postService;
         private readonly ISectionService _sectionService;
+        private readonly IUserService _userService;
 
         public HomeController(ServiceFacades.Controller<HomeController> context,
             IFileService fileService,
             ILinkService linkService,
             IPostService postService,
-            ISectionService sectionService) : base(context)
+            ISectionService sectionService,
+            IUserService userService) : base(context)
         {
-            _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _linkService = linkService ?? throw new ArgumentNullException(nameof(linkService));
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
+            _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
         public async Task<IActionResult> Index(string section, int page = 1)
@@ -59,6 +62,9 @@ namespace Ocuda.Ops.Controllers
 
             foreach (var post in postList.Data)
             {
+                var userInfo = await _userService.GetUserInfoById(post.CreatedBy);
+                post.CreatedByName = userInfo.Item1;
+                post.CreatedByUsername = userInfo.Item2;
                 post.Content = CommonMark.CommonMarkConverter.Convert(post.Content);
             }
 

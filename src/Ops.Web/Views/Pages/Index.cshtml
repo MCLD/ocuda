@@ -18,16 +18,16 @@ else
         <tbody>
             @foreach (var ocPage in Model.Pages)
             {
-            <tr>
-                <td class="rowlink-parent">
-                    <a asp-action="@(nameof(PagesController.Display))" asp-route-id="@ocPage.Stub" class="rowlink">
-                        @ocPage.Title
-                    </a>
-                </td>
-                <td>@ocPage.CreatedBy</td>
-                <td>@ocPage.CreatedAt</td>
-                <td>@ocPage.IsDraft</td>
-            </tr>
+                <tr>
+                    <td class="rowlink-parent">
+                        <a asp-action="@(nameof(PagesController.Display))" asp-route-id="@ocPage.Stub" class="rowlink">
+                            @ocPage.Title
+                        </a>
+                    </td>
+                    <td>@ocPage.CreatedByName</td>
+                    <td>@ocPage.CreatedAt</td>
+                    <td>@ocPage.IsDraft</td>
+                </tr>
             }
         </tbody>
     </table>

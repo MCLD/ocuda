@@ -24,16 +24,20 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         private readonly IFileService _fileService;
         private readonly IPostService _postService;
         private readonly ISectionService _sectionService;
+        private readonly IUserService _userService;
 
         public PostsController(ServiceFacades.Controller<PostsController> context,
             IFileService fileService,
             IPostService postService,
-            ISectionService sectionService) : base(context)
+            ISectionService sectionService,
+            IUserService userService) : base(context)
         {
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
             _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(sectionService));
+            _userService = userService
+                ?? throw new ArgumentNullException(nameof(userService));
         }
 
         public async Task<IActionResult> Index(string section, int page = 1)
@@ -63,6 +67,13 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     {
                         page = paginateModel.LastPage ?? 1
                     });
+            }
+
+            foreach(var post in postList.Data)
+            {
+                var userInfo = await _userService.GetUserInfoById(post.CreatedBy);
+                post.CreatedByName = userInfo.Item1;
+                post.CreatedByUsername = userInfo.Item2;
             }
 
             var viewModel = new IndexViewModel()

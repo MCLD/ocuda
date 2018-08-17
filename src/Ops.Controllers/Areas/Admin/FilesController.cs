@@ -34,6 +34,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         private readonly IPostService _postService;
         private readonly ISectionService _sectionService;
         private readonly IThumbnailService _thumbnailService;
+        private readonly IUserService _userService;
 
         private const string FileValidationPassed = "Valid";
         private const string FileValidationFailedNoFile = "No file selected.";
@@ -51,7 +52,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             IPathResolverService pathResolver,
             IPostService postService,
             ISectionService sectionService,
-            IThumbnailService thumbnailService) : base(context)
+            IThumbnailService thumbnailService,
+            IUserService userService) : base(context)
         {
             _categoryService = categoryService
                 ?? throw new ArgumentNullException(nameof(categoryService));
@@ -65,6 +67,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ?? throw new ArgumentNullException(nameof(sectionService));
             _thumbnailService = thumbnailService
                 ?? throw new ArgumentNullException(nameof(thumbnailService));
+            _userService = userService
+                ?? throw new ArgumentNullException(nameof(userService));
         }
 
         public async Task<IActionResult> Index(string section, int? categoryId = null, int page = 1)
@@ -97,6 +101,13 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     {
                         page = paginateModel.LastPage ?? 1
                     });
+            }
+
+            foreach (var file in fileList.Data)
+            {
+                var userInfo = await _userService.GetUserInfoById(file.CreatedBy);
+                file.CreatedByName = userInfo.Item1;
+                file.CreatedByUsername = userInfo.Item2;
             }
 
             var viewModel = new IndexViewModel()
@@ -521,7 +532,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                             file.PostId = null;
                         }
 
-                        var newFile = 
+                        var newFile =
                             await _fileService.CreatePublicFileAsync(CurrentUserId, file, fileData);
 
                         _logger.LogInformation(
@@ -562,7 +573,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 _logger.LogError($"Error deleting attachment: {ex.Message}", ex);
                 return Json(new { success = false, message = ex.Message });
-            }          
+            }
         }
 
         public async Task<IActionResult> ValidateFileBeforeUpload(
@@ -591,7 +602,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 {
                     result = FileValidationFailedType;
                 }
-                else if (!string.IsNullOrWhiteSpace(fileExtensions) 
+                else if (!string.IsNullOrWhiteSpace(fileExtensions)
                     && !fileExtensions.Split(',').Any(_ => _ == extension))
                 {
                     result = FileValidationFailedType;

@@ -22,6 +22,7 @@ namespace Ocuda.Ops.Controllers
         private readonly IFileService _fileService;
         private readonly ISectionService _sectionService;
         private readonly IThumbnailService _thumbnailService;
+        private readonly IUserService _userService;
 
         public const string DefaultCategoryDisplayName = "[No Category]";
 
@@ -29,8 +30,8 @@ namespace Ocuda.Ops.Controllers
             ICategoryService categoryService,
             IFileService fileService,
             ISectionService sectionService,
-            IThumbnailService thumbnailService
-            ) : base(context)
+            IThumbnailService thumbnailService,
+            IUserService userService) : base(context)
         {
             _categoryService = categoryService
                 ?? throw new ArgumentNullException(nameof(categoryService));
@@ -39,6 +40,8 @@ namespace Ocuda.Ops.Controllers
                 ?? throw new ArgumentNullException(nameof(sectionService));
             _thumbnailService = thumbnailService
                 ?? throw new ArgumentNullException(nameof(thumbnailService));
+            _userService = userService
+                ?? throw new ArgumentNullException(nameof(userService));
         }
 
         public async Task<IActionResult> Index(string section, int? categoryId = null, int page = 1)
@@ -71,6 +74,13 @@ namespace Ocuda.Ops.Controllers
                     {
                         page = paginateModel.LastPage ?? 1
                     });
+            }
+
+            foreach (var file in fileList.Data)
+            {
+                var userInfo = await _userService.GetUserInfoById(file.CreatedBy);
+                file.CreatedByName = userInfo.Item1;
+                file.CreatedByUsername = userInfo.Item2;
             }
 
             var viewModel = new IndexViewModel()
