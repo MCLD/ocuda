@@ -21,16 +21,23 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Authorize(Policy = nameof(SectionManagerRequirement))]
     public class PagesController : BaseController<PagesController>
     {
+        private readonly IFileService _fileService;
         private readonly IPageService _pageService;
         private readonly ISectionService _sectionService;
+        private readonly IUserService _userService;
 
         public PagesController(ServiceFacades.Controller<PagesController> context,
+            IFileService fileService,
             IPageService pageService,
-            ISectionService sectionService) : base(context)
+            ISectionService sectionService,
+            IUserService userService) : base(context)
         {
+            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
             _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(sectionService));
+            _userService = userService
+                ?? throw new ArgumentNullException(nameof(userService));
         }
 
         public async Task<IActionResult> Index(string section, int page = 1)
@@ -60,6 +67,13 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     {
                         page = paginateModel.LastPage ?? 1
                     });
+            }
+
+            foreach (var ocPage in pageList.Data)
+            {
+                var userInfo = await _userService.GetUserInfoById(ocPage.CreatedBy);
+                ocPage.CreatedByName = userInfo.Item1;
+                ocPage.CreatedByUsername = userInfo.Item2;
             }
 
             var viewModel = new IndexViewModel
@@ -100,13 +114,15 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         public async Task<IActionResult> Edit(int id)
         {
             var page = await _pageService.GetByIdAsync(id);
+            var attachments = await _fileService.GetByPageIdAsync(id);
 
             var viewModel = new DetailViewModel
             {
                 Action = nameof(Edit),
                 Page = page,
                 SectionId = page.SectionId,
-                IsDraft = page.IsDraft
+                IsDraft = page.IsDraft,
+                Attachments = attachments
             };
 
             return View("Detail", viewModel);

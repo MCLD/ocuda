@@ -75,6 +75,24 @@ namespace Ocuda.Ops.Models.Defaults
             #region UserInterface
             new SiteSetting
             {
+                Key = Keys.SiteSetting.FileManagement.MaxThumbnailCount,
+                Name = "Maximum Thumbnail Count",
+                Description = "Maximum number of thumbnails that can be attached to a file",
+                Category = "File Management",
+                Value = "4",
+                Type = SiteSettingType.Int
+            },
+            new SiteSetting
+            {
+                Key = Keys.SiteSetting.FileManagement.ThumbnailTypes,
+                Name = "Thumbnail Types",
+                Description = "Comma separated list of acceptable file type extensions for thumbnails",
+                Category = "File Management",
+                Value = ".jpg,.png",
+                Type = SiteSettingType.String
+            },
+            new SiteSetting
+            {
                 Key = Keys.SiteSetting.UserInterface.ModelStateTimeoutMinutes,
                 Name = "Web request validation timeout",
                 Description = "Timeout for submitted pages to perform validation",

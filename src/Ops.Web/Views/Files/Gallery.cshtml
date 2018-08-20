@@ -1,0 +1,70 @@
+﻿@model Ocuda.Ops.Controllers.ViewModels.Files.GalleryViewModel
+
+<div class="row mb-2">
+    <div class="col">
+        <span>Category: </span>
+        <a class="dropdown-toggle" href="#" role="button" id="dropdownCategory"
+           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            @(Model.CategoryName ?? "Show All")
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="dropdownCategory">
+            <li><a class="dropdown-item" asp-route-categoryId="">Show All</a></li>
+            @foreach (var category in Model.Categories)
+            {
+                <li>
+                    <a class="dropdown-item" asp-route-categoryId="@category.Id">
+                        @(string.IsNullOrWhiteSpace(category.Name)
+                            ? FilesController.DefaultCategoryDisplayName
+                            : category.Name)
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+
+@if (Model.Files.Count() == 0)
+{
+    <div class="alert alert-warning">No Files Found</div>
+}
+else
+{
+    <div class="oc-gallery card-deck">
+        @foreach (var file in Model.Files)
+        {
+            <div class="flex-wrap">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-center">
+                        <a class="card-title" asp-action="ViewPrivateFile" asp-route-id="@file.Id" target="_blank">
+                            @file.Name
+                        </a>
+                    </div>
+                    <div class="card-body m-0">
+                        <div id="@file.Id" class="carousel slide" data-ride="carousel" data-interval="false">
+                            <div class="carousel-inner w-100" role="listbox">
+                                @for (int i = 0; i < file.Thumbnails.Count(); i++)
+                                {
+                                    <div class="carousel-item h-100 @(i == 0 ? "active" : "")">
+                                        <div class="m-0 d-flex row h-100 justify-content-center align-items-center">
+                                            <a asp-action="ViewPrivateFile" asp-route-id="@file.Id" target="_blank">
+                                                <img src="@file.Thumbnails.ElementAt(i).Url" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <ul class="carousel-indicators position-relative pt-3 pb-0 mb-0">
+                                @for (int i = 0; i < file.Thumbnails.Count(); i++)
+                                {
+                                    <li data-target="#@file.Id" data-slide-to="@i"
+                                        class="@(i == 0 ? "active" : "")" )></li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

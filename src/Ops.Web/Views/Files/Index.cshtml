@@ -34,6 +34,7 @@ else
             <tr>
                 <th>File Name</th>
                 <th>Description</th>
+                <th>Thumbnails</th>
                 <th>Creator</th>
                 <th>Creation Date</th>
             </tr>
@@ -41,16 +42,18 @@ else
         <tbody>
             @foreach (var file in Model.Files)
             {
-                <tr>
-                    <td class="rowlink-parent">
-                        <a asp-action="ViewPrivateFile" asp-route-id="@file.Id" target="_blank" class="rowlink">
-                            <span class="@file.Icon"></span> @file.Name
-                        </a>
-                    </td>
-                    <td>@file.Description</td>
-                    <td>@file.CreatedBy</td>
-                    <td>@file.CreatedAt</td>
-                </tr>
+            <tr>
+                <td class="rowlink-parent">
+                    <a asp-action="ViewPrivateFile"
+                       asp-route-id="@file.Id" target="_blank" class="rowlink">
+                        <span class="@file.FileType.Icon"></span> @file.Name
+                    </a>
+                </td>
+                <td>@file.Description</td>
+                <td>@file.Thumbnails.Count()</td>
+                <td>@file.CreatedByName</td>
+                <td>@file.CreatedAt</td>
+            </tr>
             }
         </tbody>
     </table>

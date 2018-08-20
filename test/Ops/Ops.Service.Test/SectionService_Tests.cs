@@ -52,6 +52,7 @@ namespace Ocuda.test.Ops.Service.Test
             var categoryLogger = new Mock<ILogger<CategoryService>>();
             var sectionLogger = new Mock<ILogger<SectionService>>();
             var categoryRepository = new Mock<ICategoryRepository>();
+            var categoryFileTypeRepository = new Mock<ICategoryFileTypeRepository>();
             var userRepository = new Mock<IUserRepository>();
             userRepository.Setup(
                 m => m.FindAsync(1))
@@ -62,8 +63,9 @@ namespace Ocuda.test.Ops.Service.Test
                     });
 
             var categoryService = new CategoryService(
-                categoryLogger.Object, 
-                categoryRepository.Object, 
+                categoryLogger.Object,
+                categoryRepository.Object,
+                categoryFileTypeRepository.Object,
                 sectionRepository.Object,
                 userRepository.Object);
 

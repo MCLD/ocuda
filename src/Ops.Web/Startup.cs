@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -169,6 +170,8 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Utility.Helpers.WebHelper>();
 
             // repositories
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryFileTypeRepository,
+                Data.Ops.CategoryFileTypeRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
                 Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,
@@ -193,6 +196,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.SectionRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ISiteSettingRepository,
                 Data.Ops.SiteSettingRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IThumbnailRepository,
+                Data.Ops.ThumbnailRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserRepository,
                 Data.Ops.UserRepository>();
 
@@ -213,6 +218,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IRosterService, RosterService>();
             services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<ISiteSettingService, SiteSettingService>();
+            services.AddScoped<IThumbnailService, ThumbnailService>();
             services.AddScoped<IUserService, UserService>();
 
             var serviceProvider = services.BuildServiceProvider();
@@ -227,6 +233,27 @@ namespace Ocuda.Ops.Web
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider
+                    = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+                        Path.Combine(Path.GetFullPath("Styles"))),
+                    RequestPath = new Microsoft.AspNetCore.Http.PathString("/devstyles")
+                });
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider
+                    = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+                        Path.Combine(Path.GetFullPath("Scripts"))),
+                    RequestPath = new Microsoft.AspNetCore.Http.PathString("/devscripts")
+                });
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider
+                    = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+                        Path.Combine(Path.GetFullPath("bower_components"))),
+                    RequestPath = new Microsoft.AspNetCore.Http.PathString("/devbower")
+                });
             }
             else
             {

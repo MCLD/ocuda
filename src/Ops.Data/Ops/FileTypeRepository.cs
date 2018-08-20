@@ -17,6 +17,15 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
+        public async Task<ICollection<FileType>> GetAllExtensionsAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.IsDefault == false || !string.IsNullOrWhiteSpace(_.Extension))
+                .OrderBy(_ => _.Extension)
+                .ToListAsync();
+        }
+
         public async Task<FileType> GetByExtensionAsync(string extension)
         {
             var query = DbSet
@@ -28,6 +37,24 @@ namespace Ocuda.Ops.Data.Ops
                 query = DbSet
                     .AsNoTracking()
                     .Where(_ => _.IsDefault == true);
+            }
+
+            return await query.FirstOrDefaultAsync();
+        }
+
+        public async Task<int> GetIdByExtensionAsync(string extension)
+        {
+            var query = DbSet
+                .AsNoTracking()
+                .Where(_ => _.Extension == extension)
+                .Select(_ => _.Id);
+
+            if (query.Count() == 0)
+            {
+                query = DbSet
+                    .AsNoTracking()
+                    .Where(_ => _.IsDefault == true)
+                    .Select(_ => _.Id);
             }
 
             return await query.FirstOrDefaultAsync();

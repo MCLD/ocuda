@@ -1,5 +1,7 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Ops.Models
 {
@@ -10,9 +12,6 @@ namespace Ocuda.Ops.Models
         [Required]
         [MaxLength(255)]
         public string Name { get; set; }
-        [MaxLength(255)]
-        public string Type { get; set; }
-        public string Icon { get; set; }
         public string Extension { get; set; }
         [MaxLength(255)]
         public string Description { get; set; }
@@ -24,7 +23,12 @@ namespace Ocuda.Ops.Models
         public int? CategoryId { get; set; }
         public Category Category { get; set; }
 
+        public int FileTypeId { get; set; }
+        public FileType FileType { get; set; }
+
         public int? PageId { get; set; }
         public int? PostId { get; set; }
+
+        public ICollection<Thumbnail> Thumbnails { get; set; }
     }
 }

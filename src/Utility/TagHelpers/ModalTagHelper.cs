@@ -15,6 +15,7 @@ namespace Ocuda.Utility.TagHelpers
         private const string idAttributeName = "id";
         private const string nameAttributeName = "name";
         private const string typeAttributeName = "type";
+        private const string isNonSubmitAttributeName = "isNonSubmit";
         private const string containerClass = "row";
         private const string modalClass = "modal fade";
         private const string dialogClass = "modal-dialog";
@@ -28,6 +29,7 @@ namespace Ocuda.Utility.TagHelpers
         private const string bodyDeleteTextClass = "modal-text";
         private const string footerClass = "modal-footer";
         private const string cancelButtonClass = "btn btn-outline-secondary";
+        private const string confirmButtonClass = "modal-btn-confirm";
         private const string deleteButtonClass = "btn btn-danger btn-spinner";
         private const string saveButtonClass = "btn btn-success btn-spinner";
         private const string footerDeleteIconClass = "fa fa-times";
@@ -48,6 +50,9 @@ namespace Ocuda.Utility.TagHelpers
 
         [HtmlAttributeName(typeAttributeName)]
         public ModalTypes? Type { get; set; }
+
+        [HtmlAttributeName(isNonSubmitAttributeName)]
+        public bool IsNonSubmit { get; set; }
 
         [ViewContext]
         [HtmlAttributeNotBound]
@@ -147,7 +152,18 @@ namespace Ocuda.Utility.TagHelpers
             cancelButton.Attributes.Add("data-dismiss", "modal");
             cancelButton.InnerHtml.Append("Cancel");
             var confirmButton = new TagBuilder("button");
-            confirmButton.Attributes.Add("type", "submit");
+            confirmButton.AddCssClass(confirmButtonClass);
+
+            if(IsNonSubmit)
+            {
+                confirmButton.Attributes.Add("type", "button");
+                confirmButton.Attributes.Add("data-dismiss", "modal");
+            }
+            else
+            {
+                confirmButton.Attributes.Add("type", "submit");
+            }
+            
             var icon = new TagBuilder("span");
             confirmButton.InnerHtml.AppendHtml(icon);
 

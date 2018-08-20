@@ -19,8 +19,15 @@
             @Html.Raw(Model.Content)
         </div>
         <div class="card-footer d-flex">
-            <div class="flex-grow-1">Posted by <a href="#">@Model.CreatedBy</a></div>
-            <div>@Model.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")</div>
+            <div class="flex-grow-1 mr-2">
+                Posted by
+                <a asp-controller="Profile"
+                   asp-action="@nameof(ProfileController.Index)"
+                   asp-route-id="@Model.CreatedByUsername">
+                    @Model.CreatedByName
+                </a>
+            </div>
+            @Model.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")
         </div>
     </div>
 </div>

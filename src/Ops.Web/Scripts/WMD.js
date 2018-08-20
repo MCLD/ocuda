@@ -1055,12 +1055,12 @@ Markdown.HookCollection = HookCollection;
             if (isCancel) {
                 text = null;
             }
-            else {
-                // Fixes common pasting errors.
-                text = text.replace(/^http:\/\/(https?|ftp):\/\//, '$1://');
-                if (!/^(?:https?|ftp):\/\//.test(text))
-                    text = 'http://' + text;
-            }
+            //else {
+            //    // Fixes common pasting errors.
+            //    //text = text.replace(/^http:\/\/(https?|ftp):\/\//, '$1://');
+            //    //if (!/^(?:https?|ftp):\/\//.test(text))
+            //    //    text = 'http://' + text;
+            //}
 
             dialog.parentNode.removeChild(dialog);
 

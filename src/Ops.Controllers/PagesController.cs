@@ -14,14 +14,18 @@ namespace Ocuda.Ops.Controllers
     {
         private readonly IPageService _pageService;
         private readonly ISectionService _sectionService;
+        private readonly IUserService _userService;
 
         public PagesController(ServiceFacades.Controller<PagesController> context,
-            IPageService pageService, 
-            ISectionService sectionService) : base(context)
+            IPageService pageService,
+            ISectionService sectionService,
+            IUserService userService) : base(context)
         {
             _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
-            _sectionService = sectionService 
+            _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(sectionService));
+            _userService = userService
+                ?? throw new ArgumentNullException(nameof(userService));
         }
 
         public async Task<IActionResult> Index(string section, int page = 1)
@@ -53,6 +57,13 @@ namespace Ocuda.Ops.Controllers
                     });
             }
 
+            foreach (var ocPage in pageList.Data)
+            {
+                var userInfo = await _userService.GetUserInfoById(ocPage.CreatedBy);
+                ocPage.CreatedByName = userInfo.Item1;
+                ocPage.CreatedByUsername = userInfo.Item2;
+            }
+
             var viewModel = new IndexViewModel
             {
                 PaginateModel = paginateModel,
@@ -67,8 +78,11 @@ namespace Ocuda.Ops.Controllers
             var currentSection = await _sectionService.GetByPathAsync(section);
             var page = await _pageService.GetByStubAndSectionIdAsync(id, currentSection.Id);
 
-            if(page != null)
+            if (page != null)
             {
+                var userInfo = await _userService.GetUserInfoById(page.CreatedBy);
+                page.CreatedByName = userInfo.Item1;
+                page.CreatedByUsername = userInfo.Item2;
                 page.Content = CommonMark.CommonMarkConverter.Convert(page.Content);
                 return View(page);
             }
@@ -78,7 +92,7 @@ namespace Ocuda.Ops.Controllers
                 return RedirectToAction(nameof(PagesController.Index));
             }
 
-            
+
         }
     }
 }

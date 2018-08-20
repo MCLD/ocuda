@@ -20,9 +20,22 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
-        public async Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter)
+        public override async Task<File> FindAsync(int id)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Include(_ => _.Thumbnails)
+                .Where(_ => _.Id == id)
+                .SingleOrDefaultAsync();
+        }
+
+        public async Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(
+            BlogFilter filter, bool isGallery)
         {
             var query = DbSet.AsNoTracking();
+
+            query = query.Include(_ => _.Category);
+            query = query.Where(_ => _.Category.IsAttachment == false);
 
             if (filter.CategoryId.HasValue)
             {
@@ -33,6 +46,14 @@ namespace Ocuda.Ops.Data.Ops
                 query = query.Where(_ => _.SectionId == filter.SectionId);
             }
 
+            query = query.Include(_ => _.FileType);
+            query = query.Include(_ => _.Thumbnails);
+
+            if (isGallery)
+            {
+                query = query.Where(_ => _.Thumbnails.Count > 0);
+            }
+
             return new DataWithCount<ICollection<File>>
             {
                 Count = await query.CountAsync(),
@@ -41,6 +62,32 @@ namespace Ocuda.Ops.Data.Ops
                     .ApplyPagination(filter)
                     .ToListAsync()
             };
+        }
+
+        public async Task<IEnumerable<int>> GetFileTypeIdsInUseByCategoryId(int categoryId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.CategoryId == categoryId)
+                .Select(_ => _.FileTypeId)
+                .Distinct()
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<File>> GetByPageIdAsync(int pageId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.PageId == pageId)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<File>> GetByPostIdAsync(int postId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.PostId == postId)
+                .ToListAsync();
         }
     }
 }

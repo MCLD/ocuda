@@ -21,16 +21,23 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Authorize(Policy = nameof(SectionManagerRequirement))]
     public class PostsController : BaseController<PostsController>
     {
+        private readonly IFileService _fileService;
         private readonly IPostService _postService;
         private readonly ISectionService _sectionService;
+        private readonly IUserService _userService;
 
         public PostsController(ServiceFacades.Controller<PostsController> context,
+            IFileService fileService,
             IPostService postService,
-            ISectionService sectionService) : base(context)
+            ISectionService sectionService,
+            IUserService userService) : base(context)
         {
+            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
             _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(sectionService));
+            _userService = userService
+                ?? throw new ArgumentNullException(nameof(userService));
         }
 
         public async Task<IActionResult> Index(string section, int page = 1)
@@ -60,6 +67,13 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     {
                         page = paginateModel.LastPage ?? 1
                     });
+            }
+
+            foreach(var post in postList.Data)
+            {
+                var userInfo = await _userService.GetUserInfoById(post.CreatedBy);
+                post.CreatedByName = userInfo.Item1;
+                post.CreatedByUsername = userInfo.Item2;
             }
 
             var viewModel = new IndexViewModel()
@@ -101,13 +115,15 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         public async Task<IActionResult> Edit(int id)
         {
             var post = await _postService.GetByIdAsync(id);
+            var attachments = await _fileService.GetByPostIdAsync(id);
 
             var viewModel = new DetailViewModel()
             {
                 Action = nameof(Edit),
                 Post = post,
                 SectionId = post.SectionId,
-                IsDraft = post.IsDraft
+                IsDraft = post.IsDraft,
+                Attachments = attachments
             };
 
             return View("Detail", viewModel);

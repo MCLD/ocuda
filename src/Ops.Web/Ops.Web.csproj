@@ -57,6 +57,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="bower_components\bootstrap-multiselect\.bower.json" />
+    <Content Include="bower_components\bootstrap-multiselect\bower.json" />
+    <Content Include="bower_components\bootstrap-multiselect\dist\css\bootstrap-multiselect.css" />
+    <Content Include="bower_components\bootstrap-multiselect\docs\css\bootstrap-3.3.2.min.css" />
+    <Content Include="bower_components\bootstrap-multiselect\docs\css\bootstrap-example.min.css" />
+    <Content Include="bower_components\bootstrap-multiselect\docs\css\prettify.min.css" />
+    <Content Include="bower_components\bootstrap-multiselect\docs\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="bower_components\bootstrap-multiselect\docs\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="bower_components\bootstrap-multiselect\docs\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="bower_components\bootstrap-multiselect\package.json" />
+    <Content Include="bower_components\bootstrap-multiselect\tests\lib\jasmine-2.4.1\jasmine.css" />
+    <Content Include="bower_components\bootstrap-multiselect\types\bootstrap-multiselect\tsconfig.json" />
+    <Content Include="bower_components\bootstrap-multiselect\types\bootstrap-multiselect\tslint.json" />
     <Content Include="bower_components\commonmark\.bower.json" />
     <Content Include="bower_components\commonmark\bower.json" />
     <Content Include="bower_components\commonmark\changelog.txt" />
@@ -65,6 +78,24 @@
   <ItemGroup>
     <None Include="appsettings.Development.json" />
     <None Include="bower.json" />
+    <None Include="bower_components\bootstrap-multiselect\.travis.yml" />
+    <None Include="bower_components\bootstrap-multiselect\dist\js\bootstrap-multiselect.js" />
+    <None Include="bower_components\bootstrap-multiselect\dist\less\bootstrap-multiselect.less" />
+    <None Include="bower_components\bootstrap-multiselect\docs\fonts\glyphicons-halflings-regular.svg" />
+    <None Include="bower_components\bootstrap-multiselect\docs\fonts\glyphicons-halflings-regular.woff2" />
+    <None Include="bower_components\bootstrap-multiselect\docs\js\bootstrap-3.3.2.min.js" />
+    <None Include="bower_components\bootstrap-multiselect\docs\js\jquery-2.1.3.min.js" />
+    <None Include="bower_components\bootstrap-multiselect\docs\js\prettify.min.js" />
+    <None Include="bower_components\bootstrap-multiselect\docs\js\require-2.3.5.min.js" />
+    <None Include="bower_components\bootstrap-multiselect\docs\less\bootstrap-example.less" />
+    <None Include="bower_components\bootstrap-multiselect\tests\karma.conf.js" />
+    <None Include="bower_components\bootstrap-multiselect\tests\lib\jasmine-2.4.1\boot.js" />
+    <None Include="bower_components\bootstrap-multiselect\tests\lib\jasmine-2.4.1\console.js" />
+    <None Include="bower_components\bootstrap-multiselect\tests\lib\jasmine-2.4.1\jasmine-html.js" />
+    <None Include="bower_components\bootstrap-multiselect\tests\lib\jasmine-2.4.1\jasmine.js" />
+    <None Include="bower_components\bootstrap-multiselect\tests\lib\MIT.LICENSE" />
+    <None Include="bower_components\bootstrap-multiselect\tests\spec\bootstrap-multiselect.js" />
+    <None Include="bower_components\bootstrap-multiselect\yarn.lock" />
     <None Include="bower_components\bootstrap\.babelrc.js" />
     <None Include="bower_components\bootstrap\.bower.json" />
     <None Include="bower_components\bootstrap\.editorconfig" />
@@ -3249,6 +3280,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Shared\" />
     <Folder Include="Views\Error\" />
   </ItemGroup>
 
@@ -3262,6 +3294,11 @@
     <ProjectReference Include="..\Ops.Models\Ops.Models.csproj" />
     <ProjectReference Include="..\Ops.Service\Ops.Service.csproj" />
     <ProjectReference Include="..\Promenade.Models\Promenade.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="bower_components\bootstrap-multiselect\types\bootstrap-multiselect\bootstrap-multiselect-tests.ts" />
+    <TypeScriptCompile Include="bower_components\bootstrap-multiselect\types\bootstrap-multiselect\index.d.ts" />
   </ItemGroup>
 
 </Project>

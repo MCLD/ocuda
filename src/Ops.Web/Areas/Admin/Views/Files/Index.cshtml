@@ -1,5 +1,16 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Files.IndexViewModel
 
+<form id="addForm" asp-controller="Files" asp-action="@(nameof(FilesController.Create))" method="get" role="form">
+    <div modal id="addModal" name="File" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+        <select id="addCategory" class="w-auto" asp-for="@Model.CategoryId" formgroup>
+            @foreach (var category in Model.Categories)
+            {
+                <option value="@category.Id">@category.Name</option>
+            }
+        </select>
+    </div>
+</form>
+
 <form asp-controller="Files" asp-action="@(nameof(FilesController.Delete))" method="post" role="form">
     <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
     <input id="deleteName" asp-for="File.Name" type="hidden" />
@@ -8,7 +19,11 @@
 </form>
 
 <div class="mb-2">
-    <a class="btn btn-outline-secondary text-dark" asp-action="@(nameof(FilesController.Create))">Add New File</a>
+    <button class="btn btn-outline-secondary text-dark"
+            data-toggle="modal"
+            data-target="#addModal">
+        Add New File
+    </button>
     <a class="btn btn-secondary float-right" asp-action="@(nameof(FilesController.Categories))">Manage Categories</a>
 </div>
 
@@ -46,6 +61,7 @@ else
             <tr>
                 <th>File Name</th>
                 <th>Description</th>
+                <th>Thumbnails</th>
                 <th>Creator</th>
                 <th>Creation Date</th>
                 <th>Featured</th>
@@ -58,11 +74,12 @@ else
                 <tr>
                     <td class="rowlink-parent">
                         <a asp-action="@(nameof(FilesController.Edit))" asp-route-id="@file.Id" class="rowlink">
-                            <span class="@file.Icon"></span> @file.Name
+                            <span class="@file.FileType.Icon"></span> @file.Name
                         </a>
                     </td>
                     <td>@file.Description</td>
-                    <td>@file.CreatedBy</td>
+                    <td>@file.Thumbnails.Count()</td>
+                    <td>@file.CreatedByName</td>
                     <td>@file.CreatedAt</td>
                     <td>@file.IsFeatured</td>
                     <td align="center" class="on-top">
