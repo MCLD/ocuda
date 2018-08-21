@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models;
 
@@ -17,5 +16,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task LoggedInUpdateAsync(User user);
         Task<User> UpdateRosterUserAsync(int rosterUserId, User user);
         Task<Tuple<string, string>> GetUserInfoById(int id);
+        Task<ICollection<User>> GetDirectReportsAsync(int supervisorId);
     }
 }

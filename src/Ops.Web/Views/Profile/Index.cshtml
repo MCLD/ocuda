@@ -37,12 +37,42 @@
 
     <div class="row">
         <div class="col-sm-3 text-sm-right font-weight-bold">Supervisor</div>
-        <div class="col-sm-9">@(Model.User.Supervisor?.Name ?? "None")</div>
+        <div class="col-sm-9">
+            @if (Model.User.Supervisor?.Name == null)
+            {
+                @:None
+            }
+            else
+            {
+                <a href="@Url.Action("Index", "Profile", new { id = Model.User.Supervisor.Username})">@Model.User.Supervisor.Name</a>
+            }
+        </div>
     </div>
+
+    @if (Model.DirectReports != null && Model.DirectReports.Count > 0)
+    {
+        <div class="row">
+            <div class="col-sm-3 text-sm-right font-weight-bold">Direct reports</div>
+            <div class="col-sm-9">
+                @foreach (var directReport in Model.DirectReports)
+                {
+                    @if (string.IsNullOrEmpty(directReport.Username))
+                    {
+                        @directReport.Name<br />
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("Index", "Profile", new { id = directReport.Username })">@directReport.Name</a><br />
+                    }
+                }
+            </div>
+        </div>
+
+    }
 
     <div class="row">
         <div class="col-sm-3 text-sm-right font-weight-bold">Email</div>
-        <div class="col-sm-9">@Model.User.Email</div>
+        <div class="col-sm-9"><a href="mailto:@Model.User.Email">@Model.User.Email</a></div>
     </div>
 
     <div class="row">
