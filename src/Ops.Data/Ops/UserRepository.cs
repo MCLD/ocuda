@@ -73,12 +73,26 @@ namespace Ocuda.Ops.Data.Ops
 
         public async Task<Tuple<string, string>> GetUserInfoById(int id)
         {
-            var user = await DbSet
+            User user = await DbSet
                 .AsNoTracking()
                 .Where(_ => _.Id == id)
                 .FirstOrDefaultAsync();
 
             return new Tuple<string, string>(user.Name, user.Username);
+        }
+
+        public async Task<ICollection<User>> GetDirectReportsAsync(int supervisorId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.SupervisorId == supervisorId)
+                .Select(_ => new User
+                {
+                    Name = _.Name,
+                    Username = _.Username
+                })
+                .OrderBy(_ => _.Name)
+                .ToListAsync();
         }
 
         #region Initial setup methods

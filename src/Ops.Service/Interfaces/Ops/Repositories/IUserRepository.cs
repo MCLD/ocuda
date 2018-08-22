@@ -14,5 +14,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         Task<bool> IsDuplicateUsername(User user);
         Task<bool> IsDuplicateEmail(User user);
         Task<Tuple<string, string>> GetUserInfoById(int id);
+        Task<ICollection<User>> GetDirectReportsAsync(int supervisorId);
     }
 }

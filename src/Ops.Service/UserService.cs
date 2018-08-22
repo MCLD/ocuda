@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models;
@@ -18,7 +19,7 @@ namespace Ocuda.Ops.Service
         {
             _logger = logger
                ?? throw new ArgumentNullException(nameof(logger));
-            _userRepository = userRepository 
+            _userRepository = userRepository
                 ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
@@ -32,7 +33,7 @@ namespace Ocuda.Ops.Service
             return await _userRepository.FindByEmailAsync(email?.Trim().ToLower());
         }
 
-        public async Task<Tuple<string,string>> GetUserInfoById(int id)
+        public async Task<Tuple<string, string>> GetUserInfoById(int id)
         {
             return await _userRepository.GetUserInfoById(id);
         }
@@ -42,7 +43,7 @@ namespace Ocuda.Ops.Service
             user.Username = user.Username?.Trim().ToLower();
             user.Email = user.Email?.Trim().ToLower();
             user.CreatedAt = DateTime.Now;
-            if(createdById != null)
+            if (createdById != null)
             {
                 user.CreatedBy = (int)createdById;
             }
@@ -56,7 +57,7 @@ namespace Ocuda.Ops.Service
                 return user;
             }
             {
-                var createdUser = await _userRepository.FindByUsernameAsync(user.Username);
+                User createdUser = await _userRepository.FindByUsernameAsync(user.Username);
                 createdUser.CreatedBy = createdUser.Id;
                 _userRepository.Update(user);
                 await _userRepository.SaveAsync();
@@ -69,7 +70,7 @@ namespace Ocuda.Ops.Service
         /// </summary>
         public async Task<User> EnsureSysadminUserAsync()
         {
-            var sysadminUser = await _userRepository.GetSystemAdministratorAsync();
+            User sysadminUser = await _userRepository.GetSystemAdministratorAsync();
             if (sysadminUser == null)
             {
                 sysadminUser = new User
@@ -91,7 +92,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<User> EditNicknameAsync(User user)
         {
-            var currentUser = await _userRepository.FindAsync(user.Id);
+            User currentUser = await _userRepository.FindAsync(user.Id);
             currentUser.Nickname = user.Nickname;
 
             await ValidateUserAsync(currentUser);
@@ -103,7 +104,7 @@ namespace Ocuda.Ops.Service
 
         public async Task LoggedInUpdateAsync(User user)
         {
-            var dbUser = await GetByIdAsync(user.Id);
+            User dbUser = await GetByIdAsync(user.Id);
             dbUser.LastRosterUpdate = user.LastRosterUpdate;
             dbUser.LastSeen = DateTime.Now;
             dbUser.ReauthenticateUser = false;
@@ -118,7 +119,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<User> UpdateRosterUserAsync(int rosterUserId, User user)
         {
-            var rosterUser = await GetByIdAsync(rosterUserId);
+            User rosterUser = await GetByIdAsync(rosterUserId);
             rosterUser.Email = user.Email;
             rosterUser.Name = user.Name;
             rosterUser.Nickname = user.Nickname;
@@ -133,7 +134,7 @@ namespace Ocuda.Ops.Service
 
         public async Task ValidateUserAsync(User user)
         {
-            var message = string.Empty;
+            string message = string.Empty;
 
             if (!string.IsNullOrWhiteSpace(user.Username))
             {
@@ -145,7 +146,7 @@ namespace Ocuda.Ops.Service
                 }
             }
             else
-            { 
+            {
                 message = $"Username cannot be empty.";
                 _logger.LogWarning(message);
                 throw new OcudaException(message);
@@ -159,11 +160,11 @@ namespace Ocuda.Ops.Service
                     _logger.LogWarning(message, user.Email);
                     throw new OcudaException(message);
                 }
-            }         
- 
-            if(user.SupervisorId.HasValue)
+            }
+
+            if (user.SupervisorId.HasValue)
             {
-                var supervisor = await _userRepository.FindAsync(user.SupervisorId.Value);
+                User supervisor = await _userRepository.FindAsync(user.SupervisorId.Value);
                 if (supervisor == null)
                 {
                     message = $"SupervisorId '{user.SupervisorId}' is not valid.";
@@ -171,6 +172,11 @@ namespace Ocuda.Ops.Service
                     throw new OcudaException(message);
                 }
             }
+        }
+
+        public async Task<ICollection<User>> GetDirectReportsAsync(int supervisorId)
+        {
+            return await _userRepository.GetDirectReportsAsync(supervisorId);
         }
     }
 }

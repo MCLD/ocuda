@@ -46,6 +46,8 @@ namespace Ocuda.Ops.Controllers
                     await _userService.GetByIdAsync(viewModel.User.SupervisorId.Value);
             }
 
+            viewModel.DirectReports = await _userService.GetDirectReportsAsync(viewModel.User.Id);
+
             if (viewModel.User.Username == CurrentUsername)
             {
                 viewModel.CanEdit = true;

@@ -94,10 +94,7 @@ namespace Ocuda.Ops.Controllers.Abstract
         {
             get
             {
-                return HttpContext.User.Claims
-                    .Where(_ => _.Type == ClaimType.Username)
-                    .FirstOrDefault()?
-                    .Value;
+                return HttpContext.User.Identity.Name;
             }
         }
 
