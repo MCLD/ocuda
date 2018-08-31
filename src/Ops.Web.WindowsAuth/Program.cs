@@ -16,7 +16,6 @@ namespace Ops.Web.WindowsAuth
         {
             var applicationName = Assembly.GetExecutingAssembly().GetName().Name;
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-            var id = Process.GetCurrentProcess().Id;
 
             string logPath = "logs";
             string logFile = "log-{Date}.txt";
