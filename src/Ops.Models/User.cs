@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Ops.Models
@@ -25,6 +26,7 @@ namespace Ocuda.Ops.Models
         public string Title { get; set; }
         [MaxLength(255)]
         public string Email { get; set; }
+        [MaxLength(255)]
         public string Phone { get; set; }
         public int? EmployeeId { get; set; }
         public DateTime? ServiceStartDate { get; set; }
@@ -35,5 +37,7 @@ namespace Ocuda.Ops.Models
 
         public bool? IsInLatestRoster { get; set; }
         public bool IsDeleted { get; set; }
+
+        public ICollection<UserMetadata> Metadata { get; set; }
     }
 }

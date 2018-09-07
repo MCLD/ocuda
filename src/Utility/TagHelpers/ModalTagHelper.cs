@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -15,17 +15,19 @@ namespace Ocuda.Utility.TagHelpers
         private const string idAttributeName = "id";
         private const string nameAttributeName = "name";
         private const string typeAttributeName = "type";
+        private const string isLargeAttributeName = "isLarge";
         private const string isNonSubmitAttributeName = "isNonSubmit";
         private const string containerClass = "row";
         private const string modalClass = "modal fade";
         private const string dialogClass = "modal-dialog";
+        private const string modalLargeClass = "modal-lg";
         private const string contentClass = "modal-content";
         private const string headerClass = "modal-header";
         private const string headerTitleClass = "modal-title";
         private const string headerButtonClass = "close";
         private const string headerIconClass = "fa fa-times";
         private const string bodyClass = "modal-body";
-        private const string bodyDeleteIconClass = "fa fa-exclamation-triangle";
+        private const string bodyDeleteIconClass = "fa fa-exclamation-triangle modal-icon";
         private const string bodyDeleteTextClass = "modal-text";
         private const string footerClass = "modal-footer";
         private const string cancelButtonClass = "btn btn-outline-secondary";
@@ -51,6 +53,9 @@ namespace Ocuda.Utility.TagHelpers
         [HtmlAttributeName(typeAttributeName)]
         public ModalTypes? Type { get; set; }
 
+        [HtmlAttributeName(isLargeAttributeName)]
+        public bool IsLarge { get; set; }
+
         [HtmlAttributeName(isNonSubmitAttributeName)]
         public bool IsNonSubmit { get; set; }
 
@@ -62,23 +67,42 @@ namespace Ocuda.Utility.TagHelpers
         {
             var content = new TagBuilder("div");
             content.AddCssClass(contentClass);
-            content.InnerHtml.AppendHtml(CreateHeader()).AppendHtml(await CreateBody(output));
-            if (Type.HasValue)
-            {
-                content.InnerHtml.AppendHtml(CreateFooter());
-            }
+            content.InnerHtml.AppendHtml(CreateHeader())
+                .AppendHtml(await CreateBody(output))
+                .AppendHtml(CreateFooter());
 
             var dialog = new TagBuilder("div");
-            dialog.AddCssClass(dialogClass);
+            var appenededDialogClass = dialogClass;
+            if (IsLarge)
+            {
+                appenededDialogClass += $" {modalLargeClass}";
+            }
+            dialog.AddCssClass(appenededDialogClass);
             dialog.Attributes.Add("role", "document");
             dialog.InnerHtml.AppendHtml(content);
 
             var modal = new TagBuilder("div");
-            modal.AddCssClass(modalClass);
+
+            var appendedModalClass = modalClass;
+            var tagClass = output.Attributes.FirstOrDefault(_ => _.Name == "class");
+            if (tagClass != null)
+            {
+                appendedModalClass += $" {tagClass.Value}";
+            }
+            modal.AddCssClass(appendedModalClass);
+
             modal.Attributes.Add("id", Id);
             modal.Attributes.Add("tabindex", "-1");
             modal.Attributes.Add("role", "dialog");
             modal.InnerHtml.AppendHtml(dialog);
+
+            var dataAttributes = output.Attributes.Where(_ => _.Name.StartsWith("data-")).ToList();
+
+            foreach (var attribute in dataAttributes)
+            {
+                modal.Attributes.Add(attribute.Name, attribute.Value.ToString());
+                output.Attributes.Remove(attribute);
+            }
 
             output.Content.SetHtmlContent(modal);
             output.Attributes.SetAttribute("class", containerClass);
@@ -126,6 +150,8 @@ namespace Ocuda.Utility.TagHelpers
         {
             var body = new TagBuilder("div");
             body.AddCssClass(bodyClass);
+            body.InnerHtml.AppendHtml(await output.GetChildContentAsync());
+
             if (Type == ModalTypes.Delete)
             {
                 var icon = new TagBuilder("span");
@@ -136,57 +162,63 @@ namespace Ocuda.Utility.TagHelpers
                 text.AddCssClass(bodyDeleteTextClass);
                 body.InnerHtml.AppendHtml(text);
             }
-            else
-            {
-                body.InnerHtml.AppendHtml(await output.GetChildContentAsync());
-            }
 
             return body;
         }
 
         public TagBuilder CreateFooter()
         {
+            var footer = new TagBuilder("div");
+            footer.AddCssClass(footerClass);
+
             var cancelButton = new TagBuilder("button");
             cancelButton.AddCssClass(cancelButtonClass);
             cancelButton.Attributes.Add("type", "button");
             cancelButton.Attributes.Add("data-dismiss", "modal");
-            cancelButton.InnerHtml.Append("Cancel");
-            var confirmButton = new TagBuilder("button");
-            confirmButton.AddCssClass(confirmButtonClass);
 
-            if(IsNonSubmit)
+            if (!Type.HasValue)
             {
-                confirmButton.Attributes.Add("type", "button");
-                confirmButton.Attributes.Add("data-dismiss", "modal");
+                cancelButton.InnerHtml.Append("Close");
+                footer.InnerHtml.AppendHtml(cancelButton);
             }
             else
             {
-                confirmButton.Attributes.Add("type", "submit");
-            }
-            
-            var icon = new TagBuilder("span");
-            confirmButton.InnerHtml.AppendHtml(icon);
+                cancelButton.InnerHtml.Append("Cancel");
+                footer.InnerHtml.AppendHtml(cancelButton);
+                var confirmButton = new TagBuilder("button");
+                confirmButton.AddCssClass(confirmButtonClass);
 
-            if (Type == ModalTypes.Delete)
-            {
-                confirmButton.AddCssClass(deleteButtonClass);
-                icon.AddCssClass(footerDeleteIconClass);
-                confirmButton.InnerHtml.Append(" Delete ");
-            }
-            else
-            {
-                confirmButton.AddCssClass(saveButtonClass);
-                icon.AddCssClass(footerSaveIconClass);
-                confirmButton.InnerHtml.Append(" Save ");
-            }
+                if (IsNonSubmit)
+                {
+                    confirmButton.Attributes.Add("type", "button");
+                }
+                else
+                {
+                    confirmButton.Attributes.Add("type", "submit");
+                }
 
-            var spinner = new TagBuilder("span");
-            spinner.AddCssClass(buttonSpinnerClass);
-            confirmButton.InnerHtml.AppendHtml(spinner);
+                var icon = new TagBuilder("span");
+                confirmButton.InnerHtml.AppendHtml(icon);
 
-            var footer = new TagBuilder("div");
-            footer.AddCssClass(footerClass);
-            footer.InnerHtml.AppendHtml(cancelButton).AppendHtml(confirmButton);
+                if (Type == ModalTypes.Delete)
+                {
+                    confirmButton.AddCssClass(deleteButtonClass);
+                    icon.AddCssClass(footerDeleteIconClass);
+                    confirmButton.InnerHtml.Append(" Delete ");
+                }
+                else
+                {
+                    confirmButton.AddCssClass(saveButtonClass);
+                    icon.AddCssClass(footerSaveIconClass);
+                    confirmButton.InnerHtml.Append(" Save ");
+                }
+
+                var spinner = new TagBuilder("span");
+                spinner.AddCssClass(buttonSpinnerClass);
+                confirmButton.InnerHtml.AppendHtml(spinner);
+
+                footer.InnerHtml.AppendHtml(confirmButton);
+            }
 
             return footer;
         }

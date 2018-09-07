@@ -16,6 +16,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<ICollection<Category>> InsertFileCategoriesAsync(Section section);
         Task InsertFileTypesAsync();
         Task InsertPagesAsync(int sectionId);
+        Task InsertUserMetadataTypesAsync();
         Task InsertUsersAsync();
     }
 }

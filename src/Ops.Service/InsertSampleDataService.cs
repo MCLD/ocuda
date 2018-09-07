@@ -19,6 +19,7 @@ namespace Ocuda.Ops.Service
         private readonly IPostRepository _postRepository;
         private readonly ISectionRepository _sectionRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IUserMetadataTypeRepository _userMetadataTypeRepository;
         private readonly ISiteSettingRepository _siteSettingRepository;
         private readonly ICategoryService _categoryService;
 
@@ -29,6 +30,7 @@ namespace Ocuda.Ops.Service
             IPageRepository pageRepository,
             IPostRepository postRepository,
             ISectionRepository sectionRepository,
+            IUserMetadataTypeRepository userMetadataTypeRepository,
             IUserRepository userRepository,
             ISiteSettingRepository siteSettingRepository,
             ICategoryService categoryService)
@@ -47,6 +49,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(postRepository));
             _sectionRepository = sectionRepository
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
+            _userMetadataTypeRepository = userMetadataTypeRepository
+                ?? throw new ArgumentNullException(nameof(userMetadataTypeRepository));
             _userRepository = userRepository
                 ?? throw new ArgumentNullException(nameof(userRepository));
             _pageRepository = pageRepository
@@ -76,6 +80,7 @@ namespace Ocuda.Ops.Service
             var defaultSection = await _sectionRepository.GetDefaultSectionAsync();
             sections.Add(defaultSection);
 
+            await InsertUserMetadataTypesAsync();
             await InsertUsersAsync();
             await InsertFileTypesAsync();
 
@@ -456,6 +461,25 @@ namespace Ocuda.Ops.Service
             });
 
             await _pageRepository.SaveAsync();
+        }
+
+        public async Task InsertUserMetadataTypesAsync()
+        {
+            await _userMetadataTypeRepository.AddAsync(new UserMetadataType
+            {
+                CreatedAt = DateTime.Now,
+                CreatedBy = SystemAdministrator.Id,
+                IsPublic = false,
+                Name = "Barcode"
+            });
+
+            await _userMetadataTypeRepository.AddAsync(new UserMetadataType
+            {
+                CreatedAt = DateTime.Now,
+                CreatedBy = SystemAdministrator.Id,
+                IsPublic = true,
+                Name = "Favorite Book"
+            });
         }
 
         public async Task InsertUsersAsync()
