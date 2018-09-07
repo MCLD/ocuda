@@ -9,6 +9,7 @@
     <Copyright>2018 Maricopa County Library District</Copyright>
     <RepositoryType>Git</RepositoryType>
     <UserSecretsId>eb6c2377-84db-46df-9f5d-fde6a5ab4b8f</UserSecretsId>
+    <RuntimeFrameworkVersion>2.1.3</RuntimeFrameworkVersion>
   </PropertyGroup>
 
   <ItemGroup>
