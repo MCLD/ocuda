@@ -87,8 +87,7 @@ namespace Ocuda.Utility.TagHelpers
             inputTag.MergeAttribute("type", "number");
             inputTag.MergeAttribute("min", "1");
             inputTag.MergeAttribute("max", model.MaxPage.ToString());
-            inputTag.MergeAttribute("class", "form-control page-link");
-            inputTag.MergeAttribute("style", $"width:80px;");
+            inputTag.MergeAttribute("class", "page-link page-input");
             inputTag.MergeAttribute("value", model.CurrentPage.ToString());
             inputTag.TagRenderMode = TagRenderMode.Normal;
 

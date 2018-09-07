@@ -19,11 +19,18 @@ namespace Ocuda.Ops.Data
                 relationship.DeleteBehavior = DeleteBehavior.Restrict;
             }
 
+            // configure composite keys
+            // https://docs.microsoft.com/en-us/ef/core/modeling/keys
+            modelBuilder.Entity<Models.UserMetadata>()
+                .HasKey(_ => new { _.UserId, _.UserMetadataTypeId });
+
+            /*
             var categoryConverter = new EnumToNumberConverter<Models.CategoryType, int>();
             modelBuilder
                 .Entity<Models.Category>()
                 .Property(_ => _.CategoryType)
                 .HasConversion(categoryConverter);
+            */
         }
 
         #region IMigratableContext
@@ -33,7 +40,7 @@ namespace Ocuda.Ops.Data
         #endregion IMigratableContext
 
         public DbSet<Models.Category> Categories { get; set; }
-        public DbSet<Models.ClaimGroup> ClaimGroup { get; set; }
+        public DbSet<Models.ClaimGroup> ClaimGroups { get; set; }
         public DbSet<Models.CategoryFileType> CategoryFileTypes { get; set; }
         public DbSet<Models.File> Files { get; set; }
         public DbSet<Models.FileType> FileTypes { get; set; }
@@ -47,7 +54,7 @@ namespace Ocuda.Ops.Data
         public DbSet<Models.SiteSetting> SiteSettings { get; set; }
         public DbSet<Models.Thumbnail> Thumbnails { get; set; }
         public DbSet<Models.User> Users { get; set; }
-        public DbSet<Models.UserProperty> UserProperties { get; set; }
-        public DbSet<Models.UserPropertyType> UserPropertyType { get; set; }
+        public DbSet<Models.UserMetadata> UserMetadata { get; set; }
+        public DbSet<Models.UserMetadataType> UserMetadataTypes { get; set; }
     }
 }

@@ -1,7 +1,7 @@
 ﻿[
   {
-    "inputFile": "Scripts/Bootstrap/our-bootstrap.scss",
-    "outputFile": "Scripts/Bootstrap/bootstrap.css",
+    "inputFile": "Styles/Bootstrap/our-bootstrap.scss",
+    "outputFile": "Styles/Bootstrap/bootstrap.css",
     "includeInProject": true,
     "minify": {
       "enabled": false

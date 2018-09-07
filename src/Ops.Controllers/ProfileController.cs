@@ -37,7 +37,7 @@ namespace Ocuda.Ops.Controllers
             }
             else
             {
-                viewModel.User = await _userService.LookupUserAsync(CurrentUsername);
+                viewModel.User = await _userService.GetByIdAsync(CurrentUserId);
             }
 
             if (viewModel.User.SupervisorId.HasValue)
@@ -48,7 +48,7 @@ namespace Ocuda.Ops.Controllers
 
             viewModel.DirectReports = await _userService.GetDirectReportsAsync(viewModel.User.Id);
 
-            if (viewModel.User.Username == CurrentUsername)
+            if (viewModel.User.Id == CurrentUserId)
             {
                 viewModel.CanEdit = true;
             }

@@ -125,30 +125,22 @@ a.rowlink {
 }
 
 .page-link {
-    position: relative;
-    float: left;
-    padding: 6px 12px;
-    margin-left: -1px;
-    line-height: 1.42857143;
-    color: #337ab7;
-    text-decoration: none;
-    background-color: #fff;
-    border: 1px solid #ddd;
+    height: 36px;
 }
 
-    .page-link:hover {
-        z-index: 2;
-        color: #23527c;
-        background-color: #eee;
-        border-color: #ddd;
+.page-input {
+    padding: .5rem;
+    text-align: center;
+    width: 60px;
+    -moz-appearance: textfield;
+    -webkit-appearance: none;
+}
+
+    .page-input::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+        margin: 0;
+        -moz-appearance: textfield;
+        -webkit-appearance: none;
     }
-
-.page-item.disabled {
-    color: #777;
-    cursor: not-allowed;
-    background-color: #fff;
-    border-color: #ddd;
-}
 
 .field-validation-error {
     color: #f00;
@@ -173,11 +165,13 @@ a.rowlink {
     position: fixed;
     z-index: 3;
     overflow-x: hidden;
+    overflow-y: hidden;
     transition: .5s;
     padding-top: 2rem;
 }
 
     .navcolumn.navcolumn-open {
+        overflow-y: unset;
         width: 250px;
     }
 
@@ -323,3 +317,7 @@ a.rowlink {
         max-height: 150px;
         max-width: 150px;
     }
+
+.modal-icon {
+    padding-right: 0.5rem;
+}

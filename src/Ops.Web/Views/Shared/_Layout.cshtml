@@ -5,11 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
     @*<title>@ViewData[Ocuda.Ops.Controllers.ViewDataKey.Title]</title>*@
-    <link rel="stylesheet" href="~/css/main.min.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    <environment include="Production">
+        <link rel="stylesheet" href="~/css/main.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    </environment>
     <environment include="Development">
-        <link rel="stylesheet" href="~/devstyles/ops.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/devstyles/Bootstrap/bootstrap.css" asp-append-version="true" />
         <link rel="stylesheet" href="~/devbower/bootstrap-multiselect/dist/css/bootstrap-multiselect.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/devbower/fontawesome/web-fonts-with-css/css/fontawesome-all.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/devstyles/ops.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/devstyles/site.css" asp-append-version="true" />
     </environment>
 
     @RenderSection("Styles", required: false)

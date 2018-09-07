@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Authorization;
 using Ocuda.Ops.Controllers.RouteConstraints;
@@ -154,6 +156,8 @@ namespace Ocuda.Ops.Web
                 .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_1)
                 .AddSessionStateTempDataProvider();
 
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             // service facades
             services.AddScoped(typeof(Controllers.ServiceFacades.Controller<>));
 
@@ -198,6 +202,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.SiteSettingRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IThumbnailRepository,
                 Data.Ops.ThumbnailRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IUserMetadataTypeRepository,
+                Data.Ops.UserMetadataTypeRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserRepository,
                 Data.Ops.UserRepository>();
 
@@ -219,6 +225,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<ISiteSettingService, SiteSettingService>();
             services.AddScoped<IThumbnailService, ThumbnailService>();
+            services.AddScoped<IUserMetadataTypeService, UserMetadataTypeService>();
             services.AddScoped<IUserService, UserService>();
 
             var serviceProvider = services.BuildServiceProvider();
