@@ -19,6 +19,8 @@ namespace Ops.Web.WindowsAuth
 
             string logPath = "logs";
             string logFile = "log-{Date}.txt";
+
+            // build a WebHost so that we can access configuration
             IWebHost webHost = CreateWebHostBuilder(args).Build();
             var config = (IConfiguration)webHost.Services.GetService(typeof(IConfiguration));
 
@@ -37,10 +39,16 @@ namespace Ops.Web.WindowsAuth
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
                 .MinimumLevel.Override("System", LogEventLevel.Error)
+                .ReadFrom.Configuration(config)
+                .Enrich.WithProperty("Application", applicationName)
+                .Enrich.WithProperty("Version", version)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
                 .WriteTo.RollingFile(fullLogPath)
                 .CreateLogger();
+
+            // rebuild WebHost now that we have logging configuration
+            webHost = CreateWebHostBuilder(args).Build();
 
             try
             {
