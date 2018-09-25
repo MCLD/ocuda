@@ -8,6 +8,7 @@ using Ocuda.Utility.Keys;
 namespace Ocuda.Ops.Controllers.Abstract
 {
     [ServiceFilter(typeof(AuthenticationFilter))]
+    [ServiceFilter(typeof(ExternalResourceFilter))]
     [ServiceFilter(typeof(NavigationFilter))]
     [ServiceFilter(typeof(UserFilter))]
     [ServiceFilter(typeof(SectionFilter))]

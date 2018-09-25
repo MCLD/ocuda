@@ -20,13 +20,14 @@ namespace Ocuda.Utility.TagHelpers
         private const string containerClass = "row";
         private const string modalClass = "modal fade";
         private const string dialogClass = "modal-dialog";
-        private const string modalLargeClass = "modal-lg";
+        private const string modalLargeClass = "modal-lg oc-modal-xl";
         private const string contentClass = "modal-content";
         private const string headerClass = "modal-header";
         private const string headerTitleClass = "modal-title";
         private const string headerButtonClass = "close";
         private const string headerIconClass = "fa fa-times";
         private const string bodyClass = "modal-body";
+        private const string bodyAlertClass = "modal-alert alert alert-danger d-none";
         private const string bodyDeleteIconClass = "fa fa-exclamation-triangle modal-icon";
         private const string bodyDeleteTextClass = "modal-text";
         private const string footerClass = "modal-footer";
@@ -35,7 +36,6 @@ namespace Ocuda.Utility.TagHelpers
         private const string deleteButtonClass = "btn btn-danger btn-spinner";
         private const string saveButtonClass = "btn btn-success btn-spinner";
         private const string footerDeleteIconClass = "fa fa-times";
-        private const string footerSaveIconClass = "fa fa-save";
         private const string buttonSpinnerClass = "fa fa-spinner fa-lg fa-pulse fa-fw d-none";
 
         private readonly IHtmlGenerator _htmlGenerator;
@@ -150,6 +150,11 @@ namespace Ocuda.Utility.TagHelpers
         {
             var body = new TagBuilder("div");
             body.AddCssClass(bodyClass);
+
+            var alert = new TagBuilder("div");
+            alert.AddCssClass(bodyAlertClass);
+            body.InnerHtml.AppendHtml(alert);
+
             body.InnerHtml.AppendHtml(await output.GetChildContentAsync());
 
             if (Type == ModalTypes.Delete)
@@ -197,20 +202,20 @@ namespace Ocuda.Utility.TagHelpers
                     confirmButton.Attributes.Add("type", "submit");
                 }
 
-                var icon = new TagBuilder("span");
-                confirmButton.InnerHtml.AppendHtml(icon);
-
                 if (Type == ModalTypes.Delete)
                 {
-                    confirmButton.AddCssClass(deleteButtonClass);
+                    var icon = new TagBuilder("span");
                     icon.AddCssClass(footerDeleteIconClass);
-                    confirmButton.InnerHtml.Append(" Delete ");
+
+                    confirmButton.InnerHtml.AppendHtml(icon);
+                    confirmButton.AddCssClass(deleteButtonClass);
+                    confirmButton.InnerHtml.Append("Delete");
                 }
                 else
                 {
                     confirmButton.AddCssClass(saveButtonClass);
-                    icon.AddCssClass(footerSaveIconClass);
-                    confirmButton.InnerHtml.Append(" Save ");
+
+                    confirmButton.InnerHtml.Append("Save");
                 }
 
                 var spinner = new TagBuilder("span");
