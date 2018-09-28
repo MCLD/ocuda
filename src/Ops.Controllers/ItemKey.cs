@@ -2,6 +2,8 @@
 {
     public class ItemKey
     {
+        public const string ExternalCSS = "ExternalCSS";
+        public const string ExternalJS = "ExternalJS";
         public const string Sections = "Sections";
         public const string Files = "Files";
         public const string Links = "Links";

@@ -163,6 +163,7 @@ namespace Ocuda.Ops.Web
 
             // filters
             services.AddScoped<Controllers.Filters.AuthenticationFilter>();
+            services.AddScoped<Controllers.Filters.ExternalResourceFilter>();
             services.AddScoped<Controllers.Filters.NavigationFilter>();
             services.AddScoped<Controllers.Filters.UserFilter>();
             services.AddScoped<Controllers.Filters.SectionFilter>();
@@ -180,6 +181,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,
                 Data.Ops.ClaimGroupRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IExternalResourceRepository,
+                Data.Ops.ExternalResourceRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileRepository,
                 Data.Ops.FileRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileTypeRepository,
@@ -212,6 +215,7 @@ namespace Ocuda.Ops.Web
                 AuthorizationService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IExternalResourceService, ExternalResourceService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IFileTypeService, FileTypeService>();
             services.AddScoped<IInitialSetupService, InitialSetupService>();
