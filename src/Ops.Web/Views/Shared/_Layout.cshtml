@@ -15,12 +15,31 @@
         <link rel="stylesheet" href="~/devbower/fontawesome/web-fonts-with-css/css/fontawesome-all.css" asp-append-version="true" />
         <link rel="stylesheet" href="~/devstyles/ops.css" asp-append-version="true" />
         <link rel="stylesheet" href="~/devstyles/site.css" asp-append-version="true" />
-    </environment>
+        <style>
+            .oc-navbar {
+                background-color: #1d3b64 !important;
+            }
 
+            .oc-navbrand::after {
+                content: " dev";
+            }
+        </style>
+    </environment>
+    <instance name="test">
+        <style>
+            .oc-navbar {
+                background-color: #712227 !important;
+            }
+
+            .oc-navbrand::after {
+                content: " TEST";
+            }
+        </style>
+    </instance>
     @RenderSection("Styles", required: false)
 </head>
 <body>
-    <div class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-dark">
+    <div class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-dark oc-navbar">
         @{
             var navigationRows = (List<NavigationRow>)Context.Items[ItemKey.NavColumn];
             if (navigationRows?.Count > 0)
@@ -32,7 +51,7 @@
         }
         <a class="navbar-brand" asp-area="" asp-route-section="" asp-controller="Home" asp-action="@(nameof(HomeController.Index))">
             <span class="fa fa-home"></span>
-            Home
+            <span class="font-weight-light oc-navbrand">Home</span>
         </a>
         <button class="navbar-toggler btn-sm justify-self-end" type="button"
                 data-toggle="collapse" data-target=".navbar-collapse">
