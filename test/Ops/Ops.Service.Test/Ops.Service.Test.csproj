@@ -1,18 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <IsPackable>false</IsPackable>
     <AssemblyName>Ocuda.test.Ops.Service.Test</AssemblyName>
+    <Authors>Maricopa County Library District Web developers</Authors>
+    <CodeAnalysisRuleSet>../../OcudaRuleSet.ruleset</CodeAnalysisRuleSet>
+    <Company>Maricopa County Library District</Company>
+    <Copyright>Copyright 2018 Maricopa County Library District</Copyright>
+    <IsPackable>false</IsPackable>
+    <PackageLicenseUrl>https://github.com/MCLD/ocuda/blob/develop/LICENSE</PackageLicenseUrl>
+    <Product>Ocuda</Product>
+    <RepositoryType>Git</RepositoryType>
+    <RepositoryUrl>https://github.com/MCLD/ocuda/</RepositoryUrl>
     <RootNamespace>Ocuda.test.Ops.Service.Test</RootNamespace>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.*" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.*" />
     <PackageReference Include="Moq" Version="4.8.*" />
     <PackageReference Include="xunit" Version="2.3.*" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.*" />
-    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.*" />
   </ItemGroup>
 
   <ItemGroup>
