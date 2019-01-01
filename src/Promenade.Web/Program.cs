@@ -8,7 +8,7 @@ using Serilog;
 
 namespace Ocuda.Promenade.Web
 {
-    public class Program
+    public static class Program
     {
         public static int Main(string[] args)
         {

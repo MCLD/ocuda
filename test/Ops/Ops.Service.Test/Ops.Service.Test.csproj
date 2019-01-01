@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>Ocuda.test.Ops.Service.Test</AssemblyName>
     <Authors>Maricopa County Library District Web developers</Authors>
-    <CodeAnalysisRuleSet>../../OcudaRuleSet.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>../../../OcudaRuleSet.ruleset</CodeAnalysisRuleSet>
     <Company>Maricopa County Library District</Company>
     <Copyright>Copyright 2018 Maricopa County Library District</Copyright>
     <IsPackable>false</IsPackable>
