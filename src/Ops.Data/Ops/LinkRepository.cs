@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Data.Extensions;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Models;
@@ -13,7 +13,7 @@ using Ocuda.Ops.Service.Models;
 namespace Ocuda.Ops.Data.Ops
 {
     public class LinkRepository 
-        : GenericRepository<Models.Link, int>, ILinkRepository
+        : GenericRepository<Link, int>, ILinkRepository
     {
         public LinkRepository(OpsContext context, ILogger<LinkRepository> logger)
             : base(context, logger)
@@ -24,13 +24,13 @@ namespace Ocuda.Ops.Data.Ops
         {
             var query = DbSet.AsNoTracking();
 
-            if (filter.CategoryId.HasValue)
+            if (filter.LinkLibraryId.HasValue)
             {
-                query = query.Where(_ => _.CategoryId == filter.CategoryId);
+                query = query.Where(_ => _.LinkLibraryId == filter.LinkLibraryId.Value);
             }
             else if (filter.SectionId.HasValue)
             {
-                query = query.Where(_ => _.SectionId == filter.SectionId);
+                query = query.Where(_ => _.LinkLibrary.SectionId == filter.SectionId.Value);
             }
 
             return new DataWithCount<ICollection<Link>>

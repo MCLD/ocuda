@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Data.Extensions;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Models;
@@ -13,7 +13,7 @@ using Ocuda.Ops.Service.Models;
 namespace Ocuda.Ops.Data.Ops
 {
     public class PageRepository 
-        : GenericRepository<Models.Page, int>, IPageRepository
+        : GenericRepository<Page, int>, IPageRepository
     {
         public PageRepository(OpsContext context, ILogger<PageRepository> logger)
             : base(context, logger)

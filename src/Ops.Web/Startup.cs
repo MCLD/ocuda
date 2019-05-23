@@ -175,22 +175,24 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Utility.Helpers.WebHelper>();
 
             // repositories
-            services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryFileTypeRepository,
-                Data.Ops.CategoryFileTypeRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
-                Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,
                 Data.Ops.ClaimGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IExternalResourceRepository,
                 Data.Ops.ExternalResourceRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IFileLibraryRepository,
+                Data.Ops.FileLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileRepository,
                 Data.Ops.FileRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileTypeRepository,
                 Data.Ops.FileTypeRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkLibraryRepository,
+                Data.Ops.LinkLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository,
                 Data.Ops.LinkRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPageRepository,
                 Data.Ops.PageRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPostCategoryRepository,
+               Data.Ops.PostCategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPostRepository,
                 Data.Ops.PostRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterDetailRepository,
@@ -213,7 +215,6 @@ namespace Ocuda.Ops.Web
             // services
             services.AddScoped<Service.Interfaces.Ops.Services.IAuthorizationService,
                 AuthorizationService>();
-            services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IExternalResourceService, ExternalResourceService>();
             services.AddScoped<IFileService, FileService>();

@@ -5,60 +5,57 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Data.Extensions;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class PostRepository 
-        : GenericRepository<Models.Post, int>, IPostRepository
+    public class PostRepository
+        : GenericRepository<Post, int>, IPostRepository
     {
-        public PostRepository(OpsContext context, ILogger<PostRepository> logger) 
+        public PostRepository(OpsContext context, ILogger<PostRepository> logger)
             : base(context, logger)
         {
         }
 
-        public async Task<Post> GetByStubAsync(string stub)
+        public override Task<Post> FindAsync(int id)
         {
-            return await DbSet
+            return DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == stub)
-                .FirstOrDefaultAsync();
+                .Include(_ => _.PostCategory)
+                .Where(_ => _.Id == id)
+                .SingleAsync();
         }
 
-        public async Task<Post> GetByStubAndSectionIdAsync(string stub, int sectionId)
+        public async Task<Post> GetByStubAndCategoryIdAsync(string stub, int categoryId)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.Stub == stub
-                         && _.SectionId == sectionId)
+                         && _.PostCategoryId == categoryId)
                 .FirstOrDefaultAsync();
-        }
-
-        public async Task<Post> GetByTitleAndSectionIdAsync(string title, int sectionId)
-        {
-            return await DbSet
-                    .AsNoTracking()
-                    .Where(_ => _.Title == title
-                             && _.SectionId == sectionId)
-                    .FirstOrDefaultAsync();
         }
 
         public async Task<DataWithCount<ICollection<Post>>> GetPaginatedListAsync(BlogFilter filter)
         {
             var query = DbSet.AsNoTracking();
 
-            if (filter.SectionId.HasValue)
+            if (filter.PostCategoryId.HasValue)
             {
-                query = query.Where(_ => _.SectionId == filter.SectionId);
+                query = query.Where(_ => _.PostCategoryId == filter.PostCategoryId.Value);
+            }
+            else if (filter.SectionId.HasValue)
+            {
+                query = query.Where(_ => _.PostCategory.SectionId == filter.SectionId.Value);
             }
 
             return new DataWithCount<ICollection<Post>>
             {
                 Count = await query.CountAsync(),
                 Data = await query
+                    .Include(_ => _.PostCategory)
                     .OrderByDescending(_ => _.IsPinned)
                     .ThenByDescending(_ => _.CreatedAt)
                     .ApplyPagination(filter)
@@ -71,7 +68,7 @@ namespace Ocuda.Ops.Data.Ops
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.Stub == post.Stub
-                         && _.SectionId == post.SectionId
+                         && _.PostCategoryId == post.PostCategoryId
                          && _.Id != post.Id
                          && _.IsDraft == false)
                 .AnyAsync();

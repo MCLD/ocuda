@@ -11,17 +11,13 @@
     <div modal isNonSubmit="true" id="deleteModal" name="Post Attachment" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
 </form>
 
-<form asp-action="@Model.Action" method="post" role="form">
+<form asp-action="@nameof(PostsController.Detail)" method="post" role="form">
+    <input id="contentId" asp-for="Post.Id" type="hidden" />
+    <input id="contentType" value="@(nameof(Post))" type="hidden" />
     <input asp-for="SectionId" type="hidden" />
-    @if (Model.Action == nameof(PostsController.Edit))
-    {
-        <input asp-for="Post.SectionId" type="hidden" />
-        <input asp-for="Post.CreatedBy" type="hidden" />
-        <input id="contentId" asp-for="Post.Id" type="hidden" />
-        <input id="contentType" value="@(nameof(Post))" type="hidden" />
-    }
+
     <input asp-for="Post.Title" formgroup />
-    <input asp-for="Post.Stub" formgroup readonly="@(Model.IsDraft == false ? "readonly" : null)" />
+    <input asp-for="Post.Stub" formgroup readonly="@(Model.Post.IsDraft == false ? "readonly" : null)" />
 
     <div class="form-group row">
         <label asp-for="Post.Content" class="col-md-3 col-form-label text-md-right"></label>
@@ -47,7 +43,7 @@
         </div>
     </div>
 
-    @if (Model.Action == nameof(PostsController.Edit) && Model.Attachments != null && Model.Attachments.Count() > 0)
+    @if (Model.Attachments?.Count() > 0)
     {
         <div id="attachmentsInputRow" class="form-group row">
             <label class="col-md-3 col-form-label text-md-right">Attachments</label>
@@ -57,16 +53,16 @@
                     <div id="attachmentItem_@(attachment.Id)" class="input-group">
                         <input asp-for="@attachment.Id" type="hidden" />
                         <div class="input-group-prepend col-md-9 px-0">
-                            <label class="form-control h-auto mb-0 mb-md-auto">@(attachment.Name)@(attachment.Extension)</label>
+                            <label class="form-control h-auto mb-0 mb-md-auto">@(attachment.Name)@(attachment.FileType.Extension)</label>
                         </div>
                         <div class="input-group-append col-md-3 px-0">
-                            <label class="form-control rounded-0">file@(attachment.Id)@(attachment.Extension)</label>
+                            <label class="form-control rounded-0">file@(attachment.Id)@(attachment.FileType.Extension)</label>
                             <label class="btn btn-outline-danger"
                                    data-toggle="modal"
                                    data-target="#deleteModal"
                                    data-id="@attachment.Id"
                                    data-name="@attachment.Name"
-                                   data-extension="@attachment.Extension">
+                                   data-extension="@attachment.FileType.Extension">
                                 <span class="fa fa-minus-circle"></span>
                             </label>
                         </div>
@@ -76,15 +72,11 @@
         </div>
     }
 
-    <select class="w-auto" asp-for="Post.IsDraft" disabled="@(Model.IsDraft == false ? true : false)" formgroup>
+    <select class="w-auto" asp-for="Post.IsDraft" disabled="@(Model.Post.IsDraft == false ? true : false)" formgroup>
         <option value="false">No</option>
         <option value="true">Yes</option>
     </select>
     <select class="w-auto" asp-for="Post.IsPinned" formgroup>
-        <option value="false">No</option>
-        <option value="true">Yes</option>
-    </select>
-    <select class="w-auto" asp-for="Post.ShowOnHomepage" formgroup>
         <option value="false">No</option>
         <option value="true">Yes</option>
     </select>
@@ -169,6 +161,7 @@
             var url = "@(Url.Action("DeleteAttachment", "Files"))";
             var id = $("#deleteId").val();
             removeAttachmentItem(url, id);
+            $("#deleteModal").modal("hide");
             ResetSpinners();
         });
     </script>

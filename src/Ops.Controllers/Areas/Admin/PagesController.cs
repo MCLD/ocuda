@@ -6,9 +6,8 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages;
 using Ocuda.Ops.Controllers.Authorization;
-using Ocuda.Ops.Controllers.Filter;
 using Ocuda.Ops.Controllers.Filters;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
@@ -111,9 +110,16 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [RestoreModelState]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(string section, int id)
         {
+            var currentSection = await _sectionService.GetByPathAsync(section);
             var page = await _pageService.GetByIdAsync(id);
+
+            if (page?.SectionId != currentSection.Id)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
             var attachments = await _fileService.GetByPageIdAsync(id);
 
             var viewModel = new DetailViewModel

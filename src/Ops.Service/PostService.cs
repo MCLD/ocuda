@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -14,18 +14,22 @@ namespace Ocuda.Ops.Service
     public class PostService : IPostService
     {
         private readonly ILogger _logger;
+        private readonly IPostCategoryRepository _postCategoryRepository;
         private readonly IPostRepository _postRepository;
         private readonly ISectionRepository _sectionRepository;
         private readonly IUserRepository _userRepository;
 
         public PostService(ILogger<PostService> logger,
+            IPostCategoryRepository postCategoryRepository,
             IPostRepository postRepository,
             ISectionRepository sectionRepository,
             IUserRepository userRepository)
         {
             _logger = logger
                 ?? throw new ArgumentNullException(nameof(logger));
-            _postRepository = postRepository 
+            _postCategoryRepository = postCategoryRepository
+                ?? throw new ArgumentNullException(nameof(postCategoryRepository));
+            _postRepository = postRepository
                 ?? throw new ArgumentNullException(nameof(postRepository));
             _sectionRepository = sectionRepository
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
@@ -49,19 +53,10 @@ namespace Ocuda.Ops.Service
             return await _postRepository.FindAsync(id);
         }
 
-        public async Task<Post> GetByStubAsync(string stub)
+        public async Task<Post> GetByStubAndCategoryIdAsync(string stub, int categoryId)
         {
-            return await _postRepository.GetByStubAsync(stub?.Trim().ToLower());
-        }
-
-        public async Task<Post> GetByStubAndSectionIdAsync(string stub, int sectionId)
-        {
-            return await _postRepository.GetByStubAndSectionIdAsync(stub?.Trim().ToLower(), sectionId);
-        }
-
-        public async Task<Post> GetByTitleAndSectionIdAsync(string title, int sectionId)
-        {
-            return await _postRepository.GetByTitleAndSectionIdAsync(title?.Trim(), sectionId);
+            return await _postRepository.GetByStubAndCategoryIdAsync(
+                stub?.Trim().ToLower(), categoryId);
         }
 
         public async Task<DataWithCount<ICollection<Post>>> GetPaginatedListAsync(BlogFilter filter)
@@ -87,12 +82,21 @@ namespace Ocuda.Ops.Service
         public async Task<Post> EditAsync(Post post)
         {
             var currentPost = await _postRepository.FindAsync(post.Id);
+
             currentPost.Title = post.Title?.Trim();
             currentPost.Stub = post.Stub?.Trim().ToLower();
             currentPost.Content = post.Content;
             currentPost.IsDraft = post.IsDraft;
             currentPost.IsPinned = post.IsPinned;
-            currentPost.ShowOnHomepage = post.ShowOnHomepage;
+
+            if (currentPost.IsDraft)
+            {
+                currentPost.Stub = post.Stub?.Trim().ToLower();
+                if (!post.IsDraft)
+                {
+                    currentPost.IsDraft = false;
+                }
+            }
 
             await ValidatePostAsync(post);
 
@@ -112,48 +116,62 @@ namespace Ocuda.Ops.Service
             return await _postRepository.StubInUseAsync(post);
         }
 
-        public async Task ValidatePostAsync(Post post)
+        private async Task ValidatePostAsync(Post post)
         {
             var message = string.Empty;
-            var section = await _sectionRepository.FindAsync(post.SectionId);
 
-            if (section == null)
+            if (!post.IsDraft && await _postRepository.StubInUseAsync(post))
             {
-                message = $"SectionId '{post.SectionId}' is not a valid section.";
-                _logger.LogWarning(message, post.SectionId);
+                message = $"Stub '{post.Stub}' already exists in that category.";
+                _logger.LogWarning(message, post.Title, post.PostCategoryId);
                 throw new OcudaException(message);
             }
+        }
 
-            if (string.IsNullOrWhiteSpace(post.Title))
-            {
-                message = $"Post title cannot be empty.";
-                _logger.LogWarning(message);
-                throw new OcudaException(message);
-            }
+        public async Task<PostCategory> GetCategoryByIdAsync(int id)
+        {
+            return await _postCategoryRepository.FindAsync(id);
+        }
 
-            if (string.IsNullOrWhiteSpace(post.Stub))
-            {
-                message = $"Post stub cannot be empty.";
-                _logger.LogWarning(message);
-                throw new OcudaException(message);
-            }
+        public async Task<IEnumerable<PostCategory>> GetCategoriesBySectionIdAsync(int sectionId)
+        {
+            return await _postCategoryRepository.GetBySectionIdAsync(sectionId);
+        }
 
-            var stubInUse = await _postRepository.StubInUseAsync(post);
+        public async Task<DataWithCount<ICollection<PostCategory>>> GetPaginatedCategoryList(
+            BlogFilter filter)
+        {
+            return await _postCategoryRepository.GetPaginatedListAsync(filter);
+        }
 
-            if (!post.IsDraft && stubInUse)
-            {
-                message = $"Stub '{post.Stub}' already exists in '{section.Name}'.";
-                _logger.LogWarning(message, post.Title, post.SectionId);
-                throw new OcudaException(message);
-            }
+        public async Task<PostCategory> CreateCategoryAsync(int currentUserId, PostCategory category)
+        {
+            category.Name = category.Name?.Trim();
+            category.CreatedAt = DateTime.Now;
+            category.CreatedBy = currentUserId;
 
-            var creator = await _userRepository.FindAsync(post.CreatedBy);
-            if (creator == null)
-            {
-                message = $"Created by invalid User Id: {post.CreatedBy}";
-                _logger.LogWarning(message, post.CreatedBy);
-                throw new OcudaException(message);
-            }
+            await _postCategoryRepository.AddAsync(category);
+            await _postCategoryRepository.SaveAsync();
+
+            return category;
+        }
+
+        public async Task<PostCategory> EditCategoryAsync(PostCategory category)
+        {
+            var currentCategory = await _postCategoryRepository.FindAsync(category.Id);
+
+            currentCategory.Name = category.Name?.Trim();
+
+            _postCategoryRepository.Update(currentCategory);
+            await _postCategoryRepository.SaveAsync();
+
+            return currentCategory;
+        }
+
+        public async Task DeleteCategoryAsync(int id)
+        {
+            _postCategoryRepository.Remove(id);
+            await _postCategoryRepository.SaveAsync();
         }
     }
 }

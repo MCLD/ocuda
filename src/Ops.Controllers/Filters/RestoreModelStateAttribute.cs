@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Helpers;
 
-namespace Ocuda.Ops.Controllers.Filter
+namespace Ocuda.Ops.Controllers.Filters
 {
     public class RestoreModelStateAttribute : ActionFilterAttribute
     {

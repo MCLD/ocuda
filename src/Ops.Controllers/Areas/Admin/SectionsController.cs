@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Sections;
-using Ocuda.Ops.Controllers.Filter;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -130,31 +129,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
 
             return RedirectToAction(nameof(Edit));
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> EditFeaturedVideoUrl(int sectionId, string url)
-        {
-            try
-            {
-                await _sectionService.EditFeaturedVideoUrlAsync(sectionId, url);
-
-                if(string.IsNullOrWhiteSpace(url))
-                {
-                    ShowAlertSuccess("Removed featured video.");
-                }
-                else
-                {
-                    ShowAlertSuccess("Updated featured video.");
-                }
-                
-                return Json(new { success = true });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error updating featured video: {ex}", ex);
-                return Json(new { success = false, message = ex.Message });
-            }
         }
 
         [HttpPost]

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Utility.Exceptions;

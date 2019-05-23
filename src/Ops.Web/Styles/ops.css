@@ -318,10 +318,6 @@ a.rowlink {
         max-width: 150px;
     }
 
-.modal-icon {
-    padding-right: 0.5rem;
-}
-
 .oc-modal-xl {
     max-width: unset;
     width: 95%;

@@ -58,16 +58,16 @@
                     <div id="attachmentItem_@(attachment.Id)" class="input-group">
                         <input asp-for="@attachment.Id" type="hidden" />
                         <div class="input-group-prepend col-md-9 px-0">
-                            <label class="form-control h-auto mb-0 mb-md-auto">@(attachment.Name)@(attachment.Extension)</label>
+                            <label class="form-control h-auto mb-0 mb-md-auto">@(attachment.Name)@(attachment.FileType.Extension)</label>
                         </div>
                         <div class="input-group-append col-md-3 px-0">
-                            <label class="form-control rounded-0">file@(attachment.Id)@(attachment.Extension)</label>
+                            <label class="form-control rounded-0">file@(attachment.Id)@(attachment.FileType.Extension)</label>
                             <label class="btn btn-outline-danger"
                                    data-toggle="modal"
                                    data-target="#deleteModal"
                                    data-id="@attachment.Id"
                                    data-name="@attachment.Name"
-                                   data-extension="@attachment.Extension">
+                                   data-extension="@attachment.FileType.Extension">
                                 <span class="fa fa-minus-circle"></span>
                             </label>
                         </div>
@@ -161,6 +161,7 @@
             var url = "@(Url.Action("DeleteAttachment", "Files"))";
             var id = $("#deleteId").val();
             removeAttachmentItem(url, id);
+            $("#deleteModal").modal("hide");
             ResetSpinners();
         });
     </script>

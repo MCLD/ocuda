@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Exceptions;
@@ -37,21 +37,22 @@ namespace Ocuda.Ops.Service
 
         public string GetUrl(Thumbnail thumbnail)
         {
-            var extension = System.IO.Path.GetExtension(thumbnail.Name);
-            var url = _pathResolver.GetPublicContentUrl("thumbnails",
+            return _pathResolver.GetPublicContentUrl("thumbnails",
                 $"file{thumbnail.FileId}",
-                $"thumbnail{thumbnail.Id}{extension}");
-            return url;
+                $"thumbnail{thumbnail.Id}{thumbnail.FileType.Extension}");
         }
 
         public async Task CreateThumbnailFilesAsync(
             ICollection<Thumbnail> thumbnails, ICollection<IFormFile> thumbnailFiles)
         {
+            // TODO
+            /*
             foreach (var thumbnail in thumbnails)
             {
                 var fileData = thumbnailFiles.Where(_ => _.FileName == thumbnail.Name).Single();
                 await WriteThumbnailAsync(thumbnail, fileData);
             }
+            */
         }
 
         private async Task WriteThumbnailAsync(Thumbnail thumbnail, IFormFile fileData)
@@ -66,10 +67,14 @@ namespace Ocuda.Ops.Service
 
         private string GetFilePath(Thumbnail thumbnail)
         {
+            // TODO
+            return null;
+            /*
             var extension = System.IO.Path.GetExtension(thumbnail.Name);
             return _pathResolver.GetPublicContentFilePath($"thumbnail{thumbnail.Id}{extension}",
                 "thumbnails",
                 $"file{thumbnail.FileId}");
+                */
         }
 
         public void DeleteThumbnailFiles(IEnumerable<Thumbnail> thumbnailsToRemove)
