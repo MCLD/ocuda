@@ -48,7 +48,7 @@
                             @post.CreatedByName
                         </a>
                     </div>
-                    @post.CreatedAt.ToString("MM/dd/yyyy hh:mm tt")
+                    @post.PublishedAt?.ToString("MM/dd/yyyy hh:mm tt")
                 </div>
             </div>
         }

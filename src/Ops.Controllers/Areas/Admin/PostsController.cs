@@ -111,7 +111,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             JsonResponse response;
 
-            model.Post.IsDraft = true;
+            model.Post.PublishedAt = null;
 
             try
             {
@@ -151,7 +151,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var viewModel = new DetailViewModel()
             {
                 Post = post,
-                SectionId = post.PostCategory.SectionId,
+                SectionId = currentSection.Id,
+                DefaultSection = currentSection.IsDefault,
                 Attachments = attachments
             };
 
@@ -164,7 +165,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             var currentPost = await _postService.GetByIdAsync(model.Post.Id);
 
-            if (currentPost.IsDraft && model.Post.IsDraft)
+            if (!currentPost.PublishedAt.HasValue && model.Publish)
             {
                 var stubInUse = await _postService.StubInUseAsync(model.Post);
 
@@ -179,7 +180,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 try
                 {
-                    var post = await _postService.EditAsync(model.Post);
+                    var post = await _postService.EditAsync(model.Post, model.Publish);
                     ShowAlertSuccess($"Updated blog post: {post.Title}");
                     return RedirectToAction(nameof(Index));
                 }

@@ -17,7 +17,7 @@
     <input asp-for="SectionId" type="hidden" />
 
     <input asp-for="Post.Title" formgroup />
-    <input asp-for="Post.Stub" formgroup readonly="@(Model.Post.IsDraft == false ? "readonly" : null)" />
+    <input asp-for="Post.Stub" formgroup readonly="@(Model.Post.PublishedAt.HasValue ? "readonly" : null)" />
 
     <div class="form-group row">
         <label asp-for="Post.Content" class="col-md-3 col-form-label text-md-right"></label>
@@ -72,11 +72,11 @@
         </div>
     }
 
-    <select class="w-auto" asp-for="Post.IsDraft" disabled="@(Model.Post.IsDraft == false ? true : false)" formgroup>
+    <select class="w-auto" asp-for="Post.IsPinned" formgroup>
         <option value="false">No</option>
         <option value="true">Yes</option>
     </select>
-    <select class="w-auto" asp-for="Post.IsPinned" formgroup>
+    <select class="w-auto" asp-for="Post.ShowOnHomepage" formgroup disabled="@(Model.DefaultSection ? "disabled" : null)">
         <option value="false">No</option>
         <option value="true">Yes</option>
     </select>
@@ -84,11 +84,25 @@
     <div class="row">
         <div class="offset-md-3 col-md-9">
             <a class="btn btn-outline-secondary text-dark" asp-action="@(nameof(PostsController.Index))">Cancel</a>
-            <button type="submit" class="btn btn-success btn-spinner" aria-label="Confirm">
-                <span class="fa fa-save" aria-hidden="true"></span>
-                Save
-                <span class="fa fa-spinner fa-pulse fa-fw d-none"></span>
-            </button>
+            @if (Model.Post?.PublishedAt != null)
+            {
+                <button type="submit" class="btn btn-success btn-spinner">
+                    <span class="fa fa-save" aria-hidden="true"></span>
+                    <span class="buttonText">Save</span>
+                    <span class="fa fa-spinner fa-pulse fa-fw d-none"></span>
+                </button>
+            }
+            else
+            {
+                <button type="submit" name="Publish" value="False" class="btn btn-primary btn-spinner">
+                    <span class="buttonText">Save as Draft</span>
+                    <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
+                </button>
+                <button type="submit" name="Publish" value="True" class="btn btn-success btn-spinner">
+                    <span class="buttonText">Save and Publish</span>
+                    <span class="fa fa-spinner fa-pulse fa-fw d-none"></span>
+                </button>
+            }
         </div>
     </div>
 </form>
@@ -101,7 +115,7 @@
         var editor = new Markdown.Editor({ allowUploads: true });
         editor.run();
 
-        @if(Model.Post.IsDraft == true)
+        @if(!Model.Post.PublishedAt.HasValue)
         {
             <text>
                 var title = $('#Post_Title');

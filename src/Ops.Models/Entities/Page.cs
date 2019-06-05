@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Ops.Models.Entities
@@ -18,7 +18,6 @@ namespace Ocuda.Ops.Models.Entities
         
         public string Content { get; set; }
 
-        [DisplayName("Is this a Draft?")]
-        public bool IsDraft { get; set; }
+        public DateTime? PublishedAt { get; set; }
     }
 }

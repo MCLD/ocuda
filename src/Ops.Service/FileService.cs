@@ -361,7 +361,7 @@ namespace Ocuda.Ops.Service
             await _fileRepository.SaveAsync();
         }
 
-        private void ValidateFile(File file)
+        public void ValidateFile(File file)
         {
             if (file.FileLibraryId.HasValue)
             {

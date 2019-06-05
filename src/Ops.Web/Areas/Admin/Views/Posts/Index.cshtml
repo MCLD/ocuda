@@ -56,10 +56,9 @@ else
     <table class="table table-sm table-bordered link-table">
         <thead>
             <tr>
+                <th>Published</th>
                 <th>Title</th>
                 <th>Author</th>
-                <th>Date</th>
-                <th>Draft</th>
                 <th>Category</th>
                 <th>Pinned</th>
                 <th>&nbsp;</th>
@@ -68,33 +67,32 @@ else
         <tbody>
             @foreach (var post in Model.Posts)
             {
-                <tr>
-                    <td class="rowlink-parent">
-                        <a asp-action="@(nameof(PostsController.Detail))" asp-route-id="@post.Id" class="rowlink">
-                            @post.Title
-                        </a>
-                    </td>
-                    <td>@post.CreatedByName</td>
-                    <td>@post.CreatedAt</td>
-                    <td>@(post.IsDraft == true ? "Yes" : "No")</td>
-                    <td>@post.PostCategory.Name</td>
-                    <td align="center">
-                        @if (post.IsPinned)
-                        {
-                            <span class="fa fa-thumbtack"></span>
-                        }
-                    </td>
-                    <td align="center" class="on-top">
-                        <button type="button"
-                                class="btn btn-danger btn-xs"
-                                data-toggle="modal"
-                                data-target="#deleteModal"
-                                data-id="@post.Id"
-                                data-title="@post.Title">
-                            <span class="fa fa-times" aria-hidden="true"></span>
-                        </button>
-                    </td>
-                </tr>
+            <tr>
+                <td class="rowlink-parent">
+                    <a asp-action="@(nameof(PostsController.Detail))" asp-route-id="@post.Id" class="rowlink">
+                        @(post.PublishedAt.HasValue ? post.PublishedAt.Value.ToString() : "Draft")
+                    </a>
+                </td>
+                <td>@post.Title</td>
+                <td>@post.CreatedByName</td>
+                <td>@post.PostCategory.Name</td>
+                <td align="center">
+                    @if (post.IsPinned)
+                    {
+                        <span class="fa fa-thumbtack"></span>
+                    }
+                </td>
+                <td align="center" class="on-top">
+                    <button type="button"
+                            class="btn btn-danger btn-xs"
+                            data-toggle="modal"
+                            data-target="#deleteModal"
+                            data-id="@post.Id"
+                            data-title="@post.Title">
+                        <span class="fa fa-times" aria-hidden="true"></span>
+                    </button>
+                </td>
+            </tr>
             }
         </tbody>
     </table>

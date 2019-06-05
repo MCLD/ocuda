@@ -49,10 +49,8 @@ namespace Ocuda.test.Ops.Service.Test
             var sectionRepository = new Mock<ISectionRepository>();
             sectionRepository.Setup(_ => _.FindAsync(5)).Returns(Task.FromResult(currentSection));
 
-            var categoryLogger = new Mock<ILogger<CategoryService>>();
             var sectionLogger = new Mock<ILogger<SectionService>>();
-            var categoryRepository = new Mock<ICategoryRepository>();
-            var categoryFileTypeRepository = new Mock<ICategoryFileTypeRepository>();
+            var linkLibraryRepository = new Mock<ILinkLibraryRepository>();
             var userRepository = new Mock<IUserRepository>();
             userRepository.Setup(
                 m => m.FindAsync(1))
@@ -62,18 +60,11 @@ namespace Ocuda.test.Ops.Service.Test
                         Name = "Test User 1"
                     });
 
-            var categoryService = new CategoryService(
-                categoryLogger.Object,
-                categoryRepository.Object,
-                categoryFileTypeRepository.Object,
+            var service = new SectionService(
+                sectionLogger.Object,
+                linkLibraryRepository.Object,
                 sectionRepository.Object,
                 userRepository.Object);
-
-            var service = new SectionService(
-                sectionLogger.Object, 
-                sectionRepository.Object, 
-                userRepository.Object,
-                categoryService);
 
             editedSection = await service.EditAsync(editedSection);
 
@@ -139,6 +130,7 @@ namespace Ocuda.test.Ops.Service.Test
             sectionRepository.Setup(m => m.IsDuplicateNameAsync(section)).ReturnsAsync(isDuplicateName);
             sectionRepository.Setup(m => m.IsDuplicatePathAsync(section)).ReturnsAsync(isDuplicatePath);
 
+            var linkLibraryRepository = new Mock<ILinkLibraryRepository>();
             var userRepository = new Mock<IUserRepository>();
             userRepository.Setup(
                 m => m.FindAsync(1))
@@ -148,13 +140,11 @@ namespace Ocuda.test.Ops.Service.Test
                         Name = "Test User 1"
                     });
 
-            var categoryService = new Mock<ICategoryService>();
-
             var sectionService = new SectionService(
                 logger.Object,
+                linkLibraryRepository.Object,
                 sectionRepository.Object,
-                userRepository.Object,
-                categoryService.Object);
+                userRepository.Object);
 
             //Act
             var ex = await Record.ExceptionAsync(() => sectionService.ValidateSectionAsync(section));

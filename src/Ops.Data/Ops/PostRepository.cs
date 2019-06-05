@@ -33,7 +33,8 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == stub
+                .Where(_ => _.PublishedAt.HasValue
+                         && _.Stub == stub
                          && _.PostCategoryId == categoryId)
                 .FirstOrDefaultAsync();
         }
@@ -42,13 +43,22 @@ namespace Ocuda.Ops.Data.Ops
         {
             var query = DbSet.AsNoTracking();
 
-            if (filter.PostCategoryId.HasValue)
+            if (filter.IsHomepage)
+            {
+                query = query.Where(_ => _.ShowOnHomepage);
+            }
+            else if (filter.PostCategoryId.HasValue)
             {
                 query = query.Where(_ => _.PostCategoryId == filter.PostCategoryId.Value);
             }
             else if (filter.SectionId.HasValue)
             {
                 query = query.Where(_ => _.PostCategory.SectionId == filter.SectionId.Value);
+            }
+
+            if (filter.IsPublished.HasValue)
+            {
+                query = query.Where(_ => _.PublishedAt.HasValue == filter.IsPublished.Value);
             }
 
             return new DataWithCount<ICollection<Post>>
@@ -70,7 +80,7 @@ namespace Ocuda.Ops.Data.Ops
                 .Where(_ => _.Stub == post.Stub
                          && _.PostCategoryId == post.PostCategoryId
                          && _.Id != post.Id
-                         && _.IsDraft == false)
+                         && _.PublishedAt.HasValue)
                 .AnyAsync();
         }
     }

@@ -71,6 +71,14 @@ namespace Ocuda.Ops.Service
             post.CreatedAt = DateTime.Now;
             post.CreatedBy = currentUserId;
 
+            var category = await _postCategoryRepository.FindAsync(post.PostCategoryId);
+            var section = await _sectionRepository.FindAsync(category.SectionId);
+
+            if (section.IsDefault)
+            {
+                post.ShowOnHomepage = true;
+            }
+
             await ValidatePostAsync(post);
 
             await _postRepository.AddAsync(post);
@@ -79,23 +87,29 @@ namespace Ocuda.Ops.Service
             return post;
         }
 
-        public async Task<Post> EditAsync(Post post)
+        public async Task<Post> EditAsync(Post post, bool publish = false)
         {
             var currentPost = await _postRepository.FindAsync(post.Id);
 
             currentPost.Title = post.Title?.Trim();
             currentPost.Stub = post.Stub?.Trim().ToLower();
             currentPost.Content = post.Content;
-            currentPost.IsDraft = post.IsDraft;
             currentPost.IsPinned = post.IsPinned;
 
-            if (currentPost.IsDraft)
+            if (!currentPost.PublishedAt.HasValue)
             {
                 currentPost.Stub = post.Stub?.Trim().ToLower();
-                if (!post.IsDraft)
+                if (publish)
                 {
-                    currentPost.IsDraft = false;
+                    currentPost.PublishedAt = DateTime.Now;
                 }
+            } 
+
+            var category = await _postCategoryRepository.FindAsync(currentPost.PostCategoryId);
+            var section = await _sectionRepository.FindAsync(category.SectionId);
+            if (!section.IsDefault)
+            {
+                currentPost.ShowOnHomepage = post.ShowOnHomepage;
             }
 
             await ValidatePostAsync(post);
@@ -116,11 +130,11 @@ namespace Ocuda.Ops.Service
             return await _postRepository.StubInUseAsync(post);
         }
 
-        private async Task ValidatePostAsync(Post post)
+        public async Task ValidatePostAsync(Post post)
         {
             var message = string.Empty;
 
-            if (!post.IsDraft && await _postRepository.StubInUseAsync(post))
+            if (post.PublishedAt.HasValue && await _postRepository.StubInUseAsync(post))
             {
                 message = $"Stub '{post.Stub}' already exists in that category.";
                 _logger.LogWarning(message, post.Title, post.PostCategoryId);

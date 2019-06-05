@@ -19,65 +19,47 @@ namespace Ocuda.test.Ops.Service.Test
         private const string TestDate = "2018-07-20";
 
         [Theory]
-        [InlineData(true, 1, 1, ".txt", 1, "Name", null, null, 1)]      //Valid CategoryId
-        [InlineData(true, null, 1, ".txt", 1, "Name", 1, null, 1)]      //Valid PageId
-        [InlineData(true, null, 1, ".txt", 1, "Name", null, 1, 1)]      //Valid PostId
-        [InlineData(false, 1, -1, ".txt", 1, "Name", null, null, 1)]    //Invalid CreatedBy
-        [InlineData(false, -1, 1, ".txt", 1, "Name", null, null, 1)]    //Invalid CategoryId
-        [InlineData(false, 1, 1, ".fail", 1, "Name", null, null, 1)]    //Invalid Extension
-        [InlineData(false, 1, 1, ".txt", -1, "Name", null, null, 1)]    //Invalid FileTypeId
-        [InlineData(false, null, 1, ".txt", 1, "Name", -1, null, 1)]    //Invalid PageId
-        [InlineData(false, null, 1, ".txt", 1, "Name", null, -1, 1)]    //Invalid PostId
-        [InlineData(false, 1, 1, ".txt", 1, "Name", null, null, -1)]    //Invalid SectionId
-        [InlineData(false, null, 1, ".txt", 1, "Name", null, null, 1)]  //Invalid Null Category/Page/Post
-        [InlineData(false, 1, 1, null, 1, "Name", null, null, 1)]       //Invalid Null Extension
-        [InlineData(false, 1, 1, ".txt", 1, null, null, null, 1)]       //Invalid Null Name
-        public async Task ValidateFile_ThrowsOcudaExceptions(
+        [InlineData(true, 1, 1, 1, "Name", null, null)]        //Valid FileLibraryId
+        [InlineData(true, 1, 1, null, "Name", 1, null)]      //Valid PageId
+        [InlineData(true, 1, 1, null, "Name", null, 1)]      //Valid PostId
+        [InlineData(false, -1, 1, 1, "Name", null, null)]    //Invalid CreatedBy
+        [InlineData(false, 1, -1, 1, "Name", null, null)]    //Invalid FileTypeId
+        [InlineData(false, 1, 1, -1, "Name", 1, null)]         //Invalid FileLibraryId
+        [InlineData(false, 1, 1, null, "Name", -1, null)]    //Invalid PageId
+        [InlineData(false, 1, 1, null, "Name", null, -1)]    //Invalid PostId
+        [InlineData(false, 1, 1, null, "Name", null, null)]  //Invalid Null Library/Page/Post
+        [InlineData(false, 1, 1, 1, null, null, null)]       //Invalid Null Name
+        public void ValidateFile_ThrowsOcudaExceptions(
             bool isValidInput,
-            int? categoryId,
             int createdBy,
-            string extension,
             int fileTypeId,
+            int? fileLibraryId,
             string name,
             int? pageId,
-            int? postId,
-            int sectionId)
+            int? postId)
         {
             var file = new File
             {
-                CategoryId = categoryId,
                 CreatedAt = DateTime.Parse(TestDate),
                 CreatedBy = createdBy,
                 Description = "Description",
-                Extension = extension,
+                FileLibraryId = fileLibraryId,
                 FileTypeId = fileTypeId,
                 Id = 1,
-                IsFeatured = false,
                 Name = name,
                 PageId = pageId,
-                PostId = postId,
-                SectionId = sectionId
+                PostId = postId
             };
 
             var logger = new Mock<ILogger<FileService>>();
 
-            var categoryRepository = new Mock<ICategoryRepository>();
-            categoryRepository.Setup(
-                m => m.GetCategoryAndFileTypesByCategoryIdAsync(1))
-                    .ReturnsAsync(new Category
+            var fileLibraryRepository = new Mock<IFileLibraryRepository>();
+            fileLibraryRepository.Setup(
+                m => m.FindAsync(1))
+                    .ReturnsAsync(new FileLibrary
                     {
                         Id = 1,
-                        Name = "Test Category 1",
-                        CategoryFileTypes = new List<CategoryFileType>
-                        {
-                            new CategoryFileType{
-                                FileTypeId = 1,
-                                FileType = new FileType
-                                {
-                                    Extension = ".txt"
-                                }
-                            }
-                        }
+                        Name = "Test Library 1"
                     });
 
             var fileRepository = new Mock<IFileRepository>();
@@ -141,7 +123,7 @@ namespace Ocuda.test.Ops.Service.Test
 
             var fileService = new FileService(
                 logger.Object,
-                categoryRepository.Object,
+                fileLibraryRepository.Object,
                 fileRepository.Object,
                 pageRepository.Object,
                 postRepository.Object,
@@ -153,7 +135,7 @@ namespace Ocuda.test.Ops.Service.Test
                 pathResolver.Object);
 
             //Act
-            var ex = await Record.ExceptionAsync(() => fileService.ValidateFileAsync(file));
+            var ex = Record.Exception(() => fileService.ValidateFile(file));
 
             //Assert
             if (isValidInput)

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Ops.Models.Entities
 {
@@ -22,5 +23,11 @@ namespace Ocuda.Ops.Models.Entities
 
         [DisplayName("Show in Navigation Bar?")]
         public bool IsNavigation { get; set; }
+
+        [NotMapped]
+        public bool IsDefault
+        {
+            get => string.IsNullOrWhiteSpace(Path);
+        }
     }
 }

@@ -8,6 +8,8 @@ namespace Ocuda.Ops.Service.Filters
         public int? PostCategoryId { get; set; }
         public int? FileLibraryId { get; set; }
         public int? LinkLibraryId { get; set; }
+        public bool IsHomepage { get; set; }
+        public bool? IsPublished { get; set; }
 
         public BlogFilter(int? page = null, int take = 15) : base(page, take) { }
     }

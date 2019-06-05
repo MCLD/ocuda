@@ -7,10 +7,10 @@ using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages;
 using Ocuda.Ops.Controllers.Authorization;
 using Ocuda.Ops.Controllers.Filters;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Utility.Keys;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
 
@@ -86,27 +86,31 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(string title, string stub, int sectionId)
+        public async Task<IActionResult> Create(IndexViewModel model)
         {
-            var page = new Page
-            {
-                IsDraft = true,
-                SectionId = sectionId,
-                Stub = stub,
-                Title = title
-            };
+            JsonResponse response;
+
+            model.Page.PublishedAt = null;
 
             try
             {
-                var newPage = await _pageService.CreateAsync(CurrentUserId, page);
-                return Json(new { success = true, id = newPage.Id });
+                var newPage = await _pageService.CreateAsync(CurrentUserId, model.Page);
+                response = new JsonResponse
+                {
+                    Success = true,
+                    EntityId = newPage.Id
+                };
             }
             catch (OcudaException ex)
             {
-                _logger.LogError($"Error adding page: {ex}", ex);
-                ShowAlertDanger("Unable to add page: ", ex.Message);
-                return Json(new { success = false, message = ex.Message });
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
             }
+
+            return Json(response);
         }
 
         [RestoreModelState]
@@ -127,7 +131,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 Action = nameof(Edit),
                 Page = page,
                 SectionId = page.SectionId,
-                IsDraft = page.IsDraft,
                 Attachments = attachments
             };
 
@@ -138,15 +141,15 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [SaveModelState]
         public async Task<IActionResult> Edit(DetailViewModel model)
         {
-            var currentPost = await _pageService.GetByIdAsync(model.Page.Id);
+            var currentPage = await _pageService.GetByIdAsync(model.Page.Id);
 
-            if (currentPost.IsDraft == true && model.Page.IsDraft == false)
+            if (!currentPage.PublishedAt.HasValue && model.Publish)
             {
                 var stubInUse = await _pageService.StubInUseAsync(model.Page);
 
                 if (stubInUse)
                 {
-                    ModelState.AddModelError("Page_IsDraft", string.Empty);
+                    ModelState.AddModelError("Post_IsDraft", string.Empty);
                     ShowAlertDanger("The chosen stub is already in use. Please choose a different stub.");
                 }
             }

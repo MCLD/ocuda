@@ -14,14 +14,14 @@ namespace Ocuda.Ops.Service
     public class LinkService : ILinkService
     {
         private readonly ILogger<LinkService> _logger;
-        private readonly ILinkRepository _linkRepository;
         private readonly ILinkLibraryRepository _linkLibraryRepository;
+        private readonly ILinkRepository _linkRepository;
         private readonly ISectionRepository _sectionRepository;
         private readonly IUserRepository _userRepository;
 
         public LinkService(ILogger<LinkService> logger,
-            ILinkRepository linkRepository,
             ILinkLibraryRepository linkLibraryRepository,
+            ILinkRepository linkRepository,
             ISectionRepository sectionRepository,
             IUserRepository userRepository)
         {
