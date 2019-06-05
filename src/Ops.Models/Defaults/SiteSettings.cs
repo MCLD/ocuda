@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Ocuda.Ops.Models.Entities;
+
 namespace Ocuda.Ops.Models.Defaults
 {
     public static class SiteSettings

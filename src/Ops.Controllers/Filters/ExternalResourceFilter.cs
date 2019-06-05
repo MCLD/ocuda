@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Controllers.Filters
@@ -22,8 +23,8 @@ namespace Ocuda.Ops.Controllers.Filters
         public async Task OnResourceExecutionAsync(ResourceExecutingContext context,
             ResourceExecutionDelegate next)
         {
-            var css = await _externalResourceService.GetAllAsync(Models.ExternalResourceType.CSS);
-            var js = await _externalResourceService.GetAllAsync(Models.ExternalResourceType.JS);
+            var css = await _externalResourceService.GetAllAsync(ExternalResourceType.CSS);
+            var js = await _externalResourceService.GetAllAsync(ExternalResourceType.JS);
 
             context.HttpContext.Items[ItemKey.ExternalCSS] = css.Select(_ => _.Url).ToList();
             context.HttpContext.Items[ItemKey.ExternalJS] = js.Select(_ => _.Url).ToList();

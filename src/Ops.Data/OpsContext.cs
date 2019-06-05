@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Data
 {
@@ -21,16 +22,10 @@ namespace Ocuda.Ops.Data
 
             // configure composite keys
             // https://docs.microsoft.com/en-us/ef/core/modeling/keys
-            modelBuilder.Entity<Models.UserMetadata>()
+            modelBuilder.Entity<FileLibraryFileType>()
+                .HasKey(_ => new { _.FileLibraryId, _.FileTypeId });
+            modelBuilder.Entity<UserMetadata>()
                 .HasKey(_ => new { _.UserId, _.UserMetadataTypeId });
-
-            /*
-            var categoryConverter = new EnumToNumberConverter<Models.CategoryType, int>();
-            modelBuilder
-                .Entity<Models.Category>()
-                .Property(_ => _.CategoryType)
-                .HasConversion(categoryConverter);
-            */
         }
 
         #region IMigratableContext
@@ -39,23 +34,25 @@ namespace Ocuda.Ops.Data
         public new string GetCurrentMigration() => Database.GetAppliedMigrations().Last();
         #endregion IMigratableContext
 
-        public DbSet<Models.Category> Categories { get; set; }
-        public DbSet<Models.ClaimGroup> ClaimGroups { get; set; }
-        public DbSet<Models.CategoryFileType> CategoryFileTypes { get; set; }
-        public DbSet<Models.ExternalResource> ExternalResources { get; set; }
-        public DbSet<Models.File> Files { get; set; }
-        public DbSet<Models.FileType> FileTypes { get; set; }
-        public DbSet<Models.Link> Links { get; set; }
-        public DbSet<Models.Page> Pages { get; set; }
-        public DbSet<Models.Post> Posts { get; set; }
-        public DbSet<Models.RosterHeader> RosterHeaders { get; set; }
-        public DbSet<Models.RosterDetail> RosterDetails { get; set; }
-        public DbSet<Models.Section> Sections { get; set; }
-        public DbSet<Models.SectionManagerGroup> SectionManagerGroups { get; set; }
-        public DbSet<Models.SiteSetting> SiteSettings { get; set; }
-        public DbSet<Models.Thumbnail> Thumbnails { get; set; }
-        public DbSet<Models.User> Users { get; set; }
-        public DbSet<Models.UserMetadata> UserMetadata { get; set; }
-        public DbSet<Models.UserMetadataType> UserMetadataTypes { get; set; }
+        public DbSet<ClaimGroup> ClaimGroups { get; set; }
+        public DbSet<ExternalResource> ExternalResources { get; set; }
+        public DbSet<File> Files { get; set; }
+        public DbSet<FileLibrary> FileLibraries { get; set; }
+        public DbSet<FileLibraryFileType> FileLibraryFileTypes { get; set; }
+        public DbSet<FileType> FileTypes { get; set; }
+        public DbSet<Link> Links { get; set; }
+        public DbSet<Link> LinkLibrary { get; set; }
+        public DbSet<Page> Pages { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Post> PostCategory { get; set; }
+        public DbSet<RosterHeader> RosterHeaders { get; set; }
+        public DbSet<RosterDetail> RosterDetails { get; set; }
+        public DbSet<Section> Sections { get; set; }
+        public DbSet<SectionManagerGroup> SectionManagerGroups { get; set; }
+        public DbSet<SiteSetting> SiteSettings { get; set; }
+        public DbSet<Thumbnail> Thumbnails { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserMetadata> UserMetadata { get; set; }
+        public DbSet<UserMetadataType> UserMetadataTypes { get; set; }
     }
 }

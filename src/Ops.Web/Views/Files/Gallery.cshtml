@@ -1,5 +1,6 @@
 ﻿@model Ocuda.Ops.Controllers.ViewModels.Files.GalleryViewModel
-
+@*TODO*@
+@*
 <div class="row mb-2">
     <div class="col">
         <span>Category: </span>
@@ -14,8 +15,8 @@
                 <li>
                     <a class="dropdown-item" asp-route-categoryId="@category.Id">
                         @(string.IsNullOrWhiteSpace(category.Name)
-                            ? FilesController.DefaultCategoryDisplayName
-                            : category.Name)
+                                    ? FilesController.DefaultCategoryDisplayName
+                                    : category.Name)
                     </a>
                 </li>
             }
@@ -68,3 +69,4 @@ else
         }
     </div>
 }
+*@

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Data.Extensions;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Models;
@@ -13,9 +13,9 @@ using Ocuda.Ops.Service.Models;
 namespace Ocuda.Ops.Data.Ops
 {
     public class SectionRepository 
-        : GenericRepository<Models.Section, int>, ISectionRepository
+        : GenericRepository<Section, int>, ISectionRepository
     {
-        public SectionRepository(OpsContext context, ILogger<SectionRepository> logger) 
+        public SectionRepository(OpsContext context, ILogger<SectionRepository> logger)
             : base(context, logger)
         {
         }
@@ -33,10 +33,10 @@ namespace Ocuda.Ops.Data.Ops
             return await DbSet
                 .AsNoTracking()
                 .GroupJoin(_context.Links
-                                .Where(_ => _.Category.IsNavigation)
+                                .Where(_ => _.LinkLibrary.IsNavigation)
                                 .OrderBy(_ => _.Name),
                       section => section.Id,
-                      links => links.SectionId,
+                      links => links.LinkLibrary.SectionId,
                       (section, links) => new { section, links })
                 .Where(_ => _.section.IsNavigation
                          && _.section.IsDeleted == false)
@@ -95,7 +95,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Name == section.Name 
+                .Where(_ => _.Name == section.Name
                          && _.Id != section.Id
                          && _.IsDeleted == false)
                 .AnyAsync();

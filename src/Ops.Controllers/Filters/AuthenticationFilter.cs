@@ -157,7 +157,7 @@ namespace Ocuda.Ops.Controllers.Filters
                         var newUser = user == null;
                         if (newUser)
                         {
-                            user = new Models.User
+                            user = new Models.Entities.User
                             {
                                 Username = username,
                                 LastSeen = now

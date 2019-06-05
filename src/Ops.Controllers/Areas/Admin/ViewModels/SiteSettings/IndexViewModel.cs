@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.SiteSettings
 {

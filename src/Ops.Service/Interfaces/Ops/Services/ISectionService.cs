@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Models;
 
@@ -20,7 +20,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<int> GetSectionCountAsync();
         Task<Section> CreateAsync(int currentUserId, Section section);
         Task<Section> EditAsync(Section section);
-        Task EditFeaturedVideoUrlAsync(int sectionId, string url);
         Task DeleteAsync(int id);
     }
 }

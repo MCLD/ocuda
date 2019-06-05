@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Files;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
@@ -18,7 +18,6 @@ namespace Ocuda.Ops.Controllers
 {
     public class FilesController : BaseController<FilesController>
     {
-        private readonly ICategoryService _categoryService;
         private readonly IFileService _fileService;
         private readonly ISectionService _sectionService;
         private readonly IThumbnailService _thumbnailService;
@@ -27,14 +26,11 @@ namespace Ocuda.Ops.Controllers
         public const string DefaultCategoryDisplayName = "[No Category]";
 
         public FilesController(ServiceFacades.Controller<FilesController> context,
-            ICategoryService categoryService,
             IFileService fileService,
             ISectionService sectionService,
             IThumbnailService thumbnailService,
             IUserService userService) : base(context)
         {
-            _categoryService = categoryService
-                ?? throw new ArgumentNullException(nameof(categoryService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(sectionService));
@@ -44,21 +40,26 @@ namespace Ocuda.Ops.Controllers
                 ?? throw new ArgumentNullException(nameof(userService));
         }
 
-        public async Task<IActionResult> Index(string section, int? categoryId = null, int page = 1)
+        public async Task<IActionResult> Library(string section, int id, int page = 1)
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
+            var currentLibrary = await _fileService.GetLibraryByIdAsync(id);
+
+            if (currentLibrary?.SectionId != currentSection.Id)
+            {
+                return RedirectToAction(nameof(HomeController.Index), "Home");
+            }
+
             var itemsPerPage = await _siteSettingService
                 .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
 
             var filter = new BlogFilter(page, itemsPerPage)
             {
                 SectionId = currentSection.Id,
-                CategoryId = categoryId,
-                CategoryType = CategoryType.File
+                FileLibraryId = id
             };
 
             var fileList = await _fileService.GetPaginatedListAsync(filter);
-            var categories = await _categoryService.GetBySectionIdAsync(filter);
 
             var paginateModel = new PaginateModel()
             {
@@ -66,7 +67,6 @@ namespace Ocuda.Ops.Controllers
                 CurrentPage = page,
                 ItemsPerPage = filter.Take.Value
             };
-
             if (paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
             {
                 return RedirectToRoute(
@@ -83,19 +83,12 @@ namespace Ocuda.Ops.Controllers
                 file.CreatedByUsername = userInfo.Item2;
             }
 
-            var viewModel = new IndexViewModel()
+            var viewModel = new LibraryViewModel()
             {
                 PaginateModel = paginateModel,
                 Files = fileList.Data,
-                Categories = categories
+                Library = currentLibrary
             };
-
-            if (categoryId.HasValue)
-            {
-                var name = (await _categoryService.GetByIdAsync(categoryId.Value)).Name;
-                viewModel.CategoryName =
-                    string.IsNullOrWhiteSpace(name) ? DefaultCategoryDisplayName : name;
-            }
 
             return View(viewModel);
         }
@@ -104,7 +97,7 @@ namespace Ocuda.Ops.Controllers
         {
             var file = await _fileService.GetByIdAsync(id);
             var fileBytes = await _fileService.ReadPrivateFileAsync(file);
-            string fileName = $"{file.Name}{file.Extension}";
+            string fileName = file.Name + file.FileType.Extension;
             try
             {
                 var typeProvider = new FileExtensionContentTypeProvider();
@@ -122,6 +115,9 @@ namespace Ocuda.Ops.Controllers
 
         public async Task<IActionResult> Gallery(string section, int? categoryId = null, int page = 1)
         {
+            // TODO
+            return null;
+            /*
             var currentSection = await _sectionService.GetByPathAsync(section);
             var itemsPerPage = await _siteSettingService
                 .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
@@ -175,6 +171,7 @@ namespace Ocuda.Ops.Controllers
             }
 
             return View(viewModel);
+            */
         }
     }
 }

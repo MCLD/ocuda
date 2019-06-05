@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
@@ -35,11 +35,6 @@ namespace Ocuda.Ops.Service
         public async Task<FileType> GetByIdAsync(int id)
         {
             return await _fileTypeRepository.FindAsync(id);
-        }
-
-        public async Task<int> GetIdByExtensionAsync(string extension)
-        {
-            return await _fileTypeRepository.GetIdByExtensionAsync(extension);
         }
     }
 }

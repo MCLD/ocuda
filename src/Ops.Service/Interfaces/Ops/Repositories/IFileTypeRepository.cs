@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
@@ -10,6 +10,5 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
     {
         Task<ICollection<FileType>> GetAllExtensionsAsync();
         Task<FileType> GetByExtensionAsync(string extension);
-        Task<int> GetIdByExtensionAsync(string extension);
     }
 }

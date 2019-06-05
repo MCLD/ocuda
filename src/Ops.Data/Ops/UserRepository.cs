@@ -4,13 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 
 namespace Ocuda.Ops.Data.Ops
 {
     public class UserRepository
-        : GenericRepository<Models.User, int>, IUserRepository
+        : GenericRepository<User, int>, IUserRepository
     {
         public UserRepository(OpsContext context, ILogger<UserRepository> logger)
             : base(context, logger)
@@ -96,7 +96,7 @@ namespace Ocuda.Ops.Data.Ops
         }
 
         #region Initial setup methods
-        public async Task<Models.User> GetSystemAdministratorAsync()
+        public async Task<User> GetSystemAdministratorAsync()
         {
             return await DbSet
                 .AsNoTracking()

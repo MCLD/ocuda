@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Files
 {
@@ -8,9 +8,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Files
     {
         public File File { get; set; }
         public string Action { get; set; }
-        public int SectionId { get; set; }
-        public Category Category { get; set; }
-        public string CategoryName { get; set; }
+        public int LibraryId { get; set; }
         public IFormFile FileData { get; set; }
         public bool ThumbnailRequired { get; set; }
         public ICollection<IFormFile> ThumbnailFiles { get; set; }

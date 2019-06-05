@@ -28,15 +28,15 @@ namespace Ocuda.Utility.TagHelpers
         private const string headerIconClass = "fa fa-times";
         private const string bodyClass = "modal-body";
         private const string bodyAlertClass = "modal-alert alert alert-danger d-none";
-        private const string bodyDeleteIconClass = "fa fa-exclamation-triangle modal-icon";
+        private const string bodyDeleteIconClass = "fa fa-exclamation-triangle mr-2";
         private const string bodyDeleteTextClass = "modal-text";
         private const string footerClass = "modal-footer";
         private const string cancelButtonClass = "btn btn-outline-secondary";
         private const string confirmButtonClass = "modal-btn-confirm";
         private const string deleteButtonClass = "btn btn-danger btn-spinner";
         private const string saveButtonClass = "btn btn-success btn-spinner";
-        private const string footerDeleteIconClass = "fa fa-times";
-        private const string buttonSpinnerClass = "fa fa-spinner fa-lg fa-pulse fa-fw d-none";
+        private const string footerDeleteIconClass = "fa fa-times mr-1";
+        private const string buttonSpinnerClass = "fa fa-spinner fa-lg fa-pulse fa-fw ml-1 d-none";
 
         private readonly IHtmlGenerator _htmlGenerator;
         public ModalTagHelper(IHtmlGenerator htmlGenerator)

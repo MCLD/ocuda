@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -17,7 +17,7 @@ namespace Ocuda.Ops.Service
     public class FileService : IFileService
     {
         private readonly ILogger<FileService> _logger;
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly IFileLibraryRepository _fileLibraryRepository;
         private readonly IFileRepository _fileRepository;
         private readonly IPageRepository _pageRepository;
         private readonly IPostRepository _postRepository;
@@ -29,7 +29,7 @@ namespace Ocuda.Ops.Service
         private readonly IPathResolverService _pathResolver;
 
         public FileService(ILogger<FileService> logger,
-            ICategoryRepository categoryRepository,
+            IFileLibraryRepository fileLibraryRepository,
             IFileRepository fileRepository,
             IPageRepository pageRepository,
             IPostRepository postRepository,
@@ -42,8 +42,8 @@ namespace Ocuda.Ops.Service
         {
             _logger = logger
                 ?? throw new ArgumentNullException(nameof(logger));
-            _categoryRepository = categoryRepository
-                ?? throw new ArgumentNullException(nameof(categoryRepository));
+            _fileLibraryRepository = fileLibraryRepository
+                ?? throw new ArgumentNullException(nameof(fileLibraryRepository));
             _fileRepository = fileRepository
                 ?? throw new ArgumentNullException(nameof(fileRepository));
             _pageRepository = pageRepository
@@ -88,11 +88,20 @@ namespace Ocuda.Ops.Service
         public async Task<File> CreatePrivateFileAsync(int currentUserId,
             File file, IFormFile fileData, ICollection<IFormFile> thumbnailFiles)
         {
+            var extension = System.IO.Path.GetExtension(fileData.FileName);
+            var fileType = await _fileTypeService.GetByExtensionAsync(extension);
+
+            if (fileType == null)
+            {
+                _logger.LogError($"{extension} is an unknown file type.", file);
+                throw new OcudaException("Unknown file type.");
+            }
+
+            file.Description = file.Description?.Trim();
             file.Name = file.Name?.Trim();
             file.CreatedAt = DateTime.Now;
             file.CreatedBy = currentUserId;
-            file.Extension = System.IO.Path.GetExtension(fileData.FileName);
-            file.FileTypeId = await _fileTypeService.GetIdByExtensionAsync(file.Extension);
+            file.FileTypeId = fileType.Id;
 
             if (thumbnailFiles != null)
             {
@@ -102,7 +111,6 @@ namespace Ocuda.Ops.Service
                 {
                     thumbnailList.Add(new Thumbnail
                     {
-                        Name = thumbnail.FileName,
                         CreatedAt = file.CreatedAt,
                         CreatedBy = file.CreatedBy
                     });
@@ -111,11 +119,12 @@ namespace Ocuda.Ops.Service
                 file.Thumbnails = thumbnailList;
             }
 
-            await ValidateFileAsync(file);
+            ValidateFile(file);
 
             await _fileRepository.AddAsync(file);
             await _fileRepository.SaveAsync();
 
+            file.FileType = fileType;
             await WritePrivateFileAsync(file, fileData);
 
             if (thumbnailFiles != null)
@@ -127,23 +136,33 @@ namespace Ocuda.Ops.Service
         }
 
         public async Task<File> EditPrivateFileAsync(int currentUserId,
-            File file, IFormFile fileData, ICollection<IFormFile> thumbnailFiles, int[] thumbnailIdsToKeep)
+            File file,
+            IFormFile fileData,
+            ICollection<IFormFile> thumbnailFiles,
+            int[] thumbnailIdsToKeep)
         {
             var currentFile = await _fileRepository.FindAsync(file.Id);
-            var currentFilePath = GetPrivateFilePath(currentFile);
-
-            currentFile.Name = file.Name?.Trim();
-            currentFile.Description = file.Description;
-            currentFile.IsFeatured = file.IsFeatured;
 
             if (fileData != null)
             {
-                currentFile.Extension = System.IO.Path.GetExtension(fileData.FileName);
-                currentFile.FileTypeId = await _fileTypeService.GetIdByExtensionAsync(file.Extension);
+                var extension = System.IO.Path.GetExtension(fileData.FileName);
+                var fileType = await _fileTypeService.GetByExtensionAsync(extension);
+
+                if (fileType == null)
+                {
+                    _logger.LogError($"{extension} is an unknown file type.", file);
+                    throw new OcudaException("Unknown file type.");
+                }
+
+                currentFile.FileTypeId = fileType.Id;
+                currentFile.FileType = fileType;
             }
 
+            currentFile.Description = file.Description?.Trim();
+            currentFile.Name = file.Name?.Trim();
+
             var thumbnailsToRemove = currentFile.Thumbnails
-                .Where(_ => thumbnailIdsToKeep.Contains(_.Id) == false).ToList();
+                .Where(_ => !thumbnailIdsToKeep.Contains(_.Id)).ToList();
 
             foreach (var thumbnail in thumbnailsToRemove)
             {
@@ -159,7 +178,6 @@ namespace Ocuda.Ops.Service
                 {
                     var newThumbnail = new Thumbnail
                     {
-                        Name = thumbnail.FileName,
                         CreatedAt = DateTime.Now,
                         CreatedBy = currentUserId
                     };
@@ -169,7 +187,7 @@ namespace Ocuda.Ops.Service
                 }
             }
 
-            await ValidateFileAsync(currentFile);
+            ValidateFile(currentFile);
 
             _fileRepository.Update(currentFile);
             await _fileRepository.SaveAsync();
@@ -177,6 +195,7 @@ namespace Ocuda.Ops.Service
 
             if (fileData != null)
             {
+                var currentFilePath = GetPrivateFilePath(currentFile);
                 await WritePrivateFileAsync(currentFile, fileData, currentFilePath);
             }
 
@@ -195,17 +214,16 @@ namespace Ocuda.Ops.Service
 
         public string GetPublicFilePath(File file)
         {
-            return _pathResolver.GetPublicContentFilePath($"file{file.Id}{file.Extension}",
-                $"section{file.SectionId}");
+            return _pathResolver.GetPublicContentFilePath($"file{file.Id}{file.FileType.Extension}");
         }
 
         public string GetPrivateFilePath(File file)
         {
-            return _pathResolver.GetPrivateContentFilePath($"file{file.Id}{file.Extension}",
-                $"section{file.SectionId}");
+            return _pathResolver.GetPrivateContentFilePath($"file{file.Id}{file.FileType.Extension}");
         }
 
-        private async Task WritePrivateFileAsync(File file, IFormFile fileData, string oldFilePath = null)
+        private async Task WritePrivateFileAsync(File file, IFormFile fileData,
+            string oldFilePath = null)
         {
             string filePath = GetPrivateFilePath(file);
             byte[] fileBytes = IFormFileHelper.GetFileBytes(fileData);
@@ -264,120 +282,30 @@ namespace Ocuda.Ops.Service
             }
         }
 
-        public async Task ValidateFileAsync(File file)
-        {
-            // TODO Update Validation
-            var message = string.Empty;
-            var section = await _sectionRepository.FindAsync(file.SectionId);
-
-            if (section == null)
-            {
-                message = $"SectionId '{file.SectionId}' is not a valid section.";
-                _logger.LogWarning(message, file.SectionId);
-                throw new OcudaException(message);
-            }
-
-            if (string.IsNullOrWhiteSpace(file.Name))
-            {
-                message = $"File name cannot be empty.";
-                _logger.LogWarning(message, file);
-                throw new OcudaException(message);
-            }
-
-            if (string.IsNullOrWhiteSpace(file.Extension))
-            {
-                message = $"File must have a type extension.";
-                _logger.LogWarning(message, file);
-                throw new OcudaException(message);
-            }
-
-            var fileType = await _fileTypeService.GetByIdAsync(file.FileTypeId);
-            if (fileType == null)
-            {
-                message = $"File must have a type.";
-                _logger.LogWarning(message, file);
-                throw new OcudaException(message);
-            }
-
-            if (file.CategoryId.HasValue)
-            {
-                var category = await _categoryRepository
-                    .GetCategoryAndFileTypesByCategoryIdAsync(file.CategoryId.Value);
-
-                if (category == null)
-                {
-                    message = $"CategoryId '{file.CategoryId}' is not valid.";
-                    _logger.LogWarning(message, file.CategoryId);
-                    throw new OcudaException(message);
-                }
-                else
-                {
-                    var fileExtensions = category.CategoryFileTypes.Select(_ => _.FileType.Extension);
-
-                    if (fileExtensions.Count() > 0 && !fileExtensions.Contains(file.Extension))
-                    {
-                        message = $"{category.Name} does not accept files ending with '{file.Extension}'.";
-                        _logger.LogWarning(message, file.CategoryId, file.Extension, fileExtensions);
-                        throw new OcudaException(message);
-                    }
-                }
-            }
-
-            if (file.PageId.HasValue)
-            {
-                var page = await _pageRepository.FindAsync(file.PageId.Value);
-                if (page == null)
-                {
-                    message = $"PageId '{file.PageId}' is not valid.";
-                    _logger.LogWarning(message, file.PageId);
-                    throw new OcudaException(message);
-                }
-            }
-
-            if (file.PostId.HasValue)
-            {
-                var post = await _postRepository.FindAsync(file.PostId.Value);
-                if (post == null)
-                {
-                    message = $"PostId '{file.PostId}' is not valid.";
-                    _logger.LogWarning(message, file.PostId);
-                    throw new OcudaException(message);
-                }
-            }
-
-            if (!file.CategoryId.HasValue && !file.PageId.HasValue && !file.PostId.HasValue)
-            {
-                message = $"File must be assigned to a Category, Page, or Post";
-                _logger.LogWarning(message, file);
-                throw new OcudaException(message);
-            }
-
-            var creator = await _userRepository.FindAsync(file.CreatedBy);
-            if (creator == null)
-            {
-                message = $"Created by invalid User Id: {file.CreatedBy}";
-                _logger.LogWarning(message, file.CreatedBy);
-                throw new OcudaException(message);
-            }
-        }
-
-        public async Task<IEnumerable<int>> GetFileTypeIdsInUseByCategoryIdAsync(int categoryId)
-        {
-            return await _fileRepository.GetFileTypeIdsInUseByCategoryId(categoryId);
-        }
-
         public async Task<File> CreatePublicFileAsync(int currentUserId, File file, IFormFile fileData)
         {
+            var extension = System.IO.Path.GetExtension(fileData.FileName);
+            var fileType = await _fileTypeService.GetByExtensionAsync(extension);
+
+            if (fileType == null)
+            {
+                _logger.LogError($"{extension} is an unknown file type.", file);
+                throw new OcudaException("Unknown file type.");
+            }
+
             file.Name = file.Name?.Trim();
+            file.Description = file.Description?.Trim();
+            file.FileTypeId = fileType.Id;
             file.CreatedAt = DateTime.Now;
             file.CreatedBy = currentUserId;
-            file.Extension = System.IO.Path.GetExtension(fileData.FileName);
-            file.FileTypeId = await _fileTypeService.GetIdByExtensionAsync(file.Extension);
 
-            await ValidateFileAsync(file);
+
+            ValidateFile(file);
 
             await _fileRepository.AddAsync(file);
             await _fileRepository.SaveAsync();
+
+            file.FileType = fileType;
 
             await WritePublicFileAsync(file, fileData);
 
@@ -431,6 +359,110 @@ namespace Ocuda.Ops.Service
 
             _fileRepository.Remove(id);
             await _fileRepository.SaveAsync();
+        }
+
+        public void ValidateFile(File file)
+        {
+            if (file.FileLibraryId.HasValue)
+            {
+                if (file.PageId.HasValue)
+                {
+                    var message = "File cannot belong to a file library and a page.";
+                    _logger.LogWarning(message, file);
+                    throw new OcudaException(message);
+                }
+                else if (file.PostId.HasValue)
+                {
+                    var message = "File cannot belong to a file library and a post.";
+                    _logger.LogWarning(message, file);
+                    throw new OcudaException(message);
+                }
+            }
+            else if (file.PageId.HasValue && file.PostId.HasValue)
+            {
+                var message = "File cannot belong to a page and a post.";
+                _logger.LogWarning(message, file);
+                throw new OcudaException(message);
+            }
+            else if (!file.PageId.HasValue && !file.PostId.HasValue)
+            {
+                var message = "File must belong to a file library, page or post.";
+                _logger.LogWarning(message, file);
+                throw new OcudaException(message);
+            }
+        }
+
+        public async Task<FileLibrary> GetLibraryByIdAsync(int id)
+        {
+            return await _fileLibraryRepository.FindAsync(id);
+        }
+
+        public async Task<DataWithCount<ICollection<FileLibrary>>> GetPaginatedLibraryListAsync(
+            BlogFilter filter)
+        {
+            return await _fileLibraryRepository.GetPaginatedListAsync(filter);
+        }
+
+        public async Task<FileLibrary> CreateLibraryAsync(int currentUserId, FileLibrary library,
+            ICollection<int> fileTypeIds)
+        {
+            library.Name = library.Name?.Trim();
+            library.CreatedAt = DateTime.Now;
+            library.CreatedBy = currentUserId;
+            library.FileTypes = fileTypeIds.Select(_ => new FileLibraryFileType
+            {
+                FileTypeId = _
+            }).ToList();
+
+            await _fileLibraryRepository.AddAsync(library);
+            await _fileLibraryRepository.SaveAsync();
+
+            return library;
+        }
+
+        public async Task<FileLibrary> EditLibraryAsync(FileLibrary library,
+            ICollection<int> fileTypeIds)
+        {
+            var currentLibrary = await _fileLibraryRepository.FindAsync(library.Id);
+
+            currentLibrary.Name = currentLibrary.Name.Trim();
+
+            var fileTypesToAdd = fileTypeIds
+                .Except(currentLibrary.FileTypes.Select(_ => _.FileTypeId))
+                .Select(_ => new FileLibraryFileType
+                {
+                    FileLibrary = currentLibrary,
+                    FileTypeId = _
+                });
+            foreach (var fileType in fileTypesToAdd)
+            {
+                currentLibrary.FileTypes.Add(fileType);
+            }
+
+            var fileTypesToRemove = currentLibrary.FileTypes
+                .Where(_ => !fileTypeIds.Contains(_.FileTypeId));
+
+            _fileLibraryRepository.Update(currentLibrary);
+            _fileLibraryRepository.RemoveLibraryFileTypes(fileTypesToRemove);
+            await _fileLibraryRepository.SaveAsync();
+
+            return library;
+        }
+
+        public async Task DeleteLibraryAsync(int id)
+        {
+            _fileLibraryRepository.Remove(id);
+            await _fileLibraryRepository.SaveAsync();
+        }
+
+        public async Task<ICollection<int>> GetLibraryFileTypeIdsAsync(int libraryId)
+        {
+            return await _fileLibraryRepository.GetLibraryFileTypeIdsAsync(libraryId);
+        }
+
+        public async Task<ICollection<int>> GetFileTypeIdsInUseByLibraryAsync(int libraryId)
+        {
+            return await _fileRepository.GetFileTypeIdsInUseByLibraryAsync(libraryId);
         }
     }
 }

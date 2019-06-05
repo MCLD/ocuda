@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -83,13 +83,20 @@ namespace Ocuda.Ops.Service
             return page;
         }
 
-        public async Task<Page> EditAsync(Page page)
+        public async Task<Page> EditAsync(Page page, bool publish = false)
         {
             var currentPage = await _pageRepository.FindAsync(page.Id);
             currentPage.Title = page.Title?.Trim();
-            currentPage.Stub = page.Stub?.Trim().ToLower();
             currentPage.Content = page.Content;
-            currentPage.IsDraft = page.IsDraft;
+
+            if (!currentPage.PublishedAt.HasValue)
+            {
+                currentPage.Stub = page.Stub?.Trim().ToLower();
+                if (publish)
+                {
+                    currentPage.PublishedAt = DateTime.Now;
+                }
+            }
 
             await ValidatePageAsync(currentPage);
 
@@ -135,9 +142,7 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException(message);
             }
 
-            var stubInUse = await _pageRepository.StubInUseAsync(page);
-
-            if (!page.IsDraft && stubInUse)
+            if (page.PublishedAt.HasValue && await _pageRepository.StubInUseAsync(page))
             {
                 message = $"Stub '{page.Stub}' already exists in '{section.Name}'.";
                 _logger.LogWarning(message, page.Title, page.SectionId);
