@@ -22,13 +22,7 @@ namespace Ocuda.test.Ops.Service.Test
         [InlineData(true, 1, 1, 1, "Name", null, null)]        //Valid FileLibraryId
         [InlineData(true, 1, 1, null, "Name", 1, null)]      //Valid PageId
         [InlineData(true, 1, 1, null, "Name", null, 1)]      //Valid PostId
-        [InlineData(false, -1, 1, 1, "Name", null, null)]    //Invalid CreatedBy
-        [InlineData(false, 1, -1, 1, "Name", null, null)]    //Invalid FileTypeId
-        [InlineData(false, 1, 1, -1, "Name", 1, null)]         //Invalid FileLibraryId
-        [InlineData(false, 1, 1, null, "Name", -1, null)]    //Invalid PageId
-        [InlineData(false, 1, 1, null, "Name", null, -1)]    //Invalid PostId
         [InlineData(false, 1, 1, null, "Name", null, null)]  //Invalid Null Library/Page/Post
-        [InlineData(false, 1, 1, 1, null, null, null)]       //Invalid Null Name
         public void ValidateFile_ThrowsOcudaExceptions(
             bool isValidInput,
             int createdBy,

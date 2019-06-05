@@ -81,8 +81,6 @@ namespace Ocuda.test.Ops.Service.Test
         [InlineData(true, false, false, true, 1, 2, "Name", "path")]     //Valid Section (No Existing Default)
         [InlineData(true, false, false, false, 1, 1, "Name", null)]      //Valid Default Section
         [InlineData(true, false, false, true, 1, 1, "Name", null)]       //Valid Default Section (No Existing Default)
-        [InlineData(false, false, false, false, -1, 2, "Name", "path")]  //Invalid CreatedBy
-        [InlineData(false, false, false, false, 1, 2, null, "path")]     //Invalid Null Name
         [InlineData(false, false, false, false, 1, 2, "Name", null)]     //Invalid Null Path
         [InlineData(false, true, false, false, 1, 2, "Name", "path")]    //Invalid Duplicate Name
         [InlineData(false, false, true, false, 1, 2, "Name", "path")]    //Invalid Duplicate Path

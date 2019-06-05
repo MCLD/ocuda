@@ -19,10 +19,6 @@ namespace Ocuda.test.Ops.Service.Test
         [InlineData(true, true, 1, 1, null, "test-stub", "Test Title")]        //Valid Draft, StubInUse
         [InlineData(true, false, 1, 1, TestDate, "test-stub", "Test Title")]      //Valid Non-Draft
         [InlineData(false, true, 1, 1, TestDate, "test-stub", "Test Title")]      //Invalid StubInUse, Non-Draft
-        [InlineData(false, false, -1, 1, TestDate, "test-stub", "Test Title")]    //Invalid CreatedBy
-        [InlineData(false, false, 1, -1, TestDate, "test-stub", "Test Title")]    //Invalid PostCategoryId
-        [InlineData(false, false, 1, 1, TestDate, null, "Test Title")]            //Invalid Null Stub
-        [InlineData(false, false, 1, 1, TestDate, "test-stub", null)]             //Invalid Null Title
         public async Task ValidatePost_ThrowsOcudaExceptions(
             bool isValidInput,
             bool stubInUse,

@@ -16,10 +16,6 @@ namespace Ocuda.test.Ops.Service.Test
 
         [Theory]
         [InlineData(true, 1, 1, "Name", "www.test.com")]    //Valid
-        [InlineData(false, -1, 1, "Name", "www.test.com")]  //Invalid CreatedBy
-        [InlineData(false, 1, -1, "Name", "www.test.com")]  //Invalid FileLibraryId
-        [InlineData(false, 1, 1, null, "www.test.com")]     //Invalid Null Name
-        [InlineData(false, 1, 1, "Name", null)]             //Invalid Null URL
         public async Task ValidateLink_ThrowsOcudaExceptions(
             bool isValidInput,
             int createdBy,
