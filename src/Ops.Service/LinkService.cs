@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -14,23 +14,23 @@ namespace Ocuda.Ops.Service
     public class LinkService : ILinkService
     {
         private readonly ILogger<LinkService> _logger;
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly ILinkLibraryRepository _linkLibraryRepository;
         private readonly ILinkRepository _linkRepository;
         private readonly ISectionRepository _sectionRepository;
         private readonly IUserRepository _userRepository;
 
         public LinkService(ILogger<LinkService> logger,
-            ICategoryRepository categoryRepository,
+            ILinkLibraryRepository linkLibraryRepository,
             ILinkRepository linkRepository,
             ISectionRepository sectionRepository,
             IUserRepository userRepository)
         {
             _logger = logger
                 ?? throw new ArgumentNullException(nameof(logger));
-            _categoryRepository = categoryRepository
-                ?? throw new ArgumentNullException(nameof(categoryRepository));
             _linkRepository = linkRepository
                 ?? throw new ArgumentNullException(nameof(linkRepository));
+            _linkLibraryRepository = linkLibraryRepository
+                ?? throw new ArgumentNullException(nameof(linkLibraryRepository));
             _sectionRepository = sectionRepository
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
             _userRepository = userRepository
@@ -60,10 +60,9 @@ namespace Ocuda.Ops.Service
         public async Task<Link> CreateAsync(int currentUserId, Link link)
         {
             link.Name = link.Name?.Trim();
+            link.Url = link.Url?.Trim();
             link.CreatedAt = DateTime.Now;
             link.CreatedBy = currentUserId;
-
-            await ValidateLinkAsync(link);
 
             await _linkRepository.AddAsync(link);
             await _linkRepository.SaveAsync();
@@ -73,13 +72,10 @@ namespace Ocuda.Ops.Service
         public async Task<Link> EditAsync(Link link)
         {
             var currentLink = await _linkRepository.FindAsync(link.Id);
-            currentLink.Name = link.Name?.Trim();
-            currentLink.Url = link.Url;
-            currentLink.CategoryId = link.CategoryId;
-            currentLink.IsFeatured = link.IsFeatured;
-            currentLink.Icon = link.Icon;
 
-            await ValidateLinkAsync(currentLink);
+            currentLink.Name = link.Name?.Trim();
+            currentLink.Url = link.Url?.Trim();
+            currentLink.Icon = link.Icon;
 
             _linkRepository.Update(currentLink);
             await _linkRepository.SaveAsync();
@@ -92,50 +88,51 @@ namespace Ocuda.Ops.Service
             await _linkRepository.SaveAsync();
         }
 
-        public async Task ValidateLinkAsync(Link link)
+        public async Task<LinkLibrary> GetLibraryByIdAsync(int id)
         {
-            var message = string.Empty;
-            var section = await _sectionRepository.FindAsync(link.SectionId);
+            return await _linkLibraryRepository.FindAsync(id);
+        }
 
-            if (section == null)
+        public async Task<DataWithCount<ICollection<LinkLibrary>>> GetPaginatedLibraryListAsync(
+            BlogFilter filter)
+        {
+            return await _linkLibraryRepository.GetPaginatedListAsync(filter);
+        }
+
+        public async Task<LinkLibrary> CreateLibraryAsync(int currentUserId, LinkLibrary library)
+        {
+            library.IsNavigation = false;
+            library.Name = library.Name?.Trim();
+            library.CreatedAt = DateTime.Now;
+            library.CreatedBy = currentUserId;
+
+            await _linkLibraryRepository.AddAsync(library);
+            await _linkLibraryRepository.SaveAsync();
+            return library;
+        }
+
+        public async Task<LinkLibrary> EditLibraryAsync(LinkLibrary library)
+        {
+            var currentLibrary = await _linkLibraryRepository.FindAsync(library.Id);
+
+            currentLibrary.Name = library.Name?.Trim();
+
+            _linkLibraryRepository.Update(currentLibrary);
+            await _linkLibraryRepository.SaveAsync();
+            return currentLibrary;
+        }
+
+        public async Task DeleteLibraryAsync(int id)
+        {
+            var library = await _linkLibraryRepository.FindAsync(id);
+
+            if (library.IsNavigation)
             {
-                message = $"SectionId '{link.SectionId}' is not a valid section.";
-                _logger.LogWarning(message, link.SectionId);
-                throw new OcudaException(message);
+                throw new OcudaException("Cannot delete navigation link libraries.");
             }
 
-            if (string.IsNullOrWhiteSpace(link.Name))
-            {
-                message = $"Link name cannot be empty.";
-                _logger.LogWarning(message);
-                throw new OcudaException(message);
-            }
-
-            if (string.IsNullOrWhiteSpace(link.Url))
-            {
-                message = $"Link URL cannot be empty.";
-                _logger.LogWarning(message);
-                throw new OcudaException(message);
-            }
-
-            if (link.CategoryId.HasValue)
-            {
-                var category = await _categoryRepository.FindAsync(link.CategoryId.Value);
-                if (category == null)
-                {
-                    message = $"CategoryId '{link.CategoryId}' is not valid.";
-                    _logger.LogWarning(message);
-                    throw new OcudaException(message);
-                }
-            }
-
-            var creator = await _userRepository.FindAsync(link.CreatedBy);
-            if (creator == null)
-            {
-                message = $"Created by invalid User Id: {link.CreatedBy}";
-                _logger.LogWarning(message, link.CreatedBy);
-                throw new OcudaException(message);
-            }
+            _linkLibraryRepository.Remove(id);
+            await _linkLibraryRepository.SaveAsync();
         }
     }
 }

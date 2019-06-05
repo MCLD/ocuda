@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -14,23 +14,23 @@ namespace Ocuda.Ops.Service
     public class SectionService : ISectionService
     {
         private readonly ILogger<SectionService> _logger;
+        private readonly ILinkLibraryRepository _linkLibraryRepository;
         private readonly ISectionRepository _sectionRepository;
         private readonly IUserRepository _userRepository;
-        private readonly ICategoryService _categoryService;
 
         public SectionService(ILogger<SectionService> logger,
+            ILinkLibraryRepository linkLibraryRepository,
             ISectionRepository sectionRepository,
-            IUserRepository userRepository,
-            ICategoryService categoryService)
+            IUserRepository userRepository)
         {
             _logger = logger
                ?? throw new ArgumentNullException(nameof(logger));
+            _linkLibraryRepository = linkLibraryRepository 
+                ?? throw new ArgumentNullException(nameof(linkLibraryRepository));
             _sectionRepository = sectionRepository
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
             _userRepository = userRepository
                 ?? throw new ArgumentNullException(nameof(userRepository));
-            _categoryService = categoryService
-                ?? throw new ArgumentNullException(nameof(categoryService));
         }
 
         /// <summary>
@@ -68,11 +68,6 @@ namespace Ocuda.Ops.Service
             return await _sectionRepository.IsValidPathAsync(path?.Trim().ToLower());
         }
 
-        public async Task<Section> GetByNameAsync(string name)
-        {
-            return await _sectionRepository.GetByNameAsync(name?.Trim());
-        }
-
         public async Task<Section> GetByPathAsync(string path)
         {
             return await _sectionRepository.GetByPathAsync(path?.Trim().ToLower());
@@ -105,8 +100,19 @@ namespace Ocuda.Ops.Service
             await ValidateSectionAsync(section);
 
             await _sectionRepository.AddAsync(section);
+
+            var navigationLinkLibrary = new LinkLibrary
+            {
+                CreatedAt = DateTime.Now,
+                CreatedBy = currentUserId,
+                IsNavigation = true,
+                Name = "Navigation",
+                Section = section
+            };
+            await _linkLibraryRepository.AddAsync(navigationLinkLibrary);
+
+
             await _sectionRepository.SaveAsync();
-            await _categoryService.CreateDefaultCategories(currentUserId, section);
 
             return section;
         }
@@ -118,7 +124,6 @@ namespace Ocuda.Ops.Service
             currentSection.Path = section.Path?.Trim().ToLower();
             currentSection.Icon = section.Icon;
             currentSection.SortOrder = section.SortOrder;
-            currentSection.FeaturedVideoUrl = section.FeaturedVideoUrl;
             currentSection.IsNavigation = section.IsNavigation;
 
             await ValidateSectionAsync(currentSection);
@@ -126,15 +131,6 @@ namespace Ocuda.Ops.Service
             _sectionRepository.Update(currentSection);
             await _sectionRepository.SaveAsync();
             return currentSection;
-        }
-
-        public async Task EditFeaturedVideoUrlAsync(int sectionId, string url)
-        {
-            var currentSection = await _sectionRepository.FindAsync(sectionId);
-            currentSection.FeaturedVideoUrl = url;
-
-            _sectionRepository.Update(currentSection);
-            await _sectionRepository.SaveAsync();
         }
 
         public async Task DeleteAsync(int id)
@@ -150,19 +146,10 @@ namespace Ocuda.Ops.Service
             var message = string.Empty;
             var defaultSection = await _sectionRepository.GetDefaultSectionAsync();
 
-            if (defaultSection != null && defaultSection.Id != section.Id)
+            if (defaultSection != null && defaultSection.Id != section.Id 
+                && string.IsNullOrWhiteSpace(section.Path))
             {
-                if (string.IsNullOrWhiteSpace(section.Path))
-                {
-                    message = $"Section path cannot be empty.";
-                    _logger.LogWarning(message);
-                    throw new OcudaException(message);
-                }
-            }
-
-            if (string.IsNullOrWhiteSpace(section.Name))
-            {
-                message = $"Section name cannot be empty.";
+                message = $"Section path cannot be empty.";
                 _logger.LogWarning(message);
                 throw new OcudaException(message);
             }
@@ -178,14 +165,6 @@ namespace Ocuda.Ops.Service
             {
                 message = $"Section path '{section.Path }' already exists.";
                 _logger.LogWarning(message, section.Path);
-                throw new OcudaException(message);
-            }
-
-            var creator = await _userRepository.FindAsync(section.CreatedBy);
-            if (creator == null)
-            {
-                message = $"Created by invalid User Id: {section.CreatedBy}";
-                _logger.LogWarning(message, section.CreatedBy);
                 throw new OcudaException(message);
             }
         }

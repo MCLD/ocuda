@@ -36,7 +36,8 @@ namespace Ocuda.Ops.Controllers
 
             var filter = new BlogFilter(page, itemsPerPage)
             {
-                SectionId = currentSection.Id
+                SectionId = currentSection.Id,
+                IsPublished = true
             };
 
             var pageList = await _pageService.GetPaginatedListAsync(filter);

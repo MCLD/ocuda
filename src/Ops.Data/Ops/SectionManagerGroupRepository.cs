@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 
 namespace Ocuda.Ops.Data.Ops
 {
     public class SectionManagerGroupRepository
-        : GenericRepository<Models.SectionManagerGroup, int>, ISectionManagerGroupRepository
+        : GenericRepository<SectionManagerGroup, int>, ISectionManagerGroupRepository
     {
         public SectionManagerGroupRepository(OpsContext context, 
             ILogger<SectionManagerGroupRepository> logger)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Models.Abstract
 {

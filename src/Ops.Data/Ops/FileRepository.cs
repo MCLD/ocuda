@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Data.Extensions;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Models;
@@ -13,7 +13,7 @@ using Ocuda.Ops.Service.Models;
 namespace Ocuda.Ops.Data.Ops
 {
     public class FileRepository 
-        : GenericRepository<Models.File, int>, IFileRepository
+        : GenericRepository<File, int>, IFileRepository
     {
         public FileRepository(OpsContext context, ILogger<FileRepository> logger)
             : base(context, logger)
@@ -24,6 +24,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
+                .Include(_ => _.FileType)
                 .Include(_ => _.Thumbnails)
                 .Where(_ => _.Id == id)
                 .SingleOrDefaultAsync();
@@ -34,20 +35,14 @@ namespace Ocuda.Ops.Data.Ops
         {
             var query = DbSet.AsNoTracking();
 
-            query = query.Include(_ => _.Category);
-            query = query.Where(_ => _.Category.IsAttachment == false);
-
-            if (filter.CategoryId.HasValue)
+            if (filter.FileLibraryId.HasValue)
             {
-                query = query.Where(_ => _.CategoryId == filter.CategoryId);
+                query = query.Where(_ => _.FileLibraryId == filter.FileLibraryId.Value);
             }
             else if (filter.SectionId.HasValue)
             {
-                query = query.Where(_ => _.SectionId == filter.SectionId);
+                query = query.Where(_ => _.FileLibrary.SectionId == filter.SectionId.Value);
             }
-
-            query = query.Include(_ => _.FileType);
-            query = query.Include(_ => _.Thumbnails);
 
             if (isGallery)
             {
@@ -58,17 +53,19 @@ namespace Ocuda.Ops.Data.Ops
             {
                 Count = await query.CountAsync(),
                 Data = await query
+                    .Include(_ => _.FileType)
+                    .Include(_ => _.Thumbnails)
                     .OrderByDescending(_ => _.CreatedAt)
                     .ApplyPagination(filter)
                     .ToListAsync()
             };
         }
 
-        public async Task<IEnumerable<int>> GetFileTypeIdsInUseByCategoryId(int categoryId)
+        public async Task<ICollection<int>> GetFileTypeIdsInUseByLibraryAsync(int libraryId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.CategoryId == categoryId)
+                .Where(_ => _.FileLibraryId == libraryId)
                 .Select(_ => _.FileTypeId)
                 .Distinct()
                 .ToListAsync();
@@ -78,6 +75,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
+                .Include(_ => _.FileType)
                 .Where(_ => _.PageId == pageId)
                 .ToListAsync();
         }
@@ -86,6 +84,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
+                .Include(_ => _.FileType)
                 .Where(_ => _.PostId == postId)
                 .ToListAsync();
         }

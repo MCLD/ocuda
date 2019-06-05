@@ -3,12 +3,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 
 namespace Ocuda.Ops.Data.Ops
 {
     public class ClaimGroupRepository
-        : GenericRepository<Models.ClaimGroup, int>, IClaimGroupRepository
+        : GenericRepository<ClaimGroup, int>, IClaimGroupRepository
     {
         public ClaimGroupRepository(OpsContext context,
             ILogger<ClaimGroupRepository> logger)

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -49,10 +49,8 @@ namespace Ocuda.test.Ops.Service.Test
             var sectionRepository = new Mock<ISectionRepository>();
             sectionRepository.Setup(_ => _.FindAsync(5)).Returns(Task.FromResult(currentSection));
 
-            var categoryLogger = new Mock<ILogger<CategoryService>>();
             var sectionLogger = new Mock<ILogger<SectionService>>();
-            var categoryRepository = new Mock<ICategoryRepository>();
-            var categoryFileTypeRepository = new Mock<ICategoryFileTypeRepository>();
+            var linkLibraryRepository = new Mock<ILinkLibraryRepository>();
             var userRepository = new Mock<IUserRepository>();
             userRepository.Setup(
                 m => m.FindAsync(1))
@@ -62,18 +60,11 @@ namespace Ocuda.test.Ops.Service.Test
                         Name = "Test User 1"
                     });
 
-            var categoryService = new CategoryService(
-                categoryLogger.Object,
-                categoryRepository.Object,
-                categoryFileTypeRepository.Object,
+            var service = new SectionService(
+                sectionLogger.Object,
+                linkLibraryRepository.Object,
                 sectionRepository.Object,
                 userRepository.Object);
-
-            var service = new SectionService(
-                sectionLogger.Object, 
-                sectionRepository.Object, 
-                userRepository.Object,
-                categoryService);
 
             editedSection = await service.EditAsync(editedSection);
 
@@ -90,8 +81,6 @@ namespace Ocuda.test.Ops.Service.Test
         [InlineData(true, false, false, true, 1, 2, "Name", "path")]     //Valid Section (No Existing Default)
         [InlineData(true, false, false, false, 1, 1, "Name", null)]      //Valid Default Section
         [InlineData(true, false, false, true, 1, 1, "Name", null)]       //Valid Default Section (No Existing Default)
-        [InlineData(false, false, false, false, -1, 2, "Name", "path")]  //Invalid CreatedBy
-        [InlineData(false, false, false, false, 1, 2, null, "path")]     //Invalid Null Name
         [InlineData(false, false, false, false, 1, 2, "Name", null)]     //Invalid Null Path
         [InlineData(false, true, false, false, 1, 2, "Name", "path")]    //Invalid Duplicate Name
         [InlineData(false, false, true, false, 1, 2, "Name", "path")]    //Invalid Duplicate Path
@@ -139,6 +128,7 @@ namespace Ocuda.test.Ops.Service.Test
             sectionRepository.Setup(m => m.IsDuplicateNameAsync(section)).ReturnsAsync(isDuplicateName);
             sectionRepository.Setup(m => m.IsDuplicatePathAsync(section)).ReturnsAsync(isDuplicatePath);
 
+            var linkLibraryRepository = new Mock<ILinkLibraryRepository>();
             var userRepository = new Mock<IUserRepository>();
             userRepository.Setup(
                 m => m.FindAsync(1))
@@ -148,13 +138,11 @@ namespace Ocuda.test.Ops.Service.Test
                         Name = "Test User 1"
                     });
 
-            var categoryService = new Mock<ICategoryService>();
-
             var sectionService = new SectionService(
                 logger.Object,
+                linkLibraryRepository.Object,
                 sectionRepository.Object,
-                userRepository.Object,
-                categoryService.Object);
+                userRepository.Object);
 
             //Act
             var ex = await Record.ExceptionAsync(() => sectionService.ValidateSectionAsync(section));

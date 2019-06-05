@@ -33,10 +33,9 @@ else
     <table class="table table-sm table-bordered link-table">
         <thead>
             <tr>
+                <th>Published</th>
                 <th>Title</th>
                 <th>Author</th>
-                <th>Date</th>
-                <th>Draft</th>
                 <th>&nbsp;</th>
             </tr>
         </thead>
@@ -46,12 +45,12 @@ else
             <tr>
                 <td class="rowlink-parent">
                     <a asp-action="@(nameof(PagesController.Edit))" asp-route-id="@ocPage.Id" class="rowlink">
-                        @ocPage.Title
+                        @(ocPage.PublishedAt.HasValue ? ocPage.PublishedAt.Value.ToString() : "Draft")
                     </a>
                 </td>
+                <td>@ocPage.Title</td>
                 <td>@ocPage.CreatedByName</td>
-                <td>@ocPage.CreatedAt</td>
-                <td>@(ocPage.IsDraft == true ? "Yes" : null)</td>
+
                 <td align="center" class="on-top">
                     <button type="button"
                             class="btn btn-danger btn-xs"

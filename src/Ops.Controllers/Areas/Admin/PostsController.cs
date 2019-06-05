@@ -6,14 +6,15 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Posts;
 using Ocuda.Ops.Controllers.Authorization;
-using Ocuda.Ops.Controllers.Filter;
 using Ocuda.Ops.Controllers.Filters;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
+using Ocuda.Ops.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
 {
@@ -40,14 +41,27 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ?? throw new ArgumentNullException(nameof(userService));
         }
 
-        public async Task<IActionResult> Index(string section, int page = 1)
+        #region Posts
+        public async Task<IActionResult> Index(string section, int? category, int page = 1)
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
+            PostCategory currentCategory = null;
+            if (category.HasValue)
+            {
+                currentCategory = await _postService.GetCategoryByIdAsync(category.Value);
+
+                if (currentCategory?.SectionId != currentSection.Id)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+
             var itemsPerPage = await _siteSettingService
                 .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
 
             var filter = new BlogFilter(page, itemsPerPage)
             {
+                PostCategoryId = category,
                 SectionId = currentSection.Id
             };
 
@@ -59,7 +73,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 CurrentPage = page,
                 ItemsPerPage = filter.Take.Value
             };
-
             if (paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
             {
                 return RedirectToRoute(
@@ -69,7 +82,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     });
             }
 
-            foreach(var post in postList.Data)
+            foreach (var post in postList.Data)
             {
                 var userInfo = await _userService.GetUserInfoById(post.CreatedBy);
                 post.CreatedByName = userInfo.Item1;
@@ -80,62 +93,79 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 PaginateModel = paginateModel,
                 Posts = postList.Data,
-                SectionId = currentSection.Id
+                SectionId = currentSection.Id,
+                CategoryId = category,
+                Category = currentCategory,
+                CategoryList = new SelectList(
+                    await _postService.GetCategoriesBySectionIdAsync(currentSection.Id),
+                    nameof(PostCategory.Id),
+                    nameof(PostCategory.Name)
+                )
             };
 
             return View(viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(string title, string stub, int sectionId)
+        public async Task<IActionResult> Create(IndexViewModel model)
         {
-            var post = new Post
-            {
-                IsDraft = true,
-                SectionId = sectionId,
-                Stub = stub,
-                Title = title
-            };
+            JsonResponse response;
+
+            model.Post.PublishedAt = null;
 
             try
             {
-                var newPost = await _postService.CreateAsync(CurrentUserId, post);
-                return Json(new { success = true, id = newPost.Id });
+                var newPost = await _postService.CreateAsync(CurrentUserId, model.Post);
+                response = new JsonResponse
+                {
+                    Success = true,
+                    EntityId = newPost.Id
+                };
             }
             catch (OcudaException ex)
             {
-                _logger.LogError($"Error adding post: {ex}", ex);
-                ShowAlertDanger("Unable to add blog post: ", ex.Message);
-                return Json(new { success = false, message = ex.Message });
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
             }
+
+            return Json(response);
         }
 
 
         [RestoreModelState]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Detail(string section, int id)
         {
+            var currentSection = await _sectionService.GetByPathAsync(section);
             var post = await _postService.GetByIdAsync(id);
+            
+            if (post?.PostCategory.SectionId != currentSection.Id)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
             var attachments = await _fileService.GetByPostIdAsync(id);
 
             var viewModel = new DetailViewModel()
             {
-                Action = nameof(Edit),
                 Post = post,
-                SectionId = post.SectionId,
-                IsDraft = post.IsDraft,
+                SectionId = currentSection.Id,
+                DefaultSection = currentSection.IsDefault,
                 Attachments = attachments
             };
 
-            return View("Detail", viewModel);
+            return View(viewModel);
         }
 
         [HttpPost]
         [SaveModelState]
-        public async Task<IActionResult> Edit(DetailViewModel model)
+        public async Task<IActionResult> Detail(DetailViewModel model)
         {
             var currentPost = await _postService.GetByIdAsync(model.Post.Id);
 
-            if (currentPost.IsDraft == true && model.Post.IsDraft == false)
+            if (!currentPost.PublishedAt.HasValue && model.Publish)
             {
                 var stubInUse = await _postService.StubInUseAsync(model.Post);
 
@@ -150,7 +180,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 try
                 {
-                    var post = await _postService.EditAsync(model.Post);
+                    var post = await _postService.EditAsync(model.Post, model.Publish);
                     ShowAlertSuccess($"Updated blog post: {post.Title}");
                     return RedirectToAction(nameof(Index));
                 }
@@ -161,7 +191,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
             }
 
-            return RedirectToAction(nameof(Edit));
+            return RedirectToAction(nameof(Detail));
         }
 
         [HttpPost]
@@ -186,5 +216,115 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             return Json(await _postService.StubInUseAsync(item));
         }
+        #endregion
+
+        #region Categories
+        public async Task<IActionResult> Categories(string section, int page = 1)
+        {
+            var currentSection = await _sectionService.GetByPathAsync(section);
+            var itemsPerPage = await _siteSettingService
+                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
+
+            var filter = new BlogFilter(page, itemsPerPage)
+            {
+                SectionId = currentSection.Id
+            };
+
+            var categoryList = await _postService.GetPaginatedCategoryList(filter);
+
+            var paginateModel = new PaginateModel()
+            {
+                ItemCount = categoryList.Count,
+                CurrentPage = page,
+                ItemsPerPage = filter.Take.Value
+            };
+            if (paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
+            {
+                return RedirectToRoute(
+                    new
+                    {
+                        page = paginateModel.LastPage ?? 1
+                    });
+            }
+
+            var viewModel = new CategoriesViewModel
+            {
+                PaginateModel = paginateModel,
+                Categories = categoryList.Data,
+                SectionId = currentSection.Id
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateCategory(CategoriesViewModel model)
+        {
+            JsonResponse response;
+
+            try
+            {
+                var category = await _postService.CreateCategoryAsync(CurrentUserId, model.Category);
+                ShowAlertSuccess($"Added post category: {category.Name}");
+                response = new JsonResponse
+                {
+                    Success = true,
+                };
+            }
+            catch (OcudaException ex)
+            {
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditCategory(CategoriesViewModel model)
+        {
+            JsonResponse response;
+
+            try
+            {
+                var category = await _postService.EditCategoryAsync(model.Category);
+                ShowAlertSuccess($"Updated post category: {category.Name}");
+                response = new JsonResponse
+                {
+                    Success = true,
+                };
+            }
+            catch (OcudaException ex)
+            {
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteCategory(CategoriesViewModel model)
+        {
+            try
+            {
+                await _postService.DeleteCategoryAsync(model.Category.Id);
+                ShowAlertSuccess($"Delete post category: {model.Category.Name}.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error deleting post category: {ex}", ex);
+                ShowAlertDanger("Unable to post category: ", ex.Message);
+            }
+
+            return RedirectToAction(nameof(Categories), new { page = model.PaginateModel.CurrentPage });
+        }
+        #endregion
     }
 }

@@ -1,12 +1,15 @@
-﻿using Ocuda.Ops.Models;
+﻿using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Service.Filters
 {
     public class BlogFilter : BaseFilter
     {
-        public int? CategoryId { get; set; }
         public int? SectionId { get; set; }
-        public CategoryType? CategoryType { get; set; }
+        public int? PostCategoryId { get; set; }
+        public int? FileLibraryId { get; set; }
+        public int? LinkLibraryId { get; set; }
+        public bool IsHomepage { get; set; }
+        public bool? IsPublished { get; set; }
 
         public BlogFilter(int? page = null, int take = 15) : base(page, take) { }
     }

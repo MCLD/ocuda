@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Data.Extensions;
-using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class PageRepository 
-        : GenericRepository<Models.Page, int>, IPageRepository
+    public class PageRepository
+        : GenericRepository<Page, int>, IPageRepository
     {
         public PageRepository(OpsContext context, ILogger<PageRepository> logger)
             : base(context, logger)
@@ -24,7 +24,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == stub)
+                .Where(_ => _.PublishedAt.HasValue && _.Stub == stub)
                 .FirstOrDefaultAsync();
         }
 
@@ -32,8 +32,9 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == stub
-                         && _.SectionId == sectionId)
+                .Where(_ => _.PublishedAt.HasValue
+                        && _.Stub == stub
+                        && _.SectionId == sectionId)
                 .FirstOrDefaultAsync();
         }
 
@@ -55,6 +56,11 @@ namespace Ocuda.Ops.Data.Ops
                 query = query.Where(_ => _.SectionId == filter.SectionId);
             }
 
+            if (filter.IsPublished.HasValue)
+            {
+                query = query.Where(_ => _.PublishedAt.HasValue == filter.IsPublished.Value);
+            }
+
             return new DataWithCount<ICollection<Page>>
             {
                 Count = await query.CountAsync(),
@@ -70,9 +76,9 @@ namespace Ocuda.Ops.Data.Ops
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.Stub == page.Stub
-                         && _.SectionId == page.SectionId 
+                         && _.SectionId == page.SectionId
                          && _.Id != page.Id
-                         && _.IsDraft == false)
+                         && _.PublishedAt.HasValue)
                 .AnyAsync();
         }
     }

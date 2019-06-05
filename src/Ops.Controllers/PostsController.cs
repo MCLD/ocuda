@@ -36,7 +36,8 @@ namespace Ocuda.Ops.Controllers
 
             var filter = new BlogFilter(page, itemsPerPage)
             {
-                SectionId = currentSection.Id
+                SectionId = currentSection.Id,
+                IsPublished = true
             };
 
             var postList = await _postService.GetPaginatedListAsync(filter);
@@ -74,12 +75,19 @@ namespace Ocuda.Ops.Controllers
             return View(viewModel);
         }
 
-        public async Task<IActionResult> Display(string section, string id)
+        public new async Task<IActionResult> Display(string section, int categoryId, string id)
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
-            var post = await _postService.GetByStubAndSectionIdAsync(id, currentSection.Id);
+            var currentCategory = await _postService.GetCategoryByIdAsync(categoryId);
 
-            if(post != null)
+            if (currentCategory?.SectionId != currentSection.Id)
+            {
+                return RedirectToAction(nameof(HomeController.Index));
+            }
+
+            var post = await _postService.GetByStubAndCategoryIdAsync(id, currentSection.Id);
+
+            if (post != null)
             {
                 var userInfo = await _userService.GetUserInfoById(post.CreatedBy);
                 post.CreatedByName = userInfo.Item1;

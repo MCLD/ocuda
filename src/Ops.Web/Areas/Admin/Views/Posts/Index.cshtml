@@ -1,11 +1,12 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Posts.IndexViewModel
 
+@await Html.PartialAsync("_PostsPartial")
+
 <form id="addForm" role="form">
-    <input asp-for="@Model.SectionId" type="hidden" />
-    <input id="addDraft" asp-for="Post.IsDraft" type="hidden" value="true" />
     <input id="addStub" asp-for="Post.Stub" type="hidden" readonly />
     <div modal id="addModal" name="Post" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addTitle" asp-for="Post.Title" formgroup />
+        <select id="addCategories" asp-for="Post.PostCategoryId" asp-items="Model.CategoryList" formgroup></select>
     </div>
 </form>
 
@@ -15,6 +16,28 @@
     <input id="deleteId" asp-for="Post.Id" type="hidden" />
     <div modal id="deleteModal" name="Post" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
 </form>
+
+<div class="form-group row">
+    <div class="col-12">
+        <div class="dropdown">
+            <span class="dropdown-label">Category:</span>
+            <ul class="nav" style="display: inline-table;">
+                <li>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                        @(Model.Category?.Name ?? "Show All") <span class="caret"></span>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a asp-action="@nameof(PostsController.Index)" class="dropdown-item">Show All</a>
+                        @foreach (var category in Model.CategoryList)
+                        {
+                            <a asp-route-Category="@category.Value" class="dropdown-item">@category.Text</a>
+                        }
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
 
 <div class="mb-2">
     <button class="btn btn-outline-secondary text-dark"
@@ -33,10 +56,10 @@ else
     <table class="table table-sm table-bordered link-table">
         <thead>
             <tr>
+                <th>Published</th>
                 <th>Title</th>
                 <th>Author</th>
-                <th>Date</th>
-                <th>Draft</th>
+                <th>Category</th>
                 <th>Pinned</th>
                 <th>&nbsp;</th>
             </tr>
@@ -44,32 +67,32 @@ else
         <tbody>
             @foreach (var post in Model.Posts)
             {
-                <tr>
-                    <td class="rowlink-parent">
-                        <a asp-action="@(nameof(PostsController.Edit))" asp-route-id="@post.Id" class="rowlink">
-                            @post.Title
-                        </a>
-                    </td>
-                    <td>@post.CreatedByName</td>
-                    <td>@post.CreatedAt</td>
-                    <td>@(post.IsDraft == true ? "Yes" : null)</td>
-                    <td align="center">
-                        @if (post.IsPinned)
-                        {
-                            <span class="fa fa-thumbtack"></span>
-                        }
-                    </td>
-                    <td align="center" class="on-top">
-                        <button type="button"
-                                class="btn btn-danger btn-xs"
-                                data-toggle="modal"
-                                data-target="#deleteModal"
-                                data-id="@post.Id"
-                                data-title="@post.Title">
-                            <span class="fa fa-times" aria-hidden="true"></span>
-                        </button>
-                    </td>
-                </tr>
+            <tr>
+                <td class="rowlink-parent">
+                    <a asp-action="@(nameof(PostsController.Detail))" asp-route-id="@post.Id" class="rowlink">
+                        @(post.PublishedAt.HasValue ? post.PublishedAt.Value.ToString() : "Draft")
+                    </a>
+                </td>
+                <td>@post.Title</td>
+                <td>@post.CreatedByName</td>
+                <td>@post.PostCategory.Name</td>
+                <td align="center">
+                    @if (post.IsPinned)
+                    {
+                        <span class="fa fa-thumbtack"></span>
+                    }
+                </td>
+                <td align="center" class="on-top">
+                    <button type="button"
+                            class="btn btn-danger btn-xs"
+                            data-toggle="modal"
+                            data-target="#deleteModal"
+                            data-id="@post.Id"
+                            data-title="@post.Title">
+                        <span class="fa fa-times" aria-hidden="true"></span>
+                    </button>
+                </td>
+            </tr>
             }
         </tbody>
     </table>
@@ -80,21 +103,17 @@ else
     }
 }
 
-@section scripts
-    {
+@section scripts {
     <script>
-        var title = $("#addTitle");
-        var stub = $("#addStub");
-
         $("#addForm").submit(function (e) {
             e.preventDefault();
-            var sectionId = $("#SectionId").val();
+            var form = $(this);
 
-            $.post("@(Url.Action("Create", "Posts"))",
-                { title: title.val(), stub: stub.val(), sectionId: sectionId },
+            $.post("@(Url.Action(nameof(PostsController.Create), "Posts"))",
+                form.serialize(),
                 function (response) {
                     if (response.success == true) {
-                        var url = "@(Url.Action("Edit", "Posts"))/" + response.id;
+                        var url = "@(Url.Action(nameof(PostsController.Detail), "Posts"))/" + response.entityId;
                         location.href = url;
                     }
                     else {
@@ -114,8 +133,8 @@ else
             });
         });
 
-        title.on("keyup", function () {
-            updateStub(stub, title.val());
+        $("#addTitle").on("keyup", function () {
+            updateStub($("#addStub"), $(this).val());
         });
 
         $("#deleteModal").on("show.bs.modal", function (e) {

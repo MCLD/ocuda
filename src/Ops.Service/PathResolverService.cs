@@ -54,8 +54,8 @@ namespace Ocuda.Ops.Service
             string fileName = default(string),
             params object[] pathElement)
         {
-            string publicPrivateRoot = privatePath 
-                ? DefaultPrivateDirectory 
+            string publicPrivateRoot = privatePath
+                ? DefaultPrivateDirectory
                 : DefaultPublicDirectory;
 
             string path

@@ -12,7 +12,6 @@ else
                 <th>Title</th>
                 <th>Author</th>
                 <th>Date</th>
-                <th>Draft</th>
             </tr>
         </thead>
         <tbody>
@@ -25,8 +24,7 @@ else
                         </a>
                     </td>
                     <td>@ocPage.CreatedByName</td>
-                    <td>@ocPage.CreatedAt</td>
-                    <td>@ocPage.IsDraft</td>
+                    <td>@ocPage.PublishedAt?.ToString()</td>
                 </tr>
             }
         </tbody>

@@ -25,6 +25,13 @@
             }
         </style>
     </environment>
+    @if (Context.Items.ContainsKey(ItemKey.ExternalCSS))
+    {
+        foreach (var cssUrl in (List<string>)Context.Items[ItemKey.ExternalCSS])
+        {
+            <link rel="stylesheet" href="@cssUrl" asp-append-version="true" />
+        }
+    }
     <instance name="test">
         <style>
             .oc-navbar {
@@ -239,6 +246,13 @@
         <script src="~/devscripts/Layout.js" asp-append-version="true"></script>
         <script src="~/devscripts/ops.js" asp-append-version="true"></script>
     </environment>
+    @if (Context.Items.ContainsKey(ItemKey.ExternalJS))
+    {
+        foreach (var jsUrl in (List<string>)Context.Items[ItemKey.ExternalJS])
+        {
+            <script src="@jsUrl" asp-append-version="true"></script>
+        }
+    }
     @RenderSection("Scripts", required: false)
 </body>
 </html>
