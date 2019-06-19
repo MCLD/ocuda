@@ -92,6 +92,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<Section> CreateAsync(int currentUserId, Section section)
         {
+            section.EmbeddedVideo = section.EmbeddedVideo?.Trim();
             section.Name = section.Name?.Trim();
             section.Path = section.Path?.Trim().ToLower();
             section.CreatedAt = DateTime.Now;
@@ -120,6 +121,7 @@ namespace Ocuda.Ops.Service
         public async Task<Section> EditAsync(Section section)
         {
             var currentSection = await _sectionRepository.FindAsync(section.Id);
+            currentSection.EmbeddedVideo = section.EmbeddedVideo?.Trim();
             currentSection.Name = section.Name?.Trim();
             currentSection.Path = section.Path?.Trim().ToLower();
             currentSection.Icon = section.Icon;

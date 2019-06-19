@@ -24,6 +24,9 @@ namespace Ocuda.Ops.Models.Entities
         [DisplayName("Show in Navigation Bar?")]
         public bool IsNavigation { get; set; }
 
+        [DisplayName("Video Embed URL")]
+        public string EmbeddedVideo { get; set; }
+
         [NotMapped]
         public bool IsDefault
         {

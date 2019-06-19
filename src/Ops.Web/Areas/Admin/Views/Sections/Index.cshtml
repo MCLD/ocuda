@@ -34,14 +34,21 @@ else
                 <td class="rowlink-parent">
                     <a asp-action="@(nameof(SectionsController.Edit))" asp-route-id="@sec.Id" class="rowlink">@sec.Name</a>
                 </td>
-                <td>@(string.IsNullOrWhiteSpace(sec.Path) ? "null" : sec.Path)</td>
-                @if (string.IsNullOrWhiteSpace(sec.Icon))
+                @if (!string.IsNullOrWhiteSpace(sec.Path))
                 {
-                    <td>No Icon</td>
+                    <td>@sec.Path</td>
                 }
                 else
                 {
+                    <td>&nbsp;</td>
+                }
+                @if (!string.IsNullOrWhiteSpace(sec.Icon))
+                {
                     <td><span class="fa @sec.Icon"></span> @sec.Icon</td>
+                }
+                else
+                {
+                    <td>&nbsp;</td>
                 }
                 <td>@sec.SortOrder</td>
                 <td align="center" class="on-top">
@@ -74,8 +81,7 @@ else
     }
 }
 
-@section scripts
-    {
+@section scripts {
     <script>
         $(document).ready(function () {
             $('.rowlink-parent').each(function () {
