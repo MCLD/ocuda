@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +17,15 @@ namespace Ocuda.Ops.Data.Ops
         public LinkRepository(OpsContext context, ILogger<LinkRepository> logger)
             : base(context, logger)
         {
+        }
+
+        public async Task<Link> GetLatestByLibraryIdAsync(int id)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.LinkLibraryId == id)
+                .OrderByDescending(_ => _.CreatedAt)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<DataWithCount<ICollection<Link>>> GetPaginatedListAsync(BlogFilter filter)

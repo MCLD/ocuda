@@ -79,6 +79,11 @@ namespace Ocuda.Ops.Service
             return await _fileRepository.FindAsync(id);
         }
 
+        public async Task<File> GetLatestByLibraryIdAsync(int id)
+        {
+            return await _fileRepository.GetLatestByLibraryIdAsync(id);
+        }
+
         public async Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(
             BlogFilter filter, bool isGallery = false)
         {

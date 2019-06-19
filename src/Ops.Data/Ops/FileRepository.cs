@@ -30,6 +30,17 @@ namespace Ocuda.Ops.Data.Ops
                 .SingleOrDefaultAsync();
         }
 
+        public async Task<File> GetLatestByLibraryIdAsync(int id)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Include(_ => _.FileType)
+                .Include(_ => _.Thumbnails)
+                .Where(_ => _.FileLibraryId == id)
+                .OrderByDescending(_ => _.CreatedAt)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(
             BlogFilter filter, bool isGallery)
         {

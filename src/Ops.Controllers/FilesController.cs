@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,10 +6,8 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Files;
-using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers
@@ -110,6 +106,28 @@ namespace Ocuda.Ops.Controllers
             {
                 _logger.LogError($"Error viewing file {file.Id} : {ex}", ex);
                 return StatusCode(StatusCodes.Status404NotFound);
+            }
+        }
+
+        public async Task<IActionResult> Latest(string section, int id)
+        {
+            var currentSection = await _sectionService.GetByPathAsync(section);
+            var currentLibrary = await _fileService.GetLibraryByIdAsync(id);
+
+            if (currentLibrary?.SectionId != currentSection.Id)
+            {
+                return RedirectToAction(nameof(HomeController.Index), "Home");
+            }
+
+            var latestFile = await _fileService.GetLatestByLibraryIdAsync(id);
+
+            if (latestFile != null)
+            {
+                return await ViewPrivateFile(latestFile.Id);
+            }
+            else
+            {
+                return RedirectToAction(nameof(HomeController.Index), "Home");
             }
         }
 
