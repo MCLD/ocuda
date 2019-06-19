@@ -43,6 +43,7 @@ namespace Ocuda.Ops.Models.Entities
         public DateTime? LastSeen { get; set; }
 
         public bool? IsInLatestRoster { get; set; }
+        public bool ExcludeFromRoster { get; set; }
         public bool IsDeleted { get; set; }
 
         public ICollection<UserMetadata> Metadata { get; set; }
