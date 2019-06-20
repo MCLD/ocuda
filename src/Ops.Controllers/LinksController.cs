@@ -3,10 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Links;
-using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers
@@ -70,6 +68,28 @@ namespace Ocuda.Ops.Controllers
             };
 
             return View(viewModel);
+        }
+
+        public async Task<IActionResult> Latest(string section, int id)
+        {
+            var currentSection = await _sectionService.GetByPathAsync(section);
+            var currentLibrary = await _linkService.GetLibraryByIdAsync(id);
+
+            if (currentLibrary?.SectionId != currentSection.Id)
+            {
+                return RedirectToAction(nameof(HomeController.Index), "Home");
+            }
+
+            var latestLink = await _linkService.GetLatestByLibraryIdAsync(id);
+
+            if (latestLink != null)
+            {
+                return Redirect(latestLink.Url);
+            }
+            else
+            {
+                return RedirectToAction(nameof(HomeController.Index), "Home");
+            }
         }
     }
 }

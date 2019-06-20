@@ -69,7 +69,7 @@ namespace Ocuda.Ops.Service
                 int emailColId = 0;
                 int asOfColId = 0;
                 int rows = 0;
-                using (var excelReader = ExcelReaderFactory.CreateBinaryReader(stream))
+                using (var excelReader = ExcelReaderFactory.CreateReader(stream))
                 {
                     while (excelReader.Read())
                     {
@@ -117,47 +117,46 @@ namespace Ocuda.Ops.Service
                         {
                             var name = excelReader.GetString(nameColId)?.Trim();
 
-                            var entry = new RosterDetail()
+                            if (!string.IsNullOrWhiteSpace(name))
                             {
-                                RosterHeader = rosterHeader,
-                                Name = name,
-                                PositionNum = int.Parse(excelReader.GetString(positionColId)),
-                                JobTitle = excelReader.GetString(titleColId)?.Trim(),
-                                ReportsToId = int.Parse(excelReader.GetString(reportToIdColId)),
-                                ReportsToPos = int.Parse(excelReader.GetString(reportToPosColId)),
-                                AsOf = DateTime.Parse(excelReader.GetString(asOfColId)),
-                                IsVacant = string.Equals(name, "Vacant",
-                                    StringComparison.OrdinalIgnoreCase),
-                                CreatedAt = now,
-                                CreatedBy = currentUserId
-                            };
-
-                            if (string.Equals(name, "Vacant", StringComparison.OrdinalIgnoreCase))
-                            {
-                                entry.IsVacant = true;
-                            }
-                            else
-                            {
-                                entry.EmployeeId = int.Parse(excelReader.GetString(employeeIdColId));
-                                entry.EmailAddress = excelReader.GetString(emailColId)?.Trim();
-
-                                var hireDate = excelReader.GetString(hireDateColId);
-                                if (DateTime.TryParse(hireDate, out DateTime hireDateTime))
+                                var entry = new RosterDetail()
                                 {
-                                    entry.HireDate = hireDateTime;
-                                }
-                                var rehireDate = excelReader.GetString(rehireDateColId);
-                                if (DateTime.TryParse(rehireDate, out DateTime rehireDateTime))
-                                {
-                                    entry.RehireDate = rehireDateTime;
-                                }
-                            }
+                                    RosterHeader = rosterHeader,
+                                    Name = name,
+                                    PositionNum = int.Parse(excelReader.GetString(positionColId)),
+                                    JobTitle = excelReader.GetString(titleColId)?.Trim(),
+                                    ReportsToId = int.Parse(excelReader.GetString(reportToIdColId)),
+                                    ReportsToPos = int.Parse(excelReader.GetString(reportToPosColId)),
+                                    AsOf = DateTime.Parse(excelReader.GetString(asOfColId)),
+                                    IsVacant = string.Equals(name, "Vacant",
+                                        StringComparison.OrdinalIgnoreCase),
+                                    CreatedAt = now,
+                                    CreatedBy = currentUserId
+                                };
 
-                            // Check if position has already been added to the list
-                            if (rosterDetails.Select(_ => _.PositionNum)
-                                .Contains(entry.PositionNum) == false)
-                            {
-                                rosterDetails.Add(entry);
+                                if (!entry.IsVacant)
+                                {
+                                    entry.EmployeeId = int.Parse(excelReader.GetString(employeeIdColId));
+                                    entry.EmailAddress = excelReader.GetString(emailColId)?.Trim();
+
+                                    var hireDate = excelReader.GetString(hireDateColId);
+                                    if (DateTime.TryParse(hireDate, out DateTime hireDateTime))
+                                    {
+                                        entry.HireDate = hireDateTime;
+                                    }
+                                    var rehireDate = excelReader.GetString(rehireDateColId);
+                                    if (DateTime.TryParse(rehireDate, out DateTime rehireDateTime))
+                                    {
+                                        entry.RehireDate = rehireDateTime;
+                                    }
+                                }
+
+                                // Check if position has already been added to the list
+                                if (rosterDetails.Select(_ => _.PositionNum)
+                                    .Contains(entry.PositionNum) == false)
+                                {
+                                    rosterDetails.Add(entry);
+                                }
                             }
                         }
                     }
@@ -187,7 +186,7 @@ namespace Ocuda.Ops.Service
                             .Where(_ => string.Equals(_.Email, rosterDetail.EmailAddress,
                                 StringComparison.OrdinalIgnoreCase))
                             .FirstOrDefault();
-                        if (user != null)
+                        if (user != null && !user.ExcludeFromRoster)
                         {
                             user.EmployeeId = rosterDetail.EmployeeId;
                         }
@@ -195,12 +194,15 @@ namespace Ocuda.Ops.Service
                 }
                 if (user != null)
                 {
-                    user.ServiceStartDate = rosterDetail.RehireDate ?? rosterDetail.HireDate;
-                    user.Title = rosterDetail.JobTitle;
-                    user.LastRosterUpdate = now;
-                    user.IsInLatestRoster = true;
+                    if (!user.ExcludeFromRoster)
+                    {
+                        user.ServiceStartDate = rosterDetail.RehireDate ?? rosterDetail.HireDate;
+                        user.Title = rosterDetail.JobTitle;
+                        user.LastRosterUpdate = now;
+                        user.IsInLatestRoster = true;
 
-                    userUpdateList.Add(user);
+                        userUpdateList.Add(user);
+                    }
                 }
                 else
                 {
@@ -230,11 +232,12 @@ namespace Ocuda.Ops.Service
 
             var rosterEmployeeIds = nonVacantRosterDetails.Select(_ => _.EmployeeId).ToList();
             var userRemoveList = users
-                .Where(_ => _.EmployeeId.HasValue 
-                    && rosterEmployeeIds.Contains(_.EmployeeId.Value) == false)
+                .Where(_ => _.EmployeeId.HasValue
+                    && !_.ExcludeFromRoster
+                    && !rosterEmployeeIds.Contains(_.EmployeeId.Value))
                 .ToList();
 
-            for(int i = 0; i < userRemoveList.Count; i++)
+            for (int i = 0; i < userRemoveList.Count; i++)
             {
                 userRemoveList[i].IsInLatestRoster = false;
                 userRemoveList[i].SupervisorId = null;

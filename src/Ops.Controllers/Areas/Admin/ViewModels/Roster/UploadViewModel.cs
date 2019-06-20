@@ -10,7 +10,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Roster
         public IFormFile Roster { get; set; }
 
         [DisplayName("Roster")]
-        [FileExtensions(Extensions = "xls")]
+        [FileExtensions(Extensions = "xls,xlsx")]
         public string FileName
         {
             get

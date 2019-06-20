@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
@@ -13,6 +11,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<int> GetLinkCountAsync();
         Task<ICollection<Link>> GetLinksAsync();
         Task<Link> GetByIdAsync(int id);
+        Task<Link> GetLatestByLibraryIdAsync(int id);
         Task<DataWithCount<ICollection<Link>>> GetPaginatedListAsync(BlogFilter filter);
         Task<Link> CreateAsync(int currentUserId, Link link);
         Task<Link> EditAsync(Link link);

@@ -17,6 +17,7 @@ namespace Ocuda.Ops.Service
         private const string ADTelephoneNumber = "telephoneNumber";
         private const string ADTitle = "title";
         private const string ADMail = "mail";
+        private const string ADMailAlias = "proxyAddresses";
         private const string ADGivenName = "givenName";
 
         private readonly string[] AttributesToReturn = {
@@ -25,6 +26,7 @@ namespace Ocuda.Ops.Service
             ADTelephoneNumber,
             ADTitle,
             ADMail,
+            ADMailAlias,
             ADGivenName
         };
 
@@ -48,7 +50,7 @@ namespace Ocuda.Ops.Service
         public User LookupByEmail(User user)
         {
             // Lookup non-disabled account by email
-            var filter = $"(&({ADMail}={user.Email})(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))";
+            var filter = $"(&(|({ADMail}={user.Email})({ADMailAlias}=smtp:{user.Email}))(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))";
             return Lookup(user, filter);
         }
 
