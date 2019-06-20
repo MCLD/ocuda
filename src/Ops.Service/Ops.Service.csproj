@@ -1,9 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Ocuda.Ops.Service</AssemblyName>
+    <Authors>Maricopa County Library District Web developers</Authors>
+    <CodeAnalysisRuleSet>../../OcudaRuleSet.ruleset</CodeAnalysisRuleSet>
+    <Company>Maricopa County Library District</Company>
+    <Copyright>Copyright 2018 Maricopa County Library District</Copyright>
+    <PackageLicenseUrl>https://github.com/MCLD/ocuda/blob/develop/LICENSE</PackageLicenseUrl>
+    <Product>Ocuda</Product>
+    <RepositoryType>Git</RepositoryType>
+    <RepositoryUrl>https://github.com/MCLD/ocuda/</RepositoryUrl>
     <RootNamespace>Ocuda.Ops.Service</RootNamespace>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>

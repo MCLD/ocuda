@@ -9,7 +9,7 @@ using Serilog;
 
 namespace Ocuda.Ops.Web
 {
-    public class Program
+    public static class Program
     {
         public static int Main(string[] args)
         {

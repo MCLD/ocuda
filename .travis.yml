@@ -1,40 +1,14 @@
 # Ocuda Travis CI Docker build file
 
 os: linux
-dist: trusty
-sudo: required
+dist: xenial
 
 language: bash
 
 git:
-  depth: 3
+  depth: 1
 
 services:
   - docker
 
-env:
-  - PROJECT=ops
-  - PROJECT=promenade
-
-script: bash dev/bin/docker-build.sh $PROJECT
-
-after_success:
-  - |
-    if [[ "$DOCKER_USERNAME" != "" ]] && [[ "$DOCKER_PASSWORD" != "" ]]; then
-        if [[ "$TRAVIS_BRANCH" == "master" ]]; then
-          echo "Pushing to Docker Hub: ocuda/$PROJECT:latest"
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          docker push ocuda/$PROJECT:latest
-          docker logout
-        elif [[ "$TRAVIS_BRANCH" == "develop" ]]; then
-          echo "Pushing to Docker Hub: ocuda/$PROJECT:$TRAVIS_BRANCH"
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          docker push ocuda/$PROJECT:$TRAVIS_BRANCH
-          docker logout
-        else
-          echo 'Not pushing build for this branch to Docker Hub.'
-        fi
-    else
-      echo 'Not pushing to Docker Hub: Docker username or password is not configured.'
-    fi
-
+script: bash docker-build-ops.bash

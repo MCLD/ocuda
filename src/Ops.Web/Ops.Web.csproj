@@ -1,45 +1,47 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <Authors>Maricopa County Library District</Authors>
-    <Company>Maricopa County Library District</Company>
-    <Product>MCLD.Web</Product>
-    <Copyright>2018 Maricopa County Library District</Copyright>
-    <RepositoryType>Git</RepositoryType>
+    <AssemblyName>Ocuda.Ops.Web</AssemblyName>
     <AssemblyVersion>0.0.1.0</AssemblyVersion>
-    <FileVersion>0.0.1.0</FileVersion>
-    <Version>0.0.1</Version>
+    <Authors>Maricopa County Library District Web developers</Authors>
+    <CodeAnalysisRuleSet>../../OcudaRuleSet.ruleset</CodeAnalysisRuleSet>
+    <Company>Maricopa County Library District</Company>
+    <Copyright>Copyright 2018 Maricopa County Library District</Copyright>
+    <LangVersion>Latest</LangVersion>
+    <PackageLicenseUrl>https://github.com/MCLD/ocuda/blob/develop/LICENSE</PackageLicenseUrl>
+    <Product>Ocuda</Product>
+    <RepositoryType>Git</RepositoryType>
+    <RepositoryUrl>https://github.com/MCLD/ocuda/</RepositoryUrl>
+    <RootNamespace>Ocuda.Ops.Web</RootNamespace>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
-    <LangVersion>Latest</LangVersion>
-    <AssemblyName>Ocuda.Ops.Web</AssemblyName>
-    <RootNamespace>Ocuda.Ops.Web</RootNamespace>
     <UserSecretsId>6c6caf47-6455-4913-81a0-5bc95b0b8612</UserSecretsId>
+    <Version>0.0.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <TypeScriptTarget>ES5</TypeScriptTarget>
-    <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
-    <TypeScriptModuleKind />
     <TypeScriptCompileOnSaveEnabled>False</TypeScriptCompileOnSaveEnabled>
-    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
-    <TypeScriptRemoveComments>False</TypeScriptRemoveComments>
-    <TypeScriptOutFile />
-    <TypeScriptOutDir />
     <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
-    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
-    <TypeScriptSourceMap>True</TypeScriptSourceMap>
+    <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
     <TypeScriptMapRoot />
+    <TypeScriptModuleKind />
+    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+    <TypeScriptOutDir />
+    <TypeScriptOutFile />
+    <TypeScriptRemoveComments>False</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>True</TypeScriptSourceMap>
     <TypeScriptSourceRoot />
+    <TypeScriptTarget>ES5</TypeScriptTarget>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="BuildBundlerMinifier" Version="2.8.*" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.Redis" Version="0.4.1" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" PrivateAssets="All" />
     <PackageReference Include="Serilog.AspNetCore" Version="2.1.*" />
     <PackageReference Include="Serilog.Filters.Expressions" Version="1.1.*" />
@@ -89,11 +91,11 @@
     <None Include="bower_components\bootstrap-multiselect\docs\js\require-2.3.5.min.js" />
     <None Include="bower_components\bootstrap-multiselect\docs\less\bootstrap-example.less" />
     <None Include="bower_components\bootstrap-multiselect\tests\karma.conf.js" />
+    <None Include="bower_components\bootstrap-multiselect\tests\lib\MIT.LICENSE" />
     <None Include="bower_components\bootstrap-multiselect\tests\lib\jasmine-2.4.1\boot.js" />
     <None Include="bower_components\bootstrap-multiselect\tests\lib\jasmine-2.4.1\console.js" />
     <None Include="bower_components\bootstrap-multiselect\tests\lib\jasmine-2.4.1\jasmine-html.js" />
     <None Include="bower_components\bootstrap-multiselect\tests\lib\jasmine-2.4.1\jasmine.js" />
-    <None Include="bower_components\bootstrap-multiselect\tests\lib\MIT.LICENSE" />
     <None Include="bower_components\bootstrap-multiselect\tests\spec\bootstrap-multiselect.js" />
     <None Include="bower_components\bootstrap-multiselect\yarn.lock" />
     <None Include="bower_components\bootstrap\.babelrc.js" />
@@ -533,9 +535,9 @@
     <None Include="bower_components\bootstrap\scss\utilities\_text.scss" />
     <None Include="bower_components\bootstrap\scss\utilities\_visibility.scss" />
     <None Include="bower_components\bootstrap\sw.js" />
+    <None Include="bower_components\commonmark\LICENSE" />
     <None Include="bower_components\commonmark\dist\commonmark.js" />
     <None Include="bower_components\commonmark\dist\commonmark.min.js" />
-    <None Include="bower_components\commonmark\LICENSE" />
     <None Include="bower_components\fontawesome\.bower.json" />
     <None Include="bower_components\fontawesome\.github\ISSUE_TEMPLATE\bug-report.md" />
     <None Include="bower_components\fontawesome\.github\ISSUE_TEMPLATE\feature-request.md" />
@@ -3295,7 +3297,7 @@
     <ProjectReference Include="..\Ops.Service\Ops.Service.csproj" />
     <ProjectReference Include="..\Promenade.Models\Promenade.Models.csproj" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <TypeScriptCompile Include="bower_components\bootstrap-multiselect\types\bootstrap-multiselect\bootstrap-multiselect-tests.ts" />
     <TypeScriptCompile Include="bower_components\bootstrap-multiselect\types\bootstrap-multiselect\index.d.ts" />

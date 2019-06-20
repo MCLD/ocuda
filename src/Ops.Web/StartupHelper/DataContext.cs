@@ -59,7 +59,7 @@ namespace Ocuda.Ops.Web.StartupHelper
             catch (Exception ex)
             {
                 _logger.LogCritical($"Error looking up migrations for {contextName}: {ex.Message}");
-                throw ex;
+                throw;
             }
             try
             {
@@ -71,7 +71,7 @@ namespace Ocuda.Ops.Web.StartupHelper
             catch (Exception ex)
             {
                 _logger.LogCritical($"Error performing migrations for {contextName}: {ex.Message}");
-                throw ex;
+                throw;
             }
         }
     }

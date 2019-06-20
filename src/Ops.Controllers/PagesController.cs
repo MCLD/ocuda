@@ -74,7 +74,7 @@ namespace Ocuda.Ops.Controllers
             return View(viewModel);
         }
 
-        public new async Task<IActionResult> Display(string section, string id)
+        public async Task<IActionResult> Display(string section, string id)
         {
             var currentSection = await _sectionService.GetByPathAsync(section);
             var page = await _pageService.GetByStubAndSectionIdAsync(id, currentSection.Id);

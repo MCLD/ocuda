@@ -10,7 +10,7 @@ using Serilog.Events;
 
 namespace Ops.Web.WindowsAuth
 {
-    public class Program
+    public static class Program
     {
         public static int Main(string[] args)
         {
