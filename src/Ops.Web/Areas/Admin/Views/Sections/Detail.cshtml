@@ -9,6 +9,7 @@
     <input asp-for="Section.Name" formgroup />
     <input asp-for="Section.Path" readonly="@(Model.IsReadonly ? "readonly" : null)" formgroup />
     <input asp-for="Section.Icon" formgroup />
+    <input asp-for="Section.EmbeddedVideo" formgroup />
     <input asp-for="Section.SortOrder" formgroup />
 
     <select class="w-auto" asp-for="Section.IsNavigation" formgroup>

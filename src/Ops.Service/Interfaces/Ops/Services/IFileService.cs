@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Ocuda.Ops.Models.Entities;
@@ -14,6 +12,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<int> GetFileCountAsync();
         Task<ICollection<File>> GetFilesAsync();
         Task<File> GetByIdAsync(int id);
+        Task<File> GetLatestByLibraryIdAsync(int id);
 
         Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(
             BlogFilter filter, bool isGallery = false);
