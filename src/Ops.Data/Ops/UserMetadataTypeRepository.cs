@@ -17,7 +17,6 @@ namespace Ocuda.Ops.Data.Ops
         public UserMetadataTypeRepository(OpsContext context,
             ILogger<UserMetadataTypeRepository> logger) : base(context, logger)
         {
-
         }
 
         public async Task<ICollection<UserMetadataType>> GetAllAsync()

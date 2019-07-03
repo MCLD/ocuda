@@ -13,7 +13,6 @@ namespace Ocuda.Ops.Data.Ops
 {
     public class FileLibraryRepository : GenericRepository<FileLibrary, int>, IFileLibraryRepository
     {
-
         public FileLibraryRepository(OpsContext context, ILogger<FileLibraryRepository> logger)
             : base(context, logger)
         {
@@ -46,11 +45,6 @@ namespace Ocuda.Ops.Data.Ops
                 BlogFilter filter)
         {
             var query = DbSet.AsNoTracking();
-
-            if (filter.SectionId.HasValue)
-            {
-                query = query.Where(_ => _.SectionId == filter.SectionId.Value);
-            }
 
             return new DataWithCount<ICollection<FileLibrary>>
             {

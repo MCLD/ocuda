@@ -13,7 +13,7 @@ namespace Ocuda.Ops.Service
 
         public FileTypeService(IFileTypeRepository fileTypeRepository)
         {
-            _fileTypeRepository = fileTypeRepository 
+            _fileTypeRepository = fileTypeRepository
                 ?? throw new ArgumentNullException(nameof(fileTypeRepository));
         }
 

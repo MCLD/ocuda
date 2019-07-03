@@ -48,8 +48,6 @@ namespace Ocuda.Ops.Service
                 user.CreatedBy = (int)createdById;
             }
 
-            await ValidateUserAsync(user);
-
             await _userRepository.AddAsync(user);
             await _userRepository.SaveAsync();
             if (createdById != null)
@@ -95,8 +93,6 @@ namespace Ocuda.Ops.Service
             User currentUser = await _userRepository.FindAsync(user.Id);
             currentUser.Nickname = user.Nickname;
 
-            await ValidateUserAsync(currentUser);
-
             _userRepository.Update(currentUser);
             await _userRepository.SaveAsync();
             return currentUser;
@@ -130,48 +126,6 @@ namespace Ocuda.Ops.Service
             await _userRepository.SaveAsync();
 
             return rosterUser;
-        }
-
-        public async Task ValidateUserAsync(User user)
-        {
-            string message = string.Empty;
-
-            if (!string.IsNullOrWhiteSpace(user.Username))
-            {
-                if (await _userRepository.IsDuplicateUsername(user))
-                {
-                    message = $"User '{user.Username}' already exists.";
-                    _logger.LogWarning(message, user.Username);
-                    throw new OcudaException(message);
-                }
-            }
-            else
-            {
-                message = $"Username cannot be empty.";
-                _logger.LogWarning(message);
-                throw new OcudaException(message);
-            }
-
-            if (!string.IsNullOrWhiteSpace(user.Email))
-            {
-                if (await _userRepository.IsDuplicateEmail(user))
-                {
-                    message = $"User with email '{user.Email}' already exists.";
-                    _logger.LogWarning(message, user.Email);
-                    throw new OcudaException(message);
-                }
-            }
-
-            if (user.SupervisorId.HasValue)
-            {
-                User supervisor = await _userRepository.FindAsync(user.SupervisorId.Value);
-                if (supervisor == null)
-                {
-                    message = $"SupervisorId '{user.SupervisorId}' is not valid.";
-                    _logger.LogWarning(message, user.SupervisorId);
-                    throw new OcudaException(message);
-                }
-            }
         }
 
         public async Task<ICollection<User>> GetDirectReportsAsync(int supervisorId)

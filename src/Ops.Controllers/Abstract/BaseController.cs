@@ -11,7 +11,6 @@ namespace Ocuda.Ops.Controllers.Abstract
     [ServiceFilter(typeof(ExternalResourceFilter))]
     [ServiceFilter(typeof(NavigationFilter))]
     [ServiceFilter(typeof(UserFilter))]
-    [ServiceFilter(typeof(SectionFilter))]
     public abstract class BaseController<T> : Controller
     {
         protected readonly ILogger _logger;

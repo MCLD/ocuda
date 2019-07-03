@@ -42,15 +42,10 @@ namespace Ocuda.Ops.Data
         public DbSet<FileType> FileTypes { get; set; }
         public DbSet<Link> Links { get; set; }
         public DbSet<Link> LinkLibrary { get; set; }
-        public DbSet<Page> Pages { get; set; }
-        public DbSet<Post> Posts { get; set; }
-        public DbSet<Post> PostCategory { get; set; }
         public DbSet<RosterHeader> RosterHeaders { get; set; }
         public DbSet<RosterDetail> RosterDetails { get; set; }
-        public DbSet<Section> Sections { get; set; }
         public DbSet<SectionManagerGroup> SectionManagerGroups { get; set; }
         public DbSet<SiteSetting> SiteSettings { get; set; }
-        public DbSet<Thumbnail> Thumbnails { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<UserMetadata> UserMetadata { get; set; }
         public DbSet<UserMetadataType> UserMetadataTypes { get; set; }

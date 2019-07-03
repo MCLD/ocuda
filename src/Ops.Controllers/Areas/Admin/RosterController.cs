@@ -2,16 +2,19 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Roster;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
 {
     [Area("Admin")]
+    [Authorize(Policy = nameof(ClaimType.SiteManager))]
     public class RosterController : BaseController<RosterController>
     {
         private readonly IRosterService _rosterService;

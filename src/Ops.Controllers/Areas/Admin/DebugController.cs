@@ -1,17 +1,23 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Keys;
 
-namespace Ocuda.Ops.Controllers
+namespace Ocuda.Ops.Controllers.Areas.Admin
 {
-    public class DebugController : ControllerBase
+    [Area("Admin")]
+    [Authorize(Policy = nameof(ClaimType.SiteManager))]
+    public class DebugController : BaseController<DebugController>
     {
         private readonly IInsertSampleDataService _insertSampleDataService;
-        public DebugController(IInsertSampleDataService insertSampleDataService)
+        public DebugController(ServiceFacades.Controller<DebugController> context,
+            IInsertSampleDataService insertSampleDataService) : base(context)
         {
-            _insertSampleDataService = insertSampleDataService 
+            _insertSampleDataService = insertSampleDataService
                 ?? throw new ArgumentNullException(nameof(insertSampleDataService));
         }
 

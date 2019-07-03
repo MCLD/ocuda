@@ -36,5 +36,4 @@ namespace Ocuda.Ops.Models.Entities
         String,
         String_Emptiable
     }
-
 }

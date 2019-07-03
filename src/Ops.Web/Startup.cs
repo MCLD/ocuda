@@ -12,8 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Authorization;
-using Ocuda.Ops.Controllers.RouteConstraints;
-using Ocuda.Ops.Controllers.Validators;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -166,10 +164,6 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Controllers.Filters.ExternalResourceFilter>();
             services.AddScoped<Controllers.Filters.NavigationFilter>();
             services.AddScoped<Controllers.Filters.UserFilter>();
-            services.AddScoped<Controllers.Filters.SectionFilter>();
-
-            // section path validator
-            services.AddScoped<ISectionPathValidator, SectionPathValidator>();
 
             // helpers
             services.AddScoped<Utility.Helpers.WebHelper>();
@@ -189,24 +183,14 @@ namespace Ocuda.Ops.Web
                 Data.Ops.LinkLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository,
                 Data.Ops.LinkRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IPageRepository,
-                Data.Ops.PageRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IPostCategoryRepository,
-               Data.Ops.PostCategoryRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IPostRepository,
-                Data.Ops.PostRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterDetailRepository,
                 Data.Ops.RosterDetailRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterHeaderRepository,
                 Data.Ops.RosterHeaderRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ISectionManagerGroupRepository,
                 Data.Ops.SectionManagerGroupRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.ISectionRepository,
-                Data.Ops.SectionRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ISiteSettingRepository,
                 Data.Ops.SiteSettingRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IThumbnailRepository,
-                Data.Ops.ThumbnailRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserMetadataTypeRepository,
                 Data.Ops.UserMetadataTypeRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserRepository,
@@ -224,12 +208,8 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ILdapService, LdapService>();
             services.AddScoped<ILinkService, LinkService>();
             services.AddScoped<IPathResolverService, PathResolverService>();
-            services.AddScoped<IPageService, PageService>();
-            services.AddScoped<IPostService, PostService>();
             services.AddScoped<IRosterService, RosterService>();
-            services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<ISiteSettingService, SiteSettingService>();
-            services.AddScoped<IThumbnailService, ThumbnailService>();
             services.AddScoped<IUserMetadataTypeService, UserMetadataTypeService>();
             services.AddScoped<IUserService, UserService>();
 
@@ -312,30 +292,6 @@ namespace Ocuda.Ops.Web
 
             app.UseMvc(routes =>
             {
-                routes.MapRoute(
-                    name: null,
-                    template: "{area}/{section}/{controller}/{action}/{id?}",
-                    defaults: new { controller = "Home", action = "Index" },
-                    constraints: new
-                    {
-                        section = new SectionRouteConstraint(app
-                            .ApplicationServices.GetRequiredService<ISectionPathValidator>())
-                    });
-
-                routes.MapRoute(
-                    name: null,
-                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-
-                routes.MapRoute(
-                   name: null,
-                   template: "{section}/{controller}/{action}/{id?}",
-                   defaults: new { controller = "Home", action = "Index" },
-                   constraints: new
-                   {
-                       section = new SectionRouteConstraint(app
-                           .ApplicationServices.GetRequiredService<ISectionPathValidator>())
-                   });
-
                 routes.MapRoute(
                     name: null,
                     template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");

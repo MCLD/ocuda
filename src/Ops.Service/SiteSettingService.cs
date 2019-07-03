@@ -18,23 +18,19 @@ namespace Ocuda.Ops.Service
         private readonly IDistributedCache _cache;
         private readonly IConfiguration _config;
         private readonly ISiteSettingRepository _siteSettingRepository;
-        private readonly IUserRepository _userRepository;
 
         private int CacheMinutes { get; set; }
 
         public SiteSettingService(ILogger<SiteSettingService> logger,
             IDistributedCache cache,
             IConfiguration config,
-            ISiteSettingRepository siteSettingRepository,
-            IUserRepository userRepository)
+            ISiteSettingRepository siteSettingRepository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _siteSettingRepository = siteSettingRepository
                 ?? throw new ArgumentNullException(nameof(siteSettingRepository));
-            _userRepository = userRepository
-                ?? throw new ArgumentNullException(nameof(userRepository));
 
             string timeoutSetting
                 = _config[Utility.Keys.Configuration.OpsSiteSettingCacheMinutes] ?? "60";
@@ -134,7 +130,7 @@ namespace Ocuda.Ops.Service
 
             if (currentSetting.Type == SiteSettingType.Bool)
             {
-                if (!bool.TryParse(value, out bool result))
+                if (!bool.TryParse(value, out _))
                 {
                     _logger.LogError($"Invalid format for boolean key {key}: {value}");
                     throw new OcudaException("Invald format.");
@@ -142,7 +138,7 @@ namespace Ocuda.Ops.Service
             }
             else if (currentSetting.Type == SiteSettingType.Int)
             {
-                if (!int.TryParse(value, out int result))
+                if (!int.TryParse(value, out _))
                 {
                     _logger.LogError($"Invalid format for integer key {key}: {value}");
                     throw new OcudaException("Invald format.");
@@ -168,42 +164,10 @@ namespace Ocuda.Ops.Service
 
         public async Task ValidateSiteSettingAsync(SiteSetting siteSetting)
         {
-            var message = string.Empty;
-
-            if (!string.IsNullOrWhiteSpace(siteSetting.Key))
+            if (await _siteSettingRepository.IsDuplicateKey(siteSetting))
             {
-                if (await _siteSettingRepository.IsDuplicateKey(siteSetting))
-                {
-                    message = $"Site Setting with key '{siteSetting.Key}' already exists.";
-                    _logger.LogWarning(message, siteSetting.Key);
-                    throw new OcudaException(message);
-                }
-            }
-            else
-            { 
-                message = $"Site Setting must have a key.";
-                _logger.LogWarning(message);
-                throw new OcudaException(message);
-            }
-
-            if (string.IsNullOrWhiteSpace(siteSetting.Name))
-            {
-                message = $"Site Setting must have a name.";
-                _logger.LogWarning(message);
-                throw new OcudaException(message);
-            }
-
-            if (string.IsNullOrWhiteSpace(siteSetting.Value))
-            {
-                message = $"Site Setting value cannot be empty.";
-                _logger.LogWarning(message);
-                throw new OcudaException(message);
-            }
-
-            if (!Enum.IsDefined(typeof(SiteSettingType), siteSetting.Type))
-            {
-                message = $"Site Setting type is invalid.";
-                _logger.LogWarning(message, siteSetting.Type);
+                var message = $"Site Setting with key '{siteSetting.Key}' already exists.";
+                _logger.LogWarning(message, siteSetting.Key);
                 throw new OcudaException(message);
             }
 
@@ -211,28 +175,19 @@ namespace Ocuda.Ops.Service
             {
                 if (!bool.TryParse(siteSetting.Value, out bool result))
                 {
-                    message = $"{siteSetting.Name} requires a value of type {siteSetting.Type}.";
+                    var message = $"{siteSetting.Name} requires a value of type {siteSetting.Type}.";
                     _logger.LogWarning(message, siteSetting.Value, result);
                     throw new OcudaException(message);
                 }
             }
-
             else if (siteSetting.Type == SiteSettingType.Int)
             {
                 if (!int.TryParse(siteSetting.Value, out int result))
                 {
-                    message = $"{siteSetting.Name} requires a value of type {siteSetting.Type}.";
+                    var message = $"{siteSetting.Name} requires a value of type {siteSetting.Type}.";
                     _logger.LogWarning(message, siteSetting.Value, result);
                     throw new OcudaException(message);
                 }
-            }
-
-            var creator = await _userRepository.FindAsync(siteSetting.CreatedBy);
-            if (creator == null)
-            {
-                message = $"Created by invalid User Id: {siteSetting.CreatedBy}";
-                _logger.LogWarning(message, siteSetting.CreatedBy);
-                throw new OcudaException(message);
             }
         }
     }

@@ -21,7 +21,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.IsDeleted == false && _.Id == id)
+                .Where(_ => !_.IsDeleted && _.Id == id)
                 .FirstOrDefaultAsync();
         }
 
@@ -29,7 +29,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.IsDeleted == false && _.Username == username && _.IsSysadmin == false)
+                .Where(_ => !_.IsDeleted && _.Username == username && !_.IsSysadmin)
                 .FirstOrDefaultAsync();
         }
 
@@ -37,7 +37,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.IsDeleted == false && _.Email == email && _.IsSysadmin == false)
+                .Where(_ => !_.IsDeleted && _.Email == email && !_.IsSysadmin)
                 .FirstOrDefaultAsync();
         }
 
@@ -45,7 +45,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.IsDeleted == false && _.IsSysadmin == false)
+                .Where(_ => !_.IsDeleted && !_.IsSysadmin)
                 .ToListAsync();
         }
 
@@ -55,8 +55,8 @@ namespace Ocuda.Ops.Data.Ops
                 .AsNoTracking()
                 .Where(_ => _.Username == user.Username
                          && _.Id != user.Id
-                         && _.IsDeleted == false
-                         && _.IsSysadmin == false)
+                         && !_.IsDeleted
+                         && !_.IsSysadmin)
                 .AnyAsync();
         }
 
@@ -66,8 +66,8 @@ namespace Ocuda.Ops.Data.Ops
                 .AsNoTracking()
                 .Where(_ => _.Email == user.Email
                          && _.Id != user.Id
-                         && _.IsDeleted == false
-                         && _.IsSysadmin == false)
+                         && !_.IsDeleted
+                         && !_.IsSysadmin)
                 .AnyAsync();
         }
 
@@ -100,7 +100,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.IsSysadmin == true)
+                .Where(_ => _.IsSysadmin)
                 .FirstOrDefaultAsync();
         }
         #endregion Initial setup methods

@@ -7,7 +7,7 @@ namespace Ocuda.Ops.Data.Ops
     public class SectionManagerGroupRepository
         : GenericRepository<SectionManagerGroup, int>, ISectionManagerGroupRepository
     {
-        public SectionManagerGroupRepository(OpsContext context, 
+        public SectionManagerGroupRepository(OpsContext context,
             ILogger<SectionManagerGroupRepository> logger)
             : base(context, logger)
         {
