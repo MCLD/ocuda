@@ -37,18 +37,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BuildBundlerMinifier" Version="2.8.*" />
+    <PackageReference Include="BuildBundlerMinifier" Version="2.9.406" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.Redis" Version="0.4.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" PrivateAssets="All" />
-    <PackageReference Include="Serilog.AspNetCore" Version="2.1.*" />
-    <PackageReference Include="Serilog.Filters.Expressions" Version="1.1.*" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="2.6.*" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.*" />
-    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="5.1.*" />
-    <PackageReference Include="Serilog.Sinks.Rollingfile" Version="3.3.*" />
+    <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -3296,6 +3291,7 @@
     <ProjectReference Include="..\Ops.Models\Ops.Models.csproj" />
     <ProjectReference Include="..\Ops.Service\Ops.Service.csproj" />
     <ProjectReference Include="..\Promenade.Models\Promenade.Models.csproj" />
+    <ProjectReference Include="..\Utility\Utility.csproj" />
   </ItemGroup>
   
   <ItemGroup>

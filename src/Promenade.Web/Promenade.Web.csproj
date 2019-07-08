@@ -32,16 +32,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BuildBundlerMinifier" Version="2.8.*" />
+    <PackageReference Include="BuildBundlerMinifier" Version="2.9.406" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" PrivateAssets="All" />
-    <PackageReference Include="Serilog.AspNetCore" Version="2.1.*" />
-    <PackageReference Include="Serilog.Filters.Expressions" Version="1.1.*" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="2.6.*" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.*" />
-    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="5.1.*" />
-    <PackageReference Include="Serilog.Sinks.Rollingfile" Version="3.3.*" />
+    <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -3240,7 +3235,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Promenade.Controllers\Promenade.Controllers.csproj" />
-    <ProjectReference Include="..\Promenade.DataProvider.SQLite.Promenade\Promenade.DataProvider.SQLite.Promenade.csproj" />
     <ProjectReference Include="..\Promenade.DataProvider.SqlServer.Promenade\Promenade.DataProvider.SqlServer.Promenade.csproj" />
     <ProjectReference Include="..\Promenade.Data\Promenade.Data.csproj" />
     <ProjectReference Include="..\Promenade.Models\Promenade.Models.csproj" />

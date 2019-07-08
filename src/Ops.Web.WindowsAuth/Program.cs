@@ -24,9 +24,9 @@ namespace Ops.Web.WindowsAuth
             IWebHost webHost = CreateWebHostBuilder(args).Build();
             var config = (IConfiguration)webHost.Services.GetService(typeof(IConfiguration));
 
-            if (!string.IsNullOrEmpty(config[Configuration.OpsRollingLogLocation]))
+            if (!string.IsNullOrEmpty(config[Configuration.OcudaLoggingRollingFile]))
             {
-                logPath = config[Configuration.OpsRollingLogLocation];
+                logPath = config[Configuration.OcudaLoggingRollingFile];
                 if (!System.IO.Directory.Exists(logPath))
                 {
                     System.IO.Directory.CreateDirectory(logPath);
