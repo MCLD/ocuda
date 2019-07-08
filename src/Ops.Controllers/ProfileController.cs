@@ -7,6 +7,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Controllers
 {
+    [Route("[controller]")]
     public class ProfileController : BaseController<ProfileController>
     {
         private readonly IUserService _userService;
@@ -17,15 +18,17 @@ namespace Ocuda.Ops.Controllers
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
+        [Route("")]
+        [Route("[action]")]
         public async Task<IActionResult> Index(string id)
         {
             var viewModel = new IndexViewModel();
-            
-            if(!string.IsNullOrWhiteSpace(id))
+
+            if (!string.IsNullOrWhiteSpace(id))
             {
                 var user = await _userService.LookupUserAsync(id);
 
-                if(user != null)
+                if (user != null)
                 {
                     viewModel.User = user;
                 }
@@ -42,7 +45,7 @@ namespace Ocuda.Ops.Controllers
 
             if (viewModel.User.SupervisorId.HasValue)
             {
-                viewModel.User.Supervisor = 
+                viewModel.User.Supervisor =
                     await _userService.GetByIdAsync(viewModel.User.SupervisorId.Value);
             }
 
@@ -57,16 +60,17 @@ namespace Ocuda.Ops.Controllers
         }
 
         [HttpPost]
+        [Route("[action]")]
         public async Task<IActionResult> EditNickname(IndexViewModel model)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {
                     var user = await _userService.EditNicknameAsync(model.User);
                     ShowAlertSuccess($"Updated nickname: {user.Nickname}");
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     ShowAlertDanger("Unable to update nickname: ", ex.Message);
                 }

@@ -15,6 +15,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 {
     [Area("Admin")]
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
+    [Route("[area]/[controller]")]
     public class RosterController : BaseController<RosterController>
     {
         private readonly IRosterService _rosterService;
@@ -26,6 +27,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ?? throw new ArgumentNullException(nameof(rosterService));
         }
 
+        [Route("[action]")]
         [RestoreModelState]
         public IActionResult Upload()
         {
@@ -33,6 +35,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
+        [Route("[action]")]
         [SaveModelState]
         public async Task<IActionResult> Upload(UploadViewModel model)
         {

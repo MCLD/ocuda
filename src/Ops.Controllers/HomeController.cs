@@ -4,18 +4,22 @@ using Ocuda.Ops.Controllers.ViewModels.Home;
 
 namespace Ocuda.Ops.Controllers
 {
+    [Route("")]
+    [Route("[controller]")]
     public class HomeController : BaseController<HomeController>
     {
-
         public HomeController(ServiceFacades.Controller<HomeController> context) : base(context)
         {
         }
 
+        [Route("")]
+        [Route("[action]")]
         public IActionResult Index()
         {
             return View();
         }
 
+        [Route("[action]")]
         public IActionResult Unauthorized(string returnUrl)
         {
             return View(new UnauthorizedViewModel
@@ -25,6 +29,7 @@ namespace Ocuda.Ops.Controllers
             });
         }
 
+        [Route("[action]")]
         public IActionResult Authenticate(string returnUrl)
         {
             // by the time we get here the user is probably authenticated - if so we can take them

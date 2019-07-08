@@ -9,6 +9,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Controllers
 {
+    [Route("[controller]")]
     public class FilesController : BaseController<FilesController>
     {
         private readonly IFileService _fileService;
@@ -19,6 +20,7 @@ namespace Ocuda.Ops.Controllers
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         }
 
+        [Route("[action]")]
         public async Task<IActionResult> ViewPrivateFile(int id)
         {
             var file = await _fileService.GetByIdAsync(id);

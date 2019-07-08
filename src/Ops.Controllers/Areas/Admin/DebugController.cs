@@ -11,9 +11,11 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 {
     [Area("Admin")]
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
+    [Route("[area]/[controller]")]
     public class DebugController : BaseController<DebugController>
     {
         private readonly IInsertSampleDataService _insertSampleDataService;
+
         public DebugController(ServiceFacades.Controller<DebugController> context,
             IInsertSampleDataService insertSampleDataService) : base(context)
         {
@@ -21,6 +23,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ?? throw new ArgumentNullException(nameof(insertSampleDataService));
         }
 
+        [Route("[action]")]
         public async Task<IActionResult> InsertSampleData()
         {
             await _insertSampleDataService.InsertDataAsync();

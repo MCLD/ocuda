@@ -1,13 +1,13 @@
-﻿using System;
-using System.Diagnostics;
-using Ocuda.Ops.Controllers.Abstract;
-using Ocuda.Ops.Controllers.ViewModels;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Controllers.Abstract;
+using Ocuda.Ops.Controllers.ViewModels;
 
 namespace Ocuda.Ops.Controllers
 {
+    [Route("[controller]")]
     public class ErrorController : BaseController<ErrorController>
     {
         public ErrorController(ServiceFacades.Controller<ErrorController> context)
@@ -15,6 +15,8 @@ namespace Ocuda.Ops.Controllers
         {
         }
 
+        [Route("")]
+        [Route("[action]")]
         public IActionResult Index(int id)
         {
             string originalPath = "unknown";

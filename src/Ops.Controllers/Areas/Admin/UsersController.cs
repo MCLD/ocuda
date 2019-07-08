@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,21 +15,19 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 {
     [Area("Admin")]
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
+    [Route("[area]/[controller]")]
     public class UsersController : BaseController<UsersController>
     {
         private readonly IUserMetadataTypeService _userMetadataTypeService;
-        private readonly IUserService _userService;
 
         public UsersController(ServiceFacades.Controller<UsersController> context,
-            IUserMetadataTypeService userMetadataTypeService,
-            IUserService userService) : base(context)
+            IUserMetadataTypeService userMetadataTypeService) : base(context)
         {
             _userMetadataTypeService = userMetadataTypeService
                 ?? throw new ArgumentNullException(nameof(userMetadataTypeService));
-            _userService = userService
-                ?? throw new ArgumentNullException(nameof(userService));
         }
 
+        [Route("[action]")]
         public async Task<IActionResult> Metadata(int page = 1)
         {
             var itemsPerPage = await _siteSettingService
@@ -67,6 +63,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
+        [Route("[action]")]
         public async Task<JsonResult> CreateMetadataType(UserMetadataType metadataType)
         {
             var success = false;
@@ -78,7 +75,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ShowAlertSuccess($"Added user metadata type: {newMetadataType.Name}");
                 success = true;
             }
-            catch(OcudaException ex)
+            catch (OcudaException ex)
             {
                 message = ex.Message;
             }
@@ -87,6 +84,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
+        [Route("[action]")]
         public async Task<JsonResult> EditMetadataType(UserMetadataType metadataType)
         {
             var success = false;
@@ -103,11 +101,11 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 message = ex.Message;
             }
 
-
             return Json(new { success, message });
         }
 
         [HttpPost]
+        [Route("[action]")]
         public async Task<JsonResult> DeleteMetadataType(UserMetadataType metadataType)
         {
             var success = false;

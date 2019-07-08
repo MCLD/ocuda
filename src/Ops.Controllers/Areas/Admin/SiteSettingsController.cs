@@ -13,6 +13,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 {
     [Area("Admin")]
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
+    [Route("[area]/[controller]")]
     public class SiteSettingsController : BaseController<SiteSettingsController>
     {
         public SiteSettingsController(ServiceFacades.Controller<SiteSettingsController> context)
@@ -20,6 +21,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
         }
 
+        [Route("")]
+        [Route("[action]")]
         public async Task<IActionResult> Index()
         {
             var siteSettings = await _siteSettingService.GetAllAsync();
@@ -41,6 +44,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
+        [Route("[action]")]
         public async Task<IActionResult> Update(IndexViewModel model)
         {
             ModelState.Remove("SiteSetting.Description");
