@@ -33,10 +33,6 @@ namespace Ocuda.Promenade.Web
                     services.AddDbContextPool<PromenadeContext, DataProvider.SqlServer.Promenade.Context>(_ =>
                         _.UseSqlServer(@"Data Source=(LocalDb)\MSSQLLocalDB;"));
                     break;
-                case "SQLite":
-                    services.AddDbContextPool<PromenadeContext, DataProvider.SQLite.Promenade.Context>(_ =>
-                        _.UseSqlite(@"promenade.sqlite"));
-                    break;
                 default:
                     throw new System.Exception("No Ops.DatabaseProvider configured.");
             }

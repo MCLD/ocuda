@@ -13,31 +13,32 @@ namespace Ocuda.Ops.Web
     {
         public static int Main(string[] args)
         {
-            var applicationName = Assembly.GetExecutingAssembly().GetName().Name;
-            var version = Assembly.GetExecutingAssembly().GetName().Version;
-            var id = Process.GetCurrentProcess().Id;
-
-            Log.Logger = new LogConfig().Build(applicationName, version, id, args).CreateLogger();
-
             var webHost = CreateWebHostBuilder(args).Build();
             var config = (IConfiguration)webHost.Services.GetService(typeof(IConfiguration));
 
-            var instanceConfig = config[Utility.Keys.Configuration.OpsInstance];
-            string instance = string.IsNullOrEmpty(instanceConfig) ? null : $" ({instanceConfig})";
+            Log.Logger = new Utility.Logging.Configuration().Build(config).CreateLogger();
+
+            var instanceConfig = config[Utility.Keys.Configuration.OcudaInstance];
+            var instance = string.IsNullOrEmpty(instanceConfig) ? null : $" ({instanceConfig})";
+
+            var version = Assembly.GetEntryAssembly()
+                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                    .InformationalVersion;
 
             try
             {
-                Log.Information($"{applicationName} v{version}{instance} starting up");
+                Log.Information($"Ocuda.Ops{instance} v{version} starting up");
                 webHost.Run();
                 return 0;
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, $"{applicationName} v{version}{instance} exited unexpectedly: {ex.Message}");
+                Log.Fatal(ex, $"Ocuda.Ops{instance} v{version} exited unexpectedly: {ex.Message}");
                 return 1;
             }
             finally
             {
+
                 Log.CloseAndFlush();
             }
         }
