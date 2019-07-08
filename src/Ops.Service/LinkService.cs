@@ -16,14 +16,10 @@ namespace Ocuda.Ops.Service
         private readonly ILogger<LinkService> _logger;
         private readonly ILinkLibraryRepository _linkLibraryRepository;
         private readonly ILinkRepository _linkRepository;
-        private readonly ISectionRepository _sectionRepository;
-        private readonly IUserRepository _userRepository;
 
         public LinkService(ILogger<LinkService> logger,
             ILinkLibraryRepository linkLibraryRepository,
-            ILinkRepository linkRepository,
-            ISectionRepository sectionRepository,
-            IUserRepository userRepository)
+            ILinkRepository linkRepository)
         {
             _logger = logger
                 ?? throw new ArgumentNullException(nameof(logger));
@@ -31,10 +27,6 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(linkRepository));
             _linkLibraryRepository = linkLibraryRepository
                 ?? throw new ArgumentNullException(nameof(linkLibraryRepository));
-            _sectionRepository = sectionRepository
-                ?? throw new ArgumentNullException(nameof(sectionRepository));
-            _userRepository = userRepository
-                ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
         public async Task<int> GetLinkCountAsync()

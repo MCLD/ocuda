@@ -29,6 +29,7 @@ namespace Ocuda.Ops.Service
         private readonly IRosterDetailRepository _rosterDetailRepository;
         private readonly IRosterHeaderRepository _rosterHeaderRepository;
         private readonly IUserRepository _userRepository;
+
         public RosterService(ILogger<RosterService> logger,
             ILdapService ldapService,
             IRosterDetailRepository rosterDetailRepository,
@@ -152,8 +153,8 @@ namespace Ocuda.Ops.Service
                                 }
 
                                 // Check if position has already been added to the list
-                                if (rosterDetails.Select(_ => _.PositionNum)
-                                    .Contains(entry.PositionNum) == false)
+                                if (!rosterDetails.Select(_ => _.PositionNum)
+                                    .Contains(entry.PositionNum))
                                 {
                                     rosterDetails.Add(entry);
                                 }
@@ -166,27 +167,23 @@ namespace Ocuda.Ops.Service
             await _rosterHeaderRepository.AddAsync(rosterHeader);
             await _rosterDetailRepository.AddRangeAsync(rosterDetails);
 
-
             var users = await _userRepository.GetAllAsync();
             var userAddList = new List<User>();
             var userUpdateList = new List<User>();
-            var nonVacantRosterDetails = rosterDetails.Where(_ => _.IsVacant == false);
+            var nonVacantRosterDetails = rosterDetails.Where(_ => !_.IsVacant);
             foreach (var rosterDetail in nonVacantRosterDetails)
             {
                 // Check if user exists with the employee id
-                var user = users
-                    .Where(_ => _.EmployeeId == rosterDetail.EmployeeId)
-                    .FirstOrDefault();
+                var user = users.FirstOrDefault(_ => _.EmployeeId == rosterDetail.EmployeeId);
                 if (user == null)
                 {
                     // Check if user exists with the email
                     if (!string.IsNullOrWhiteSpace(rosterDetail.EmailAddress))
                     {
-                        user = users
-                            .Where(_ => string.Equals(_.Email, rosterDetail.EmailAddress,
-                                StringComparison.OrdinalIgnoreCase))
-                            .FirstOrDefault();
-                        if (user != null && !user.ExcludeFromRoster)
+                        user = users.FirstOrDefault(_ => string.Equals(_.Email,
+                            rosterDetail.EmailAddress,
+                            StringComparison.OrdinalIgnoreCase));
+                        if (user?.ExcludeFromRoster == false)
                         {
                             user.EmployeeId = rosterDetail.EmployeeId;
                         }
@@ -275,18 +272,12 @@ namespace Ocuda.Ops.Service
             var rosterUsers = userAddList.Union(userUpdateList).ToList();
             foreach (var user in rosterUsers)
             {
-                var rosterDetail = rosterDetails
-                    .Where(_ => _.EmployeeId == user.EmployeeId)
-                    .FirstOrDefault();
+                var rosterDetail = rosterDetails.Find(_ => _.EmployeeId == user.EmployeeId);
 
-                var reportsTo = rosterDetails
-                    .Where(_ => _.PositionNum == rosterDetail.ReportsToPos)
-                    .FirstOrDefault();
-                while (reportsTo != null && reportsTo.IsVacant)
+                var reportsTo = rosterDetails.Find(_ => _.PositionNum == rosterDetail.ReportsToPos);
+                while (reportsTo?.IsVacant == true)
                 {
-                    reportsTo = rosterDetails
-                        .Where(_ => _.PositionNum == reportsTo.ReportsToPos)
-                        .FirstOrDefault();
+                    reportsTo = rosterDetails.Find(_ => _.PositionNum == reportsTo.ReportsToPos);
                 }
 
                 if (reportsTo != null)
@@ -305,7 +296,7 @@ namespace Ocuda.Ops.Service
             _userRepository.UpdateRange(rosterUsers);
             await _userRepository.SaveAsync();
 
-            return rosterDetails.Count();
+            return rosterDetails.Count;
         }
     }
 }

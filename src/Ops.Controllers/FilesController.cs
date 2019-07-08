@@ -5,90 +5,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
-using Ocuda.Ops.Controllers.ViewModels.Files;
-using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers
 {
+    [Route("[controller]")]
     public class FilesController : BaseController<FilesController>
     {
         private readonly IFileService _fileService;
-        private readonly ISectionService _sectionService;
-        private readonly IThumbnailService _thumbnailService;
-        private readonly IUserService _userService;
-
-        public const string DefaultCategoryDisplayName = "[No Category]";
 
         public FilesController(ServiceFacades.Controller<FilesController> context,
-            IFileService fileService,
-            ISectionService sectionService,
-            IThumbnailService thumbnailService,
-            IUserService userService) : base(context)
+            IFileService fileService) : base(context)
         {
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
-            _sectionService = sectionService
-                ?? throw new ArgumentNullException(nameof(sectionService));
-            _thumbnailService = thumbnailService
-                ?? throw new ArgumentNullException(nameof(thumbnailService));
-            _userService = userService
-                ?? throw new ArgumentNullException(nameof(userService));
         }
 
-        public async Task<IActionResult> Library(string section, int id, int page = 1)
-        {
-            var currentSection = await _sectionService.GetByPathAsync(section);
-            var currentLibrary = await _fileService.GetLibraryByIdAsync(id);
-
-            if (currentLibrary?.SectionId != currentSection.Id)
-            {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
-            }
-
-            var itemsPerPage = await _siteSettingService
-                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
-
-            var filter = new BlogFilter(page, itemsPerPage)
-            {
-                SectionId = currentSection.Id,
-                FileLibraryId = id
-            };
-
-            var fileList = await _fileService.GetPaginatedListAsync(filter);
-
-            var paginateModel = new PaginateModel()
-            {
-                ItemCount = fileList.Count,
-                CurrentPage = page,
-                ItemsPerPage = filter.Take.Value
-            };
-            if (paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
-            {
-                return RedirectToRoute(
-                    new
-                    {
-                        page = paginateModel.LastPage ?? 1
-                    });
-            }
-
-            foreach (var file in fileList.Data)
-            {
-                var userInfo = await _userService.GetUserInfoById(file.CreatedBy);
-                file.CreatedByName = userInfo.Item1;
-                file.CreatedByUsername = userInfo.Item2;
-            }
-
-            var viewModel = new LibraryViewModel()
-            {
-                PaginateModel = paginateModel,
-                Files = fileList.Data,
-                Library = currentLibrary
-            };
-
-            return View(viewModel);
-        }
-
+        [Route("[action]")]
         public async Task<IActionResult> ViewPrivateFile(int id)
         {
             var file = await _fileService.GetByIdAsync(id);
@@ -107,89 +39,6 @@ namespace Ocuda.Ops.Controllers
                 _logger.LogError($"Error viewing file {file.Id} : {ex}", ex);
                 return StatusCode(StatusCodes.Status404NotFound);
             }
-        }
-
-        public async Task<IActionResult> Latest(string section, int id)
-        {
-            var currentSection = await _sectionService.GetByPathAsync(section);
-            var currentLibrary = await _fileService.GetLibraryByIdAsync(id);
-
-            if (currentLibrary?.SectionId != currentSection.Id)
-            {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
-            }
-
-            var latestFile = await _fileService.GetLatestByLibraryIdAsync(id);
-
-            if (latestFile != null)
-            {
-                return await ViewPrivateFile(latestFile.Id);
-            }
-            else
-            {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
-            }
-        }
-
-        public async Task<IActionResult> Gallery(string section, int? categoryId = null, int page = 1)
-        {
-            // TODO
-            return null;
-            /*
-            var currentSection = await _sectionService.GetByPathAsync(section);
-            var itemsPerPage = await _siteSettingService
-                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
-
-            var filter = new BlogFilter(page, itemsPerPage)
-            {
-                SectionId = currentSection.Id,
-                CategoryId = categoryId,
-                CategoryType = CategoryType.File
-            };
-
-            var fileList = await _fileService.GetPaginatedListAsync(filter, true);
-            var categories = await _categoryService.GetBySectionIdAsync(filter, true);
-
-            var paginateModel = new PaginateModel()
-            {
-                ItemCount = fileList.Count,
-                CurrentPage = page,
-                ItemsPerPage = filter.Take.Value
-            };
-
-            if (paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
-            {
-                return RedirectToRoute(
-                    new
-                    {
-                        page = paginateModel.LastPage ?? 1
-                    });
-            }
-
-            foreach (var file in fileList.Data)
-            {
-                foreach (var thumbnail in file.Thumbnails)
-                {
-                    thumbnail.Url = _thumbnailService.GetUrl(thumbnail);
-                }
-            }
-
-            var viewModel = new GalleryViewModel()
-            {
-                PaginateModel = paginateModel,
-                Files = fileList.Data,
-                Categories = categories
-            };
-
-            if (categoryId.HasValue)
-            {
-                var name = (await _categoryService.GetByIdAsync(categoryId.Value)).Name;
-                viewModel.CategoryName =
-                    string.IsNullOrWhiteSpace(name) ? DefaultCategoryDisplayName : name;
-            }
-
-            return View(viewModel);
-            */
         }
     }
 }

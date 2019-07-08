@@ -11,7 +11,7 @@ using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class LinkRepository 
+    public class LinkRepository
         : GenericRepository<Link, int>, ILinkRepository
     {
         public LinkRepository(OpsContext context, ILogger<LinkRepository> logger)
@@ -35,10 +35,6 @@ namespace Ocuda.Ops.Data.Ops
             if (filter.LinkLibraryId.HasValue)
             {
                 query = query.Where(_ => _.LinkLibraryId == filter.LinkLibraryId.Value);
-            }
-            else if (filter.SectionId.HasValue)
-            {
-                query = query.Where(_ => _.LinkLibrary.SectionId == filter.SectionId.Value);
             }
 
             return new DataWithCount<ICollection<Link>>

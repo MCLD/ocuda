@@ -19,25 +19,13 @@ namespace Ocuda.Ops.Service
         private readonly ILogger<FileService> _logger;
         private readonly IFileLibraryRepository _fileLibraryRepository;
         private readonly IFileRepository _fileRepository;
-        private readonly IPageRepository _pageRepository;
-        private readonly IPostRepository _postRepository;
-        private readonly ISectionRepository _sectionRepository;
-        private readonly IThumbnailRepository _thumbnailRepository;
-        private readonly IUserRepository _userRepository;
         private readonly IFileTypeService _fileTypeService;
-        private readonly IThumbnailService _thumbnailService;
         private readonly IPathResolverService _pathResolver;
 
         public FileService(ILogger<FileService> logger,
             IFileLibraryRepository fileLibraryRepository,
             IFileRepository fileRepository,
-            IPageRepository pageRepository,
-            IPostRepository postRepository,
-            ISectionRepository sectionRepository,
-            IThumbnailRepository thumbnailRepository,
-            IUserRepository userRepository,
             IFileTypeService fileTypeService,
-            IThumbnailService thumbnailService,
             IPathResolverService pathResolver)
         {
             _logger = logger
@@ -46,20 +34,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(fileLibraryRepository));
             _fileRepository = fileRepository
                 ?? throw new ArgumentNullException(nameof(fileRepository));
-            _pageRepository = pageRepository
-                ?? throw new ArgumentNullException(nameof(pageRepository));
-            _postRepository = postRepository
-                ?? throw new ArgumentNullException(nameof(postRepository));
-            _sectionRepository = sectionRepository
-                ?? throw new ArgumentNullException(nameof(sectionRepository));
-            _thumbnailRepository = thumbnailRepository
-                ?? throw new ArgumentNullException(nameof(thumbnailRepository));
-            _userRepository = userRepository
-                ?? throw new ArgumentNullException(nameof(userRepository));
             _fileTypeService = fileTypeService
                 ?? throw new ArgumentNullException(nameof(fileTypeService));
-            _thumbnailService = thumbnailService
-               ?? throw new ArgumentNullException(nameof(thumbnailService));
             _pathResolver = pathResolver
                 ?? throw new ArgumentNullException(nameof(pathResolver));
         }
@@ -84,10 +60,9 @@ namespace Ocuda.Ops.Service
             return await _fileRepository.GetLatestByLibraryIdAsync(id);
         }
 
-        public async Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(
-            BlogFilter filter, bool isGallery = false)
+        public async Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter)
         {
-            return await _fileRepository.GetPaginatedListAsync(filter, isGallery);
+            return await _fileRepository.GetPaginatedListAsync(filter);
         }
 
         public async Task<File> CreatePrivateFileAsync(int currentUserId,
@@ -108,34 +83,11 @@ namespace Ocuda.Ops.Service
             file.CreatedBy = currentUserId;
             file.FileTypeId = fileType.Id;
 
-            if (thumbnailFiles != null)
-            {
-                var thumbnailList = new List<Thumbnail>();
-
-                foreach (var thumbnail in thumbnailFiles)
-                {
-                    thumbnailList.Add(new Thumbnail
-                    {
-                        CreatedAt = file.CreatedAt,
-                        CreatedBy = file.CreatedBy
-                    });
-                }
-
-                file.Thumbnails = thumbnailList;
-            }
-
-            ValidateFile(file);
-
             await _fileRepository.AddAsync(file);
             await _fileRepository.SaveAsync();
 
             file.FileType = fileType;
             await WritePrivateFileAsync(file, fileData);
-
-            if (thumbnailFiles != null)
-            {
-                await _thumbnailService.CreateThumbnailFilesAsync(file.Thumbnails, thumbnailFiles);
-            }
 
             return file;
         }
@@ -166,52 +118,13 @@ namespace Ocuda.Ops.Service
             currentFile.Description = file.Description?.Trim();
             currentFile.Name = file.Name?.Trim();
 
-            var thumbnailsToRemove = currentFile.Thumbnails
-                .Where(_ => !thumbnailIdsToKeep.Contains(_.Id)).ToList();
-
-            foreach (var thumbnail in thumbnailsToRemove)
-            {
-                currentFile.Thumbnails.Remove(thumbnail);
-                _thumbnailRepository.Remove(thumbnail);
-            }
-
-            var thumbnailsToAdd = new List<Thumbnail>();
-
-            if (thumbnailFiles != null)
-            {
-                foreach (var thumbnail in thumbnailFiles)
-                {
-                    var newThumbnail = new Thumbnail
-                    {
-                        CreatedAt = DateTime.Now,
-                        CreatedBy = currentUserId
-                    };
-
-                    thumbnailsToAdd.Add(newThumbnail);
-                    currentFile.Thumbnails.Add(newThumbnail);
-                }
-            }
-
-            ValidateFile(currentFile);
-
             _fileRepository.Update(currentFile);
             await _fileRepository.SaveAsync();
-            await _thumbnailRepository.SaveAsync();
 
             if (fileData != null)
             {
                 var currentFilePath = GetPrivateFilePath(currentFile);
                 await WritePrivateFileAsync(currentFile, fileData, currentFilePath);
-            }
-
-            if (thumbnailsToRemove.Count > 0)
-            {
-                _thumbnailService.DeleteThumbnailFiles(thumbnailsToRemove);
-            }
-
-            if (thumbnailsToAdd.Count > 0)
-            {
-                await _thumbnailService.CreateThumbnailFilesAsync(thumbnailsToAdd, thumbnailFiles);
             }
 
             return currentFile;
@@ -255,11 +168,6 @@ namespace Ocuda.Ops.Service
         {
             var file = await _fileRepository.FindAsync(id);
 
-            if (file.Thumbnails.Count > 0)
-            {
-                _thumbnailService.DeleteThumbnailFiles(file.Thumbnails);
-            }
-
             string filePath = GetPrivateFilePath(file);
 
             if (System.IO.File.Exists(filePath))
@@ -269,7 +177,6 @@ namespace Ocuda.Ops.Service
             }
 
             _fileRepository.Remove(id);
-            _thumbnailRepository.RemoveByFileId(id);
             await _fileRepository.SaveAsync();
         }
 
@@ -304,9 +211,6 @@ namespace Ocuda.Ops.Service
             file.CreatedAt = DateTime.Now;
             file.CreatedBy = currentUserId;
 
-
-            ValidateFile(file);
-
             await _fileRepository.AddAsync(file);
             await _fileRepository.SaveAsync();
 
@@ -340,16 +244,6 @@ namespace Ocuda.Ops.Service
             await System.IO.File.WriteAllBytesAsync(filePath, fileBytes);
         }
 
-        public async Task<IEnumerable<File>> GetByPageIdAsync(int pageId)
-        {
-            return await _fileRepository.GetByPageIdAsync(pageId);
-        }
-
-        public async Task<IEnumerable<File>> GetByPostIdAsync(int postId)
-        {
-            return await _fileRepository.GetByPostIdAsync(postId);
-        }
-
         public async Task DeletePublicFileAsync(int id)
         {
             var file = await _fileRepository.FindAsync(id);
@@ -364,37 +258,6 @@ namespace Ocuda.Ops.Service
 
             _fileRepository.Remove(id);
             await _fileRepository.SaveAsync();
-        }
-
-        public void ValidateFile(File file)
-        {
-            if (file.FileLibraryId.HasValue)
-            {
-                if (file.PageId.HasValue)
-                {
-                    var message = "File cannot belong to a file library and a page.";
-                    _logger.LogWarning(message, file);
-                    throw new OcudaException(message);
-                }
-                else if (file.PostId.HasValue)
-                {
-                    var message = "File cannot belong to a file library and a post.";
-                    _logger.LogWarning(message, file);
-                    throw new OcudaException(message);
-                }
-            }
-            else if (file.PageId.HasValue && file.PostId.HasValue)
-            {
-                var message = "File cannot belong to a page and a post.";
-                _logger.LogWarning(message, file);
-                throw new OcudaException(message);
-            }
-            else if (!file.PageId.HasValue && !file.PostId.HasValue)
-            {
-                var message = "File must belong to a file library, page or post.";
-                _logger.LogWarning(message, file);
-                throw new OcudaException(message);
-            }
         }
 
         public async Task<FileLibrary> GetLibraryByIdAsync(int id)

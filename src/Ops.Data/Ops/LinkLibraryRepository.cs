@@ -24,11 +24,6 @@ namespace Ocuda.Ops.Data.Ops
         {
             var query = DbSet.AsNoTracking();
 
-            if (filter.SectionId.HasValue)
-            {
-                query = query.Where(_ => _.SectionId == filter.SectionId.Value);
-            }
-
             return new DataWithCount<ICollection<LinkLibrary>>
             {
                 Count = await query.CountAsync(),

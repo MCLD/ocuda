@@ -75,10 +75,6 @@ namespace Ocuda.Ops.Service
 
         private async Task ValidateAsync(UserMetadataType metadataType)
         {
-            if (string.IsNullOrWhiteSpace(metadataType.Name))
-            {
-                throw new OcudaException("Metadata type name cannot be empty.");
-            }
             if (await _userMetadataTypeRepository.IsDuplicateAsync(metadataType))
             {
                 throw new OcudaException($"Metdata type '{metadataType.Name}' already exists.");

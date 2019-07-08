@@ -23,8 +23,6 @@ namespace Ocuda.Ops.Controllers.Filters
         private readonly WebHelper _webHelper;
         private readonly IAuthorizationService _authorizationService;
         private readonly ILdapService _ldapService;
-        private readonly IRosterService _rosterService;
-        private readonly ISectionService _sectionService;
         private readonly IUserService _userService;
 
         public AuthenticationFilter(ILogger<AuthenticationFilter> logger,
@@ -33,8 +31,6 @@ namespace Ocuda.Ops.Controllers.Filters
             WebHelper webHelper,
             IAuthorizationService authorizationService,
             ILdapService ldapService,
-            IRosterService rosterService,
-            ISectionService sectionService,
             IUserService userService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -45,10 +41,6 @@ namespace Ocuda.Ops.Controllers.Filters
                 ?? throw new ArgumentNullException(nameof(authorizationService));
             _ldapService = ldapService
                 ?? throw new ArgumentNullException(nameof(ldapService));
-            _rosterService = rosterService
-                ?? throw new ArgumentNullException(nameof(rosterService));
-            _sectionService = sectionService
-                ?? throw new ArgumentNullException(nameof(sectionService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
@@ -63,10 +55,8 @@ namespace Ocuda.Ops.Controllers.Filters
                 var httpContext = context.HttpContext;
 
                 // check the current user's Username claim to see if they're authenticated
-                var usernameClaim = httpContext.User
-                    .Claims
-                    .Where(_ => _.Type == ClaimType.Username)
-                    .FirstOrDefault();
+                var usernameClaim = httpContext.User.Claims
+                    .FirstOrDefault(_ => _.Type == ClaimType.Username);
 
                 bool authenticateUser = usernameClaim == null;
 
@@ -76,7 +66,7 @@ namespace Ocuda.Ops.Controllers.Filters
                     // TODO probably figure out how to make this use the database less
                     string username = usernameClaim.Value;
                     var user = await _userService.LookupUserAsync(username);
-                    if (user == null || user.ReauthenticateUser)
+                    if (user?.ReauthenticateUser != false)
                     {
                         // user does not exist in the database or needs to be reauthenticated
                         authenticateUser = true;
@@ -271,13 +261,6 @@ namespace Ocuda.Ops.Controllers.Filters
                             {
                                 claims.Add(new Claim(claimType.ClaimType,
                                     ClaimType.SiteManager));
-                            }
-
-                            // also add each individual section management claim
-                            foreach (var section in await _sectionService.GetSectionsAsync())
-                            {
-                                claims.Add(new Claim(ClaimType.SectionManager,
-                                    section.Name.ToLower()));
                             }
                         }
                         else

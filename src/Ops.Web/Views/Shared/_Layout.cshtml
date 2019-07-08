@@ -3,8 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
-    @*<title>@ViewData[Ocuda.Ops.Controllers.ViewDataKey.Title]</title>*@
+    <title>@ViewData[Ocuda.Ops.Controllers.ViewDataKey.Title]</title>
     <environment include="Production">
         <link rel="stylesheet" href="~/css/main.min.css" asp-append-version="true" />
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
@@ -15,15 +14,6 @@
         <link rel="stylesheet" href="~/devbower/fontawesome/web-fonts-with-css/css/fontawesome-all.css" asp-append-version="true" />
         <link rel="stylesheet" href="~/devstyles/ops.css" asp-append-version="true" />
         <link rel="stylesheet" href="~/devstyles/site.css" asp-append-version="true" />
-        <style>
-            .oc-navbar {
-                background-color: #1d3b64 !important;
-            }
-
-            .oc-navbrand::after {
-                content: " dev";
-            }
-        </style>
     </environment>
     @if (Context.Items.ContainsKey(ItemKey.ExternalCSS))
     {
@@ -32,21 +22,10 @@
             <link rel="stylesheet" href="@cssUrl" asp-append-version="true" />
         }
     }
-    <instance name="test">
-        <style>
-            .oc-navbar {
-                background-color: #712227 !important;
-            }
-
-            .oc-navbrand::after {
-                content: " TEST";
-            }
-        </style>
-    </instance>
     @RenderSection("Styles", required: false)
 </head>
 <body>
-    <div class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-dark oc-navbar">
+    <div class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-dark">
         @{
             var navigationRows = (List<NavigationRow>)Context.Items[ItemKey.NavColumn];
             if (navigationRows?.Count > 0)
@@ -58,7 +37,7 @@
         }
         <a class="navbar-brand" asp-area="" asp-route-section="" asp-controller="Home" asp-action="@(nameof(HomeController.Index))">
             <span class="fa fa-home"></span>
-            <span class="font-weight-light oc-navbrand">Home</span>
+            <span class="font-weight-light">Home</span>
         </a>
         <button class="navbar-toggler btn-sm justify-self-end" type="button"
                 data-toggle="collapse" data-target=".navbar-collapse">
@@ -68,56 +47,6 @@
 
         <div class="collapse navbar-collapse justify-content-end">
             <ul class="navbar-nav">
-                @foreach (var sec in (IEnumerable<SectionWithNavigation>)Context.Items[ItemKey.Sections])
-                {
-                    @if (sec.NavigationLinks.Count() == 0)
-                    {
-                        <li class="nav-item" ActiveBy routeKey="Section" value="@sec.Section.Path">
-                            <a class="nav-link"
-                               asp-area="" asp-route-section="@sec.Section.Path"
-                               asp-route-controller="Home" asp-action="@(nameof(HomeController.Index))">
-                                <span class="fa @sec.Section.Icon" title="@sec.Section.Name"></span>
-                                <span class="d-sm-none"> @sec.Section.Name </span>
-                            </a>
-                        </li>
-                    }
-                    else
-                    {
-                        <li class="nav-item dropdown" ActiveBy routeKey="Section" value="@sec.Section.Path">
-                            <a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" href="#">
-                                <span class="fa @sec.Section.Icon" title="@sec.Section.Name"></span>
-                                <span class="d-sm-none"> @sec.Section.Name </span>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right w-auto border-0 bg-dark">
-                                <div class="navbar navbar-dark">
-                                    <a class="dropdown-item nav-link pl-0"
-                                       asp-area="" asp-route-section="@sec.Section.Path"
-                                       asp-route-controller="Home" asp-action="@(nameof(HomeController.Index))">
-                                        <div class="d-flex">
-                                            <span class="col-1 align-self-center fa @sec.Section.Icon"></span>
-                                            <div class="col-auto">@sec.Section.Name Home</div>
-                                        </div>
-                                    </a>
-                                    @foreach (var link in sec.NavigationLinks)
-                                    {
-                                        <a class="dropdown-item nav-link pl-0" href="@link.Url">
-                                            <div class="d-flex">
-                                                <span class="col-1 align-self-center fa @link.Icon"></span>
-                                                <div class="col-auto">@link.Name</div>
-                                            </div>
-                                        </a>
-                                    }
-                                </div>
-                            </div>
-                        </li>
-                    }
-                }
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Debug" asp-action="InsertSampleData">
-                        <span class="fas fa-database" title="Insert Sample Data"></span>
-                        <span class="d-sm-none"> Insert Sample Data</span>
-                    </a>
-                </li>
                 @if (Context.Items[ItemKey.Nickname] != null)
                 {
                     <li class="nav-item" ActiveBy routeKey="Controller" value="Profile">

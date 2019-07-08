@@ -14,6 +14,7 @@ namespace Ocuda.Ops.Service
 
         private readonly ILogger _logger;
         private readonly IConfiguration _config;
+
         public PathResolverService(ILogger<PathResolverService> logger,
             IConfiguration config)
         {
@@ -39,19 +40,20 @@ namespace Ocuda.Ops.Service
             return path.ToString();
         }
 
-        public string GetPublicContentFilePath(string fileName = default(string),
+        public string GetPublicContentFilePath(string fileName = default,
             params object[] pathElement)
         {
             return GetContentFilePath(false, fileName, pathElement);
         }
 
-        public string GetPrivateContentFilePath(string fileName = default(string),
+        public string GetPrivateContentFilePath(string fileName = default,
             params object[] pathElement)
         {
             return GetContentFilePath(true, fileName, pathElement);
         }
+
         private string GetContentFilePath(bool privatePath = false,
-            string fileName = default(string),
+            string fileName = default,
             params object[] pathElement)
         {
             string publicPrivateRoot = privatePath

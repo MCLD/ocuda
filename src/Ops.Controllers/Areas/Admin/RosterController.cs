@@ -2,16 +2,20 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Roster;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
 {
     [Area("Admin")]
+    [Authorize(Policy = nameof(ClaimType.SiteManager))]
+    [Route("[area]/[controller]")]
     public class RosterController : BaseController<RosterController>
     {
         private readonly IRosterService _rosterService;
@@ -23,6 +27,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ?? throw new ArgumentNullException(nameof(rosterService));
         }
 
+        [Route("[action]")]
         [RestoreModelState]
         public IActionResult Upload()
         {
@@ -30,6 +35,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpPost]
+        [Route("[action]")]
         [SaveModelState]
         public async Task<IActionResult> Upload(UploadViewModel model)
         {

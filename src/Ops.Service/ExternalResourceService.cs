@@ -45,15 +45,12 @@ namespace Ocuda.Ops.Service
             resource.Name = resource.Name?.Trim();
             resource.Url = resource.Url?.Trim();
 
-            Validate(resource);
-
             var maxSortOrder = await _externalResourceRepository
                 .GetMaxSortOrderAsync(resource.Type);
             if (maxSortOrder.HasValue)
             {
                 resource.SortOrder = maxSortOrder.Value + 1;
             }
-
 
             await _externalResourceRepository.AddAsync(resource);
             await _externalResourceRepository.SaveAsync();
@@ -67,8 +64,6 @@ namespace Ocuda.Ops.Service
 
             currentResource.Name = resource.Name?.Trim();
             currentResource.Url = resource.Url?.Trim();
-
-            Validate(currentResource);
 
             _externalResourceRepository.Update(currentResource);
             await _externalResourceRepository.SaveAsync();
@@ -86,7 +81,7 @@ namespace Ocuda.Ops.Service
 
             if (subsequentResources.Count > 0)
             {
-                subsequentResources.ForEach(_ => _.SortOrder -= 1);
+                subsequentResources.ForEach(_ => _.SortOrder--);
                 _externalResourceRepository.UpdateRange(subsequentResources);
             }
 
@@ -134,18 +129,6 @@ namespace Ocuda.Ops.Service
             _externalResourceRepository.Update(resource);
             _externalResourceRepository.Update(resourceInPosition);
             await _externalResourceRepository.SaveAsync();
-        }
-
-        private void Validate(ExternalResource resource)
-        {
-            if (string.IsNullOrWhiteSpace(resource.Name))
-            {
-                throw new OcudaException("External resource name cannot be empty.");
-            }
-            if (string.IsNullOrWhiteSpace(resource.Url))
-            {
-                throw new OcudaException("External resource url cannot be empty.");
-            }
         }
     }
 }
