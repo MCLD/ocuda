@@ -38,7 +38,7 @@ namespace Ocuda.Promenade.Web
             }
 
             services.AddMvc()
-                .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_1);
+                .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_2);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

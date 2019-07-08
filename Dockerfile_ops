@@ -1,5 +1,5 @@
 # Get build image
-FROM mcr.microsoft.com/dotnet/core/sdk:2.1 AS build-stage
+FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build-stage
 WORKDIR /app
 
 # Copy source
@@ -33,7 +33,7 @@ LABEL branch=$branch \
     org.opencontainers.image.revision=$IMAGE_REVISION \
     org.opencontainers.image.source="https://github.com/MCLD/ocuda" \
     org.opencontainers.image.title="Ocuda Ops" \
-    org.opencontainers.image.url="http://greatreadingadventure.com/" \
+    org.opencontainers.image.url="https://github.com/MCLD/ocuda" \
     org.opencontainers.image.vendor="Maricopa County Library District" \
     org.opencontainers.image.version=$IMAGE_VERSION
 

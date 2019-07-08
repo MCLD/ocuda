@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <AssemblyName>Ocuda.Promenade.Data</AssemblyName>
     <RootNamespace>Ocuda.Promenade.Data</RootNamespace>
   </PropertyGroup>
@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.4" />
   </ItemGroup>
 
 </Project>
