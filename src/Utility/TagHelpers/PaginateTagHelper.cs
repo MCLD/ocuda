@@ -13,7 +13,7 @@ namespace Ocuda.Utility.TagHelpers
     [HtmlTargetElement("paginate", Attributes = "paginateModel")]
     public class PaginateTagHelper : TagHelper
     {
-        private IUrlHelperFactory _urlHelperFactory;
+        private readonly IUrlHelperFactory _urlHelperFactory;
 
         public PaginateTagHelper(IUrlHelperFactory urlHelperFactory)
         {
@@ -34,8 +34,10 @@ namespace Ocuda.Utility.TagHelpers
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             IUrlHelper url = _urlHelperFactory.GetUrlHelper(ViewContextData);
-            TagBuilder ulTag = new TagBuilder("ul");
-            ulTag.TagRenderMode = TagRenderMode.Normal;
+            var ulTag = new TagBuilder("ul")
+            {
+                TagRenderMode = TagRenderMode.Normal
+            };
             ulTag.MergeAttribute("class", "pagination");
 
             string firstPage = paginateModel.FirstPage == null
@@ -65,24 +67,28 @@ namespace Ocuda.Utility.TagHelpers
 
             ulTag.InnerHtml.AppendHtml(PaginatorLi(lastPage, "fast-forward", asButtons));
 
-            TagBuilder navTag = new TagBuilder("nav");
-            navTag.TagRenderMode = TagRenderMode.Normal;
+            TagBuilder navTag = new TagBuilder("nav")
+            {
+                TagRenderMode = TagRenderMode.Normal
+            };
             navTag.InnerHtml.SetHtmlContent(ulTag);
             output.Content.SetHtmlContent(navTag);
         }
 
         public static TagBuilder PaginatorInput(PaginateModel model)
         {
-            TagBuilder liTag = new TagBuilder("li");
-            liTag.TagRenderMode = TagRenderMode.Normal;
+            var liTag = new TagBuilder("li")
+            {
+                TagRenderMode = TagRenderMode.Normal
+            };
             liTag.MergeAttribute("class", "page-item");
 
-            TagBuilder formTag = new TagBuilder("form");
+            var formTag = new TagBuilder("form");
             formTag.MergeAttribute("role", "form");
             formTag.MergeAttribute("method", "get");
             formTag.TagRenderMode = TagRenderMode.Normal;
 
-            TagBuilder inputTag = new TagBuilder("input");
+            var inputTag = new TagBuilder("input");
             inputTag.MergeAttribute("name", "page");
             inputTag.MergeAttribute("type", "number");
             inputTag.MergeAttribute("min", "1");
@@ -100,14 +106,18 @@ namespace Ocuda.Utility.TagHelpers
 
         private static TagBuilder PaginatorLi(string text, bool asButtons)
         {
-            TagBuilder liTag = new TagBuilder("li");
-            liTag.TagRenderMode = TagRenderMode.Normal;
+            var liTag = new TagBuilder("li")
+            {
+                TagRenderMode = TagRenderMode.Normal
+            };
             liTag.MergeAttribute("class", "page-item disabled");
 
             if (asButtons)
             {
-                TagBuilder buttonTag = new TagBuilder("button");
-                buttonTag.TagRenderMode = TagRenderMode.Normal;
+                var buttonTag = new TagBuilder("button")
+                {
+                    TagRenderMode = TagRenderMode.Normal
+                };
                 buttonTag.InnerHtml.SetHtmlContent(text);
                 buttonTag.MergeAttribute("class", "page-link disabled");
                 buttonTag.MergeAttribute("type", "button");
@@ -115,7 +125,7 @@ namespace Ocuda.Utility.TagHelpers
             }
             else
             {
-                TagBuilder aTag = new TagBuilder("a");
+                var aTag = new TagBuilder("a");
                 aTag.MergeAttribute("href", "#");
                 aTag.MergeAttribute("class", "page-link");
                 aTag.MergeAttribute("onclick", "return false;");
@@ -129,15 +139,21 @@ namespace Ocuda.Utility.TagHelpers
 
         private static TagBuilder PaginatorLi(string pageUrl, string glyph, bool asButtons)
         {
-            TagBuilder liTag = new TagBuilder("li");
-            liTag.TagRenderMode = TagRenderMode.Normal;
-            TagBuilder spanTag = new TagBuilder("span");
-            spanTag.TagRenderMode = TagRenderMode.Normal;
+            var liTag = new TagBuilder("li")
+            {
+                TagRenderMode = TagRenderMode.Normal
+            };
+            var spanTag = new TagBuilder("span")
+            {
+                TagRenderMode = TagRenderMode.Normal
+            };
             spanTag.MergeAttribute("class", string.Format("fa fa-{0}", glyph));
             if (asButtons)
             {
-                TagBuilder buttonTag = new TagBuilder("button");
-                buttonTag.TagRenderMode = TagRenderMode.Normal;
+                var buttonTag = new TagBuilder("button")
+                {
+                    TagRenderMode = TagRenderMode.Normal
+                };
                 buttonTag.MergeAttribute("class", "page-link");
                 buttonTag.MergeAttribute("type", "button");
                 if (pageUrl == null)
@@ -154,8 +170,10 @@ namespace Ocuda.Utility.TagHelpers
             }
             else
             {
-                TagBuilder aTag = new TagBuilder("a");
-                aTag.TagRenderMode = TagRenderMode.Normal;
+                var aTag = new TagBuilder("a")
+                {
+                    TagRenderMode = TagRenderMode.Normal
+                };
                 if (pageUrl == null)
                 {
                     liTag.MergeAttribute("class", "page-item disabled");
@@ -194,7 +212,7 @@ namespace Ocuda.Utility.TagHelpers
                 var routeValues = new RouteValueDictionary();
                 foreach (var query in url.ActionContext.HttpContext.Request.Query)
                 {
-                    if (!(String.Equals(query.Key, "page", StringComparison.OrdinalIgnoreCase)))
+                    if (!string.Equals(query.Key, "page", StringComparison.OrdinalIgnoreCase))
                     {
                         routeValues.Add(query.Key, query.Value);
                     }

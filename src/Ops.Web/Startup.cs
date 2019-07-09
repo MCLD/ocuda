@@ -23,8 +23,6 @@ namespace Ocuda.Ops.Web
     public class Startup
     {
         private const string DefaultCulture = "en-US";
-        private const string CacheInstanceInternal = "ocuda.internal.ops";
-        private const string DataProtectionKeyKey = "dpk";
 
         private readonly IConfiguration _config;
         private readonly ILogger _logger;
@@ -145,10 +143,10 @@ namespace Ocuda.Ops.Web
             services.AddScoped(typeof(Controllers.ServiceFacades.Controller<>));
 
             // filters
-            services.AddScoped<Controllers.Filters.AuthenticationFilter>();
-            services.AddScoped<Controllers.Filters.ExternalResourceFilter>();
-            services.AddScoped<Controllers.Filters.NavigationFilter>();
-            services.AddScoped<Controllers.Filters.UserFilter>();
+            services.AddScoped<Controllers.Filters.AuthenticationFilterAttribute>();
+            services.AddScoped<Controllers.Filters.ExternalResourceFilterAttribute>();
+            services.AddScoped<Controllers.Filters.NavigationFilterAttribute>();
+            services.AddScoped<Controllers.Filters.UserFilterAttribute>();
 
             // helpers
             services.AddScoped<Utility.Helpers.WebHelper>();

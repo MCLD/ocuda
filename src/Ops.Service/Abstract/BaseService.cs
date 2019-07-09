@@ -12,7 +12,7 @@ namespace Ocuda.Ops.Service.Abstract
 
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public BaseService(ILogger<Service> logger,
+        protected BaseService(ILogger<Service> logger,
             IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -23,7 +23,7 @@ namespace Ocuda.Ops.Service.Abstract
         protected int GetCurrentUserId()
         {
             var httpContext = _httpContextAccessor.HttpContext;
-            var userIdClaim = httpContext.User.Claims.Where(_ => _.Type == ClaimType.UserId).First();
+            var userIdClaim = httpContext.User.Claims.First(_ => _.Type == ClaimType.UserId);
 
             if (int.TryParse(userIdClaim.Value, out int id))
             {

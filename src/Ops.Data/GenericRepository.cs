@@ -19,10 +19,10 @@ namespace Ocuda.Ops.Data
 
         private DbSet<TEntity> _dbSet;
 
-        internal GenericRepository(OpsContext context, ILogger logger)
+        protected GenericRepository(OpsContext context, ILogger logger)
         {
-            _context = context ?? throw new ArgumentNullException();
-            _logger = logger ?? throw new ArgumentNullException();
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         protected DbSet<TEntity> DbSet

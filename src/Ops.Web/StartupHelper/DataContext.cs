@@ -45,12 +45,11 @@ namespace Ocuda.Ops.Web.StartupHelper
 
         private void MigrateContext(IMigratableContext context, string contextName)
         {
-            var hasMigrations = false;
-
+            bool hasMigrations;
             try
             {
                 var pending = context.GetPendingMigrationList();
-                hasMigrations = pending != null && pending.Count() > 0;
+                hasMigrations = pending != null && pending.Any();
                 if (hasMigrations)
                 {
                     _logger.LogWarning($"Applying {pending.Count()} db migrations for {contextName}, last is: {pending.Last()}");

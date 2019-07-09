@@ -7,10 +7,10 @@ using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Abstract
 {
-    [ServiceFilter(typeof(AuthenticationFilter))]
-    [ServiceFilter(typeof(ExternalResourceFilter))]
-    [ServiceFilter(typeof(NavigationFilter))]
-    [ServiceFilter(typeof(UserFilter))]
+    [ServiceFilter(typeof(AuthenticationFilterAttribute))]
+    [ServiceFilter(typeof(ExternalResourceFilterAttribute))]
+    [ServiceFilter(typeof(NavigationFilterAttribute))]
+    [ServiceFilter(typeof(UserFilterAttribute))]
     public abstract class BaseController<T> : Controller
     {
         protected readonly ILogger _logger;
@@ -103,8 +103,7 @@ namespace Ocuda.Ops.Controllers.Abstract
             get
             {
                 var userIdString = HttpContext.User.Claims
-                    .Where(_ => _.Type == ClaimType.UserId)
-                    .FirstOrDefault()?
+                    .FirstOrDefault(_ => _.Type == ClaimType.UserId)?
                     .Value;
                 if (int.TryParse(userIdString, out int userId))
                 {

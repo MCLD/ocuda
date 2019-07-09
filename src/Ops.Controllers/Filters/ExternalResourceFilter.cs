@@ -8,11 +8,11 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Controllers.Filters
 {
-    public class ExternalResourceFilter : Attribute, IAsyncResourceFilter
+    public class ExternalResourceFilterAttribute : Attribute, IAsyncResourceFilter
     {
-        private readonly ILogger<ExternalResourceFilter> _logger;
+        private readonly ILogger<ExternalResourceFilterAttribute> _logger;
         private readonly IExternalResourceService _externalResourceService;
-        public ExternalResourceFilter(ILogger<ExternalResourceFilter> logger,
+        public ExternalResourceFilterAttribute(ILogger<ExternalResourceFilterAttribute> logger,
             IExternalResourceService externalResourceService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

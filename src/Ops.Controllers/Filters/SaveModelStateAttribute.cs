@@ -9,14 +9,13 @@ namespace Ocuda.Ops.Controllers.Filters
         public override void OnActionExecuted(ActionExecutedContext context)
         {
             //Only export when ModelState is not valid
-            if (!context.ModelState.IsValid)
-            {
-                //Export if we are redirecting
-                if (context.Result is RedirectResult
+            if (!context.ModelState.IsValid
+                && (context.Result is RedirectResult
                     || context.Result is RedirectToRouteResult
-                    || context.Result is RedirectToActionResult)
+                    || context.Result is RedirectToActionResult))
+            {
+                using (var controller = context.Controller as Controller)
                 {
-                    var controller = context.Controller as Controller;
                     if (controller != null && context.ModelState != null)
                     {
                         var key = ModelStateHelper.GetModelStateKey(context.RouteData.Values);

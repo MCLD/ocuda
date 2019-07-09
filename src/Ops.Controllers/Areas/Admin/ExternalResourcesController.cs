@@ -50,7 +50,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
             try
             {
-                var newResource = await _externalResourceService.AddAsync(resource);
+                await _externalResourceService.AddAsync(resource);
                 ShowAlertSuccess($"Added external resource: {resource.Name}");
                 success = true;
             }
@@ -71,7 +71,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
             try
             {
-                var newResource = await _externalResourceService.EditAsync(resource);
+                await _externalResourceService.EditAsync(resource);
                 ShowAlertSuccess($"Edited external resource: {resource.Name}");
                 success = true;
             }
