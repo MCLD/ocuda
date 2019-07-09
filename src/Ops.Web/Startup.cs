@@ -17,7 +17,6 @@ using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Web.StartupHelper;
 using Ocuda.Utility.Keys;
-using StackExchange.Redis;
 
 namespace Ocuda.Ops.Web
 {
@@ -54,7 +53,7 @@ namespace Ocuda.Ops.Web
                         = _config[Configuration.OpsDistributedCacheRedisConfiguration]
                         ?? throw new Exception($"{Configuration.OpsDistributedCache} has Redis selected but {Configuration.OpsDistributedCacheRedisConfiguration} is not set.");
                     string instanceName = CacheInstance.OcudaOps;
-                    if(!instanceName.EndsWith("."))
+                    if (!instanceName.EndsWith("."))
                     {
                         instanceName += ".";
                     }
@@ -73,20 +72,10 @@ namespace Ocuda.Ops.Web
                         _.Configuration = redisConfiguration;
                         _.InstanceName = instanceName;
                     });
-                    var redis = ConnectionMultiplexer.Connect(redisConfiguration);
-                    services.AddDataProtection()
-                        .PersistKeysToRedis(redis,
-                            $"{CacheInstanceInternal}.{DataProtectionKeyKey}");
                     break;
                 default:
                     _logger.LogInformation("Using memory-based distributed cache");
                     services.AddDistributedMemoryCache();
-                    var sharedPath = string.Format("{0}{1}{2}",
-                        Utility.Files.SharedPath.Get(_config[Configuration.OpsFileShared]),
-                        System.IO.Path.DirectorySeparatorChar,
-                        DataProtectionKeyKey);
-                    services.AddDataProtection()
-                        .PersistKeysToFileSystem(new System.IO.DirectoryInfo(sharedPath));
                     break;
             }
 
@@ -105,18 +94,14 @@ namespace Ocuda.Ops.Web
                     services.AddDbContextPool<PromenadeContext,
                         DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
                     break;
-                case "SQLite":
-                    _logger.LogInformation("Using {0} data provider", provider);
-                    services.AddDbContextPool<OpsContext,
-                        DataProvider.SQLite.Ops.Context>(_ => _.UseSqlite(opsCs));
-                    services.AddDbContextPool<PromenadeContext,
-                        DataProvider.SQLite.Promenade.Context>(_ => _.UseSqlite(promCs));
-                    break;
                 default:
                     _logger.LogCritical("No {0} configured in settings. Exiting.",
                         Configuration.OpsDatabaseProvider);
                     throw new Exception($"No {Configuration.OpsDatabaseProvider} configured.");
             }
+
+            // stoer the data protection key in the context
+            services.AddDataProtection().PersistKeysToDbContext<OpsContext>();
 
             var sessionTimeout = TimeSpan.FromHours(2 * 60);
             if (int.TryParse(_config[Configuration.OpsSessionTimeoutMinutes],

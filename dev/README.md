@@ -2,12 +2,10 @@
 
 ## Framework
 
-Ocuda targets the ASP.NET Core 2.1 framework. For that to work currently you must:
+Ocuda targets the ASP.NET Core 2.2 framework. For that to work currently you must:
 
-- Install the [.NET Core 2.1 SDK](https://www.microsoft.com/net/download/dotnet-core/sdk-2.1.300)
-- Ensure you're using [Visual Studio Update 7](https://visualstudio.com/vs)
-
-For more details see the ASP.NET Blog post about [ASP.NET Core 2.1.0](https://blogs.msdn.microsoft.com/webdev/2018/05/30/asp-net-core-2-1-0-now-available/).
+- Install the [.NET Core 2.2 SDK](https://dotnet.microsoft.com/download/dotnet-core/2.2)
+- [Visual Studio 2019](https://visualstudio.microsoft.com/vs/)
 
 ## Project layout
 
@@ -32,7 +30,7 @@ This is the public-facing portion of the application.
 
 ## Initial build and run
 
-To run you must create database migrations for the two databases. First, choose a data provider - currently either SQLite ("SQLite") or Microsoft SQL Server ("SqlServer").
+To run you must create database migrations for the two databases. Currently the only available data provider is Microsoft SQL Server ("SqlServer").
 
 ### Visual Studio Package Manager Console
 
@@ -64,7 +62,7 @@ _Eventually this should be moved to the user documentation._
 - `Promenade`
 
 ##### Settings
-- `Ops.DatabaseProvider` - which database provider to use, must be one of: `SQLite`, `SqlServer`
+- `Ops.DatabaseProvider` - which database provider to use, currently the only supported option is: `SqlServer`
 
 #### Optional
 ##### Connection strings
@@ -96,7 +94,7 @@ _Eventually this should be moved to the user documentation._
 ### Promenade
 
 #### Required
-- `Promenade.DatabaseProvider` - which database provider to use, must be one of: `SQLite`, `SqlServer`
+- `Promenade.DatabaseProvider` - which database provider to use, must currently be set to: `SqlServer`
 
 #### Optional
 - `Promenade.Culture` - defaults to "en-US", the culture to use for displaying things like dates and times - for valid options see the language tags listed in the [Microsoft National Language Support (NLS) API Reference](http://go.microsoft.com/fwlink/?LinkId=200048)
