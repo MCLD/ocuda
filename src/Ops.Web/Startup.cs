@@ -151,7 +151,7 @@ namespace Ocuda.Ops.Web
             });
 
             services.AddMvc()
-                .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_1)
+                .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_2)
                 .AddSessionStateTempDataProvider();
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
