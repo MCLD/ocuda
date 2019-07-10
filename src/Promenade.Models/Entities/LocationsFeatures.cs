@@ -10,7 +10,6 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public int FeatureId { get; set; }
 
-        [MaxLength(255)]
         public string Text { get; set; }
 
         [MaxLength(255)]

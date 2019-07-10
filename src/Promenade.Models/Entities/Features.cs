@@ -11,17 +11,16 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public string Name { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(48)]
         public string FontAwesome { get; set; }
 
         [MaxLength(255)]
         public string ImagePath { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(80)]
         [Required]
         public string Stub { get; set; }
 
-        [MaxLength(255)]
         [Required]
         public string BodyText { get; set; }
     }

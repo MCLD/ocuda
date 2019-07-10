@@ -23,13 +23,12 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string Address { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(50)]
         public string City { get; set; }
 
-        [MaxLength(5)]
+        [MaxLength(10)]
         public string Zip { get; set; }
 
-        [MaxLength(255)]
         public string Description { get; set; }
 
         [MaxLength(255)]
