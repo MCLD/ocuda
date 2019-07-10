@@ -77,11 +77,11 @@ namespace Ocuda.Utility.TagHelpers
 
         private async Task<TagHelperOutput> CreateLabelElement(TagHelperContext context)
         {
-            LabelTagHelper labelTagHelper =
+            var labelTagHelper =
                 new LabelTagHelper(_htmlGenerator)
                 {
-                    For = this.For,
-                    ViewContext = this.ViewContext
+                    For = For,
+                    ViewContext = ViewContext
                 };
 
             TagHelperOutput labelOutput = CreateTagHelperOutput("label");
@@ -120,11 +120,11 @@ namespace Ocuda.Utility.TagHelpers
 
         private async Task<TagHelperOutput> CreateValidationMessageElement(TagHelperContext context)
         {
-            ValidationMessageTagHelper validationMessageTagHelper =
+            var validationMessageTagHelper =
                 new ValidationMessageTagHelper(_htmlGenerator)
                 {
-                    For = this.For,
-                    ViewContext = this.ViewContext
+                    For = For,
+                    ViewContext = ViewContext
                 };
 
             TagHelperOutput validationMessageOutput = CreateTagHelperOutput("span");
@@ -146,7 +146,7 @@ namespace Ocuda.Utility.TagHelpers
 
         private IHtmlContent WrapElementsWithDiv(List<IHtmlContent> elements, string classValue)
         {
-            TagBuilder div = new TagBuilder("div");
+            var div = new TagBuilder("div");
             div.AddCssClass(classValue);
             foreach (IHtmlContent element in elements)
             {

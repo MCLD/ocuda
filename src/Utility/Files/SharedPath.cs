@@ -8,7 +8,7 @@ namespace Ocuda.Utility.Files
 
         public static string Get(string configuredSharedPath)
         {
-            string path = null;
+            string path;
             if (!string.IsNullOrEmpty(configuredSharedPath))
             {
                 path = configuredSharedPath;

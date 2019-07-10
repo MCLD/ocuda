@@ -136,13 +136,10 @@ namespace Ocuda.Ops.Service
                     throw new OcudaException("Invald format.");
                 }
             }
-            else if (currentSetting.Type == SiteSettingType.Int)
+            else if (currentSetting.Type == SiteSettingType.Int && !int.TryParse(value, out _))
             {
-                if (!int.TryParse(value, out _))
-                {
-                    _logger.LogError($"Invalid format for integer key {key}: {value}");
-                    throw new OcudaException("Invald format.");
-                }
+                _logger.LogError($"Invalid format for integer key {key}: {value}");
+                throw new OcudaException("Invald format.");
             }
 
             currentSetting.Value = value;
@@ -180,14 +177,12 @@ namespace Ocuda.Ops.Service
                     throw new OcudaException(message);
                 }
             }
-            else if (siteSetting.Type == SiteSettingType.Int)
+            else if (siteSetting.Type == SiteSettingType.Int 
+                && !int.TryParse(siteSetting.Value, out int result))
             {
-                if (!int.TryParse(siteSetting.Value, out int result))
-                {
-                    var message = $"{siteSetting.Name} requires a value of type {siteSetting.Type}.";
-                    _logger.LogWarning(message, siteSetting.Value, result);
-                    throw new OcudaException(message);
-                }
+                var message = $"{siteSetting.Name} requires a value of type {siteSetting.Type}.";
+                _logger.LogWarning(message, siteSetting.Value, result);
+                throw new OcudaException(message);
             }
         }
     }

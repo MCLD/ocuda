@@ -8,12 +8,12 @@ using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Filters
 {
-    public class UserFilter : Attribute, IAsyncResourceFilter
+    public class UserFilterAttribute : Attribute, IAsyncResourceFilter
     {
-        private readonly ILogger<UserFilter> _logger;
+        private readonly ILogger<UserFilterAttribute> _logger;
         private readonly IUserService _userService;
 
-        public UserFilter(ILogger<UserFilter> logger, IUserService userService)
+        public UserFilterAttribute(ILogger<UserFilterAttribute> logger, IUserService userService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _userService = userService
@@ -25,8 +25,7 @@ namespace Ocuda.Ops.Controllers.Filters
         {
             var usernameClaim = context.HttpContext.User
                 .Claims
-                .Where(_ => _.Type == ClaimType.Username)
-                .FirstOrDefault();
+                .FirstOrDefault(_ => _.Type == ClaimType.Username);
 
             if (usernameClaim != null)
             {

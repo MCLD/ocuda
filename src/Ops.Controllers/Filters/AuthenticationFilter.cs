@@ -15,9 +15,9 @@ using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Filters
 {
-    public class AuthenticationFilter : Attribute, IAsyncResourceFilter
+    public class AuthenticationFilterAttribute : Attribute, IAsyncResourceFilter
     {
-        private readonly ILogger<AuthenticationFilter> _logger;
+        private readonly ILogger<AuthenticationFilterAttribute> _logger;
         private readonly IConfiguration _config;
         private readonly IDistributedCache _cache;
         private readonly WebHelper _webHelper;
@@ -25,7 +25,7 @@ namespace Ocuda.Ops.Controllers.Filters
         private readonly ILdapService _ldapService;
         private readonly IUserService _userService;
 
-        public AuthenticationFilter(ILogger<AuthenticationFilter> logger,
+        public AuthenticationFilterAttribute(ILogger<AuthenticationFilterAttribute> logger,
             IConfiguration configuration,
             IDistributedCache cache,
             WebHelper webHelper,
@@ -80,12 +80,10 @@ namespace Ocuda.Ops.Controllers.Filters
                     int authTimeoutMinutes = 2;
 
                     var configuredAuthTimeout = _config[Configuration.OpsAuthTimeoutMinutes];
-                    if (configuredAuthTimeout != null)
+                    if (configuredAuthTimeout != null
+                        && !int.TryParse(configuredAuthTimeout, out authTimeoutMinutes))
                     {
-                        if (!int.TryParse(configuredAuthTimeout, out authTimeoutMinutes))
-                        {
-                            _logger.LogWarning($"Configured {Configuration.OpsAuthTimeoutMinutes} could not be converted to a number. It should be a number of minutes (defaulting to 2).");
-                        }
+                        _logger.LogWarning($"Configured {Configuration.OpsAuthTimeoutMinutes} could not be converted to a number. It should be a number of minutes (defaulting to 2).");
                     }
 
                     // all authentication bits will expire after 2 minutes

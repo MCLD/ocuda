@@ -18,23 +18,22 @@ namespace Ocuda.Ops.Controllers.Filters
             var controller = context.Controller as Controller;
             var key = ModelStateHelper.GetModelStateKey(context.RouteData.Values);
 
-            var modelStateStorage = controller?.TempData[key] as string;
-            if (modelStateStorage != null)
+            if (controller?.TempData[key] is string modelStateStorage)
             {
-                var storage = ModelStateHelper.DeserializeModelState(modelStateStorage);
-                var timeDifference = DateTimeOffset.Now.ToUnixTimeSeconds() - storage.time;
+                var (modelState, time) = ModelStateHelper.DeserializeModelState(modelStateStorage);
+                var timeDifference = DateTimeOffset.Now.ToUnixTimeSeconds() - time;
 
                 var _siteSettingService = (ISiteSettingService)context.HttpContext.RequestServices
                     .GetService(typeof(ISiteSettingService));
                 var modelstateTimeOut = await _siteSettingService
                     .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ModelStateTimeoutMinutes);
-                if (TimeSpan.FromSeconds(timeDifference).Minutes < modelstateTimeOut 
+                if (TimeSpan.FromSeconds(timeDifference).Minutes < modelstateTimeOut
                     || modelstateTimeOut < 1)
                 {
                     //Only Import if we are viewing
                     if (resultContext.Result is ViewResult)
                     {
-                        context.ModelState.Merge(storage.modelState);
+                        context.ModelState.Merge(modelState);
                     }
                 }
                 else

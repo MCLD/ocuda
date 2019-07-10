@@ -13,7 +13,7 @@ namespace Ocuda.Utility.TagHelpers
     [HtmlTargetElement(Attributes = "ActiveBy, routeKey, value")]
     public class ActiveTagHelper : TagHelper
     {
-        private IUrlHelperFactory _urlHelperFactory;
+        private readonly IUrlHelperFactory _urlHelperFactory;
 
         public ActiveTagHelper(IUrlHelperFactory urlHelperFactory)
         {
@@ -41,7 +41,7 @@ namespace Ocuda.Utility.TagHelpers
 
             foreach (var item in valueList)
             {
-                if (String.Equals(item.Trim(), routeValue, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(item.Trim(), routeValue, StringComparison.OrdinalIgnoreCase))
                 {
                     var existingClass = output.Attributes.FirstOrDefault(f => f.Name == "class");
                     var cssClass = string.Empty;
@@ -50,7 +50,7 @@ namespace Ocuda.Utility.TagHelpers
                         cssClass = existingClass.Value.ToString();
                         output.Attributes.Remove(existingClass);
                     }
-                    cssClass = cssClass + " active";
+                    cssClass += " active";
                     var ta = new TagHelperAttribute("class", cssClass);
                     output.Attributes.Add(ta);
                 }

@@ -25,7 +25,7 @@ namespace Ops.Web.WindowsAuth
         public Startup(IConfiguration configuration, ILogger<Startup> logger)
         {
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            _logger = logger ?? throw new ArgumentNullException();
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -142,12 +142,10 @@ namespace Ops.Web.WindowsAuth
                         int authTimeoutMinutes = 2;
 
                         var configuredAuthTimeout = _config[Configuration.OpsAuthTimeoutMinutes];
-                        if (configuredAuthTimeout != null)
+                        if (configuredAuthTimeout != null
+                            && !int.TryParse(configuredAuthTimeout, out authTimeoutMinutes))
                         {
-                            if (!int.TryParse(configuredAuthTimeout, out authTimeoutMinutes))
-                            {
-                                _logger.LogWarning(BadConfig, Configuration.OpsAuthTimeoutMinutes);
-                            }
+                            _logger.LogWarning(BadConfig, Configuration.OpsAuthTimeoutMinutes);
                         }
 
                         var cacheExpiration = new DistributedCacheEntryOptions()
