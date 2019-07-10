@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -14,7 +11,7 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public string Name { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(2)]
         public string BranchCode { get; set; }
 
         [MaxLength(255)]
@@ -29,14 +26,14 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string City { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(5)]
         public string Zip { get; set; }
 
         [MaxLength(255)]
         public string Description { get; set; }
 
         [MaxLength(255)]
-        public int Facebook { get; set; }
+        public string Facebook { get; set; }
 
         public int SubscriptionLinkId { get; set; }
 
