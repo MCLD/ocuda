@@ -1,10 +1,100 @@
-﻿@{
+﻿@model Ocuda.Promenade.Controllers.ViewModels.LocationsViewModel
+@{
     ViewData["Title"] = "Locations";
 }
 
-<div class="col-sm-12">
-    <p>
-        Hello, world from Locations.
-        <span class="far fa-smile"></span>
-    </p>
+<div id="mcld-content" class="location-page">
+    <img src="@Model.Location.ImagePath" class="mcld-branch-image" />
+    <h1>
+        @Model.Location.Name
+        <a href="@Model.Location.MapLink" class="btn btn-default mcld-map-button" target="_blank">
+            <span class="fa fa-map-marker"></span> Map
+        </a>
+    </h1>
+    <table class="mcld-address-hours">
+        <tbody>
+            <tr>
+                <td class="mcld-address">
+                    <p>
+                        @Model.Location.Address
+                        <br />
+                        @Model.Location.City, AZ @Model.Location.Zip
+                        <br />
+                        <a href="tel:@Model.Location.Phone">@Model.Location.Phone</a>
+                    </p>
+                </td>
+                <td class="mcld-hours">
+                    <strong>Mon.</strong> 10 am - 7 pm <br />
+                    <strong>Tues. - Thurs.</strong> 10 am - 7 pm <br />
+                    <strong>Fri. - Sat.</strong> 10 am - 7 pm <br />
+                    <strong>Sun.</strong> Closed <br />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <h2 style="clear:both;">Library Information</h2>
+    <p>@Model.Location.Description</p>
+    <div>
+        <div>
+            <a href="http://evanced.mcldaz.org/evanced/lib/eventcalendar.asp?df=calendar&amp;EventType=ALL&amp;libnum=@Model.Location.EventLinkId" target="_blank">Browse Events</a>
+        </div>
+        <div>
+            <a href="https://mcldaz.org/subscribe/?list=@Model.Location.SubscriptionLinkId" target="_blank">Send Me Events</a>
+        </div>
+    </div>
+    <div class="row mcld-branch-features text-center">
+        @foreach (var feature in Model.LocationFeatures)
+        {
+            <text>
+                <div class="col-xs-2">
+                    <a href="@feature.RedirectUrl" target="_blank">
+                        <span class="fa-stack fa-2x" style="color:#007bff">
+                            <span class="fa fa-square fa-stack-2x"></span>
+                            <span class="@feature.FontAwesome">
+                                @if (feature.Name == "7-Day Express")
+                                {
+                                    <text><strong style="color:white;">7</strong></text>
+                                }
+                            </span>
+                        </span>
+                    </a>
+                    <div>
+                        <a href="@feature.RedirectUrl">@feature.Name</a>
+                    </div>
+                </div>
+                </text>
+            }
+    </div>
 </div>
+<script type="application/ld+json">
+    {
+    "@@context": "http://schema.org",
+    "@@type": "Library",
+    "name": "@Model.Location.Name Library",
+    "areaServed": {
+    "@@type": "AdministrativeArea",
+    "name": "Maricopa County"
+    },
+    "email": "askalibrarian@mcldaz.org",
+    "address": {
+    "@@id": "_:mcldaz_org_@Model.Location.BranchCode",
+    "@@type": "PostalAddress",
+    "addressCountry": "US",
+    "addressRegion": "AZ",
+    "addressLocality": "@Model.Location.City",
+    "contactType": "Location address",
+    "postalCode": "@Model.Location.Zip",
+    "streetAddress": "@Model.Location.Address"
+    },
+    "location": { "@@id": "_:mcldaz_org_@Model.Location.BranchCode" },
+    "parentOrganization": "https://mcldaz.org/",
+    "telephone": "@Model.Location.Phone",
+    "openingHours": [
+    "Mo-We 09:00-17:00",
+    "Th 09:00-19:00",
+    "Fr-Sa 09:00-17:00"
+    ],
+    "image": "https://mcldaz.org/custom/images/branches/3x/@Model.Location.ImagePath",
+    "sameAs": ["@Model.Location.MapLink" @if (Model.Location.Name != "HollyHock") {<text>,"http://facebook.com/@Model.Location.Facebook"</text>}]
+    }
+</script>

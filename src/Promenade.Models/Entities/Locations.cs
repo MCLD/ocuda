@@ -33,6 +33,9 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(10)]
         public string Zip { get; set; }
 
+        [MaxLength(15)]
+        public string Phone { get; set; }
+
         public string Description { get; set; }
 
         [MaxLength(255)]
