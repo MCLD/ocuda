@@ -2,7 +2,7 @@
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    class Locations
+    public class Locations
     {
         [Required]
         public int Id { get; set; }
@@ -11,11 +11,15 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public string Name { get; set; }
 
-        [MaxLength(2)]
+        [MaxLength(5)]
         public string BranchCode { get; set; }
 
         [MaxLength(255)]
         public string ImagePath { get; set; }
+
+        [MaxLength(80)]
+        [Required]
+        public string Stub { get; set; }
 
         [MaxLength(255)]
         public string MapLink { get; set; }
@@ -34,8 +38,9 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string Facebook { get; set; }
 
-        public int SubscriptionLinkId { get; set; }
+        public int? SubscriptionLinkId { get; set; }
 
-        public int EventLinkId { get; set; }
+        [MaxLength(6)]
+        public string EventLinkId { get; set; }
     }
 }

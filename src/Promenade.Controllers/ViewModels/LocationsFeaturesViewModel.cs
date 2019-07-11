@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Text;
 
-namespace Ocuda.Promenade.Models.Entities
+namespace Ocuda.Promenade.Controllers.ViewModels
 {
-    public class Features
+    public class LocationsFeaturesViewModel
     {
-        [Required]
-        public int Id { get; set; }
 
         [MaxLength(255)]
         [Required]
@@ -23,5 +24,10 @@ namespace Ocuda.Promenade.Models.Entities
 
         [Required]
         public string BodyText { get; set; }
+
+        public string Text { get; set; }
+
+        [MaxLength(255)]
+        public string RedirectUrl { get; set; }
     }
 }
