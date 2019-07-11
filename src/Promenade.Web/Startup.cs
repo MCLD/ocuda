@@ -75,6 +75,10 @@ namespace Ocuda.Promenade.Web
                 .MapRoute(
                     name: null,
                     template : "{controller}/{stub}"
+                    )
+                .MapRoute(
+                    name: null,
+                    template: "{controller}/{locaStub}/{featStub}"
                     );
             });
         }
