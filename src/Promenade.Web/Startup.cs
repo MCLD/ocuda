@@ -71,15 +71,7 @@ namespace Ocuda.Promenade.Web
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}")
-                .MapRoute(
-                    name: null,
-                    template : "{controller}/{stub}"
-                    )
-                .MapRoute(
-                    name: null,
-                    template: "{controller}/{locaStub}/{featStub}"
-                    );
+                    template: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }
