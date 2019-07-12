@@ -143,9 +143,9 @@
                 "@@type": "AdministrativeArea",
                 "name": "Maricopa County"
                 },
-                "email": "askalibrarian@mcldaz.org",
+                "email": "",
                 "address": {
-                "@@id": "_:mcldaz_org_@Model.Location.BranchCode",
+                "@@id": "@Model.Location.BranchCode",
                 "@@type": "PostalAddress",
                 "addressCountry": "US",
                 "addressRegion": "AZ",
@@ -154,15 +154,15 @@
                 "postalCode": "@Model.Location.Zip",
                 "streetAddress": "@Model.Location.Address"
                 },
-                "location": { "@@id": "_:mcldaz_org_@Model.Location.BranchCode" },
-                "parentOrganization": "https://mcldaz.org/",
+                "location": { "@@id": "@Model.Location.BranchCode" },
+                "parentOrganization": "",
                 "telephone": "@Model.Location.Phone",
                 "openingHours": [
                 "Mo-We 09:00-17:00",
                 "Th 09:00-19:00",
                 "Fr-Sa 09:00-17:00"
                 ],
-                "image": "https://mcldaz.org/custom/images/branches/3x/@Model.Location.ImagePath",
+                "image": "@Model.Location.ImagePath",
                 "sameAs": ["@Model.Location.MapLink" @if (Model.Location.Id != 8)
                 {<text>,"http://facebook.com/@Model.Location.Facebook"</text>}]
                 }
