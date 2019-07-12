@@ -74,8 +74,10 @@ namespace Ocuda.Ops.Service
 
             message.Subject = subject;
 
-            var builder = new BodyBuilder();
-            builder.TextBody = body;
+            var builder = new BodyBuilder
+            {
+                TextBody = body
+            };
             if (!string.IsNullOrWhiteSpace(htmlBody))
             {
                 builder.HtmlBody = htmlBody;

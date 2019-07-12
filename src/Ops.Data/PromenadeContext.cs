@@ -6,7 +6,7 @@ namespace Ocuda.Ops.Data
 {
     public abstract class PromenadeContext : Utility.Data.DbContextBase, IMigratableContext
     {
-        public PromenadeContext(DbContextOptions options) : base(options) { }
+        protected PromenadeContext(DbContextOptions options) : base(options) { }
 
         #region IMigratableContext
         public new void Migrate() => Database.Migrate();

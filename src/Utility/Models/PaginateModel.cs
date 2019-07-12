@@ -10,9 +10,9 @@
         {
             get
             {
-                if (this.CurrentPage < this.LastPage)
+                if (CurrentPage < LastPage)
                 {
-                    return this.CurrentPage + 1;
+                    return CurrentPage + 1;
                 }
                 return null;
             }
@@ -21,9 +21,9 @@
         {
             get
             {
-                if (this.CurrentPage > 1)
+                if (CurrentPage > 1)
                 {
-                    return this.CurrentPage - 1;
+                    return CurrentPage - 1;
                 }
                 return null;
             }
@@ -32,7 +32,7 @@
         {
             get
             {
-                if (this.CurrentPage > 1)
+                if (CurrentPage > 1)
                 {
                     return 1;
                 }
@@ -43,10 +43,10 @@
         {
             get
             {
-                if (this.ItemCount > this.ItemsPerPage)
+                if (ItemCount > ItemsPerPage)
                 {
-                    int last = this.MaxPage;
-                    if (this.CurrentPage != last)
+                    int last = MaxPage;
+                    if (CurrentPage != last)
                     {
                         return last;
                     }
@@ -58,12 +58,12 @@
         {
             get
             {
-                if (this.ItemsPerPage == 0)
+                if (ItemsPerPage == 0)
                 {
                     return 0;
                 }
-                int last = this.ItemCount / this.ItemsPerPage;
-                if (this.ItemCount % this.ItemsPerPage > 0)
+                int last = ItemCount / ItemsPerPage;
+                if (ItemCount % ItemsPerPage > 0)
                 {
                     last++;
                 }

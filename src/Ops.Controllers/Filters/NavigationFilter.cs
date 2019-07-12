@@ -10,13 +10,13 @@ using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Filters
 {
-    public class NavigationFilter : Attribute, IAsyncActionFilter
+    public class NavigationFilterAttribute : Attribute, IAsyncActionFilter
     {
-        private readonly ILogger<NavigationFilter> _logger;
+        private readonly ILogger<NavigationFilterAttribute> _logger;
         private readonly IConfiguration _config;
         private readonly IDistributedCache _cache;
 
-        public NavigationFilter(ILogger<NavigationFilter> logger,
+        public NavigationFilterAttribute(ILogger<NavigationFilterAttribute> logger,
            IConfiguration config,
            IDistributedCache cache)
         {

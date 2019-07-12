@@ -38,12 +38,6 @@ namespace Ocuda.Utility.TagHelpers
         private const string footerDeleteIconClass = "fa fa-times mr-1";
         private const string buttonSpinnerClass = "fa fa-spinner fa-lg fa-pulse fa-fw ml-1 d-none";
 
-        private readonly IHtmlGenerator _htmlGenerator;
-        public ModalTagHelper(IHtmlGenerator htmlGenerator)
-        {
-            _htmlGenerator = htmlGenerator ?? throw new ArgumentNullException(nameof(htmlGenerator));
-        }
-
         [HtmlAttributeName(idAttributeName)]
         public string Id { get; set; }
 

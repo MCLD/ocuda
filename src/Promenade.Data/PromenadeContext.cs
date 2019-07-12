@@ -4,6 +4,6 @@ namespace Ocuda.Promenade.Data
 {
     public abstract class PromenadeContext : Utility.Data.DbContextBase
     {
-        public PromenadeContext(DbContextOptions options) : base(options) { }
+        protected PromenadeContext(DbContextOptions options) : base(options) { }
     }
 }

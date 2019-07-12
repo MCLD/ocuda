@@ -21,11 +21,10 @@ namespace Ocuda.Ops.Controllers.Authorization
         {
             var claims = context.User.Claims;
 
-            if (claims != null && claims.Count() > 0)
+            if (claims != null && claims.Any())
             {
                 var isSiteManager = claims
-                    .Where(_ => _.Type == ClaimType.SiteManager)
-                    .Any();
+                    .Any(_ => _.Type == ClaimType.SiteManager);
 
                 if (isSiteManager)
                 {
@@ -33,9 +32,8 @@ namespace Ocuda.Ops.Controllers.Authorization
                 }
                 else
                 {
-                    var resource = context.Resource as Microsoft.AspNetCore.Mvc.Filters.AuthorizationFilterContext;
-
-                    if (resource != null)
+                    if (context.Resource 
+                        is Microsoft.AspNetCore.Mvc.Filters.AuthorizationFilterContext resource)
                     {
                         var sectionName = resource.RouteData.Values["section"]?.ToString();
 
@@ -47,9 +45,8 @@ namespace Ocuda.Ops.Controllers.Authorization
                         else
                         {
                             var isSectionManager = claims
-                                .Where(_ => _.Type == ClaimType.SectionManager 
-                                    && _.Value == sectionName.ToLower())
-                                .Any();
+                                .Any(_ => _.Type == ClaimType.SectionManager
+                                    && _.Value == sectionName.ToLower());
 
                             if (isSectionManager)
                             {
@@ -59,8 +56,7 @@ namespace Ocuda.Ops.Controllers.Authorization
                             {
                                 var username = context.User
                                     .Claims
-                                    .Where(_ => _.Type == ClaimType.Username)
-                                    .FirstOrDefault()?
+                                    .FirstOrDefault(_ => _.Type == ClaimType.Username)?
                                     .Value ?? "Unknown";
                                 _logger.LogWarning($"Access denied for user {username} to manage section {sectionName}");
                                 context.Fail();

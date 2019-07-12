@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Data
 {
-    public abstract class OpsContext : Utility.Data.DbContextBase, IMigratableContext
+    public abstract class OpsContext
+        : Utility.Data.DbContextBase, IMigratableContext, IDataProtectionKeyContext
     {
-        public OpsContext(DbContextOptions options) : base(options) { }
+        protected OpsContext(DbContextOptions options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -35,6 +36,7 @@ namespace Ocuda.Ops.Data
         #endregion IMigratableContext
 
         public DbSet<ClaimGroup> ClaimGroups { get; set; }
+        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
         public DbSet<ExternalResource> ExternalResources { get; set; }
         public DbSet<File> Files { get; set; }
         public DbSet<FileLibrary> FileLibraries { get; set; }

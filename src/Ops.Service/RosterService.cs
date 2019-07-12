@@ -175,18 +175,14 @@ namespace Ocuda.Ops.Service
             {
                 // Check if user exists with the employee id
                 var user = users.FirstOrDefault(_ => _.EmployeeId == rosterDetail.EmployeeId);
-                if (user == null)
+                if (user == null && !string.IsNullOrWhiteSpace(rosterDetail.EmailAddress))
                 {
-                    // Check if user exists with the email
-                    if (!string.IsNullOrWhiteSpace(rosterDetail.EmailAddress))
+                    user = users.FirstOrDefault(_ => string.Equals(_.Email,
+                        rosterDetail.EmailAddress,
+                        StringComparison.OrdinalIgnoreCase));
+                    if (user?.ExcludeFromRoster == false)
                     {
-                        user = users.FirstOrDefault(_ => string.Equals(_.Email,
-                            rosterDetail.EmailAddress,
-                            StringComparison.OrdinalIgnoreCase));
-                        if (user?.ExcludeFromRoster == false)
-                        {
-                            user.EmployeeId = rosterDetail.EmployeeId;
-                        }
+                        user.EmployeeId = rosterDetail.EmployeeId;
                     }
                 }
                 if (user != null)
