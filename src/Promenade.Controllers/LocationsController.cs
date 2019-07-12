@@ -53,7 +53,8 @@ namespace Ocuda.Promenade.Controllers
                                     var locafeat = new LocationsFeaturesViewModel();
                                     if (feat.Name == "Facebook")
                                     {
-                                        if (stub != "hollyhock")
+                                        //Specific case that doesnt have FB
+                                        if (location.Id == 8)
                                         {
                                             locafeat.RedirectUrl = "http://facebook.com/" + location.Facebook;
                                         }
