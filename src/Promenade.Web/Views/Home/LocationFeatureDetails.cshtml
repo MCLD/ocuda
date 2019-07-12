@@ -1,4 +1,4 @@
-﻿@model Ocuda.Promenade.Controllers.ViewModels.LocationsViewModel
+﻿@model Ocuda.Promenade.Controllers.ViewModels.LocationViewModel
 @{
     ViewData["Title"] = "Locations";
 }
@@ -19,7 +19,7 @@
                     <p style="margin-left: 1rem;">
                         <a href="/Locations/@Model.Location.Stub" class="btn btn-default">
                             <span class="fa fa-arrow-circle-left" aria-hidden="true"></span>
-                            Back to the @Model.Location.Name Library
+                            Back to @Model.Location.Name
                         </a>
                     </p>
                 </td>

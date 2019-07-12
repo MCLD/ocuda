@@ -3229,10 +3229,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Views\Error\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Promenade.Controllers\Promenade.Controllers.csproj" />
     <ProjectReference Include="..\Promenade.DataProvider.SqlServer.Promenade\Promenade.DataProvider.SqlServer.Promenade.csproj" />
     <ProjectReference Include="..\Promenade.Data\Promenade.Data.csproj" />

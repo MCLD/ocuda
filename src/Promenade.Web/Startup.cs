@@ -50,7 +50,7 @@ namespace Ocuda.Promenade.Web
             }
             else
             {
-                app.UseStatusCodePagesWithReExecute("/Error/Index/{0}");
+                app.UseStatusCodePagesWithReExecute("/Error/{0}");
             }
 
             // insert remote address into the log context for each request
@@ -67,12 +67,8 @@ namespace Ocuda.Promenade.Web
 
             app.UseStaticFiles();
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
+            app.UseMvc();
         }
     }
 }
+

@@ -2,7 +2,7 @@
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class Locations
+    public class Location
     {
         [Required]
         public int Id { get; set; }
@@ -12,7 +12,7 @@ namespace Ocuda.Promenade.Models.Entities
         public string Name { get; set; }
 
         [MaxLength(5)]
-        public string BranchCode { get; set; }
+        public string Code { get; set; }
 
         [MaxLength(255)]
         public string ImagePath { get; set; }
@@ -45,5 +45,9 @@ namespace Ocuda.Promenade.Models.Entities
 
         [MaxLength(6)]
         public string EventLinkId { get; set; }
+
+        public string AdministrativeArea { get; set; }
+        public string Country { get; set; }
+        public string State { get; set; }
     }
 }

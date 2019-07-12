@@ -2,7 +2,7 @@
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class LocationsFeatures
+    public class LocationFeature
     {
         [Required]
         public int LocationId { get; set; }

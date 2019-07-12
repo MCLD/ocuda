@@ -1,0 +1,167 @@
+﻿@model Ocuda.Promenade.Controllers.ViewModels.LocationViewModel
+@{
+    ViewData["Title"] = "Locations";
+}
+<html>
+<body>
+    <div id="content" class="location-page">
+        <img src="@Model.Location.ImagePath" class="branch-image" />
+        <h1>
+            @Model.Location.Name
+            <a href="@Model.Location.MapLink" class="btn btn-default map-button" target="_blank">
+                <span class="fas fa-map-marker-alt"></span> Map
+            </a>
+        </h1>
+        <table class="address-hours">
+            <tbody>
+                <tr>
+                    <td class="address">
+                        <p>
+                            @Model.Location.Address
+                            <br />
+                            @Model.Location.City, AZ @Model.Location.Zip
+                            <br />
+                            <a href="tel:+1 @Model.Location.Phone">@Model.Location.Phone</a>
+                        </p>
+                    </td>
+                    <td class="hours">
+                        <strong>Mon. - Sun.</strong> Closed<br />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <h2>Information</h2>
+        <p>@Model.Location.Description</p>
+        <div>
+            <div>
+                <a href="@Model.Location.EventLinkId" target="_blank">Browse Events</a>
+            </div>
+            <div>
+                <a href="@Model.Location.SubscriptionLinkId" target="_blank">Send Me Events</a>
+            </div>
+        </div>
+        <div class="row branch-features text-center">
+            @foreach (var feature in Model.LocationFeatures)
+            {
+                <text>
+                    <div class="col-xs-2">
+                        @if (feature.RedirectUrl != null)
+                        {
+                            <a href="@feature.RedirectUrl" target="_blank">
+                                <span class="fa-stack fa-2x" style="color:#007bff">
+                                    <span class="fa fa-square fa-stack-2x"></span>
+                                    <span class="@feature.FontAwesome">
+                                        @if (feature.Name == "7-Day Express")
+                                        {
+                                            <text><strong style="color:white;">7</strong></text>
+            }
+                                    </span>
+                                </span>
+                            </a>
+                            <div>
+                                <a href="@feature.RedirectUrl">@feature.Name</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <a href="@feature.RedirectUrl" target="_blank">
+                                <span class="fa-stack fa-2x" style="color:#007bff">
+                                    <span class="fa fa-square fa-stack-2x"></span>
+                                    <span class="@feature.FontAwesome">
+                                        @if (feature.Name == "7-Day Express")
+                                        {
+                                            <text><strong style="color:white;">7</strong></text>
+                                        }
+                                    </span>
+                                </span>
+                            </a>
+                            <div>
+                                <a class="bring-modal" href="/Locations/@Model.Location.Stub/@feature.Stub" data-toggle="modal" data-target="#myModal" data-feature="@feature.Stub">@feature.Name</a>
+                            </div>
+                        }
+
+                    </div>
+                    </text>
+                }
+        </div>
+    </div>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <p id="modal-body">
+                        </p>
+                    </div>
+                    <div>
+                        <p id="modal-text">
+
+                        </p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @section Scripts{
+        <script>
+                $('.bring-modal').on('click', function () {
+                    @foreach (var feature in Model.LocationFeatures)
+                    {
+                        <text>
+                        if ("@feature.Stub" == $(this).data("feature"))
+                        {
+                            $("#modalTitle").text("@feature.Name");
+                            $("#modal-body").text("@feature.BodyText");
+                            $("#modal-text").text("@feature.Text");
+                        }
+                        </text>
+                    }
+
+                    $('#myModal').on('shown.bs.modal', function () {
+                        $('#myInput').trigger('focus')
+                    });
+                });
+        </script>
+        <script type="application/ld+json">
+            {
+            "@@context": "http://schema.org",
+            "@@type": "Library",
+            "name": "@Model.Location.Name",
+            "areaServed": {
+            "@@type": "AdministrativeArea",
+            "name": "@Model.Location.AdministrativeArea"
+            },
+            "email": "",
+            "address": {
+            "@@id": "@Model.Location.Code",
+            "@@type": "PostalAddress",
+            "addressCountry": "@Model.Location.Country",
+            "addressRegion": "@Model.Location.State",
+            "addressLocality": "@Model.Location.City",
+            "contactType": "Location address",
+            "postalCode": "@Model.Location.Zip",
+            "streetAddress": "@Model.Location.Address"
+            },
+            "location": { "@@id": "@Model.Location.Code" },
+            "parentOrganization": "",
+            "telephone": "@Model.Location.Phone",
+            "openingHours": [
+
+            ],
+            "image": "@Model.Location.ImagePath",
+            "sameAs": ["@Model.Location.MapLink" @if (!string.IsNullOrEmpty(Model.Location.Facebook))
+            {<text>,"@Model.Location.Facebook"</text>}]
+            }
+        </script>
+    }
+</body>
+</html>

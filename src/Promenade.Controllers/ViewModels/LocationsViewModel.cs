@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Controllers.ViewModels
 {
-    public class LocationsViewModel
+    public class LocationViewModel
     {
-        public Locations Location { get; set; }
+        public Location Location { get; set; }
 
         public List<LocationsFeaturesViewModel> LocationFeatures { get; set; }
-
-
     }
 }
