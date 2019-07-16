@@ -1,4 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Web.Mvc;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -47,7 +50,34 @@ namespace Ocuda.Promenade.Models.Entities
         public string EventLinkId { get; set; }
 
         public string AdministrativeArea { get; set; }
+
         public string Country { get; set; }
+
         public string State { get; set; }
+
+        public string GeoLocation { get; set; }
+
+        public double Longitude { get; set; }
+
+        public double Latitude { get; set; }
+
+        [NotMapped]
+        public double Distance { get; set; }
+
+        public bool Open { get; set; }
+
+        public bool ShowLocation { get; set; }
+
+        public string PAbbreviation { get; set; }
+
+        [NotMapped]
+        public List<Location> CloseLocations { get; set; }
+        [NotMapped]
+        public string FormattedAddress { get; set; }
+        [NotMapped]
+        public SelectList EventDistanceOptions { get; set; }
+
+        [NotMapped]
+        public List<int> DefaultLibIds { get; set; }
     }
 }

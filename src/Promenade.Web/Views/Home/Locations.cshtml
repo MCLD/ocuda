@@ -1,2 +1,160 @@
-﻿<h1>A list of all locations</h1>
-<h2>...and a map search</h2>
+﻿@model Ocuda.Promenade.Models.Entities.Location
+@{
+    ViewData["Title"] = "Locations";
+}
+    <body>
+        <h1>Find A Library</h1>
+        <h2>Find your closest Maricopa County Library by entering your address or zip code:</h2>
+        <div class="body-content">
+
+            <div class="row">
+                <div class="col-xs-12" style="padding-bottom: 1rem;">
+                    <form asp-action="Index" method="get" role="form" id="AddressForm">
+
+                        <div class="input-group">
+                            <input asp-for="Address"
+                                   placeholder="Enter your address or zip code"
+                                   class="form-control default-text"
+                                   id="LocatorAddress" />
+                            <span class="input-group-btn">
+                                <button href="/LocateZip#" type="submit" class="btn btn-primary" id="GoButton">Go</button>
+                            </span>
+                        </div>
+                    </form>
+
+                </div>
+                    <div class="col-xs-12 @if (Model?.ShowLocation != true) {<text>hidden</text> }" style="padding-bottom: 1rem;">
+                         <form asp-action="Location" method="get" role="form" id="GeoForm">
+                             <input asp-for="Latitude" id="Latitude" hidden />
+                             <input asp-for="Longitude" id="Longitude" hidden />
+                         </form>
+                         <button type="button"
+                                class="btn btn-default btn-block"
+                                id="GeoButton"
+                                style="display: none;">
+                            Use my location
+                        </button>
+                    </div>
+            </div>
+            <div class="row">
+                @if (Model?.CloseLocations?.Count > 0)
+                {
+                    @for (int i = 0; i < Model.CloseLocations.Count; i++)
+                    {
+                        <text>
+                            <div class="col-xs-12 col-sm-4 space-above">
+                                <div class="border center-block">
+                                    <div class="@(Model.CloseLocations[i].Open ? "traffic-green" : "traffic-red")" style="border-bottom:5px solid; width: 100%;">
+                                        <a href="@Model.CloseLocations[i].MapLink" target="_blank">
+                                            <img src="@Model.CloseLocations[i].MapLink" style="width:220px;" />
+                                        </a>
+                                    </div>
+                                    <div class="branch-container">
+                                        <div style="padding: 10px;">
+                                            <table class="locator-branch-info">
+                                                <tbody>
+                                                    <tr>
+                                                        <td style="padding-bottom:10px;">
+                                                            <strong style="font-size: 17.5px;">
+                                                                @Model.CloseLocations[i].Name
+                                                            </strong> <em style="font-size:12px;">@if (Model.CloseLocations[i].Distance != 0){<text>(@Model.CloseLocations[i].Distance mi.)</text>}</em>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="padding-bottom:10px;font-size:13px;">
+                                                            @Model.CloseLocations[i].Address<br>
+                                                            @Model.CloseLocations[i].City  AZ, @Model.CloseLocations[i].Zip
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="padding-bottom:10px;">
+                                                            <strong class="traffic-green">Open until 5:00 PM</strong>
+                                                        </td>
+                                                    </tr>
+                                                    <tr style="text-align: left;">
+                                                        <td style="padding: 5px 0;">
+                                                            <a href="Locations/@Model.CloseLocations[i].Stub" target="_blank" class="btn btn-default">Library Info</a>
+                                                            <a href="http://evanced.mcldaz.org/evanced/lib/eventcalendar.asp?Lib=@Model.CloseLocations[i].EventLinkId" class="btn btn-default" style="float:right" target="_blank">Events</a>
+                                                        </td>
+
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </text>
+                    }
+                }
+                else
+                {
+                    <script>
+                        var noResults = true;
+                    </script>
+                }
+            </div>
+        </div>
+        @section scripts {
+            <script>
+        var useMyLocation = 'Use my location';
+
+        $().ready(function () {
+            if (location.protocol != 'https:' && location.hostname != 'localhost') {
+                location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
+            }
+            if (navigator.geolocation) {
+                $('#GeoButton').html(useMyLocation);
+                $('#GeoButton').show();
+            }
+        });
+
+        $('#LocatorAddress').ready(function () {
+            if (typeof noResults !== 'undefined') {
+                $('#LocatorAddress').focus();
+            }
+        });
+
+        var geoSuccess = function (position) {
+            $('#Latitude').val(position.coords.latitude);
+            $('#Longitude').val(position.coords.longitude);
+            $('#GeoForm').submit();
+        }
+
+        var geoFailure = function (error) {
+            $('#GeoButton').html(useMyLocation);
+            $('#GeoButton').prop('disabled', false);
+            alert('There was a problem determining your location, please enter an address or zip code to find your nearest library.');
+            console.log(error.message);
+        }
+
+        $('#GeoButton').on('click', function () {
+            $('#GeoButton').html('<span class="fa fa-spinner fa-spin"></span> ' + useMyLocation);
+            $('#GeoButton').prop('disabled', true);
+            var geoOptions = {
+                enableHighAccuracy: true,
+                maximumAge: 30000,
+                timeout: 27000
+            };
+            navigator.geolocation.getCurrentPosition(geoSuccess, geoFailure, geoOptions);
+        });
+
+        $('#GoButton').on('click', function () {
+            var locatorAddress = $('#LocatorAddress').val();
+            if (!$.trim(locatorAddress).length) {
+                return false;
+            } else {
+                $('#GoButton').html('<span class="fa fa-spinner fa-spin"></span>');
+                $('#GoButton').attr("href",);
+                $('#GoButton').prop('disabled', true);
+                $('#AddressForm').attr('action','/Locations/Find').submit();
+            }
+        });
+            </script>
+        }
+        <style>
+            .hidden{
+                display: none;
+            }
+        </style>
+    </body>
