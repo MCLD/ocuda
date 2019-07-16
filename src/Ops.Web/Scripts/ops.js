@@ -54,149 +54,35 @@ function SetValidationMessage(target, message) {
     validationSpan.html(messageSpan);
 }
 
+
 $(document).on('change', ':file', function (e) {
     var fileInput = $(this),
         filePath = fileInput.val().replace(/\\/g, '/').replace(/.*\//, '');
 
-    if (fileInput.hasClass("btn-thumbnail")) {
-        validateThumbnail(e, filePath);
-    }
-    else {
         validateFile(e, filePath);
-    }
-
 });
 
 $(document).on('fileselect', ':file', function (e) {
     var fileInput = $(this),
         filePath = fileInput.val().replace(/\\/g, '/').replace(/.*\//, '');
 
-    if (fileInput.hasClass("btn-thumbnail")) {
-        validateThumbnail(e, filePath);
-    }
-    else {
         validateFile(e, filePath);
-    }
 });
 
 function validateFile(e, filePath) {
     var file = $(e.target)[0].files[0],
         fileButton = e.target.parentElement,
-        fileData = new FormData(),
         fileDisplay = $(e.target).parents('.input-group').find(':text'),
         fileNameField = $('#File_Name');
 
-    fileData.append("fileName", file.name);
-    fileData.append("fileSize", file.size);
+        fileDisplay.val(filePath);
 
-    if ($("#AcceptedFileExtensions").length > 0) {
-        fileData.append("fileExtensions", $("#AcceptedFileExtensions").val());
-    }
-
-    $.ajax({
-        url: '/Admin/Files/ValidateFileBeforeUpload',
-        type: 'POST',
-        contentType: false,
-        processData: false,
-        data: fileData,
-        async: true,
-        success: function (result) {
-            if (result == "Valid") {
-                fileDisplay.val(filePath);
-
-                if (fileNameField.val().length == 0) {
-                    fileNameField.val(file.name.split('.')[0]);
-                }
-
-                $(fileButton).removeClass('btn-outline-secondary');
-                $(fileButton).addClass('btn-success');
-                return true;
-            }
-            else {
-                $(e.target).val('');
-                fileDisplay.val('');
-                $(fileButton).addClass('btn-outline-secondary');
-                $(fileButton).removeClass('btn-success');
-                alert(result);
-                return false;
-            }
-        },
-        error: function (err) {
-            alert(err.statusText);
-            return false;
+        if (fileNameField.val().length == 0) {
+            fileNameField.val(file.name.split('.')[0]);
         }
-    });
-}
 
-function validateThumbnail(e, filePath) {
-    var fileInput = $(e.target),
-        file = fileInput[0].files[0],
-        fileData = new FormData(),
-        fileDisplay = fileInput.parents('.input-group').find(':text'),
-        fileButton = fileInput.parents('.form-control'),
-        fileIcon = fileButton.find('span'),
-        img = new Image();
-
-    img.src = window.URL.createObjectURL(file);
-
-    img.onload = function () {
-        var imgHeight = img.naturalHeight,
-            imgWidth = img.naturalWidth;
-
-        fileData.append("fileName", file.name);
-        fileData.append("fileSize", file.size);
-        fileData.append("imgHeight", imgHeight);
-        fileData.append("imgWidth", imgWidth);
-
-        $.ajax({
-            url: '/Admin/Files/ValidateThumbnailBeforeUpload',
-            type: 'POST',
-            contentType: false,
-            processData: false,
-            data: fileData,
-            async: true,
-            success: function (result) {
-                if (result == "Valid") {
-                    fileDisplay.val(filePath);
-                    fileButton.removeClass('btn-outline-secondary');
-                    fileButton.addClass('btn-success');
-                    fileIcon.removeClass('fa-file-medical');
-                    fileIcon.addClass('fa-file-image');
-                    return true;
-                }
-                else {
-                    clearThumbnailInput(e);
-                    alert(result);
-                    return false;
-                }
-            },
-            error: function (err) {
-                clearThumbnailInput(e);
-                alert(err.statusText);
-                return false;
-            }
-        });
-    }
-
-    img.onerror = function () {
-        clearThumbnailInput(e);
-        alert("Error: Failed to load image.");
-        return false;
-    }
-}
-
-function clearThumbnailInput(e) {
-    var fileInput = $(e.target),
-        fileDisplay = fileInput.parents('.input-group').find(':text'),
-        fileButton = fileInput.parents('.form-control'),
-        fileIcon = fileButton.find('span');
-
-    fileInput.val('');
-    fileDisplay.val('');
-    fileButton.addClass('btn-outline-secondary');
-    fileButton.removeClass('btn-success');
-    fileIcon.removeClass('fa-file-image');
-    fileIcon.addClass('fa-file-medical');
+        $(fileButton).removeClass('btn-outline-secondary');
+        $(fileButton).addClass('btn-success');
 }
 
 function updateStub(stub, text) {

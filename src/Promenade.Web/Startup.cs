@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ocuda.Promenade.Data;
+using Ocuda.Promenade.Service;
+using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Providers;
 using Serilog.Context;
 
 namespace Ocuda.Promenade.Web
@@ -39,6 +42,19 @@ namespace Ocuda.Promenade.Web
 
             services.AddMvc()
                 .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_2);
+
+            // utilities
+            services.AddScoped<IDateTimeProvider, CurrentDateTimeProvider>();
+
+            // repositories
+            services.AddScoped<Service.Interfaces.Repositories.ILocationHoursRepository,
+                Data.Promenade.LocationHoursRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ILocationHoursOverrideRepository,
+                Data.Promenade.LocationHoursOverrideRepository>();
+
+
+            // services
+            services.AddScoped<LocationService>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
