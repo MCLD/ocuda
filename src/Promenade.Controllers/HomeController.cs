@@ -95,11 +95,7 @@ namespace Ocuda.Promenade.Controllers
         [HttpGet("Locations/[action]")]
         public async Task<IActionResult> Find(double latitude = 0, double longitude = 0, string address = null, int? mobile = null)
         {
-            var aguila = new Location { GeoLocation = "33.942968999999984,-113.173406", Longitude = -113.172069, Latitude = 33.942349, Id = 0, Name = "Aguila", Code = "AG", Stub = "aguila", MapLink = "https://goo.gl/maps/FHADwznVmfR2", Address = "51300 US-60", City = "Aguila", Zip = "85320", Description = "The Aguila Library opened in its new building in 2006. The 2,500 sq. ft. facility brings the latest in quality library services to this rural community. It contains a large Spanish materials collection for this farming community.", Facebook = "mcldag", SubscriptionLinkId = 0, EventLinkId = "0" };
-            var centralExp = new Location { GeoLocation = "33.47780600000001,-112.07406200000003", Longitude = -112.074258, Latitude = 33.478004, Id = 1, Name = "Central Express", Code = "AD", Stub = "centralexpress", MapLink = "https://goo.gl/maps/DbFro1FfiBP2", Address = "2700 N Central Ave Ste 700", City = "Phoenix", Zip = "85004", Description = "The Central Express library is a pick up/drop off (i.e., no collection to browse) location for County Library materials. It's located in midtown Phoenix near Central Ave and Thomas Rd, a convenient stop for people who live, work, or pass through the area to pick up and drop off materials from 8:00am &ndash; 5:00pm, Monday &ndash; Friday. The Central Express library also serves as MCLD's administrative headquarters. This location offers onsite use of iPads and digital services, as well as new library card applications and renewals.", Facebook = "mcldaz", SubscriptionLinkId = null, EventLinkId = "ALL" };
-            var edRobson = new Location { GeoLocation = "33.21841400000001,-111.88145799999995", Longitude = -111.881663, Latitude = 33.218343, Id = 2, Name = "Ed Robson", Code = "RO", Stub = "edrobson", MapLink = "https://goo.gl/maps/amHZCLcsT7T2", Address = "9330 E Riggs Rd", City = "Sun Lakes", Zip = "85248", Description = "The Ed Robson Library moved into its 10,000-sq. ft. facility in July 2004. This library serves Sun Lakes and surrounding communities.", Facebook = "mcldro", SubscriptionLinkId = 1, EventLinkId = "1" };
-            var elMirage = new Location { GeoLocation = "33.61118299999999,-112.32589999999993", Longitude = -112.325751, Latitude = 33.611136, Id = 3, Name = "El Mirage", Code = "EM", Stub = "elmirage", MapLink = "https://goo.gl/maps/gQqWhaBHbAn", Address = "14011 N 1st Ave", City = "El Mirage", Zip = "85335", Description = "The El Mirage Library is housed in a 2500-sq. ft. building. The El Mirage Library serves a city comprised of a culturally deep-rooted Hispanic/Spanish population, as well as a rapidly increasing population of new families from nearby developments. The library has a collection designed to meet the needs of this diverse community and includes a large collection of Spanish materials. The library also has Internet accessible computers and regular bilingual programming activities.", Facebook = "mcldem", SubscriptionLinkId = 2, EventLinkId = "2" };
-            Location[] locations = {edRobson, aguila, centralExp, elMirage };
+            Location[] locations = {};
 
             if((latitude!=0 && longitude!=0) && address==null)
             {
@@ -220,34 +216,19 @@ namespace Ocuda.Promenade.Controllers
         [HttpGet("[action]/{locationStub}/{featureStub}")]
         public IActionResult Locations(string locationStub, string featureStub)
         {
-            var aguila = new Location { Id = 0, Name = "Aguila", Code = "AG", Stub = "aguila", MapLink = "https://goo.gl/maps/FHADwznVmfR2", Address = "51300 US-60", City = "Aguila", Zip = "85320", Description = "The Aguila Library opened in its new building in 2006. The 2,500 sq. ft. facility brings the latest in quality library services to this rural community. It contains a large Spanish materials collection for this farming community.", Facebook = "mcldag", SubscriptionLinkId = 0, EventLinkId = "0" };
-            var centralExp = new Location { Id = 1, Name = "Central Express", Code = "AD", Stub = "centralexpress", MapLink = "https://goo.gl/maps/DbFro1FfiBP2", Address = "2700 N Central Ave Ste 700", City = "Phoenix", Zip = "85004", Description = "The Central Express library is a pick up/drop off (i.e., no collection to browse) location for County Library materials. It's located in midtown Phoenix near Central Ave and Thomas Rd, a convenient stop for people who live, work, or pass through the area to pick up and drop off materials from 8:00am &ndash; 5:00pm, Monday &ndash; Friday. The Central Express library also serves as MCLD's administrative headquarters. This location offers onsite use of iPads and digital services, as well as new library card applications and renewals.", Facebook = "mcldaz", SubscriptionLinkId = null, EventLinkId = "ALL" };
-            var edRobson = new Location { Id = 2, Name = "Ed Robson", Code = "RO", Stub = "edrobson", MapLink = "https://goo.gl/maps/amHZCLcsT7T2", Address = "9330 E Riggs Rd", City = "Sun Lakes", Zip = "85248", Description = "The Ed Robson Library moved into its 10,000-sq. ft. facility in July 2004. This library serves Sun Lakes and surrounding communities.", Facebook = "mcldro", SubscriptionLinkId = 1, EventLinkId = "1" };
-            var elMirage = new Location { Id = 3, Name = "El Mirage", Code = "EM", Stub = "elmirage", MapLink = "https://goo.gl/maps/gQqWhaBHbAn", Address = "14011 N 1st Ave", City = "El Mirage", Zip = "85335", Description = "The El Mirage Library is housed in a 2500-sq. ft. building. The El Mirage Library serves a city comprised of a culturally deep-rooted Hispanic/Spanish population, as well as a rapidly increasing population of new families from nearby developments. The library has a collection designed to meet the needs of this diverse community and includes a large collection of Spanish materials. The library also has Internet accessible computers and regular bilingual programming activities.", Facebook = "mcldem", SubscriptionLinkId = 2, EventLinkId = "2" };
-            Location[] locations = { aguila, centralExp, edRobson, elMirage };
+            Location[] locations = {  };
 
-            var volunteer = new Feature { Id = 0, Name = "Volunteer", FontAwesome = "fa fa-inverse fa-info-circle fa-stack-1x", ImagePath = "voluntold.jpg", Stub = "Volunteer", BodyText = "" };
-            var sevenDay = new Feature { Id = 1, Name = "7-Day Express", FontAwesome = "fa-stack-1x", ImagePath = "day.jpg", Stub = "7Day", BodyText = "Sometimes called “Lucky Day” materials, we reserve a few copies of these popular books that can only be checked out from the branch. So if you find one, it’s your lucky day! Here’s what you need to know:" };
-            var citizenSci = new Feature { Id = 2, Name = "Citizen Science", FontAwesome = "fa fa-inverse fa-flask fa-stack-1x", ImagePath = "citizen.jpg", Stub = "CitizenScience", BodyText = "Citizen Science kits empower our customers to participate in research with instruments checked out from their local library. See which kits are available from the Ed Robson Library. Watch videos about the Zombee Hunting and Bio Diversity kits to learn more." };
-            var facebook = new Feature { Id = 3, Name = "Facebook", FontAwesome = "fab fa-inverse fa-facebook-f fa-stack-1x", ImagePath = "facebook.jpg", Stub = "", BodyText = "" };
-            Feature[] features = { volunteer, sevenDay, citizenSci, facebook };
 
-            var aguilaVolunteer = new LocationFeature { LocationId = 0, FeatureId = 0, RedirectUrl = "https://mcldaz.org/volunteer/AG" };
-            var edVolunteer = new LocationFeature { LocationId = 2, FeatureId = 0, RedirectUrl = "https://mcldaz.org/volunteer/RO" };
-            var elVolunteer = new LocationFeature { LocationId = 3, FeatureId = 0, RedirectUrl = "https://mcldaz.org/volunteer/EM" };
+            Feature[] features = {  };
 
-            var aguilaSeven = new LocationFeature { LocationId = 0, FeatureId = 1, Text = " - <span class=\"fa - stack - 1x\" style=\"color: white; \"><strong>7</strong></span> 7-day checkout" };
-            var edSeven = new LocationFeature { LocationId = 2, FeatureId = 1, Text = " - <span class=\"fa - stack - 1x\" style=\"color: white; \"><strong>7</strong></span> 7-day checkout" };
-            var elSeven = new LocationFeature { LocationId = 3, FeatureId = 1, Text = " - <span class=\"fa - stack - 1x\" style=\"color: white; \"><strong>7</strong></span> 7-day checkout" };
 
-            var edCitizen = new LocationFeature { LocationId = 2, FeatureId = 2, Text = "See which kits are available from the Ed Robson Library." };
+            LocationFeature[] locationsFeat = {  };
 
-            var aguilaFace = new LocationFeature { LocationId = 0, FeatureId = 3, RedirectUrl = "" };
-            var centralFace = new LocationFeature { LocationId = 1, FeatureId = 3 };
-            var edFace = new LocationFeature { LocationId = 2, FeatureId = 3 };
-            var elFace = new LocationFeature { LocationId = 3, FeatureId = 3 };
+            var group = new Group { Id = 1, GroupType="distance" };
 
-            LocationFeature[] locationsFeat = { aguilaVolunteer, aguilaSeven, aguilaFace, edCitizen, edFace, edSeven, edVolunteer, elVolunteer, elSeven, elFace, centralFace };
+
+            LocationGroup[] locagroups = { };
+
 
             if (string.IsNullOrEmpty(locationStub))
             {
@@ -264,6 +245,7 @@ namespace Ocuda.Promenade.Controllers
                     {
                         locationViewModel.Location = location;
                         var featlist = new List<LocationsFeaturesViewModel>();
+                        var neighbors = new List<Location>();
                         foreach (var item in locationsFeat)
                         {
                             if (item.LocationId == location.Id)
@@ -287,9 +269,22 @@ namespace Ocuda.Promenade.Controllers
                                         featlist.Add(locafeat);
                                     }
                                 }
-                                locationViewModel.LocationFeatures = featlist;
                             }
                         }
+                        var groupid = locagroups.First(c => c.LocationId == location.Id && c.GroupId == 1).GroupId;
+                        foreach (var groupy in locagroups)
+                        {
+                            if (locations.First(c => c.Id == groupy.LocationId).Id != location.Id)
+                            {
+                                if (groupid == groupy.GroupId)
+                                {
+                                    var obj = locations.First(c => c.Id == groupy.LocationId);
+                                    neighbors.Add(obj);
+                                }
+                            }
+                        }
+                        locationViewModel.LocationFeatures = featlist;
+                        locationViewModel.NearByLocations = neighbors;
                         break;
                     }
                 }
@@ -342,11 +337,7 @@ namespace Ocuda.Promenade.Controllers
         public Location LibraryLookup(double latitude, double longitude)
         {
             var viewModel = new Location();
-            var aguila = new Location { GeoLocation = "33.942968999999984,-113.173406", Longitude = -113.172069, Latitude = 33.942349, Id = 0, Name = "Aguila", Code = "AG", Stub = "aguila", MapLink = "https://goo.gl/maps/FHADwznVmfR2", Address = "51300 US-60", City = "Aguila", Zip = "85320", Description = "The Aguila Library opened in its new building in 2006. The 2,500 sq. ft. facility brings the latest in quality library services to this rural community. It contains a large Spanish materials collection for this farming community.", Facebook = "mcldag", SubscriptionLinkId = 0, EventLinkId = "0" };
-            var centralExp = new Location { GeoLocation = "33.47780600000001,-112.07406200000003", Longitude = -112.074258, Latitude = 33.478004, Id = 1, Name = "Central Express", Code = "AD", Stub = "centralexpress", MapLink = "https://goo.gl/maps/DbFro1FfiBP2", Address = "2700 N Central Ave Ste 700", City = "Phoenix", Zip = "85004", Description = "The Central Express library is a pick up/drop off (i.e., no collection to browse) location for County Library materials. It's located in midtown Phoenix near Central Ave and Thomas Rd, a convenient stop for people who live, work, or pass through the area to pick up and drop off materials from 8:00am &ndash; 5:00pm, Monday &ndash; Friday. The Central Express library also serves as MCLD's administrative headquarters. This location offers onsite use of iPads and digital services, as well as new library card applications and renewals.", Facebook = "mcldaz", SubscriptionLinkId = null, EventLinkId = "ALL" };
-            var edRobson = new Location { GeoLocation = "33.21841400000001,-111.88145799999995", Longitude = -111.881663, Latitude = 33.218343, Id = 2, Name = "Ed Robson", Code = "RO", Stub = "edrobson", MapLink = "https://goo.gl/maps/amHZCLcsT7T2", Address = "9330 E Riggs Rd", City = "Sun Lakes", Zip = "85248", Description = "The Ed Robson Library moved into its 10,000-sq. ft. facility in July 2004. This library serves Sun Lakes and surrounding communities.", Facebook = "mcldro", SubscriptionLinkId = 1, EventLinkId = "1" };
-            var elMirage = new Location { GeoLocation = "33.61118299999999,-112.32589999999993", Longitude = -112.325751, Latitude = 33.611136, Id = 3, Name = "El Mirage", Code = "EM", Stub = "elmirage", MapLink = "https://goo.gl/maps/gQqWhaBHbAn", Address = "14011 N 1st Ave", City = "El Mirage", Zip = "85335", Description = "The El Mirage Library is housed in a 2500-sq. ft. building. The El Mirage Library serves a city comprised of a culturally deep-rooted Hispanic/Spanish population, as well as a rapidly increasing population of new families from nearby developments. The library has a collection designed to meet the needs of this diverse community and includes a large collection of Spanish materials. The library also has Internet accessible computers and regular bilingual programming activities.", Facebook = "mcldem", SubscriptionLinkId = 2, EventLinkId = "2" };
-            Location[] locations = { aguila, centralExp, edRobson, elMirage };
+            Location[] locations = {};
 
             List<Location> model = null;
             foreach (var location in locations)

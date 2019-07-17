@@ -84,6 +84,53 @@
                     </text>
                 }
         </div>
+        @if (Model.NearByLocations.Count() > 0){
+        <div>
+            <a name="nearby"></a>
+            <h2>Nearby Libraries</h2>
+            <p>The @Model.Location.Name has other libraries nearby.</p>
+            <div class="row">
+                <div class="col-xs-4">
+
+                </div>
+                <div class="col-xs-7">
+                    <table class="neighbor-locations">
+                        <tbody>
+                            @for (var idx = 0; idx < Model.NearByLocations.Count(); idx++)
+                            {
+                                <text>
+                                    <tr>
+                                        <td>@(1 + idx)</td>
+                                        <td>
+                                            <a href="/Locations/@Model.NearByLocations[idx].Stub">@Model.NearByLocations[idx].Name</a>
+                                        </td>
+                                        <td>
+                                            <a href="@Model.NearByLocations[idx].EventLinkId"><span class="fa fa-calendar"></span> Events</a>
+                                            <a href="@Model.NearByLocations[idx].SubscriptionLinkId"><span class="fa fa-envelope-o"></span> Mailing List</a>
+                                        </td>
+                                    </tr>
+                            </text>
+                            }
+                            <tr>
+                                <td colspan="2">&nbsp;</td>
+                                <td>
+                                    <a href="/subscribe/?@foreach (var location in Model.NearByLocations) {<text>list=@location.SubscriptionLinkId&</text> }" class="btn btn-default btn-sm" target="_blank">
+                                        <span class="fa fa-envelope-o"></span> Updates from all @Model.NearByLocations.Count() libraries
+                                    </a>
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+        }
     </div>
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">

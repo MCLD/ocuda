@@ -20,6 +20,7 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string ImagePath { get; set; }
 
+
         [MaxLength(80)]
         [Required]
         public string Stub { get; set; }

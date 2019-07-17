@@ -11,5 +11,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels
         public List<LocationsFeaturesViewModel> LocationFeatures { get; set; }
 
         public string Address { get; set; }
+
+        public List<Location> NearByLocations { get; set; }
     }
 }
