@@ -182,29 +182,29 @@ namespace Ocuda.Promenade.Controllers
                     if (location.Stub == locationStub)
                     {
                         locationViewModel.Location = location;
-                        var featlist = new List<LocationsFeaturesViewModel>();
+                        var featureList = new List<LocationsFeaturesViewModel>();
                         var neighbors = new List<Location>();
                         foreach (var item in locationFeatures)
                         {
                             if (item.LocationId == location.Id)
                             {
-                                foreach (var feat in features)
+                                foreach (var feature in features)
                                 {
-                                    if (item.FeatureId == feat.Id)
+                                    if (item.FeatureId == feature.Id)
                                     {
-                                        var locafeat = new LocationsFeaturesViewModel
+                                        var locationFeature = new LocationsFeaturesViewModel
                                         {
                                             Text = item.Text,
-                                            Stub = feat.Stub,
-                                            Name = feat.Name,
-                                            ImagePath = feat.ImagePath,
-                                            FontAwesome = feat.FontAwesome,
-                                            BodyText = feat.BodyText,
-                                            RedirectUrl = feat.Name == "Facebook"
+                                            Stub = feature.Stub,
+                                            Name = feature.Name,
+                                            ImagePath = feature.ImagePath,
+                                            FontAwesome = feature.FontAwesome,
+                                            BodyText = feature.BodyText,
+                                            RedirectUrl = feature.Name == "Facebook"
                                             ? location.Facebook
                                             : item.RedirectUrl
                                         };
-                                        featlist.Add(locafeat);
+                                        featureList.Add(locationFeature);
                                     }
                                 }
                             }
@@ -220,7 +220,7 @@ namespace Ocuda.Promenade.Controllers
                                 }
                             }
                         }
-                        locationViewModel.LocationFeatures = featlist;
+                        locationViewModel.LocationFeatures = featureList;
                         locationViewModel.NearbyLocations = neighbors;
                         locationViewModel.NearbyCount = 1;
                         break;
@@ -242,24 +242,24 @@ namespace Ocuda.Promenade.Controllers
                         {
                             if (item.LocationId == location.Id)
                             {
-                                foreach (var feat in features)
+                                foreach (var feature in features)
                                 {
-                                    if (feat.Stub == featureStub)
+                                    if (feature.Stub == featureStub)
                                     {
-                                        var locafeat = new LocationsFeaturesViewModel
+                                        var locationFeature = new LocationsFeaturesViewModel
                                         {
                                             RedirectUrl = item.RedirectUrl,
                                             Text = item.Text,
-                                            Stub = feat.Stub,
-                                            Name = feat.Name,
-                                            ImagePath = feat.ImagePath,
-                                            FontAwesome = feat.FontAwesome,
-                                            BodyText = feat.BodyText
+                                            Stub = feature.Stub,
+                                            Name = feature.Name,
+                                            ImagePath = feature.ImagePath,
+                                            FontAwesome = feature.FontAwesome,
+                                            BodyText = feature.BodyText
                                         };
-                                        featlist.Add(locafeat);
+                                        featureList.Add(locationFeature);
                                     }
                                 }
-                                locationViewModel.LocationFeatures = featlist;
+                                locationViewModel.LocationFeatures = featureList;
                                 break;
                             }
                         }
