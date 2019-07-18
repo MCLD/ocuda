@@ -107,7 +107,7 @@ namespace Ocuda.Promenade.Controllers
                 {
                     using (var client = new HttpClient())
                     {
-                        var apikey = _config["PromAPIGoogleMaps"];
+                        var apikey = _config[Ocuda.Utility.Keys.Configuration.PromAPIGoogleMaps];
 
                         GeocodeResult geoResult = null;
                         string stringResult = null;
