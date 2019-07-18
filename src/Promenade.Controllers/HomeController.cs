@@ -36,20 +36,30 @@ namespace Ocuda.Promenade.Controllers
         {
             return View();
         }
+
         [HttpGet("[action]")]
-        [HttpGet("[action]/{address}")]
-        [HttpGet("[action]/{address}/{mobile}")]
-        public async Task<IActionResult> LocateZip(string address = null, int? mobile = null)
+        [HttpGet("[action]/{zip}")]
+        [HttpGet("[action]/{latitude}/{longitude}")]
+        public async Task<IActionResult> Find(double latitude = 0, double longitude = 0, string zip = null)
         {
-            if (!string.IsNullOrWhiteSpace(address))
+
+            var features = new List<Feature> { };
+
+            var locationFeatures = new List<LocationFeature> { };
+
+            Location[] locations = { };
+
+            var viewModel = new Location();
+
+            if (!string.IsNullOrWhiteSpace(zip) && (latitude == 0 && longitude == 0))
             {
                 using (var client = new HttpClient())
                 {
                     try
                     {
-                        var apikey = _config["APIKey"];
+                        var apikey = _config[Ocuda.Utility.Keys.Configuration.PromAPIGoogleMaps];
 
-                        var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={apikey}");
+                        var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?address={zip}&key={apikey}");
                         response.EnsureSuccessStatusCode();
 
                         var stringResult = await response.Content.ReadAsStringAsync();
@@ -58,18 +68,18 @@ namespace Ocuda.Promenade.Controllers
                         if (jsonResult.results.Count > 0)
                         {
                             var result = jsonResult.results[0];
-                            double latitude = result.geometry.location.lat;
-                            double longitude = result.geometry.location.lng;
+                            latitude = result.geometry.location.lat;
+                            longitude = result.geometry.location.lng;
 
-                            Location viewModel = LibraryLookup(latitude, longitude);
+                            viewModel = LookupLocation(latitude, longitude);
                             viewModel.FormattedAddress = result.formatted_address;
 
-                            return View("Locations",viewModel);
+                            return View("Locations", viewModel);
                         }
                         else
                         {
-                            _logger.LogError($"No geocoding results for address \"{address}\"");
-                            TempData["AlertDanger"] = $"Unable to locate address <strong>\"{address}\"</strong>.";
+                            _logger.LogError($"No geocoding results for a \"{zip}\"");
+                            TempData["AlertDanger"] = $"Unable to locate zip <strong>\"{zip}\"</strong>.";
                         }
                     }
                     catch (HttpRequestException ex)
@@ -83,23 +93,12 @@ namespace Ocuda.Promenade.Controllers
                         TempData["AlertDanger"] = "An error occured, please try again later.";
                     }
                 }
+                viewModel.CloseLocations = locations.OrderBy(c => c.Name).ToList();
+                return View("Locations", viewModel);
             }
-            if (mobile == 1)
+            else if (latitude != 0 && longitude != 0 && string.IsNullOrEmpty(zip))
             {
-                return View(new Location { ShowLocation = true });
-            }
-            return View("Locations");
-        }
-
-        [HttpGet("Locations")]
-        [HttpGet("Locations/[action]")]
-        public async Task<IActionResult> Find(double latitude = 0, double longitude = 0, string address = null, int? mobile = null)
-        {
-            Location[] locations = {};
-
-            if((latitude!=0 && longitude!=0) && address==null)
-            {
-                var viewModel = LibraryLookup(latitude, longitude);
+                viewModel = LookupLocation(latitude, longitude);
                 viewModel.ShowLocation = true;
                 var latlng = $"{latitude},{longitude}";
 
@@ -108,16 +107,18 @@ namespace Ocuda.Promenade.Controllers
                 {
                     using (var client = new HttpClient())
                     {
-                        var apikey = _config["APIKey"];
-
-                        var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?latlng={latlng}&key={apikey}");
-                        response.EnsureSuccessStatusCode();
+                        var apikey = _config["PromAPIGoogleMaps"];
 
                         GeocodeResult geoResult = null;
-                        var stringResult = await response.Content.ReadAsStringAsync();
+                        string stringResult = null;
 
                         try
                         {
+                            var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?latlng={latlng}&key={apikey}");
+                            response.EnsureSuccessStatusCode();
+
+                            stringResult = await response.Content.ReadAsStringAsync();
+
                             geoResult = JsonConvert.DeserializeObject<GeocodeResult>(stringResult);
                         }
                         catch (Exception ex)
@@ -128,12 +129,11 @@ namespace Ocuda.Promenade.Controllers
                         if (geoResult?.Results?.Count() > 0)
                         {
                             viewModel.Address = geoResult.Results?
-                                .FirstOrDefault()?
+                                .FirstOrDefault(_ => _.Types.Any(t => t == "postal_code"))?
                                 .AddressComponents?
-                                .Where(_ => _.Types.Any(t => t == "postal_code"))
                                 .FirstOrDefault()?
                                 .ShortName;
-                            if (viewModel.Address == null)
+                            if (string.IsNullOrEmpty(viewModel.Address))
                             {
                                 _logger.LogInformation($"Could not find postal code when geocoding {latlng}");
                             }
@@ -144,70 +144,15 @@ namespace Ocuda.Promenade.Controllers
                 {
                     _logger.LogError(ex, $"Problem looking up postal code for coordinates {latlng}: {ex.Message}");
                 }
-                if (mobile == 1)
-                {
-                    viewModel.ShowLocation = true;
-                }
                 return View("Locations", viewModel);
-            }
-            else if((latitude==0 && longitude==0) && address != null)
-            {
-                if (!string.IsNullOrWhiteSpace(address))
-                {
-                    using (var client = new HttpClient())
-                    {
-                        try
-                        {
-                            var apikey = _config["APIKey"];
-
-                            var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={apikey}");
-                            response.EnsureSuccessStatusCode();
-
-                            var stringResult = await response.Content.ReadAsStringAsync();
-                            dynamic jsonResult = JsonConvert.DeserializeObject(stringResult);
-
-                            if (jsonResult.results.Count > 0)
-                            {
-                                var result = jsonResult.results[0];
-                                latitude = result.geometry.location.lat;
-                                longitude = result.geometry.location.lng;
-
-                                Location viewModel = LibraryLookup(latitude, longitude);
-                                viewModel.FormattedAddress = result.formatted_address;
-                                if (mobile == 1)
-                                {
-                                    viewModel.ShowLocation = true;
-                                }
-                                return View("Locations", viewModel);
-                            }
-                            else
-                            {
-                                _logger.LogError($"No geocoding results for address \"{address}\"");
-                                TempData["AlertDanger"] = $"Unable to locate address <strong>\"{address}\"</strong>.";
-                            }
-                        }
-                        catch (HttpRequestException ex)
-                        {
-                            _logger.LogCritical(ex, $"Google API error: {ex.Message}");
-                            TempData["AlertDanger"] = "An error occured, please try again later.";
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogCritical(ex, ex.Message);
-                            TempData["AlertDanger"] = "An error occured, please try again later.";
-                        }
-                    }
-                }
-                return View("Locations");
             }
             else
             {
-                var viewModel = new Location();
-                viewModel.CloseLocations = locations.OrderBy( c => c.Name).ToList();
-                if (mobile==1)
+                viewModel = new Location
                 {
-                    viewModel.ShowLocation = true;
-                }
+                    CloseLocations = locations.OrderBy(c => c.Name).ToList(),
+                    ShowLocation = true
+                };
                 return View("Locations", viewModel);
             }
         }
@@ -216,24 +161,17 @@ namespace Ocuda.Promenade.Controllers
         [HttpGet("[action]/{locationStub}/{featureStub}")]
         public IActionResult Locations(string locationStub, string featureStub)
         {
-            Location[] locations = {  };
+            Location[] locations = { };
 
+            Feature[] features = { };
 
-            Feature[] features = {  };
+            LocationFeature[] locationFeatures = { };
 
-
-            LocationFeature[] locationsFeat = {  };
-
-            var group = new Group { Id = 1, GroupType="distance" };
-
-
-            LocationGroup[] locagroups = { };
-
+            LocationGroup[] locationGroups = { };
 
             if (string.IsNullOrEmpty(locationStub))
             {
-
-                return View("Locations",locations);
+                return View("Locations", locations);
             }
             else if (string.IsNullOrEmpty(featureStub))
             {
@@ -246,7 +184,7 @@ namespace Ocuda.Promenade.Controllers
                         locationViewModel.Location = location;
                         var featlist = new List<LocationsFeaturesViewModel>();
                         var neighbors = new List<Location>();
-                        foreach (var item in locationsFeat)
+                        foreach (var item in locationFeatures)
                         {
                             if (item.LocationId == location.Id)
                             {
@@ -271,20 +209,20 @@ namespace Ocuda.Promenade.Controllers
                                 }
                             }
                         }
-                        var groupid = locagroups.First(c => c.LocationId == location.Id && c.GroupId == 1).GroupId;
-                        foreach (var groupy in locagroups)
+                        var groupId = locationGroups.FirstOrDefault(c => c.LocationId == location.Id && c.GroupId == 1);
+                        if(groupId != null)
                         {
-                            if (locations.First(c => c.Id == groupy.LocationId).Id != location.Id)
+                            foreach (var group in locationGroups)
                             {
-                                if (groupid == groupy.GroupId)
+                                if (locations.First(_ => _.Id == group.LocationId).Id != location.Id && groupId.GroupId == group.GroupId)
                                 {
-                                    var obj = locations.First(c => c.Id == groupy.LocationId);
-                                    neighbors.Add(obj);
+                                    neighbors.Add(locations.First(_ => _.Id == group.LocationId));
                                 }
                             }
                         }
                         locationViewModel.LocationFeatures = featlist;
-                        locationViewModel.NearByLocations = neighbors;
+                        locationViewModel.NearbyLocations = neighbors;
+                        locationViewModel.NearbyCount = 1;
                         break;
                     }
                 }
@@ -300,7 +238,7 @@ namespace Ocuda.Promenade.Controllers
                     {
                         locationViewModel.Location = location;
                         var featlist = new List<LocationsFeaturesViewModel>();
-                        foreach (var item in locationsFeat)
+                        foreach (var item in locationFeatures)
                         {
                             if (item.LocationId == location.Id)
                             {
@@ -317,7 +255,6 @@ namespace Ocuda.Promenade.Controllers
                                             ImagePath = feat.ImagePath,
                                             FontAwesome = feat.FontAwesome,
                                             BodyText = feat.BodyText
-
                                         };
                                         featlist.Add(locafeat);
                                     }
@@ -334,12 +271,11 @@ namespace Ocuda.Promenade.Controllers
         }
 
         [NonAction]
-        public Location LibraryLookup(double latitude, double longitude)
+        public Location LookupLocation(double latitude, double longitude)
         {
             var viewModel = new Location();
-            Location[] locations = {};
+            Location[] locations = { };
 
-            List<Location> model = null;
             foreach (var location in locations)
             {
                 var geolocation = location.GeoLocation
@@ -347,7 +283,7 @@ namespace Ocuda.Promenade.Controllers
                     .Select(_ => Convert.ToDouble(_)).ToList();
                 location.Distance = HaversineHelper
                     .Calculate(geolocation[0], geolocation[1], latitude, longitude);
-                location.MapLink = "https://maps.googleapis.com/maps/api/staticmap?center="+latitude.ToString() + "," + longitude.ToString()+ "&zoom=12&maptype=roadmap&format=png&visual_refresh=true";
+                location.MapLink = "https://maps.googleapis.com/maps/api/staticmap?center=" + latitude.ToString() + "," + longitude.ToString() + "&zoom=12&maptype=roadmap&format=png&visual_refresh=true";
             }
             viewModel.CloseLocations = locations.OrderBy(_ => _.Distance).ToList();
             viewModel.CloseLocations = viewModel.CloseLocations.Select(_ =>

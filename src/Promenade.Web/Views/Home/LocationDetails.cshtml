@@ -76,7 +76,7 @@
                                 </span>
                             </a>
                             <div>
-                                <a class="bring-modal" href="/Locations/@Model.Location.Stub/@feature.Stub" data-toggle="modal" data-target="#myModal" data-feature="@feature.Stub">@feature.Name</a>
+                                <a class="bring-modal" href="/Locations/@Model.Location.Stub/@feature.Stub" data-toggle="modal" data-target="#featureModal" data-feature="@feature.Stub">@feature.Name</a>
                             </div>
                         }
 
@@ -84,55 +84,65 @@
                     </text>
                 }
         </div>
-        @if (Model.NearByLocations.Count() > 0){
-        <div>
-            <a name="nearby"></a>
-            <h2>Nearby Libraries</h2>
-            <p>The @Model.Location.Name has other libraries nearby.</p>
-            <div class="row">
-                <div class="col-xs-4">
+        @if (Model.NearbyCount > 1)
+        {
+            <div>
+                <a name="nearby"></a>
+                <h2>Nearby Locations</h2>
+                <p>The @Model.Location.Name has other locations nearby.</p>
+                <div class="row">
+                    <div class="col-xs-4">
 
-                </div>
-                <div class="col-xs-7">
-                    <table class="neighbor-locations">
-                        <tbody>
-                            @for (var idx = 0; idx < Model.NearByLocations.Count(); idx++)
-                            {
-                                <text>
-                                    <tr>
-                                        <td>@(1 + idx)</td>
-                                        <td>
-                                            <a href="/Locations/@Model.NearByLocations[idx].Stub">@Model.NearByLocations[idx].Name</a>
-                                        </td>
-                                        <td>
-                                            <a href="@Model.NearByLocations[idx].EventLinkId"><span class="fa fa-calendar"></span> Events</a>
-                                            <a href="@Model.NearByLocations[idx].SubscriptionLinkId"><span class="fa fa-envelope-o"></span> Mailing List</a>
-                                        </td>
-                                    </tr>
-                            </text>
-                            }
-                            <tr>
-                                <td colspan="2">&nbsp;</td>
-                                <td>
-                                    <a href="/subscribe/?@foreach (var location in Model.NearByLocations) {<text>list=@location.SubscriptionLinkId&</text> }" class="btn btn-default btn-sm" target="_blank">
-                                        <span class="fa fa-envelope-o"></span> Updates from all @Model.NearByLocations.Count() libraries
-                                    </a>
-                                </td>
+                    </div>
+                    <div class="col-xs-7">
+                        <table class="neighbor-locations">
+                            <tbody>
+                                @{ int counter = 1;}
+                                @foreach (var location in Model.NearbyLocations)
+                                {
+                                    <text>
+                                        <tr>
+                                            <td>@counter</td>
+                                            <td>
+                                                <a href="/Locations/@location.Stub">@location.Name</a>
+                                            </td>
+                                            <td>
+                                                <a href="@location.EventLinkId"><span class="fa fa-calendar"></span> Events</a>
+                                                <a href="@location.SubscriptionLinkId"><span class="fa fa-envelope-o"></span> Mailing List</a>
+                                            </td>
+                                        </tr>
+                                    </text>
+                                    counter++;
+                                }
+                                <tr>
+                                    <td colspan="2">&nbsp;</td>
+                                    <td>
+                                        <a href="/subscribe/?@foreach (var location in Model.NearbyLocations) {<text>list=@location.SubscriptionLinkId&</text> }" class="btn btn-default btn-sm" target="_blank">
+                                            @if (Model.NearbyLocations.Count() > 1)
+                                            {
+                                                <text><span class="fa fa-envelope-o"></span>Updates from all @Model.NearbyLocations.Count() locations</text>
+                                            }
+                                            else
+                                            {
+                                                <text><span class="fa fa-envelope-o"></span>Updates from the location</text>
+                                            }
+                                        </a>
+                                    </td>
 
-                            </tr>
+                                </tr>
 
-                        </tbody>
+                            </tbody>
 
-                    </table>
+                        </table>
+
+                    </div>
 
                 </div>
 
             </div>
-
-        </div>
         }
     </div>
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade" id="featureModal" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -173,7 +183,7 @@
                         </text>
                     }
 
-                    $('#myModal').on('shown.bs.modal', function () {
+                    $('#featureModal').on('shown.bs.modal', function () {
                         $('#myInput').trigger('focus')
                     });
                 });

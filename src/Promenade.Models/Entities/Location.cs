@@ -20,7 +20,6 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string ImagePath { get; set; }
 
-
         [MaxLength(80)]
         [Required]
         public string Stub { get; set; }
@@ -73,8 +72,10 @@ namespace Ocuda.Promenade.Models.Entities
 
         [NotMapped]
         public List<Location> CloseLocations { get; set; }
+
         [NotMapped]
         public string FormattedAddress { get; set; }
+
         [NotMapped]
         public SelectList EventDistanceOptions { get; set; }
 

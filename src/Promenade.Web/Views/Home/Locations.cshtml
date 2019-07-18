@@ -12,29 +12,32 @@
                     <form asp-action="Index" method="get" role="form" id="AddressForm">
 
                         <div class="input-group">
-                            <input asp-for="Address"
+                            <input asp-for="Zip"
                                    placeholder="Enter your address or zip code"
                                    class="form-control default-text"
                                    id="LocatorAddress" />
                             <span class="input-group-btn">
-                                <button href="/LocateZip#" type="submit" class="btn btn-primary" id="GoButton">Go</button>
+                                <button asp-controller="Home"
+                                        asp-action="Find"
+                                        type="submit" class="btn btn-primary" id="GoButton">
+                                    Go
+                                </button>
                             </span>
                         </div>
                     </form>
-
-                </div>
                     <div class="col-xs-12 @if (Model?.ShowLocation != true) {<text>hidden</text> }" style="padding-bottom: 1rem;">
-                         <form asp-action="Location" method="get" role="form" id="GeoForm">
-                             <input asp-for="Latitude" id="Latitude" hidden />
-                             <input asp-for="Longitude" id="Longitude" hidden />
-                         </form>
-                         <button type="button"
+                        <form asp-action="Location" method="get" role="form" id="GeoForm">
+                            <input asp-for="Latitude" id="Latitude" hidden />
+                            <input asp-for="Longitude" id="Longitude" hidden />
+                        </form>
+                        <button type="button"
                                 class="btn btn-default btn-block"
                                 id="GeoButton"
                                 style="display: none;">
                             Use my location
                         </button>
                     </div>
+                </div>
             </div>
             <div class="row">
                 @if (Model?.CloseLocations?.Count > 0)
@@ -103,7 +106,7 @@
             if (location.protocol != 'https:' && location.hostname != 'localhost') {
                 location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
             }
-            if (navigator.geolocation) {
+            if ("@Model.ShowLocation" != "@false") {
                 $('#GeoButton').html(useMyLocation);
                 $('#GeoButton').show();
             }
@@ -124,7 +127,7 @@
         var geoFailure = function (error) {
             $('#GeoButton').html(useMyLocation);
             $('#GeoButton').prop('disabled', false);
-            alert('There was a problem determining your location, please enter an address or zip code to find your nearest library.');
+            alert('There was a problem determining your location.');
             console.log(error.message);
         }
 
@@ -147,14 +150,9 @@
                 $('#GoButton').html('<span class="fa fa-spinner fa-spin"></span>');
                 $('#GoButton').attr("href",);
                 $('#GoButton').prop('disabled', true);
-                $('#AddressForm').attr('action','/Locations/Find').submit();
+                $('#AddressForm').attr('action','@Url.Action("Find", "Home")').submit();
             }
         });
             </script>
         }
-        <style>
-            .hidden{
-                display: none;
-            }
-        </style>
     </body>
