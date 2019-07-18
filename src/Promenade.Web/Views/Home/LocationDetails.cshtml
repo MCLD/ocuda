@@ -19,7 +19,7 @@
                         <p>
                             @Model.Location.Address
                             <br />
-                            @Model.Location.City, AZ @Model.Location.Zip
+                            @Model.Location.City, @Model.Location.State @Model.Location.Zip
                             <br />
                             <a href="tel:+1 @Model.Location.Phone">@Model.Location.Phone</a>
                         </p>
@@ -45,41 +45,16 @@
             {
                 <text>
                     <div class="col-xs-2">
-                        @if (feature.RedirectUrl != null)
-                        {
                             <a href="@feature.RedirectUrl" target="_blank">
                                 <span class="fa-stack fa-2x" style="color:#007bff">
                                     <span class="fa fa-square fa-stack-2x"></span>
                                     <span class="@feature.FontAwesome">
-                                        @if (feature.Name == "7-Day Express")
-                                        {
-                                            <text><strong style="color:white;">7</strong></text>
-            }
                                     </span>
                                 </span>
                             </a>
                             <div>
-                                <a href="@feature.RedirectUrl">@feature.Name</a>
+                                <a class="bring-modal" href="@Url.Action("Find", "Home", new {locationStub=Model.Location.Stub,featureStub=feature.Stub})" data-toggle="modal" data-target="#featureModal" data-feature="@feature.Stub">@feature.Name</a>
                             </div>
-                        }
-                        else
-                        {
-                            <a href="@feature.RedirectUrl" target="_blank">
-                                <span class="fa-stack fa-2x" style="color:#007bff">
-                                    <span class="fa fa-square fa-stack-2x"></span>
-                                    <span class="@feature.FontAwesome">
-                                        @if (feature.Name == "7-Day Express")
-                                        {
-                                            <text><strong style="color:white;">7</strong></text>
-                                        }
-                                    </span>
-                                </span>
-                            </a>
-                            <div>
-                                <a class="bring-modal" href="/Locations/@Model.Location.Stub/@feature.Stub" data-toggle="modal" data-target="#featureModal" data-feature="@feature.Stub">@feature.Name</a>
-                            </div>
-                        }
-
                     </div>
                     </text>
                 }
@@ -187,8 +162,7 @@
                         $('#myInput').trigger('focus')
                     });
                 });
-        </script>
-        <script type="application/ld+json">
+
             {
             "@@context": "http://schema.org",
             "@@type": "Library",

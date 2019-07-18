@@ -201,8 +201,8 @@ namespace Ocuda.Promenade.Controllers
                                             FontAwesome = feature.FontAwesome,
                                             BodyText = feature.BodyText,
                                             RedirectUrl = feature.Name == "Facebook"
-                                            ? location.Facebook
-                                            : item.RedirectUrl
+                                                ? location.Facebook
+                                                : item.RedirectUrl
                                         };
                                         featureList.Add(locationFeature);
                                     }
