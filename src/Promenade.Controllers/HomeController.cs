@@ -210,7 +210,7 @@ namespace Ocuda.Promenade.Controllers
                             }
                         }
                         var groupId = locationGroups.FirstOrDefault(c => c.LocationId == location.Id && c.GroupId == 1);
-                        if(groupId != null)
+                        if (groupId != null)
                         {
                             foreach (var group in locationGroups)
                             {
