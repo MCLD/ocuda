@@ -237,7 +237,7 @@ namespace Ocuda.Promenade.Controllers
                     if (location.Stub == locationStub)
                     {
                         locationViewModel.Location = location;
-                        var featlist = new List<LocationsFeaturesViewModel>();
+                        var featureList = new List<LocationsFeaturesViewModel>();
                         foreach (var item in locationFeatures)
                         {
                             if (item.LocationId == location.Id)
