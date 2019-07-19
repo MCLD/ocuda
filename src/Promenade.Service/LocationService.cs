@@ -48,7 +48,7 @@ namespace Ocuda.Promenade.Service
             {
                 if (day.Open)
                 {
-                    var lastDayGrouping = dayGroupings.Last();
+                    var lastDayGrouping = dayGroupings.LastOrDefault();
                     if (dayGroupings.Count > 0 && lastDayGrouping.OpenTime == day.OpenTime && lastDayGrouping.CloseTime == day.CloseTime)
                     {
                         lastDayGrouping.DaysOfWeek.Add(day.DayOfWeek);
@@ -89,9 +89,11 @@ namespace Ocuda.Promenade.Service
                 formattedDayGroupings.Add($"{days} {openTime.ToString()} \u2014 {closeTime.ToString()}");
             }
 
-            var formattedClosedDays = GetFormattedDayGroupings(closedDays);
-
-            formattedDayGroupings.Add($"{formattedClosedDays} Closed");
+            if (closedDays.Count > 0)
+            {
+                var formattedClosedDays = GetFormattedDayGroupings(closedDays);
+                formattedDayGroupings.Add($"{formattedClosedDays} Closed");
+            }
 
             return formattedDayGroupings;
         }
