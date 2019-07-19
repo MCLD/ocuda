@@ -2,12 +2,15 @@
 * text=auto
 
 # linguist overrides https://github.com/github/linguist#overrides
-src/bower_components linguist-vendored
 dev/* linguist-documentation
-docs/* linguist-documentation
-re/* linguist-documentation
+
 *.min.css linguist-generated=true
 *.min.js linguist-generated=true
+src/Ops.DataProvider.SqlServer.Ops/Migrations/* linguist-generated=true
+src/Ops.DataProvider.SqlServer.Promenade/Migrations/* linguist-generated=true
+
+src/Ops.Web/bower_components linguist-vendored
+src/Promenade.Web/bower_components linguist-vendored
 
 # fix CHANGELOG.md to default to union merge
 CHANGELOG merge=union
