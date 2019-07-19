@@ -29,27 +29,27 @@
                         <form asp-action="Location" method="get" role="form" id="GeoForm">
                             <input asp-for="Latitude" id="Latitude" hidden />
                             <input asp-for="Longitude" id="Longitude" hidden />
+                            <button type="button"
+                                    class="btn btn-default btn-block"
+                                    id="GeoButton"
+                                    style="display: none;">
+                                Use my location
+                            </button>
                         </form>
-                        <button type="button"
-                                class="btn btn-default btn-block"
-                                id="GeoButton"
-                                style="display: none;">
-                            Use my location
-                        </button>
                     </div>
                 </div>
             </div>
             <div class="row">
                 @if (Model?.CloseLocations?.Count > 0)
                 {
-                    @for (int i = 0; i < Model.CloseLocations.Count; i++)
+                    @foreach(var closeLocation in Model.CloseLocations)
                     {
                         <text>
                             <div class="col-xs-12 col-sm-4 space-above">
                                 <div class="border center-block">
-                                    <div class="@(Model.CloseLocations[i].Open ? "traffic-green" : "traffic-red")" style="border-bottom:5px solid; width: 100%;">
-                                        <a href="@Model.CloseLocations[i].MapLink" target="_blank">
-                                            <img src="@Model.CloseLocations[i].MapLink" style="width:220px;" />
+                                    <div class="@(closeLocation.Open ? "traffic-green" : "traffic-red")" style="border-bottom:5px solid; width: 100%;">
+                                        <a href="@closeLocation.MapLink" target="_blank">
+                                            <img src="@closeLocation.MapLink" style="width:220px;" />
                                         </a>
                                     </div>
                                     <div class="branch-container">
@@ -59,14 +59,14 @@
                                                     <tr>
                                                         <td style="padding-bottom:10px;">
                                                             <strong style="font-size: 17.5px;">
-                                                                @Model.CloseLocations[i].Name
-                                                            </strong> <em style="font-size:12px;">@if (Model.CloseLocations[i].Distance != 0){<text>(@Model.CloseLocations[i].Distance mi.)</text>}</em>
+                                                                @closeLocation.Name
+                                                            </strong> <em style="font-size:12px;">@if (closeLocation.Distance != 0){<text>(@closeLocation.Distance mi.)</text>}</em>
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <td style="padding-bottom:10px;font-size:13px;">
-                                                            @Model.CloseLocations[i].Address<br>
-                                                            @Model.CloseLocations[i].City  AZ, @Model.CloseLocations[i].Zip
+                                                            @closeLocation.Address<br>
+                                                            @closeLocation.City  @closeLocation.State, @closeLocation.Zip
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -76,8 +76,8 @@
                                                     </tr>
                                                     <tr style="text-align: left;">
                                                         <td style="padding: 5px 0;">
-                                                            <a href="Locations/@Model.CloseLocations[i].Stub" target="_blank" class="btn btn-default">Library Info</a>
-                                                            <a href="@Model.CloseLocations[i].EventLinkId" class="btn btn-default" style="float:right" target="_blank">Events</a>
+                                                            <a href="Locations/@closeLocation.Stub" target="_blank" class="btn btn-default">Library Info</a>
+                                                            <a href="@closeLocation.EventLinkId" class="btn btn-default" style="float:right" target="_blank">Events</a>
                                                         </td>
 
                                                     </tr>

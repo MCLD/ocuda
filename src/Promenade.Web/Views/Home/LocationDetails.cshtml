@@ -162,36 +162,6 @@
                         $('#myInput').trigger('focus')
                     });
                 });
-
-            {
-            "@@context": "http://schema.org",
-            "@@type": "Library",
-            "name": "@Model.Location.Name",
-            "areaServed": {
-            "@@type": "AdministrativeArea",
-            "name": "@Model.Location.AdministrativeArea"
-            },
-            "email": "",
-            "address": {
-            "@@id": "@Model.Location.Code",
-            "@@type": "PostalAddress",
-            "addressCountry": "@Model.Location.Country",
-            "addressRegion": "@Model.Location.State",
-            "addressLocality": "@Model.Location.City",
-            "contactType": "Location address",
-            "postalCode": "@Model.Location.Zip",
-            "streetAddress": "@Model.Location.Address"
-            },
-            "location": { "@@id": "@Model.Location.Code" },
-            "parentOrganization": "",
-            "telephone": "@Model.Location.Phone",
-            "openingHours": [
-
-            ],
-            "image": "@Model.Location.ImagePath",
-            "sameAs": ["@Model.Location.MapLink" @if (!string.IsNullOrEmpty(Model.Location.Facebook))
-            {<text>,"@Model.Location.Facebook"</text>}]
-            }
         </script>
     }
 </body>

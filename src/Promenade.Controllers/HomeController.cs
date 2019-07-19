@@ -41,11 +41,9 @@ namespace Ocuda.Promenade.Controllers
         [HttpGet("[action]/{latitude}/{longitude}")]
         public async Task<IActionResult> Find(double latitude = 0, double longitude = 0, string zip = null)
         {
-
+            // TODO remove this when we have real data
             var features = new List<Feature> { };
-
             var locationFeatures = new List<LocationFeature> { };
-
             Location[] locations = { };
 
             var viewModel = new Location();
@@ -128,7 +126,7 @@ namespace Ocuda.Promenade.Controllers
                         if (geoResult?.Results?.Count() > 0)
                         {
                             viewModel.Address = geoResult.Results?
-                                .FirstOrDefault(_ => _.Types.Any(t => t == "postal_code"))?
+                                .FirstOrDefault(_ => _.Types.Any(__ => __ == "postal_code"))?
                                 .AddressComponents?
                                 .FirstOrDefault()?
                                 .ShortName;
@@ -147,12 +145,11 @@ namespace Ocuda.Promenade.Controllers
             }
             else
             {
-                viewModel = new Location
+                return View("Locations", new Location
                 {
                     CloseLocations = locations.OrderBy(c => c.Name).ToList(),
                     ShowLocation = true
-                };
-                return View("Locations", viewModel);
+                });
             }
         }
 
@@ -160,12 +157,10 @@ namespace Ocuda.Promenade.Controllers
         [HttpGet("[action]/{locationStub}/{featureStub}")]
         public IActionResult Locations(string locationStub, string featureStub)
         {
+            //TODO when we have real data
             Location[] locations = { };
-
             Feature[] features = { };
-
             LocationFeature[] locationFeatures = { };
-
             LocationGroup[] locationGroups = { };
 
             if (string.IsNullOrEmpty(locationStub))
@@ -183,39 +178,32 @@ namespace Ocuda.Promenade.Controllers
                         locationViewModel.Location = location;
                         var featureList = new List<LocationsFeaturesViewModel>();
                         var neighbors = new List<Location>();
-                        foreach (var item in locationFeatures)
+                        foreach (var item in locationFeatures.Where(_ => _.LocationId == location.Id))
                         {
-                            if (item.LocationId == location.Id)
+                            foreach (var feature in features.Where(__ => __.Id == item.FeatureId))
                             {
-                                foreach (var feature in features)
+                                featureList.Add(new LocationsFeaturesViewModel
                                 {
-                                    if (item.FeatureId == feature.Id)
-                                    {
-                                        var locationFeature = new LocationsFeaturesViewModel
-                                        {
-                                            Text = item.Text,
-                                            Stub = feature.Stub,
-                                            Name = feature.Name,
-                                            ImagePath = feature.ImagePath,
-                                            FontAwesome = feature.FontAwesome,
-                                            BodyText = feature.BodyText,
-                                            RedirectUrl = feature.Name == "Facebook"
-                                                ? location.Facebook
-                                                : item.RedirectUrl
-                                        };
-                                        featureList.Add(locationFeature);
-                                    }
-                                }
+                                    Text = item.Text,
+                                    Stub = feature.Stub,
+                                    Name = feature.Name,
+                                    ImagePath = feature.ImagePath,
+                                    FontAwesome = feature.FontAwesome,
+                                    BodyText = feature.BodyText,
+                                    RedirectUrl = feature.Name == "Facebook"
+                                        ? location.Facebook
+                                        : item.RedirectUrl
+                                });
                             }
                         }
-                        var groupId = locationGroups.FirstOrDefault(c => c.LocationId == location.Id && c.GroupId == 1);
+                        var groupId = locationGroups.FirstOrDefault(_ => _.LocationId == location.Id && _.GroupId == 1);
                         if (groupId != null)
                         {
                             foreach (var group in locationGroups)
                             {
-                                if (locations.First(_ => _.Id == group.LocationId).Id != location.Id && groupId.GroupId == group.GroupId)
+                                if (locations.FirstOrDefault(_ => _.Id == group.LocationId)?.Id != location.Id && groupId.GroupId == group.GroupId)
                                 {
-                                    neighbors.Add(locations.First(_ => _.Id == group.LocationId));
+                                    neighbors.Add(locations.FirstOrDefault(_ => _.Id == group.LocationId));
                                 }
                             }
                         }
@@ -282,7 +270,7 @@ namespace Ocuda.Promenade.Controllers
                     .Select(_ => Convert.ToDouble(_)).ToList();
                 location.Distance = HaversineHelper
                     .Calculate(geolocation[0], geolocation[1], latitude, longitude);
-                location.MapLink = "https://maps.googleapis.com/maps/api/staticmap?center=" + latitude.ToString() + "," + longitude.ToString() + "&zoom=12&maptype=roadmap&format=png&visual_refresh=true";
+                location.MapLink = $"https://maps.googleapis.com/maps/api/staticmap?center={latitude},{longitude}&zoom=12&maptype=roadmap&format=png&visual_refresh=true";
             }
             viewModel.CloseLocations = locations.OrderBy(_ => _.Distance).ToList();
             viewModel.CloseLocations = viewModel.CloseLocations.Select(_ =>
