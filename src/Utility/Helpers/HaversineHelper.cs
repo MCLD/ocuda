@@ -13,11 +13,10 @@ namespace BranchLocator.Helpers
             var R = 3959; // In miles
             var dLat = toRadians(lat2 - lat1);
             var dLon = toRadians(lon2 - lon1);
-            lat1 = toRadians(lat1);
-            lat2 = toRadians(lat2);
+            var newLat1 = toRadians(lat1);
+            var newLat2 = toRadians(lat2);
 
-            var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) + Math.Sin(dLon / 2) * Math.Sin(dLon / 2) * Math.Cos(lat1) * Math.Cos(lat2);
-            var c = 2 * Math.Asin(Math.Sqrt(a));
+            var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) + Math.Sin(dLon / 2) * Math.Sin(dLon / 2) * Math.Cos(newLat1) * Math.Cos(newLat2);
             return R * 2 * Math.Asin(Math.Sqrt(a));
         }
 

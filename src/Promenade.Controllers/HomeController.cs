@@ -19,8 +19,7 @@ namespace Ocuda.Promenade.Controllers
 
     public class HomeController : BaseController
     {
-        public const int DaysInAWeek = 7;
-
+        public static readonly int DaysInAWeek = 7;
         private readonly IConfiguration _config;
         private readonly ILogger<HomeController> _logger;
 
@@ -51,7 +50,7 @@ namespace Ocuda.Promenade.Controllers
 
             var viewModel = new Location();
 
-            if (!string.IsNullOrWhiteSpace(zip) && (latitude == 0 && longitude == 0))
+            if (!string.IsNullOrWhiteSpace(zip) && (latitude.Equals(0) && longitude.Equals(0)))
             {
                 using (var client = new HttpClient())
                 {
@@ -68,10 +67,10 @@ namespace Ocuda.Promenade.Controllers
                         if (jsonResult.results.Count > 0)
                         {
                             var result = jsonResult.results[0];
-                            latitude = result.geometry.location.lat;
-                            longitude = result.geometry.location.lng;
+                            var newLat = result.geometry.location.lat;
+                            var newLong = result.geometry.location.lng;
 
-                            viewModel = LookupLocation(latitude, longitude);
+                            viewModel = LookupLocation(newLat, newLong);
                             viewModel.FormattedAddress = result.formatted_address;
 
                             return View("Locations", viewModel);
@@ -96,7 +95,7 @@ namespace Ocuda.Promenade.Controllers
                 viewModel.CloseLocations = locations.OrderBy(c => c.Name).ToList();
                 return View("Locations", viewModel);
             }
-            else if (latitude != 0 && longitude != 0 && string.IsNullOrEmpty(zip))
+            else if (!latitude.Equals(0) && !longitude.Equals(0) && string.IsNullOrEmpty(zip))
             {
                 viewModel = LookupLocation(latitude, longitude);
                 viewModel.ShowLocation = true;
@@ -271,7 +270,7 @@ namespace Ocuda.Promenade.Controllers
         }
 
         [NonAction]
-        public Location LookupLocation(double latitude, double longitude)
+        public static Location LookupLocation(double latitude, double longitude)
         {
             var viewModel = new Location();
             Location[] locations = { };
