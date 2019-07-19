@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -49,7 +50,8 @@ namespace Ocuda.Promenade.Service
                 if (day.Open)
                 {
                     var lastDayGrouping = dayGroupings.LastOrDefault();
-                    if (dayGroupings.Count > 0 && lastDayGrouping.OpenTime == day.OpenTime && lastDayGrouping.CloseTime == day.CloseTime)
+                    if (dayGroupings.Count > 0 && lastDayGrouping.OpenTime == day.OpenTime 
+                        && lastDayGrouping.CloseTime == day.CloseTime)
                     {
                         lastDayGrouping.DaysOfWeek.Add(day.DayOfWeek);
                     }
@@ -72,14 +74,14 @@ namespace Ocuda.Promenade.Service
             {
                 var days = GetFormattedDayGroupings(grouping.DaysOfWeek);
 
-                var openTime = new StringBuilder(grouping.OpenTime.ToString("h"));
+                var openTime = new StringBuilder(grouping.OpenTime.ToString("%h"));
                 if (grouping.OpenTime.Minute != 0)
                 {
                     openTime.Append(grouping.OpenTime.ToString(":mm"));
                 }
                 openTime.Append(grouping.OpenTime.ToString(" tt").ToLower());
 
-                var closeTime = new StringBuilder(grouping.CloseTime.ToString("h"));
+                var closeTime = new StringBuilder(grouping.CloseTime.ToString("%h"));
                 if (grouping.CloseTime.Minute != 0)
                 {
                     closeTime.Append(grouping.CloseTime.ToString(":mm"));
@@ -100,9 +102,10 @@ namespace Ocuda.Promenade.Service
 
         private string GetFormattedDayGroupings(List<DayOfWeek> days)
         {
+            var dayFormatter = new DateTimeFormatInfo();
             if (days.Count == 1)
             {
-                return days.First().ToString("ddd");
+                return dayFormatter.GetAbbreviatedDayName(days.First());
             }
             else
             {
@@ -111,15 +114,15 @@ namespace Ocuda.Promenade.Service
 
                 if (days.Count == lastDay - firstDay + 1)
                 {
-                    return $"{firstDay.ToString("ddd")} \u2014 {lastDay.ToString("ddd")}";
+                    return $"{dayFormatter.GetAbbreviatedDayName(firstDay)} \u2014 {dayFormatter.GetAbbreviatedDayName(lastDay)}";
                 }
                 else if (days.Count == 2)
                 {
-                    return $"{firstDay.ToString("ddd")} & {lastDay.ToString("ddd")}";
+                    return $"{dayFormatter.GetAbbreviatedDayName(firstDay)} & {dayFormatter.GetAbbreviatedDayName(lastDay)}";
                 }
                 else
                 {
-                    return string.Join(", ", days.Select(_ => _.ToString("ddd")));
+                    return string.Join(", ", days.Select(_ => dayFormatter.GetAbbreviatedDayName(_)));
                 }
             }
         }
