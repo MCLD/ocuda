@@ -8,15 +8,19 @@ using Microsoft.Extensions.Logging;
 
 namespace Ocuda.Promenade.Controllers
 {
+    [Route("[controller]")]
     public class ErrorController : BaseController
     {
         private readonly ILogger<ErrorController> _logger;
 
+        
         public ErrorController(ILogger<ErrorController> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        [HttpGet("")]
+        [HttpGet("{id}")]
         public IActionResult Index(int id)
         {
             string originalPath = "unknown";

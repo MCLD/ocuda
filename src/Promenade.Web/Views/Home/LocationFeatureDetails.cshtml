@@ -1,0 +1,29 @@
+﻿@model Ocuda.Promenade.Controllers.ViewModels.LocationViewModel
+@{
+    ViewData["Title"] = "LocationFeatureDeatils";
+}
+
+<div>
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tbody>
+            <tr>
+                <td>
+                    <div id="content">
+                        @foreach (var feature in Model.LocationFeatures)
+                        {
+                            <h1>@Model.Location.Name Library @feature.Name</h1>
+                            <p>@feature.BodyText</p>
+                            <p>@feature.Text</p>
+                        }
+                    </div>
+                    <p style="margin-left: 1rem;">
+                        <a href="/Locations/@Model.Location.Stub" class="btn btn-default">
+                            <span class="fa fa-arrow-circle-left" aria-hidden="true"></span>
+                            Back to @Model.Location.Name
+                        </a>
+                    </p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

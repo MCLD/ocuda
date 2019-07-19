@@ -32,13 +32,12 @@ namespace Ocuda.Promenade.Web
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, 
+                Log.Fatal(ex,
                     $"Ocuda.Promenade{instance} v{version} exited unexpectedly: {ex.Message}");
                 return 1;
             }
             finally
             {
-
                 Log.CloseAndFlush();
             }
         }
