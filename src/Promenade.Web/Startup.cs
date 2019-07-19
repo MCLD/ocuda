@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
+using System;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Data;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility.Abstract;
@@ -13,28 +15,32 @@ namespace Ocuda.Promenade.Web
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        private readonly IConfiguration _config;
+        private readonly ILogger _logger;
 
-        public IConfiguration Configuration { get; }
+        public Startup(IConfiguration configuration, ILogger<Startup> logger)
+        {
+            _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
 
         public void ConfigureServices(IServiceCollection services)
         {
             // set a default culture of en-US if none is specified
-            string culture = Configuration["Promenade.Culture"] ?? "en-US";
+            string culture = _config["Promenade.Culture"] ?? "en-US";
             services.Configure<RequestLocalizationOptions>(_ =>
             {
                 _.DefaultRequestCulture
                     = new Microsoft.AspNetCore.Localization.RequestCulture(culture);
             });
 
-            switch (Configuration["Promenade.DatabaseProvider"])
+            string promCs = _config.GetConnectionString("Promenade")
+                ?? throw new Exception("ConnectionString:Promenade not configured.");
+            switch (_config["Promenade.DatabaseProvider"])
             {
                 case "SqlServer":
                     services.AddDbContextPool<PromenadeContext, DataProvider.SqlServer.Promenade.Context>(_ =>
-                        _.UseSqlServer(@"Data Source=(LocalDb)\MSSQLLocalDB;"));
+                        _.UseSqlServer(promCs));
                     break;
                 default:
                     throw new System.Exception("No Ops.DatabaseProvider configured.");
