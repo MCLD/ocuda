@@ -81,11 +81,6 @@ namespace Ocuda.Promenade.Service
             return features;
         }
 
-        public async Task<List<Feature>> GetLocationsGroupsAsync(string locationStub)
-        {
-            var location = GetLocationByStubAsync(locationStub);
-            return null;
-        }
         public async Task<List<Location>> GetLocationsNeighborsAsync(string locationStub)
         {
             var locationGroups = await _locationGroupRepository.GetGroupByLocationIdAsync(GetLocationByStubAsync(locationStub).Id);
