@@ -6,9 +6,10 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
-    public interface ILocationHoursRepository : IRepository<LocationHours, int>
+    public interface ILocationGroupRepository : IRepository<LocationGroup, int>
     {
-        Task<LocationHours> GetByDayOfWeek(int locationId, DateTime date);
-        Task<ICollection<LocationHours>> GetWeeklyHoursAsync(int locationId);
+        Task<List<LocationGroup>> GetGroupByLocationIdAsync(int locationId);
+        Task<List<LocationGroup>> GetLocationsByGroupIdAsync(int groupId);
     }
 }
+

@@ -18,24 +18,92 @@ namespace Ocuda.Promenade.Service
         private const int DaysInWeek = 7;
 
         private readonly ILocationHoursRepository _locationHoursRepository;
+        private readonly ILocationRepository _locationRepository;
+        private readonly ILocationGroupRepository _locationGroupRepository;
+        private readonly IGroupRepository _groupRepository;
+        private readonly ILocationFeatureRepository _locationFeatureRepository;
+        private readonly IFeatureRepository _featureRepository;
         private readonly ILocationHoursOverrideRepository _locationHoursOverrideRepository;
 
         public LocationService(ILogger<LocationService> logger,
             IDateTimeProvider dateTimeProvider,
+            ILocationRepository locationRepository,
+            ILocationGroupRepository locationGroupRepository,
+            IGroupRepository groupRepository,
+            ILocationFeatureRepository locationFeatureRepository,
             ILocationHoursRepository locationHoursRepository,
             ILocationHoursOverrideRepository locationHoursOverrideRepository)
             : base(logger, dateTimeProvider)
         {
+            _locationRepository = locationRepository
+                ?? throw new ArgumentNullException(nameof(locationRepository));
+            _locationGroupRepository = locationGroupRepository
+                ?? throw new ArgumentNullException(nameof(locationGroupRepository));
+            _groupRepository = groupRepository
+                ?? throw new ArgumentNullException(nameof(groupRepository));
+            _locationFeatureRepository = locationFeatureRepository
+                ?? throw new ArgumentNullException(nameof(locationFeatureRepository));
             _locationHoursRepository = locationHoursRepository
                 ?? throw new ArgumentNullException(nameof(locationHoursRepository));
             _locationHoursOverrideRepository = locationHoursOverrideRepository
                 ?? throw new ArgumentNullException(nameof(locationHoursOverrideRepository));
         }
 
+        public async Task<Location> GetLocationByStubAsync(string stub)
+        {
+            return await _locationRepository.GetLocationByStub(stub);
+        }
+
+        public async Task<List<Location>> GetAllLocationsAsync()
+        {
+            return await _locationRepository.GetAllLocations();
+        }
+
         public async Task<ICollection<LocationHours>> GetWeeklyHoursAsync(int locationId)
         {
             return await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
         }
+
+        public async Task<LocationFeature> GetLocationFeatureByFeatureId(int locationId)
+        {
+            return await _locationFeatureRepository.FindAsync(locationId);
+        }
+
+        public async Task<List<Feature>> GetLocationsFeaturesAsync(string locationStub)
+        {
+            var location = GetLocationByStubAsync(locationStub);
+            var locationFeatures = await _locationFeatureRepository.GetLocationFeaturesById(location.Id);
+            var features = new List<Feature>();
+            foreach (var feature in locationFeatures)
+            {
+                features.Add(await _featureRepository.FindAsync(feature.FeatureId));
+            }
+            return features;
+        }
+
+        public async Task<List<Feature>> GetLocationsGroupsAsync(string locationStub)
+        {
+            var location = GetLocationByStubAsync(locationStub);
+            return null;
+        }
+        public async Task<List<Location>> GetLocationsNeighborsAsync(string locationStub)
+        {
+            var locationGroups = await _locationGroupRepository.GetGroupByLocationIdAsync(GetLocationByStubAsync(locationStub).Id);
+            var locations = new List<Location>();
+            foreach(var locationGroup in locationGroups)
+            {
+                if(await _groupRepository.FindAsync(locationGroup.GroupId).IsLocationRegion)
+                {
+                    var locationIds = await _locationGroupRepository.GetLocationsByGroupIdAsync(locationGroup.GroupId);
+                    foreach(var location in locationIds)
+                    {
+                        locations.Add(_locationRepository.FindAsync(location.LocationId));
+                    }
+                }
+            }
+            return locations;
+        }
+
 
         public async Task<List<string>> GetFormattedWeeklyHoursAsync(int locationId)
         {

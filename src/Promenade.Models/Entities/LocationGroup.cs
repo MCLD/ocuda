@@ -11,5 +11,6 @@ namespace Ocuda.Promenade.Models.Entities
         public int LocationId { get; set; }
 
         public int GroupId { get; set; }
+
     }
 }

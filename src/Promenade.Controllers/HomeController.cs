@@ -12,6 +12,7 @@ using BranchLocator.Models;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Ocuda.Promenade.Service;
 
 namespace Ocuda.Promenade.Controllers
 {
@@ -21,13 +22,17 @@ namespace Ocuda.Promenade.Controllers
     {
         public static readonly int DaysInAWeek = 7;
         private readonly IConfiguration _config;
+        private readonly LocationService _locationService;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(IConfiguration config,
+            LocationService locationService,
             ILogger<HomeController> logger)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _locationService = locationService
+                ?? throw new ArgumentNullException(nameof(locationService));
         }
 
         [Route("")]
@@ -41,11 +46,6 @@ namespace Ocuda.Promenade.Controllers
         [HttpGet("[action]/{latitude}/{longitude}")]
         public async Task<IActionResult> Find(double latitude = 0, double longitude = 0, string zip = null)
         {
-            // TODO remove this when we have real data
-            var features = new List<Feature> { };
-            var locationFeatures = new List<LocationFeature> { };
-            Location[] locations = { };
-
             var viewModel = new Location();
 
             if (!string.IsNullOrWhiteSpace(zip) && (latitude.Equals(0) && longitude.Equals(0)))
@@ -90,13 +90,12 @@ namespace Ocuda.Promenade.Controllers
                         TempData["AlertDanger"] = "An error occured, please try again later.";
                     }
                 }
-                viewModel.CloseLocations = locations.OrderBy(c => c.Name).ToList();
+                viewModel.CloseLocations = (await _locationService.GetAllLocationsAsync()).OrderBy(c => c.Name).ToList();
                 return View("Locations", viewModel);
             }
             else if (!latitude.Equals(0) && !longitude.Equals(0) && string.IsNullOrEmpty(zip))
             {
                 viewModel = LookupLocation(latitude, longitude);
-                viewModel.ShowLocation = true;
                 var latlng = $"{latitude},{longitude}";
 
                 // try to get the zip code to display to the user
@@ -147,112 +146,66 @@ namespace Ocuda.Promenade.Controllers
             {
                 return View("Locations", new Location
                 {
-                    CloseLocations = locations.OrderBy(c => c.Name).ToList(),
-                    ShowLocation = true
+                    CloseLocations = (await _locationService.GetAllLocationsAsync()).OrderBy(c => c.Name).ToList()
                 });
             }
         }
 
         [HttpGet("[action]/{locationStub}")]
         [HttpGet("[action]/{locationStub}/{featureStub}")]
-        public IActionResult Locations(string locationStub, string featureStub)
+        public async Task<IActionResult> LocationsAsync(string locationStub, string featureStub)
         {
-            //TODO when we have real data
-            Location[] locations = { };
-            Feature[] features = { };
-            LocationFeature[] locationFeatures = { };
-            LocationGroup[] locationGroups = { };
-
             if (string.IsNullOrEmpty(locationStub))
             {
-                return View("Locations", locations);
+                return View("Locations", await _locationService.GetAllLocationsAsync());
             }
             else if (string.IsNullOrEmpty(featureStub))
             {
-                var locationViewModel = new LocationViewModel();
 
-                foreach (var location in locations)
+                var locationViewModel = new LocationViewModel();
+                var locationFeatureViewModel = new List<LocationsFeaturesViewModel>();
+                locationViewModel.Location = await _locationService.GetLocationByStubAsync(locationStub);
+                var features = await _locationService.GetLocationsFeaturesAsync(locationStub);
+
+                foreach (var feature in features)
                 {
-                    if (location.Stub == locationStub)
-                    {
-                        locationViewModel.Location = location;
-                        var featureList = new List<LocationsFeaturesViewModel>();
-                        var neighbors = new List<Location>();
-                        foreach (var item in locationFeatures.Where(_ => _.LocationId == location.Id))
-                        {
-                            foreach (var feature in features.Where(__ => __.Id == item.FeatureId))
-                            {
-                                featureList.Add(new LocationsFeaturesViewModel
-                                {
-                                    Text = item.Text,
-                                    Stub = feature.Stub,
-                                    Name = feature.Name,
-                                    ImagePath = feature.ImagePath,
-                                    FontAwesome = feature.FontAwesome,
-                                    BodyText = feature.BodyText,
-                                    RedirectUrl = feature.Name == "Facebook"
-                                        ? location.Facebook
-                                        : item.RedirectUrl
-                                });
-                            }
-                        }
-                        var groupId = locationGroups.FirstOrDefault(_ => _.LocationId == location.Id && _.GroupId == 1);
-                        if (groupId != null)
-                        {
-                            foreach (var group in locationGroups)
-                            {
-                                if (locations.FirstOrDefault(_ => _.Id == group.LocationId)?.Id != location.Id && groupId.GroupId == group.GroupId)
-                                {
-                                    neighbors.Add(locations.FirstOrDefault(_ => _.Id == group.LocationId));
-                                }
-                            }
-                        }
-                        locationViewModel.LocationFeatures = featureList;
-                        locationViewModel.NearbyLocations = neighbors;
-                        locationViewModel.NearbyCount = 1;
-                        break;
-                    }
+                    var locationFeature = await _locationService.GetLocationFeatureByFeatureId(feature.Id);
+                    var locationfeatureModel = new LocationsFeaturesViewModel();
+                    locationfeatureModel.BodyText = feature.BodyText;
+                    locationfeatureModel.FontAwesome = feature.FontAwesome;
+                    locationfeatureModel.ImagePath = feature.ImagePath;
+                    locationfeatureModel.Name = feature.Name;
+                    locationfeatureModel.RedirectUrl = locationFeature.RedirectUrl;
+                    locationfeatureModel.Stub = feature.Stub;
+                    locationfeatureModel.Text = locationFeature.Text;
+                    locationFeatureViewModel.Add(locationfeatureModel);
                 }
+                locationViewModel.LocationFeatures = locationFeatureViewModel;
+                locationViewModel.NearbyLocations = await _locationService.GetLocationsNeighborsAsync(locationStub);
+                locationViewModel.NearbyCount = locationViewModel.NearbyLocations.Count();
                 return View("LocationDetails", locationViewModel);
             }
             else
             {
                 var locationViewModel = new LocationViewModel();
+                var locationFeatureViewModel = new List<LocationsFeaturesViewModel>();
 
-                foreach (var location in locations)
-                {
-                    if (location.Stub == locationStub)
-                    {
-                        locationViewModel.Location = location;
-                        var featureList = new List<LocationsFeaturesViewModel>();
-                        foreach (var item in locationFeatures)
-                        {
-                            if (item.LocationId == location.Id)
-                            {
-                                foreach (var feature in features)
-                                {
-                                    if (feature.Stub == featureStub)
-                                    {
-                                        var locationFeature = new LocationsFeaturesViewModel
-                                        {
-                                            RedirectUrl = item.RedirectUrl,
-                                            Text = item.Text,
-                                            Stub = feature.Stub,
-                                            Name = feature.Name,
-                                            ImagePath = feature.ImagePath,
-                                            FontAwesome = feature.FontAwesome,
-                                            BodyText = feature.BodyText
-                                        };
-                                        featureList.Add(locationFeature);
-                                    }
-                                }
-                                locationViewModel.LocationFeatures = featureList;
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                }
+                locationViewModel.Location = await _locationService.GetLocationByStubAsync(locationStub);
+                var feature = (Feature)(await _locationService.GetLocationsFeaturesAsync(locationStub)).Where(_ =>_.Stub == featureStub);
+                var locationFeature = await _locationService.GetLocationFeatureByFeatureId(feature.Id);
+
+                var locationfeatureModel = new LocationsFeaturesViewModel();
+                locationfeatureModel.BodyText = feature.BodyText;
+                locationfeatureModel.FontAwesome = feature.FontAwesome;
+                locationfeatureModel.ImagePath = feature.ImagePath;
+                locationfeatureModel.Name = feature.Name;
+                locationfeatureModel.RedirectUrl = locationFeature.RedirectUrl;
+                locationfeatureModel.Stub = feature.Stub;
+                locationfeatureModel.Text = locationFeature.Text;
+
+                locationFeatureViewModel.Add(locationfeatureModel);
+                locationViewModel.LocationFeatures = locationFeatureViewModel;
+
                 return View("LocationFeatureDetails", locationViewModel);
             }
         }
