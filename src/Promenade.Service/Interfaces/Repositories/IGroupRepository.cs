@@ -6,7 +6,7 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
-    public interface IGroupRepository : IRepository<Group, int>
+    public interface IGroupRepository : IGenericRepository<Group, int>
     {
         Task<List<int>> GetLocationsByGroupId(int groupId);
     }
