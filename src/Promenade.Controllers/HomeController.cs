@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using BranchLocator.Helpers;
+using BranchLocator.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.ViewModels;
 using Ocuda.Promenade.Models.Entities;
-using BranchLocator.Helpers;
-using BranchLocator.Models;
-using Newtonsoft.Json;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Ocuda.Promenade.Service;
 
 namespace Ocuda.Promenade.Controllers
@@ -161,7 +161,6 @@ namespace Ocuda.Promenade.Controllers
             }
             else if (string.IsNullOrEmpty(featureStub))
             {
-
                 var locationViewModel = new LocationViewModel();
                 var locationFeatureViewModel = new List<LocationsFeaturesViewModel>();
                 locationViewModel.Location = await _locationService.GetLocationByStubAsync(locationStub);
@@ -170,19 +169,21 @@ namespace Ocuda.Promenade.Controllers
                 foreach (var feature in features)
                 {
                     var locationFeature = await _locationService.GetLocationFeatureByFeatureId(feature.Id);
-                    var locationfeatureModel = new LocationsFeaturesViewModel();
-                    locationfeatureModel.BodyText = feature.BodyText;
-                    locationfeatureModel.FontAwesome = feature.FontAwesome;
-                    locationfeatureModel.ImagePath = feature.ImagePath;
-                    locationfeatureModel.Name = feature.Name;
-                    locationfeatureModel.RedirectUrl = locationFeature.RedirectUrl;
-                    locationfeatureModel.Stub = feature.Stub;
-                    locationfeatureModel.Text = locationFeature.Text;
+                    var locationfeatureModel = new LocationsFeaturesViewModel
+                    {
+                        BodyText = feature.BodyText,
+                        FontAwesome = feature.FontAwesome,
+                        ImagePath = feature.ImagePath,
+                        Name = feature.Name,
+                        RedirectUrl = locationFeature.RedirectUrl,
+                        Stub = feature.Stub,
+                        Text = locationFeature.Text
+                    };
                     locationFeatureViewModel.Add(locationfeatureModel);
                 }
                 locationViewModel.LocationFeatures = locationFeatureViewModel;
                 locationViewModel.NearbyLocations = await _locationService.GetLocationsNeighborsAsync(locationStub);
-                locationViewModel.NearbyCount = locationViewModel.NearbyLocations.Count();
+                locationViewModel.NearbyCount = locationViewModel.NearbyLocations.Count;
                 return View("LocationDetails", locationViewModel);
             }
             else
@@ -191,17 +192,19 @@ namespace Ocuda.Promenade.Controllers
                 var locationFeatureViewModel = new List<LocationsFeaturesViewModel>();
 
                 locationViewModel.Location = await _locationService.GetLocationByStubAsync(locationStub);
-                var feature = (Feature)(await _locationService.GetLocationsFeaturesAsync(locationStub)).Where(_ =>_.Stub == featureStub);
+                var feature = (Feature)(await _locationService.GetLocationsFeaturesAsync(locationStub)).Where(_ => _.Stub == featureStub);
                 var locationFeature = await _locationService.GetLocationFeatureByFeatureId(feature.Id);
 
-                var locationfeatureModel = new LocationsFeaturesViewModel();
-                locationfeatureModel.BodyText = feature.BodyText;
-                locationfeatureModel.FontAwesome = feature.FontAwesome;
-                locationfeatureModel.ImagePath = feature.ImagePath;
-                locationfeatureModel.Name = feature.Name;
-                locationfeatureModel.RedirectUrl = locationFeature.RedirectUrl;
-                locationfeatureModel.Stub = feature.Stub;
-                locationfeatureModel.Text = locationFeature.Text;
+                var locationfeatureModel = new LocationsFeaturesViewModel
+                {
+                    BodyText = feature.BodyText,
+                    FontAwesome = feature.FontAwesome,
+                    ImagePath = feature.ImagePath,
+                    Name = feature.Name,
+                    RedirectUrl = locationFeature.RedirectUrl,
+                    Stub = feature.Stub,
+                    Text = locationFeature.Text
+                };
 
                 locationFeatureViewModel.Add(locationfeatureModel);
                 locationViewModel.LocationFeatures = locationFeatureViewModel;

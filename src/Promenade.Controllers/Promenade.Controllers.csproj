@@ -1,17 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
-    <PackageId>MCLD.Controllers</PackageId>
-    <Version>0.0.1</Version>
-    <Company>Maricopa County Library District</Company>
-    <Product>Maricopa County Library District</Product>
-    <Authors>Maricopa County Library District</Authors>
-    <Copyright>2018 Maricopa County Library District</Copyright>
-    <RepositoryType>Git</RepositoryType>
-    <LangVersion>Latest</LangVersion>
     <AssemblyName>Ocuda.Promenade.Controllers</AssemblyName>
+    <Authors>Maricopa County Library District</Authors>
+    <CodeAnalysisRuleSet>../../OcudaRuleSet.ruleset</CodeAnalysisRuleSet>
+    <Company>Maricopa County Library District</Company>
+    <Copyright>2018 Maricopa County Library District</Copyright>
+    <LangVersion>Latest</LangVersion>
+    <PackageId>MCLD.Controllers</PackageId>
+    <Product>Maricopa County Library District</Product>
+    <RepositoryType>Git</RepositoryType>
     <RootNamespace>Ocuda.Promenade.Controllers</RootNamespace>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <Version>0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

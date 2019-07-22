@@ -88,12 +88,12 @@ namespace Ocuda.Promenade.Service
         {
             var locationGroups = await _locationGroupRepository.GetGroupByLocationIdAsync((await GetLocationByStubAsync(locationStub)).Id);
             var locations = new List<Location>();
-            foreach(var locationGroup in locationGroups)
+            foreach (var locationGroup in locationGroups)
             {
-                if((await _groupRepository.FindAsync(locationGroup.GroupId)).IsLocationRegion)
+                if ((await _groupRepository.FindAsync(locationGroup.GroupId)).IsLocationRegion)
                 {
                     var locationIds = await _locationGroupRepository.GetLocationsByGroupIdAsync(locationGroup.GroupId);
-                    foreach(var location in locationIds)
+                    foreach (var location in locationIds)
                     {
                         locations.Add(await _locationRepository.FindAsync(location.LocationId));
                     }
@@ -101,7 +101,6 @@ namespace Ocuda.Promenade.Service
             }
             return locations;
         }
-
 
         public async Task<List<string>> GetFormattedWeeklyHoursAsync(int locationId)
         {
@@ -115,11 +114,11 @@ namespace Ocuda.Promenade.Service
             {
                 if (day.Open)
                 {
-                    var lastDayGrouping = dayGroupings.LastOrDefault();
-                    if (dayGroupings.Count > 0 && lastDayGrouping.OpenTime == day.OpenTime 
-                        && lastDayGrouping.CloseTime == day.CloseTime)
+                    var (DaysOfWeek, OpenTime, CloseTime) = dayGroupings.LastOrDefault();
+                    if (dayGroupings.Count > 0 && OpenTime == day.OpenTime
+                        && CloseTime == day.CloseTime)
                     {
-                        lastDayGrouping.DaysOfWeek.Add(day.DayOfWeek);
+                        DaysOfWeek.Add(day.DayOfWeek);
                     }
                     else
                     {
@@ -154,7 +153,7 @@ namespace Ocuda.Promenade.Service
                 }
                 closeTime.Append(grouping.CloseTime.ToString(" tt").ToLower());
 
-                formattedDayGroupings.Add($"{days} {openTime.ToString()} \u2014 {closeTime.ToString()}");
+                formattedDayGroupings.Add($"{days} {openTime} \u2014 {closeTime}");
             }
 
             if (closedDays.Count > 0)
@@ -171,11 +170,11 @@ namespace Ocuda.Promenade.Service
             var dayFormatter = new DateTimeFormatInfo();
             if (days.Count == 1)
             {
-                return dayFormatter.GetAbbreviatedDayName(days.First());
+                return dayFormatter.GetAbbreviatedDayName(days[0]);
             }
             else
             {
-                var firstDay = days.First();
+                var firstDay = days[0];
                 var lastDay = days.Last();
 
                 if (days.Count == lastDay - firstDay + 1)
@@ -277,7 +276,7 @@ namespace Ocuda.Promenade.Service
                 if (nextOpen != null)
                 {
                     var nextDay = "";
-                    var blah = now.DayOfWeek + 10;
+
                     if ((int)nextOpen.DayOfWeek == ((int)now.DayOfWeek + 1) % DaysInWeek)
                     {
                         nextDay = "tomorrow";

@@ -58,7 +58,6 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<Service.Interfaces.Repositories.ILocationHoursOverrideRepository,
                 Data.Promenade.LocationHoursOverrideRepository>();
 
-
             // services
             services.AddScoped<LocationService>();
         }

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Promenade.Controllers.ViewModels
 {
     public class LocationsFeaturesViewModel
     {
-
         [MaxLength(255)]
         [Required]
         public string Name { get; set; }
