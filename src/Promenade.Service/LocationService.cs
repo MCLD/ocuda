@@ -29,6 +29,7 @@ namespace Ocuda.Promenade.Service
             IDateTimeProvider dateTimeProvider,
             ILocationRepository locationRepository,
             ILocationGroupRepository locationGroupRepository,
+            IFeatureRepository featureRepository,
             IGroupRepository groupRepository,
             ILocationFeatureRepository locationFeatureRepository,
             ILocationHoursRepository locationHoursRepository,
@@ -39,6 +40,8 @@ namespace Ocuda.Promenade.Service
                 ?? throw new ArgumentNullException(nameof(locationRepository));
             _locationGroupRepository = locationGroupRepository
                 ?? throw new ArgumentNullException(nameof(locationGroupRepository));
+            _featureRepository = featureRepository
+                ?? throw new ArgumentNullException(nameof(featureRepository));
             _groupRepository = groupRepository
                 ?? throw new ArgumentNullException(nameof(groupRepository));
             _locationFeatureRepository = locationFeatureRepository
