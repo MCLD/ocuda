@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ops.Service\Ops.Service.csproj" />
     <ProjectReference Include="..\Promenade.Models\Promenade.Models.csproj" />
     <ProjectReference Include="..\Utility\Utility.csproj" />
   </ItemGroup>

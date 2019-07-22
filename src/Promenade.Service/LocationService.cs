@@ -92,12 +92,12 @@ namespace Ocuda.Promenade.Service
             var locations = new List<Location>();
             foreach(var locationGroup in locationGroups)
             {
-                if(await _groupRepository.FindAsync(locationGroup.GroupId).IsLocationRegion)
+                if((await _groupRepository.FindAsync(locationGroup.GroupId)).IsLocationRegion)
                 {
                     var locationIds = await _locationGroupRepository.GetLocationsByGroupIdAsync(locationGroup.GroupId);
                     foreach(var location in locationIds)
                     {
-                        locations.Add(_locationRepository.FindAsync(location.LocationId));
+                        locations.Add(await _locationRepository.FindAsync(location.LocationId));
                     }
                 }
             }
