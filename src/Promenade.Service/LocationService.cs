@@ -74,7 +74,7 @@ namespace Ocuda.Promenade.Service
 
         public async Task<List<Feature>> GetLocationsFeaturesAsync(string locationStub)
         {
-            var location = GetLocationByStubAsync(locationStub);
+            var location = await GetLocationByStubAsync(locationStub);
             var locationFeatures = await _locationFeatureRepository.GetLocationFeaturesById(location.Id);
             var features = new List<Feature>();
             foreach (var feature in locationFeatures)
@@ -86,7 +86,7 @@ namespace Ocuda.Promenade.Service
 
         public async Task<List<Location>> GetLocationsNeighborsAsync(string locationStub)
         {
-            var locationGroups = await _locationGroupRepository.GetGroupByLocationIdAsync(GetLocationByStubAsync(locationStub).Id);
+            var locationGroups = await _locationGroupRepository.GetGroupByLocationIdAsync((await GetLocationByStubAsync(locationStub)).Id);
             var locations = new List<Location>();
             foreach(var locationGroup in locationGroups)
             {
