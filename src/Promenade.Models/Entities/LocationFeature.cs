@@ -5,6 +5,8 @@ namespace Ocuda.Promenade.Models.Entities
     public class LocationFeature
     {
         [Required]
+        public int Id { get; set; }
+        [Required]
         public int LocationId { get; set; }
 
         [Required]
