@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +10,7 @@ namespace Ocuda.Promenade.Data.Promenade
 {
     public class LocationRepository : GenericRepository<Location, int>, ILocationRepository
     {
-        public LocationRepository(PromenadeContext context, 
+        public LocationRepository(PromenadeContext context,
             ILogger<LocationHoursRepository> logger) : base(context, logger)
         {
         }
@@ -22,6 +21,7 @@ namespace Ocuda.Promenade.Data.Promenade
                 .AsNoTracking()
                 .ToListAsync();
         }
+
         public async Task<Location> GetLocationByStub(string stub)
         {
             return await DbSet

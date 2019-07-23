@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +10,7 @@ namespace Ocuda.Promenade.Data.Promenade
 {
     public class LocationGroupRepository : GenericRepository<LocationGroup, int>, ILocationGroupRepository
     {
-        public LocationGroupRepository(PromenadeContext context, 
+        public LocationGroupRepository(PromenadeContext context,
             ILogger<LocationHoursRepository> logger) : base(context, logger)
         {
         }
