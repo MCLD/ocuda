@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -25,12 +27,17 @@ namespace Ocuda.Ops.Web
         private const string DefaultCulture = "en-US";
 
         private readonly IConfiguration _config;
+        private readonly bool _isDevelopment;
         private readonly ILogger _logger;
 
-        public Startup(IConfiguration configuration, ILogger<Startup> logger)
+        public Startup(IConfiguration configuration,
+            IHostingEnvironment env, 
+            ILogger<Startup> logger)
         {
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            _isDevelopment = env.IsDevelopment();
         }
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
@@ -77,6 +84,33 @@ namespace Ocuda.Ops.Web
                     break;
             }
 
+            // configure ef errors to throw, log, or ignore as appropriate for the environment
+            // see https://docs.microsoft.com/en-us/ef/core/querying/related-data#ignored-includes
+            var throwEvents = new List<EventId>();
+            var logEvents = new List<EventId>();
+            var ignoreEvents = new List<EventId>();
+
+            if (_isDevelopment)
+            {
+                if (string.IsNullOrEmpty(_config[Configuration.ThrowQueryWarningsInDev]))
+                {
+                    logEvents.Add(RelationalEventId.QueryClientEvaluationWarning);
+                    logEvents.Add(CoreEventId.FirstWithoutOrderByAndFilterWarning);
+                }
+                else
+                {
+                    throwEvents.Add(RelationalEventId.QueryClientEvaluationWarning);
+                    throwEvents.Add(CoreEventId.FirstWithoutOrderByAndFilterWarning);
+                }
+
+                throwEvents.Add(CoreEventId.IncludeIgnoredWarning);
+            }
+            else
+            {
+                logEvents.Add(RelationalEventId.QueryClientEvaluationWarning);
+                logEvents.Add(CoreEventId.IncludeIgnoredWarning);
+            }
+
             string opsCs = _config.GetConnectionString("Ops")
                 ?? throw new Exception("ConnectionString:Ops not configured.");
             string promCs = _config.GetConnectionString("Promenade")
@@ -88,9 +122,17 @@ namespace Ocuda.Ops.Web
                 case "SqlServer":
                     _logger.LogInformation("Using {0} data provider", provider);
                     services.AddDbContextPool<OpsContext,
-                        DataProvider.SqlServer.Ops.Context>(_ => _.UseSqlServer(opsCs));
+                        DataProvider.SqlServer.Ops.Context>(_ => _.UseSqlServer(opsCs)
+                        .ConfigureWarnings(w => w
+                            .Throw(throwEvents.ToArray())
+                            .Log(logEvents.ToArray())
+                            .Ignore(ignoreEvents.ToArray())));
                     services.AddDbContextPool<PromenadeContext,
-                        DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
+                        DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs)
+                        .ConfigureWarnings(w => w
+                            .Throw(throwEvents.ToArray())
+                            .Log(logEvents.ToArray())
+                            .Ignore(ignoreEvents.ToArray())));
                     break;
                 default:
                     _logger.LogCritical("No {0} configured in settings. Exiting.",

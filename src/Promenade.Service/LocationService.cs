@@ -380,7 +380,6 @@ namespace Ocuda.Promenade.Service
                 if (nextOpen != null)
                 {
                     var nextDay = "";
-
                     if ((int)nextOpen.DayOfWeek == ((int)now.DayOfWeek + 1) % DaysInWeek)
                     {
                         nextDay = "tomorrow";

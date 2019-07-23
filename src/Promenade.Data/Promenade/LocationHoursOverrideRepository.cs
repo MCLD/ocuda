@@ -9,11 +9,12 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 
 namespace Ocuda.Promenade.Data.Promenade
 {
-    public class LocationHoursOverrideRepository
-        : GenericRepository<LocationHoursOverride, int>, ILocationHoursOverrideRepository
+    public class LocationHoursOverrideRepository 
+        : GenericRepository<PromenadeContext, LocationHoursOverride, int>, ILocationHoursOverrideRepository
     {
-        public LocationHoursOverrideRepository(PromenadeContext context,
-            ILogger<LocationHoursOverrideRepository> logger) : base(context, logger)
+        public LocationHoursOverrideRepository(
+            ServiceFacade.Repository<PromenadeContext> repositoryFacade,
+            ILogger<LocationHoursOverrideRepository> logger) : base(repositoryFacade, logger)
         {
         }
 
