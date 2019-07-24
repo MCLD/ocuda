@@ -23,7 +23,7 @@ namespace Ocuda.Promenade.Controllers
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
-            _redirectService = redirectService 
+            _redirectService = redirectService
                 ?? throw new ArgumentNullException(nameof(redirectService));
         }
 
@@ -48,11 +48,9 @@ namespace Ocuda.Promenade.Controllers
                         return Redirect(redirect.Url);
                     }
                 }
-                else
-                {
-                    _logger.LogWarning($"No About page or redirect found for stub {stub}: {HttpContext.Request.Path}");
-                    return View("PageNotFound");
-                }
+
+                _logger.LogWarning($"No About page or redirect found for stub \"{stub}\": {HttpContext.Request.Path}");
+                return View("PageNotFound");
             }
 
             var pageContent = CommonMark.CommonMarkConverter.Convert(page.Content);

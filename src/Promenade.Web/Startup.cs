@@ -122,10 +122,10 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<RedirectService>();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
             // configure error page handling and development IDE linking
-            if (env.IsDevelopment())
+            if (_isDevelopment)
             {
                 app.UseDeveloperExceptionPage();
             }
