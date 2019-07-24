@@ -67,15 +67,15 @@ namespace Ocuda.Promenade.Service
             return await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
         }
 
-        public async Task<LocationFeature> GetLocationFeatureByFeatureId(int locationId)
+        public async Task<LocationFeature> GetLocationFeatureByIds(int locationId, int featureId)
         {
-            return await _locationFeatureRepository.FindAsync(locationId);
+            return await _locationFeatureRepository.GetLocationFeaturesByIds(locationId,featureId);
         }
 
         public async Task<List<Feature>> GetLocationsFeaturesAsync(string locationStub)
         {
             var location = await GetLocationByStubAsync(locationStub);
-            var locationFeatures = await _locationFeatureRepository.GetLocationFeaturesById(location.Id);
+            var locationFeatures = await _locationFeatureRepository.GetLocationFeaturesByLocationId(location.Id);
             var features = new List<Feature>();
             foreach (var feature in locationFeatures)
             {

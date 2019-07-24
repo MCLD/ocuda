@@ -41,9 +41,10 @@ namespace Ocuda.Promenade.Controllers
             return View();
         }
 
-        [HttpGet("[action]")]
-        [HttpGet("[action]/{zip}")]
-        [HttpGet("[action]/{latitude}/{longitude}")]
+        [HttpGet("Locations")]
+        [HttpGet("Locations/[action]")]
+        [HttpGet("Locations/[action]/{zip}")]
+        [HttpGet("Locations/[action]/{latitude}/{longitude}")]
         public async Task<IActionResult> Find(double latitude = 0, double longitude = 0, string zip = null)
         {
             var viewModel = new Location();
@@ -65,13 +66,10 @@ namespace Ocuda.Promenade.Controllers
                         if (jsonResult.results.Count > 0)
                         {
                             var result = jsonResult.results[0];
-                            var newLat = result.geometry.location.lat;
-                            var newLong = result.geometry.location.lng;
+                            double newLat = result.geometry.location.lat;
+                            double newLong = result.geometry.location.lng;
 
-                            viewModel = LookupLocation(newLat, newLong);
-                            viewModel.FormattedAddress = result.formatted_address;
-
-                            return View("Locations", viewModel);
+                            return View("Locations", await LookupLocationAsync(newLat, newLong));
                         }
                         else
                         {
@@ -95,7 +93,7 @@ namespace Ocuda.Promenade.Controllers
             }
             else if (!latitude.Equals(0) && !longitude.Equals(0) && string.IsNullOrEmpty(zip))
             {
-                viewModel = LookupLocation(latitude, longitude);
+                viewModel = await LookupLocationAsync(latitude, longitude);
                 var latlng = $"{latitude},{longitude}";
 
                 // try to get the zip code to display to the user
@@ -162,13 +160,13 @@ namespace Ocuda.Promenade.Controllers
             else if (string.IsNullOrEmpty(featureStub))
             {
                 var locationViewModel = new LocationViewModel();
-                var locationFeatureViewModel = new List<LocationsFeaturesViewModel>();
+                locationViewModel.LocationFeatures = new List<LocationsFeaturesViewModel>();
                 locationViewModel.Location = await _locationService.GetLocationByStubAsync(locationStub);
                 var features = await _locationService.GetLocationsFeaturesAsync(locationStub);
 
                 foreach (var feature in features)
                 {
-                    var locationFeature = await _locationService.GetLocationFeatureByFeatureId(feature.Id);
+                    var locationFeature = await _locationService.GetLocationFeatureByIds(locationViewModel.Location.Id, feature.Id);
                     var locationfeatureModel = new LocationsFeaturesViewModel
                     {
                         BodyText = feature.BodyText,
@@ -179,11 +177,18 @@ namespace Ocuda.Promenade.Controllers
                         Stub = feature.Stub,
                         Text = locationFeature.Text
                     };
-                    locationFeatureViewModel.Add(locationfeatureModel);
+                    locationViewModel.LocationFeatures.Add(locationfeatureModel);
                 }
-                locationViewModel.LocationFeatures = locationFeatureViewModel;
-                locationViewModel.NearbyLocations = await _locationService.GetLocationsNeighborsAsync(locationStub);
-                locationViewModel.NearbyCount = locationViewModel.NearbyLocations.Count;
+                var neighbors = await _locationService.GetLocationsNeighborsAsync(locationStub);
+                if (neighbors.Any())
+                {
+                    locationViewModel.NearbyLocations = neighbors;
+                    locationViewModel.NearbyCount = locationViewModel.NearbyLocations.Count;
+                }
+                else
+                {
+                    locationViewModel.NearbyCount = 0;
+                }
                 return View("LocationDetails", locationViewModel);
             }
             else
@@ -192,32 +197,39 @@ namespace Ocuda.Promenade.Controllers
                 var locationFeatureViewModel = new List<LocationsFeaturesViewModel>();
 
                 locationViewModel.Location = await _locationService.GetLocationByStubAsync(locationStub);
-                var feature = (Feature)(await _locationService.GetLocationsFeaturesAsync(locationStub)).Where(_ => _.Stub == featureStub);
-                var locationFeature = await _locationService.GetLocationFeatureByFeatureId(feature.Id);
-
-                var locationfeatureModel = new LocationsFeaturesViewModel
+                var feature = (await _locationService.GetLocationsFeaturesAsync(locationStub)).SingleOrDefault(_ => _.Stub == featureStub);
+                if (feature != null)
                 {
-                    BodyText = feature.BodyText,
-                    FontAwesome = feature.FontAwesome,
-                    ImagePath = feature.ImagePath,
-                    Name = feature.Name,
-                    RedirectUrl = locationFeature.RedirectUrl,
-                    Stub = feature.Stub,
-                    Text = locationFeature.Text
-                };
+                    var locationFeature = await _locationService.GetLocationFeatureByIds(locationViewModel.Location.Id, feature.Id);
 
-                locationFeatureViewModel.Add(locationfeatureModel);
-                locationViewModel.LocationFeatures = locationFeatureViewModel;
+                    var locationfeatureModel = new LocationsFeaturesViewModel
+                    {
+                        BodyText = feature.BodyText,
+                        FontAwesome = feature.FontAwesome,
+                        ImagePath = feature.ImagePath,
+                        Name = feature.Name,
+                        RedirectUrl = locationFeature.RedirectUrl,
+                        Stub = feature.Stub,
+                        Text = locationFeature.Text
+                    };
 
-                return View("LocationFeatureDetails", locationViewModel);
+                    locationFeatureViewModel.Add(locationfeatureModel);
+                    locationViewModel.LocationFeatures = locationFeatureViewModel;
+
+                    return View("LocationFeatureDetails", locationViewModel);
+                }
+                else
+                {
+                    return await Locations(locationStub, "");
+                }
             }
         }
 
         [NonAction]
-        public static Location LookupLocation(double latitude, double longitude)
+        public async Task<Location> LookupLocationAsync(double latitude, double longitude)
         {
             var viewModel = new Location();
-            Location[] locations = { };
+            var locations = (await _locationService.GetAllLocationsAsync()).OrderBy(c => c.Name).ToList();
 
             foreach (var location in locations)
             {
@@ -225,7 +237,7 @@ namespace Ocuda.Promenade.Controllers
                     .Split(',')
                     .Select(_ => Convert.ToDouble(_)).ToList();
                 location.Distance = HaversineHelper
-                    .Calculate(geolocation[0], geolocation[1], latitude, longitude);
+                    .Calculate(geolocation[1], geolocation[0], latitude, longitude);
                 location.MapLink = $"https://maps.googleapis.com/maps/api/staticmap?center={latitude},{longitude}&zoom=12&maptype=roadmap&format=png&visual_refresh=true";
             }
             viewModel.CloseLocations = locations.OrderBy(_ => _.Distance).ToList();

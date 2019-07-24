@@ -34,30 +34,50 @@
         <p>@Model.Location.Description</p>
         <div>
             <div>
-                <a href="@Model.Location.EventLinkId" target="_blank">Browse Events</a>
+                <a href="@Model.Location.EventLink" target="_blank">Browse Events</a>
             </div>
             <div>
-                <a href="@Model.Location.SubscriptionLinkId" target="_blank">Send Me Events</a>
+                <a href="@Model.Location.SubscriptionLink" target="_blank">Send Me Events</a>
             </div>
         </div>
         <div class="row branch-features text-center">
             @foreach (var feature in Model.LocationFeatures)
             {
-                <text>
-                    <div class="col-xs-2">
-                            <a href="@feature.RedirectUrl" target="_blank">
+                @if (string.IsNullOrEmpty(feature.RedirectUrl))
+                {
+                    <text>
+                        <div class="col-xs-2">
+                            <a href="@Url.Action("Locations", "Home", new { locationStub = Model.Location.Stub, featureStub = feature.Stub })" target="_blank">
                                 <span class="fa-stack fa-2x" style="color:#007bff">
                                     <span class="fa fa-square fa-stack-2x"></span>
-                                    <span class="@feature.FontAwesome">
+                                    <span class="fa fa-inverse @feature.FontAwesome fa-stack-1x">
                                     </span>
                                 </span>
                             </a>
                             <div>
-                                <a class="bring-modal" href="@Url.Action("Find", "Home", new {locationStub=Model.Location.Stub,featureStub=feature.Stub})" data-toggle="modal" data-target="#featureModal" data-feature="@feature.Stub">@feature.Name</a>
+                                <a class="bring-modal" data-toggle="modal" data-target="#featureModal" href="@Url.Action("Locations", "Home", new { locationStub = Model.Location.Stub, featureStub = feature.Stub })" data-feature="@feature.Stub"> @feature.Name</a>
                             </div>
-                    </div>
+                        </div>
                     </text>
                 }
+                else
+                {
+                    <text>
+                        <div class="col-xs-2">
+                            <a href="@feature.RedirectUrl" target="_blank">
+                                <span class="fa-stack fa-2x" style="color:#007bff">
+                                    <span class="fa fa-square fa-stack-2x"></span>
+                                    <span class="fa fa-inverse @feature.FontAwesome fa-stack-1x">
+                                    </span>
+                                </span>
+                            </a>
+                            <div>
+                                <a href="@feature.RedirectUrl" data-feature="@feature.Stub"> @feature.Name</a>
+                            </div>
+                        </div>
+                    </text>
+                }
+            }
         </div>
         @if (Model.NearbyCount > 1)
         {
@@ -82,8 +102,8 @@
                                                 <a href="/Locations/@location.Stub">@location.Name</a>
                                             </td>
                                             <td>
-                                                <a href="@location.EventLinkId"><span class="fa fa-calendar"></span> Events</a>
-                                                <a href="@location.SubscriptionLinkId"><span class="fa fa-envelope-o"></span> Mailing List</a>
+                                                <a href="@location.EventLink"><span class="fa fa-calendar"></span> Events</a>
+                                                <a href="@location.SubscriptionLink"><span class="fa fa-envelope-o"></span> Mailing List</a>
                                             </td>
                                         </tr>
                                     </text>
@@ -92,7 +112,7 @@
                                 <tr>
                                     <td colspan="2">&nbsp;</td>
                                     <td>
-                                        <a href="/subscribe/?@foreach (var location in Model.NearbyLocations) {<text>list=@location.SubscriptionLinkId&</text> }" class="btn btn-default btn-sm" target="_blank">
+                                        <a href="/subscribe/?@foreach (var location in Model.NearbyLocations) {<text>list=@location.SubscriptionLink&</text> }" class="btn btn-default btn-sm" target="_blank">
                                             @if (Model.NearbyLocations.Count() > 1)
                                             {
                                                 <text><span class="fa fa-envelope-o"></span>Updates from all @Model.NearbyLocations.Count() locations</text>
@@ -162,6 +182,7 @@
                         $('#myInput').trigger('focus')
                     });
                 });
+            console.log(@Model.Location.GeoLocation);
         </script>
     }
 </body>

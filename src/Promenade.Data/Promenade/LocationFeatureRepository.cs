@@ -15,7 +15,15 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<List<LocationFeature>> GetLocationFeaturesById(int locationId)
+        public async Task<LocationFeature> GetLocationFeaturesByIds(int locationId,int featureId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.LocationId == locationId && 
+                (_.FeatureId == featureId))
+                .SingleOrDefaultAsync();
+        }
+        public async Task<List<LocationFeature>> GetLocationFeaturesByLocationId(int locationId)
         {
             return await DbSet
                 .AsNoTracking()

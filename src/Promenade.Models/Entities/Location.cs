@@ -44,10 +44,11 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string Facebook { get; set; }
 
-        public int? SubscriptionLinkId { get; set; }
+        [MaxLength(255)]
+        public string SubscriptionLink { get; set; }
 
-        [MaxLength(6)]
-        public string EventLinkId { get; set; }
+        [MaxLength(255)]
+        public string EventLink { get; set; }
 
         public string AdministrativeArea { get; set; }
 
@@ -55,6 +56,7 @@ namespace Ocuda.Promenade.Models.Entities
 
         public string State { get; set; }
 
+        [MaxLength(255)]
         public string GeoLocation { get; set; }
 
         public double Longitude { get; set; }
