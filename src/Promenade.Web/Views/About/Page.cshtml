@@ -1,3 +1,7 @@
-﻿@model string
+﻿@model Ocuda.Promenade.Controllers.ViewModels.Shared.PageViewModel
 
-@Html.Raw(Model)
+@section metadata {
+    <socialcard card="@Model.SocialCard"></socialcard>
+}
+
+@Html.Raw(Model.Content)

@@ -91,5 +91,8 @@ namespace Ocuda.Promenade.Models.Entities
 
         [NotMapped]
         public List<string> WeeklyHours { get; set; }
+
+        public int? SocialCardId { get; set; }
+        public SocialCard SocialCard { get; set; }
     }
 }

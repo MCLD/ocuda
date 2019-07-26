@@ -17,14 +17,9 @@ namespace Ocuda.Promenade.Data.Promenade
 
         public async Task<UrlRedirect> GetRedirectByPathAsync(string path)
         {
-            var pathWithoutEndingSlash = path.TrimEnd('/');
-            var pathWithEndingSlash = path + '/';
-
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.IsActive && 
-                    (_.RequestPath == pathWithoutEndingSlash 
-                        || _.RequestPath == pathWithEndingSlash))
+                .Where(_ => _.IsActive && _.RequestPath == path)
                 .SingleOrDefaultAsync();
         }
     }

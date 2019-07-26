@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -88,8 +89,15 @@ namespace Ocuda.Promenade.Web
             services.AddMvc()
                 .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_2);
 
+            services.Configure<RouteOptions>(_ =>
+            {
+                _.AppendTrailingSlash = true;
+                _.LowercaseUrls = true;
+            });
+
             // service facades
-            services.AddScoped<Data.ServiceFacade.Repository<PromenadeContext>>();
+            services.AddScoped(typeof(Controllers.ServiceFacades.Controller<>));
+            services.AddScoped(typeof(Data.ServiceFacade.Repository<>));
 
             // utilities
             services.AddScoped<IDateTimeProvider, CurrentDateTimeProvider>();
@@ -111,6 +119,10 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.LocationRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IPageRepository,
                 Data.Promenade.PageRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ISiteSettingRepository,
+                Data.Promenade.SiteSettingRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ISocialCardRepository,
+                Data.Promenade.SocialCardRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IUrlRedirectAccessRepository,
                 Data.Promenade.UrlRedirectAccessRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IUrlRedirectRepository,
@@ -120,6 +132,8 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<LocationService>();
             services.AddScoped<PageService>();
             services.AddScoped<RedirectService>();
+            services.AddScoped<SiteSettingService>();
+            services.AddScoped<SocialCardService>();
         }
 
         public void Configure(IApplicationBuilder app)

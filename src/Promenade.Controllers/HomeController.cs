@@ -19,7 +19,7 @@ namespace Ocuda.Promenade.Controllers
 {
     [Route("")]
 
-    public class HomeController : BaseController
+    public class HomeController : BaseController<HomeController>
     {
         public static readonly int DaysInAWeek = 7;
         private readonly IConfiguration _config;

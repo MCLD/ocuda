@@ -3,8 +3,8 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
-    public interface IPageRepository
+    public interface ISiteSettingRepository
     {
-        Task<Page> GetByStubAndTypeAsync(string stub, PageType type);
+        Task<SiteSetting> FindByKeyAsync(string key);
     }
 }

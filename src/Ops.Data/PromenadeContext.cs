@@ -34,6 +34,8 @@ namespace Ocuda.Ops.Data
         public DbSet<LocationFeature> LocationFeature { get; set; }
         public DbSet<LocationGroup> LocationGroup { get; set; }
         public DbSet<Page> Pages { get; set; }
+        public DbSet<SiteSetting> SiteSettings { get; set; }
+        public DbSet<SocialCard> SocialCards { get; set; }
         public DbSet<UrlRedirectAccess> UrlRedirectAccesses { get; set; }
         public DbSet<UrlRedirect> UrlRedirects { get; set; }
     }

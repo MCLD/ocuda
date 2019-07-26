@@ -11,15 +11,13 @@ using System.Threading.Tasks;
 namespace Ocuda.Promenade.Controllers
 {
     [Route("[controller]")]
-    public class ErrorController : BaseController
+    public class ErrorController : BaseController<ErrorController>
     {
-        private readonly ILogger<ErrorController> _logger;
         private readonly RedirectService _redirectService;
 
-        public ErrorController(ILogger<ErrorController> logger,
-            RedirectService redirectService)
+        public ErrorController(ServiceFacades.Controller<ErrorController> context,
+            RedirectService redirectService) : base(context)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _redirectService = redirectService
                 ?? throw new ArgumentNullException(nameof(redirectService));
         }
