@@ -25,7 +25,7 @@
     @RenderSection("Styles", required: false)
 </head>
 <body>
-    <div class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-dark">
+    <div class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-dark oc-navbar">
         @{
             var navigationRows = (List<NavigationRow>)Context.Items[ItemKey.NavColumn];
             if (navigationRows?.Count > 0)
@@ -35,7 +35,7 @@
                 </a>
             }
         }
-        <a class="navbar-brand" asp-area="" asp-route-section="" asp-controller="Home" asp-action="@(nameof(HomeController.Index))">
+        <a class="navbar-brand oc-navbrand" asp-area="" asp-route-section="" asp-controller="Home" asp-action="@(nameof(HomeController.Index))">
             <span class="fa fa-home"></span>
             <span class="font-weight-light">Home</span>
         </a>
