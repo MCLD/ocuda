@@ -17,5 +17,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels
         public int NearbyCount { get; set; }
 
         public Group LocationNeighborGroup { get; set; }
+
+        public bool LocationSearchable { get; set; }
     }
 }

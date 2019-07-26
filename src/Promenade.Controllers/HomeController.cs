@@ -48,15 +48,18 @@ namespace Ocuda.Promenade.Controllers
         [HttpGet("Locations/[action]/{latitude}/{longitude}")]
         public async Task<IActionResult> Find(double latitude = 0, double longitude = 0, string zip = null)
         {
-            var viewModel = new Location();
 
             if (!string.IsNullOrWhiteSpace(zip) && (latitude.Equals(0) && longitude.Equals(0)))
             {
+                var viewModel = new LocationViewModel();
+                viewModel.LocationSearchable = true;
+                var location = new Location();
+
                 using (var client = new HttpClient())
                 {
                     try
                     {
-                        var apikey = _config[Ocuda.Utility.Keys.Configuration.PromAPIGoogleMaps];
+                        var apikey = _config[Utility.Keys.Configuration.PromAPIGoogleMaps];
 
                         var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?address={zip}&key={apikey}");
                         response.EnsureSuccessStatusCode();
@@ -82,6 +85,7 @@ namespace Ocuda.Promenade.Controllers
                     {
                         _logger.LogCritical(ex, $"Google API error: {ex.Message}");
                         TempData["AlertDanger"] = "An error occured, please try again later.";
+                        viewModel.LocationSearchable = false;
                     }
                     catch (Exception ex)
                     {
@@ -89,12 +93,13 @@ namespace Ocuda.Promenade.Controllers
                         TempData["AlertDanger"] = "An error occured, please try again later.";
                     }
                 }
-                viewModel.CloseLocations = (await _locationService.GetAllLocationsAsync()).OrderBy(c => c.Name).ToList();
+                location.CloseLocations = (await _locationService.GetAllLocationsAsync()).OrderBy(c => c.Name).ToList();
+                viewModel.Location = location;
                 return View("Locations", viewModel);
             }
             else if (!latitude.Equals(0) && !longitude.Equals(0) && string.IsNullOrEmpty(zip))
             {
-                viewModel = await LookupLocationAsync(latitude, longitude);
+                var viewModel = await LookupLocationAsync(latitude, longitude);
                 var latlng = $"{latitude},{longitude}";
 
                 // try to get the zip code to display to the user
@@ -143,10 +148,37 @@ namespace Ocuda.Promenade.Controllers
             }
             else
             {
-                return View("Locations", new Location
+                var location = new Location
                 {
                     CloseLocations = (await _locationService.GetAllLocationsAsync()).OrderBy(c => c.Name).ToList()
-                });
+                };
+                var viewModel = new LocationViewModel
+                {
+                    Location = location,
+                    LocationSearchable = true
+                };
+
+                using (var client = new HttpClient())
+                {
+                    try
+                    {
+                        var apikey = _config[Utility.Keys.Configuration.PromAPIGoogleMaps];
+
+                        var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?address={zip}&key={apikey}");
+                        response.EnsureSuccessStatusCode();
+
+                        var stringResult = await response.Content.ReadAsStringAsync();
+                        dynamic jsonResult = JsonConvert.DeserializeObject(stringResult);
+                    }
+                    catch (HttpRequestException ex)
+                    {
+                        _logger.LogCritical(ex, $"Google API error: {ex.Message}");
+                        TempData["AlertDanger"] = "An error occured, please try again later.";
+                        viewModel.LocationSearchable = false;
+                    }
+                }
+
+                return View("Locations", viewModel);
             }
         }
 
@@ -195,6 +227,7 @@ namespace Ocuda.Promenade.Controllers
                 {
                     locationViewModel.NearbyCount = 0;
                 }
+
                 return View("LocationDetails", locationViewModel);
             }
             else
