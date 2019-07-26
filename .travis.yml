@@ -12,7 +12,7 @@ services:
   - docker
 
 env:
-  - TCI_DOCKERFILE=Dockerfile_ops
-  - TCI_DOCKERFILE=Dockerfile_promenade
+  - TRAVISCI_DOCKERFILE=Dockerfile_ops
+  - TRAVISCI_DOCKERFILE=Dockerfile_promenade
 
-script: env BLD_DOCKERFILE="$TCI_DOCKERFILE" bash docker-build.bash
+script: env BLD_DOCKERFILE=$TRAVISCI_DOCKERFILE bash docker-build.bash

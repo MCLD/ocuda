@@ -9,11 +9,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
-		.gitlab-ci.yml = .gitlab-ci.yml
 		.travis.yml = .travis.yml
 		CHANGELOG.md = CHANGELOG.md
 		contributing.json = contributing.json
-		docker-build-ops.bash = docker-build-ops.bash
+		docker-build.bash = docker-build.bash
 		Dockerfile_ops = Dockerfile_ops
 		Dockerfile_promenade = Dockerfile_promenade
 		LICENSE = LICENSE
@@ -70,7 +69,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{EF2E402F-3
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ops", "Ops", "{3138C719-1208-42FE-8D35-B79DA1529219}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ops.Service.Test", "test\Ops\Ops.Service.Test\Ops.Service.Test.csproj", "{9A2D25BC-18E7-4B3E-91E0-1CAB9BC3DEC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ops.Data.Test", "test\Ops\Ops.Data.Test\Ops.Data.Test.csproj", "{2D056120-3B32-4188-99FA-6603FD7A7C8A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -138,10 +137,10 @@ Global
 		{67BDF627-A148-4058-936C-859BFED5EF76}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67BDF627-A148-4058-936C-859BFED5EF76}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67BDF627-A148-4058-936C-859BFED5EF76}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9A2D25BC-18E7-4B3E-91E0-1CAB9BC3DEC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9A2D25BC-18E7-4B3E-91E0-1CAB9BC3DEC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9A2D25BC-18E7-4B3E-91E0-1CAB9BC3DEC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9A2D25BC-18E7-4B3E-91E0-1CAB9BC3DEC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D056120-3B32-4188-99FA-6603FD7A7C8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D056120-3B32-4188-99FA-6603FD7A7C8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D056120-3B32-4188-99FA-6603FD7A7C8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D056120-3B32-4188-99FA-6603FD7A7C8A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -164,7 +163,7 @@ Global
 		{CA08B556-6562-42AB-9568-B27BE3A43D7C} = {53256F5C-24FD-48B1-9419-14FBC4C45348}
 		{67BDF627-A148-4058-936C-859BFED5EF76} = {F9D2666E-86C4-4620-B1F8-9AC018E4C8F4}
 		{3138C719-1208-42FE-8D35-B79DA1529219} = {EF2E402F-3D9C-4EAD-93A2-68D759A003A7}
-		{9A2D25BC-18E7-4B3E-91E0-1CAB9BC3DEC5} = {3138C719-1208-42FE-8D35-B79DA1529219}
+		{2D056120-3B32-4188-99FA-6603FD7A7C8A} = {3138C719-1208-42FE-8D35-B79DA1529219}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E2592F73-781B-49DC-8020-540473F814F7}
