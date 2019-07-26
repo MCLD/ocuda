@@ -7,7 +7,7 @@ namespace Ocuda.Promenade.Data.Promenade
     public class GroupRepository : GenericRepository<Group, int>, IGroupRepository
     {
         public GroupRepository(PromenadeContext context,
-            ILogger<FeatureRepository> logger) : base(context, logger)
+            ILogger<GroupRepository> logger) : base(context, logger)
         {
         }
     }
