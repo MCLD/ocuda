@@ -11,4 +11,8 @@ git:
 services:
   - docker
 
-script: bash docker-build-ops.bash
+env:
+  - TCI_DOCKERFILE=Dockerfile_ops
+  - TCI_DOCKERFILE=Dockerfile_promenade
+
+script: env BLD_DOCKERFILE="$TCI_DOCKERFILE" bash docker-build.bash
