@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Promenade.Controllers.ViewModels
 {
@@ -25,5 +26,8 @@ namespace Ocuda.Promenade.Controllers.ViewModels
 
         [MaxLength(255)]
         public string RedirectUrl { get; set; }
+
+        [NotMapped]
+        public string InnerSpan { get; set; }
     }
 }

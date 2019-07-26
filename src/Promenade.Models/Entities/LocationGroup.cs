@@ -10,5 +10,7 @@ namespace Ocuda.Promenade.Models.Entities
         public int LocationId { get; set; }
 
         public int GroupId { get; set; }
+
+        public bool HasSubscription { get; set; }
     }
 }

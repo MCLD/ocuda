@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Security;
 using System.Threading.Tasks;
 using BranchLocator.Helpers;
 using BranchLocator.Models;
@@ -164,22 +165,27 @@ namespace Ocuda.Promenade.Controllers
                 locationViewModel.Location = await _locationService.GetLocationByStubAsync(locationStub);
                 var features = await _locationService.GetLocationsFeaturesAsync(locationStub);
 
-                foreach (var feature in features)
+                foreach (var feature in features.OrderBy(_ => _.Name).ToList())
                 {
                     var locationFeature = await _locationService.GetLocationFeatureByIds(locationViewModel.Location.Id, feature.Id);
                     var locationfeatureModel = new LocationsFeaturesViewModel
                     {
-                        BodyText = feature.BodyText,
+                        BodyText = CommonMark.CommonMarkConverter.Convert(feature.BodyText),
                         FontAwesome = feature.FontAwesome,
                         ImagePath = feature.ImagePath,
                         Name = feature.Name,
                         RedirectUrl = locationFeature.RedirectUrl,
                         Stub = feature.Stub,
-                        Text = locationFeature.Text
+                        Text = CommonMark.CommonMarkConverter.Convert(locationFeature.Text)
                     };
+                    if (!feature.FontAwesome.Contains("fa-inverse"))
+                    {
+                        locationfeatureModel.InnerSpan = "<strong>7</strong>";
+                    }
                     locationViewModel.LocationFeatures.Add(locationfeatureModel);
                 }
                 var neighbors = await _locationService.GetLocationsNeighborsAsync(locationStub);
+                locationViewModel.LocationNeighborGroup = await _locationService.GetLocationsNeighborGroup(locationStub);
                 if (neighbors.Any())
                 {
                     locationViewModel.NearbyLocations = neighbors;
@@ -204,13 +210,13 @@ namespace Ocuda.Promenade.Controllers
 
                     var locationfeatureModel = new LocationsFeaturesViewModel
                     {
-                        BodyText = feature.BodyText,
+                        BodyText = CommonMark.CommonMarkConverter.Convert(feature.BodyText),
                         FontAwesome = feature.FontAwesome,
                         ImagePath = feature.ImagePath,
                         Name = feature.Name,
                         RedirectUrl = locationFeature.RedirectUrl,
                         Stub = feature.Stub,
-                        Text = locationFeature.Text
+                        Text = CommonMark.CommonMarkConverter.Convert(locationFeature.Text)
                     };
 
                     locationFeatureViewModel.Add(locationfeatureModel);

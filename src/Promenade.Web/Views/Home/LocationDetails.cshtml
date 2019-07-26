@@ -47,10 +47,15 @@
                 {
                     <text>
                         <div class="col-xs-2">
-                            <a href="@Url.Action("Locations", "Home", new { locationStub = Model.Location.Stub, featureStub = feature.Stub })" target="_blank">
+                            <a href="@Url.Action("Locations", "Home", new { locationStub = Model.Location.Stub, featureStub = feature.Stub })" class="bring-modal" data-toggle="modal" data-target="#featureModal" target="_blank" data-feature="@feature.Stub">
                                 <span class="fa-stack fa-2x" style="color:#007bff">
                                     <span class="fa fa-square fa-stack-2x"></span>
-                                    <span class="fa fa-inverse @feature.FontAwesome fa-stack-1x">
+                                    <span class="@feature.FontAwesome" @if (!string.IsNullOrEmpty(feature.InnerSpan)) { @:style="color:white"
+                                        }>
+                                        @if (!string.IsNullOrEmpty(feature.InnerSpan))
+                                        {
+                                            @Html.Raw(feature.InnerSpan.ToString());
+                                        }
                                     </span>
                                 </span>
                             </a>
@@ -67,12 +72,12 @@
                             <a href="@feature.RedirectUrl" target="_blank">
                                 <span class="fa-stack fa-2x" style="color:#007bff">
                                     <span class="fa fa-square fa-stack-2x"></span>
-                                    <span class="fa fa-inverse @feature.FontAwesome fa-stack-1x">
+                                    <span class="@feature.FontAwesome">
                                     </span>
                                 </span>
                             </a>
                             <div>
-                                <a href="@feature.RedirectUrl" data-feature="@feature.Stub"> @feature.Name</a>
+                                <a href=@feature.RedirectUrl data-feature="@feature.Stub" target="_blank"> @feature.Name</a>
                             </div>
                         </div>
                     </text>
@@ -112,15 +117,8 @@
                                 <tr>
                                     <td colspan="2">&nbsp;</td>
                                     <td>
-                                        <a href="/subscribe/?@foreach (var location in Model.NearbyLocations) {<text>list=@location.SubscriptionLink&</text> }" class="btn btn-default btn-sm" target="_blank">
-                                            @if (Model.NearbyLocations.Count() > 1)
-                                            {
+                                        <a href="@Model.LocationNeighborGroup.SubscriptionUrl" class="btn btn-default btn-sm" target="_blank">
                                                 <text><span class="fa fa-envelope-o"></span>Updates from all @Model.NearbyLocations.Count() locations</text>
-                                            }
-                                            else
-                                            {
-                                                <text><span class="fa fa-envelope-o"></span>Updates from the location</text>
-                                            }
                                         </a>
                                     </td>
 
@@ -148,13 +146,13 @@
                 </div>
                 <div class="modal-body">
                     <div>
-                        <p id="modal-body">
-                        </p>
+                        <div id="modal-body">
+                        </div>
                     </div>
                     <div>
-                        <p id="modal-text">
+                        <div id="modal-text">
 
-                        </p>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -171,18 +169,19 @@
                         <text>
                         if ("@feature.Stub" == $(this).data("feature"))
                         {
-                            $("#modalTitle").text("@feature.Name");
-                            $("#modal-body").text("@feature.BodyText");
-                            $("#modal-text").text("@feature.Text");
-                        }
+                            $("#modalTitle").text("@Html.Raw(feature.Name)");
+
+
+                            $("#modal-body").html($("#modal-body").html("@feature.BodyText").text());
+                            $("#modal-text").html($("#modal-text").html("@feature.Text").text());
+                    }
+                    console.log("@feature.BodyText");
                         </text>
                     }
-
                     $('#featureModal').on('shown.bs.modal', function () {
                         $('#myInput').trigger('focus')
                     });
                 });
-            console.log(@Model.Location.GeoLocation);
         </script>
     }
 </body>

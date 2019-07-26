@@ -95,13 +95,28 @@ namespace Ocuda.Promenade.Service
                     var locationIds = await _locationGroupRepository.GetLocationsByGroupIdAsync(locationGroup.GroupId);
                     foreach (var location in locationIds)
                     {
-                        locations.Add(await _locationRepository.FindAsync(location.LocationId));
+                        if (location.HasSubscription)
+                        {
+                            locations.Add(await _locationRepository.FindAsync(location.LocationId));
+                        }
                     }
                 }
             }
             return locations;
         }
-
+        public async Task<Group> GetLocationsNeighborGroup(string locationStub)
+        {
+            var locationGroups = await _locationGroupRepository.GetGroupByLocationIdAsync((await GetLocationByStubAsync(locationStub)).Id);
+            foreach (var locationGroup in locationGroups)
+            {
+                var group = await _groupRepository.FindAsync(locationGroup.GroupId);
+                if (group.IsLocationRegion)
+                {
+                    return group;
+                }
+            }
+            return null;
+        }
         public async Task<List<string>> GetFormattedWeeklyHoursAsync(int locationId)
         {
             var weeklyHours = await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
