@@ -9,7 +9,8 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 
 namespace Ocuda.Promenade.Data.Promenade
 {
-    public class LocationHoursOverrideRepository : GenericRepository<LocationHoursOverride, int>, ILocationHoursOverrideRepository
+    public class LocationHoursOverrideRepository
+        : GenericRepository<LocationHoursOverride, int>, ILocationHoursOverrideRepository
     {
         public LocationHoursOverrideRepository(PromenadeContext context,
             ILogger<LocationHoursOverrideRepository> logger) : base(context, logger)
@@ -20,7 +21,7 @@ namespace Ocuda.Promenade.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Date.Date == date.Date 
+                .Where(_ => _.Date.Date == date.Date
                     && (_.LocationId == locationId || !_.LocationId.HasValue))
                 .SingleOrDefaultAsync();
         }
@@ -31,7 +32,7 @@ namespace Ocuda.Promenade.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Date >= startDate.Date && _.Date <= endDate
+                .Where(_ => _.Date.Date >= startDate.Date && _.Date.Date <= endDate.Date
                     && (_.LocationId == locationId || !_.LocationId.HasValue))
                 .ToListAsync();
         }

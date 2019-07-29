@@ -1,19 +1,20 @@
-﻿@model Ocuda.Promenade.Models.Entities.Location
+﻿@model Ocuda.Promenade.Controllers.ViewModels.LocationViewModel
 @{
     ViewData["Title"] = "Locations";
 }
-    <body>
-        <h1>Find A Library</h1>
-        <h2>Find your closest Location by entering your address or zip code:</h2>
-        <div class="body-content">
-
+<body>
+    <h1>Find A Library</h1>
+    <div class="body-content">
+        @if (Model.LocationSearchable)
+        {
+            <h2>Find your closest Location by entering your zip code:</h2>
             <div class="row">
                 <div class="col-xs-12" style="padding-bottom: 1rem;">
                     <form asp-action="Index" method="get" role="form" id="AddressForm">
 
                         <div class="input-group">
-                            <input asp-for="Zip"
-                                   placeholder="Enter your address or zip code"
+                            <input asp-for="Location.Zip"
+                                   placeholder="Enter your zip code"
                                    class="form-control default-text"
                                    id="LocatorAddress" />
                             <span class="input-group-btn">
@@ -25,10 +26,10 @@
                             </span>
                         </div>
                     </form>
-                    <div class="col-xs-12 @if (Model?.ShowLocation != true) {<text>hidden</text> }" style="padding-bottom: 1rem;">
+                    <div class="col-xs-12 @if (Model?.Location.ShowLocation != true) {<text>hidden</text> }" style="padding-bottom: 1rem;">
                         <form asp-action="Location" method="get" role="form" id="GeoForm">
-                            <input asp-for="Latitude" id="Latitude" hidden />
-                            <input asp-for="Longitude" id="Longitude" hidden />
+                            <input asp-for="Location.Latitude" id="Latitude" hidden />
+                            <input asp-for="Location.Longitude" id="Longitude" hidden />
                             <button type="button"
                                     class="btn btn-default btn-block"
                                     id="GeoButton"
@@ -39,74 +40,81 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                @if (Model?.CloseLocations?.Count > 0)
+        }
+        <div class="row">
+            @if (Model?.Location.CloseLocations?.Count > 0)
+            {
+                @foreach (var closeLocation in Model.Location.CloseLocations)
                 {
-                    @foreach(var closeLocation in Model.CloseLocations)
-                    {
-                        <text>
-                            <div class="col-xs-12 col-sm-4 space-above">
-                                <div class="border center-block">
-                                    <div class="@(closeLocation.Open ? "traffic-green" : "traffic-red")" style="border-bottom:5px solid; width: 100%;">
-                                        <a href="@closeLocation.MapLink" target="_blank">
-                                            <img src="@closeLocation.MapLink" style="width:220px;" />
-                                        </a>
-                                    </div>
-                                    <div class="branch-container">
-                                        <div style="padding: 10px;">
-                                            <table class="locator-branch-info">
-                                                <tbody>
-                                                    <tr>
-                                                        <td style="padding-bottom:10px;">
-                                                            <strong style="font-size: 17.5px;">
+                    <text>
+                        <div class="col-xs-12 col-sm-4 space-above">
+                            <div class="border center-block">
+                                <div class="@(closeLocation.Open ? "traffic-green" : "traffic-red")" style="border-bottom:5px solid; width: 100%;">
+                                    <a href="@closeLocation.MapLink" target="_blank">
+                                        <img src="@closeLocation.MapLink" style="width:220px;" />
+                                    </a>
+                                </div>
+                                <div class="branch-container">
+                                    <div style="padding: 10px;">
+                                        <table class="locator-branch-info">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="padding-bottom:10px;">
+                                                        <strong style="font-size: 17.5px;">
+                                                            <a href="@Url.Action("Locations", "Home", new { locationStub = closeLocation.Stub })" target="_blank">
                                                                 @closeLocation.Name
-                                                            </strong> <em style="font-size:12px;">@if (closeLocation.Distance != 0){<text>(@closeLocation.Distance mi.)</text>}</em>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="padding-bottom:10px;font-size:13px;">
-                                                            @closeLocation.Address<br>
-                                                            @closeLocation.City  @closeLocation.State, @closeLocation.Zip
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="padding-bottom:10px;">
-                                                            <strong class="traffic-green">Open until 5:00 PM</strong>
-                                                        </td>
-                                                    </tr>
-                                                    <tr style="text-align: left;">
-                                                        <td style="padding: 5px 0;">
-                                                            <a href="Locations/@closeLocation.Stub" target="_blank" class="btn btn-default">Library Info</a>
-                                                            <a href="@closeLocation.EventLinkId" class="btn btn-default" style="float:right" target="_blank">Events</a>
-                                                        </td>
+                                                            </a>
+                                                        </strong> <em style="font-size:12px;">
+                                                            @if (closeLocation.Distance != 0)
+                                                            {<text>(@closeLocation.Distance mi.)</text>}
+                                                        </em>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-bottom:10px;font-size:13px;">
+                                                        @closeLocation.Address<br>
+                                                        @closeLocation.City  @closeLocation.State, @closeLocation.Zip
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-bottom:10px;">
+                                                        <strong class="traffic-green">Open until 5:00 PM</strong>
+                                                    </td>
+                                                </tr>
+                                                <tr style="text-align: left;">
+                                                    <td style="padding: 5px 0;">
+                                                        <form action="@closeLocation.EventLink" target="_blank">
+                                                            <button type="submit" class="btn btn-default" style="float:right">Events</button>
+                                                        </form>
+                                                    </td>
 
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
+                        </div>
                         </text>
                     }
-                }
-                else
-                {
-                    <script>
-                        var noResults = true;
-                    </script>
-                }
-            </div>
+            }
+            else
+            {
+                <script>
+                    var noResults = true;
+                </script>
+            }
         </div>
-        @section scripts {
-            <script>
+    </div>
+    @section scripts {
+        <script>
         var useMyLocation = 'Use my location';
 
         $().ready(function () {
             if (location.protocol != 'https:' && location.hostname != 'localhost') {
                 location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
             }
-            if ("@Model.ShowLocation" != "@false") {
+            if ("@Model.Location.ShowLocation" != "@false") {
                 $('#GeoButton').html(useMyLocation);
                 $('#GeoButton').show();
             }
@@ -153,6 +161,6 @@
                 $('#AddressForm').attr('action','@Url.Action("Find", "Home")').submit();
             }
         });
-            </script>
-        }
-    </body>
+        </script>
+    }
+</body>

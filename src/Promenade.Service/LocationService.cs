@@ -18,27 +18,184 @@ namespace Ocuda.Promenade.Service
         private const int DaysInWeek = 7;
 
         private readonly ILocationHoursRepository _locationHoursRepository;
+        private readonly ILocationRepository _locationRepository;
+        private readonly ILocationGroupRepository _locationGroupRepository;
+        private readonly IGroupRepository _groupRepository;
+        private readonly ILocationFeatureRepository _locationFeatureRepository;
+        private readonly IFeatureRepository _featureRepository;
         private readonly ILocationHoursOverrideRepository _locationHoursOverrideRepository;
 
         public LocationService(ILogger<LocationService> logger,
             IDateTimeProvider dateTimeProvider,
+            ILocationRepository locationRepository,
+            ILocationGroupRepository locationGroupRepository,
+            IFeatureRepository featureRepository,
+            IGroupRepository groupRepository,
+            ILocationFeatureRepository locationFeatureRepository,
             ILocationHoursRepository locationHoursRepository,
             ILocationHoursOverrideRepository locationHoursOverrideRepository)
             : base(logger, dateTimeProvider)
         {
+            _locationRepository = locationRepository
+                ?? throw new ArgumentNullException(nameof(locationRepository));
+            _locationGroupRepository = locationGroupRepository
+                ?? throw new ArgumentNullException(nameof(locationGroupRepository));
+            _featureRepository = featureRepository
+                ?? throw new ArgumentNullException(nameof(featureRepository));
+            _groupRepository = groupRepository
+                ?? throw new ArgumentNullException(nameof(groupRepository));
+            _locationFeatureRepository = locationFeatureRepository
+                ?? throw new ArgumentNullException(nameof(locationFeatureRepository));
             _locationHoursRepository = locationHoursRepository
                 ?? throw new ArgumentNullException(nameof(locationHoursRepository));
             _locationHoursOverrideRepository = locationHoursOverrideRepository
                 ?? throw new ArgumentNullException(nameof(locationHoursOverrideRepository));
         }
 
-        public async Task<ICollection<LocationHours>> GetWeeklyHoursAsync(int locationId)
+        public async Task<Location> GetLocationByStubAsync(string stub)
         {
-            return await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
+            return await _locationRepository.GetLocationByStub(stub);
+        }
+
+        public async Task<List<Location>> GetAllLocationsAsync()
+        {
+            return await _locationRepository.GetAllLocations();
+        }
+
+        public async Task<ICollection<LocationHoursResult>> GetWeeklyHoursAsync(int locationId)
+        {
+            var results = new List<LocationHoursResult>();
+
+            var location = await _locationRepository.FindAsync(locationId);
+
+            if (location.IsAlwaysOpen)
+            {
+                for (int day  = 0; day < DaysInWeek; day++)
+                {
+                    results.Add(new LocationHoursResult
+                    {
+                        Open = true,
+                        DayOfWeek = (DayOfWeek)day,
+                        IsCurrentlyOpen = true
+                    });
+                }
+            }
+            else
+            {
+                // Add override days
+                var now = DateTime.Now;
+                var firstDayOfWeek = now.AddDays(-(int)now.DayOfWeek);
+                var lastDayOfWeek = firstDayOfWeek.AddDays(DaysInWeek - 1);
+
+                var overrides = await _locationHoursOverrideRepository.GetBetweenDatesAsync(
+                    locationId, firstDayOfWeek, lastDayOfWeek);
+
+                foreach(var dayOverride in overrides)
+                {
+                    results.Add(new LocationHoursResult
+                    {
+                        OpenTime = dayOverride.OpenTime,
+                        CloseTime = dayOverride.CloseTime,
+                        Open = dayOverride.Open,
+                        DayOfWeek = dayOverride.Date.DayOfWeek,
+                        IsOverride = true
+                    });
+                }
+
+                // Fill in non-override days
+                if (results.Count < DaysInWeek)
+                {
+                    var weeklyHours = await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
+
+                    var remainingDays = weeklyHours
+                        .Where(_ => !results.Select(r => r.DayOfWeek).Contains(_.DayOfWeek));
+
+                    foreach (var day in remainingDays)
+                    {
+                        results.Add(new LocationHoursResult
+                        {
+                            OpenTime = day.OpenTime,
+                            CloseTime = day.CloseTime,
+                            Open = day.Open,
+                            DayOfWeek = day.DayOfWeek
+                        });
+                    }
+                }
+
+                // Set currently open
+                foreach (var dayResult in results)
+                {
+                    if (dayResult.Open && dayResult.OpenTime <= now && dayResult.CloseTime >= now)
+                    {
+                        dayResult.IsCurrentlyOpen = true;
+                    }
+                }
+
+                results = results.OrderBy(_ => _.DayOfWeek).ToList();
+            }
+
+            return results;
+        }
+
+        public async Task<LocationFeature> GetLocationFeatureByIds(int locationId, int featureId)
+        {
+            return await _locationFeatureRepository.GetLocationFeaturesByIds(locationId,featureId);
+        }
+
+        public async Task<List<Feature>> GetLocationsFeaturesAsync(string locationStub)
+        {
+            var location = await GetLocationByStubAsync(locationStub);
+            var locationFeatures = await _locationFeatureRepository.GetLocationFeaturesByLocationId(location.Id);
+            var features = new List<Feature>();
+            foreach (var feature in locationFeatures)
+            {
+                features.Add(await _featureRepository.FindAsync(feature.FeatureId));
+            }
+            return features;
+        }
+
+        public async Task<List<Location>> GetLocationsNeighborsAsync(string locationStub)
+        {
+            var locationGroups = await _locationGroupRepository.GetGroupByLocationIdAsync((await GetLocationByStubAsync(locationStub)).Id);
+            var locations = new List<Location>();
+            foreach (var locationGroup in locationGroups)
+            {
+                if ((await _groupRepository.FindAsync(locationGroup.GroupId)).IsLocationRegion)
+                {
+                    var locationIds = await _locationGroupRepository.GetLocationsByGroupIdAsync(locationGroup.GroupId);
+                    foreach (var location in locationIds)
+                    {
+                        if (location.HasSubscription)
+                        {
+                            locations.Add(await _locationRepository.FindAsync(location.LocationId));
+                        }
+                    }
+                }
+            }
+            return locations;
+        }
+        public async Task<Group> GetLocationsNeighborGroup(string locationStub)
+        {
+            var locationGroups = await _locationGroupRepository.GetGroupByLocationIdAsync((await GetLocationByStubAsync(locationStub)).Id);
+            foreach (var locationGroup in locationGroups)
+            {
+                var group = await _groupRepository.FindAsync(locationGroup.GroupId);
+                if (group.IsLocationRegion)
+                {
+                    return group;
+                }
+            }
+            return null;
         }
 
         public async Task<List<string>> GetFormattedWeeklyHoursAsync(int locationId)
         {
+            var location = await _locationRepository.FindAsync(locationId);
+            if (location.IsAlwaysOpen)
+            {
+                return null;
+            }
+
             var weeklyHours = await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
             // Order weeklyHours to start on Monday
             weeklyHours = weeklyHours.OrderBy(_ => ((int)_.DayOfWeek + 1) % 8).ToList();
@@ -49,11 +206,11 @@ namespace Ocuda.Promenade.Service
             {
                 if (day.Open)
                 {
-                    var lastDayGrouping = dayGroupings.LastOrDefault();
-                    if (dayGroupings.Count > 0 && lastDayGrouping.OpenTime == day.OpenTime 
-                        && lastDayGrouping.CloseTime == day.CloseTime)
+                    var (DaysOfWeek, OpenTime, CloseTime) = dayGroupings.LastOrDefault();
+                    if (dayGroupings.Count > 0 && OpenTime == day.OpenTime
+                        && CloseTime == day.CloseTime)
                     {
-                        lastDayGrouping.DaysOfWeek.Add(day.DayOfWeek);
+                        DaysOfWeek.Add(day.DayOfWeek);
                     }
                     else
                     {
@@ -88,7 +245,7 @@ namespace Ocuda.Promenade.Service
                 }
                 closeTime.Append(grouping.CloseTime.ToString(" tt").ToLower());
 
-                formattedDayGroupings.Add($"{days} {openTime.ToString()} \u2014 {closeTime.ToString()}");
+                formattedDayGroupings.Add($"{days} {openTime} \u2014 {closeTime}");
             }
 
             if (closedDays.Count > 0)
@@ -105,11 +262,11 @@ namespace Ocuda.Promenade.Service
             var dayFormatter = new DateTimeFormatInfo();
             if (days.Count == 1)
             {
-                return dayFormatter.GetAbbreviatedDayName(days.First());
+                return dayFormatter.GetAbbreviatedDayName(days[0]);
             }
             else
             {
-                var firstDay = days.First();
+                var firstDay = days[0];
                 var lastDay = days.Last();
 
                 if (days.Count == lastDay - firstDay + 1)
@@ -129,6 +286,18 @@ namespace Ocuda.Promenade.Service
 
         public async Task<LocationHoursResult> GetCurrentStatusAsync(int locationId)
         {
+            var location = await _locationRepository.FindAsync(locationId);
+
+            if (location.IsAlwaysOpen)
+            {
+                return new LocationHoursResult
+                {
+                    Open = true,
+                    IsCurrentlyOpen = true,
+                    StatusMessage = "Open"
+                };
+            }
+
             var now = _dateTimeProvider.Now;
 
             var result = new LocationHoursResult();
@@ -211,7 +380,7 @@ namespace Ocuda.Promenade.Service
                 if (nextOpen != null)
                 {
                     var nextDay = "";
-                    var blah = now.DayOfWeek + 10;
+
                     if ((int)nextOpen.DayOfWeek == ((int)now.DayOfWeek + 1) % DaysInWeek)
                     {
                         nextDay = "tomorrow";

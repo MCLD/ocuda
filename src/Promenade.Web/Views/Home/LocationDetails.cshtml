@@ -25,144 +25,176 @@
                         </p>
                     </td>
                     <td class="hours">
-                        <strong>Mon. - Sun.</strong> Closed<br />
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <h2>Information</h2>
-        <p>@Model.Location.Description</p>
-        <div>
+                        @if (Model.Location.IsAlwaysOpen)
+                        {
+                        <td>Open</td>
+                        }
+                        else
+                        {
+                            @foreach (var time in Model.Location.LocationHours)
+                            {
+                                <text>
+                                    <p>@time</p><br />
+                                </text>
+                            }
+                        }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <h2>Information</h2>
+            <p>@Model.Location.Description</p>
             <div>
-                <a href="@Model.Location.EventLinkId" target="_blank">Browse Events</a>
+                <div>
+                    <a href="@Model.Location.EventLink" target="_blank">Browse Events</a>
+                </div>
+                <div>
+                    <a href="@Model.Location.SubscriptionLink" target="_blank">Send Me Events</a>
+                </div>
             </div>
-            <div>
-                <a href="@Model.Location.SubscriptionLinkId" target="_blank">Send Me Events</a>
-            </div>
-        </div>
-        <div class="row branch-features text-center">
-            @foreach (var feature in Model.LocationFeatures)
-            {
-                <text>
-                    <div class="col-xs-2">
-                            <a href="@feature.RedirectUrl" target="_blank">
-                                <span class="fa-stack fa-2x" style="color:#007bff">
-                                    <span class="fa fa-square fa-stack-2x"></span>
-                                    <span class="@feature.FontAwesome">
+            <div class="row branch-features text-center">
+                @foreach (var feature in Model.LocationFeatures)
+                {
+                    @if (string.IsNullOrEmpty(feature.RedirectUrl))
+                    {
+                        <text>
+                            <div class="col-xs-2">
+                                <a href="@Url.Action("Locations", "Home", new { locationStub = Model.Location.Stub, featureStub = feature.Stub })" class="bring-modal" data-toggle="modal" data-target="#featureModal" target="_blank" data-feature="@feature.Stub">
+                                    <span class="fa-stack fa-2x" style="color:#007bff">
+                                        <span class="fa fa-square fa-stack-2x"></span>
+                                        <span class="@feature.FontAwesome" @if(!string.IsNullOrEmpty(feature.InnerSpan)) { @:style="color:white"
+                                                                                                                        }>
+                                            @if (!string.IsNullOrEmpty(feature.InnerSpan))
+                                            {
+                                                @Html.Raw(feature.InnerSpan.ToString());
+                                            }
+                                        </span>
                                     </span>
-                                </span>
-                            </a>
-                            <div>
-                                <a class="bring-modal" href="@Url.Action("Find", "Home", new {locationStub=Model.Location.Stub,featureStub=feature.Stub})" data-toggle="modal" data-target="#featureModal" data-feature="@feature.Stub">@feature.Name</a>
+                                </a>
+                                <div>
+                                    <a class="bring-modal" data-toggle="modal" data-target="#featureModal" href="@Url.Action("Locations", "Home", new { locationStub = Model.Location.Stub, featureStub = feature.Stub })" data-feature="@feature.Stub"> @feature.Name</a>
+                                </div>
                             </div>
-                    </div>
-                    </text>
+                        </text>
+                    }
+                    else
+                    {
+                        <text>
+                            <div class="col-xs-2">
+                                <a href="@feature.RedirectUrl" target="_blank">
+                                    <span class="fa-stack fa-2x" style="color:#007bff">
+                                        <span class="fa fa-square fa-stack-2x"></span>
+                                        <span class="@feature.FontAwesome">
+                                        </span>
+                                    </span>
+                                </a>
+                                <div>
+                                    <a href=@feature.RedirectUrl data-feature="@feature.Stub" target="_blank"> @feature.Name</a>
+                                </div>
+                            </div>
+                        </text>
+                    }
                 }
-        </div>
-        @if (Model.NearbyCount > 1)
-        {
-            <div>
-                <a name="nearby"></a>
-                <h2>Nearby Locations</h2>
-                <p>The @Model.Location.Name has other locations nearby.</p>
-                <div class="row">
-                    <div class="col-xs-4">
+            </div>
+            @if (Model.NearbyCount > 1)
+            {
+                <div>
+                    <a name="nearby"></a>
+                    <h2>Nearby Locations</h2>
+                    <p>The @Model.Location.Name has other locations nearby.</p>
+                    <div class="row">
+                        <div class="col-xs-4">
 
-                    </div>
-                    <div class="col-xs-7">
-                        <table class="neighbor-locations">
-                            <tbody>
-                                @{ int counter = 1;}
-                                @foreach (var location in Model.NearbyLocations)
-                                {
-                                    <text>
-                                        <tr>
-                                            <td>@counter</td>
-                                            <td>
-                                                <a href="/Locations/@location.Stub">@location.Name</a>
-                                            </td>
-                                            <td>
-                                                <a href="@location.EventLinkId"><span class="fa fa-calendar"></span> Events</a>
-                                                <a href="@location.SubscriptionLinkId"><span class="fa fa-envelope-o"></span> Mailing List</a>
-                                            </td>
-                                        </tr>
-                                    </text>
-                                    counter++;
-                                }
-                                <tr>
-                                    <td colspan="2">&nbsp;</td>
-                                    <td>
-                                        <a href="/subscribe/?@foreach (var location in Model.NearbyLocations) {<text>list=@location.SubscriptionLinkId&</text> }" class="btn btn-default btn-sm" target="_blank">
-                                            @if (Model.NearbyLocations.Count() > 1)
-                                            {
+                        </div>
+                        <div class="col-xs-7">
+                            <table class="neighbor-locations">
+                                <tbody>
+                                    @{ int counter = 1;}
+                                    @foreach (var location in Model.NearbyLocations)
+                                    {
+                                        <text>
+                                            <tr>
+                                                <td>@counter</td>
+                                                <td>
+                                                    <a href="@Url.Action("Locations", "Home", new { locationStub = @location.Stub})">@location.Name</a>
+                                                </td>
+                                                <td>
+                                                    <a href="@location.EventLink"><span class="fa fa-calendar"></span> Events</a>
+                                                    <a href="@location.SubscriptionLink"><span class="fa fa-envelope-o"></span> Mailing List</a>
+                                                </td>
+                                            </tr>
+                                        </text>
+                                        counter++;
+                                    }
+                                    <tr>
+                                        <td colspan="2">&nbsp;</td>
+                                        <td>
+                                            <a href="@Model.LocationNeighborGroup.SubscriptionUrl" class="btn btn-default btn-sm" target="_blank">
                                                 <text><span class="fa fa-envelope-o"></span>Updates from all @Model.NearbyLocations.Count() locations</text>
-                                            }
-                                            else
-                                            {
-                                                <text><span class="fa fa-envelope-o"></span>Updates from the location</text>
-                                            }
-                                        </a>
-                                    </td>
+                                            </a>
+                                        </td>
 
-                                </tr>
+                                    </tr>
 
-                            </tbody>
+                                </tbody>
 
-                        </table>
+                            </table>
+
+                        </div>
 
                     </div>
 
                 </div>
-
-            </div>
-        }
-    </div>
-    <div class="modal fade" id="featureModal" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">Details</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div>
-                        <p id="modal-body">
-                        </p>
+            }
+        </div>
+        <div class="modal fade" id="featureModal" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalTitle">Details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                    <div>
-                        <p id="modal-text">
+                    <div class="modal-body">
+                        <div>
+                            <div id="modal-body">
+                            </div>
+                        </div>
+                        <div>
+                            <div id="modal-text">
 
-                        </p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    @section Scripts{
-        <script>
+        @section Scripts{
+            <script>
                 $('.bring-modal').on('click', function () {
                     @foreach (var feature in Model.LocationFeatures)
                     {
                         <text>
                         if ("@feature.Stub" == $(this).data("feature"))
                         {
-                            $("#modalTitle").text("@feature.Name");
-                            $("#modal-body").text("@feature.BodyText");
-                            $("#modal-text").text("@feature.Text");
-                        }
+                            $("#modalTitle").text("@Html.Raw(feature.Name)");
+
+
+                            $("#modal-body").html($("#modal-body").html("@feature.BodyText").text());
+                            $("#modal-text").html($("#modal-text").html("@feature.Text").text());
+                    }
+                    console.log("@feature.BodyText");
                         </text>
                     }
-
                     $('#featureModal').on('shown.bs.modal', function () {
                         $('#myInput').trigger('focus')
                     });
                 });
-        </script>
-    }
-</body>
+            </script>
+        }
+    </body>
 </html>
