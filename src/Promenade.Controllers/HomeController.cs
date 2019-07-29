@@ -191,13 +191,14 @@ namespace Ocuda.Promenade.Controllers
         {
             if (string.IsNullOrEmpty(locationStub))
             {
-                return View("Locations", await _locationService.GetAllLocationsAsync());
+                return await Find();
             }
             else if (string.IsNullOrEmpty(featureStub))
             {
                 var locationViewModel = new LocationViewModel();
                 locationViewModel.LocationFeatures = new List<LocationsFeaturesViewModel>();
                 locationViewModel.Location = await _locationService.GetLocationByStubAsync(locationStub);
+                locationViewModel.Location.LocationHours = await _locationService.GetFormattedWeeklyHoursAsync(locationViewModel.Location.Id);
                 var features = await _locationService.GetLocationsFeaturesAsync(locationStub);
 
                 foreach (var feature in features.OrderBy(_ => _.Name).ToList())

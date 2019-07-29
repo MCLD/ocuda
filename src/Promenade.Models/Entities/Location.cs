@@ -78,6 +78,9 @@ namespace Ocuda.Promenade.Models.Entities
         public List<Location> CloseLocations { get; set; }
 
         [NotMapped]
+        public List<string> LocationHours { get; set; }
+
+        [NotMapped]
         public string FormattedAddress { get; set; }
 
         [NotMapped]
