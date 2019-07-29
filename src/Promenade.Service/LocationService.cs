@@ -62,9 +62,79 @@ namespace Ocuda.Promenade.Service
             return await _locationRepository.GetAllLocations();
         }
 
-        public async Task<ICollection<LocationHours>> GetWeeklyHoursAsync(int locationId)
+        public async Task<ICollection<LocationHoursResult>> GetWeeklyHoursAsync(int locationId)
         {
-            return await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
+            var results = new List<LocationHoursResult>();
+
+            var location = await _locationRepository.FindAsync(locationId);
+
+            if (location.IsAlwaysOpen)
+            {
+                for (int day  = 0; day < DaysInWeek; day++)
+                {
+                    results.Add(new LocationHoursResult
+                    {
+                        Open = true,
+                        DayOfWeek = (DayOfWeek)day,
+                        IsCurrentlyOpen = true
+                    });
+                }
+            }
+            else
+            {
+                // Add override days
+                var now = DateTime.Now;
+                var firstDayOfWeek = now.AddDays(-(int)now.DayOfWeek);
+                var lastDayOfWeek = firstDayOfWeek.AddDays(DaysInWeek - 1);
+
+                var overrides = await _locationHoursOverrideRepository.GetBetweenDatesAsync(
+                    locationId, firstDayOfWeek, lastDayOfWeek);
+
+                foreach(var dayOverride in overrides)
+                {
+                    results.Add(new LocationHoursResult
+                    {
+                        OpenTime = dayOverride.OpenTime,
+                        CloseTime = dayOverride.CloseTime,
+                        Open = dayOverride.Open,
+                        DayOfWeek = dayOverride.Date.DayOfWeek,
+                        IsOverride = true
+                    });
+                }
+
+                // Fill in non-override days
+                if (results.Count < DaysInWeek)
+                {
+                    var weeklyHours = await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
+
+                    var remainingDays = weeklyHours
+                        .Where(_ => !results.Select(r => r.DayOfWeek).Contains(_.DayOfWeek));
+
+                    foreach (var day in remainingDays)
+                    {
+                        results.Add(new LocationHoursResult
+                        {
+                            OpenTime = day.OpenTime,
+                            CloseTime = day.CloseTime,
+                            Open = day.Open,
+                            DayOfWeek = day.DayOfWeek
+                        });
+                    }
+                }
+
+                // Set currently open
+                foreach (var dayResult in results)
+                {
+                    if (dayResult.Open && dayResult.OpenTime <= now && dayResult.CloseTime >= now)
+                    {
+                        dayResult.IsCurrentlyOpen = true;
+                    }
+                }
+
+                results = results.OrderBy(_ => _.DayOfWeek).ToList();
+            }
+
+            return results;
         }
 
         public async Task<LocationFeature> GetLocationFeatureByIds(int locationId, int featureId)
@@ -117,8 +187,15 @@ namespace Ocuda.Promenade.Service
             }
             return null;
         }
+
         public async Task<List<string>> GetFormattedWeeklyHoursAsync(int locationId)
         {
+            var location = await _locationRepository.FindAsync(locationId);
+            if (location.IsAlwaysOpen)
+            {
+                return null;
+            }
+
             var weeklyHours = await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
             // Order weeklyHours to start on Monday
             weeklyHours = weeklyHours.OrderBy(_ => ((int)_.DayOfWeek + 1) % 8).ToList();
@@ -209,6 +286,18 @@ namespace Ocuda.Promenade.Service
 
         public async Task<LocationHoursResult> GetCurrentStatusAsync(int locationId)
         {
+            var location = await _locationRepository.FindAsync(locationId);
+
+            if (location.IsAlwaysOpen)
+            {
+                return new LocationHoursResult
+                {
+                    Open = true,
+                    IsCurrentlyOpen = true,
+                    StatusMessage = "Open"
+                };
+            }
+
             var now = _dateTimeProvider.Now;
 
             var result = new LocationHoursResult();

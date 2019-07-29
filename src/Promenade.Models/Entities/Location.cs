@@ -72,6 +72,8 @@ namespace Ocuda.Promenade.Models.Entities
 
         public string PAbbreviation { get; set; }
 
+        public bool IsAlwaysOpen { get; set; }
+
         [NotMapped]
         public List<Location> CloseLocations { get; set; }
 

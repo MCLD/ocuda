@@ -32,7 +32,7 @@ namespace Ocuda.Promenade.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Date >= startDate.Date && _.Date <= endDate
+                .Where(_ => _.Date.Date >= startDate.Date && _.Date.Date <= endDate.Date
                     && (_.LocationId == locationId || !_.LocationId.HasValue))
                 .ToListAsync();
         }
