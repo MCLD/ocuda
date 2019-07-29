@@ -157,7 +157,10 @@ namespace Ocuda.Promenade.Controllers
                     Location = location,
                     LocationSearchable = true
                 };
-
+                foreach (var item in viewModel.Location.CloseLocations)
+                {
+                    item.WeeklyHours = await _locationService.GetFormattedWeeklyHoursAsync(item.Id);
+                }
                 using (var client = new HttpClient())
                 {
                     try

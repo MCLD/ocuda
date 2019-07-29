@@ -79,6 +79,10 @@
                                                 <tr>
                                                     <td style="padding-bottom:10px;">
                                                         <strong class="traffic-green">Open until 5:00 PM</strong>
+                                                        @foreach(var hour in closeLocation.WeeklyHours)
+                                                        {
+                                                            <tr>@hour</tr>
+                                                        }
                                                     </td>
                                                 </tr>
                                                 <tr style="text-align: left;">

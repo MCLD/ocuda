@@ -83,5 +83,8 @@ namespace Ocuda.Promenade.Models.Entities
 
         [NotMapped]
         public List<int> DefaultLibIds { get; set; }
+
+        [NotMapped]
+        public List<string> WeeklyHours { get; set; }
     }
 }
