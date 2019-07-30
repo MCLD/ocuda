@@ -9,14 +9,15 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 namespace Ocuda.Ops.Data.Ops
 {
     public class RosterDetailRepository
-        : GenericRepository<RosterDetail, int>, IRosterDetailRepository
+        : GenericRepository<OpsContext, RosterDetail, int>, IRosterDetailRepository
     {
-        public RosterDetailRepository(OpsContext context, ILogger<RosterDetailRepository> logger) 
-            : base(context, logger)
+        public RosterDetailRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
+            ILogger<RosterDetailRepository> logger) : base(repositoryFacade, logger)
         {
         }
 
-        public async Task AddRangeAsync(IEnumerable<RosterDetail> rosterDetails) {
+        public async Task AddRangeAsync(IEnumerable<RosterDetail> rosterDetails)
+        {
             await DbSet.AddRangeAsync(rosterDetails);
         }
 

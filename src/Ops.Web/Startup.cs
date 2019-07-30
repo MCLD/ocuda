@@ -141,6 +141,7 @@ namespace Ocuda.Ops.Web
 
             // service facades
             services.AddScoped(typeof(Controllers.ServiceFacades.Controller<>));
+            services.AddScoped(typeof(Data.ServiceFacade.Repository<>));
 
             // filters
             services.AddScoped<Controllers.Filters.AuthenticationFilterAttribute>();
