@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Service;
@@ -21,7 +22,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
             var isTLS = await _siteSettingService.GetSettingBoolAsync(
                 Models.Keys.SiteSetting.Site.IsTLS);
 
-            var scheme = isTLS ? "https" : "http";
+            var scheme = isTLS ? Uri.UriSchemeHttps : Uri.UriSchemeHttp;
 
             return Url.Action(null, null, null, scheme);
         }

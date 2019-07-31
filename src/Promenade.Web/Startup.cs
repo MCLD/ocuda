@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -119,6 +119,8 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.LocationRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IPageRepository,
                 Data.Promenade.PageRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ISiteAlertRepository,
+                Data.Promenade.SiteAlertRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ISiteSettingRepository,
                 Data.Promenade.SiteSettingRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ISocialCardRepository,
@@ -132,6 +134,7 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<LocationService>();
             services.AddScoped<PageService>();
             services.AddScoped<RedirectService>();
+            services.AddScoped<SiteAlertService>();
             services.AddScoped<SiteSettingService>();
             services.AddScoped<SocialCardService>();
         }
