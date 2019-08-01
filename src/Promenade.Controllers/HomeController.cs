@@ -155,32 +155,12 @@ namespace Ocuda.Promenade.Controllers
                 var viewModel = new LocationViewModel
                 {
                     Location = location,
-                    LocationSearchable = true
+                    LocationSearchable = false
                 };
                 foreach (var item in viewModel.Location.CloseLocations)
                 {
                     item.WeeklyHours = await _locationService.GetFormattedWeeklyHoursAsync(item.Id);
                 }
-                using (var client = new HttpClient())
-                {
-                    try
-                    {
-                        var apikey = _config[Utility.Keys.Configuration.PromAPIGoogleMaps];
-
-                        var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?address={zip}&key={apikey}");
-                        response.EnsureSuccessStatusCode();
-
-                        var stringResult = await response.Content.ReadAsStringAsync();
-                        dynamic jsonResult = JsonConvert.DeserializeObject(stringResult);
-                    }
-                    catch (HttpRequestException ex)
-                    {
-                        _logger.LogCritical(ex, $"Google API error: {ex.Message}");
-                        TempData["AlertDanger"] = "An error occured, please try again later.";
-                        viewModel.LocationSearchable = false;
-                    }
-                }
-
                 return View("Locations", viewModel);
             }
         }
