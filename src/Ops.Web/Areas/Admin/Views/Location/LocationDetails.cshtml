@@ -1,124 +1,130 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location.LocationViewModel
-    <html>
-    <body>
-        <div class="container">
-            <div class="row page-title">
-                <div class="col-xs-12">
-                    <h2>Edit Location - @Model.Location.Name</h2>
-                </div>
+<html>
+<body>
+    <div class="container">
+        <div class="row page-title">
+            <div class="col-xs-12">
+                <h2>Edit Location - @Model.Location.Name</h2>
             </div>
-            <form method="post" asp-controller="Location" asp-action="EditLocation" role="form" display="inline">
-                <div class="row">
-                    <input asp-for="Location.Id" value="@Model.Location.Id" type="hidden" />
-                    <input asp-for="Location.AdministrativeArea" value="@Model.Location.AdministrativeArea" type="hidden" />
-                    <input asp-for="Location.CloseLocations" value="@Model.Location.CloseLocations" type="hidden" />
-                    <input asp-for="Location.Code" value="@Model.Location.Code" type="hidden" />
-                    <input asp-for="Location.Country" value="@Model.Location.Country" type="hidden" />
-                    <input asp-for="Location.DefaultLibIds" value="@Model.Location.DefaultLibIds" type="hidden" />
-                    <input asp-for="Location.EventLink" value="@Model.Location.EventLink" type="hidden" />
-                    <input asp-for="Location.Facebook" value="@Model.Location.Facebook" type="hidden" />
-                    <input asp-for="Location.ImagePath" value="@Model.Location.ImagePath" type="hidden" />
-                    <input asp-for="Location.IsAlwaysOpen" value="@Model.Location.IsAlwaysOpen" type="hidden" />
-                    <input asp-for="Location.Latitude" value="@Model.Location.Latitude" type="hidden" />
-                    <input asp-for="Location.Longitude" value="@Model.Location.Longitude" type="hidden" />
-                    <input asp-for="Location.Open" value="@Model.Location.Open" type="hidden" />
-                    <input asp-for="Location.PAbbreviation" value="@Model.Location.PAbbreviation" type="hidden" />
-                    <input asp-for="Location.ShowLocation" value="@Model.Location.ShowLocation" type="hidden" />
-                    <input asp-for="Location.Stub" value="@Model.Location.Stub" type="hidden" />
-                    <input asp-for="Location.SubscriptionLink" value="@Model.Location.SubscriptionLink" type="hidden" />
-                    <input asp-for="Location.State" value="@Model.Location.State" type="hidden" />
-                    <div class="col-xs-12">
-                        <div class="form-group">
-                            <input value="@Model.Location.Name" asp-for="Location.Name" id="location-name" formgroup autocomplete="off" />
-                            <span class="text-danger field-validation-valid"></span>
-                        </div>
-                        <div class="form-group">
-                            <input value="@Model.Location.Address" asp-for="Location.Address" id="location-address" formgroup autocomplete="off" />
-                            <span class="text-danger field-validation-valid"></span>
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-6">
-                                <div class="form-group">
-                                    <input value="@Model.Location.City" asp-for="Location.City" id="location-city" formgroup autocomplete="off" />
-                                    <span class="text-danger field-validation-valid"></span>
-                                </div>
-                            </div>
-                            <div class="col-xs-6">
-                                <div class="form-group">
-                                    <input value="@Model.Location.Zip" asp-for="Location.Zip" id="location-zip" formgroup autocomplete="off" />
-                                    <span class="text-danger field-validation-valid"></span>
-                                </div>
+        </div>
+        <form method="post" asp-controller="Location" asp-action="EditLocation" role="form" display="inline">
+            <div class="row">
+                <input asp-for="Location.Id" value="@Model.Location.Id" type="hidden" />
+                <input asp-for="Location.AdministrativeArea" value="@Model.Location.AdministrativeArea" type="hidden" />
+                <input asp-for="Location.CloseLocations" value="@Model.Location.CloseLocations" type="hidden" />
+                <input asp-for="Location.Code" value="@Model.Location.Code" type="hidden" />
+                <input asp-for="Location.Country" value="@Model.Location.Country" type="hidden" />
+                <input asp-for="Location.DefaultLibIds" value="@Model.Location.DefaultLibIds" type="hidden" />
+                <input asp-for="Location.EventLink" value="@Model.Location.EventLink" type="hidden" />
+                <input asp-for="Location.Facebook" value="@Model.Location.Facebook" type="hidden" />
+                <input asp-for="Location.ImagePath" value="@Model.Location.ImagePath" type="hidden" />
+                <input asp-for="Location.IsAlwaysOpen" value="@Model.Location.IsAlwaysOpen" type="hidden" />
+                <input asp-for="Location.Latitude" value="@Model.Location.Latitude" type="hidden" />
+                <input asp-for="Location.Longitude" value="@Model.Location.Longitude" type="hidden" />
+                <input asp-for="Location.Open" value="@Model.Location.Open" type="hidden" />
+                <input asp-for="Location.PAbbreviation" value="@Model.Location.PAbbreviation" type="hidden" />
+                <input asp-for="Location.ShowLocation" value="@Model.Location.ShowLocation" type="hidden" />
+                <input asp-for="Location.Stub" value="@Model.Location.Stub" type="hidden" />
+                <input asp-for="Location.SubscriptionLink" value="@Model.Location.SubscriptionLink" type="hidden" />
+                <input asp-for="Location.State" value="@Model.Location.State" type="hidden" />
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <input value="@Model.Location.Name" asp-for="Location.Name" id="location-name" formgroup autocomplete="off" />
+                        <span class="text-danger field-validation-valid"></span>
+                    </div>
+                    <div class="form-group">
+                        <input value="@Model.Location.Address" asp-for="Location.Address" id="location-address" formgroup autocomplete="off" />
+                        <span class="text-danger field-validation-valid"></span>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-4">
+                            <div class="form-group">
+                                <input value="@Model.Location.City" asp-for="Location.City" id="location-city" formgroup autocomplete="off" />
+                                <span class="text-danger field-validation-valid"></span>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <input type="tel" value="@Model.Location.Phone" asp-for="Location.Phone" id="location-phone" formgroup autocomplete="off" />
-                            <span class="text-danger field-validation-valid"></span>
+                        <div class="col-xs-4">
+                            <div class="form-group">
+                                <input value="@Model.Location.State" asp-for="Location.State" id="location-state" formgroup autocomplete="off" />
+                                <span class="text-danger field-validation-valid"></span>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <input type="tel" value="@Model.Location.MapLink" asp-for="Location.MapLink" id="location-maplink" formgroup autocomplete="off" />
-                            <ul class="list-group" id="maplink-suggestions"></ul>
-                            <span class="text-danger field-validation-valid"></span>
-                        </div>
-                        <div class="form-group">
-                            <textarea id="comment location-description" asp-for="Location.Description" rows="5" formgroup autocomplete="off">@Model.Location.Description</textarea>
-                            <span class="text-danger field-validation-valid"></span>
-                        </div>
-                        <div class="form-group">
-                            <button class="btn btn-default" onclick="@Url.Action("Index", "Location")">Return to Locations</button>
-                            @if (string.IsNullOrEmpty(Model.Location.Name))
-                            {
-                                <button type="submit" id="Submit" name="Submit" value="Submit" class="btn btn-primary btn-spinner">
-                                    <span class="buttonText">Add Location</span>
-                                    <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
-                                </button>
-                            }
-                            else
-                            {
-                                <button type="submit" id="Submit" name="Submit" value="Submit" class="btn btn-primary btn-spinner">
-                                    <span class="buttonText">Save Location</span>
-                                    <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
-                                </button>
-                            }
+                        <div class="col-xs-4">
+                            <div class="form-group">
+                                <input value="@Model.Location.Zip" asp-for="Location.Zip" id="location-zip" formgroup autocomplete="off" />
+                                <span class="text-danger field-validation-valid"></span>
+                            </div>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <input type="tel" value="@Model.Location.Phone" asp-for="Location.Phone" id="location-phone" formgroup autocomplete="off" />
+                        <span class="text-danger field-validation-valid"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" value="@Model.Location.MapLink" asp-for="Location.MapLink" id="location-maplink" formgroup autocomplete="off" />
+                        <ul class="list-group" id="maplink-suggestions"></ul>
+                        <span class="text-danger field-validation-valid"></span>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="comment location-description" asp-for="Location.Description" rows="5" formgroup autocomplete="off">@Model.Location.Description</textarea>
+                        <span class="text-danger field-validation-valid"></span>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-default" onclick="@Url.Action("Index", "Location")">Return to Locations</button>
+                        @if (string.IsNullOrEmpty(Model.Location.Name))
+                        {
+                            <button type="submit" id="Submit" name="Submit" value="Submit" class="btn btn-primary btn-spinner">
+                                <span class="buttonText">Add Location</span>
+                                <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="submit" id="Submit" name="Submit" value="Submit" class="btn btn-primary btn-spinner">
+                                <span class="buttonText">Save Location</span>
+                                <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
+                            </button>
+                        }
+                    </div>
                 </div>
-            </form>
-        </div>
-    </body>
+            </div>
+        </form>
+    </div>
     @section scripts{
         <script>
             $("Submit").on("click", function (e) {
                 var button = $(this);
-            })
 
-        // Saves the Avatars items
-        function GetMapLinks() {
-            $.get("@Url.Action("SaveAvatar")", { selectionJson: GetAvatarSelection() }, function (response) {
-                if (response.success == true) {
-                    @if (Context.Items[GRA.Controllers.ItemKey.GoogleAnalytics] != null){
-                        <text>
-                        if (unsavedChanges){
-                                gtag('event', 'avatar_update');
+            });
+            $( "input" ).blur(function() {
+               if ($('#location-address').val() && $('#location-city').val() && $('#location-state').val()) {
+                    var data = {};
+                    data["Address"] = $("#location-address").val();
+                    data["City"] = $("#location-city").val();
+                    data["State"] = $("#location-state").val();
+                    data["Zip"] = $("#location-zip").val();
+                    var addressdata = JSON.stringify(data);
+
+                    $.get("@Url.Action("GetUrlLocations")", { addressJson: addressdata }, function (response) {
+                        if (response.success == true) {
+                            var locations = $.parseJSON(response.data);
+                            HandleGoogleLocations(locations);
                         }
-                        </text>
-                        }
-                    
-                        SetUnsavedChanges(false);
+
+                    }).fail(function(){});
                 }
-                else {
-                    $(".avatar-save-message").removeClass("text-success").addClass("text-danger");
-                    $(".avatar-save-message").text(response.message);
-                    $(".avatar-save-message").show();
+            });
+    function HandleGoogleLocations(locations) {
+        console.log("yo");
+          console.log(locations);
+                for (var index = 0; index < locations.length;index++) {
+                    console.log(locations[index]);
+                    //var link = document.createElement('a');
+                    //link.href = "https://www.google.com/maps/search/?api=1&query=" +  + "&query_place_id=" + locations[index].PlaceId;
                 }
-                }).fail(function () {
-                    $(".avatar-save-message").removeClass("text-success").addClass("text-danger");
-                    $(".avatar-save-message").text("@SharedLocalizer[GRA.Annotations.Validate.CouldNotSaveAvatar]");
-                    $(".avatar-save-message").show();
-                })
-                .always(function() {
-                    $("#saveSpinner").addClass("hidden");
-                    $("#saveAvatar").removeAttr("disabled");
-                });
+            }
         </script>
     }
-    </html>
+
+</body>
+</html>

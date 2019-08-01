@@ -11,13 +11,16 @@ namespace BranchLocator.Models
         public string[] HtmlAtrributions { get; set; }
 
         [JsonProperty("results")]
-        public Result[] Results { get; set; }
+        public PlaceResult[] Results { get; set; }
 
         [JsonProperty("status")]
         public string Status { get; set; }
     }
-    public partial class Result
+    public class PlaceResult
     {
+        [JsonProperty("formatted_address")]
+        public string FormattedAddress { get; set; }
+
         [JsonProperty("geometry")]
         public Geometry Geometry { get; set; }
 
@@ -28,25 +31,13 @@ namespace BranchLocator.Models
         public string Id { get; set; }
 
         [JsonProperty("name")]
-        public string name { get; set; }
-
-        [JsonProperty("opening_hours")]
-        public OpeningHours OpeningHours { get; set; }
+        public string Name { get; set; }
 
         [JsonProperty("photos")]
         public Photo[] Photos { get; set; }
 
-        [JsonProperty("plus_code")]
-        public PlusCode PlusCode { get; set; }
-
         [JsonProperty("place_id")]
         public string PlaceId { get; set; }
-
-        [JsonProperty("price_level")]
-        public int PriceLevel { get; set; }
-
-        [JsonProperty("rating")]
-        public double Rating { get; set; }
 
         [JsonProperty("reference")]
         public string Reference { get; set; }
@@ -57,20 +48,15 @@ namespace BranchLocator.Models
         [JsonProperty("vicinity")]
         public string Vicinity { get; set; }
 
-        [JsonProperty("aspect")]
-        public Aspect[] Aspect { get; set; }
-
-        [JsonProperty("scope")]
-        public string Scope { get; set; }
-
-        [JsonProperty("user_ratings_total")]
-        public int UserRatingsTotal { get; set; }
 
     }
     public partial class Geometry
     {
         [JsonProperty("location")]
-        public Locate Location { get; set; }
+        public Locate Locate { get; set; }
+
+        [JsonProperty("viewport")]
+        public ViewPort Viewport { get; set; }
 
     }
     public partial class PlusCode
@@ -111,8 +97,41 @@ namespace BranchLocator.Models
         [JsonProperty("open_now")]
         public bool OpenNow { get; set; }
 
+        [JsonProperty("periods")]
+        public Period[] Periods { get; set; }
+
+        [JsonProperty("weekday_text")]
+        public string[] GetWeekDayText { get; set; }
     }
 
+    public partial class Period
+    {
+        [JsonProperty("open")]
+        public Open Open { get; set; }
+
+        [JsonProperty("close")]
+        public Close Close { get; set; }
+
+
+    }
+    public partial class Open
+    {
+        [JsonProperty("day")]
+        public string Day { get; set; }
+
+        [JsonProperty("time")]
+        public string Time { get; set; }
+
+    }
+    public partial class Close
+    {
+        [JsonProperty("day")]
+        public string Day { get; set; }
+
+        [JsonProperty("time")]
+        public string Time { get; set; }
+
+    }
     public partial class Aspect
     {
         [JsonProperty("rating")]
@@ -123,17 +142,17 @@ namespace BranchLocator.Models
 
     }
 
-    public partial class GeocodeRoutes
+    public partial class GeocodePlace
     {
-        public static GeocodeRoutes FromJson(string json)
+        public static GeocodePlace FromJson(string json)
         {
-            return JsonConvert.DeserializeObject<GeocodeRoutes>(json, Converter.Settings);
+            return JsonConvert.DeserializeObject<GeocodePlace>(json, Converter.Settings);
         }
     }
 
     public static class Serialize
     {
-        public static string ToJson(this GeocodeRoutes self)
+        public static string ToJson(this GeocodePlace self)
         {
             return JsonConvert.SerializeObject(self, Converter.Settings);
         }
