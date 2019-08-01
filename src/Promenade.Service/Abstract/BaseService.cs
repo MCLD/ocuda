@@ -9,7 +9,7 @@ namespace Ocuda.Promenade.Service.Abstract
         protected readonly ILogger<Service> _logger;
         protected readonly IDateTimeProvider _dateTimeProvider;
 
-        public BaseService(ILogger<Service> logger,
+        protected BaseService(ILogger<Service> logger,
             IDateTimeProvider dateTimeProvider)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

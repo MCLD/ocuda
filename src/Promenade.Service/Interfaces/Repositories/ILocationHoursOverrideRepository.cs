@@ -6,6 +6,7 @@ using Ocuda.Promenade.Models.Entities;
 namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
     public interface ILocationHoursOverrideRepository
+        : IGenericRepository<LocationHoursOverride, int>
     {
         Task<LocationHoursOverride> GetByDateAsync(int locationId, DateTime date);
 

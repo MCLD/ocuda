@@ -12,8 +12,8 @@
                         @foreach (var feature in Model.LocationFeatures)
                         {
                             <h1>@Model.Location.Name Library @feature.Name</h1>
-                            <p>@feature.BodyText</p>
-                            <p>@feature.Text</p>
+                            <div id="feature-body">@Html.Raw(feature.BodyText)</div>
+                            <div id="feature-text">@Html.Raw(feature.Text)</div>
                         }
                     </div>
                     <p style="margin-left: 1rem;">
