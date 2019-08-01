@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
@@ -31,6 +32,46 @@ namespace Ocuda.Ops.Service
         public async Task<Location> GetLocationByStubAsync(string locationStub)
         {
             return await _locationRepository.GetLocationByStub(locationStub);
+        }
+
+        public async Task<Location> AddAsync(Location location)
+        {
+            location.Name = location.Name?.Trim();
+
+            await ValidateAsync(location);
+
+            await _locationRepository.AddAsync(location);
+            await _locationRepository.SaveAsync();
+
+            return location;
+        }
+
+        public async Task<Location> EditAsync(Location location)
+        {
+            var currentlocation = await _locationRepository.FindAsync(location.Id);
+
+            currentlocation.Name = location.Name?.Trim();
+
+            await ValidateAsync(currentlocation);
+
+            _locationRepository.Update(currentlocation);
+            await _locationRepository.SaveAsync();
+
+            return currentlocation;
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            _locationRepository.Remove(id);
+            await _locationRepository.SaveAsync();
+        }
+
+        private async Task ValidateAsync(Location location)
+        {
+            if (await _locationRepository.IsDuplicateAsync(location))
+            {
+                throw new OcudaException($"Location type '{location.Name}' already exists.");
+            }
         }
     }
 }

@@ -10,5 +10,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
     {
         Task<List<Location>> GetAllLocationsAsync();
         Task<Location> GetLocationByStubAsync(string locationStub);
+        Task<Location> AddAsync(Location location);
+        Task<Location> EditAsync(Location location);
+        Task DeleteAsync(int id);
     }
 }

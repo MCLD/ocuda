@@ -36,5 +36,6 @@
         public static readonly string OpsUrlSharedContent = "Ops.UrlSharedContent";
 
         public static readonly string PromAPIGoogleMaps = "Promenade.API.GoogleMaps";
+        public static readonly string OpsAPIGoogleMaps = "Ops.API.GoogleMaps";
     }
 }

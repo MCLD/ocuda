@@ -1,87 +1,93 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location.LocationViewModel
-
-<div class="row">
-    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel">
-        <div class="modal-dialog" role="document">
-            <form asp-action="@nameof(LocationController.DeleteLocation)" method="post" role="form" style="display:inline">
-                <input asp-for="Location.Id" type="hidden" />
-                <input asp-for="Location.Name" type="hidden" />
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="deleteModalLabel">Delete Post</h4>
-                    </div>
-                    <div class="modal-body">
-                        <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
-                        <span id="modal-text"></span>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal" style="margin-right: 1em;">Cancel</button>
-                        <button type="submit" class="btn btn-danger btn-spinner pull-right" aria-label="Confirm">
-                            <span class="fa fa-remove" aria-hidden="true"></span>
-                            Delete
-                            <span class="fa fa-spinner fa-pulse fa-lg fa-fw hidden"></span>
-                        </button>
-                    </div>
+    <div class="container">
+        <div class="row">
+            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel">
+                <div class="modal-dialog" role="document">
+                    <form asp-action="@nameof(LocationController.DeleteLocation)" method="post" role="form" style="display:inline">
+                        <input asp-for="Location.Id" type="hidden" />
+                        <input asp-for="Location.Name" type="hidden" />
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="deleteModalLabel">Delete Location</h4>
+                            </div>
+                            <div class="modal-body">
+                                <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+                                <span id="modal-text"></span>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal" style="margin-right: 1em;">Cancel</button>
+                                <button type="submit" class="btn btn-danger btn-spinner pull-right" aria-label="Confirm">
+                                    <span class="fa fa-remove" aria-hidden="true"></span>
+                                    Delete
+                                    <span class="fa fa-spinner fa-pulse fa-lg fa-fw hidden"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
+        </div>
+
+        <div class="row" style="padding: 10px 0;">
+            <div class="col-xs-12">
+                <a href="@Url.Action("Location", "Location")" class="btn btn-default">Add a Location</a>
+            </div>
+        </div>
+        <div class="row" style="padding: 10px 0;">
+            <div class="col-xs-12">
+                <a asp-action="@nameof(LocationController.GetLocations)" method="get" class="btn btn-default">Get a Location</a>
+            </div>
+        </div>
+
+        <div class="row" style="padding: 10px 0;">
+            <div class="col-xs-12">
+                @if (Model.AllLocations.Count() == 0)
+                {
+                    <div class="alert alert-warning">No Locations found.</div>
+                }
+                else
+                {
+                    <div>
+                        <table class="table table-condensed table-bordered link-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Address</th>
+                                    <th>Phone</th>
+                                    <th>&nbsp;</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var location in Model.AllLocations)
+                                {
+                                    <tr>
+                                        <td class="td-class">
+                                            <a href="@Url.Action("Location", "Location", new { locationStub = location.Stub})" class="rowlink">
+                                                @location.Name
+                                            </a>
+                                        </td>
+                                        <td>@location.Address <br /> @location.City, @location.State @location.Zip</td>
+                                        <td>@location.Phone</td>
+                                        <td class="on-top gra-mc-icon">
+                                            <button type="button"
+                                                    class="btn btn-danger btn-xs"
+                                                    data-toggle="modal"
+                                                    data-target="#deleteModal"
+                                                    data-id="@location.Id"
+                                                    data-name="@location.Name">
+                                                <span class="fa fa-remove" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
         </div>
     </div>
-</div>
-
-<div class="row" style="padding: 10px 0;">
-    <div class="col-xs-12">
-        <a asp-action="CreateLocation" class="btn btn-default">Add a Location</a>
-    </div>
-</div>
-
-<div class="row" style="padding: 10px 0;">
-    <div class="col-xs-12">
-        @if (Model.AllLocations.Count() == 0)
-        {
-            <div class="alert alert-warning">No Locations found.</div>
-        }
-        else
-        {
-            <div>
-                <table class="table table-condensed table-bordered link-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Address</th>
-                            <th>Phone</th>
-                            <th>&nbsp;</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var location in Model.AllLocations)
-                        {
-                            <tr>
-                                <td class="td-class">
-                                    <a href="@Url.Action("Index", "Location", new { locationStub = location.Stub})" class="rowlink">
-                                        @location.Name
-                                    </a>
-                                </td>
-                                <td>@location.Address <br/> @location.City, @location.State @location.Zip</td>
-                                <td>@location.Phone</td>
-                                <td class="on-top gra-mc-icon">
-                                    <button type="button"
-                                            class="btn btn-danger btn-xs"
-                                            data-toggle="modal"
-                                            data-target="#deleteModal"
-                                            data-id="@location.Id"
-                                            data-name="@location.Name">
-                                        <span class="fa fa-remove" aria-hidden="true"></span>
-                                    </button>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
-    </div>
-</div>
 
 @section scripts
     {

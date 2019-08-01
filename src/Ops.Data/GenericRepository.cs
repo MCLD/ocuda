@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Data.ServiceFacade;
 using Ocuda.Utility.Data;
 
 namespace Ocuda.Ops.Data

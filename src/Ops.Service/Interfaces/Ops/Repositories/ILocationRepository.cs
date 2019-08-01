@@ -10,5 +10,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
     {
         Task<List<Location>> GeAllLocationsAsync();
         Task<Location> GetLocationByStub(string locationStub);
+        Task<bool> IsDuplicateAsync(Location location);
     }
 }
