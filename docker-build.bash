@@ -4,11 +4,15 @@ set -e
 
 BLD_PUSH=false
 BLD_BRANCH_FOUND=false
-BLD_DOCKERFILE="Dockerfile_ops"
 BLD_COMMIT=$(git rev-parse --short HEAD)
 BLD_VERSION=unknown
 BLD_VERSION_DATE=$(date -u +'%Y%m%d_%H%M%SZ')
 BLD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+
+if [[ -z $BLD_DOCKERFILE ]]; then
+  BLD_DOCKERFILE="Dockerfile"
+  echo "=== No BLD_DOCKERFILE configured, using: $BLD_DOCKERFILE"
+fi
 
 if [[ -z $BLD_DOCKER_IMAGE ]]; then
   BLD_DIRECTORY=${PWD##*/}
