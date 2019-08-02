@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -15,12 +16,12 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<UrlRedirect> GetRedirectByPathAsync(string path)
+        public async Task<ICollection<UrlRedirect>> GetRedirectsByPathAsync(string path)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.IsActive && _.RequestPath == path)
-                .SingleOrDefaultAsync();
+                .ToListAsync();
         }
     }
 }

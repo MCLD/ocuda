@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -10,7 +7,7 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 
 namespace Ocuda.Promenade.Data.Promenade
 {
-    public class PageRepository 
+    public class PageRepository
         : GenericRepository<PromenadeContext, Page, int>, IPageRepository
     {
         public PageRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,

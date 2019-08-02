@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -37,8 +37,14 @@ namespace Ocuda.Promenade.Controllers
 
             if (page == null)
             {
-                var currentUrl = Url.Action();
-                var redirect = await _redirectService.GetUrlRedirectByPathAsync(currentUrl);
+                var queryParams = Request.Query.Select(_ => new KeyValuePair<string, string>
+                (
+                    _.Key,
+                    _.Value
+                )).ToList();
+
+                var redirect = await _redirectService.GetUrlRedirectByPathAsync(Request.Path,
+                    queryParams);
 
                 if (redirect != null)
                 {
@@ -52,7 +58,7 @@ namespace Ocuda.Promenade.Controllers
                     }
                 }
 
-                _logger.LogWarning($"No About page or redirect found for stub \"{stub}\": {currentUrl}");
+                _logger.LogWarning($"No About page or redirect found for stub \"{stub}\": {Request.Path}");
                 return View("PageNotFound");
             }
 

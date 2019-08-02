@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
@@ -27,9 +27,32 @@ namespace Ocuda.Promenade.Service
                 ?? throw new ArgumentNullException(nameof(urlRedirectRepository));
         }
 
-        public async Task<UrlRedirect> GetUrlRedirectByPathAsync(string path)
+        public async Task<UrlRedirect> GetUrlRedirectByPathAsync(string path,
+            List<KeyValuePair<string, string>> queryParams)
         {
-            var redirect = await _urlRedirectRepository.GetRedirectByPathAsync(path);
+            var redirects = await _urlRedirectRepository.GetRedirectsByPathAsync(path.TrimEnd('/'));
+            UrlRedirect redirect = null;
+
+            if (queryParams.Count > 0)
+            {
+                var queryRedirects = redirects.Where(_ => !string.IsNullOrWhiteSpace(_.QueryKey)
+                    && queryParams.Any(q => q.Key == _.QueryKey && q.Value == _.QueryValue));
+
+                if (queryRedirects.Count() == 1)
+                {
+                    redirect = queryRedirects.Single();
+                }
+            }
+
+            if (redirect == null)
+            {
+                var nonQueryRedirects = redirects.Where(_ => string.IsNullOrWhiteSpace(_.QueryKey));
+
+                if (nonQueryRedirects.Count() == 1)
+                {
+                    redirect = nonQueryRedirects.Single();
+                }
+            }
 
             if (redirect != null)
             {

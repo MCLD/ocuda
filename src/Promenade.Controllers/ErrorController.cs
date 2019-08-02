@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using Ocuda.Promenade.Controllers.Abstract;
-using Ocuda.Promenade.Controllers.ViewModels;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Ocuda.Promenade.Controllers.Abstract;
+using Ocuda.Promenade.Controllers.ViewModels;
 using Ocuda.Promenade.Service;
-using System.Threading.Tasks;
 
 namespace Ocuda.Promenade.Controllers
 {
@@ -36,7 +38,14 @@ namespace Ocuda.Promenade.Controllers
 
             if (id == 404)
             {
-                var redirect = await _redirectService.GetUrlRedirectByPathAsync(originalPath);
+                var queryParams = Request.Query.Select(_ => new KeyValuePair<string, string>
+                (
+                    _.Key,
+                    _.Value
+                )).ToList();
+
+                var redirect = await _redirectService.GetUrlRedirectByPathAsync(originalPath,
+                    queryParams);
                 if (redirect != null)
                 {
                     if (redirect.IsPermanent)
