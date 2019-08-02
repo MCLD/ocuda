@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Service;
 
@@ -7,6 +8,7 @@ namespace Ocuda.Promenade.Controllers.ServiceFacades
     public class Controller<T>
     {
         private readonly ILogger _logger;
+        private readonly IConfiguration _config;
         private readonly SiteSettingService _siteSettingService;
 
         public ILogger Logger
@@ -14,6 +16,14 @@ namespace Ocuda.Promenade.Controllers.ServiceFacades
             get
             {
                 return _logger;
+            }
+        }
+
+        public IConfiguration Config
+        {
+            get
+            {
+                return _config;
             }
         }
 
@@ -25,9 +35,11 @@ namespace Ocuda.Promenade.Controllers.ServiceFacades
             }
         }
 
-        public Controller(SiteSettingService siteSettingService, ILogger<T> logger)
+        public Controller(ILogger<T> logger, IConfiguration config, 
+            SiteSettingService siteSettingService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
             _siteSettingService = siteSettingService
                 ?? throw new ArgumentNullException(nameof(siteSettingService));
         }

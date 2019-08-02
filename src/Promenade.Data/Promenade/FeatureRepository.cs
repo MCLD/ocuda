@@ -4,10 +4,12 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 
 namespace Ocuda.Promenade.Data.Promenade
 {
-    public class FeatureRepository : GenericRepository<Feature, int>, IFeatureRepository
+    public class FeatureRepository
+        : GenericRepository<PromenadeContext, Feature, int>, IFeatureRepository
     {
-        public FeatureRepository(PromenadeContext context,
-            ILogger<FeatureRepository> logger) : base(context, logger)
+        public FeatureRepository(
+            ServiceFacade.Repository<PromenadeContext> repositoryFacade,
+            ILogger<FeatureRepository> logger) : base(repositoryFacade, logger)
         {
         }
     }

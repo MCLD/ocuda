@@ -103,20 +103,20 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<IDateTimeProvider, CurrentDateTimeProvider>();
 
             // repositories
-            services.AddScoped<Service.Interfaces.Repositories.ILocationHoursRepository,
-                Data.Promenade.LocationHoursRepository>();
-            services.AddScoped<Service.Interfaces.Repositories.ILocationHoursOverrideRepository,
-                Data.Promenade.LocationHoursOverrideRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IFeatureRepository,
                 Data.Promenade.FeatureRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IGroupRepository,
                 Data.Promenade.GroupRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ILocationRepository,
+                Data.Promenade.LocationRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ILocationFeatureRepository,
                 Data.Promenade.LocationFeatureRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ILocationGroupRepository,
                 Data.Promenade.LocationGroupRepository>();
-            services.AddScoped<Service.Interfaces.Repositories.ILocationRepository,
-                Data.Promenade.LocationRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ILocationHoursRepository,
+                Data.Promenade.LocationHoursRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ILocationHoursOverrideRepository,
+                Data.Promenade.LocationHoursOverrideRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IPageRepository,
                 Data.Promenade.PageRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ISiteAlertRepository,

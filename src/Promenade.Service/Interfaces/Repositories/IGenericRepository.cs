@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
 namespace Ocuda.Promenade.Service.Interfaces
 {

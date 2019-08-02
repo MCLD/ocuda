@@ -227,25 +227,25 @@ namespace Ocuda.Promenade.Service
             }
 
             var formattedDayGroupings = new List<string>();
-            foreach (var grouping in dayGroupings)
+            foreach (var (DaysOfWeek, OpenTime, CloseTime) in dayGroupings)
             {
-                var days = GetFormattedDayGroupings(grouping.DaysOfWeek);
+                var days = GetFormattedDayGroupings(DaysOfWeek);
 
-                var openTime = new StringBuilder(grouping.OpenTime.ToString("%h"));
-                if (grouping.OpenTime.Minute != 0)
+                var openTime = new StringBuilder(OpenTime.ToString("%h"));
+                if (OpenTime.Minute != 0)
                 {
-                    openTime.Append(grouping.OpenTime.ToString(":mm"));
+                    openTime.Append(OpenTime.ToString(":mm"));
                 }
-                openTime.Append(grouping.OpenTime.ToString(" tt").ToLower());
+                openTime.Append(OpenTime.ToString(" tt").ToLower());
 
-                var closeTime = new StringBuilder(grouping.CloseTime.ToString("%h"));
-                if (grouping.CloseTime.Minute != 0)
+                var closeTime = new StringBuilder(CloseTime.ToString("%h"));
+                if (CloseTime.Minute != 0)
                 {
-                    closeTime.Append(grouping.CloseTime.ToString(":mm"));
+                    closeTime.Append(CloseTime.ToString(":mm"));
                 }
-                closeTime.Append(grouping.CloseTime.ToString(" tt").ToLower());
+                closeTime.Append(CloseTime.ToString(" tt").ToLower());
 
-                formattedDayGroupings.Add($"{days} {openTime} \u2014 {closeTime}");
+                formattedDayGroupings.Add($"{days} {openTime} \u2015 {closeTime}");
             }
 
             if (closedDays.Count > 0)
@@ -271,7 +271,7 @@ namespace Ocuda.Promenade.Service
 
                 if (days.Count == lastDay - firstDay + 1)
                 {
-                    return $"{dayFormatter.GetAbbreviatedDayName(firstDay)} \u2014 {dayFormatter.GetAbbreviatedDayName(lastDay)}";
+                    return $"{dayFormatter.GetAbbreviatedDayName(firstDay)} \u2015 {dayFormatter.GetAbbreviatedDayName(lastDay)}";
                 }
                 else if (days.Count == 2)
                 {
