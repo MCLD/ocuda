@@ -70,7 +70,7 @@ namespace Ocuda.Promenade.Service
 
             if (location.IsAlwaysOpen)
             {
-                for (int day  = 0; day < DaysInWeek; day++)
+                for (int day = 0; day < DaysInWeek; day++)
                 {
                     results.Add(new LocationHoursResult
                     {
@@ -90,7 +90,7 @@ namespace Ocuda.Promenade.Service
                 var overrides = await _locationHoursOverrideRepository.GetBetweenDatesAsync(
                     locationId, firstDayOfWeek, lastDayOfWeek);
 
-                foreach(var dayOverride in overrides)
+                foreach (var dayOverride in overrides)
                 {
                     results.Add(new LocationHoursResult
                     {
@@ -139,7 +139,7 @@ namespace Ocuda.Promenade.Service
 
         public async Task<LocationFeature> GetLocationFeatureByIds(int locationId, int featureId)
         {
-            return await _locationFeatureRepository.GetLocationFeaturesByIds(locationId,featureId);
+            return await _locationFeatureRepository.GetLocationFeaturesByIds(locationId, featureId);
         }
 
         public async Task<List<Feature>> GetLocationsFeaturesAsync(string locationStub)
