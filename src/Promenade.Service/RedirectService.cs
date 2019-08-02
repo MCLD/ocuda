@@ -28,7 +28,7 @@ namespace Ocuda.Promenade.Service
         }
 
         public async Task<UrlRedirect> GetUrlRedirectByPathAsync(string path,
-            List<KeyValuePair<string, string>> queryParams)
+            Dictionary<string, string> queryParams)
         {
             var redirects = await _urlRedirectRepository.GetRedirectsByPathAsync(path.TrimEnd('/'));
             UrlRedirect redirect = null;

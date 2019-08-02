@@ -152,8 +152,8 @@ namespace Ocuda.Promenade.Controllers
             }
         }
 
-        [HttpGet("[action]/{locationStub}")]
-        [HttpGet("[action]/{locationStub}/{featureStub}")]
+        [HttpGet("{locationStub}")]
+        [HttpGet("{locationStub}/{featureStub}")]
         public async Task<IActionResult> Locations(string locationStub, string featureStub)
         {
             if (string.IsNullOrEmpty(locationStub))

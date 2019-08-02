@@ -38,11 +38,7 @@ namespace Ocuda.Promenade.Controllers
 
             if (id == 404)
             {
-                var queryParams = Request.Query.Select(_ => new KeyValuePair<string, string>
-                (
-                    _.Key,
-                    _.Value
-                )).ToList();
+                var queryParams = Request.Query.ToDictionary(_ => _.Key, _ => _.Value.ToString());
 
                 var redirect = await _redirectService.GetUrlRedirectByPathAsync(originalPath,
                     queryParams);

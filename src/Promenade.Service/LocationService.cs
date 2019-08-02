@@ -16,6 +16,7 @@ namespace Ocuda.Promenade.Service
     public class LocationService : BaseService<LocationService>
     {
         private const int DaysInWeek = 7;
+        private const string ndash = "\u2013";
 
         private readonly ILocationHoursRepository _locationHoursRepository;
         private readonly ILocationRepository _locationRepository;
@@ -245,7 +246,7 @@ namespace Ocuda.Promenade.Service
                 }
                 closeTime.Append(CloseTime.ToString(" tt").ToLower());
 
-                formattedDayGroupings.Add($"{days} {openTime} \u2015 {closeTime}");
+                formattedDayGroupings.Add($"{days} {openTime}{ndash}{closeTime}");
             }
 
             if (closedDays.Count > 0)
@@ -271,7 +272,7 @@ namespace Ocuda.Promenade.Service
 
                 if (days.Count == lastDay - firstDay + 1)
                 {
-                    return $"{dayFormatter.GetAbbreviatedDayName(firstDay)} \u2015 {dayFormatter.GetAbbreviatedDayName(lastDay)}";
+                    return $"{dayFormatter.GetAbbreviatedDayName(firstDay)}{ndash}{dayFormatter.GetAbbreviatedDayName(lastDay)}";
                 }
                 else if (days.Count == 2)
                 {

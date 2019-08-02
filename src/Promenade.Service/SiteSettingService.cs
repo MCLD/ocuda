@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
-using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Promenade.Service
 {
@@ -30,7 +30,18 @@ namespace Ocuda.Promenade.Service
             }
             else
             {
-                throw new OcudaException($"Invalid value for promenade boolean setting {key}: {settingValue}");
+                _logger.LogError($"Invalid value for promenade boolean setting {key}: {settingValue}");
+
+                var defaultSetting = GetDefaultSetting(key);
+                if (bool.TryParse(defaultSetting.Value, out bool defaultResult))
+                {
+                    return defaultResult;
+                }
+                else
+                {
+                    _logger.LogCritical($"Invalid default value for promenade boolean setting {key}: {settingValue}");
+                    return default;
+                }
             }
         }
 
@@ -45,7 +56,18 @@ namespace Ocuda.Promenade.Service
             }
             else
             {
-                throw new OcudaException($"Invalid value for promenade integer setting {key}: {settingValue}");
+                _logger.LogError($"Invalid value for promenade integer setting {key}: {settingValue}");
+
+                var defaultSetting = GetDefaultSetting(key);
+                if (int.TryParse(defaultSetting.Value, out int defaultResult))
+                {
+                    return defaultResult;
+                }
+                else
+                {
+                    _logger.LogCritical($"Invalid default value for promenade integer setting {key}: {settingValue}");
+                    return default;
+                }
             }
         }
 
@@ -60,11 +82,15 @@ namespace Ocuda.Promenade.Service
             if (siteSetting == null)
             {
                 _logger.LogError($"Promenade site setting key \"{key}\" not found.");
-                siteSetting = Models.Defaults.SiteSettings.Get.Where(_ => _.Key == key).Single();
+                siteSetting = GetDefaultSetting(key);
             }
 
-
             return siteSetting.Value;
+        }
+
+        private SiteSetting GetDefaultSetting(string key)
+        {
+            return Models.Defaults.SiteSettings.Get.Where(_ => _.Key == key).Single();
         }
     }
 }
