@@ -8,6 +8,8 @@
         public static readonly string OcudaLoggingRollingFile = "Ocuda.LoggingRollingFile";
         public static readonly string OcudaLoggingRollingHttpFile = "Ocuda.LoggingRollingHttpFile";
 
+        public static readonly string ThrowQueryWarningsInDev = "ThrowQueryWarningsInDev";
+
         public static readonly string OpsAuthBlankRequestRedirect = "Ops.AuthBlankRequestRedirect";
         public static readonly string OpsAuthRedirect = "Ops.AuthRedirect";
         public static readonly string OpsAuthTimeoutMinutes = "Ops.AuthTimeoutMinutes";

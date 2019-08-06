@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Ocuda.Promenade.Models.Entities;
 
-namespace Ocuda.Promenade.Controllers.ViewModels
+namespace Ocuda.Promenade.Controllers.ViewModels.Locations
 {
     public class LocationViewModel
     {

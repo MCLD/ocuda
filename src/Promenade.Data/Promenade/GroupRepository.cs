@@ -4,10 +4,10 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 
 namespace Ocuda.Promenade.Data.Promenade
 {
-    public class GroupRepository : GenericRepository<Group, int>, IGroupRepository
+    public class GroupRepository : GenericRepository<PromenadeContext, Group, int>, IGroupRepository
     {
-        public GroupRepository(PromenadeContext context,
-            ILogger<GroupRepository> logger) : base(context, logger)
+        public GroupRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
+            ILogger<GroupRepository> logger) : base(repositoryFacade, logger)
         {
         }
     }
