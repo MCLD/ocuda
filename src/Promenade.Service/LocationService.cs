@@ -16,6 +16,7 @@ namespace Ocuda.Promenade.Service
     public class LocationService : BaseService<LocationService>
     {
         private const int DaysInWeek = 7;
+        private const string ndash = "\u2013";
 
         private readonly ILocationHoursRepository _locationHoursRepository;
         private readonly ILocationRepository _locationRepository;
@@ -70,7 +71,7 @@ namespace Ocuda.Promenade.Service
 
             if (location.IsAlwaysOpen)
             {
-                for (int day  = 0; day < DaysInWeek; day++)
+                for (int day = 0; day < DaysInWeek; day++)
                 {
                     results.Add(new LocationHoursResult
                     {
@@ -90,7 +91,7 @@ namespace Ocuda.Promenade.Service
                 var overrides = await _locationHoursOverrideRepository.GetBetweenDatesAsync(
                     locationId, firstDayOfWeek, lastDayOfWeek);
 
-                foreach(var dayOverride in overrides)
+                foreach (var dayOverride in overrides)
                 {
                     results.Add(new LocationHoursResult
                     {
@@ -139,7 +140,7 @@ namespace Ocuda.Promenade.Service
 
         public async Task<LocationFeature> GetLocationFeatureByIds(int locationId, int featureId)
         {
-            return await _locationFeatureRepository.GetLocationFeaturesByIds(locationId,featureId);
+            return await _locationFeatureRepository.GetLocationFeaturesByIds(locationId, featureId);
         }
 
         public async Task<List<Feature>> GetLocationsFeaturesAsync(string locationStub)
@@ -227,25 +228,25 @@ namespace Ocuda.Promenade.Service
             }
 
             var formattedDayGroupings = new List<string>();
-            foreach (var grouping in dayGroupings)
+            foreach (var (DaysOfWeek, OpenTime, CloseTime) in dayGroupings)
             {
-                var days = GetFormattedDayGroupings(grouping.DaysOfWeek);
+                var days = GetFormattedDayGroupings(DaysOfWeek);
 
-                var openTime = new StringBuilder(grouping.OpenTime.ToString("%h"));
-                if (grouping.OpenTime.Minute != 0)
+                var openTime = new StringBuilder(OpenTime.ToString("%h"));
+                if (OpenTime.Minute != 0)
                 {
-                    openTime.Append(grouping.OpenTime.ToString(":mm"));
+                    openTime.Append(OpenTime.ToString(":mm"));
                 }
-                openTime.Append(grouping.OpenTime.ToString(" tt").ToLower());
+                openTime.Append(OpenTime.ToString(" tt").ToLower());
 
-                var closeTime = new StringBuilder(grouping.CloseTime.ToString("%h"));
-                if (grouping.CloseTime.Minute != 0)
+                var closeTime = new StringBuilder(CloseTime.ToString("%h"));
+                if (CloseTime.Minute != 0)
                 {
-                    closeTime.Append(grouping.CloseTime.ToString(":mm"));
+                    closeTime.Append(CloseTime.ToString(":mm"));
                 }
-                closeTime.Append(grouping.CloseTime.ToString(" tt").ToLower());
+                closeTime.Append(CloseTime.ToString(" tt").ToLower());
 
-                formattedDayGroupings.Add($"{days} {openTime} \u2014 {closeTime}");
+                formattedDayGroupings.Add($"{days} {openTime}{ndash}{closeTime}");
             }
 
             if (closedDays.Count > 0)
@@ -271,7 +272,7 @@ namespace Ocuda.Promenade.Service
 
                 if (days.Count == lastDay - firstDay + 1)
                 {
-                    return $"{dayFormatter.GetAbbreviatedDayName(firstDay)} \u2014 {dayFormatter.GetAbbreviatedDayName(lastDay)}";
+                    return $"{dayFormatter.GetAbbreviatedDayName(firstDay)}{ndash}{dayFormatter.GetAbbreviatedDayName(lastDay)}";
                 }
                 else if (days.Count == 2)
                 {
@@ -380,7 +381,6 @@ namespace Ocuda.Promenade.Service
                 if (nextOpen != null)
                 {
                     var nextDay = "";
-
                     if ((int)nextOpen.DayOfWeek == ((int)now.DayOfWeek + 1) % DaysInWeek)
                     {
                         nextDay = "tomorrow";

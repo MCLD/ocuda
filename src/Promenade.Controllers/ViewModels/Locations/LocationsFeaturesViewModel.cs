@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Ocuda.Promenade.Controllers.ViewModels
+namespace Ocuda.Promenade.Controllers.ViewModels.Locations
 {
     public class LocationsFeaturesViewModel
     {
