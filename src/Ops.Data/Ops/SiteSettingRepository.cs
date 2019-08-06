@@ -8,10 +8,10 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 namespace Ocuda.Ops.Data.Ops
 {
     public class SiteSettingRepository
-        : GenericRepository<OpsContext, SiteSetting, int>, ISiteSettingRepository
+        : GenericRepository<SiteSetting, int>, ISiteSettingRepository
     {
-        public SiteSettingRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
-            ILogger<SiteSettingRepository> logger) : base(repositoryFacade, logger)
+        public SiteSettingRepository(OpsContext context, ILogger<SiteSettingRepository> logger)
+            : base(context, logger)
         {
         }
 

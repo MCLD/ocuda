@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -8,11 +10,10 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class FileTypeRepository
-        : GenericRepository<OpsContext, FileType, int>, IFileTypeRepository
+    public class FileTypeRepository : GenericRepository<FileType, int>, IFileTypeRepository
     {
-        public FileTypeRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
-            ILogger<FileTypeRepository> logger) : base(repositoryFacade, logger)
+        public FileTypeRepository(OpsContext context, ILogger<FileTypeRepository> logger)
+            : base(context, logger)
         {
         }
 

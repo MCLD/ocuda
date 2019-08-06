@@ -183,7 +183,6 @@ namespace Ocuda.Ops.Web
 
             // service facades
             services.AddScoped(typeof(Controllers.ServiceFacades.Controller<>));
-            services.AddScoped(typeof(Data.ServiceFacade.Repository<>));
 
             // filters
             services.AddScoped<Controllers.Filters.AuthenticationFilterAttribute>();
@@ -205,8 +204,6 @@ namespace Ocuda.Ops.Web
                 Data.Ops.FileRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileTypeRepository,
                 Data.Ops.FileTypeRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.ILocationRepository,
-                Data.Ops.LocationRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkLibraryRepository,
                 Data.Ops.LinkLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository,
@@ -234,7 +231,6 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IInitialSetupService, InitialSetupService>();
             services.AddScoped<IInsertSampleDataService, InsertSampleDataService>();
             services.AddScoped<ILdapService, LdapService>();
-            services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<ILinkService, LinkService>();
             services.AddScoped<IPathResolverService, PathResolverService>();
             services.AddScoped<IRosterService, RosterService>();

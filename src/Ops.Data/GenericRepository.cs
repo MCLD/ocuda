@@ -6,29 +6,21 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Data.ServiceFacade;
-using Ocuda.Utility.Data;
 
 namespace Ocuda.Ops.Data
 {
-    public abstract class GenericRepository<TContext, TEntity, TKeyType>
-        where TContext : DbContextBase
+    public abstract class GenericRepository<TEntity, TKeyType>
         where TEntity : class
         where TKeyType : struct
     {
-        protected readonly TContext _context;
+        protected readonly OpsContext _context;
         protected readonly ILogger _logger;
 
         private DbSet<TEntity> _dbSet;
 
-        protected GenericRepository(Repository<TContext> repositoryFacade, ILogger logger)
+        protected GenericRepository(OpsContext context, ILogger logger)
         {
-            if (repositoryFacade == null)
-            {
-                throw new ArgumentNullException(nameof(repositoryFacade));
-            }
-
-            _context = repositoryFacade.context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -70,7 +62,7 @@ namespace Ocuda.Ops.Data
             DbSet.UpdateRange(entities);
         }
 
-        public virtual async Task<ICollection<TEntity>>
+        public virtual async Task<ICollection<TEntity>> 
             ToListAsync(params Expression<Func<TEntity, IComparable>>[] orderBys)
         {
             Contract.Requires(orderBys != null && orderBys.Any());
@@ -110,7 +102,7 @@ namespace Ocuda.Ops.Data
             await _context.SaveChangesAsync();
         }
 
-        private IOrderedQueryable<TEntity>
+        private IOrderedQueryable<TEntity> 
             DbSetOrdered(Expression<Func<TEntity, IComparable>>[] orderBys)
         {
             IOrderedQueryable<TEntity> query = null;
