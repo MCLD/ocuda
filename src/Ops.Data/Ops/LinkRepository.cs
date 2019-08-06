@@ -12,10 +12,10 @@ using Ocuda.Ops.Service.Models;
 namespace Ocuda.Ops.Data.Ops
 {
     public class LinkRepository
-        : GenericRepository<Link, int>, ILinkRepository
+        : GenericRepository<OpsContext, Link, int>, ILinkRepository
     {
-        public LinkRepository(OpsContext context, ILogger<LinkRepository> logger)
-            : base(context, logger)
+        public LinkRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
+            ILogger<LinkRepository> logger) : base(repositoryFacade, logger)
         {
         }
 

@@ -9,17 +9,16 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 namespace Ocuda.Ops.Data.Ops
 {
     public class ClaimGroupRepository
-        : GenericRepository<ClaimGroup, int>, IClaimGroupRepository
+        : GenericRepository<OpsContext, ClaimGroup, int>, IClaimGroupRepository
     {
-        public ClaimGroupRepository(OpsContext context,
-            ILogger<ClaimGroupRepository> logger)
-            : base(context, logger)
+        public ClaimGroupRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
+            ILogger<ClaimGroupRepository> logger) : base(repositoryFacade, logger)
         {
         }
 
         public async Task<bool> IsClaimGroup(string claim, string group)
         {
-            if(string.IsNullOrEmpty(group) || string.IsNullOrEmpty(claim))
+            if (string.IsNullOrEmpty(group) || string.IsNullOrEmpty(claim))
             {
                 return false;
             }
