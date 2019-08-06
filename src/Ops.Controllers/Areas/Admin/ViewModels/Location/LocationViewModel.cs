@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Ocuda.Promenade.Models.Entities;
+﻿using System.Collections.Generic;
+using Ocuda.Ops.Service.Models;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location
 {
     public class LocationViewModel
     {
-        public List<Promenade.Models.Entities.Location> AllLocations { get; set; }
+        public ICollection<Promenade.Models.Entities.Location> AllLocations { get; set; }
 
         public Promenade.Models.Entities.Location Location { get; set; }
+        public bool IsSavedLocation { get; set; }
+
+        public PaginateModel PaginateModel { get; set; }
     }
 }

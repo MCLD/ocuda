@@ -10,8 +10,8 @@ namespace BranchLocator.Models.PlaceDetails
         [JsonProperty("html_attributions")]
         public string[] HtmlAtrributions { get; set; }
 
-        [JsonProperty("results")]
-        public PlaceDetailsResult[] Results { get; set; }
+        [JsonProperty("result")]
+        public PlaceDetailsResult Results { get; set; }
 
         [JsonProperty("status")]
         public string Status { get; set; }
@@ -19,7 +19,7 @@ namespace BranchLocator.Models.PlaceDetails
     public class PlaceDetailsResult
     {
         [JsonProperty("address_components")]
-        public AddressComponent AddressComponents { get; set; }
+        public AddressComponent[] AddressComponents { get; set; }
 
         [JsonProperty("addr_address")]
         public string AddrAddress { get; set; }

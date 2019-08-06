@@ -91,5 +91,8 @@ namespace Ocuda.Promenade.Models.Entities
 
         [NotMapped]
         public List<string> WeeklyHours { get; set; }
+
+        [NotMapped]
+        public bool IsNewLocation { get; set; }
     }
 }

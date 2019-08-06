@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 
@@ -28,42 +30,62 @@ namespace Ocuda.Ops.Service
         {
             return await _locationRepository.GeAllLocationsAsync();
         }
+        public async Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(
+            BaseFilter filter)
+        {
+            return await _locationRepository.GetPaginatedListAsync(filter);
+        }
 
         public async Task<Location> GetLocationByStubAsync(string locationStub)
         {
             return await _locationRepository.GetLocationByStub(locationStub);
         }
 
-        public async Task<Location> AddAsync(Location location)
+        public async Task<Location> AddLocationAsync(Location location)
         {
-            location.Name = location.Name?.Trim();
+            try
+            {
+                location.Name = location.Name?.Trim();
+                await ValidateAsync(location);
 
-            await ValidateAsync(location);
+                await _locationRepository.AddAsync(location);
+                await _locationRepository.SaveAsync();
+            }
+            catch (OcudaException ex)
+            {
+                throw new OcudaException(ex.Message);
+            }
 
-            await _locationRepository.AddAsync(location);
-            await _locationRepository.SaveAsync();
-
-            return location;
+                return location;
         }
 
         public async Task<Location> EditAsync(Location location)
         {
-            var currentlocation = await _locationRepository.FindAsync(location.Id);
 
-            currentlocation.Name = location.Name?.Trim();
+            try
+            {
 
-            await ValidateAsync(currentlocation);
-
-            _locationRepository.Update(currentlocation);
-            await _locationRepository.SaveAsync();
-
-            return currentlocation;
+                _locationRepository.Update(location);
+                await _locationRepository.SaveAsync();
+                return await _locationRepository.FindAsync(location.Id);
+            }
+            catch (OcudaException ex)
+            {
+                throw new OcudaException(ex.Message);
+            }
         }
 
         public async Task DeleteAsync(int id)
         {
-            _locationRepository.Remove(id);
-            await _locationRepository.SaveAsync();
+            try
+            {
+                _locationRepository.Remove(id);
+                await _locationRepository.SaveAsync();
+            }
+            catch(OcudaException ex)
+            {
+                throw new OcudaException(ex.Message);
+            }
         }
 
         private async Task ValidateAsync(Location location)
