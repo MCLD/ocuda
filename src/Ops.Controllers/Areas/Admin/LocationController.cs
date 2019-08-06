@@ -56,7 +56,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
             var locationList = await _locationService.GetPaginatedListAsync(filter);
 
-            var paginateModel = new PaginateModel()
+            var paginateModel = new PaginateModel
             {
                 ItemCount = locationList.Count,
                 CurrentPage = page,
@@ -244,7 +244,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
                         geoPlace = JsonConvert.DeserializeObject<GeocodePlace>(stringResult);
                         var results = new List<PlaceDetailsResult>();
-                        foreach (var result in geoPlace.Results.Where(_ => _.PlaceId != null || !_.PlaceId.Equals("")))
+                        foreach (var result in geoPlace.Results.Where(_ => !_.PlaceId.Equals("") || _.PlaceId != null))
                         {
                             string stringDetailResult = null;
 
