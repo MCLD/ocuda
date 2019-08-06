@@ -120,6 +120,9 @@
     background-color: lightskyblue;
     padding-left: 1.75rem;
 }
+span.format-addr {
+    font-style: italic;
+}
 
 @media screen and (max-height: 500px) {
     .navcolumn {
