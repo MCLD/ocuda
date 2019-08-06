@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -23,5 +24,8 @@ namespace Ocuda.Promenade.Models.Entities
 
         [Required]
         public string BodyText { get; set; }
+
+        [NotMapped]
+        public bool IsNewFeature { get; set; }
     }
 }

@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Promenade.Data;
 
 namespace Ocuda.Ops.Data.Ops
 {
     public class ClaimGroupRepository
-        : GenericRepository<ClaimGroup, int>, IClaimGroupRepository
+        : GenericRepository<OpsContext, ClaimGroup, int>, IClaimGroupRepository
     {
-        public ClaimGroupRepository(OpsContext context,
-            ILogger<ClaimGroupRepository> logger)
-            : base(context, logger)
+        public ClaimGroupRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
+            ILogger<ClaimGroupRepository> logger) : base(repositoryFacade, logger)
         {
         }
 

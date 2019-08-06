@@ -8,13 +8,15 @@ using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Models;
+using Ocuda.Promenade.Data;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class FileLibraryRepository : GenericRepository<FileLibrary, int>, IFileLibraryRepository
+    public class FileLibraryRepository
+        : GenericRepository<OpsContext, FileLibrary, int>, IFileLibraryRepository
     {
-        public FileLibraryRepository(OpsContext context, ILogger<FileLibraryRepository> logger)
-            : base(context, logger)
+        public FileLibraryRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
+            ILogger<FileLibraryRepository> logger) : base(repositoryFacade, logger)
         {
         }
 

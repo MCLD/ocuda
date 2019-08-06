@@ -8,14 +8,15 @@ using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Models;
+using Ocuda.Promenade.Data;
 
 namespace Ocuda.Ops.Data.Ops
 {
     public class UserMetadataTypeRepository
-        : GenericRepository<UserMetadataType, int>, IUserMetadataTypeRepository
+        : GenericRepository<OpsContext, UserMetadataType, int>, IUserMetadataTypeRepository
     {
-        public UserMetadataTypeRepository(OpsContext context,
-            ILogger<UserMetadataTypeRepository> logger) : base(context, logger)
+        public UserMetadataTypeRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
+            ILogger<UserMetadataTypeRepository> logger) : base(repositoryFacade, logger)
         {
         }
 
