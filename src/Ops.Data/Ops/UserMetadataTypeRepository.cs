@@ -12,10 +12,10 @@ using Ocuda.Ops.Service.Models;
 namespace Ocuda.Ops.Data.Ops
 {
     public class UserMetadataTypeRepository
-        : GenericRepository<OpsContext, UserMetadataType, int>, IUserMetadataTypeRepository
+        : GenericRepository<UserMetadataType, int>, IUserMetadataTypeRepository
     {
-        public UserMetadataTypeRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
-            ILogger<UserMetadataTypeRepository> logger) : base(repositoryFacade, logger)
+        public UserMetadataTypeRepository(OpsContext context,
+            ILogger<UserMetadataTypeRepository> logger) : base(context, logger)
         {
         }
 

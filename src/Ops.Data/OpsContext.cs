@@ -3,7 +3,6 @@ using System.Linq;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Ocuda.Ops.Models.Entities;
-using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data
 {
@@ -48,7 +47,7 @@ namespace Ocuda.Ops.Data
         public DbSet<RosterHeader> RosterHeaders { get; set; }
         public DbSet<RosterDetail> RosterDetails { get; set; }
         public DbSet<SectionManagerGroup> SectionManagerGroups { get; set; }
-        public DbSet<Models.Entities.SiteSetting> SiteSettings { get; set; }
+        public DbSet<SiteSetting> SiteSettings { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<UserMetadata> UserMetadata { get; set; }
         public DbSet<UserMetadataType> UserMetadataTypes { get; set; }
