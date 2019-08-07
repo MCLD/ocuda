@@ -32,9 +32,17 @@ namespace Ocuda.Ops.Service
             return await _featureRepository.GetPaginatedListAsync(filter);
         }
 
-        public async Task<Feature> GetFeatureByStubAsync(string featureStub)
+        public async Task<Feature> GetFeatureByNameAsync(string featureName)
         {
-            return await _featureRepository.GetFeatureByStub(featureStub);
+            try
+            {
+                return await _featureRepository.GetFeatureByName(featureName);
+            }
+            catch (OcudaException ex)
+            {
+                _logger.LogError(ex.Message);
+                throw new OcudaException($"The feature: " + featureName + " was unable to be found.");
+            }
         }
 
         public async Task<Feature> AddFeatureAsync(Feature feature)
@@ -49,6 +57,7 @@ namespace Ocuda.Ops.Service
             }
             catch (OcudaException ex)
             {
+                _logger.LogError(ex.Message);
                 throw new OcudaException(ex.Message);
             }
 
@@ -67,6 +76,7 @@ namespace Ocuda.Ops.Service
             }
             catch (OcudaException ex)
             {
+                _logger.LogError(ex.Message);
                 throw new OcudaException(ex.Message);
             }
         }
@@ -80,6 +90,7 @@ namespace Ocuda.Ops.Service
             }
             catch (OcudaException ex)
             {
+                _logger.LogError(ex.Message);
                 throw new OcudaException(ex.Message);
             }
         }

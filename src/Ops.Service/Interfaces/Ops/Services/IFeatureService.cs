@@ -10,7 +10,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IFeatureService
     {
-        Task<Feature> GetFeatureByStubAsync(string featureStub);
+        Task<Feature> GetFeatureByNameAsync(string featureName);
         Task<Feature> AddFeatureAsync(Feature feature);
         Task<DataWithCount<ICollection<Feature>>> GetPaginatedListAsync(BaseFilter filter);
         Task<Feature> EditAsync(Feature feature);

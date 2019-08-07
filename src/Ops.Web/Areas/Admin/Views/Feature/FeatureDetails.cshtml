@@ -1,151 +1,160 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Feature.FeatureViewModel
-<html>
-<body>
-    <div class="container">
-        <div class="feature-save-container">
-            <div class="feature-save-message"></div>
+
+@section styles {
+    <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/devstyles/fontawesome-iconpicker/main.min.css" asp-append-version="true" />
+}
+
+
+<div class="container">
+    <div class="feature-save-container">
+        <div class="feature-save-message"></div>
+    </div>
+    <div class="row page-title">
+        <div class="col-xs-12">
+            @if (Model.Feature.IsNewFeature)
+            {
+                <h2>Add Feature</h2>
+            }
+            else
+            {
+                <h2>Edit Feature</h2>
+            }
         </div>
-        <div class="row page-title">
+    </div>
+    <form method="post" asp-controller="Feature" asp-action="@if(Model.Feature.IsNewFeature){<text>CreateFeature</text> }else{<text>EditFeature</text>}" role="form" display="inline">
+        <div class="row">
+            <input value="@Model.Feature.Id" asp-for="Feature.Id" id="feature-id" type="hidden" />
+            <input value="@Model.Feature.ImagePath" asp-for="Feature.ImagePath" id="location-imagepath" type="hidden" />
             <div class="col-xs-12">
-                @if (Model.Feature.IsNewFeature)
-                {
-                    <h2>Add Feature</h2>
-                }
-                else
-                {
-                    <h2>Edit Feature - @Model.Feature.Name</h2>
-                }
-            </div>
-        </div>
-        <form method="post" asp-controller="Feature" asp-action="@if(Model.Feature.IsNewFeature){<text>CreateFeature</text> }else{<text>EditFeature</text>}" role="form" display="inline">
-            <div class="row">
-                <input value="@Model.Feature.Id" asp-for="Feature.Id" id="feature-id" type="hidden" />
-                <input value="@Model.Feature.ImagePath" asp-for="Feature.ImagePath" id="location-imagepath" type="hidden" />
-                <div class="col-xs-12">
-                    <div class="form-group">
-                        <input value="@Model.Feature.Name" asp-for="Feature.Name" id="location-name" formgroup autocomplete="off" />
-                        <span class="text-danger field-validation-valid"></span>
-                    </div>
-                    @if (Model.Feature.IsNewFeature)
-                    {
-                        <text>
-                            Popup? <input type="checkbox" id="stubCheck" onclick="needStub()">
-                            Need a General Description? <input type="checkbox" id="bodyTextCheck" onclick="needBodyText()">
-                        </text>
-                    }
-                    <div class="form-group" id="stub-div" @if (Model.Feature.IsNewFeature) { @:style = "display: none;"
-                         }>
-                        <div class="form-group" id="stub">
-                            <input value="@Model.Feature.Stub" asp-for="Feature.Stub" id="feature-stub" formgroup autocomplete="off" />
-                            <span class="text-danger field-validation-valid"></span>
+                <div class="form-group">
+                    <input value="@Model.Feature.Name" asp-for="Feature.Name" id="location-name" formgroup autocomplete="off" />
+                    <span class="text-danger field-validation-valid"></span>
+                </div>
+                <div class="form-group">
+                    <input value="@Model.Feature.FontAwesome" asp-for="Feature.FontAwesome" id="feature-fontAwesome" class="form-control icon-picker" type="text" formgroup autocomplete="off" />
+                    <span class="text-danger field-validation-valid"></span>
+                </div>
+                <div class="accordion" id="popup-accordion">
+                    <div class="card">
+                        <div class="card-header" id="accordion-header">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" id="popup-button" type="button" data-toggle="collapse" data-target="#collapseDiv" aria-expanded="true" aria-controls="collapseDiv">
+                                    Make it a Popup
+                                </button>
+                            </h5>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="form-group">
-                            <input value="@Model.Feature.FontAwesome" asp-for="Feature.FontAwesome" id="feature-fontAwesome" formgroup autocomplete="off" />
-                            <span class="text-danger field-validation-valid"></span>
-                        </div>
-                    </div>
-                    <div class="form-group row" id="bodyText-div"  @if (Model.Feature.IsNewFeature) { @:style = "display: none;"
-                         }>
-                        <label asp-for="Feature.BodyText" class="col-md-3 col-form-label text-md-right"></label>
-                        <div class="col-md-9">
-                            <ul class="nav nav-tabs">
-                                <li class="nav-item">
-                                    <a class="nav-link active" data-toggle="tab" href="#md-edit" role="tab">Edit</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-toggle="tab" href="#md-preview" role="tab">Preview</a>
-                                </li>
-                            </ul>
-                            <div class="tab-content" id="md-edit-preview">
-                                <div class="tab-pane show active" id="md-edit" role="tabpanel">
-                                    <div id="wmd-button-bar" class="wmd-button-row"></div>
-                                    <textarea asp-for="Feature.BodyText" value="@Model.Feature.BodyText" class="form-control wmd-input" id="wmd-input"></textarea>
+                        <div id="collapseDiv" class="collapse show" aria-labelledby="headingOne" data-parent="#popup-accordion">
+                            <div class="card-body">
+                                <div class="form-group" id="stub-div">
+                                    <input value="@Model.Feature.Stub" asp-for="Feature.Stub" id="feature-stub" formgroup autocomplete="off" />
+                                    <span class="text-danger field-validation-valid"></span>
                                 </div>
-                                <div class="tab-pane" id="md-preview" role="tabpanel">
-                                    <div id="preview" class="wmd-preview"></div>
+                                <div class="form-group row" id="bodyText-div">
+                                    <label asp-for="Feature.BodyText" class="col-md-3 col-form-label text-md-right"></label>
+                                    <div class="col-md-9">
+                                        <ul class="nav nav-tabs">
+                                            <li class="nav-item">
+                                                <a class="nav-link active" data-toggle="tab" href="#md-edit" role="tab">Edit</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-toggle="tab" href="#md-preview" role="tab">Preview</a>
+                                            </li>
+                                        </ul>
+                                        <div class="tab-content" id="md-edit-preview">
+                                            <div class="tab-pane show active" id="md-edit" role="tabpanel">
+                                                <div id="wmd-button-bar" class="wmd-button-row"></div>
+                                                <textarea asp-for="Feature.BodyText" value="@Model.Feature.BodyText" class="form-control wmd-input" id="wmd-input"></textarea>
+                                            </div>
+                                            <div class="tab-pane" id="md-preview" role="tabpanel">
+                                                <div id="preview" class="wmd-preview"></div>
+                                            </div>
+                                            <span asp-validation-for="Feature.BodyText" class="text-danger"></span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <span asp-validation-for="Feature.BodyText" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
-
-
-                    <div class="form-group">
-                        <a class="btn btn-secondary" id="return-home" href="@Url.Action("Index", "Feature")">Return to Features</a>
-                        @if (Model.Feature.IsNewFeature)
-                        {
-                            <text>
-                                <button type="submit" id="submit" value="Submit" class="btn btn-primary btn-spinner">
-                                    <span class="buttonText">Add Feature</span>
-                                    <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
-                                </button>
-                            </text>
-                        }
-                        else
-                        {
-                            <text>
-                                <button type="submit" id="submit" value="Submit" class="btn btn-primary btn-spinner">
-                                    <span class="buttonText">Update Feature</span>
-                                    <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
-                                </button>
-                            </text>
-                        }
-                    </div>
+                </div>
+                <div class="form-group">
+                    <a class="btn btn-secondary" id="return-home" href="@Url.Action("Index", "Feature")">Return to Features</a>
+                    @if (Model.Feature.IsNewFeature)
+                    {
+                        <text>
+                            <button type="submit" id="submit" value="Submit" class="btn btn-primary btn-spinner">
+                                <span class="buttonText">Add Feature</span>
+                                <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
+                            </button>
+                        </text>
+                    }
+                    else
+                    {
+                        <text>
+                            <button type="submit" id="submit" value="Submit" class="btn btn-primary btn-spinner">
+                                <span class="buttonText">Update Feature</span>
+                                <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
+                            </button>
+                        </text>
+                    }
                 </div>
             </div>
-        </form>
-    </div>
-    @section scripts{
-        <script src="~/js/md.min.js" asp-append-version="true"></script>
-        <script>
-            var editor = new Markdown.Editor({ allowUploads: false });
-            editor.run();
-            @if (Model.Feature.IsNewFeature) {
-                <text>
-                function needStub() {
-                    var checkBox = document.getElementById("stubCheck");
-                    var div = document.getElementById("stub-div");
+        </div>
+    </form>
+</div>
+@section scripts{
+    <script src="~/devscripts/fontawesome-iconpicker/main.js" asp-append-version="true"></script>
+    <script>
+    $(function () {
+        $('.icon-picker').iconpicker();
+    });
+        
+    </script>
+    <script src="~/js/md.min.js" asp-append-version="true"></script>
+    <script>
+        $("#accordion-header").addClass("alert-success");
 
-                    if (checkBox.checked == true){
-                    div.style.display = "block";
-                    } else {
-                    div.style.display = "none";
-                    }
-                }
-                function needBodyText() {
-                    var checkBox = document.getElementById("bodyTextCheck");
-                    var div = document.getElementById("bodyText-div");
+        if(!$("#feature-stub").val()) {
+            $('.collapse').collapse();
+            $("#accordion-header").removeClass( "alert-success" );
+            $("#accordion-header").addClass("alert-danger");
+        }
 
-                    if (checkBox.checked == true){
-                    div.style.display = "block";
-                    } else {
-                    div.style.display = "none";
-                    }
-                }
-                </text>
+        $("#popup-button").click(function () {
+            if ($("#accordion-header").hasClass("alert-success")) {
+                $("#accordion-header").removeClass( "alert-success" );
+                $("#accordion-header").addClass("alert-danger");
             }
-            $(document).ready(function () {
+            else if ($("#accordion-header").hasClass("alert-danger")) {
+                $("#accordion-header").removeClass( "alert-danger" );
+                $("#accordion-header").addClass("alert-success");
+            }
+        });
+        $("#submit").click(function () {
+            if ($("#accordion-header").hasClass("alert-danger")) {
+                $("#wmd-input").val(" ");
+                $("#feature-stub").val(" ");
+            }
+        });
+        var editor = new Markdown.Editor({ allowUploads: false });
+        editor.run();
+        $(document).ready(function () {
 
-                var stubInfo = document.createElement("span");
-                stubInfo.classList.add("fa-info-circle");
-                stubInfo.classList.add("fas");
-                stubInfo.setAttribute("data-toggle", "tooltip");
-                stubInfo.setAttribute("href", "#");
-                stubInfo.setAttribute("id", "stub-info");
-                stubInfo.setAttribute("title", "The stub is the nickname for the feature");
-                $($($($("#feature-stub").parent()).parent()).children().first()).attr("id", "Feature_Stub");
-                $("#Feature_Stub").append("&nbsp;");
-                $("#Feature_Stub").append(stubInfo);
-                $('[data-toggle="tooltip"]').tooltip();
+            var stubInfo = document.createElement("span");
+            stubInfo.classList.add("fa-info-circle");
+            stubInfo.classList.add("fas");
+            stubInfo.setAttribute("data-toggle", "tooltip");
+            stubInfo.setAttribute("href", "#");
+            stubInfo.setAttribute("id", "stub-info");
+            stubInfo.setAttribute("title", "The stub is the nickname/URL for the feature.");
+            $($($($("#feature-stub").parent()).parent()).children().first()).attr("id", "Feature_Stub");
+            $("#Feature_Stub").append("&nbsp;");
+            $("#Feature_Stub").append(stubInfo);
+            $('[data-toggle="tooltip"]').tooltip();
 
-                $("input#feature-stub").blur(function () {
-                    $("input#feature-stub").val($("input#feature-stub").val().toLowerCase().replace(/\s/g, ''));
-                });
+            $("input#feature-stub").blur(function () {
+                $("input#feature-stub").val($("input#feature-stub").val().toLowerCase().replace(/\s/g, ''));
             });
-        </script>
-    }
-
-</body>
-</html>
+        });
+    </script>
+}

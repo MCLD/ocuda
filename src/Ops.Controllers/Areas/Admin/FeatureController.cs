@@ -38,8 +38,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ?? throw new ArgumentNullException(nameof(featureService));
         }
 
-        [HttpGet("")]
-        [HttpGet("[action]")]
+        [Route("")]
+        [Route("[action]")]
         public async Task<IActionResult> Index(int page = 1)
         {
 
@@ -74,11 +74,12 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
             return View(viewModel);
         }
-        [HttpGet("{featureStub}")]
-        [HttpGet("AddFeature")]
-        public async Task<IActionResult> Feature(string featureStub)
+
+        [Route("AddFeature")]
+        [Route("{featureName}")]
+        public async Task<IActionResult> Feature(string featureName)
         {
-            if (string.IsNullOrEmpty(featureStub))
+            if (string.IsNullOrEmpty(featureName))
             {
                 var feature = new Feature();
                 feature.IsNewFeature = true;
@@ -91,13 +92,22 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             else
             {
-                var feature = await _featureService.GetFeatureByStubAsync(featureStub);
-                feature.IsNewFeature = false;
-                var viewModel = new FeatureViewModel
+                try
                 {
-                    Feature = feature,
-                };
-                return View("FeatureDetails", viewModel);
+                    var feature = await _featureService.GetFeatureByNameAsync(featureName);
+                    feature.IsNewFeature = false;
+                    var viewModel = new FeatureViewModel
+                    {
+                        Feature = feature,
+                    };
+                    return View("FeatureDetails", viewModel);
+                }
+                catch (OcudaException ex)
+                {
+                    ShowAlertDanger($"Feature does not exist: {ex.Message}");
+                    _logger.LogError(ex.Message);
+                    return RedirectToAction("Index");
+                }
             }
         }
 
@@ -105,16 +115,34 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [Route("[action]")]
         public async Task<IActionResult> CreateFeature(Feature feature)
         {
+            if (string.IsNullOrEmpty(feature.Stub))
+            {
+                feature.Stub = "";
+            }
+            if (string.IsNullOrEmpty(feature.BodyText))
+            {
+                feature.BodyText = "";
+            }
+            if (feature.FontAwesome.Contains("fab"))
+            {
+                feature.FontAwesome = "fa-inverse " + feature.FontAwesome +" fa-stack-1x";
+            }
+            else
+            {
+                feature.FontAwesome = "fa fa-inverse " + feature.FontAwesome + " fa-stack-1x";
+            }
+            
             try
             {
                 await _featureService.AddFeatureAsync(feature);
                 ShowAlertSuccess($"Added Feature: {feature.Name}");
                 feature.IsNewFeature = true;
-                return RedirectToAction("Feature", new { featureStub = feature.Stub });
+                return RedirectToAction("Feature", new { featureName = feature.Name });
             }
             catch (OcudaException ex)
             {
                 ShowAlertDanger($"Unable to Create Feature: {ex.Message}");
+                _logger.LogError(ex.Message);
                 feature.IsNewFeature = true;
                 var viewModel = new FeatureViewModel
                 {
@@ -136,6 +164,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             catch (OcudaException ex)
             {
+                _logger.LogError(ex.Message);
                 ShowAlertDanger($"Unable to Delete Feature {feature.Name}: {ex.Message}");
             }
 
@@ -146,6 +175,22 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [Route("[action]")]
         public async Task<IActionResult> EditFeature(Feature feature)
         {
+            if (string.IsNullOrEmpty(feature.Stub))
+            {
+                feature.Stub = "";
+            }
+            if (string.IsNullOrEmpty(feature.BodyText))
+            {
+                feature.BodyText = "";
+            }
+            if (feature.FontAwesome.Contains("fab"))
+            {
+                feature.FontAwesome = "fa-inverse " + feature.FontAwesome + " fa-stack-1x";
+            }
+            else
+            {
+                feature.FontAwesome = "fa fa-inverse " + feature.FontAwesome + " fa-stack-1x";
+            }
             try
             {
                 await _featureService.EditAsync(feature);
@@ -155,6 +200,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             catch (OcudaException ex)
             {
                 ShowAlertDanger($"Unable to Update Feature: {feature.Name}");
+                _logger.LogError(ex.Message);
                 feature.IsNewFeature = false;
                 var viewModel = new FeatureViewModel
                 {
@@ -163,7 +209,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
                 return View("FeatureDetails", viewModel);
             }
-            return RedirectToAction("Feature", new { featureStub = feature.Stub });
+            return RedirectToAction("Feature", new { featureName = feature.Name });
         }
     }
 }

@@ -19,10 +19,8 @@ namespace Ocuda.Promenade.Models.Entities
         public string ImagePath { get; set; }
 
         [MaxLength(80)]
-        [Required]
         public string Stub { get; set; }
 
-        [Required]
         public string BodyText { get; set; }
 
         [NotMapped]

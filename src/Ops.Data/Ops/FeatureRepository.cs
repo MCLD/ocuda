@@ -45,11 +45,11 @@ namespace Ocuda.Ops.Data.Ops
         }
 
 
-        public async Task<Feature> GetFeatureByStub(string featureStub)
+        public async Task<Feature> GetFeatureByName(string featureName)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == featureStub)
+                .Where(_ => _.Name.ToLower().Replace(" ","") == featureName)
                 .FirstOrDefaultAsync();
         }
 

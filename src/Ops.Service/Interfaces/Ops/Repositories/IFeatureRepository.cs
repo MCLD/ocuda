@@ -11,7 +11,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
     public interface IFeatureRepository : IRepository<Feature, int>
     {
         Task<List<Feature>> GeAllFeaturesAsync();
-        Task<Feature> GetFeatureByStub(string featureStub);
+        Task<Feature> GetFeatureByName(string featureName);
         Task<bool> IsDuplicateAsync(Feature feature);
         Task<DataWithCount<ICollection<Feature>>> GetPaginatedListAsync(BaseFilter filter);
     }
