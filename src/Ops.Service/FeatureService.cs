@@ -66,18 +66,28 @@ namespace Ocuda.Ops.Service
 
         public async Task<Feature> EditAsync(Feature feature)
         {
-
-            try
+            var currentFeature = await _featureRepository.FindAsync(feature.Id);
+            if(currentFeature != null)
             {
-
-                _featureRepository.Update(feature);
-                await _featureRepository.SaveAsync();
-                return await _featureRepository.FindAsync(feature.Id);
+                try
+                {
+                    currentFeature.BodyText = feature.BodyText;
+                    currentFeature.FontAwesome = feature.FontAwesome;
+                    currentFeature.Name = feature.Name;
+                    currentFeature.Stub = feature.Stub;
+                    _featureRepository.Update(feature);
+                    await _featureRepository.SaveAsync();
+                    return await _featureRepository.FindAsync(currentFeature.Id);
+                }
+                catch (OcudaException ex)
+                {
+                    _logger.LogError(ex.Message);
+                    throw new OcudaException(ex.Message);
+                }
             }
-            catch (OcudaException ex)
+            else
             {
-                _logger.LogError(ex.Message);
-                throw new OcudaException(ex.Message);
+                throw new OcudaException($"Could not find Feature.");
             }
         }
 

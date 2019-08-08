@@ -22,19 +22,11 @@
             }
         </div>
     </div>
-    <form method="post" asp-controller="Feature" asp-action="@if(Model.Feature.IsNewFeature){<text>CreateFeature</text> }else{<text>EditFeature</text>}" role="form" display="inline">
+    <form method="post" asp-controller="@FeaturesController.Name" asp-action="@Model.Action" role="form" display="inline">
         <div class="row">
-            <input value="@Model.Feature.Id" asp-for="Feature.Id" id="feature-id" type="hidden" />
-            <input value="@Model.Feature.ImagePath" asp-for="Feature.ImagePath" id="location-imagepath" type="hidden" />
             <div class="col-xs-12">
-                <div class="form-group">
-                    <input value="@Model.Feature.Name" asp-for="Feature.Name" id="location-name" formgroup autocomplete="off" />
-                    <span class="text-danger field-validation-valid"></span>
-                </div>
-                <div class="form-group">
-                    <input value="@Model.Feature.FontAwesome" asp-for="Feature.FontAwesome" id="feature-fontAwesome" class="form-control icon-picker" type="text" formgroup autocomplete="off" />
-                    <span class="text-danger field-validation-valid"></span>
-                </div>
+                <input value="@Model.Feature.Name" asp-for="Feature.Name" formgroup autocomplete="off" />
+                <input value="@Model.Feature.FontAwesome" asp-for="Feature.FontAwesome" class="form-control icon-picker" type="text" formgroup autocomplete="off" />
                 <div class="accordion" id="popup-accordion">
                     <div class="card">
                         <div class="card-header" id="accordion-header">
@@ -46,10 +38,7 @@
                         </div>
                         <div id="collapseDiv" class="collapse show" aria-labelledby="headingOne" data-parent="#popup-accordion">
                             <div class="card-body">
-                                <div class="form-group" id="stub-div">
-                                    <input value="@Model.Feature.Stub" asp-for="Feature.Stub" id="feature-stub" formgroup autocomplete="off" />
-                                    <span class="text-danger field-validation-valid"></span>
-                                </div>
+                                <input value="@Model.Feature.Stub" asp-for="Feature.Stub" formgroup autocomplete="off" />
                                 <div class="form-group row" id="bodyText-div">
                                     <label asp-for="Feature.BodyText" class="col-md-3 col-form-label text-md-right"></label>
                                     <div class="col-md-9">
@@ -78,7 +67,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <a class="btn btn-secondary" id="return-home" href="@Url.Action("Index", "Feature")">Return to Features</a>
+                    <a class="btn btn-secondary" id="return-home" asp-action="@nameof(FeaturesController.Index)">Return to Features</a>
                     @if (Model.Feature.IsNewFeature)
                     {
                         <text>
@@ -114,7 +103,7 @@
     <script>
         $("#accordion-header").addClass("alert-success");
 
-        if(!$("#feature-stub").val()) {
+        if(!$("#Feature_Stub").val()) {
             $('.collapse').collapse();
             $("#accordion-header").removeClass( "alert-success" );
             $("#accordion-header").addClass("alert-danger");
@@ -133,7 +122,7 @@
         $("#submit").click(function () {
             if ($("#accordion-header").hasClass("alert-danger")) {
                 $("#wmd-input").val(" ");
-                $("#feature-stub").val(" ");
+                $("input#Feature_Stub").val(" ");
             }
         });
         var editor = new Markdown.Editor({ allowUploads: false });
@@ -147,13 +136,13 @@
             stubInfo.setAttribute("href", "#");
             stubInfo.setAttribute("id", "stub-info");
             stubInfo.setAttribute("title", "The stub is the nickname/URL for the feature.");
-            $($($($("#feature-stub").parent()).parent()).children().first()).attr("id", "Feature_Stub");
-            $("#Feature_Stub").append("&nbsp;");
-            $("#Feature_Stub").append(stubInfo);
+            $($($($("#Feature_Stub").parent()).parent()).children().first()).attr("id", "feature-stub");
+            $("#feature-stub").append("&nbsp;");
+            $("#feature-stub").append(stubInfo);
             $('[data-toggle="tooltip"]').tooltip();
 
-            $("input#feature-stub").blur(function () {
-                $("input#feature-stub").val($("input#feature-stub").val().toLowerCase().replace(/\s/g, ''));
+            $("input#Feature_Stub").blur(function () {
+                $("input#Feature_Stub").val($("input#Feature_Stub").val().toLowerCase().replace(/\s/g, ''));
             });
         });
     </script>

@@ -3,7 +3,7 @@
     <div class="row">
         <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel">
             <div class="modal-dialog" role="document">
-                <form asp-action="@nameof(FeatureController.DeleteFeature)" method="post" role="form" style="display:inline">
+                <form asp-action="@nameof(FeaturesController.DeleteFeature)" method="post" role="form" style="display:inline">
                     <input asp-for="Feature.Id" type="hidden" />
                     <input asp-for="Feature.Name" type="hidden" />
                     <div class="modal-content">
@@ -31,7 +31,7 @@
 
     <div class="row" style="padding: 10px 0;">
         <div class="col-xs-12">
-            <a href="@Url.Action("Feature", "Feature")" class="btn btn-primary">Add a Feature</a>
+            <a asp-action="@nameof(FeaturesController.AddFeature)" class="btn btn-primary">Add a Feature</a>
         </div>
     </div>
     <div class="row" style="padding: 10px 0;">
@@ -57,7 +57,7 @@
                             {
                                 <tr>
                                     <td class="td-class">
-                                        <a href="@Url.Action("Feature", "Feature", new { featureName = feature.Name.ToLower().Replace(" ", "")})" class="rowlink">
+                                        <a asp-action="@nameof(FeaturesController.Feature)" asp-route-featureName="@feature.Name.ToLower().Replace(" ", "")" class="rowlink">
                                             @feature.Name
                                         </a>
                                     </td>

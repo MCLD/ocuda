@@ -11,5 +11,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Feature
         public Promenade.Models.Entities.Feature Feature { get; set; }
 
         public PaginateModel PaginateModel { get; set; }
+        public string Action { get; set; }
     }
 }

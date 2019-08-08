@@ -57,8 +57,8 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Name.Equals(feature.Name, StringComparison.OrdinalIgnoreCase)
-                    && _.Id != feature.Id)
+                .Where(_ => _.Name == feature.Name
+                    || _.Id == feature.Id || (feature.Stub != "" && _.Stub == feature.Stub ))
                 .AnyAsync();
         }
     }

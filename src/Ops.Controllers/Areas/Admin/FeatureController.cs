@@ -21,14 +21,16 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Area("Admin")]
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]/[controller]")]
-    public class FeatureController : BaseController<FeatureController>
+    public class FeaturesController : BaseController<FeaturesController>
     {
         private readonly IFeatureService _featureService;
         private readonly IConfiguration _config;
         private readonly ILogger<HomeController> _logger;
+        public static string Name { get { return "Features"; } }
 
-        public FeatureController(IConfiguration config,
-            ServiceFacades.Controller<FeatureController> context,
+
+        public FeaturesController(IConfiguration config,
+            ServiceFacades.Controller<FeaturesController> context,
             IFeatureService featureService,
             ILogger<HomeController> logger) : base(context)
         {
@@ -76,38 +78,38 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [Route("AddFeature")]
+        public IActionResult AddFeature()
+        {
+            var feature = new Feature();
+            feature.IsNewFeature = true;
+            var viewModel = new FeatureViewModel
+            {
+                Feature = feature,
+                Action = nameof(FeaturesController.CreateFeature)
+            };
+
+            return View("FeatureDetails", viewModel);
+        }
+
         [Route("{featureName}")]
         public async Task<IActionResult> Feature(string featureName)
         {
-            if (string.IsNullOrEmpty(featureName))
+            try
             {
-                var feature = new Feature();
-                feature.IsNewFeature = true;
+                var feature = await _featureService.GetFeatureByNameAsync(featureName);
+                feature.IsNewFeature = false;
                 var viewModel = new FeatureViewModel
                 {
                     Feature = feature,
+                    Action = nameof(FeaturesController.EditFeature)
                 };
-
                 return View("FeatureDetails", viewModel);
             }
-            else
+            catch (OcudaException ex)
             {
-                try
-                {
-                    var feature = await _featureService.GetFeatureByNameAsync(featureName);
-                    feature.IsNewFeature = false;
-                    var viewModel = new FeatureViewModel
-                    {
-                        Feature = feature,
-                    };
-                    return View("FeatureDetails", viewModel);
-                }
-                catch (OcudaException ex)
-                {
-                    ShowAlertDanger($"Feature does not exist: {ex.Message}");
-                    _logger.LogError(ex.Message);
-                    return RedirectToAction("Index");
-                }
+                ShowAlertDanger($"Feature does not exist: {ex.Message}");
+                _logger.LogError(ex.Message);
+                return RedirectToAction("Index");
             }
         }
 
@@ -115,38 +117,54 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [Route("[action]")]
         public async Task<IActionResult> CreateFeature(Feature feature)
         {
-            if (string.IsNullOrEmpty(feature.Stub))
+            if (ModelState.IsValid)
             {
-                feature.Stub = "";
-            }
-            if (string.IsNullOrEmpty(feature.BodyText))
-            {
-                feature.BodyText = "";
-            }
-            if (feature.FontAwesome.Contains("fab"))
-            {
-                feature.FontAwesome = "fa-inverse " + feature.FontAwesome +" fa-stack-1x";
+                if (string.IsNullOrEmpty(feature.Stub))
+                {
+                    feature.Stub = "";
+                }
+                if (string.IsNullOrEmpty(feature.BodyText))
+                {
+                    feature.BodyText = "";
+                }
+                if (feature.FontAwesome.Contains("fab"))
+                {
+                    feature.FontAwesome = "fa-inverse " + feature.FontAwesome + " fa-stack-1x";
+                }
+                else
+                {
+                    feature.FontAwesome = "fa fa-inverse " + feature.FontAwesome + " fa-stack-1x";
+                }
+
+                try
+                {
+                    await _featureService.AddFeatureAsync(feature);
+                    ShowAlertSuccess($"Added Feature: {feature.Name}");
+                    feature.IsNewFeature = true;
+                    return RedirectToAction("Feature", new { featureName = feature.Name });
+                }
+                catch (OcudaException ex)
+                {
+                    ShowAlertDanger($"Unable to Create Feature: {ex.Message}");
+                    _logger.LogError(ex.Message);
+                    feature.IsNewFeature = true;
+                    var viewModel = new FeatureViewModel
+                    {
+                        Feature = feature,
+                        Action = nameof(FeaturesController.CreateFeature)
+                    };
+
+                    return View("FeatureDetails", viewModel);
+                }
             }
             else
             {
-                feature.FontAwesome = "fa fa-inverse " + feature.FontAwesome + " fa-stack-1x";
-            }
-            
-            try
-            {
-                await _featureService.AddFeatureAsync(feature);
-                ShowAlertSuccess($"Added Feature: {feature.Name}");
-                feature.IsNewFeature = true;
-                return RedirectToAction("Feature", new { featureName = feature.Name });
-            }
-            catch (OcudaException ex)
-            {
-                ShowAlertDanger($"Unable to Create Feature: {ex.Message}");
-                _logger.LogError(ex.Message);
+                ShowAlertDanger($"Invalid paramaters");
                 feature.IsNewFeature = true;
                 var viewModel = new FeatureViewModel
                 {
                     Feature = feature,
+                    Action = nameof(FeaturesController.CreateFeature)
                 };
 
                 return View("FeatureDetails", viewModel);
@@ -175,41 +193,57 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [Route("[action]")]
         public async Task<IActionResult> EditFeature(Feature feature)
         {
-            if (string.IsNullOrEmpty(feature.Stub))
+            if (ModelState.IsValid)
             {
-                feature.Stub = "";
-            }
-            if (string.IsNullOrEmpty(feature.BodyText))
-            {
-                feature.BodyText = "";
-            }
-            if (feature.FontAwesome.Contains("fab"))
-            {
-                feature.FontAwesome = "fa-inverse " + feature.FontAwesome + " fa-stack-1x";
+                if (string.IsNullOrEmpty(feature.Stub))
+                {
+                    feature.Stub = "";
+                }
+                if (string.IsNullOrEmpty(feature.BodyText))
+                {
+                    feature.BodyText = "";
+                }
+                if (feature.FontAwesome.Contains("fab"))
+                {
+                    feature.FontAwesome = "fa-inverse " + feature.FontAwesome + " fa-stack-1x";
+                }
+                else
+                {
+                    feature.FontAwesome = "fa fa-inverse " + feature.FontAwesome + " fa-stack-1x";
+                }
+                try
+                {
+                    await _featureService.EditAsync(feature);
+                    ShowAlertSuccess($"Updated Feature: {feature.Name}");
+                    feature.IsNewFeature = false;
+                }
+                catch (OcudaException ex)
+                {
+                    ShowAlertDanger($"Unable to Update Feature: {feature.Name}");
+                    _logger.LogError(ex.Message);
+                    feature.IsNewFeature = false;
+                    var viewModel = new FeatureViewModel
+                    {
+                        Feature = feature,
+                        Action = nameof(FeaturesController.EditFeature)
+                    };
+
+                    return View("FeatureDetails", viewModel);
+                }
+                return RedirectToAction("Feature", new { featureName = feature.Name });
             }
             else
             {
-                feature.FontAwesome = "fa fa-inverse " + feature.FontAwesome + " fa-stack-1x";
-            }
-            try
-            {
-                await _featureService.EditAsync(feature);
-                ShowAlertSuccess($"Updated Feature: {feature.Name}");
-                feature.IsNewFeature = false;
-            }
-            catch (OcudaException ex)
-            {
-                ShowAlertDanger($"Unable to Update Feature: {feature.Name}");
-                _logger.LogError(ex.Message);
+                ShowAlertDanger($"Invalid Parameters: {feature.Name}");
                 feature.IsNewFeature = false;
                 var viewModel = new FeatureViewModel
                 {
                     Feature = feature,
+                    Action = nameof(FeaturesController.EditFeature)
                 };
 
                 return View("FeatureDetails", viewModel);
             }
-            return RedirectToAction("Feature", new { featureName = feature.Name });
         }
     }
 }
