@@ -16,5 +16,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(BaseFilter filter);
         Task<Location> EditAsync(Location location);
         Task DeleteAsync(int id);
+        Task<Location> GetLocationByIdAsync(int locationId);
     }
 }

@@ -10,7 +10,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location
 
         public Promenade.Models.Entities.Location Location { get; set; }
         public bool IsSavedLocation { get; set; }
-
+        public string Action { get; set; }
         public PaginateModel PaginateModel { get; set; }
     }
 }

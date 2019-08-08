@@ -17,7 +17,7 @@
                 }
             </div>
         </div>
-        <form method="post" asp-controller="Location" asp-action="@if(Model.Location.IsNewLocation){<text>CreateLocation</text> }else{<text>EditLocation</text>}" role="form" display="inline">
+        <form method="post" asp-controller="@LocationsController.Name" asp-action="@Model.Action" role="form" display="inline">
             <div class="row">
                 <input value="@Model.Location.Id" asp-for="Location.Id" id="location-id" type="hidden" />
                 <input value="@Model.Location.AdministrativeArea" asp-for="Location.AdministrativeArea" id="location-adminarea" type="hidden" />
@@ -32,74 +32,36 @@
                 <input value="@Model.Location.PAbbreviation" asp-for="Location.PAbbreviation" id="location-paabbrev" type="hidden" />
                 <input value="@Model.Location.ShowLocation" asp-for="Location.ShowLocation" id="location-showlocation" type="hidden" />
                 <div class="col-xs-12">
-                    <div class="form-group">
-                        <input value="@Model.Location.Name" asp-for="Location.Name" id="location-name" formgroup autocomplete="off" />
-                        <span class="text-danger field-validation-valid"></span>
-                    </div>
+                    <input value="@Model.Location.Name" asp-for="Location.Name" formgroup autocomplete="off" />
                     <div class="row">
                         <div class="col-xs-6">
-                            <div class="form-group" id="stub">
-                                <input value="@Model.Location.Stub" asp-for="Location.Stub" id="location-stub" formgroup autocomplete="off" />
-                                <span class="text-danger field-validation-valid"></span>
-                            </div>
+                            <input value="@Model.Location.Stub" asp-for="Location.Stub" formgroup autocomplete="off" />
                         </div>
                         <div class="col-xs-6">
-                            <div class="form-group">
-                                <input value="@Model.Location.Code" asp-for="Location.Code" id="location-code" formgroup autocomplete="off" />
-                                <span class="text-danger field-validation-valid"></span>
-                            </div>
+                            <input value="@Model.Location.Code" asp-for="Location.Code" formgroup autocomplete="off" />
                         </div>
                     </div>
-                    <div class="form-group">
-                        <input value="@Model.Location.Address" asp-for="Location.Address" id="location-address" formgroup autocomplete="off" />
-                        <span class="text-danger field-validation-valid"></span>
-                    </div>
+                    <input value="@Model.Location.Address" asp-for="Location.Address" formgroup autocomplete="off" />
                     <div class="row">
                         <div class="col-xs-4">
-                            <div class="form-group">
-                                <input value="@Model.Location.City" asp-for="Location.City" id="location-city" formgroup autocomplete="off" />
-                                <span class="text-danger field-validation-valid"></span>
-                            </div>
+                            <input value="@Model.Location.City" asp-for="Location.City" formgroup autocomplete="off" />
                         </div>
                         <div class="col-xs-4">
-                            <div class="form-group">
-                                <input value="@Model.Location.State" asp-for="Location.State" id="location-state" formgroup autocomplete="off" />
-                                <span class="text-danger field-validation-valid"></span>
-                            </div>
+                            <input value="@Model.Location.State" asp-for="Location.State" formgroup autocomplete="off" />
                         </div>
                         <div class="col-xs-4">
-                            <div class="form-group">
-                                <input value="@Model.Location.Zip" asp-for="Location.Zip" id="location-zip" formgroup autocomplete="off" />
-                                <span class="text-danger field-validation-valid"></span>
-                            </div>
+                            <input value="@Model.Location.Zip" asp-for="Location.Zip" formgroup autocomplete="off" />
                         </div>
                     </div>
-                    <div class="form-group" id="map-link">
-                        <input value="@Model.Location.MapLink" asp-for="Location.MapLink" id="location-maplink" formgroup autocomplete="off" />
-                        <span class="text-danger field-validation-valid"></span>
-                    </div>
+                    <input value="@Model.Location.MapLink" asp-for="Location.MapLink" formgroup autocomplete="off" />
+                    <input type="tel" value="@Model.Location.Phone" asp-for="Location.Phone" formgroup autocomplete="off" />
+                    <textarea id="comment location-description" asp-for="Location.Description" rows="5" formgroup autocomplete="off">@Model.Location.Description</textarea>
+                    <input value="@Model.Location.Facebook" asp-for="Location.Facebook" formgroup autocomplete="off" />
+                    <input value="@Model.Location.EventLink" asp-for="Location.EventLink" formgroup autocomplete="off" />
+                    <input value="@Model.Location.SubscriptionLink" asp-for="Location.SubscriptionLink" formgroup autocomplete="off" />
+
                     <div class="form-group">
-                        <input type="tel" value="@Model.Location.Phone" asp-for="Location.Phone" id="location-phone" formgroup autocomplete="off" />
-                        <span class="text-danger field-validation-valid"></span>
-                    </div>
-                    <div class="form-group">
-                        <textarea id="comment location-description" asp-for="Location.Description" rows="5" formgroup autocomplete="off">@Model.Location.Description</textarea>
-                        <span class="text-danger field-validation-valid"></span>
-                    </div>
-                    <div class="form-group" id="facebook-link">
-                        <input value="@Model.Location.Facebook" asp-for="Location.Facebook" id="location-facebook" formgroup autocomplete="off" />
-                        <span class="text-danger field-validation-valid"></span>
-                    </div>
-                    <div class="form-group" id="event-link">
-                        <input value="@Model.Location.EventLink" asp-for="Location.EventLink" id="location-eventlink" formgroup autocomplete="off" />
-                        <span class="text-danger field-validation-valid"></span>
-                    </div>
-                    <div class="form-group" id="subscription-link">
-                        <input value="@Model.Location.SubscriptionLink" asp-for="Location.SubscriptionLink" id="location-subscriptionlink" formgroup autocomplete="off" />
-                        <span class="text-danger field-validation-valid"></span>
-                    </div>
-                    <div class="form-group">
-                        <a class="btn btn-secondary" id="return-home" href="@Url.Action("Index", "Location")">Return to Locations</a>
+                        <a class="btn btn-secondary" id="return-home" asp-action="@nameof(LocationsController.Index)">Return to Locations</a>
                         @if (Model.Location.IsNewLocation)
                         {
                             <text>
@@ -130,7 +92,7 @@
                 var ulMapList = document.createElement("ul");
                 ulMapList.classList.add("list-group");
                 ulMapList.setAttribute("id","maplink-suggestions")
-                $($("#location-address").parent()).append(ulMapList);
+                $($("#Location_Address").parent()).append(ulMapList);
 
                 var stubInfo = document.createElement("span");
                 stubInfo.classList.add("fa-info-circle");
@@ -139,68 +101,66 @@
                 stubInfo.setAttribute("href","#");
                 stubInfo.setAttribute("id", "stub-info");
                 stubInfo.setAttribute("title", "The stub is the nickname for the location");
-                $($($($("#location-stub").parent()).parent()).children().first()).attr("id", "Location_Stub");
+                $($($($("#Location_Stub").parent()).parent()).children().first()).attr("id", "Location_Stub");
                 $("#Location_Stub").append("&nbsp;");
                 $("#Location_Stub").append(stubInfo);
                 $('[data-toggle="tooltip"]').tooltip();
 
-                $("#maplink-suggestions").click(function () {
+                $("#maplink-suggestions").on('click','li', function () {
                     var urlstring = $(this).find("a").data("maps-url");
-                    var address = $(this).find("span.format-addr").text();
-                    address = address.split(", ");
+                    var address = $(this).find("span.format-addr").text().split(", ");
                     if (address.length == 5) {
-                        $("#location-address").val(address[1]);
-                        $("#location-city").val(address[2]);
+                        $("#Location_Address").val(address[1]);
+                        $("#Location_City").val(address[2]);
                         $("#Location_Country").val(address[4]);
                         var stateZip = address[3].split(" ");
-                        $($($("div#map-link").find("div")).find("input")[0]).val(urlstring);
-                        $("#location-state").val(stateZip[0]);
-                        $("#location-zip").val(stateZip[1]);
+                        $($("input#Location_MapLink")[0]).val(urlstring);
+                        $("#Location_State").val(stateZip[0]);
+                        $("#Location_Zip").val(stateZip[1]);
                         $("#maplink-suggestions").html("");
                     }
                     else {
-                        $("#location-address").val(address[0]);
-                        $("#location-city").val(address[1]);
+                        $("#Location_Address").val(address[0]);
+                        $("#Location_City").val(address[1]);
                         $("#Location_Country").val(address[3]);
                         var stateZip = address[2].split(" ");
-                        $($($("div#map-link").find("div")).find("input")[0]).val(urlstring);
-                        $("#location-state").val(stateZip[0]);
-                        $("#location-zip").val(stateZip[1]);
+                        $($("input#Location_MapLink")[0]).val(urlstring);
+                        $("#Location_State").val(stateZip[0]);
+                        $("#Location_Zip").val(stateZip[1]);
                         $("#maplink-suggestions").html("");
                     }
                 });
-
-                $("input#location-stub").blur(function () {
-                    $("input#location-stub").val($("input#location-stub").val().toLowerCase().replace(/\s/g, ''));
-                });
-
-                $("input#location-address").blur(function () {
-                    if ($('#location-address').val() && !$('#location-maplink').val())
-                    {
-                        $("#maplink-suggestions").html("");
-                        var data = {};
-                        data["Address"] = $("#location-address").val();
-                        data["City"] = $("#location-city").val();
-                        data["State"] = $("#location-state").val();
-                        data["Zip"] = $("#location-zip").val();
-                        data["Country"] = $("#Location_Country").val();
-                        var addressdata = JSON.stringify(data);
-
-                        $.get("@Url.Action("GetUrlLocations")", { addressJson: addressdata }, function (response) {
-                            if (response.success == true) {
-                                var locations = $.parseJSON(response.data);
-                                HandleGoogleLocations(locations);
-                            }});
-                    }
-                    else
-                    {
-                        $("#maplink-suggestions").html("");
-                    }
-                });
-
             });
+
+            $("input#Location_Stub").blur(function () {
+                $("input#Location_Stub").val($("input#Location_Stub").val().toLowerCase().replace(/\s/g, ''));
+            });
+
+            $("input#Location_Address").blur(function () {
+                if ($('#Location_Address').val() && !$('#Location_MapLink').val())
+                {
+                    $("#maplink-suggestions").html("");
+                    var data = {};
+                    data["Address"] = $("#Location_Address").val();
+                    data["City"] = $("#Location_City").val();
+                    data["State"] = $("#Location_State").val();
+                    data["Zip"] = $("#Location_Zip").val();
+                    data["Country"] = $("#Location_Country").val();
+                    var addressdata = JSON.stringify(data);
+
+                    $.get("@Url.Action(nameof(LocationsController.GetUrlLocations))", { addressJson: addressdata }, function (response) {
+                        if (response.success == true) {
+                            var locations = $.parseJSON(response.data);
+                            HandleGoogleLocations(locations);
+                        }});
+                }
+                else
+                {
+                    $("#maplink-suggestions").html("");
+                }
+            });
+
             function HandleGoogleLocations(locations) {
-                console.log(locations);
                 for (var index = 0; index < locations.length; index++)
                 {
                     var link = document.createElement('a');
@@ -217,6 +177,7 @@
                     var listitem = document.createElement("li");
                     listitem.classList.add("list-group-item");
                     listitem.classList.add("list-group-item-action");
+                    listitem.classList.add("map-item");
                     var icon = document.createElement("span");
                     var formatAddr = document.createElement("span");
                     formatAddr.innerHTML = " "+locations[index].formatted_address;
@@ -227,7 +188,6 @@
                     listitem.appendChild(link);
                     listitem.appendChild(formatAddr);
                     document.getElementById("maplink-suggestions").appendChild(listitem);
-                    console.log(link);
                 }
             }
         </script>

@@ -27,14 +27,15 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Area("Admin")]
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]/[controller]")]
-    public class LocationController : BaseController<LocationController>
+    public class LocationsController : BaseController<LocationsController>
     {
         private readonly ILocationService _locationService;
         private readonly IConfiguration _config;
         private readonly ILogger<HomeController> _logger;
+        public static string Name { get { return "Locations"; } }
 
-        public LocationController(IConfiguration config,
-            ServiceFacades.Controller<LocationController> context,
+        public LocationsController(IConfiguration config,
+            ServiceFacades.Controller<LocationsController> context,
             ILocationService locationService,
             ILogger<HomeController> logger) : base(context)
         {
@@ -81,28 +82,42 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             return View(viewModel);
         }
         [HttpGet("{locationStub}")]
-        [HttpGet("AddLocation")]
         public async Task<IActionResult> Location(string locationStub)
         {
-            if (string.IsNullOrEmpty(locationStub))
+            var location = await _locationService.GetLocationByStubAsync(locationStub);
+            location.IsNewLocation = false;
+            var viewModel = new LocationViewModel
             {
-                var location = new Location();
-                location.IsNewLocation = true;
-                var viewModel = new LocationViewModel
-                {
-                    Location = location,
-                };
+                Location = location,
+                Action = nameof(LocationsController.EditLocation)
+            };
+            return View("LocationDetails", viewModel);
+        }
 
-                return View("LocationDetails", viewModel);
-            }
-            else
+        [HttpGet("[action]")]
+        public IActionResult AddLocation()
+        {
+            var location = new Location();
+            location.IsNewLocation = true;
+            var viewModel = new LocationViewModel
             {
-                var location = await _locationService.GetLocationByStubAsync(locationStub);
-                location.IsNewLocation = false;
-                var viewModel = new LocationViewModel
+                Location = location,
+                Action = nameof(LocationsController.CreateLocation)
+            };
+
+            return View("LocationDetails", viewModel);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> CreateLocation(Location location)
+        {
+            if (ModelState.IsValid)
+            {
+                if (location.Phone.Length == 10)
                 {
-                    Location = location,
-                };
+                    location.Phone = string.Format("+1 {0:###-###-####}", Convert.ToInt64(location.Phone));
+                }
                 try
                 {
                     location = await GetLatLng(location);
@@ -110,57 +125,39 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, $"Problem looking up postal code for coordinates {location.Address}: {ex.Message}");
+                    ShowAlertDanger($"Unable to find Location's address: {location.Address}");
+                    location.IsNewLocation = true;
+                    var viewModel = new LocationViewModel
+                    {
+                        Location = location,
+                        Action = nameof(LocationsController.CreateLocation)
+                    };
+
+                    return View("LocationDetails", viewModel);
                 }
 
 
-                return View("LocationDetails", viewModel);
-            }
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> CreateLocation(Location location)
-        {
-            if (location.Phone.Length == 10)
-            {
-                location.Phone = string.Format("+1 {0:###-###-####}", Convert.ToInt64(location.Phone));
-            }
-            try
-            {
-                location = await GetLatLng(location);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Problem looking up postal code for coordinates {location.Address}: {ex.Message}");
-                ShowAlertDanger($"Unable to find Location's address: {location.Address}");
-                location.IsNewLocation = true;
-                var viewModel = new LocationViewModel
+                try
                 {
-                    Location = location,
-                };
-
-                return View("LocationDetails", viewModel);
-            }
-
-
-            try
-            {
-                await _locationService.AddLocationAsync(location);
-                ShowAlertSuccess($"Added Location: {location.Name}");
-                location.IsNewLocation = true;
-                return RedirectToAction("Location", new { locationStub = location.Stub});
-            }
-            catch (OcudaException ex)
-            {
-                ShowAlertDanger($"Unable to Create Location: {ex.Message}");
-                location.IsNewLocation = true;
-                var viewModel = new LocationViewModel
+                    await _locationService.AddLocationAsync(location);
+                    ShowAlertSuccess($"Added Location: {location.Name}");
+                    location.IsNewLocation = true;
+                    return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
+                }
+                catch (OcudaException ex)
                 {
-                    Location = location,
-                };
+                    ShowAlertDanger($"Unable to Create Location: {ex.Message}");
+                    location.IsNewLocation = true;
+                    var viewModel = new LocationViewModel
+                    {
+                        Location = location,
+                        Action = nameof(LocationsController.CreateLocation)
+                    };
 
-                return View("LocationDetails", viewModel);
+                    return View("LocationDetails", viewModel);
+                }
             }
+            return RedirectToAction(nameof(LocationsController.AddLocation));
         }
 
         [HttpPost]
@@ -177,31 +174,60 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ShowAlertDanger($"Unable to Delete Location {location.Name}: {ex.Message}");
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(LocationsController.Index));
         }
 
         [HttpPost]
         [Route("[action]")]
         public async Task<IActionResult> EditLocation(Location location)
         {
-            try
+            if (ModelState.IsValid)
             {
-                await _locationService.EditAsync(location);
-                ShowAlertSuccess($"Updated Location: {location.Name}");
-                location.IsNewLocation = false;
-            }
-            catch (OcudaException ex)
-            {
-                ShowAlertDanger($"Unable to Update Location: {location.Name}");
-                location.IsNewLocation = false;
-                var viewModel = new LocationViewModel
+                try
                 {
-                    Location = location,
-                };
+                    var oldLocation = await _locationService.GetLocationByIdAsync(location.Id);
+                    if (!(oldLocation.Address.Equals(location.Address) && oldLocation.City.Equals(location.City)
+                        && oldLocation.State.Equals(location.State) && oldLocation.Zip.Equals(location.Zip)
+                        && oldLocation.Country.Equals(location.Country)))
+                    {
+                        try
+                        {
+                            location = await GetLatLng(location);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Problem looking up postal code for coordinates {location.Address}: {ex.Message}");
+                            ShowAlertDanger($"Unable to find Location's address: {location.Address}");
+                            location.IsNewLocation = true;
+                            var viewModel = new LocationViewModel
+                            {
+                                Location = location,
+                                Action = nameof(LocationsController.EditLocation)
+                            };
 
-                return View("LocationDetails", viewModel);
+                            return View("LocationDetails", viewModel);
+                        }
+                    }
+
+                    await _locationService.EditAsync(location);
+                    ShowAlertSuccess($"Updated Location: {location.Name}");
+                    location.IsNewLocation = false;
+                    return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
+                }
+                catch (OcudaException ex)
+                {
+                    ShowAlertDanger($"Unable to Update Location {location.Name} : {ex.Message}");
+                    location.IsNewLocation = false;
+                    var viewModel = new LocationViewModel
+                    {
+                        Location = location,
+                        Action = nameof(LocationsController.EditLocation)
+                    };
+
+                    return View("LocationDetails", viewModel);
+                }
             }
-            return RedirectToAction("Location", new { locationStub = location.Stub});
+            return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
         }
 
         [HttpGet]
@@ -253,7 +279,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
                             stringDetailResult = await detailResponse.Content.ReadAsStringAsync();
                             var geoDetailPlace = JsonConvert.DeserializeObject<GeocodePlaceDetails>(stringDetailResult);
-                            if(geoDetailPlace != null)
+                            if (geoDetailPlace != null)
                             {
                                 results.Add(geoDetailPlace.Results);
                             }

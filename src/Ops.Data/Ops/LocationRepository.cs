@@ -57,7 +57,7 @@ namespace Ocuda.Ops.Data.Ops
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.Name.ToLower() == location.Name.ToLower()
-                    && _.Id != location.Id )
+                    || _.Id != location.Id || _.Stub != location.Stub)
                 .AnyAsync();
         }
     }
