@@ -19,6 +19,7 @@ namespace Ocuda.Promenade.Controllers
     public class LocationsController : BaseController<LocationsController>
     {
         private readonly LocationService _locationService;
+        public static string Name { get { return "Locations"; } }
 
         public LocationsController(ServiceFacades.Controller<LocationsController> context,
             LocationService locationService) : base(context)
