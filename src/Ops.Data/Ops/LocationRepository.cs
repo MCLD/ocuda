@@ -52,12 +52,25 @@ namespace Ocuda.Ops.Data.Ops
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<bool> IsDuplicateAsync(Location location)
+        public async Task<bool> IsDuplicateIdAsync(Location location)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Name.ToLower() == location.Name.ToLower()
-                    || _.Id != location.Id || _.Stub != location.Stub)
+                .Where(_ => _.Id != location.Id)
+                .AnyAsync();
+        }
+        public async Task<bool> IsDuplicateStubAsync(Location location)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Stub != location.Stub)
+                .AnyAsync();
+        }
+        public async Task<bool> IsDuplicateNameAsync(Location location)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Name != location.Name)
                 .AnyAsync();
         }
     }

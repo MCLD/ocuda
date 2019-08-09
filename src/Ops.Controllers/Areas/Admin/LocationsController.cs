@@ -30,6 +30,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     public class LocationsController : BaseController<LocationsController>
     {
         private readonly ILocationService _locationService;
+        private readonly ILocationFeatureService _locationFeatureService;
+        private readonly ILocationGroupService _locationGroupService;
+        private readonly IGroupService _groupService;
         private readonly IConfiguration _config;
         private readonly ILogger<HomeController> _logger;
         public static string Name { get { return "Locations"; } }
@@ -37,12 +40,21 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         public LocationsController(IConfiguration config,
             ServiceFacades.Controller<LocationsController> context,
             ILocationService locationService,
+            IGroupService groupService,
+            ILocationFeatureService locationFeatureService,
+            ILocationGroupService locationGroupService,
             ILogger<HomeController> logger) : base(context)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _locationService = locationService
                 ?? throw new ArgumentNullException(nameof(locationService));
+            _groupService = groupService
+                ?? throw new ArgumentNullException(nameof(groupService));
+            _locationGroupService = locationGroupService
+                ?? throw new ArgumentNullException(nameof(locationGroupService));
+            _locationFeatureService = locationFeatureService
+                ?? throw new ArgumentNullException(nameof(locationFeatureService));
         }
 
         [HttpGet("")]
@@ -84,14 +96,25 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [HttpGet("{locationStub}")]
         public async Task<IActionResult> Location(string locationStub)
         {
-            var location = await _locationService.GetLocationByStubAsync(locationStub);
-            location.IsNewLocation = false;
-            var viewModel = new LocationViewModel
+            try
             {
-                Location = location,
-                Action = nameof(LocationsController.EditLocation)
-            };
-            return View("LocationDetails", viewModel);
+                var location = await _locationService.GetLocationByStubAsync(locationStub);
+                location.IsNewLocation = false;
+                var viewModel = new LocationViewModel
+                {
+                    Location = location,
+                    LocationFeatures = await _locationFeatureService.GetLocationFeaturesByLocationAsync(location),
+                    LocationGroups = await _locationGroupService.GetLocationGroupsByLocationAsync(location),
+                    Groups = await _groupService.GetAllGroupsAsync(),
+                    Action = nameof(LocationsController.EditLocation)
+                };
+                return View("LocationDetails", viewModel);
+            }
+            catch (OcudaException ex)
+            {
+                ShowAlertDanger($"Unable to find Location {locationStub}: {ex.Message}");
+                return RedirectToAction(nameof(LocationsController.Index));
+            }
         }
 
         [HttpGet("[action]")]
@@ -229,7 +252,27 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
         }
-
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> GetNonLocationGroups(string LocationGroupJson)
+        {
+            var success = false;
+            try
+            {
+                var locationGroupIds = JsonConvert.DeserializeObject<List<int>>(LocationGroupJson);
+                var data = JsonConvert.SerializeObject(await _groupService.GetMissingGroups(locationGroupIds));
+                success = true;
+                return Json(new {data, success});
+            }
+            catch(OcudaException ex)
+            {
+                ShowAlertDanger($"Unable to retrieve groups: {ex.Message}");
+                return Json(new
+                {
+                    success
+                });
+            }
+        }
         [HttpGet]
         [Route("[action]")]
         public async Task<IActionResult> GetUrlLocations(string addressJson)

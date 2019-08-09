@@ -38,7 +38,16 @@ namespace Ocuda.Ops.Service
 
         public async Task<Location> GetLocationByStubAsync(string locationStub)
         {
-            return await _locationRepository.GetLocationByStub(locationStub);
+            var location = await _locationRepository.GetLocationByStub(locationStub);
+            if(location == null)
+            {
+                throw new OcudaException($"Location not found.");
+            }
+            else
+            {
+                return await _locationRepository.GetLocationByStub(locationStub);
+            }
+            
         }
 
         public async Task<Location> GetLocationByIdAsync(int locationId)
@@ -69,55 +78,24 @@ namespace Ocuda.Ops.Service
             try
             {
                 var currentLocation = await _locationRepository.FindAsync(location.Id);
-                if (currentLocation != null)
-                {
-                    if (!(currentLocation.Address.Equals(location.Address) && currentLocation.City.Equals(location.City)
-                    && currentLocation.State.Equals(location.State) && currentLocation.Zip.Equals(location.Zip)
-                    && currentLocation.Country.Equals(location.Country)))
-                    {
-                        currentLocation.Address = location.Address;
-                        currentLocation.City = location.City;
-                        currentLocation.Zip = location.Zip;
-                        currentLocation.State = location.State;
-                        currentLocation.Country = location.Country;
-                        currentLocation.MapLink = location.MapLink;
-                    }
-                    if (!currentLocation.Name.Equals(location.Name))
-                    {
-                        currentLocation.Name = location.Name;
-                    }
-                    if (!currentLocation.Stub.Equals(location.Stub))
-                    {
-                        currentLocation.Stub = location.Stub;
-                    }
-                    if (!currentLocation.Code.Equals(location.Code))
-                    {
-                        currentLocation.Code = location.Code;
-                    }
-                    if (!currentLocation.Phone.Equals(location.Phone))
-                    {
-                        currentLocation.Phone = location.Phone;
-                    }
-                    if (!currentLocation.Description.Equals(location.Description))
-                    {
-                        currentLocation.Description = location.Description;
-                    }
-                    if (!currentLocation.Facebook.Equals(location.Facebook))
-                    {
-                        currentLocation.Facebook = location.Facebook;
-                    }
-                    if (!currentLocation.EventLink.Equals(location.EventLink))
-                    {
-                        currentLocation.EventLink = location.EventLink;
-                    }
-                    if (!currentLocation.SubscriptionLink.Equals(location.SubscriptionLink))
-                    {
-                        currentLocation.SubscriptionLink = location.SubscriptionLink;
-                    }
-                }
+                currentLocation.Address = location.Address;
+                currentLocation.City = location.City;
+                currentLocation.Zip = location.Zip;
+                currentLocation.State = location.State;
+                currentLocation.Country = location.Country;
+                currentLocation.MapLink = location.MapLink;
+                currentLocation.Name = location.Name;
+                currentLocation.Stub = location.Stub;
+                currentLocation.Code = location.Code;
+                currentLocation.Phone = location.Phone;
+                currentLocation.Description = location.Description;
+                currentLocation.Facebook = location.Facebook;
+                currentLocation.EventLink = location.EventLink;
+                currentLocation.SubscriptionLink = location.SubscriptionLink;
+                await ValidateAsync(currentLocation);
                 _locationRepository.Update(currentLocation);
                 await _locationRepository.SaveAsync();
-                return await _locationRepository.FindAsync(currentLocation.Id);
+                return currentLocation;
             }
             catch (OcudaException ex)
             {
@@ -140,9 +118,17 @@ namespace Ocuda.Ops.Service
 
         private async Task ValidateAsync(Location location)
         {
-            if (await _locationRepository.IsDuplicateAsync(location))
+            if (await _locationRepository.IsDuplicateIdAsync(location))
             {
-                throw new OcudaException($"Location type '{location.Name}' already exists.");
+                throw new OcudaException($"Location Id already exists.");
+            }
+            if (await _locationRepository.IsDuplicateNameAsync(location))
+            {
+                throw new OcudaException($"Location Name '{location.Name}' already exists.");
+            }
+            if (await _locationRepository.IsDuplicateStubAsync(location))
+            {
+                throw new OcudaException($"Location Stub '{location.Stub}' already exists.");
             }
         }
     }

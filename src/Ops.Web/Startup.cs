@@ -207,6 +207,10 @@ namespace Ocuda.Ops.Web
                 Data.Ops.FileTypeRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILocationRepository,
                 Data.Ops.LocationRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ILocationFeatureRepository,
+                Data.Ops.LocationFeatureRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ILocationGroupRepository,
+                Data.Ops.LocationGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkLibraryRepository,
                 Data.Ops.LinkLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository,
@@ -231,10 +235,13 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IExternalResourceService, ExternalResourceService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IFileTypeService, FileTypeService>();
+            services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IInitialSetupService, InitialSetupService>();
             services.AddScoped<IInsertSampleDataService, InsertSampleDataService>();
             services.AddScoped<ILdapService, LdapService>();
             services.AddScoped<ILocationService, LocationService>();
+            services.AddScoped<ILocationGroupService, LocationGroupService>();
+            services.AddScoped<ILocationFeatureService, LocationFeatureService>();
             services.AddScoped<ILinkService, LinkService>();
             services.AddScoped<IPathResolverService, PathResolverService>();
             services.AddScoped<IRosterService, RosterService>();

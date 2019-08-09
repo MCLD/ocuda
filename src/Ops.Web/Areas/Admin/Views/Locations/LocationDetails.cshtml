@@ -1,92 +1,153 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location.LocationViewModel
-<html>
-<body>
-    <div class="container">
-        <div class="location-save-container">
-            <div class="location-save-message"></div>
-        </div>
-        <div class="row page-title">
-            <div class="col-xs-12">
-                @if (Model.Location.IsNewLocation)
-                {
-                    <h2>Add Location</h2>
-                }
-                else
-                {
-                    <h2>Edit Location - @Model.Location.Name</h2>
-                }
-            </div>
-        </div>
-        <form method="post" asp-controller="@LocationsController.Name" asp-action="@Model.Action" role="form" display="inline">
-            <div class="row">
-                <input value="@Model.Location.Id" asp-for="Location.Id" id="location-id" type="hidden" />
-                <input value="@Model.Location.AdministrativeArea" asp-for="Location.AdministrativeArea" id="location-adminarea" type="hidden" />
-                <input value="@Model.Location.CloseLocations" asp-for="Location.CloseLocations" id="location-closelocations" type="hidden" />
-                <input value="@Model.Location.Country" asp-for="Location.Country" id="location-country" type="hidden" />
-                <input value="@Model.Location.DefaultLibIds" asp-for="Location.DefaultLibIds" id="location-defaultLibIds" type="hidden" />
-                <input value="@Model.Location.ImagePath" asp-for="Location.ImagePath" id="location-imagepath" type="hidden" />
-                <input value="@Model.Location.IsAlwaysOpen" asp-for="Location.IsAlwaysOpen" id="location-isalwaysopen" type="hidden" />
-                <input value="@Model.Location.Latitude" asp-for="Location.Latitude" id="location-lat" type="hidden" />
-                <input value="@Model.Location.Longitude" asp-for="Location.Longitude" id="location-lng" type="hidden" />
-                <input value="@Model.Location.Open" asp-for="Location.Open" type="hidden" />
-                <input value="@Model.Location.PAbbreviation" asp-for="Location.PAbbreviation" id="location-paabbrev" type="hidden" />
-                <input value="@Model.Location.ShowLocation" asp-for="Location.ShowLocation" id="location-showlocation" type="hidden" />
-                <div class="col-xs-12">
-                    <input value="@Model.Location.Name" asp-for="Location.Name" formgroup autocomplete="off" />
-                    <div class="row">
-                        <div class="col-xs-6">
-                            <input value="@Model.Location.Stub" asp-for="Location.Stub" formgroup autocomplete="off" />
-                        </div>
-                        <div class="col-xs-6">
-                            <input value="@Model.Location.Code" asp-for="Location.Code" formgroup autocomplete="off" />
-                        </div>
-                    </div>
-                    <input value="@Model.Location.Address" asp-for="Location.Address" formgroup autocomplete="off" />
-                    <div class="row">
-                        <div class="col-xs-4">
-                            <input value="@Model.Location.City" asp-for="Location.City" formgroup autocomplete="off" />
-                        </div>
-                        <div class="col-xs-4">
-                            <input value="@Model.Location.State" asp-for="Location.State" formgroup autocomplete="off" />
-                        </div>
-                        <div class="col-xs-4">
-                            <input value="@Model.Location.Zip" asp-for="Location.Zip" formgroup autocomplete="off" />
-                        </div>
-                    </div>
-                    <input value="@Model.Location.MapLink" asp-for="Location.MapLink" formgroup autocomplete="off" />
-                    <input type="tel" value="@Model.Location.Phone" asp-for="Location.Phone" formgroup autocomplete="off" />
-                    <textarea id="comment location-description" asp-for="Location.Description" rows="5" formgroup autocomplete="off">@Model.Location.Description</textarea>
-                    <input value="@Model.Location.Facebook" asp-for="Location.Facebook" formgroup autocomplete="off" />
-                    <input value="@Model.Location.EventLink" asp-for="Location.EventLink" formgroup autocomplete="off" />
-                    <input value="@Model.Location.SubscriptionLink" asp-for="Location.SubscriptionLink" formgroup autocomplete="off" />
 
-                    <div class="form-group">
-                        <a class="btn btn-secondary" id="return-home" asp-action="@nameof(LocationsController.Index)">Return to Locations</a>
-                        @if (Model.Location.IsNewLocation)
-                        {
-                            <text>
-                                <button type="submit" id="submit" value="Submit" class="btn btn-primary btn-spinner">
-                                    <span class="buttonText">Add Location</span>
-                                    <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
-                                </button>
-                            </text>
-                        }
-                        else
-                        {
-                            <text>
-                                <button type="submit" id="submit" value="Submit" class="btn btn-primary btn-spinner">
-                                    <span class="buttonText">Update Location</span>
-                                    <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
-                                </button>
-                            </text>
-                        }
+<form>
+    <div modal id="Features" name="feature" isNonSubmit="true">
+        <input id="addName" asp-for="MetadataType.Name" formgroup autocomplete="off" />
+        <select id="addPublic" asp-for="MetadataType.IsPublic" formgroup autocomplete="off">
+            <option></option>
+            <option value="False">No</option>
+            <option value="True">Yes</option>
+        </select>
+    </div>
+</form>
+
+<form>
+    <div modal id="Groups" name="group" isNonSubmit="true">
+        <input id="editGroupType" asp-for="MetadataType.Name" formgroup autocomplete="off" />
+        <div id="collapseDiv" class="collapse show" aria-labelledby="headingOne" data-parent="#region-accordion">
+            <div class="card-body">
+                <input value="" asp-for="Group.GroupType" formgroup autocomplete="off" />
+                <div class="form-group row" id="bodyText-div">
+                    <label asp-for="Feature.BodyText" class="col-md-3 col-form-label text-md-right"></label>
+                    <div class="col-md-9">
+                        <ul class="nav nav-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#md-edit" role="tab">Edit</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#md-preview" role="tab">Preview</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="md-edit-preview">
+                            <div class="tab-pane show active" id="md-edit" role="tabpanel">
+                                <div id="wmd-button-bar" class="wmd-button-row"></div>
+                                <textarea asp-for="Feature.BodyText" value="@Model.Feature.BodyText" class="form-control wmd-input" id="wmd-input"></textarea>
+                            </div>
+                            <div class="tab-pane" id="md-preview" role="tabpanel">
+                                <div id="preview" class="wmd-preview"></div>
+                            </div>
+                            <span asp-validation-for="Feature.BodyText" class="text-danger"></span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
-    @section scripts{
-        <script>
+</form>
+<div class="container">
+    <div class="location-save-container">
+        <div class="location-save-message"></div>
+    </div>
+    <div class="row page-title">
+        <div class="col-xs-12">
+            @if (Model.Location.IsNewLocation)
+            {
+                <h2>Add Location</h2>
+            }
+            else
+            {
+                <h2>Edit Location - @Model.Location.Name</h2>
+            }
+        </div>
+    </div>
+    <form method="post" asp-controller="@LocationsController.Name" asp-action="@Model.Action" role="form" display="inline">
+        <div class="row">
+            <input value="@Model.Location.Id" asp-for="Location.Id" id="location-id" type="hidden" />
+            <div class="col-xs-12">
+                <input value="@Model.Location.Name" asp-for="Location.Name" formgroup autocomplete="off" />
+                <div class="row">
+                    <div class="col-xs-6">
+                        <input value="@Model.Location.Stub" asp-for="Location.Stub" formgroup autocomplete="off" />
+                    </div>
+                    <div class="col-xs-6">
+                        <input value="@Model.Location.Code" asp-for="Location.Code" formgroup autocomplete="off" />
+                    </div>
+                </div>
+                <input value="@Model.Location.Address" asp-for="Location.Address" formgroup autocomplete="off" />
+                <div class="row">
+                    <div class="col-xs-4">
+                        <input value="@Model.Location.City" asp-for="Location.City" formgroup autocomplete="off" />
+                    </div>
+                    <div class="col-xs-4">
+                        <input value="@Model.Location.State" asp-for="Location.State" formgroup autocomplete="off" />
+                    </div>
+                    <div class="col-xs-4">
+                        <input value="@Model.Location.Zip" asp-for="Location.Zip" formgroup autocomplete="off" />
+                    </div>
+                </div>
+                <input value="@Model.Location.MapLink" asp-for="Location.MapLink" formgroup autocomplete="off" />
+                <input type="tel" value="@Model.Location.Phone" asp-for="Location.Phone" formgroup autocomplete="off" />
+                <textarea id="comment location-description" asp-for="Location.Description" rows="5" formgroup autocomplete="off">@Model.Location.Description</textarea>
+                <input value="@Model.Location.Facebook" asp-for="Location.Facebook" formgroup autocomplete="off" />
+                <input value="@Model.Location.EventLink" asp-for="Location.EventLink" formgroup autocomplete="off" />
+                <input value="@Model.Location.SubscriptionLink" asp-for="Location.SubscriptionLink" formgroup autocomplete="off" />
+                <div class="row">
+                    <div class="col-xs-6 card"">
+                        <div class="card-header">
+                            Features
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            @foreach (var locationFeature in Model.LocationFeatures)
+                            {
+                                @foreach (var feature in Model.Features.Where(_ => _.Id == locationFeature.FeatureId))
+                                {
+                                    <a class="list-group-item feature" data-feature-id="@locationFeature.Id">@feature.Name</a>
+                                }
+                            }
+                        </ul>
+                    </div>
+                    <div class="col-xs-6 card" ">
+                        <div class="card-header">
+                            Groups
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            @foreach (var locationGroup in Model.LocationGroups)
+                            {
+                                @foreach (var group in Model.Groups.Where(_ => _.Id == locationGroup.GroupId))
+                                {
+                                    <a href="#" list-group-item group" data-feature-id="@locationGroup.Id">@group.GroupType</a>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <a class="btn btn-secondary" id="return-home" asp-action="@nameof(LocationsController.Index)">Return to Locations</a>
+                    @if (Model.Location.IsNewLocation)
+                    {
+                        <text>
+                            <button type="submit" id="submit" value="Submit" class="btn btn-primary btn-spinner">
+                                <span class="buttonText">Add Location</span>
+                                <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
+                            </button>
+                        </text>
+                    }
+                    else
+                    {
+                        <text>
+                            <button type="submit" id="submit" value="Submit" class="btn btn-primary btn-spinner">
+                                <span class="buttonText">Update Location</span>
+                                <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
+                            </button>
+                        </text>
+                    }
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+@section scripts{
+    <script>
             $(document).ready(function () {
 
                 var ulMapList = document.createElement("ul");
@@ -129,6 +190,25 @@
                         $("#Location_Zip").val(stateZip[1]);
                         $("#maplink-suggestions").html("");
                     }
+                });
+
+                $('.feature').on('click', function () {
+                    @foreach (var feature in Model.LocationFeatures)
+                    {
+                        <text>
+                        if ("@feature.Id" == $(this).data("feature-id"))
+                        {
+                            $("#modalTitle").text("@Html.Raw(feature.Name)");
+
+
+                            $("#modal-body").html($("#modal-body").html("@feature.BodyText").text());
+                            $("#modal-text").html($("#modal-text").html("@feature.Text").text());
+                        }
+                        </text>
+                    }
+                    $('#featureModal').on('shown.bs.modal', function () {
+                        $('#myInput').trigger('focus')
+                    });
                 });
             });
 
@@ -190,8 +270,5 @@
                     document.getElementById("maplink-suggestions").appendChild(listitem);
                 }
             }
-        </script>
-    }
-
-</body>
-</html>
+    </script>
+}
