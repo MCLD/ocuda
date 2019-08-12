@@ -13,6 +13,7 @@ namespace Ocuda.Promenade.Models.Entities
         public string Name { get; set; }
 
         [MaxLength(48)]
+        [Required]
         public string FontAwesome { get; set; }
 
         [MaxLength(255)]

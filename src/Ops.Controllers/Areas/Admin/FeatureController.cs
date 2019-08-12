@@ -203,19 +203,11 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 {
                     feature.BodyText = "";
                 }
-                if (feature.FontAwesome.Contains("fab"))
-                {
-                    feature.FontAwesome = "fa-inverse " + feature.FontAwesome + " fa-stack-1x";
-                }
-                else
-                {
-                    feature.FontAwesome = "fa fa-inverse " + feature.FontAwesome + " fa-stack-1x";
-                }
                 try
                 {
                     await _featureService.EditAsync(feature);
                     ShowAlertSuccess($"Updated Feature: {feature.Name}");
-                    feature.IsNewFeature = false;
+                    return RedirectToAction("Feature", new { featureName = feature.Name });
                 }
                 catch (OcudaException ex)
                 {
@@ -230,7 +222,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
                     return View("FeatureDetails", viewModel);
                 }
-                return RedirectToAction("Feature", new { featureName = feature.Name });
             }
             else
             {

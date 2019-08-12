@@ -24,6 +24,7 @@
     </div>
     <form method="post" asp-controller="@FeaturesController.Name" asp-action="@Model.Action" role="form" display="inline">
         <div class="row">
+            <input value="@Model.Feature.Id" asp-for="Feature.Id" id="feature-id" type="hidden" />
             <div class="col-xs-12">
                 <input value="@Model.Feature.Name" asp-for="Feature.Name" formgroup autocomplete="off" />
                 <input value="@Model.Feature.FontAwesome" asp-for="Feature.FontAwesome" class="form-control icon-picker" type="text" formgroup autocomplete="off" />

@@ -71,6 +71,17 @@ namespace Ocuda.Ops.Service
             {
                 try
                 {
+                    if (!feature.FontAwesome.Contains("fa-inverse"))
+                    {
+                        if (feature.FontAwesome.Contains("fab"))
+                        {
+                            feature.FontAwesome = "fa-inverse " + feature.FontAwesome + " fa-stack-1x";
+                        }
+                        else
+                        {
+                            feature.FontAwesome = "fa fa-inverse " + feature.FontAwesome + " fa-stack-1x";
+                        }
+                    }
                     currentFeature.BodyText = feature.BodyText;
                     currentFeature.FontAwesome = feature.FontAwesome;
                     currentFeature.Name = feature.Name;
@@ -107,9 +118,13 @@ namespace Ocuda.Ops.Service
 
         private async Task ValidateAsync(Feature feature)
         {
-            if (await _featureRepository.IsDuplicateAsync(feature))
+            if (await _featureRepository.IsDuplicateNameAsync(feature))
             {
-                throw new OcudaException($"Feature type '{feature.Name}' already exists.");
+                throw new OcudaException($"Feature name '{feature.Name}' already exists.");
+            }
+            if (await _featureRepository.IsDuplicateStubAsync(feature))
+            {
+                throw new OcudaException($"Feature stub '{feature.Stub}' already exists.");
             }
         }
     }

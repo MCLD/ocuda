@@ -49,16 +49,22 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Name.ToLower().Replace(" ","") == featureName)
+                .Where(_ => _.Name.ToLower().Replace(" ","") == featureName.ToLower().Replace(" ", ""))
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<bool> IsDuplicateAsync(Feature feature)
+        public async Task<bool> IsDuplicateNameAsync(Feature feature)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Name == feature.Name
-                    || _.Id == feature.Id || (feature.Stub != "" && _.Stub == feature.Stub ))
+                .Where(_ => _.Name == feature.Name && _.Id != feature.Id)
+                .AnyAsync();
+        }
+        public async Task<bool> IsDuplicateStubAsync(Feature feature)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Id != feature.Id && feature.Stub != "" && _.Stub == feature.Stub)
                 .AnyAsync();
         }
     }
