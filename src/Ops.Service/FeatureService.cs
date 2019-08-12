@@ -67,6 +67,7 @@ namespace Ocuda.Ops.Service
         public async Task<Feature> EditAsync(Feature feature)
         {
             var currentFeature = await _featureRepository.FindAsync(feature.Id);
+            await ValidateAsync(currentFeature);
             if(currentFeature != null)
             {
                 try
