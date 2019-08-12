@@ -2,8 +2,8 @@
 
 <form>
     <div modal id="Features" name="feature" isNonSubmit="true">
-        <input id="addName" asp-for="MetadataType.Name" formgroup autocomplete="off" />
-        <select id="addPublic" asp-for="MetadataType.IsPublic" formgroup autocomplete="off">
+        <input id="addName" asp-for="Feature.Name" formgroup autocomplete="off" />
+        <select id="addPublic" asp-for="Feature.IsPublic" formgroup autocomplete="off">
             <option></option>
             <option value="False">No</option>
             <option value="True">Yes</option>
@@ -13,10 +13,14 @@
 
 <form>
     <div modal id="Groups" name="group" isNonSubmit="true">
-        <input id="editGroupType" asp-for="MetadataType.Name" formgroup autocomplete="off" />
+        <input id="editGroupType" asp-for="Group.GroupType" formgroup autocomplete="off" />
         <div id="collapseDiv" class="collapse show" aria-labelledby="headingOne" data-parent="#region-accordion">
             <div class="card-body">
-                <input value="" asp-for="Group.GroupType" formgroup autocomplete="off" />
+                <select id="addPublic" asp-for="Feature" formgroup autocomplete="off">
+                    @foreach (var grouptype in )
+                        <option value="False">No</option>
+                    <option value="True">Yes</option>
+                </select>
                 <div class="form-group row" id="bodyText-div">
                     <label asp-for="Feature.BodyText" class="col-md-3 col-form-label text-md-right"></label>
                     <div class="col-md-9">
@@ -92,7 +96,7 @@
                 <input value="@Model.Location.EventLink" asp-for="Location.EventLink" formgroup autocomplete="off" />
                 <input value="@Model.Location.SubscriptionLink" asp-for="Location.SubscriptionLink" formgroup autocomplete="off" />
                 <div class="row">
-                    <div class="col-xs-6 card"">
+                    <div class="col-xs-6 card" ">
                         <div class="card-header">
                             Features
                         </div>
@@ -193,19 +197,20 @@
                 });
 
                 $('.feature').on('click', function () {
-                    @foreach (var feature in Model.LocationFeatures)
+                    @foreach (var locationfeature in Model.LocationFeatures)
                     {
-                        <text>
-                        if ("@feature.Id" == $(this).data("feature-id"))
-                        {
-                            $("#modalTitle").text("@Html.Raw(feature.Name)");
+                        @:if ("@locationfeature.Id" == $(this).data("feature-id")){
+                            @foreach (var feature in Model.Features.Where(_ => _.Id == locationfeature.FeatureId))
+                            {
 
-
-                            $("#modal-body").html($("#modal-body").html("@feature.BodyText").text());
-                            $("#modal-text").html($("#modal-text").html("@feature.Text").text());
-                        }
-                        </text>
-                    }
+                                <text>
+                                $("#modalTitle").text("@Html.Raw(feature.Name)");
+                                $("#modal-text").html($("#modal-text").html("@locationfeature.Text").text());
+                                $("#modal-text").html($("#modal-text").html("@locationfeature.Text").text());
+                                </text>
+                            }
+                        @:}
+                     }
                     $('#featureModal').on('shown.bs.modal', function () {
                         $('#myInput').trigger('focus')
                     });
