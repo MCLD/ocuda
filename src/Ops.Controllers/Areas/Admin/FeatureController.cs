@@ -52,7 +52,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ItemsPerPage = filter.Take.Value
             };
 
-            if (paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
+            if (paginateModel.PastMaxPage)
             {
                 return RedirectToRoute(
                     new
