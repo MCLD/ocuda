@@ -205,6 +205,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.FileRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileTypeRepository,
                 Data.Ops.FileTypeRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IGroupRepository,
+                Data.Ops.GroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILocationRepository,
                 Data.Ops.LocationRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILocationFeatureRepository,

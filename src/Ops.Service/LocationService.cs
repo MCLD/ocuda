@@ -115,7 +115,6 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException(ex.Message);
             }
         }
-
         private async Task ValidateAsync(Location location)
         {
             if (await _locationRepository.IsDuplicateIdAsync(location))

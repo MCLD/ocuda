@@ -124,7 +124,15 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException(ex.Message);
             }
         }
-
+        public async Task<DataWithCount<ICollection<Group>>> PageItemsAsync(
+            GroupFilter filter)
+        {
+            return new DataWithCount<ICollection<Group>>
+            {
+                Data = await _groupRepository.PageAsync(filter),
+                Count = await _groupRepository.CountAsync(filter)
+            };
+        }
         private async Task ValidateAsync(Group group)
         {
             if (await _groupRepository.IsDuplicateIdAsync(group))

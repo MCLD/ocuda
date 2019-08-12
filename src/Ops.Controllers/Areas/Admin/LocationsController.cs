@@ -273,6 +273,50 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 });
             }
         }
+
+
+
+
+
+
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> GetItemsList(string itemIds, string objectType, int page = 1)
+        {
+                var filter = new GroupFilter(page, 10);
+
+                if (!string.IsNullOrWhiteSpace(itemIds))
+                {
+                    filter.GroupIds = itemIds.Split(',')
+                        .Where(_ => !string.IsNullOrWhiteSpace(_))
+                        .Select(int.Parse)
+                        .ToList();
+                }
+                var items = await _groupService.PageItemsAsync(filter);
+                var paginateModel = new PaginateModel
+                {
+                    ItemCount = items.Count,
+                    CurrentPage = page,
+                    ItemsPerPage = filter.Take.Value
+                };
+
+                var viewModel = new GroupListViewModel
+                {
+                    Groups = items.Data,
+                    PaginateModel = paginateModel
+                };
+
+                return PartialView("_GroupsPartial", viewModel);
+        }
+
+
+
+
+
+
+
+
         [HttpGet]
         [Route("[action]")]
         public async Task<IActionResult> GetUrlLocations(string addressJson)

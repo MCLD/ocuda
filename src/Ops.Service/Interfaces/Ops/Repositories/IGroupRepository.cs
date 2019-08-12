@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ocuda.Ops.Service.Filters;
@@ -16,5 +17,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         Task<bool> IsDuplicateIdAsync(Group group);
         Task<bool> IsDuplicateGroupTypeAsync(Group group);
         Task<DataWithCount<ICollection<Group>>> GetPaginatedListAsync(BaseFilter filter);
+        Task<ICollection<Group>> PageAsync(GroupFilter filter);
+        Task<int> CountAsync(GroupFilter filter);
     }
 }

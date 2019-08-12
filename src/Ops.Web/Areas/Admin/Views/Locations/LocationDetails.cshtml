@@ -1,43 +1,53 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location.LocationViewModel
 
-<form>
-    <div modal id="Features" name="feature" isNonSubmit="true">
-        <input id="editGroupType" asp-for="Group.GroupType" formgroup autocomplete="off" />
-        <div id="collapseDiv" class="collapse show" aria-labelledby="headingOne" data-parent="#region-accordion">
-            <div class="card-body">
-                <select id="addPublic" asp-for="Group." formgroup autocomplete="off">
-                    @foreach (var grouptype in Model.NonLocationGroups)
-                    {
-                        <option>@grouptype.</option>
-                    }
-                </select>
-                <div class="form-group row" id="bodyText-div">
-                    <label asp-for="Feature.BodyText" class="col-md-3 col-form-label text-md-right"></label>
-                    <div class="col-md-9">
-                        <ul class="nav nav-tabs">
-                            <li class="nav-item">
-                                <a class="nav-link active" data-toggle="tab" href="#md-edit" role="tab">Edit</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#md-preview" role="tab">Preview</a>
-                            </li>
-                        </ul>
-                        <div class="tab-content" id="md-edit-preview">
-                            <div class="tab-pane show active" id="md-edit" role="tabpanel">
-                                <div id="wmd-button-bar" class="wmd-button-row"></div>
-                                <textarea asp-for="Feature.BodyText" value="@Model.Feature.BodyText" class="form-control wmd-input" id="wmd-input"></textarea>
+<div class="row">
+    <div class="modal fade" id="listGroupModal" tabindex="-1" role="dialog" aria-labelledby="listModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="row">
+                <div class="col-xs-12 col-sm-10 col-sm-offset-1">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <span class="lead">Add Group</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div id="modalGroupList" class="col-xs-12">
+                                </div>
                             </div>
-                            <div class="tab-pane" id="md-preview" role="tabpanel">
-                                <div id="preview" class="wmd-preview"></div>
-                            </div>
-                            <span asp-validation-for="Feature.BodyText" class="text-danger"></span>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal" style="margin-right: 1em;">Close</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</form>
+</div>
+<div class="row">
+    <div class="modal fade" id="listFeatureModal" tabindex="-1" role="dialog" aria-labelledby="listModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="row">
+                <div class="col-xs-12 col-sm-10 col-sm-offset-1">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <span class="lead">Add Feature</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div id="modalFeatureList" class="col-xs-12">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal" style="margin-right: 1em;">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="container">
     <div class="location-save-container">
         <div class="location-save-message"></div>
@@ -56,6 +66,8 @@
     </div>
     <form method="post" asp-controller="@LocationsController.Name" asp-action="@Model.Action" role="form" display="inline">
         <div class="row">
+            <input asp-for="Groups" type="hidden" />
+            <input asp-for="Features" type="hidden" />
             <input value="@Model.Location.Id" asp-for="Location.Id" id="location-id" type="hidden" />
             <div class="col-xs-12">
                 <input value="@Model.Location.Name" asp-for="Location.Name" formgroup autocomplete="off" />
@@ -91,14 +103,18 @@
                             Features
                         </div>
                         <ul class="list-group list-group-flush">
-                            @foreach (var locationFeature in Model.LocationFeatures)
+                            @if (Model.Features != null)
                             {
-                                @foreach (var feature in Model.Features.Where(_ => _.Id == locationFeature.FeatureId))
+                                @foreach (var locationFeature in Model.LocationFeatures)
                                 {
-                                    <a class="list-group-item feature" data-feature-id="@locationFeature.Id">@feature.Name</a>
+                                    @foreach (var feature in Model.Features.Where(_ => _.Id == locationFeature.FeatureId))
+                                    {
+                                        <a class="list-group-item feature" data-feature-id="@locationFeature.Id">@feature.Name</a>
+                                    }
                                 }
                             }
                         </ul>
+                        <button type="button" id="addFeatureButton" class="btn btn-warning">Add Feature</button>
                     </div>
                     <div class="col-xs-6 card" ">
                         <div class="card-header">
@@ -113,6 +129,7 @@
                                 }
                             }
                         </ul>
+                        <button type="button" id="addGroupButton" class="btn btn-warning">Add Group</button>
                     </div>
                 </div>
                 <div class="form-group">
@@ -142,6 +159,11 @@
 </div>
 @section scripts{
     <script>
+        var groupIds = $("#GroupsList").val().split(',').filter(function (x) { return x }).map(Number);
+        var featureIds = $("#FeaturesList").val().split(',').filter(function (x) { return x }).map(Number);
+        var itemUrl = "@nameof(LocationsController.GetItemsList)";
+        var page = 1;
+
             $(document).ready(function () {
 
                 var ulMapList = document.createElement("ul");
@@ -186,27 +208,39 @@
                     }
                 });
 
+
                 $('.feature').on('click', function () {
+                    @if (Model.Features != null) {
                     @foreach (var locationfeature in Model.LocationFeatures)
                     {
-                        @:if ("@locationfeature.Id" == $(this).data("feature-id")){
+                        @:if ("@locationfeature.Id" == $(this).data("feature-id")) {
                             @foreach (var feature in Model.Features.Where(_ => _.Id == locationfeature.FeatureId))
                             {
 
                                 <text>
-                                $("#modalTitle").text("@feature.Name");
-                                $("#modal-text").html($("#modal-text").html("@locationfeature.Text").text());
-                                $("#modal-text").html($("#modal-text").html("@locationfeature.Text").text());
+                            $("#modalTitle").text("@feature.Name");
+                            $("#modal-text").html($("#modal-text").html("@locationfeature.Text").text());
+                            $("#modal-text").html($("#modal-text").html("@locationfeature.Text").text());
                                 </text>
                             }
                         @:}
                      }
+                        }
                     $('#featureModal').on('shown.bs.modal', function () {
                         $('#myInput').trigger('focus')
                     });
                 });
             });
-
+            function UpdateGroupsList() {
+                $.get(itemsUrl,
+                    {
+                        itemIds: itemIds.join(','),
+                        objectType: "Group"
+                        page: page
+                    }, function(response) {
+                        $("#modalGroupList").html(response);
+                    });
+            }
             $("input#Location_Stub").blur(function () {
                 $("input#Location_Stub").val($("input#Location_Stub").val().toLowerCase().replace(/\s/g, ''));
             });

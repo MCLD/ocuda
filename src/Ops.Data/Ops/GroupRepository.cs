@@ -10,6 +10,7 @@ using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Ops.Data.Extensions;
 
 namespace Ocuda.Ops.Data.Ops
 {
@@ -27,6 +28,30 @@ namespace Ocuda.Ops.Data.Ops
                 .OrderBy(_ => _.GroupType)
                 .ToListAsync();
         }
+        public async Task<int> CountAsync(GroupFilter filter)
+        {
+            return await ApplyFilters(filter)
+                .CountAsync();
+        }
+        public async Task<ICollection<Group>> PageAsync(GroupFilter filter)
+        {
+            return await ApplyFilters(filter)
+                .OrderBy(_ => _.GroupType)
+                .ApplyPagination(filter)
+                .ToListAsync();
+        }
+        private IQueryable<Group> ApplyFilters(GroupFilter filter)
+        {
+            var items = DbSet.AsNoTracking();
+
+            if (filter.GroupIds?.Count > 0)
+            {
+                items = items.Where(_ => !filter.GroupIds.Contains(_.Id));
+            }
+
+            return items;
+        }
+
         public async Task<List<Group>> GetAllGroupRegions()
         {
             return await DbSet

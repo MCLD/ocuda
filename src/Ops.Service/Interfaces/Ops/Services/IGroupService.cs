@@ -15,5 +15,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<List<Group>> GetNonGroupRegions();
         Task<List<Group>> GetMissingGroups(List<int> locationGroupIds);
         Task<DataWithCount<ICollection<Group>>> GetPaginatedListAsync(BaseFilter filter);
+        Task<DataWithCount<ICollection<Group>>> PageItemsAsync(GroupFilter filter);
     }
 }
