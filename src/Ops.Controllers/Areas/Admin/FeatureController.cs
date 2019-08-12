@@ -25,18 +25,11 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     public class FeaturesController : BaseController<FeaturesController>
     {
         private readonly IFeatureService _featureService;
-        private readonly IConfiguration _config;
-        private readonly ILogger<HomeController> _logger;
         public static string Name { get { return "Features"; } }
 
-
-        public FeaturesController(IConfiguration config,
-            ServiceFacades.Controller<FeaturesController> context,
-            IFeatureService featureService,
-            ILogger<HomeController> logger) : base(context)
+        public FeaturesController(ServiceFacades.Controller<FeaturesController> context,
+            IFeatureService featureService) : base(context)
         {
-            _config = config ?? throw new ArgumentNullException(nameof(config));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _featureService = featureService
                 ?? throw new ArgumentNullException(nameof(featureService));
         }
@@ -45,7 +38,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [Route("[action]")]
         public async Task<IActionResult> Index(int page = 1)
         {
-
             var itemsPerPage = await _siteSettingService
                 .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
 
@@ -82,8 +74,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [RestoreModelState]
         public IActionResult AddFeature()
         {
-            var feature = new Feature();
-            feature.IsNewFeature = true;
+            var feature = new Feature
+            {
+                IsNewFeature = true
+            };
             var viewModel = new FeatureViewModel
             {
                 Feature = feature,
@@ -158,12 +152,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 ShowAlertDanger($"Invalid paramaters");
                 feature.IsNewFeature = true;
-                var viewModel = new FeatureViewModel
-                {
-                    Feature = feature,
-                    Action = nameof(FeaturesController.CreateFeature)
-                };
-
                 return RedirectToAction(nameof(Feature));
             }
         }
