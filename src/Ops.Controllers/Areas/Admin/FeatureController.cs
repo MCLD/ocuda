@@ -25,6 +25,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     public class FeaturesController : BaseController<FeaturesController>
     {
         private readonly IFeatureService _featureService;
+
         public static string Name { get { return "Features"; } }
 
         public FeaturesController(ServiceFacades.Controller<FeaturesController> context,
