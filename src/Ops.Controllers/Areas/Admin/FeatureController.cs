@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Feature;
+using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Promenade.Models.Entities;
@@ -78,6 +79,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [Route("AddFeature")]
+        [RestoreModelState]
         public IActionResult AddFeature()
         {
             var feature = new Feature();
@@ -92,6 +94,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [Route("{featureName}")]
+        [RestoreModelState]
         public async Task<IActionResult> Feature(string featureName)
         {
             try
@@ -109,12 +112,13 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 ShowAlertDanger($"Feature does not exist: {ex.Message}");
                 _logger.LogError(ex.Message);
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
         }
 
         [HttpPost]
         [Route("[action]")]
+        [SaveModelState]
         public async Task<IActionResult> CreateFeature(Feature feature)
         {
             if (ModelState.IsValid)
@@ -141,20 +145,14 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     await _featureService.AddFeatureAsync(feature);
                     ShowAlertSuccess($"Added Feature: {feature.Name}");
                     feature.IsNewFeature = true;
-                    return RedirectToAction("Feature", new { featureName = feature.Name });
+                    return RedirectToAction(nameof(Feature), new { featureName = feature.Name });
                 }
                 catch (OcudaException ex)
                 {
                     ShowAlertDanger($"Unable to Create Feature: {ex.Message}");
                     _logger.LogError(ex.Message);
                     feature.IsNewFeature = true;
-                    var viewModel = new FeatureViewModel
-                    {
-                        Feature = feature,
-                        Action = nameof(FeaturesController.CreateFeature)
-                    };
-
-                    return View("FeatureDetails", viewModel);
+                    return RedirectToAction(nameof(Feature));
                 }
             }
             else
@@ -167,12 +165,13 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     Action = nameof(FeaturesController.CreateFeature)
                 };
 
-                return View("FeatureDetails", viewModel);
+                return RedirectToAction(nameof(Feature));
             }
         }
 
         [HttpPost]
         [Route("[action]")]
+        [SaveModelState]
         public async Task<IActionResult> DeleteFeature(Feature feature)
         {
             try
@@ -186,11 +185,12 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ShowAlertDanger($"Unable to Delete Feature {feature.Name}: {ex.Message}");
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
         [Route("[action]")]
+        [SaveModelState]
         public async Task<IActionResult> EditFeature(Feature feature)
         {
             if (ModelState.IsValid)
@@ -207,33 +207,21 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 {
                     await _featureService.EditAsync(feature);
                     ShowAlertSuccess($"Updated Feature: {feature.Name}");
-                    return RedirectToAction("Feature", new { featureName = feature.Name });
+                    return RedirectToAction(nameof(Feature), new { featureName = feature.Name });
                 }
                 catch (OcudaException ex)
                 {
                     ShowAlertDanger($"Unable to Update Feature: {feature.Name}");
                     _logger.LogError(ex.Message);
                     feature.IsNewFeature = false;
-                    var viewModel = new FeatureViewModel
-                    {
-                        Feature = feature,
-                        Action = nameof(FeaturesController.EditFeature)
-                    };
-
-                    return View("FeatureDetails", viewModel);
+                    return RedirectToAction(nameof(Feature), new { featureName = feature.Name });
                 }
             }
             else
             {
                 ShowAlertDanger($"Invalid Parameters: {feature.Name}");
                 feature.IsNewFeature = false;
-                var viewModel = new FeatureViewModel
-                {
-                    Feature = feature,
-                    Action = nameof(FeaturesController.EditFeature)
-                };
-
-                return View("FeatureDetails", viewModel);
+                return RedirectToAction(nameof(Feature), new { featureName = feature.Name });
             }
         }
     }
