@@ -38,7 +38,6 @@ namespace Ocuda.Ops.Web
             }
             finally
             {
-
                 Log.CloseAndFlush();
             }
         }

@@ -31,7 +31,7 @@ namespace Ocuda.Ops.Web
         private readonly ILogger _logger;
 
         public Startup(IConfiguration configuration,
-            IHostingEnvironment env, 
+            IHostingEnvironment env,
             ILogger<Startup> logger)
         {
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
