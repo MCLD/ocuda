@@ -2,24 +2,14 @@
 
 <form>
     <div modal id="Features" name="feature" isNonSubmit="true">
-        <input id="addName" asp-for="Feature.Name" formgroup autocomplete="off" />
-        <select id="addPublic" asp-for="Feature.IsPublic" formgroup autocomplete="off">
-            <option></option>
-            <option value="False">No</option>
-            <option value="True">Yes</option>
-        </select>
-    </div>
-</form>
-
-<form>
-    <div modal id="Groups" name="group" isNonSubmit="true">
         <input id="editGroupType" asp-for="Group.GroupType" formgroup autocomplete="off" />
         <div id="collapseDiv" class="collapse show" aria-labelledby="headingOne" data-parent="#region-accordion">
             <div class="card-body">
-                <select id="addPublic" asp-for="Feature" formgroup autocomplete="off">
-                    @foreach (var grouptype in )
-                        <option value="False">No</option>
-                    <option value="True">Yes</option>
+                <select id="addPublic" asp-for="Group." formgroup autocomplete="off">
+                    @foreach (var grouptype in Model.NonLocationGroups)
+                    {
+                        <option>@grouptype.</option>
+                    }
                 </select>
                 <div class="form-group row" id="bodyText-div">
                     <label asp-for="Feature.BodyText" class="col-md-3 col-form-label text-md-right"></label>
@@ -204,7 +194,7 @@
                             {
 
                                 <text>
-                                $("#modalTitle").text("@Html.Raw(feature.Name)");
+                                $("#modalTitle").text("@feature.Name");
                                 $("#modal-text").html($("#modal-text").html("@locationfeature.Text").text());
                                 $("#modal-text").html($("#modal-text").html("@locationfeature.Text").text());
                                 </text>
