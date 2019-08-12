@@ -97,9 +97,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [RestoreModelState]
         public async Task<IActionResult> Feature(string featureName)
         {
-            try
+            var feature = await _featureService.GetFeatureByNameAsync(featureName);
+            if (feature != null)
             {
-                var feature = await _featureService.GetFeatureByNameAsync(featureName);
                 feature.IsNewFeature = false;
                 var viewModel = new FeatureViewModel
                 {
@@ -108,10 +108,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 };
                 return View("FeatureDetails", viewModel);
             }
-            catch (OcudaException ex)
+            else
             {
-                ShowAlertDanger($"Feature does not exist: {ex.Message}");
-                _logger.LogError(ex.Message);
+                ShowAlertDanger($"Feature does not exist.");
                 return RedirectToAction(nameof(Index));
             }
         }
