@@ -105,7 +105,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             else
             {
-                ShowAlertDanger($"Feature does not exist.");
+                ShowAlertDanger("Feature does not exist.");
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -117,23 +117,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             if (ModelState.IsValid)
             {
-                if (string.IsNullOrEmpty(feature.Stub))
-                {
-                    feature.Stub = "";
-                }
-                if (string.IsNullOrEmpty(feature.BodyText))
-                {
-                    feature.BodyText = "";
-                }
-                if (feature.FontAwesome.Contains("fab"))
-                {
-                    feature.FontAwesome = "fa-inverse " + feature.FontAwesome + " fa-stack-1x";
-                }
-                else
-                {
-                    feature.FontAwesome = "fa fa-inverse " + feature.FontAwesome + " fa-stack-1x";
-                }
-
                 try
                 {
                     await _featureService.AddFeatureAsync(feature);
@@ -144,7 +127,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 catch (OcudaException ex)
                 {
                     ShowAlertDanger($"Unable to Create Feature: {ex.Message}");
-                    _logger.LogError(ex.Message);
+                    _logger.LogError(ex, "Problem creating feature: {Message}", ex.Message);
                     feature.IsNewFeature = true;
                     return RedirectToAction(nameof(Feature));
                 }
@@ -169,7 +152,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             catch (OcudaException ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError(ex, "Problem deleting feature: {Message}", ex.Message);
                 ShowAlertDanger($"Unable to Delete Feature {feature.Name}: {ex.Message}");
             }
 
@@ -183,14 +166,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             if (ModelState.IsValid)
             {
-                if (string.IsNullOrEmpty(feature.Stub))
-                {
-                    feature.Stub = "";
-                }
-                if (string.IsNullOrEmpty(feature.BodyText))
-                {
-                    feature.BodyText = "";
-                }
                 try
                 {
                     await _featureService.EditAsync(feature);
@@ -200,7 +175,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 catch (OcudaException ex)
                 {
                     ShowAlertDanger($"Unable to Update Feature: {feature.Name}");
-                    _logger.LogError(ex.Message);
+                    _logger.LogError(ex, "Problem updating feature: {Message}", ex.Message);
                     feature.IsNewFeature = false;
                     return RedirectToAction(nameof(Feature), new { featureName = feature.Name });
                 }

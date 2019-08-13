@@ -93,7 +93,6 @@
     </form>
 </div>
 @section scripts{
-    <script src="~/devscripts/fontawesome-iconpicker/main.js" asp-append-version="true"></script>
     <script>
     $(function () {
         $('.icon-picker').iconpicker();
@@ -122,8 +121,8 @@
         });
         $("#submit").click(function () {
             if ($("#accordion-header").hasClass("alert-danger")) {
-                $("#wmd-input").val(" ");
-                $("input#Feature_Stub").val(" ");
+                $("#wmd-input").val(null);
+                $("input#Feature_Stub").val(null);
             }
         });
         var editor = new Markdown.Editor({ allowUploads: false });

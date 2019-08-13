@@ -22,15 +22,7 @@ namespace Ocuda.Ops.Data.Ops
                 .AsNoTracking()
                 .OrderByDescending(_ => _.CreatedAt)
                 .FirstOrDefaultAsync();
-
-            if (latest != null)
-            {
-                return latest.Id;
-            }
-            else
-            {
-                return null;
-            }
+            return latest?.Id;
         }
     }
 }

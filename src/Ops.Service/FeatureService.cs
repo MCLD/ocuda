@@ -40,8 +40,8 @@ namespace Ocuda.Ops.Service
             }
             catch (OcudaException ex)
             {
-                _logger.LogError(ex.Message);
-                throw new OcudaException($"The feature: " + featureName + " was unable to be found.");
+                _logger.LogError(ex, "Problem finding feature: {Message}", ex.Message);
+                throw new OcudaException($"The feature: '{featureName}' was unable to be found.");
             }
         }
 
@@ -49,9 +49,16 @@ namespace Ocuda.Ops.Service
         {
             try
             {
+                feature.FontAwesome = "fa-inverse " + feature.FontAwesome + " fa-stack-1x";
+                if (!feature.FontAwesome.Contains("fab"))
+                {
+                    feature.FontAwesome = "fa " + feature.FontAwesome;
+                }
                 feature.Name = feature.Name?.Trim();
-                await ValidateAsync(feature);
+                feature.BodyText = feature.BodyText?.Trim();
+                feature.Stub = feature.Stub?.Trim();
 
+                await ValidateAsync(feature);
                 await _featureRepository.AddAsync(feature);
                 await _featureRepository.SaveAsync();
             }
@@ -74,19 +81,16 @@ namespace Ocuda.Ops.Service
                 {
                     if (!feature.FontAwesome.Contains("fa-inverse"))
                     {
-                        if (feature.FontAwesome.Contains("fab"))
+                        feature.FontAwesome = "fa-inverse " + feature.FontAwesome + " fa-stack-1x";
+                        if (!feature.FontAwesome.Contains("fab"))
                         {
-                            feature.FontAwesome = "fa-inverse " + feature.FontAwesome + " fa-stack-1x";
-                        }
-                        else
-                        {
-                            feature.FontAwesome = "fa fa-inverse " + feature.FontAwesome + " fa-stack-1x";
+                            feature.FontAwesome = "fa " + feature.FontAwesome;
                         }
                     }
-                    currentFeature.BodyText = feature.BodyText;
+                    currentFeature.BodyText = feature.BodyText?.Trim();
                     currentFeature.FontAwesome = feature.FontAwesome;
-                    currentFeature.Name = feature.Name;
-                    currentFeature.Stub = feature.Stub;
+                    currentFeature.Name = feature.Name?.Trim();
+                    currentFeature.Stub = feature.Stub?.Trim();
                     _featureRepository.Update(feature);
                     await _featureRepository.SaveAsync();
                     return await _featureRepository.FindAsync(currentFeature.Id);
@@ -99,7 +103,7 @@ namespace Ocuda.Ops.Service
             }
             else
             {
-                throw new OcudaException($"Could not find Feature.");
+                throw new OcudaException("Could not find Feature.");
             }
         }
 
@@ -112,7 +116,6 @@ namespace Ocuda.Ops.Service
             }
             catch (OcudaException ex)
             {
-                _logger.LogError(ex.Message);
                 throw new OcudaException(ex.Message);
             }
         }
@@ -123,7 +126,7 @@ namespace Ocuda.Ops.Service
             {
                 throw new OcudaException($"Feature name '{feature.Name}' already exists.");
             }
-            if (await _featureRepository.IsDuplicateStubAsync(feature))
+            if (!string.IsNullOrEmpty(feature.Stub) && await _featureRepository.IsDuplicateStubAsync(feature))
             {
                 throw new OcudaException($"Feature stub '{feature.Stub}' already exists.");
             }

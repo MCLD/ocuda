@@ -32,12 +32,10 @@ namespace Ocuda.Ops.Data.Ops
         public async Task<DataWithCount<ICollection<Feature>>> GetPaginatedListAsync(
             BaseFilter filter)
         {
-            var query = DbSet.AsNoTracking();
-
             return new DataWithCount<ICollection<Feature>>
             {
-                Count = await query.CountAsync(),
-                Data = await query
+                Count = await DbSet.AsNoTracking().CountAsync(),
+                Data = await DbSet.AsNoTracking()
                     .OrderBy(_ => _.Name)
                     .ApplyPagination(filter)
                     .ToListAsync()
@@ -64,7 +62,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id != feature.Id && feature.Stub != "" && _.Stub == feature.Stub)
+                .Where(_ => _.Id != feature.Id && _.Stub == feature.Stub)
                 .AnyAsync();
         }
     }
