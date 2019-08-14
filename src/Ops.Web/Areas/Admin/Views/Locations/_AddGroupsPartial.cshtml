@@ -1,38 +1,37 @@
-﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location.FeatureListViewModel;
+﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location.GroupListViewModel;
 
-@if (Model.Features.Count() == 0)
+@if (Model.Groups.Count() == 0)
 {
     <div class="alert alert-warning">No Items found</div>
 }
 else
 {
     <div>
-        <table class="table table-condensed table-bordered table-striped">
+        <table class="table table-sm table-bordered table-striped">
             <thead>
                 <tr>
-                    <td>Name</td>
-                    <td>Stub</td>
-                    <td>Body Text</td>
-                    <td width="44px">&nbsp;</td>
+                    <th>Group Type</th>
+                    <th width="100px">Is Location Region</th>
+                    <th width="44px">&nbsp;</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var feature in Model.Features)
+                @foreach (var group in Model.Groups)
                 {
                     <tr class="itemRow">
-                        <td>
-                            @feature.Name
+                        <td style="vertical-align:middle;">
+                            @group.GroupType
                         </td>
-                        <td>
-                            @feature.Stub
-                        </td>
-                        <td>
-                            @feature.BodyText
+                        <td class="text-center" style="vertical-align:middle;">
+                            @if (group.IsLocationRegion)
+                            {
+                                <span class="fas fa-check"></span>
+                            }
                         </td>
                         <td>
                             <button type="button"
                                     class="btn btn-link btn-xs addgroupButton"
-                                    data-itemid="@feature.Id">
+                                    data-groupid="@group.Id">
                                 <span class="fa fa-2x fa-plus-circle text-success" aria-hidden="true"></span>
                             </button>
                         </td>

@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location;
+using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Promenade.Models.Entities;
@@ -94,6 +95,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             return View(viewModel);
         }
         [HttpGet("{locationStub}")]
+        [RestoreModelState]
         public async Task<IActionResult> Location(string locationStub)
         {
             try
@@ -108,6 +110,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     Groups = await _groupService.GetAllGroupsAsync(),
                     Action = nameof(LocationsController.EditLocation)
                 };
+                viewModel.FeatureList = string.Join(",", viewModel.LocationFeatures.Select(_ => _.FeatureId));
+                viewModel.GroupList = string.Join(",", viewModel.LocationGroups.Select(_ => _.GroupId));
                 return View("LocationDetails", viewModel);
             }
             catch (OcudaException ex)
@@ -118,6 +122,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [HttpGet("[action]")]
+        [SaveModelState]
         public IActionResult AddLocation()
         {
             var location = new Location();
@@ -133,6 +138,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
         [HttpPost]
         [Route("[action]")]
+        [SaveModelState]
         public async Task<IActionResult> CreateLocation(Location location)
         {
             if (ModelState.IsValid)
@@ -185,6 +191,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
         [HttpPost]
         [Route("[action]")]
+        [SaveModelState]
         public async Task<IActionResult> DeleteLocation(Location location)
         {
             try
@@ -202,6 +209,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
         [HttpPost]
         [Route("[action]")]
+        [SaveModelState]
         public async Task<IActionResult> EditLocation(Location location)
         {
             if (ModelState.IsValid)
@@ -252,38 +260,110 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
         }
-        [HttpGet]
+
+        [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> GetNonLocationGroups(string LocationGroupJson)
+        [SaveModelState]
+        public async Task<IActionResult> EditLocationGroup(LocationGroup locationGroup)
         {
-            var success = false;
-            try
+            var location = await _locationService.GetLocationByIdAsync(locationGroup.LocationId);
+            if (ModelState.IsValid)
             {
-                var locationGroupIds = JsonConvert.DeserializeObject<List<int>>(LocationGroupJson);
-                var data = JsonConvert.SerializeObject(await _groupService.GetMissingGroups(locationGroupIds));
-                success = true;
-                return Json(new {data, success});
-            }
-            catch(OcudaException ex)
-            {
-                ShowAlertDanger($"Unable to retrieve groups: {ex.Message}");
-                return Json(new
+                try
                 {
-                    success
-                });
+                    await _locationGroupService.EditAsync(locationGroup);
+                    var group = await _groupService.GetGroupByIdAsync(locationGroup.GroupId);
+                    ShowAlertSuccess($"Updated {location.Name}'s Group: {group.GroupType}");
+                }
+                catch (OcudaException ex)
+                {
+                    var group = await _groupService.GetGroupByIdAsync(locationGroup.GroupId);
+                    ShowAlertDanger($"Updated {location.Name}'s Group: {group.GroupType}");
+                }
             }
+            return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
         }
 
+        [HttpPost]
+        [Route("[action]")]
+        [SaveModelState]
+        public async Task<IActionResult> EditLocationFeature(LocationFeature locationFeature)
+        {
+            var location = await _locationService.GetLocationByIdAsync(locationFeature.LocationId);
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _locationFeatureService.EditAsync(locationFeature);
+                    //var feature = await _featureService.GetFeatureByIdAsync(locationFeature.FeatureId);
+                    //ShowAlertSuccess($"Updated {location.Name}'s Feature: {feature.Name}");
+                }
+                catch (OcudaException ex)
+                {
+                    //var group = await _featureService.GetFeatureByIdAsync(locationGroup.FeatureId);
+                    //ShowAlertDanger($"Failed to Update {location.Name}'s Feature: {feature.Name}");
+                    _logger.LogError($"Unable to edit {ex.Message}: {ex}");
+                    ShowAlertDanger($"Failed to Update {location.Name}'s Feature");
+                }
+            }
+            return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
+        }
+        [HttpPost]
+        [Route("[action]")]
+        [SaveModelState]
+        public async Task<IActionResult> CreateLocationGroup(int locationId, int groupId)
+        {
+            var location = await _locationService.GetLocationByIdAsync(locationId);
+            var group = await _groupService.GetGroupByIdAsync(groupId);
+            try
+            {
+                var locationGroup = new LocationGroup()
+                {
+                    GroupId = groupId,
+                    LocationId = locationId
+                };
+                if (!string.IsNullOrEmpty(group.SubscriptionUrl))
+                {
+                    locationGroup.HasSubscription = true;
+                }
+                await _locationGroupService.AddLocationGroupAsync(locationGroup);
+                ShowAlertSuccess($"Added group '{group.GroupType}' to location '{location.Name}'");
+            }
+            catch (OcudaException ex)
+            {
+                ShowAlertDanger($"Unable to Add group to Location: {ex.Message}");
+            }
 
+            return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
+        }
 
+        [HttpPost]
+        [Route("[action]")]
+        [SaveModelState]
+        public async Task<IActionResult> DeleteLocationGroup(int locationgroupId)
+        {
+            var locationgroup = await _locationGroupService.GetLocationGroupByIdAsync(locationgroupId);
+            var location = await _locationService.GetLocationByIdAsync(locationgroup.LocationId);
+            var group = await _groupService.GetGroupByIdAsync(locationgroup.GroupId);
+            try
+            {
+                await _locationGroupService.DeleteAsync(locationgroupId);
+                ShowAlertSuccess($"Deleted Group '{group.GroupType}' from '{location.Name}'");
+            }
+            catch (OcudaException ex)
+            {
+                ShowAlertDanger($"Unable to delete group '{group.GroupType}' from '{location.Name}': {ex.Message}");
+            }
 
-
-
+            return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub});
+        }
 
         [HttpGet]
         [Route("[action]")]
         public async Task<IActionResult> GetItemsList(string itemIds, string objectType, int page = 1)
         {
+            if (objectType == "Group")
+            {
                 var filter = new GroupFilter(page, 10);
 
                 if (!string.IsNullOrWhiteSpace(itemIds))
@@ -307,15 +387,59 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     PaginateModel = paginateModel
                 };
 
-                return PartialView("_GroupsPartial", viewModel);
+                return PartialView("_AddGroupsPartial", viewModel);
+            }
+            else
+            {
+                var filter = new GroupFilter(page, 10);
+
+                if (!string.IsNullOrWhiteSpace(itemIds))
+                {
+                    filter.GroupIds = itemIds.Split(',')
+                        .Where(_ => !string.IsNullOrWhiteSpace(_))
+                        .Select(int.Parse)
+                        .ToList();
+                }
+                var items = await _groupService.PageItemsAsync(filter);
+                var paginateModel = new PaginateModel
+                {
+                    ItemCount = items.Count,
+                    CurrentPage = page,
+                    ItemsPerPage = filter.Take.Value
+                };
+
+                var viewModel = new GroupListViewModel
+                {
+                    Groups = items.Data,
+                    PaginateModel = paginateModel
+                };
+
+                return PartialView("_AddFeaturesPartial", viewModel);
+            }
         }
 
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> GetItemInfo(int itemId, string objectType,string locationStub)
+        {
+            var location = await _locationService.GetLocationByStubAsync(locationStub);
+            var viewModel = new LocationViewModel {
+                Location = location
+            };
 
+            if (objectType == "Group")
+            {
+                viewModel.LocationGroup = await _locationGroupService.GetLocationGroupByIdAsync(itemId);
 
+                return PartialView("_EditGroupsPartial", viewModel);
+            }
+            else
+            {
+                viewModel.LocationFeature = await _locationFeatureService.GetLocationFeatureByIdAsync(itemId);
 
-
-
-
+                return PartialView("_EditFeaturesPartial", viewModel);
+            }
+        }
 
         [HttpGet]
         [Route("[action]")]

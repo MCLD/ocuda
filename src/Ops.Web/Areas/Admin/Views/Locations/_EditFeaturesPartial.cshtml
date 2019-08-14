@@ -1,0 +1,7 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location.LocationViewModel;
+
+    <div>
+        <input value="@Model.LocationFeature.Id" asp-for="LocationFeature.Id" type="hidden" />
+        <input value="@Model.LocationFeature.Text" asp-for="LocationFeature.Text" formgroup autocomplete="off" />
+        <input value="@Model.LocationFeature.RedirectUrl" asp-for="LocationFeature.RedirectUrl" formgroup autocomplete="off" />
+    </div>

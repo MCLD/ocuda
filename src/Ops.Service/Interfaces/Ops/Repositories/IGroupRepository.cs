@@ -14,7 +14,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         Task<List<Group>> GetAllGroupsAsync();
         Task<List<Group>> GetAllGroupRegions();
         Task<List<Group>> GetAllNonGroupRegions();
-        Task<bool> IsDuplicateIdAsync(Group group);
         Task<bool> IsDuplicateGroupTypeAsync(Group group);
         Task<DataWithCount<ICollection<Group>>> GetPaginatedListAsync(BaseFilter filter);
         Task<ICollection<Group>> PageAsync(GroupFilter filter);

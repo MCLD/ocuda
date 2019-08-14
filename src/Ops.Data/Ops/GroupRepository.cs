@@ -88,14 +88,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.GroupType.ToLower() == group.GroupType.ToLower())
-                .AnyAsync();
-        }
-        public async Task<bool> IsDuplicateIdAsync(Group group)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.Id != group.Id)
+                .Where(_ => _.Id != group.Id && string.Equals(_.GroupType, group.GroupType, StringComparison.OrdinalIgnoreCase))
                 .AnyAsync();
         }
     }

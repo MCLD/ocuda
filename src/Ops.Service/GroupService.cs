@@ -135,10 +135,6 @@ namespace Ocuda.Ops.Service
         }
         private async Task ValidateAsync(Group group)
         {
-            if (await _groupRepository.IsDuplicateIdAsync(group))
-            {
-                throw new OcudaException($"Group Id already exists.");
-            }
             if (await _groupRepository.IsDuplicateGroupTypeAsync(group))
             {
                 throw new OcudaException($"Group '{group.GroupType}' already exists.");

@@ -27,5 +27,12 @@ namespace Ocuda.Ops.Data.Ops
                 .Where(_ => _.LocationId == location.Id)
                 .ToListAsync();
         }
+        public async Task<bool> IsDuplicateAsync(LocationGroup locationGroup)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Id != locationGroup.Id && _.LocationId != locationGroup.LocationId && _.GroupId != locationGroup.GroupId)
+                .AnyAsync();
+        }
     }
 }

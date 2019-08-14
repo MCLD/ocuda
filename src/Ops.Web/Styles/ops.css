@@ -123,6 +123,9 @@
 span.format-addr {
     font-style: italic;
 }
+td.group-item:hover, td.feature-item:hover{
+    cursor: pointer;
+}
 
 @media screen and (max-height: 500px) {
     .navcolumn {

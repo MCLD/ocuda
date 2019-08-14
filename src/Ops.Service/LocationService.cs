@@ -41,7 +41,7 @@ namespace Ocuda.Ops.Service
             var location = await _locationRepository.GetLocationByStub(locationStub);
             if(location == null)
             {
-                throw new OcudaException($"Location not found.");
+                throw new OcudaException("Location not found.");
             }
             else
             {
@@ -117,10 +117,6 @@ namespace Ocuda.Ops.Service
         }
         private async Task ValidateAsync(Location location)
         {
-            if (await _locationRepository.IsDuplicateIdAsync(location))
-            {
-                throw new OcudaException($"Location Id already exists.");
-            }
             if (await _locationRepository.IsDuplicateNameAsync(location))
             {
                 throw new OcudaException($"Location Name '{location.Name}' already exists.");
