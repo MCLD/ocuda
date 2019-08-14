@@ -21,7 +21,6 @@ namespace Ocuda.Utility.TagHelpers
         private const string infoTooltipAttributeName = "info-tooltip";
         private const string onBlurJs = "on-blur-js";
         private const string defaultWraperDivClass = "form-group row";
-        private const string defaultRowDivClass = "row";
         private const string defaultLabelClass = "col-md-3 col-form-label text-md-right";
         private const string defaultInputClass = "form-control";
         private const string defaultInnerDivClass = "col-md-9";
@@ -31,7 +30,8 @@ namespace Ocuda.Utility.TagHelpers
         private readonly IHtmlGenerator _htmlGenerator;
         public FormGroupTagHelper(IHtmlGenerator htmlGenerator)
         {
-            _htmlGenerator = htmlGenerator ?? throw new ArgumentNullException(nameof(htmlGenerator));
+            _htmlGenerator = htmlGenerator 
+                ?? throw new ArgumentNullException(nameof(htmlGenerator));
         }
 
         [HtmlAttributeName(forAttributeName)]
@@ -55,7 +55,8 @@ namespace Ocuda.Utility.TagHelpers
             // Manually create each child asp form tag helper element
             TagHelperOutput labelElement = await CreateLabelElement(context);
             TagHelperOutput inputElement = await CreateInputElement(context, output);
-            TagHelperOutput validationMessageElement = await CreateValidationMessageElement(context);
+            TagHelperOutput validationMessageElement 
+                = await CreateValidationMessageElement(context);
 
             // Wrap input and validation with column div
             IHtmlContent innerDiv = WrapElementsWithDiv(
@@ -136,7 +137,7 @@ namespace Ocuda.Utility.TagHelpers
             inputOutput.Content.AppendHtml(await output.GetChildContentAsync());
             inputOutput.Content.AppendHtml(output.PostContent.GetContent());
 
-            if(!string.IsNullOrEmpty(OnBlurJs))
+            if (!string.IsNullOrEmpty(OnBlurJs))
             {
                 inputOutput.Attributes.Add("onblur", $"{OnBlurJs}(this)");
             }
@@ -187,7 +188,7 @@ namespace Ocuda.Utility.TagHelpers
             return new TagHelperOutput(
                 tagName: tagName,
                 attributes: new TagHelperAttributeList(),
-                getChildContentAsync: (s, t) =>
+                getChildContentAsync: (_, __) =>
                 {
                     return Task.Factory.StartNew<TagHelperContent>(
                             () => new DefaultTagHelperContent());

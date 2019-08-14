@@ -13,14 +13,7 @@
 
 <div class="row">
     <div class="col-12">
-        @if (Model.Feature.IsNewFeature)
-        {
-            <h1>Add Feature</h1>
-        }
-        else
-        {
-            <h1>Edit Feature</h1>
-        }
+        <h1>@Model.Feature.IsNewFeature ? "Add Feature" : "Edit Feature"</h1>
     </div>
 </div>
 
@@ -57,7 +50,7 @@
                     </button>
                 </div>
                 <div id="collapseDiv"
-                     class="collapse @(string.IsNullOrEmpty(Model?.Feature?.Stub) ? "" : "show")"
+                     class="collapse @(string.IsNullOrEmpty(Model?.Feature?.Stub) ? " " : " show")"
                      aria-labelledby="headingOne"
                      data-parent="#popup-accordion">
                     <div class="card-body">
@@ -66,8 +59,7 @@
                                formgroup
                                autocomplete="off"
                                info-tooltip="The stub is the nickname/URL for the feature."
-                               on-blur-js="FormatStub"
-                               />
+                               on-blur-js="FormatStub" />
                         <div class="form-group row" id="bodyText-div">
                             <label asp-for="Feature.BodyText"
                                    class="col-md-3 col-form-label text-md-right"></label>
@@ -174,7 +166,7 @@
         });
 
         function FormatStub(object) {
-            $(object).val($(object).val().toLowerCase().replace(/\s/g, '-'));
+            updateStub($(object), $(object).val());
         }
 
         $(document).ready(function () {
@@ -184,10 +176,6 @@
             $('.icon-picker').iconpicker();
 
             $('[data-toggle="tooltip"]').tooltip();
-
-            $("input#Feature_StubZZZ").blur(function () {
-                $("input#Feature_Stub").val($("input#Feature_Stub").val().toLowerCase().replace(/\s/g, ''));
-            });
         });
     </script>
 }
