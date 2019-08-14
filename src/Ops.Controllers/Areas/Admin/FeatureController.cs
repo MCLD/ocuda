@@ -2,10 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Feature;
 using Ocuda.Ops.Controllers.Filters;
@@ -15,7 +12,6 @@ using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
-using Ocuda.Utility.TagHelpers;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
 {
@@ -75,17 +71,14 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [RestoreModelState]
         public IActionResult AddFeature()
         {
-            var feature = new Feature
+            return View("FeatureDetails", new FeatureViewModel
             {
-                IsNewFeature = true
-            };
-            var viewModel = new FeatureViewModel
-            {
-                Feature = feature,
+                Feature = new Feature
+                {
+                    IsNewFeature = true
+                },
                 Action = nameof(FeaturesController.CreateFeature)
-            };
-
-            return View("FeatureDetails", viewModel);
+            });
         }
 
         [Route("{featureName}")]
@@ -96,12 +89,11 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             if (feature != null)
             {
                 feature.IsNewFeature = false;
-                var viewModel = new FeatureViewModel
+                return View("FeatureDetails", new FeatureViewModel
                 {
                     Feature = feature,
                     Action = nameof(FeaturesController.EditFeature)
-                };
-                return View("FeatureDetails", viewModel);
+                });
             }
             else
             {

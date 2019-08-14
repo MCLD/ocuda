@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Filters;
@@ -41,7 +40,7 @@ namespace Ocuda.Ops.Service
             catch (OcudaException ex)
             {
                 _logger.LogError(ex, "Problem finding feature: {Message}", ex.Message);
-                throw new OcudaException($"The feature: '{featureName}' was unable to be found.");
+                throw new OcudaException($"Could not find feature: {featureName}");
             }
         }
 
@@ -75,7 +74,7 @@ namespace Ocuda.Ops.Service
         {
             var currentFeature = await _featureRepository.FindAsync(feature.Id);
             await ValidateAsync(currentFeature);
-            if(currentFeature != null)
+            if (currentFeature != null)
             {
                 try
                 {
@@ -103,7 +102,7 @@ namespace Ocuda.Ops.Service
             }
             else
             {
-                throw new OcudaException("Could not find Feature.");
+                throw new OcudaException($"Could not find feature id {feature.Id} to edit.");
             }
         }
 
@@ -124,11 +123,12 @@ namespace Ocuda.Ops.Service
         {
             if (await _featureRepository.IsDuplicateNameAsync(feature))
             {
-                throw new OcudaException($"Feature name '{feature.Name}' already exists.");
+                throw new OcudaException($"A feature named '{feature.Name}' already exists.");
             }
-            if (!string.IsNullOrEmpty(feature.Stub) && await _featureRepository.IsDuplicateStubAsync(feature))
+            if (!string.IsNullOrEmpty(feature.Stub)
+                && await _featureRepository.IsDuplicateStubAsync(feature))
             {
-                throw new OcudaException($"Feature stub '{feature.Stub}' already exists.");
+                throw new OcudaException($"A feature with stub '{feature.Stub}' already exists.");
             }
         }
     }

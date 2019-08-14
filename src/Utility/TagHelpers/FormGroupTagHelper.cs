@@ -18,6 +18,8 @@ namespace Ocuda.Utility.TagHelpers
         private const string attributeName = "formgroup";
         private const string forAttributeName = "asp-for";
         private const string ignoreValidationAttributeName = "ignore-validation";
+        private const string infoTooltipAttributeName = "info-tooltip";
+        private const string onBlurJs = "on-blur-js";
         private const string defaultWraperDivClass = "form-group row";
         private const string defaultRowDivClass = "row";
         private const string defaultLabelClass = "col-md-3 col-form-label text-md-right";
@@ -34,8 +36,15 @@ namespace Ocuda.Utility.TagHelpers
 
         [HtmlAttributeName(forAttributeName)]
         public ModelExpression For { get; set; }
+
         [HtmlAttributeName(ignoreValidationAttributeName)]
         public bool IgnoreValidation { get; set; }
+
+        [HtmlAttributeName(infoTooltipAttributeName)]
+        public string InfoTooltip { get; set; }
+
+        [HtmlAttributeName(onBlurJs)]
+        public string OnBlurJs { get; set; }
 
         [ViewContext]
         [HtmlAttributeNotBound]
@@ -91,10 +100,22 @@ namespace Ocuda.Utility.TagHelpers
             labelOutput.Attributes.Add(
                 new TagHelperAttribute("class", defaultLabelClass));
 
+            if (!string.IsNullOrEmpty(InfoTooltip))
+            {
+                var tooltip = new TagBuilder("span");
+                tooltip.AddCssClass("fas fa-info-circle");
+                tooltip.Attributes.Add("data-toggle", "tooltip");
+                tooltip.Attributes.Add("href", "#");
+                tooltip.Attributes.Add("title", InfoTooltip);
+                labelOutput.Content.AppendHtml("&nbsp;");
+                labelOutput.Content.AppendHtml(tooltip.RenderSelfClosingTag());
+            }
+
             return labelOutput;
         }
 
-        private async Task<TagHelperOutput> CreateInputElement(TagHelperContext context, TagHelperOutput output)
+        private async Task<TagHelperOutput> CreateInputElement(TagHelperContext context,
+            TagHelperOutput output)
         {
             var inputOutput = CreateTagHelperOutput(output.TagName);
 
@@ -115,6 +136,11 @@ namespace Ocuda.Utility.TagHelpers
             inputOutput.Content.AppendHtml(await output.GetChildContentAsync());
             inputOutput.Content.AppendHtml(output.PostContent.GetContent());
 
+            if(!string.IsNullOrEmpty(OnBlurJs))
+            {
+                inputOutput.Attributes.Add("onblur", $"{OnBlurJs}(this)");
+            }
+
             return inputOutput;
         }
 
@@ -131,7 +157,7 @@ namespace Ocuda.Utility.TagHelpers
 
             var validatorClass = defaultValidationMessageClass;
 
-            if(IgnoreValidation)
+            if (IgnoreValidation)
             {
                 validatorClass += $" {validationIgnoreClass}";
             }
@@ -139,7 +165,7 @@ namespace Ocuda.Utility.TagHelpers
             validationMessageOutput.Attributes.Add(
                 new TagHelperAttribute("class", validatorClass));
 
-            await validationMessageTagHelper.ProcessAsync(context, validationMessageOutput);        
+            await validationMessageTagHelper.ProcessAsync(context, validationMessageOutput);
 
             return validationMessageOutput;
         }
