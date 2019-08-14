@@ -328,44 +328,48 @@
         }
     }
 
-    function CreateLocationGroup(groupid) {
-    $.post("@Url.Action(nameof(LocationsController.CreateLocationGroup))",
-        {
-            locationId: @Model.Location.Id,
-            groupId: groupid,
-        }, function (response) {
-            $("#listAddModal").modal('hide');
-            window.location.reload();
-        });
+    function CreateLocationObject(itemid, objType) {
+        if (objType == "Group") {
+            $.post("@Url.Action(nameof(LocationsController.CreateLocationGroup))",
+                {
+                    locationId: @Model.Location.Id,
+                    groupId: itemid,
+                }, function (response) {
+                    $("#listAddModal").modal('hide');
+                    window.location.reload();
+                });
         }
-    @*function CreateLocationFeature(featureid) {
-        $.post("@Url.Action(nameof(LocationsController.CreateFeatureGroup))",
-        {
+        @*else {
+            $.post("@Url.Action(nameof(LocationsController.CreateFeatureGroup))",
+            {
             locationId: @Model.Location.Id,
-            featureId: featureid,
+            featureId: itemid,
             }, function (response) {
                 $("#listAddModal").modal('hide');
                 window.location.reload();
-        });
+            });
+        }*@
     }
-    function DeleteLocationFeature(locationFeatureId) {
-        $.post("@Url.Action(nameof(LocationsController.DeleteLocationFeature))",
-        {
-            locationfeatureId: locationFeatureId
-            },function (response) {
-                $("#deleteModal").modal('hide');
-                window.location.reload();
-        });
-    }
-        *@
-     function DeleteLocationGroup(locationGroupId) {
-    $.post("@Url.Action(nameof(LocationsController.DeleteLocationGroup))",
-        {
-            locationgroupId: locationGroupId
-        },function (response) {
-            $("#deleteModal").modal('hide');
-            window.location.reload();
-        });
+
+        function DeleteLocationObject(itemId, objType) {
+            if (objType == "Group") {
+                $.post("@Url.Action(nameof(LocationsController.DeleteLocationGroup))",
+                    {
+                        locationgroupId: itemId
+                    }, function (response) {
+                        $("#deleteModal").modal('hide');
+                        window.location.reload();
+                    });
+            }
+            @*else {
+                $.post("@Url.Action(nameof(LocationsController.DeleteLocationFeature))",
+                {
+                    locationfeatureId: locationFeatureId
+                    },function (response) {
+                        $("#deleteModal").modal('hide');
+                        window.location.reload();
+                });
+            }*@
     }
     $("#addGroupButton").on('click', function(e) {
         $("#listAddModal").modal("show");
@@ -378,19 +382,22 @@
         UpdateItemsList("Feature");
     });
     $(document).on('click',"#confirmDeleteGroup", function () {
-        DeleteLocationGroup($(this).data('locationgroupid'))
+        DeleteLocationObject($(this).data('locationgroupid'),"Group")
+    });
+    $(document).on('click',"#confirmDeleteFeature", function () {
+        DeleteLocationObject($(this).data('locationfeatureid'),"Feature")
     });
     $(document).on("click", ".addgroupButton", function () {
         groupIds.push($(this).data("groupid"));
         $("#GroupList").val(groupIds.join(','));
         $(".addgroupButton").addClass("disabled");
-        CreateLocationGroup($(this).data("groupid").toString());
+        CreateLocationObject($(this).data("groupid").toString(),"Group");
     });
     $(document).on("click", ".addfeatureButton", function () {
         groupIds.push($(this).data("featureid"));
         $("#FeatureList").val(groupIds.join(','));
         $(".addfeatureButton").addClass("disabled");
-        CreateLocationGroup($(this).data("featureid").toString());
+        CreateLocationObject($(this).data("featureid").toString(),"Feature");
     });
     $(".group-item").on('click', function (e) {
         @foreach (var locationgroup in Model.LocationGroups)
