@@ -57,7 +57,7 @@
                             {
                                 <tr>
                                     <td class="td-class">
-                                        <a asp-action="@nameof(FeaturesController.Feature)" asp-route-featureName="@feature.Name.ToLower()" class="rowlink">
+                                        <a asp-action="@nameof(FeaturesController.Feature)" asp-route-featureName="@feature.Name.ToLower().Replace(" ","")" class="rowlink">
                                             @feature.Name
                                         </a>
                                     </td>

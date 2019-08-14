@@ -114,7 +114,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     await _featureService.AddFeatureAsync(feature);
                     ShowAlertSuccess($"Added Feature: {feature.Name}");
                     feature.IsNewFeature = true;
-                    return RedirectToAction(nameof(Feature), new { featureName = feature.Name });
+                    return RedirectToAction(nameof(Feature), new { featureName = feature.Name.ToLower().Replace(" ", "") });
                 }
                 catch (OcudaException ex)
                 {
@@ -162,21 +162,21 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 {
                     await _featureService.EditAsync(feature);
                     ShowAlertSuccess($"Updated Feature: {feature.Name}");
-                    return RedirectToAction(nameof(Feature), new { featureName = feature.Name });
+                    return RedirectToAction(nameof(Feature), new { featureName = feature.Name.ToLower().Replace(" ", "") });
                 }
                 catch (OcudaException ex)
                 {
                     ShowAlertDanger($"Unable to Update Feature: {feature.Name}");
                     _logger.LogError(ex, "Problem updating feature: {Message}", ex.Message);
                     feature.IsNewFeature = false;
-                    return RedirectToAction(nameof(Feature), new { featureName = feature.Name });
+                    return RedirectToAction(nameof(Feature), new { featureName = feature.Name.ToLower().Replace(" ", "") });
                 }
             }
             else
             {
                 ShowAlertDanger($"Invalid Parameters: {feature.Name}");
                 feature.IsNewFeature = false;
-                return RedirectToAction(nameof(Feature), new { featureName = feature.Name });
+                return RedirectToAction(nameof(Feature), new { featureName = feature.Name.ToLower().Replace(" ", "") });
             }
         }
     }

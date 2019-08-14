@@ -44,7 +44,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Name.ToLower() == featureName.ToLower())
+                .Where(_ => _.Name.ToLower().Replace(" ", "") == featureName)
                 .FirstOrDefaultAsync();
         }
 

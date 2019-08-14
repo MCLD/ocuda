@@ -163,7 +163,15 @@
                 $("input#Feature_Stub").val(null);
             }
         });
-
+    $("button#popup-button").on("click", function () {
+        alert($("div#collapseDiv").hasClass("show"));
+            if (!$("div#collapseDiv").hasClass("show")) {
+                $("#Feature_Stub").data("val-required", "The Stub field is required for the popup");
+            }
+            else {
+                $(this).removeData("val-required");
+            }
+        });
         function FormatStub(object) {
             updateStub($(object), $(object).val());
         }
@@ -175,6 +183,9 @@
             $('.icon-picker').iconpicker();
 
             $('[data-toggle="tooltip"]').tooltip();
+            if ($("div#collapsDiv").hasClass("show")) {
+                $("#Feature_Stub").data("val-required", "The Stub field is required for the popup");
+            }
         });
     </script>
 }
