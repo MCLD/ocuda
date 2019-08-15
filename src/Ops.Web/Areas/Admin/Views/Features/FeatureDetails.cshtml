@@ -20,12 +20,13 @@
       asp-action="@Model.Action"
       role="form"
       display="inline">
-    <input value="@Model.Feature.Id" asp-for="Feature.Id" id="feature-id" type="hidden" />
-    <input value="@Model.Feature.Name"
+    <input asp-for="Feature.Id" id="feature-id" type="hidden" />
+    <input asp-for="Feature.NeedsPopup" id="feature-needsPopup" type="hidden" />
+    <input
            asp-for="Feature.Name"
            formgroup
            autocomplete="off" />
-    <input value="@Model.Feature.FontAwesome"
+    <input
            asp-for="Feature.FontAwesome"
            class="form-control icon-picker"
            type="text"
@@ -52,7 +53,7 @@
                      aria-labelledby="headingOne"
                      data-parent="#popup-accordion">
                     <div class="card-body">
-                        <input value="@Model.Feature.Stub"
+                        <input
                                asp-for="Feature.Stub"
                                formgroup
                                autocomplete="off"
@@ -156,20 +157,12 @@
                 $("#accordion-disclosure").addClass("fa-caret-down");
             }
         });
-
-        $("#submit").click(function () {
-            if (!$("#accordion-header").hasClass("bg-info")) {
-                $("#wmd-input").val(null);
-                $("input#Feature_Stub").val(null);
-            }
-        });
     $("button#popup-button").on("click", function () {
-        alert($("div#collapseDiv").hasClass("show"));
-            if (!$("div#collapseDiv").hasClass("show")) {
-                $("#Feature_Stub").data("val-required", "The Stub field is required for the popup");
+        if (!$("div#collapseDiv").hasClass("show")) {
+            $("#feature-needsPopup").val("True");
             }
-            else {
-                $(this).removeData("val-required");
+        else {
+            $("#feature-needsPopup").val("False");
             }
         });
         function FormatStub(object) {
@@ -179,13 +172,12 @@
         $(document).ready(function () {
             var editor = new Markdown.Editor({ allowUploads: false });
             editor.run();
-
-            $('.icon-picker').iconpicker();
-
-            $('[data-toggle="tooltip"]').tooltip();
-            if ($("div#collapsDiv").hasClass("show")) {
-                $("#Feature_Stub").data("val-required", "The Stub field is required for the popup");
+            if ($($("#Feature_Stub").next()).hasClass("field-validation-error"))
+            {
+                $( "#collapseDiv" ).collapse('show');
             }
+            $('.icon-picker').iconpicker();
+            $('[data-toggle="tooltip"]').tooltip();
         });
     </script>
 }

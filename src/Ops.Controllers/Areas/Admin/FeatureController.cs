@@ -67,9 +67,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             return View(viewModel);
         }
 
-        [Route("AddFeature")]
+        [Route("CreateFeature")]
         [RestoreModelState]
-        public IActionResult AddFeature()
+        public IActionResult CreateFeature()
         {
             return View("FeatureDetails", new FeatureViewModel
             {
@@ -107,6 +107,13 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [SaveModelState]
         public async Task<IActionResult> CreateFeature(Feature feature)
         {
+            if(feature.NeedsPopup && string.IsNullOrEmpty(feature.Stub))
+            {
+                ModelState.AddModelError("Feature.Stub", "A 'Stub' is required for a popup.");
+                ShowAlertDanger($"Invalid paramaters");
+                feature.IsNewFeature = true;
+                return RedirectToAction(nameof(CreateFeature));
+            }
             if (ModelState.IsValid)
             {
                 try
@@ -128,7 +135,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 ShowAlertDanger($"Invalid paramaters");
                 feature.IsNewFeature = true;
-                return RedirectToAction(nameof(Feature));
+                return RedirectToAction(nameof(CreateFeature));
             }
         }
 

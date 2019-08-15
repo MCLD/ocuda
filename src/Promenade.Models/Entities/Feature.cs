@@ -26,5 +26,8 @@ namespace Ocuda.Promenade.Models.Entities
 
         [NotMapped]
         public bool IsNewFeature { get; set; }
+
+        [NotMapped]
+        public bool NeedsPopup { get; set; }
     }
 }
