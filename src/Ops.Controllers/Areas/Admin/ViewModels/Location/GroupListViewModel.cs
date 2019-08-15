@@ -8,7 +8,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location
 {
     public class GroupListViewModel
     {
-        public IEnumerable<Group> Groups { get; set; }
+        public IEnumerable<Promenade.Models.Entities.Group> Groups { get; set; }
         public PaginateModel PaginateModel { get; set; }
     }
 }

@@ -91,5 +91,19 @@ namespace Ocuda.Ops.Data.Ops
                 .Where(_ => _.Id != group.Id && string.Equals(_.GroupType, group.GroupType, StringComparison.OrdinalIgnoreCase))
                 .AnyAsync();
         }
+        public async Task<bool> IsDuplicateStubAsync(Group group)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Id != group.Id && string.Equals(_.Stub, group.Stub, StringComparison.OrdinalIgnoreCase))
+                .AnyAsync();
+        }
+        public async Task<Group> GetGroupByStubAsync(string groupStub)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Stub == groupStub)
+                .FirstOrDefaultAsync();
+        }
     }
 }

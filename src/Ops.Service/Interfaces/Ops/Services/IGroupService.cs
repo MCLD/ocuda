@@ -13,9 +13,13 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<List<Group>> GetAllGroupsAsync();
         Task<List<Group>> GetGroupRegions();
         Task<List<Group>> GetNonGroupRegions();
+        Task<Group> AddGroupAsync(Group group);
+        Task<Group> EditAsync(Group group);
+        Task DeleteAsync(int id);
         Task<List<Group>> GetMissingGroups(List<int> locationGroupIds);
         Task<DataWithCount<ICollection<Group>>> GetPaginatedListAsync(BaseFilter filter);
         Task<DataWithCount<ICollection<Group>>> PageItemsAsync(GroupFilter filter);
         Task<Group> GetGroupByIdAsync(int groupId);
+        Task<Group> GetGroupByStubAsync(string groupType);
     }
 }

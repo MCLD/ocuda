@@ -1,5 +1,117 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Group.GroupViewModel
+<div class="container">
+    <div class="row">
+        <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel">
+            <div class="modal-dialog" role="document">
+                <form asp-action="@nameof(GroupsController.DeleteGroup)" method="post" role="form" style="display:inline">
+                    <input asp-for="Group.Id" type="hidden" />
+                    <input asp-for="Group.GroupType" type="hidden" />
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="deleteModalLabel">Delete Group</h4>
+                        </div>
+                        <div class="modal-body">
+                            <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+                            <span id="modal-text"></span>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal" style="margin-right: 1em;">Cancel</button>
+                            <button type="submit" class="btn btn-danger btn-spinner pull-right" aria-label="Confirm">
+                                <span class="fas fa-spinner fa-times" aria-hidden="true"></span>
+                                Delete
+                                <span class="fa fa-spinner fa-pulse fa-lg fa-fw hidden"></span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="padding: 10px 0;">
+        <div class="col-xs-12">
+            <a asp-action="@nameof(GroupsController.AddGroup)" class="btn btn-primary">Add a Group</a>
+        </div>
+    </div>
+    <div class="row" style="padding: 10px 0;">
+        <div class="col-xs-12">
+            @if (Model.AllGroups.Count() == 0)
+            {
+                <div class="alert alert-warning">No Groups found.</div>
+            }
+            else
+            {
+                <div>
+                    <table class="table table-condensed table-bordered link-table">
+                        <thead>
+                            <tr>
+                                <th>GroupType</th>
+                                <th>Stub</th>
+                                <th>Location Region?</th>
+                                <th>SubscriptionUrl</th>
+                                <th>&nbsp;</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var group in Model.AllGroups)
+                            {
+                                <tr>
+                                    <td class="td-class">
+                                        <a asp-action="@nameof(GroupsController.Groups)" asp-route-groupStub="@group.Stub" class="rowlink">
+                                            @group.GroupType
+                                        </a>
+                                    </td>
+                                    <td>@group.Stub</td>
+                                    <td class="text-center" style="vertical-align:middle;">@if (group.IsLocationRegion)
+                                    {<text><span class="fas fa-check"></span></text>}</td>
+                                    <td>@group.SubscriptionUrl</td>
+                                    <td class="on-top gra-mc-icon">
+                                        <button type="button"
+                                                class="btn btn-danger btn-xs"
+                                                data-toggle="modal"
+                                                data-target="#deleteModal"
+                                                data-id="@group.Id"
+                                                data-name="@group.GroupType">
+                                            <span class="fas fa-times" aria-hidden="true"></span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    @if (Model.PaginateModel.MaxPage > 1)
+                    {
+                        <paginate paginateModel="@Model.PaginateModel"></paginate>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts
+    {
+    <script>
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+            var modal = $(this);
+            modal.find("#modal-text").text("Are you sure you want to delete the Group \"" + name + "\"?");
+            modal.find("#Group_Id").val(id);
+            modal.find("#Group_GroupType").val(name);
+        });
+
+        $(window).on("load", function () {
+            $(".td-class").each(function () {
+                $(this).children("a.rowlink").height($(this).height() + 11);
+            });
+        });
+        $(window).resize(function () {
+            $(".td-class").each(function () {
+                $(this).children("a.rowlink").height($(this).height() + 11);
+            });
+        });
+    </script>
 }

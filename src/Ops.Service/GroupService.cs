@@ -69,15 +69,18 @@ namespace Ocuda.Ops.Service
         {
             return await _groupRepository.FindAsync(groupId);
         }
-
+        public async Task<Group> GetGroupByStubAsync(string groupType)
+        {
+            return await _groupRepository.GetGroupByStubAsync(groupType);
+        }
         public async Task<Group> AddGroupAsync(Group group)
         {
             try
             {
                 group.GroupType = group.GroupType?.Trim();
+                group.Stub = group.Stub.Trim();
                 group.SubscriptionUrl = group.SubscriptionUrl?.Trim();
                 await ValidateAsync(group);
-
                 await _groupRepository.AddAsync(group);
                 await _groupRepository.SaveAsync();
             }
@@ -95,11 +98,11 @@ namespace Ocuda.Ops.Service
             try
             {
                 var currentGroup = await _groupRepository.FindAsync(group.Id);
+                await ValidateAsync(currentGroup);
                 currentGroup.GroupType = group.GroupType?.Trim();
+                currentGroup.Stub = group.Stub.Trim();
                 currentGroup.IsLocationRegion = group.IsLocationRegion;
                 currentGroup.SubscriptionUrl = group.SubscriptionUrl?.Trim();
-
-                await ValidateAsync(currentGroup);
                 _groupRepository.Update(currentGroup);
                 await _groupRepository.SaveAsync();
                 return currentGroup;
@@ -138,6 +141,10 @@ namespace Ocuda.Ops.Service
             if (await _groupRepository.IsDuplicateGroupTypeAsync(group))
             {
                 throw new OcudaException($"Group '{group.GroupType}' already exists.");
+            }
+            if (await _groupRepository.IsDuplicateStubAsync(group))
+            {
+                throw new OcudaException($"Group '{group.Stub}' already exists.");
             }
         }
     }
