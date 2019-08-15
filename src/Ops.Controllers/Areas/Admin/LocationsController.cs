@@ -35,6 +35,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         private readonly ILocationGroupService _locationGroupService;
         private readonly IGroupService _groupService;
         private readonly IConfiguration _config;
+
         public static string Name { get { return "Locations"; } }
 
         public LocationsController(IConfiguration config,
@@ -59,7 +60,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [HttpGet("[action]")]
         public async Task<IActionResult> Index(int page = 1)
         {
-
             var itemsPerPage = await _siteSettingService
                 .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
 
@@ -74,7 +74,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ItemsPerPage = filter.Take.Value
             };
 
-            if (paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
+            if (paginateModel.PastMaxPage)
             {
                 return RedirectToRoute(
                     new
@@ -122,8 +122,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [SaveModelState]
         public IActionResult AddLocation()
         {
-            var location = new Location();
-            location.IsNewLocation = true;
+            var location = new Location {
+                IsNewLocation = true
+            };
             var viewModel = new LocationViewModel
             {
                 Location = location,
@@ -245,6 +246,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 catch (OcudaException ex)
                 {
                     ShowAlertDanger($"Unable to Update Location {location.Name} : {ex.Message}");
+                    _logger.LogError(ex, $"Problem updating location {location.Name}:", ex.Message);
                     location.IsNewLocation = false;
                     var viewModel = new LocationViewModel
                     {
@@ -275,7 +277,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 catch (OcudaException ex)
                 {
                     var group = await _groupService.GetGroupByIdAsync(locationGroup.GroupId);
-                    ShowAlertDanger($"Updated {location.Name}'s Group: {group.GroupType}");
+                    ShowAlertDanger($"problem Updating {location.Name}'s Group: {group.GroupType}");
+                    _logger.LogError(ex, $"Problem updating {location.Name}'s Group: {group.GroupType}", ex.Message);
                 }
             }
             return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
@@ -298,7 +301,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 catch (OcudaException ex)
                 {
                     //var group = await _featureService.GetFeatureByIdAsync(locationGroup.FeatureId);
-                    //ShowAlertDanger($"Failed to Update {location.Name}'s Feature: {feature.Name}");
+                    //ShowAlertDanger(ex, $"Failed to Update {location.Name}'s Feature: {feature.Name}", ex.Message);
                     _logger.LogError($"Unable to edit {ex.Message}: {ex}");
                     ShowAlertDanger($"Failed to Update {location.Name}'s Feature");
                 }
@@ -329,6 +332,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             catch (OcudaException ex)
             {
                 ShowAlertDanger($"Unable to Add group to Location: {ex.Message}");
+                _logger.LogError(ex, $"Failed to Add {location.Name}.", ex.Message);
             }
 
             return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
@@ -350,6 +354,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             catch (OcudaException ex)
             {
                 ShowAlertDanger($"Unable to delete group '{group.GroupType}' from '{location.Name}': {ex.Message}");
+                _logger.LogError(ex, $"Problem deleting group '{group.GroupType}' from '{location.Name}':", ex.Message);
             }
 
             return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub});
@@ -503,7 +508,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     catch (Exception ex)
                     {
 
-                        _logger.LogError($"Error parsing Geocode API JSON: {ex.Message} - {stringResult}");
+                        _logger.LogError(ex,$"Error parsing Geocode API JSON: {ex.Message} - {stringResult}",ex.Message);
                         return Json(new
                         {
                             success
@@ -514,7 +519,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Problem looking up postal code for coordinates {location.Address}: {ex.Message}");
+                _logger.LogError(ex, $"Problem looking up postal code for coordinates {location.Address}",ex.Message);
                 return Json(new
                 {
                     success
@@ -543,7 +548,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"Error parsing Geocode API JSON: {ex.Message} - {stringResult}");
+                        _logger.LogError(ex,$"Error parsing Geocode API JSON: - {stringResult}",ex.Message);
                     }
 
                     if (geoResult?.Results?.Count() > 0)
@@ -574,7 +579,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Problem looking up postal code for coordinates {location.Address}: {ex.Message}");
+                _logger.LogError(ex, $"Problem looking up postal code for coordinates {location.Address}", ex.Message);
             }
             return location;
         }

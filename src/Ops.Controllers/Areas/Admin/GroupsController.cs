@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Group;
@@ -25,6 +26,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     {
         private readonly IGroupService _groupService;
         private readonly IConfiguration _config;
+
         public static string Name { get { return "Groups"; } }
 
         public GroupsController(IConfiguration config,
@@ -40,7 +42,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [HttpGet("[action]")]
         public async Task<IActionResult> Index(int page = 1)
         {
-
             var itemsPerPage = await _siteSettingService
                 .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
 
@@ -55,7 +56,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ItemsPerPage = filter.Take.Value
             };
 
-            if (paginateModel.MaxPage > 0 && paginateModel.CurrentPage > paginateModel.MaxPage)
+            if (paginateModel.PastMaxPage)
             {
                 return RedirectToRoute(
                     new
@@ -97,8 +98,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [SaveModelState]
         public IActionResult AddGroup()
         {
-            var group = new Group();
-            group.IsNewGroup = true;
+            var group = new Group {
+                IsNewGroup = true
+            };
             var viewModel = new GroupViewModel
             {
                 Group = group,
@@ -124,6 +126,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
                 catch (OcudaException ex)
                 {
+                    _logger.LogError(ex, $"Problem creating Group {group.GroupType}", ex.Message);
                     ShowAlertDanger($"Unable to create Group: {ex.Message}");
                     group.IsNewGroup = true;
                     var viewModel = new GroupViewModel
@@ -151,6 +154,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             catch (OcudaException ex)
             {
                 ShowAlertDanger($"Unable to delete Group {group.GroupType}: {ex.Message}");
+                _logger.LogError(ex, $"Problem deleting Group {group.GroupType}", ex.Message);
             }
 
             return RedirectToAction(nameof(GroupsController.Index));
@@ -173,6 +177,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 catch (OcudaException ex)
                 {
                     ShowAlertDanger($"Unable to update Group {group.GroupType} : {ex.Message}");
+                    _logger.LogError(ex, $"Problem updating {group.GroupType}",ex.Message);
                     group.IsNewGroup = false;
                     var viewModel = new GroupViewModel
                     {

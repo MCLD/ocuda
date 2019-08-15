@@ -29,25 +29,25 @@
             <div class="row">
                 <div class="col-xs-12 col-sm-10 col-sm-offset-1">
                     <form method="post" id="updateItem" asp-controller="@nameof(LocationsController)">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="editModalTitle"></h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div id="modalItemInfo" class="col-xs-12 col">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editModalTitle"></h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div id="modalItemInfo" class="col-xs-12 col">
 
+                                    </div>
                                 </div>
                             </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal" style="margin-right: 1em;">Cancel</button>
+                                <button type="button" type="submit" class="btn btn-primary" data-dismiss="modal" style="margin-right: 1em;">Save</button>
+                            </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal" style="margin-right: 1em;">Cancel</button>
-                            <button type="button" type="submit" class="btn btn-primary" data-dismiss="modal" style="margin-right: 1em;">Save</button>
-                        </div>
-                    </div>
                     </form>
                 </div>
             </div>
@@ -125,88 +125,91 @@
                 <input value="@Model.Location.Facebook" asp-for="Location.Facebook" formgroup autocomplete="off" />
                 <input value="@Model.Location.EventLink" asp-for="Location.EventLink" formgroup autocomplete="off" />
                 <input value="@Model.Location.SubscriptionLink" asp-for="Location.SubscriptionLink" formgroup autocomplete="off" />
-                <div class="row">
-                    <div class="col-xs-6 card" ">
-                        <div class="card-header">
-                            <h4 style="margin: 0; display: initial;">Features</h4>
-                            <button type="button" id="addFeatureButton" class="btn btn-warning" style="float:right;">Add Feature</button>
+                @if (!Model.Location.IsNewLocation)
+                {
+                    <div class="row">
+                        <div class="col-xs-6 card" ">
+                            <div class="card-header">
+                                <h4 style="margin: 0; display: initial;">Features</h4>
+                                <button type="button" id="addFeatureButton" class="btn btn-warning" style="float:right;">Add Feature</button>
+                            </div>
+                            @if (Model.LocationFeatures.Any())
+                            {
+                                <table class="table table-sm table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Custom Text</th>
+                                            <th>Redirect URL</th>
+                                            <th width="44px">&nbsp;</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="featureList">
+                                        @foreach (var locationFeature in Model.LocationFeatures)
+                                        {
+                                            @foreach (var feature in Model.Features.Where(_ => _.Id == locationFeature.FeatureId))
+                                            {
+                                                <tr>
+                                                    <td class="td-class feature-item" data-locationFeatureId="@locationFeature.Id">@feature.Name</td>
+                                                    <td style="vertical-align:middle;">@locationFeature.Text</td">
+                                                    <td style="vertical-align:middle;">@locationFeature.RedirectUrl</td>
+                                                    <td><button type="button" class="btn btn-link btn-xs deleteFeatureButton" data-locationFeatureId="@locationFeature.Id" data-featureName="@feature.Name"><span class="fa fa-2x fas fa-minus-circle" aria-hidden="true"></span></button></td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <text><ul class="list-group" id="nofeatures"><li class="list-group-item">No Features</li></ul></text>
+                            }
                         </div>
-                        @if (Model.LocationFeatures.Any())
-                        {
+                        <div class="col-xs-6 card" ">
+                            <div class="card-header">
+                                <h4 style="margin: 0; display: initial;">Groups</h4>
+                                <button type="button" id="addGroupButton" class="btn btn-warning" data-toggle="modal" style="float:right;">Add Group</button>
+                            </div>
                             <table class="table table-sm table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Custom Text</th>
-                                        <th>Redirect URL</th>
+                                        <th>Group Type</th>
+                                        <th>Location Region?</th>
                                         <th width="44px">&nbsp;</th>
                                     </tr>
                                 </thead>
-                                <tbody id="featureList">
-                                    @foreach (var locationFeature in Model.LocationFeatures)
+                                <tbody id="groupList">
+                                    @if (Model.LocationGroups.Any())
                                     {
-                                        @foreach (var feature in Model.Features.Where(_ => _.Id == locationFeature.FeatureId))
+                                        @foreach (var locationGroup in Model.LocationGroups)
                                         {
-                                            <tr>
-                                                <td class="td-class feature-item" data-locationFeatureId="@locationFeature.Id">@feature.Name</td>
-                                                <td style="vertical-align:middle;">@locationFeature.Text</td">
-                                                <td style="vertical-align:middle;">@locationFeature.RedirectUrl</td>
-                                                <td><button type="button" class="btn btn-link btn-xs deleteFeatureButton" data-locationFeatureId="@locationFeature.Id" data-featureName="@feature.Name"><span class="fa fa-2x fas fa-minus-circle" aria-hidden="true"></span></button></td>
-                                            </tr>
+                                            @foreach (var group in Model.Groups.Where(_ => _.Id == locationGroup.GroupId))
+                                            {
+                                                <tr>
+                                                    <td style="vertical-align:middle;" class="group-item" data-locationgroupid="@locationGroup.Id">@group.GroupType</td>
+                                                    @if (group.IsLocationRegion)
+                                                    {
+                                                        <td class="text-center" style="vertical-align:middle;"><span class="fas fa-check"></span></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                    <td><button type="button" class="btn btn-link btn-xs deletegroupButton" data-locationgroupid="@locationGroup.Id" data-groupname="@group.GroupType"><span class="fa fa-2x fas fa-minus-circle text-danger" aria-hidden="true"></span></button></td>
+                                                </tr>
+                                            }
                                         }
+                                    }
+                                    else
+                                    {
+                                        <text>
+                                            <tr id="nogroups">No Groups</tr></text>
                                     }
                                 </tbody>
                             </table>
-                        }
-                        else
-                        {
-                            <text><ul class="list-group" id="nofeatures"><li class="list-group-item">No Features</li></ul></text>
-                        }
-                    </div>
-                    <div class="col-xs-6 card" ">
-                        <div class="card-header">
-                            <h4 style="margin: 0; display: initial;">Groups</h4>
-                            <button type="button" id="addGroupButton" class="btn btn-warning" data-toggle="modal" style="float:right;">Add Group</button>
                         </div>
-                        <table class="table table-sm table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Group Type</th>
-                                    <th>Location Region?</th>
-                                    <th width="44px">&nbsp;</th>
-                                </tr>
-                            </thead>
-                            <tbody id="groupList">
-                                @if (Model.LocationGroups.Any())
-                                {
-                                    @foreach (var locationGroup in Model.LocationGroups)
-                                    {
-                                        @foreach (var group in Model.Groups.Where(_ => _.Id == locationGroup.GroupId))
-                                        {
-                                            <tr>
-                                                <td style="vertical-align:middle;" class="group-item" data-locationgroupid="@locationGroup.Id">@group.GroupType</td>
-                                                @if (group.IsLocationRegion)
-                                                {
-                                                    <td class="text-center" style="vertical-align:middle;"><span class="fas fa-check"></span></td>
-                                                }
-                                                else
-                                                {
-                                                    <td></td>
-                                                }
-                                                <td><button type="button" class="btn btn-link btn-xs deletegroupButton" data-locationgroupid="@locationGroup.Id" data-groupname="@group.GroupType"><span class="fa fa-2x fas fa-minus-circle text-danger" aria-hidden="true"></span></button></td>
-                                            </tr>
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    <text>
-                                        <tr id="nogroups">No Groups</tr></text>
-                                }
-                            </tbody>
-                        </table>
                     </div>
-                </div>
+                }
                 <div class="form-group">
                     <a class="btn btn-secondary" id="return-home" asp-action="@nameof(LocationsController.Index)">Return to Locations</a>
                     @if (Model.Location.IsNewLocation)
@@ -282,240 +285,225 @@
                 $("#maplink-suggestions").html("");
             }
         });
-    });
-    function GetItemList(objType) {
-        if (objType == "Group") {
+        });
+        @if (!Model.Location.IsNewLocation) {
+                <text>
+                function GetItemList(objType) {
+                    if (objType == "Group") {
             $.get("@Url.Action(nameof(LocationsController.GetItemsList))",
-                {
-                    itemIds: groupIds.join(','),
+                                                    {
+                        itemIds: groupIds.join(','),
                     objectType: "Group",
                     page: page
-                }, function (response) {
+                }, function(response) {
                     $("#modalItemList").html(response);
-                });
-        }
-        else {
+                        });
+            }
+            else {
             $.get("@Url.Action(nameof(LocationsController.GetItemsList))",
-                {
-                    itemIds: featureIds.join(','),
+                            {
+                itemIds: featureIds.join(','),
                     objectType: "Feature",
                     page: page
-                }, function (response) {
+                }, function(response) {
                     $("#modalItemList").html(response);
                 });
+            }
         }
-    }
-    function GetEditInfo(item, objType) {
-        if (objType == "Group") {
+        function GetEditInfo(item, objType) {
+            if (objType == "Group") {
             $.get("@Url.Action(nameof(LocationsController.GetItemInfo))",
-                {
-                    itemId: item,
+                                {
+                itemId: item,
                     objectType: objType,
                     locationStub: "@Model.Location.Stub"
-                }, function (response) {
+                }, function(response) {
                     $("#modalItemInfo").html(response);
-            });
-        }
-        else {
+                });
+            }
+            else {
             $.get("@Url.Action(nameof(LocationsController.GetItemInfo))",
-                {
-                    itemId: item,
+                                {
+                itemId: item,
                     objectType: objType,
-                    locationStub:"@Model.Location.Stub"
-                }, function (response) {
+                    locationStub: "@Model.Location.Stub"
+                }, function(response) {
                     $("#modalItemInfo").html(response);
-            });
+                });
+            }
         }
-    }
 
-    function CreateLocationObject(itemid, objType) {
-        if (objType == "Group") {
+        function CreateLocationObject(itemid, objType) {
+            if (objType == "Group") {
             $.post("@Url.Action(nameof(LocationsController.CreateLocationGroup))",
-                {
-                    locationId: @Model.Location.Id,
+                                {
+                locationId: @Model.Location.Id,
                     groupId: itemid,
-                }, function (response) {
+                }, function(response) {
                     $("#listAddModal").modal('hide');
                     window.location.reload();
                 });
+            }
         }
-        @*else {
-            $.post("@Url.Action(nameof(LocationsController.CreateFeatureGroup))",
-            {
-            locationId: @Model.Location.Id,
-            featureId: itemid,
-            }, function (response) {
-                $("#listAddModal").modal('hide');
-                window.location.reload();
-            });
-        }*@
-    }
 
         function DeleteLocationObject(itemId, objType) {
             if (objType == "Group") {
                 $.post("@Url.Action(nameof(LocationsController.DeleteLocationGroup))",
-                    {
-                        locationgroupId: itemId
-                    }, function (response) {
+                                {
+                locationgroupId: itemId
+                    }, function(response) {
                         $("#deleteModal").modal('hide');
-                        window.location.reload();
-                    });
-            }
-            @*else {
-                $.post("@Url.Action(nameof(LocationsController.DeleteLocationFeature))",
-                {
-                    locationfeatureId: locationFeatureId
-                    },function (response) {
-                        $("#deleteModal").modal('hide');
-                        window.location.reload();
+                    window.location.reload();
                 });
-            }*@
-    }
+            }
+        }
     $("#addGroupButton").on('click', function(e) {
         $("#listAddModal").modal("show");
         $("#addModalTitle").text("Add a group");
-        GetItemList("Group");
-    });
+            GetItemList("Group");
+        });
     $("#addFeatureButton").on('click', function(e) {
         $("#listAddModal").modal("show");
         $("#addModalTitle").text("Add a feature");
-        UpdateItemsList("Feature");
-    });
+            UpdateItemsList("Feature");
+        });
     $(document).on('click',"#confirmDeleteGroup", function () {
-        DeleteLocationObject($(this).data('locationgroupid'),"Group")
+            DeleteLocationObject($(this).data('locationgroupid'), "Group")
     });
     $(document).on('click',"#confirmDeleteFeature", function () {
-        DeleteLocationObject($(this).data('locationfeatureid'),"Feature")
+            DeleteLocationObject($(this).data('locationfeatureid'), "Feature")
     });
     $(document).on("click", ".addgroupButton", function () {
-        groupIds.push($(this).data("groupid"));
+            groupIds.push($(this).data("groupid"));
         $("#GroupList").val(groupIds.join(','));
         $(".addgroupButton").addClass("disabled");
-        CreateLocationObject($(this).data("groupid").toString(),"Group");
-    });
+            CreateLocationObject($(this).data("groupid").toString(), "Group");
+        });
     $(document).on("click", ".addfeatureButton", function () {
-        groupIds.push($(this).data("featureid"));
+            groupIds.push($(this).data("featureid"));
         $("#FeatureList").val(groupIds.join(','));
         $(".addfeatureButton").addClass("disabled");
-        CreateLocationObject($(this).data("featureid").toString(),"Feature");
-    });
+            CreateLocationObject($(this).data("featureid").toString(), "Feature");
+        });
     $(".group-item").on('click', function (e) {
-        @foreach (var locationgroup in Model.LocationGroups)
+            @foreach(var locationgroup in Model.LocationGroups)
         {
-            <text>
-            if (@locationgroup.Id == parseInt($(this).data("locationgroupid"))){
-                @foreach(var group in Model.Groups.Where(_ => _.Id == locationgroup.GroupId))
+            < text >
+            if (@locationgroup.Id == parseInt($(this).data("locationgroupid"))) {
+                    @foreach(var group in Model.Groups.Where(_ => _.Id == locationgroup.GroupId))
                 {
                     @:$("#editModalTitle").text("Edit Group: @group.GroupType");
                 }
-            }
-            </text>
+                }
+            </ text >
         }
         $("#itemEditModal").modal("show");
         $("#updateItem").attr("asp-action", "@nameof(LocationsController.EditLocationGroup)");
-        GetEditInfo($(this).data("locationgroupid"),"Group");
-    });
+            GetEditInfo($(this).data("locationgroupid"), "Group");
+        });
     $(".feature-item").on('click', function (e) {
-        @foreach (var locationfeature in Model.LocationFeatures)
+            @foreach(var locationfeature in Model.LocationFeatures)
         {
-            <text>
+            < text >
             if (@locationfeature.Id == parseInt($(this).data("locationfeatureid")))
-            {
-                @foreach(var feature in Model.Features.Where(_ => _.Id == locationfeature.FeatureId))
+                {
+                    @foreach(var feature in Model.Features.Where(_ => _.Id == locationfeature.FeatureId))
                 {
                     @:$("#editModalTitle").text("Edit Feature: @feature.Name");
                 }
-            }
-            </text>
+                        }
+            </ text >
         }
         $("#itemEditModal").modal("show");
         $("#updateItem").attr("asp-action", "@nameof(LocationsController.EditLocationFeature)");
-        GetEditInfo($(this).data("locationfeatureid"),"Feature");
-    });
+                    GetEditInfo($(this).data("locationfeatureid"), "Feature");
+                });
     $(document).on("click", "#removeGroupButton", function () {
-        groupIds.splice(groupIds.indexOf($(this).data("locationgroupid")), 1);
+                    groupIds.splice(groupIds.indexOf($(this).data("locationgroupid")), 1);
         $("#GroupList").val(groupIds.join(','));
         $(this).parent().parent().remove();
-        if (groupIds.length == 0) {
+                    if (groupIds.length == 0) {
             $("#noItems").removeClass("hide");
-        }
-    });
+                    }
+                });
     $(document).on("click", "#removeFeatureButton", function () {
-        featureIds.splice(featureIds.indexOf($(this).data("locationfeatureid")), 1);
+                    featureIds.splice(featureIds.indexOf($(this).data("locationfeatureid")), 1);
         $("#FeatureList").val(featureIds.join(','));
         $(this).parent().parent().remove();
-        if (featureIds.length == 0) {
+                    if (featureIds.length == 0) {
             $("#noItems").removeClass("hide");
-        }
-    });
+                    }
+                });
     $('.deletegroupButton').on('click', function () {
         $($("#deleteModal").find("button.btn-danger")).attr("data-locationgroupid",$(this).data("locationgroupid").toString());
-        $($("#deleteModal").find("button.btn-danger")).attr("id","confirmDeleteGroup")
-        $("#deleteModal").find(".modal-body").html("Are you sure you want to remove the group '<strong>" + $(this).data("groupname") +"</strong>' from '<strong>@Model.Location.Name</strong>'")
+        $($("#deleteModal").find("button.btn-danger")).attr("id", "confirmDeleteGroup")
+        $("#deleteModal").find(".modal-body").html("Are you sure you want to remove the group '<strong>" + $(this).data("groupname") + "</strong>' from '<strong>@Model.Location.Name</strong>'")
         $("#deleteModal").modal("show");
-    });
+                });
     $('.deleteFeatureButton').on('click', function () {
         $($("#deleteModal").find("button.btn-danger")).attr("data-locationFeatureId",$(this).data("locationFeatureid").toString());
-        $($("#deleteModal").find("button.btn-danger")).attr("id","confirmDeleteFeature")
-        $("#deleteModal").find(".modal-body").html("Are you sure you want to remove the feature '<strong>" + $(this).data("featureName") +"</strong>' from '<strong>@Model.Location.Name</strong>'")
+        $($("#deleteModal").find("button.btn-danger")).attr("id", "confirmDeleteFeature")
+        $("#deleteModal").find(".modal-body").html("Are you sure you want to remove the feature '<strong>" + $(this).data("featureName") + "</strong>' from '<strong>@Model.Location.Name</strong>'")
         $("#deleteModal").modal("show");
-    });
+                });
+        </text>
+            }
     // For Google Maps
     $("input#Location_Stub").blur(function () {
         $("input#Location_Stub").val($("input#Location_Stub").val().toLowerCase().replace(/\s/g, ''));
-    });
+            });
     $("input#Location_Address").blur(function () {
-        if ($('#Location_Address').val() && !$('#Location_MapLink').val())
+                if ($('#Location_Address').val() && !$('#Location_MapLink').val())
         {
             $("#maplink-suggestions").html("");
-            var data = {};
-            data["Address"] = $("#Location_Address").val();
-            data["City"] = $("#Location_City").val();
-            data["State"] = $("#Location_State").val();
-            data["Zip"] = $("#Location_Zip").val();
-            data["Country"] = $("#Location_Country").val();
-            var addressdata = JSON.stringify(data);
+                    var data = {};
+                    data["Address"] = $("#Location_Address").val();
+                    data["City"] = $("#Location_City").val();
+                    data["State"] = $("#Location_State").val();
+                    data["Zip"] = $("#Location_Zip").val();
+                    data["Country"] = $("#Location_Country").val();
+                    var addressdata = JSON.stringify(data);
 
             $.get("@Url.Action(nameof(LocationsController.GetUrlLocations))", { addressJson: addressdata }, function (response) {
-                if (response.success == true) {
-                    var locations = $.parseJSON(response.data);
-                    HandleGoogleLocations(locations);
-                }});
-        }
+                        if (response.success == true) {
+                            var locations = $.parseJSON(response.data);
+                            HandleGoogleLocations(locations);
+                        }});
+                }
         else
-        {
+                {
             $("#maplink-suggestions").html("");
-        }
-    });
+                }
+            });
     function HandleGoogleLocations(locations) {
-        for (var index = 0; index < locations.length; index++)
-        {
-            var link = document.createElement('a');
-            link.setAttribute("data-maps-url", locations[index].url);
-            link.setAttribute("data-address", locations[index].url);
-            link.setAttribute("data-city", locations[index].url);
-            link.setAttribute("data-state", locations[index].url);
-            link.setAttribute("data-zip",locations[index].url);
-            link.innerHTML = " <strong>" + locations[index].name + "</strong>";
-            link.classList.add("url-suggestion");
-            link.setAttribute("id", "list-item-" + index.toString());
-            link.setAttribute("role", "button");
+                for (var index = 0; index < locations.length; index++)
+                {
+                    var link = document.createElement('a');
+                    link.setAttribute("data-maps-url", locations[index].url);
+                    link.setAttribute("data-address", locations[index].url);
+                    link.setAttribute("data-city", locations[index].url);
+                    link.setAttribute("data-state", locations[index].url);
+                    link.setAttribute("data-zip",locations[index].url);
+                    link.innerHTML = " <strong>" + locations[index].name + "</strong>";
+                    link.classList.add("url-suggestion");
+                    link.setAttribute("id", "list-item-" + index.toString());
+                    link.setAttribute("role", "button");
 
-            var listitem = document.createElement("li");
-            listitem.classList.add("list-group-item");
-            listitem.classList.add("list-group-item-action");
-            listitem.classList.add("map-item");
-            var icon = document.createElement("span");
-            var formatAddr = document.createElement("span");
-            formatAddr.innerHTML = " "+locations[index].formatted_address;
-            formatAddr.setAttribute("class", "format-addr");
-            icon.classList.add("fas");
-            icon.classList.add("fa-map-marker-alt");
-            listitem.appendChild(icon);
-            listitem.appendChild(link);
-            listitem.appendChild(formatAddr);
-            document.getElementById("maplink-suggestions").appendChild(listitem);
-        }
-    }
+                    var listitem = document.createElement("li");
+                    listitem.classList.add("list-group-item");
+                    listitem.classList.add("list-group-item-action");
+                    listitem.classList.add("map-item");
+                    var icon = document.createElement("span");
+                    var formatAddr = document.createElement("span");
+                    formatAddr.innerHTML = " "+locations[index].formatted_address;
+                    formatAddr.setAttribute("class", "format-addr");
+                    icon.classList.add("fas");
+                    icon.classList.add("fa-map-marker-alt");
+                    listitem.appendChild(icon);
+                    listitem.appendChild(link);
+                    listitem.appendChild(formatAddr);
+                    document.getElementById("maplink-suggestions").appendChild(listitem);
+                }
+            }
     </script>
 }
