@@ -35,7 +35,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         private readonly ILocationGroupService _locationGroupService;
         private readonly IGroupService _groupService;
         private readonly IConfiguration _config;
-        private readonly ILogger<HomeController> _logger;
         public static string Name { get { return "Locations"; } }
 
         public LocationsController(IConfiguration config,
@@ -43,11 +42,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             ILocationService locationService,
             IGroupService groupService,
             ILocationFeatureService locationFeatureService,
-            ILocationGroupService locationGroupService,
-            ILogger<HomeController> logger) : base(context)
+            ILocationGroupService locationGroupService) : base(context)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _locationService = locationService
                 ?? throw new ArgumentNullException(nameof(locationService));
             _groupService = groupService
