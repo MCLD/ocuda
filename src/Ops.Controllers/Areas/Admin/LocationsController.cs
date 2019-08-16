@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using BranchLocator.Models;
 using BranchLocator.Models.PlaceDetails;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -21,7 +19,6 @@ using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
-using Ocuda.Utility.TagHelpers;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin
 {
@@ -76,20 +73,17 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
             if (paginateModel.PastMaxPage)
             {
-                return RedirectToRoute(
-                    new
-                    {
-                        page = paginateModel.LastPage ?? 1
-                    });
+                return RedirectToRoute(new
+                {
+                    page = paginateModel.LastPage ?? 1
+                });
             }
 
-            var viewModel = new LocationViewModel
+            return View(new LocationViewModel
             {
                 AllLocations = locationList.Data,
                 PaginateModel = paginateModel
-            };
-
-            return View(viewModel);
+            });
         }
         [HttpGet("{locationStub}")]
         [RestoreModelState]
@@ -125,13 +119,11 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var location = new Location {
                 IsNewLocation = true
             };
-            var viewModel = new LocationViewModel
+            return View("LocationDetails", new LocationViewModel
             {
                 Location = location,
                 Action = nameof(LocationsController.CreateLocation)
-            };
-
-            return View("LocationDetails", viewModel);
+            });
         }
 
         [HttpPost]
@@ -154,13 +146,11 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     _logger.LogError(ex, $"Problem looking up postal code for coordinates {location.Address}: {ex.Message}");
                     ShowAlertDanger($"Unable to find Location's address: {location.Address}");
                     location.IsNewLocation = true;
-                    var viewModel = new LocationViewModel
+                    return View("LocationDetails", new LocationViewModel
                     {
                         Location = location,
                         Action = nameof(LocationsController.CreateLocation)
-                    };
-
-                    return View("LocationDetails", viewModel);
+                    });
                 }
 
 
@@ -175,13 +165,12 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 {
                     ShowAlertDanger($"Unable to Create Location: {ex.Message}");
                     location.IsNewLocation = true;
-                    var viewModel = new LocationViewModel
+
+                    return View("LocationDetails", new LocationViewModel
                     {
                         Location = location,
                         Action = nameof(LocationsController.CreateLocation)
-                    };
-
-                    return View("LocationDetails", viewModel);
+                    });
                 }
             }
             return RedirectToAction(nameof(LocationsController.AddLocation));
@@ -228,13 +217,12 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                             _logger.LogError(ex, $"Problem looking up postal code for coordinates {location.Address}: {ex.Message}");
                             ShowAlertDanger($"Unable to find Location's address: {location.Address}");
                             location.IsNewLocation = true;
-                            var viewModel = new LocationViewModel
+
+                            return View("LocationDetails", new LocationViewModel
                             {
                                 Location = location,
                                 Action = nameof(LocationsController.EditLocation)
-                            };
-
-                            return View("LocationDetails", viewModel);
+                            });
                         }
                     }
 
@@ -383,13 +371,11 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     ItemsPerPage = filter.Take.Value
                 };
 
-                var viewModel = new GroupListViewModel
+                return PartialView("_AddGroupsPartial", new GroupListViewModel
                 {
                     Groups = items.Data,
                     PaginateModel = paginateModel
-                };
-
-                return PartialView("_AddGroupsPartial", viewModel);
+                });
             }
             else
             {
@@ -410,13 +396,11 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     ItemsPerPage = filter.Take.Value
                 };
 
-                var viewModel = new GroupListViewModel
+                return PartialView("_AddFeaturesPartial", new GroupListViewModel
                 {
                     Groups = items.Data,
                     PaginateModel = paginateModel
-                };
-
-                return PartialView("_AddFeaturesPartial", viewModel);
+                });
             }
         }
 

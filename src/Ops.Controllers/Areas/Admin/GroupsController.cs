@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
-using Ocuda.Ops.Controllers.Areas.Admin.ViewModels;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Group;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Service.Filters;
@@ -58,20 +55,17 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
             if (paginateModel.PastMaxPage)
             {
-                return RedirectToRoute(
-                    new
+                return RedirectToRoute(new
                     {
                         page = paginateModel.LastPage ?? 1
                     });
             }
 
-            var viewModel = new GroupViewModel
+            return View(new GroupViewModel
             {
                 AllGroups = groupList.Data,
                 PaginateModel = paginateModel
-            };
-
-            return View(viewModel);
+            });
         }
         [HttpGet("{groupStub}")]
         [RestoreModelState]
@@ -81,12 +75,11 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 var group = await _groupService.GetGroupByStubAsync(groupStub);
                 group.IsNewGroup = false;
-                var viewModel = new GroupViewModel
+                return View("GroupDetails", new GroupViewModel
                 {
                     Group = group,
-                Action = nameof(GroupsController.EditGroup)
-                };
-                return View("GroupDetails", viewModel);
+                    Action = nameof(GroupsController.EditGroup)
+                });
             }
             catch (OcudaException ex)
             {
@@ -101,13 +94,12 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var group = new Group {
                 IsNewGroup = true
             };
-            var viewModel = new GroupViewModel
+
+            return View("GroupDetails", new GroupViewModel
             {
                 Group = group,
                 Action = nameof(GroupsController.CreateGroup)
-            };
-
-            return View("GroupDetails", viewModel);
+            });
         }
 
         [HttpPost]
@@ -129,13 +121,11 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     _logger.LogError(ex, $"Problem creating Group {group.GroupType}", ex.Message);
                     ShowAlertDanger($"Unable to create Group: {ex.Message}");
                     group.IsNewGroup = true;
-                    var viewModel = new GroupViewModel
+                    return View("GroupDetails", new GroupViewModel
                     {
                         Group = group,
                         Action = nameof(GroupsController.CreateGroup)
-                    };
-
-                    return View("GroupDetails", viewModel);
+                    });
                 }
             }
             return RedirectToAction(nameof(GroupsController.AddGroup));
@@ -179,13 +169,11 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     ShowAlertDanger($"Unable to update Group {group.GroupType} : {ex.Message}");
                     _logger.LogError(ex, $"Problem updating {group.GroupType}",ex.Message);
                     group.IsNewGroup = false;
-                    var viewModel = new GroupViewModel
+                    return View("GroupDetails", new GroupViewModel
                     {
                         Group = group,
                         Action = nameof(GroupsController.EditGroup)
-                    };
-
-                    return View("GroupDetails", viewModel);
+                    });
                 }
             }
             return RedirectToAction(nameof(GroupsController.Groups), new { groupStub = group.Stub });
