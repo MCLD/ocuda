@@ -55,10 +55,6 @@ namespace Ocuda.Ops.Service
         {
             return await _groupRepository.GetAllGroupRegions();
         }
-        public async Task<List<Group>> GetNonGroupRegions()
-        {
-            return await _groupRepository.GetAllNonGroupRegions();
-        }
         public async Task<DataWithCount<ICollection<Group>>> GetPaginatedListAsync(
             BaseFilter filter)
         {
@@ -71,7 +67,15 @@ namespace Ocuda.Ops.Service
         }
         public async Task<Group> GetGroupByStubAsync(string groupType)
         {
-            return await _groupRepository.GetGroupByStubAsync(groupType);
+            var group = await _groupRepository.GetGroupByStubAsync(groupType);
+            if (group == null)
+            {
+                throw new OcudaException("Group not found.");
+            }
+            else
+            {
+                return group;
+            }
         }
         public async Task<Group> AddGroupAsync(Group group)
         {

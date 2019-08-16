@@ -12,7 +12,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
     {
         Task<List<Group>> GetAllGroupsAsync();
         Task<List<Group>> GetGroupRegions();
-        Task<List<Group>> GetNonGroupRegions();
         Task<Group> AddGroupAsync(Group group);
         Task<Group> EditAsync(Group group);
         Task DeleteAsync(int id);

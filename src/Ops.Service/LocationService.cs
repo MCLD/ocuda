@@ -45,7 +45,7 @@ namespace Ocuda.Ops.Service
             }
             else
             {
-                return await _locationRepository.GetLocationByStub(locationStub);
+                return location;
             }
             
         }
