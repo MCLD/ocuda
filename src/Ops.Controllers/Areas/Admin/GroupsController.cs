@@ -167,6 +167,17 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [SaveModelState]
         public async Task<IActionResult> EditGroup(Group group)
         {
+            if (group.IsLocationRegion && string.IsNullOrEmpty(group.SubscriptionUrl))
+            {
+                ModelState.AddModelError("Group.SubscriptionUrl", "A 'Subscription URL' is required for a location region.");
+                ShowAlertDanger($"Invalid paramaters");
+                group.IsNewGroup = false;
+                return View("GroupDetails", new GroupViewModel
+                {
+                    Group = group,
+                    Action = nameof(GroupsController.EditGroup)
+                });
+            }
             if (ModelState.IsValid)
             {
                 try
