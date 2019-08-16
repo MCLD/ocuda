@@ -31,7 +31,7 @@ namespace Ocuda.Ops.Web
         private readonly ILogger _logger;
 
         public Startup(IConfiguration configuration,
-            IHostingEnvironment env, 
+            IHostingEnvironment env,
             ILogger<Startup> logger)
         {
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
@@ -183,6 +183,7 @@ namespace Ocuda.Ops.Web
 
             // service facades
             services.AddScoped(typeof(Controllers.ServiceFacades.Controller<>));
+            services.AddScoped(typeof(Data.ServiceFacade.Repository<>));
 
             // filters
             services.AddScoped<Controllers.Filters.AuthenticationFilterAttribute>();
@@ -198,6 +199,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.ClaimGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IExternalResourceRepository,
                 Data.Ops.ExternalResourceRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IFeatureRepository,
+                Data.Ops.FeatureRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileLibraryRepository,
                 Data.Ops.FileLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileRepository,
@@ -226,6 +229,7 @@ namespace Ocuda.Ops.Web
                 AuthorizationService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IExternalResourceService, ExternalResourceService>();
+            services.AddScoped<IFeatureService, FeatureService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IFileTypeService, FileTypeService>();
             services.AddScoped<IInitialSetupService, InitialSetupService>();

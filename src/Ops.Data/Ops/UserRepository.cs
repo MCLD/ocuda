@@ -6,14 +6,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Promenade.Data;
 
 namespace Ocuda.Ops.Data.Ops
 {
     public class UserRepository
-        : GenericRepository<User, int>, IUserRepository
+        : GenericRepository<OpsContext, User, int>, IUserRepository
     {
-        public UserRepository(OpsContext context, ILogger<UserRepository> logger)
-            : base(context, logger)
+        public UserRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
+             ILogger<UserRepository> logger) : base(repositoryFacade, logger)
         {
         }
 

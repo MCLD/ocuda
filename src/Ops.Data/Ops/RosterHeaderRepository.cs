@@ -8,10 +8,10 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 namespace Ocuda.Ops.Data.Ops
 {
     public class RosterHeaderRepository
-        : GenericRepository<RosterHeader, int>, IRosterHeaderRepository
+        : GenericRepository<OpsContext, RosterHeader, int>, IRosterHeaderRepository
     {
-        public RosterHeaderRepository(OpsContext context, ILogger<RosterHeaderRepository> logger)
-            : base(context, logger)
+        public RosterHeaderRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
+            ILogger<RosterHeaderRepository> logger) : base(repositoryFacade, logger)
         {
         }
 
@@ -21,15 +21,7 @@ namespace Ocuda.Ops.Data.Ops
                 .AsNoTracking()
                 .OrderByDescending(_ => _.CreatedAt)
                 .FirstOrDefaultAsync();
-
-            if(latest != null)
-            {
-                return latest.Id;
-            }
-            else
-            {
-                return null;
-            }
+            return latest?.Id;
         }
     }
 }

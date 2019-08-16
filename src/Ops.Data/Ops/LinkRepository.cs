@@ -8,14 +8,15 @@ using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Models;
+using Ocuda.Promenade.Data;
 
 namespace Ocuda.Ops.Data.Ops
 {
     public class LinkRepository
-        : GenericRepository<Link, int>, ILinkRepository
+        : GenericRepository<OpsContext, Link, int>, ILinkRepository
     {
-        public LinkRepository(OpsContext context, ILogger<LinkRepository> logger)
-            : base(context, logger)
+        public LinkRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
+            ILogger<LinkRepository> logger) : base(repositoryFacade, logger)
         {
         }
 

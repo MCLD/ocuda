@@ -8,14 +8,15 @@ using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Models;
+using Ocuda.Promenade.Data;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class ExternalResourceRepository : GenericRepository<ExternalResource, int>,
-        IExternalResourceRepository
+    public class ExternalResourceRepository
+        : GenericRepository<OpsContext, ExternalResource, int>, IExternalResourceRepository
     {
-        public ExternalResourceRepository(OpsContext context,
-            ILogger<ExternalResourceRepository> logger) : base(context, logger)
+        public ExternalResourceRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
+            ILogger<ExternalResourceRepository> logger) : base(repositoryFacade, logger)
         {
 
         }
