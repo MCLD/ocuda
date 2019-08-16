@@ -30,7 +30,7 @@ namespace Ocuda.Utility.TagHelpers
         private readonly IHtmlGenerator _htmlGenerator;
         public FormGroupTagHelper(IHtmlGenerator htmlGenerator)
         {
-            _htmlGenerator = htmlGenerator
+            _htmlGenerator = htmlGenerator 
                 ?? throw new ArgumentNullException(nameof(htmlGenerator));
         }
 
@@ -55,7 +55,7 @@ namespace Ocuda.Utility.TagHelpers
             // Manually create each child asp form tag helper element
             TagHelperOutput labelElement = await CreateLabelElement(context);
             TagHelperOutput inputElement = await CreateInputElement(context, output);
-            TagHelperOutput validationMessageElement
+            TagHelperOutput validationMessageElement 
                 = await CreateValidationMessageElement(context);
 
             // Wrap input and validation with column div

@@ -1,4 +1,5 @@
 ﻿@model Ocuda.Promenade.Controllers.ViewModels.Locations.LocationViewModel
+@using Ocuda.Promenade.Controllers;
 @{
     ViewData["Title"] = "Locations";
 }
@@ -61,7 +62,7 @@
                                                 <tr>
                                                     <td style="padding-bottom:10px;">
                                                         <strong style="font-size: 17.5px;">
-                                                            <a href="@Url.Action("Locations", "Home", new { locationStub = closeLocation.Stub })" target="_blank">
+                                                            <a asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub="@closeLocation.Stub" target="_blank">
                                                                 @closeLocation.Name
                                                             </a>
                                                         </strong> <em style="font-size:12px;">
@@ -158,7 +159,8 @@
                 $('#GoButton').html('<span class="fa fa-spinner fa-spin"></span>');
                 $('#GoButton').attr("href",);
                 $('#GoButton').prop('disabled', true);
-                $('#AddressForm').attr('action','@Url.Action("Find", "Home")').submit();
+                $('#AddressForm').attr('asp-controller','@nameof(LocationsController.Name)');
+                $('#AddressForm').attr('asp-action','@nameof(LocationsController.Find)').submit();
             }
         });
         </script>

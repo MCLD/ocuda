@@ -38,6 +38,16 @@
     }
   },
   {
+    "outputFileName": "wwwroot/js/iconpicker.min.js",
+    "inputFiles": [
+      "Scripts/fontawesome-iconpicker/main.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    }
+  },
+  {
     "outputFileName": "wwwroot/css/main.min.css",
     "inputFiles": [
       "Scripts/Bootstrap/bootstrap.css",
@@ -63,6 +73,15 @@
     "outputFileName": "wwwroot/css/md.min.css",
     "inputFiles": [
       "Styles/WMD.css"
+    ],
+    "minify": {
+      "enabled": true
+    }
+  },
+  {
+    "outputFileName": "wwwroot/css/iconpicker.min.css",
+    "inputFiles": [
+      "Styles/fontawesome-iconpicker/main.css"
     ],
     "minify": {
       "enabled": true
