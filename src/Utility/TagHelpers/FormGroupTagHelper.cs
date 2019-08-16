@@ -20,17 +20,21 @@ namespace Ocuda.Utility.TagHelpers
         private const string ignoreValidationAttributeName = "ignore-validation";
         private const string infoTooltipAttributeName = "info-tooltip";
         private const string onBlurJs = "on-blur-js";
-        private const string defaultWraperDivClass = "form-group row";
-        private const string defaultLabelClass = "col-md-3 col-form-label text-md-right";
+        private const string labelClassAttribute = "label-class";
+        private const string fieldClassAttribute = "field-class";
+
+        private const string defaultWrapperDivClass = "row form-group";
+        private const string defaultLabelLayoutClass = "col-md-3";
+        private const string defaultLabelClass = "col-form-label text-md-right";
         private const string defaultInputClass = "form-control";
-        private const string defaultInnerDivClass = "col-md-9";
+        private const string defaultFieldLayoutClass = "col-md-9";
         private const string defaultValidationMessageClass = "text-danger";
         private const string validationIgnoreClass = "validation-ignore";
 
         private readonly IHtmlGenerator _htmlGenerator;
         public FormGroupTagHelper(IHtmlGenerator htmlGenerator)
         {
-            _htmlGenerator = htmlGenerator 
+            _htmlGenerator = htmlGenerator
                 ?? throw new ArgumentNullException(nameof(htmlGenerator));
         }
 
@@ -46,6 +50,12 @@ namespace Ocuda.Utility.TagHelpers
         [HtmlAttributeName(onBlurJs)]
         public string OnBlurJs { get; set; }
 
+        [HtmlAttributeName(labelClassAttribute)]
+        public string LabelClass { get; set; }
+
+        [HtmlAttributeName(fieldClassAttribute)]
+        public string FieldClass { get; set; }
+
         [ViewContext]
         [HtmlAttributeNotBound]
         public ViewContext ViewContext { get; set; }
@@ -55,7 +65,7 @@ namespace Ocuda.Utility.TagHelpers
             // Manually create each child asp form tag helper element
             TagHelperOutput labelElement = await CreateLabelElement(context);
             TagHelperOutput inputElement = await CreateInputElement(context, output);
-            TagHelperOutput validationMessageElement 
+            TagHelperOutput validationMessageElement
                 = await CreateValidationMessageElement(context);
 
             // Wrap input and validation with column div
@@ -65,7 +75,7 @@ namespace Ocuda.Utility.TagHelpers
                         inputElement,
                         validationMessageElement
                     },
-                    defaultInnerDivClass
+                    string.IsNullOrEmpty(FieldClass) ? defaultFieldLayoutClass : FieldClass
                 );
 
             // Wrap all elements with a form group div
@@ -75,7 +85,7 @@ namespace Ocuda.Utility.TagHelpers
                         labelElement,
                         innerDiv
                     },
-                    defaultWraperDivClass
+                    defaultWrapperDivClass
                 );
 
             // Reinitialize the parent tag helper into an empty tag
@@ -98,8 +108,12 @@ namespace Ocuda.Utility.TagHelpers
 
             await labelTagHelper.ProcessAsync(context, labelOutput);
 
+            string combinedLabelClass = string.IsNullOrEmpty(LabelClass)
+                ? string.Join(' ', defaultLabelClass, defaultLabelLayoutClass)
+                : string.Join(' ', defaultLabelClass, LabelClass);
+
             labelOutput.Attributes.Add(
-                new TagHelperAttribute("class", defaultLabelClass));
+                new TagHelperAttribute("class", combinedLabelClass));
 
             if (!string.IsNullOrEmpty(InfoTooltip))
             {
