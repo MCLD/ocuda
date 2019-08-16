@@ -1,8 +1,8 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Feature.FeatureViewModel
 
 @section styles {
-    <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/iconpicker.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
 
 <div class="feature-save-container">
@@ -114,7 +114,7 @@
                         <button type="submit"
                                 id="submit"
                                 value="Submit"
-                                class="btn btn-primary btn-spinner">
+                                class="btn btn-success btn-spinner">
                             <span class="buttonText">Add Feature</span>
                             <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
                         </button>
@@ -126,7 +126,7 @@
                         <button type="submit"
                                 id="submit"
                                 value="Submit"
-                                class="btn btn-primary btn-spinner">
+                                class="btn btn-success btn-spinner">
                             <span class="buttonText">Update Feature</span>
                             <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
                         </button>
@@ -138,8 +138,8 @@
 </form>
 
 @section scripts{
-    <script src="~/js/md.min.js" asp-append-version="true"></script>
     <script src="~/js/iconpicker.min.js" asp-append-version="true"></script>
+    <script src="~/js/md.min.js" asp-append-version="true"></script>
     <script>
         $("#popup-button").click(function () {
             if ($("#accordion-header").hasClass("bg-info")) {
