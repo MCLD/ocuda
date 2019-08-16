@@ -11,62 +11,42 @@
 
 window.onunload = function () {
     ResetSpinners();
-}
+};
 
 $(".btn-spinner").on("click", function (e) {
-    var parentForm = $(this).parents("form:first");
-    if (parentForm.length == 0 || parentForm.valid()) {
-        if ($(this).hasClass("disabled")) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-        }
-        else {
-            $(this).addClass("disabled");
-            $(this).children(".fa-spinner").removeClass("d-none");
-        }
-    }
-    else {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-    }
-});
-
-$(".btn-spinner-no-validate").on("click", function (e) {
     if ($(this).hasClass("disabled")) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
     }
     else {
-        $(this).addClass("disabled");
-        $(this).children(".fa-spinner").removeClass("d-none");
+        var parentForm = $(this).parents("form:first");
+
+        if (!$(this).hasClass("spinner-ignore-validation")
+            && (parentForm.length > 0 && !parentForm.valid())) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+        }
+        else {
+            parentForm.find(".btn-spinner").addClass("disabled");
+            $(this).children(".fa-spinner").removeClass("d-none");
+        }
     }
 });
-
-function SetValidationMessage(target, message) {
-    target.addClass("input-validation-error");
-
-    var validationSpan = target.siblings("span");
-    validationSpan.removeClass("field-validation-valid").addClass("field-validation.error");
-    var messageSpan = $("<span></span>").text(message);
-    validationSpan.html(messageSpan);
-}
-
 
 $(document).on('change', ':file', function (e) {
     var fileInput = $(this),
         filePath = fileInput.val().replace(/\\/g, '/').replace(/.*\//, '');
 
-        validateFile(e, filePath);
+    validateFile(e, filePath);
 });
 
 $(document).on('fileselect', ':file', function (e) {
     var fileInput = $(this),
         filePath = fileInput.val().replace(/\\/g, '/').replace(/.*\//, '');
 
-        validateFile(e, filePath);
+    validateFile(e, filePath);
 });
 
 function validateFile(e, filePath) {
@@ -75,14 +55,14 @@ function validateFile(e, filePath) {
         fileDisplay = $(e.target).parents('.input-group').find(':text'),
         fileNameField = $('#File_Name');
 
-        fileDisplay.val(filePath);
+    fileDisplay.val(filePath);
 
-        if (fileNameField.val().length == 0) {
-            fileNameField.val(file.name.split('.')[0]);
-        }
+    if (fileNameField.val().length == 0) {
+        fileNameField.val(file.name.split('.')[0]);
+    }
 
-        $(fileButton).removeClass('btn-outline-secondary');
-        $(fileButton).addClass('btn-success');
+    $(fileButton).removeClass('btn-outline-secondary');
+    $(fileButton).addClass('btn-success');
 }
 
 function updateStub(stub, text) {
@@ -97,52 +77,41 @@ function updateStub(stub, text) {
     stub.val(slug);
 }
 
-function validateStub(stub, id, stubCheckUrl) {
-    var stubValidation = stub.parent().find('span');
-    var sectionId = $("#SectionId");
-    if (stub.val().trim() != "") {
-        stub.val(stub.val().trim());
+function SetValidation(target, message) {
+    target.addClass("input-validation-error");
 
-        stubValidation.removeClass("text-danger text-success");
-        stubValidation.text("Checking stub availability...")
-
-        $.post(stubCheckUrl, {
-            item: {
-                id: id.val(),
-                stub: stub.val(),
-                sectionId: sectionId.val()
-            }
-        }, function (response) {
-            if (response) {
-                stub.removeClass("valid");
-                stub.addClass("input-validation-error");
-                stubValidation.removeClass("field-validation-valid text-success");
-                stubValidation.addClass("field-validation-error");
-                stubValidation.text("The stub is already in use.");
-            }
-            else {
-                stub.removeClass("input-validation-error");
-                stub.addClass("valid");
-                stubValidation.removeClass("field-validation-error");
-                stubValidation.addClass("field-validation-valid text-success");
-                stubValidation.text("The stub is available.");
-            }
-        });
-    }
-    else {
-        stub.removeClass("valid");
-        stub.addClass("input-validation-error");
-        stubValidation.removeClass("field-validation-valid text-success");
-        stubValidation.addClass("field-validation-error");
-        stubValidation.text("The Stub field is required.");
-    }
+    var validationMessage = target.siblings("span");
+    validationMessage.removeClass("field-validation-valid");
+    validationMessage.addClass("field-validation-error");
+    validationMessage.text(message);
 }
 
-function clearStubValidation(stub) {
-    if (stub.val().trim() != "") {
-        var stubValidation = stub.parent().find('span');
-        stubValidation.text("");
-    }
+function ClearValidation(target) {
+    target.removeClass("input-validation-error");
+
+    var validationMessage = target.siblings("span");
+    validationMessage.text("");
+    validationMessage.removeClass("field-validation-error");
+    validationMessage.addClass("text-danger field-validation-valid");
+}
+
+function ValidateField(target, validateUrl, params) {
+    var validationMessage = target.siblings("span");
+
+    ClearValidation(target);
+    validationMessage.removeClass("text-danger text-success");
+    validationMessage.text("Checking...");
+
+    $.post(validateUrl,
+        params,
+        function (response) {
+            if (!response.success) {
+                SetValidation(target, response.message);
+            }
+            else {
+                ClearValidation(target);
+            }
+        });
 }
 
 $.validator.setDefaults({

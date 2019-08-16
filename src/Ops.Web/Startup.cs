@@ -17,6 +17,7 @@ using Ocuda.Ops.Controllers.Authorization;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Ops.Web.StartupHelper;
 using Ocuda.Utility.Keys;
 
@@ -195,6 +196,9 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Utility.Helpers.WebHelper>();
 
             // repositories
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageRepository,
+                Data.Promenade.PageRepository>();
+
             services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,
                 Data.Ops.ClaimGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IExternalResourceRepository,
@@ -251,6 +255,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ILocationGroupService, LocationGroupService>();
             services.AddScoped<ILocationFeatureService, LocationFeatureService>();
             services.AddScoped<ILinkService, LinkService>();
+            services.AddScoped<IPageService, PageService>();
             services.AddScoped<IPathResolverService, PathResolverService>();
             services.AddScoped<IRosterService, RosterService>();
             services.AddScoped<ISiteSettingService, SiteSettingService>();
@@ -266,7 +271,7 @@ namespace Ocuda.Ops.Web
             IPathResolverService pathResolver)
         {
             // configure error page handling and development IDE linking
-            if (env.IsDevelopment())
+            if (_isDevelopment)
             {
                 app.UseDeveloperExceptionPage();
                 app.UseStaticFiles(new StaticFileOptions

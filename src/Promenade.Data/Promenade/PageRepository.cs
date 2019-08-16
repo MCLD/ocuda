@@ -19,7 +19,7 @@ namespace Ocuda.Promenade.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == stub && _.Type == type)
+                .Where(_ => _.Stub == stub && _.Type == type && _.IsPublished)
                 .SingleOrDefaultAsync();
         }
     }

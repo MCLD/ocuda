@@ -1,0 +1,100 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages.DetailViewModel
+
+@section styles {
+    <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
+}
+
+<form asp-action="@nameof(PagesController.Edit)" method="post" role="form">
+    @if (Model.Action == nameof(PagesController.Edit))
+    {
+        <input asp-for="Page.Id" type="hidden" />
+    }
+
+    <input asp-for="Page.Stub" formgroup readonly="@(Model.Page.IsPublished ? " readonly" : null)" />
+    <select id="addType" asp-for="Page.Type" formgroup readonly="@(Model.Page.IsPublished ? " readonly" : null)">
+        @foreach (var type in (PageType[])Enum.GetValues(typeof(PageType)))
+        {
+            <option value="@Convert.ToInt32(type)">@type</option>
+        }
+    </select>
+
+    <div class="form-group row">
+        <label asp-for="Page.Content" class="col-md-3 col-form-label text-md-right"></label>
+        <div class="col-md-9">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#md-edit" role="tab">Edit</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#md-preview" role="tab">Preview</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="md-edit-preview">
+                <div class="tab-pane show active" id="md-edit" role="tabpanel">
+                    <div id="wmd-button-bar" class="wmd-button-row"></div>
+                    <textarea asp-for="Page.Content" class="form-control wmd-input" id="wmd-input"></textarea>
+                </div>
+                <div class="tab-pane" id="md-preview" role="tabpanel">
+                    <div id="preview" class="wmd-preview"></div>
+                </div>
+                <span asp-validation-for="Page.Content" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="offset-md-3 col-md-9">
+            <a class="btn btn-outline-secondary text-dark" asp-action="@(nameof(PagesController.Index))">Cancel</a>
+            @if (Model.Page.IsPublished)
+            {
+                <button type="submit" class="btn btn-success" aria-label="Confirm" buttonspinner>
+                    <span class="fa fa-save" aria-hidden="true"></span>
+                    Save
+                </button>
+            }
+            else
+            {
+                <button type="submit" name="Publish" value="False" class="btn btn-success" aria-label="Confirm" buttonspinner>
+                    <span class="fa fa-save" aria-hidden="true"></span>
+                    Save as Draft
+                </button>
+                <button type="submit" name="Publish" value="True" class="btn btn-success" aria-label="Confirm" buttonspinner>
+                    <span class="fa fa-save" aria-hidden="true"></span>
+                    Save and Publish
+                </button>
+            }
+        </div>
+    </div>
+</form>
+
+@section scripts {
+    <script src="~/js/md.min.js" asp-append-version="true"></script>
+
+    <script>
+        var editor = new Markdown.Editor({ allowUploads: true });
+        editor.run();
+
+        @if (!Model.Page.IsPublished)
+        {
+        <text>
+                var id = $("#Page_Id");
+                var stub = $("#Page_Stub");
+                var type = $("Page_Type")
+                var currentStub = stub.val();
+                var stubCheckUrl = "@Url.Action(nameof(PagesController.StubInUse), PagesController.Name)";
+
+                stub.on("blur", function () {
+                    if (stub.val() != currentStub) {
+                        if (stub.valid()) {
+                            updateStub(stub, stub.val());
+                            setTimeout(function () {
+                                ValidateField(stub, stubCheckUrl, [id.serialize(), stub.serialize(), type.serialize()].join("&"));
+                                currentStub = stub.val();
+                            }, 200);
+                        }
+                    }
+                });
+            </text>
+        }
+    </script>
+}

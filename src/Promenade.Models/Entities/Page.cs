@@ -14,6 +14,7 @@ namespace Ocuda.Promenade.Models.Entities
 
         public string Content { get; set; }
         public PageType Type { get; set; }
+        public bool IsPublished { get; set; }
 
         public int? SocialCardId { get; set; }
         public SocialCard SocialCard { get; set; }

@@ -48,7 +48,9 @@ function initializePreview() {
 
         textarea.bind('input propertychange', parseAndRender);
     });
-}
+
+    textarea.bind('input propertychange', parseAndRender);
+});
 //End of dingus
 
 // From Markdown.Converter

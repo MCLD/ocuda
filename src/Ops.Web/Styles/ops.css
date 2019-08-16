@@ -30,6 +30,14 @@
     background-color: #fee;
 }
 
+.colored-icon.fa-times {
+    color: red;
+}
+
+.colored-icon.fa-check {
+    color: green;
+}
+
 .navbar .dropdown-item:hover {
     color: inherit;
     background: inherit;

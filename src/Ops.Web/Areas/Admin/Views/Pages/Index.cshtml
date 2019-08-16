@@ -1,0 +1,115 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages.IndexViewModel
+
+<form id="addForm" role="form">
+    <div modal id="addModal" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+        <input id="addStub" asp-for="Page.Stub" formgroup />
+        <select id="addType" asp-for="Page.Type" formgroup>
+            @foreach (var type in (PageType[]) Enum.GetValues(typeof(PageType)))
+            {
+                <option value="@Convert.ToInt32(type)">@type</option>
+            }
+        </select>
+    </div>
+</form>
+
+<form asp-controller="Pages" asp-action="@(nameof(PagesController.Delete))" method="post" role="form">
+    <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
+    <input id="deleteStub" asp-for="Page.Stub" type="hidden" />
+    <input id="deleteId" asp-for="Page.Id" type="hidden" />
+    <div modal id="deleteModal" name="Post" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+</form>
+
+<div class="mb-2">
+    <button class="btn btn-outline-secondary text-dark"
+            data-toggle="modal"
+            data-target="#addModal">
+        Create Page
+    </button>
+</div>
+
+@if (Model.Pages.Count() == 0)
+{
+    <div class="alert alert-warning">No Pages Found</div>
+
+}
+else
+{
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th>Stub</th>
+                <th>Type</th>
+                <th>Published</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ocPage in Model.Pages)
+            {
+                <tr>
+                    <td>
+                        <a asp-action="@(nameof(PagesController.Edit))" asp-route-id="@ocPage.Id" class="rowlink">
+                            @if (string.IsNullOrWhiteSpace(ocPage.Stub))
+                            {
+                                @:(none)
+                            }
+                            else
+                            {
+                                @ocPage.Stub
+                            }
+                        </a>
+                    </td>
+                    <td>@ocPage.Type.ToString()</td>
+                    <td><span class="fas @(ocPage.IsPublished ? "fa-check"  : "fa-times") colored-icon"></span></td>
+
+                    <td align="center" class="on-top">
+                        <button type="button"
+                                class="btn btn-danger btn-xs"
+                                data-toggle="modal"
+                                data-target="#deleteModal"
+                                data-id="@ocPage.Id"
+                                data-stub="@ocPage.Stub">
+                            <span class="fa fa-times" aria-hidden="true"></span>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (Model.PaginateModel.MaxPage > 1)
+    {
+        <paginate paginateModel="@Model.PaginateModel"></paginate>
+    }
+}
+
+
+@section scripts {
+    <script>
+        $("#addForm").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.post("@(Url.Action(nameof(PagesController.Create), PagesController.Name))",
+                form.serialize(),
+                function (response) {
+                    if (response.success == true) {
+                        var url = "@(Url.Action(nameof(PagesController.Edit), PagesController.Name))/" + response.entityId;
+                        location.href = url;
+                    }
+                    else {
+                        alert(response.message);
+                    }
+                });
+        });
+
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var stub = button.data("stub");
+            var modal = $(this);
+            $("#deleteStub").val(stub);
+            $("#deleteId").val(id);
+            modal.find(".modal-text").text(" Are you sure you want to delete \"" + stub + "\"?");
+        });
+    </script>
+}
