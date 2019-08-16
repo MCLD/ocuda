@@ -1,4 +1,5 @@
 ﻿@model Ocuda.Promenade.Controllers.ViewModels.Locations.LocationViewModel
+@using Ocuda.Promenade.Controllers;
 @{
     ViewData["Title"] = "LocationDetails";
 }
@@ -59,7 +60,7 @@
                     {
                         <text>
                             <div class="col-xs-2">
-                                <a href="@Url.Action("Locations", "Home", new { locationStub = Model.Location.Stub, featureStub = feature.Stub })" class="bring-modal" data-toggle="modal" data-target="#featureModal" target="_blank" data-feature="@feature.Stub">
+                                <a asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub= "@Model.Location.Stub" asp-route-featureStub="@feature.Stub" class="bring-modal" data-toggle="modal" data-target="#featureModal" target="_blank" data-feature="@feature.Stub">
                                     <span class="fa-stack fa-2x" style="color:#007bff">
                                         <span class="fa fa-square fa-stack-2x"></span>
                                         <span class="@feature.FontAwesome" @if(!string.IsNullOrEmpty(feature.InnerSpan)) { @:style="color:white"
@@ -72,7 +73,7 @@
                                     </span>
                                 </a>
                                 <div>
-                                    <a class="bring-modal" data-toggle="modal" data-target="#featureModal" href="@Url.Action("Locations", "Home", new { locationStub = Model.Location.Stub, featureStub = feature.Stub })" data-feature="@feature.Stub"> @feature.Name</a>
+                                    <a class="bring-modal" data-toggle="modal" data-target="#featureModal" asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub="@Model.Location.Stub" asp-route-featureStub="@feature.Stub" data-feature="@feature.Stub"> @feature.Name</a>
                                 </div>
                             </div>
                         </text>
@@ -116,7 +117,7 @@
                                             <tr>
                                                 <td>@counter</td>
                                                 <td>
-                                                    <a href="@Url.Action("Locations", "Home", new { locationStub = @location.Stub})">@location.Name</a>
+                                                    <a asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub = "@location.Stub">@location.Name</a>
                                                 </td>
                                                 <td>
                                                     <a href="@location.EventLink"><span class="fa fa-calendar"></span> Events</a>

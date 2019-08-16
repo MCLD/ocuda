@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -12,16 +13,21 @@ namespace Ocuda.Promenade.Models.Entities
         public string Name { get; set; }
 
         [MaxLength(48)]
+        [Required]
         public string FontAwesome { get; set; }
 
         [MaxLength(255)]
         public string ImagePath { get; set; }
 
         [MaxLength(80)]
-        [Required]
         public string Stub { get; set; }
 
-        [Required]
         public string BodyText { get; set; }
+
+        [NotMapped]
+        public bool IsNewFeature { get; set; }
+
+        [NotMapped]
+        public bool NeedsPopup { get; set; }
     }
 }
