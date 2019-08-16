@@ -11,7 +11,7 @@
 
 <div class="row">
     <div class="col-12">
-        <h1>@Model.Feature.IsNewFeature ? "Add Feature" : "Edit Feature"</h1>
+        <h1>@(Model.Feature.IsNewFeature ? "Add Feature" : "Edit Feature")</h1>
     </div>
 </div>
 
@@ -174,7 +174,8 @@
             editor.run();
             if ($($("#Feature_Stub").next()).hasClass("field-validation-error"))
             {
-                $( "#collapseDiv" ).collapse('show');
+                $("#collapseDiv").collapse('show');
+                $("#feature-needsPopup").val("True");
             }
             $('.icon-picker').iconpicker();
             $('[data-toggle="tooltip"]').tooltip();

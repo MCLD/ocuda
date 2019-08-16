@@ -51,10 +51,12 @@ namespace Ocuda.Ops.Service
         {
             return await _groupRepository.GetAllGroupsAsync();
         }
+
         public async Task<List<Group>> GetGroupRegions()
         {
             return await _groupRepository.GetAllGroupRegions();
         }
+
         public async Task<DataWithCount<ICollection<Group>>> GetPaginatedListAsync(
             BaseFilter filter)
         {
@@ -131,6 +133,7 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException(ex.Message);
             }
         }
+
         public async Task<DataWithCount<ICollection<Group>>> PageItemsAsync(
             GroupFilter filter)
         {
@@ -140,6 +143,7 @@ namespace Ocuda.Ops.Service
                 Count = await _groupRepository.CountAsync(filter)
             };
         }
+
         private async Task ValidateAsync(Group group)
         {
             if (await _groupRepository.IsDuplicateGroupTypeAsync(group))

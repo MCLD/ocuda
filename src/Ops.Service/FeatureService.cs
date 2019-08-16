@@ -31,6 +31,11 @@ namespace Ocuda.Ops.Service
             return await _featureRepository.GetPaginatedListAsync(filter);
         }
 
+        public async Task<List<Feature>> GetAllFeaturesAsync()
+        {
+            return await _featureRepository.GetAllFeaturesAsync();
+        }
+
         public async Task<Feature> GetFeatureByNameAsync(string featureName)
         {
             try
@@ -42,6 +47,11 @@ namespace Ocuda.Ops.Service
                 _logger.LogError(ex, "Problem finding feature: {Message}", ex.Message);
                 throw new OcudaException($"Could not find feature: {featureName}");
             }
+        }
+
+        public async Task<Feature> GetFeatureByIdAsync(int featureId)
+        {
+            return await _featureRepository.FindAsync(featureId);
         }
 
         public async Task<Feature> AddFeatureAsync(Feature feature)
@@ -117,6 +127,16 @@ namespace Ocuda.Ops.Service
             {
                 throw new OcudaException(ex.Message);
             }
+        }
+
+        public async Task<DataWithCount<ICollection<Feature>>> PageItemsAsync(
+            FeatureFilter filter)
+        {
+            return new DataWithCount<ICollection<Feature>>
+            {
+                Data = await _featureRepository.PageAsync(filter),
+                Count = await _featureRepository.CountAsync(filter)
+            };
         }
 
         private async Task ValidateAsync(Feature feature)

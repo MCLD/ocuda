@@ -12,31 +12,41 @@ else
                 <tr>
                     <td>Name</td>
                     <td>Stub</td>
-                    <td>Body Text</td>
+                    <td>General Body Text</td>
                     <td width="44px">&nbsp;</td>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var feature in Model.Features)
                 {
-                    <tr class="itemRow">
-                        <td style="vertical-align:middle;">
-                            @feature.Name
-                        </td>
-                        <td style="vertical-align:middle;">
-                            @feature.Stub
-                        </td>
-                        <td style="vertical-align:middle;">
+                <tr class="itemRow">
+                    <td style="vertical-align:middle;">
+                        @feature.Name
+                    </td>
+                    <td style="vertical-align:middle;">
+                        @feature.Stub
+                    </td>
+                    <td style="vertical-align:middle;">
+                        @if (!string.IsNullOrEmpty(feature.BodyText))
+                        {
+                            @if (feature.BodyText.Length > 200)
+                            {
+                                @(feature.BodyText.Substring(0, 200) + "...")
+                            }
+                        }
+                        else
+                        {
                             @feature.BodyText
-                        </td>
-                        <td>
-                            <button type="button"
-                                    class="btn btn-link btn-xs addgroupButton"
-                                    data-itemid="@feature.Id">
-                                <span class="fa fa-2x fa-plus-circle text-success" aria-hidden="true"></span>
-                            </button>
-                        </td>
-                    </tr>
+                        }
+                    </td>
+                    <td style="vertical-align:middle;">
+                        <button type="button"
+                                class="btn btn-link btn-xs addfeatureButton"
+                                data-featureid="@feature.Id">
+                            <span class="fa fa-2x fa-plus-circle text-success" aria-hidden="true"></span>
+                        </button>
+                    </td>
+                </tr>
                 }
             </tbody>
         </table>

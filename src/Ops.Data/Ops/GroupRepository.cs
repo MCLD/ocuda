@@ -28,11 +28,13 @@ namespace Ocuda.Ops.Data.Ops
                 .OrderBy(_ => _.GroupType)
                 .ToListAsync();
         }
+
         public async Task<int> CountAsync(GroupFilter filter)
         {
             return await ApplyFilters(filter)
                 .CountAsync();
         }
+
         public async Task<ICollection<Group>> PageAsync(GroupFilter filter)
         {
             return await ApplyFilters(filter)
@@ -40,6 +42,7 @@ namespace Ocuda.Ops.Data.Ops
                 .ApplyPagination(filter)
                 .ToListAsync();
         }
+
         private IQueryable<Group> ApplyFilters(GroupFilter filter)
         {
             var items = DbSet.AsNoTracking();
@@ -57,14 +60,6 @@ namespace Ocuda.Ops.Data.Ops
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.IsLocationRegion)
-                .OrderBy(_ => _.GroupType)
-                .ToListAsync();
-        }
-        public async Task<List<Group>> GetAllNonGroupRegions()
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => !_.IsLocationRegion)
                 .OrderBy(_ => _.GroupType)
                 .ToListAsync();
         }
@@ -89,6 +84,7 @@ namespace Ocuda.Ops.Data.Ops
                 .Where(_ => _.Id != group.Id && string.Equals(_.GroupType, group.GroupType, StringComparison.OrdinalIgnoreCase))
                 .AnyAsync();
         }
+
         public async Task<bool> IsDuplicateStubAsync(Group group)
         {
             return await DbSet
@@ -96,6 +92,7 @@ namespace Ocuda.Ops.Data.Ops
                 .Where(_ => _.Id != group.Id && string.Equals(_.Stub, group.Stub, StringComparison.OrdinalIgnoreCase))
                 .AnyAsync();
         }
+
         public async Task<Group> GetGroupByStubAsync(string groupStub)
         {
             return await DbSet

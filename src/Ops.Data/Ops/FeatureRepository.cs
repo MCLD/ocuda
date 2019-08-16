@@ -18,7 +18,7 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
-        public async Task<List<Feature>> GeAllFeaturesAsync()
+        public async Task<List<Feature>> GetAllFeaturesAsync()
         {
             return await DbSet
                 .AsNoTracking()
@@ -39,6 +39,31 @@ namespace Ocuda.Ops.Data.Ops
             };
         }
 
+        public async Task<ICollection<Feature>> PageAsync(FeatureFilter filter)
+        {
+            return await ApplyFilters(filter)
+                .OrderBy(_ => _.Name)
+                .ApplyPagination(filter)
+                .ToListAsync();
+        }
+
+        private IQueryable<Feature> ApplyFilters(FeatureFilter filter)
+        {
+            var items = DbSet.AsNoTracking();
+
+            if (filter.FeatureIds?.Count > 0)
+            {
+                items = items.Where(_ => !filter.FeatureIds.Contains(_.Id));
+            }
+
+            return items;
+        }
+
+        public async Task<int> CountAsync(FeatureFilter filter)
+        {
+            return await ApplyFilters(filter)
+                .CountAsync();
+        }
 
         public async Task<Feature> GetFeatureByName(string featureName)
         {

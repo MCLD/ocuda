@@ -1,7 +1,11 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location.LocationViewModel;
 
-    <div>
-        <input value="@Model.LocationFeature.Id" asp-for="LocationFeature.Id" type="hidden" />
-        <input value="@Model.LocationFeature.Text" asp-for="LocationFeature.Text" formgroup autocomplete="off" />
-        <input value="@Model.LocationFeature.RedirectUrl" asp-for="LocationFeature.RedirectUrl" formgroup autocomplete="off" />
+    <div class="row">
+        <div id="modalItemInfo" class="col-xs-12 col">
+            <input value="@Model.LocationFeature.Id" asp-for="LocationFeature.Id" type="hidden" />
+            <input value="@Model.LocationFeature.LocationId" asp-for="LocationFeature.LocationId" type="hidden" />
+            <input value="@Model.LocationFeature.FeatureId" asp-for="LocationFeature.FeatureId" type="hidden" />
+            <textarea value="@Model.LocationFeature.Text" asp-for="LocationFeature.Text" rows="5" formgroup autocomplete="off" />
+            <input value="@Model.LocationFeature.RedirectUrl" asp-for="LocationFeature.RedirectUrl" formgroup autocomplete="off" />
+        </div>
     </div>

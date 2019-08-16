@@ -60,10 +60,10 @@ namespace Ocuda.Ops.Service
         {
             try
             {
-                ValidateAsync(locationFeature);
                 var currentLocationFeature = await _locationFeatureRepository.FindAsync(locationFeature.Id);
                 currentLocationFeature.Text = locationFeature.Text;
                 currentLocationFeature.RedirectUrl = locationFeature.RedirectUrl;
+                await ValidateAsync(currentLocationFeature);
                 _locationFeatureRepository.Update(currentLocationFeature);
                 await _locationFeatureRepository.SaveAsync();
                 return currentLocationFeature;

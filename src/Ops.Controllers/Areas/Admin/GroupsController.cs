@@ -75,6 +75,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 var group = await _groupService.GetGroupByStubAsync(groupStub);
                 group.IsNewGroup = false;
+                group.IsLocationRegion = !string.IsNullOrEmpty(group.SubscriptionUrl);
                 return View("GroupDetails", new GroupViewModel
                 {
                     Group = group,

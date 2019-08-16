@@ -124,9 +124,10 @@
             editor.run();
         });
         if ($("#Group_SubscriptionUrl").next().hasClass("field-validation-error"))
-            {
-                $("#collapseDiv").collapse('show');
-            }
+        {
+            $("#collapseDiv").collapse('show');
+            $("#group-isLocationRegion").val("True");
+        }
         $("button#popup-button").on("click", function () {
 
             if (!$("div#collapseDiv").hasClass("show")) {

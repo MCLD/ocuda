@@ -13,7 +13,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
     {
         Task<List<Group>> GetAllGroupsAsync();
         Task<List<Group>> GetAllGroupRegions();
-        Task<List<Group>> GetAllNonGroupRegions();
         Task<bool> IsDuplicateGroupTypeAsync(Group group);
         Task<bool> IsDuplicateStubAsync(Group group);
         Task<DataWithCount<ICollection<Group>>> GetPaginatedListAsync(BaseFilter filter);

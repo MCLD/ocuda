@@ -89,6 +89,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             if (feature != null)
             {
                 feature.IsNewFeature = false;
+                feature.NeedsPopup = !string.IsNullOrEmpty(feature.Stub);
                 return View("FeatureDetails", new FeatureViewModel
                 {
                     Feature = feature,
@@ -163,6 +164,17 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [SaveModelState]
         public async Task<IActionResult> EditFeature(Feature feature)
         {
+            if (feature.NeedsPopup && string.IsNullOrEmpty(feature.Stub))
+            {
+                ModelState.AddModelError("Feature.Stub", "A 'Stub' is required for a popup.");
+                ShowAlertDanger($"Invalid paramaters");
+                feature.IsNewFeature = false;
+                return View("FeatureDetails", new FeatureViewModel
+                {
+                    Feature = feature,
+                    Action = nameof(FeaturesController.EditFeature)
+                });
+            }
             if (ModelState.IsValid)
             {
                 try

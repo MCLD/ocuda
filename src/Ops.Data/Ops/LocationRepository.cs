@@ -60,7 +60,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id != location.Id && _.Name != location.Name)
+                .Where(_ => _.Id != location.Id && _.Name == location.Name)
                 .AnyAsync();
         }
     }

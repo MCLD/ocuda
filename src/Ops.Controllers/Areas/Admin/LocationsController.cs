@@ -30,6 +30,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         private readonly ILocationService _locationService;
         private readonly ILocationFeatureService _locationFeatureService;
         private readonly ILocationGroupService _locationGroupService;
+        private readonly IFeatureService _featureService;
         private readonly IGroupService _groupService;
         private readonly IConfiguration _config;
 
@@ -39,6 +40,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             ServiceFacades.Controller<LocationsController> context,
             ILocationService locationService,
             IGroupService groupService,
+            IFeatureService featureService,
             ILocationFeatureService locationFeatureService,
             ILocationGroupService locationGroupService) : base(context)
         {
@@ -47,6 +49,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ?? throw new ArgumentNullException(nameof(locationService));
             _groupService = groupService
                 ?? throw new ArgumentNullException(nameof(groupService));
+            _featureService = featureService
+                ?? throw new ArgumentNullException(nameof(featureService));
             _locationGroupService = locationGroupService
                 ?? throw new ArgumentNullException(nameof(locationGroupService));
             _locationFeatureService = locationFeatureService
@@ -99,6 +103,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     LocationFeatures = await _locationFeatureService.GetLocationFeaturesByLocationAsync(location),
                     LocationGroups = await _locationGroupService.GetLocationGroupsByLocationAsync(location),
                     Groups = await _groupService.GetAllGroupsAsync(),
+                    Features = await _featureService.GetAllFeaturesAsync(),
                     Action = nameof(LocationsController.EditLocation)
                 };
                 viewModel.FeatureList = string.Join(",", viewModel.LocationFeatures.Select(_ => _.FeatureId));
@@ -283,15 +288,14 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 try
                 {
                     await _locationFeatureService.EditAsync(locationFeature);
-                    //var feature = await _featureService.GetFeatureByIdAsync(locationFeature.FeatureId);
-                    //ShowAlertSuccess($"Updated {location.Name}'s Feature: {feature.Name}");
+                    var feature = await _featureService.GetFeatureByIdAsync(locationFeature.FeatureId);
+                    ShowAlertSuccess($"Updated {location.Name}'s Feature: {feature.Name}");
                 }
                 catch (OcudaException ex)
                 {
-                    //var group = await _featureService.GetFeatureByIdAsync(locationGroup.FeatureId);
-                    //ShowAlertDanger(ex, $"Failed to Update {location.Name}'s Feature: {feature.Name}", ex.Message);
-                    _logger.LogError($"Unable to edit {ex.Message}: {ex}");
-                    ShowAlertDanger($"Failed to Update {location.Name}'s Feature");
+                    var feature = await _featureService.GetFeatureByIdAsync(locationFeature.FeatureId);
+                    ShowAlertDanger($"Failed to Update {location.Name}'s Feature: {feature.Name}");
+                    _logger.LogError(ex,$"Unable to edit {ex.Message}: {ex}", ex.Message);
                 }
             }
             return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
@@ -320,7 +324,33 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             catch (OcudaException ex)
             {
                 ShowAlertDanger($"Unable to Add group to Location: {ex.Message}");
-                _logger.LogError(ex, $"Failed to Add {location.Name}.", ex.Message);
+                _logger.LogError(ex, $"Failed to Add {group.GroupType} to {location.Name}.", ex.Message);
+            }
+
+            return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        [SaveModelState]
+        public async Task<IActionResult> CreateLocationFeature(int locationId, int featureId)
+        {
+            var location = await _locationService.GetLocationByIdAsync(locationId);
+            var feature = await _featureService.GetFeatureByIdAsync(featureId);
+            try
+            {
+                var locationFeature = new LocationFeature()
+                {
+                    FeatureId = featureId,
+                    LocationId = locationId
+                };
+                await _locationFeatureService.AddLocationFeatureAsync(locationFeature);
+                ShowAlertSuccess($"Added feature '{feature.Name}' to location '{location.Name}'");
+            }
+            catch (OcudaException ex)
+            {
+                ShowAlertDanger($"Unable to Add feature to Location: {ex.Message}");
+                _logger.LogError(ex, $"Failed to Add {feature.Name} to {location.Name}.", ex.Message);
             }
 
             return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
@@ -346,6 +376,27 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
 
             return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub});
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        [SaveModelState]
+        public async Task<IActionResult> DeleteLocationFeature(int locationfeatureId)
+        {
+            var locationfeature = await _locationFeatureService.GetLocationFeatureByIdAsync(locationfeatureId);
+            var location = await _locationService.GetLocationByIdAsync(locationfeature.LocationId);
+            var feature = await _featureService.GetFeatureByIdAsync(locationfeature.FeatureId);
+            try
+            {
+                await _locationFeatureService.DeleteAsync(locationfeatureId);
+                ShowAlertSuccess($"Deleted Feature '{feature.Name}' from '{location.Name}'");
+            }
+            catch (OcudaException ex)
+            {
+                ShowAlertDanger($"Unable to delete feature '{feature.Name}' from '{location.Name}': {ex.Message}");
+                _logger.LogError(ex, $"Problem deleting feature '{feature.Name}' from '{location.Name}':", ex.Message);
+            }
+            return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
         }
 
         [HttpGet]
@@ -379,16 +430,16 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             else
             {
-                var filter = new GroupFilter(page, 10);
+                var filter = new FeatureFilter(page, 10);
 
                 if (!string.IsNullOrWhiteSpace(itemIds))
                 {
-                    filter.GroupIds = itemIds.Split(',')
+                    filter.FeatureIds = itemIds.Split(',')
                         .Where(_ => !string.IsNullOrWhiteSpace(_))
                         .Select(int.Parse)
                         .ToList();
                 }
-                var items = await _groupService.PageItemsAsync(filter);
+                var items = await _featureService.PageItemsAsync(filter);
                 var paginateModel = new PaginateModel
                 {
                     ItemCount = items.Count,
@@ -396,9 +447,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     ItemsPerPage = filter.Take.Value
                 };
 
-                return PartialView("_AddFeaturesPartial", new GroupListViewModel
+                return PartialView("_AddFeaturesPartial", new FeatureListViewModel
                 {
-                    Groups = items.Data,
+                    Features = items.Data,
                     PaginateModel = paginateModel
                 });
             }
