@@ -72,12 +72,10 @@ namespace Ocuda.Ops.Data.Ops
         public async Task<DataWithCount<ICollection<Group>>> GetPaginatedListAsync(
             BaseFilter filter)
         {
-            var query = DbSet.AsNoTracking();
-
             return new DataWithCount<ICollection<Group>>
             {
-                Count = await query.CountAsync(),
-                Data = await query
+                Count = await DbSet.AsNoTracking().CountAsync(),
+                Data = await DbSet.AsNoTracking()
                     .OrderBy(_ => _.GroupType)
                     .ApplyPagination(filter)
                     .ToListAsync()

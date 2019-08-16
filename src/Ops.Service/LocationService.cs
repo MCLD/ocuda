@@ -112,6 +112,7 @@ namespace Ocuda.Ops.Service
             }
             catch(OcudaException ex)
             {
+                _logger.LogError(ex, "Could not delete location", ex.Message);
                 throw new OcudaException(ex.Message);
             }
         }
