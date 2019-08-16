@@ -88,8 +88,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
         }
         [HttpGet("[action]")]
-        [SaveModelState]
-        public IActionResult AddGroup()
+        [RestoreModelState]
+        public IActionResult CreateGroup()
         {
             var group = new Group {
                 IsNewGroup = true
@@ -107,6 +107,13 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [SaveModelState]
         public async Task<IActionResult> CreateGroup(Group group)
         {
+            if (group.IsLocationRegion && string.IsNullOrEmpty(group.SubscriptionUrl))
+            {
+                ModelState.AddModelError("Group.SubscriptionUrl", "A 'Subscription URL' is required for a location region.");
+                ShowAlertDanger($"Invalid paramaters");
+                group.IsNewGroup = true;
+                return RedirectToAction(nameof(CreateGroup));
+            }
             if (ModelState.IsValid)
             {
                 try
@@ -128,7 +135,12 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     });
                 }
             }
-            return RedirectToAction(nameof(GroupsController.AddGroup));
+            else
+            {
+                ShowAlertDanger($"Invalid paramaters");
+                group.IsNewGroup = true;
+                return RedirectToAction(nameof(CreateGroup));
+            }
         }
 
         [HttpPost]

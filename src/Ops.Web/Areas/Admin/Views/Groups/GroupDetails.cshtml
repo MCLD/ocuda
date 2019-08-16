@@ -112,14 +112,6 @@
                 $("#accordion-disclosure").addClass("fa-caret-down");
             }
         });
-        $("button#popup-button").on("click", function () {
-            if (!$("div#collapseDiv").hasClass("show")) {
-                $("#group-isLocationRegion").val("True");
-            }
-            else {
-                $("#group-isLocationregion").val("False");
-            }
-        });
         function FormatStub(object) {
             updateStub($(object), $(object).val());
         }
@@ -128,12 +120,22 @@
         });
         $(document).ready(function () {
             var editor = new Markdown.Editor({ allowUploads: false });
+
             editor.run();
-            if ($($("#Group_Stub").next()).hasClass("field-validation-error")) {
+        });
+        if ($("#Group_SubscriptionUrl").next().hasClass("field-validation-error"))
+            {
                 $("#collapseDiv").collapse('show');
             }
+        $("button#popup-button").on("click", function () {
 
-            $('.icon-picker').iconpicker();
+            if (!$("div#collapseDiv").hasClass("show")) {
+                $("#group-isLocationRegion").val("True");
+            }
+            else {
+                $("#group-isLocationRegion").val("False");
+            }
         });
+
     </script>
 }
