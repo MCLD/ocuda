@@ -26,7 +26,7 @@ else
                     <td style="vertical-align:middle;">
                         @feature.Stub
                     </td>
-                    <td style="vertical-align:middle;">
+                    <td style="vertical-align:middle; word-wrap: break-word;min-width: 160px;max-width: 160px;">
                         @if (!string.IsNullOrEmpty(feature.BodyText))
                         {
                             @if (feature.BodyText.Length > 200)
