@@ -457,12 +457,6 @@
                 }
             });
     $(document).on('click', "button.page-link", function (e) {
-                if ($("#addModalTitle").data("objtype") == "Feature") {
-                    $("#addModalTitle").text("Add a feature");
-                }
-                else {
-                    $("#addModalTitle").text("Add a group");
-                }
                 $.get("@Url.Action(nameof(LocationsController.GetItemsList))",
                 {
                     itemIds: featureIds.join(','),
