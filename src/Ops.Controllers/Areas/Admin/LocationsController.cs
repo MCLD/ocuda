@@ -473,7 +473,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             else
             {
                 viewModel.LocationFeature = await _locationFeatureService.GetLocationFeatureByIdAsync(itemId);
-
+                viewModel.Features = await _featureService.GetAllFeaturesAsync();
                 return PartialView("_EditFeaturesPartial", viewModel);
             }
         }

@@ -1,5 +1,7 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location.LocationViewModel
-
+@section styles{
+    <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
+}
 <div class="modal fade" id="listAddModal" tabindex="-1" role="dialog" aria-labelledby="listModalLabel">
     <div class="modal-dialog modal-lg" role="document">
         <div class="row">
@@ -258,6 +260,7 @@
 </form>
 
 @section scripts{
+    <script src="~/js/md.min.js" asp-append-version="true"></script>
     <script>
         var groupIds = $("#GroupList").val().split(',').filter(function (x) { return x }).map(Number);
         var featureIds = $("#FeatureList").val().split(',').filter(function (x) { return x }).map(Number);
@@ -267,21 +270,19 @@
     function FormatStub(object) {
         updateStub($(object), $(object).val());
     }
-
     $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-
+        $('[data-toggle="tooltip"]').tooltip();
         var ulMapList = document.createElement("ul");
         ulMapList.classList.add("list-group");
         ulMapList.setAttribute("id", "maplink-suggestions");
         $($("#Location_Address").parent()).append(ulMapList);
-
+    });
+    function InitMarkDown() {
         if (typeof Markdown != "undefined") {
             var editor = new Markdown.Editor({ allowUploads: false });
             editor.run();
         }
-    });
-
+    }
         @if (!Model.Location.IsNewLocation)
         {
             <text>
@@ -328,10 +329,11 @@
                         locationStub: "@Model.Location.Stub"
                     }, function(response) {
                         $("#modalItemInfo").html(response);
-                    });
-                    }
+                        }).done(function () {
+                        InitMarkDown();
+                        });
+                }
             }
-
             function CreateLocationObject(itemid, objType) {
                 if (objType == "Group") {
                     $.post("@Url.Action(nameof(LocationsController.CreateLocationGroup))",
