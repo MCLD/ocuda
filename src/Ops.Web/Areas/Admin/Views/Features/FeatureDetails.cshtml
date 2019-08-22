@@ -19,6 +19,7 @@
       asp-controller="@FeaturesController.Name"
       asp-action="@Model.Action"
       role="form"
+      id="featureform"
       display="inline">
     <input asp-for="Feature.Id" id="feature-id" type="hidden" />
     <input asp-for="Feature.NeedsPopup" id="feature-needsPopup" type="hidden" />
@@ -44,7 +45,7 @@
                             data-target="#collapseDiv"
                             aria-expanded="true"
                             aria-controls="collapseDiv">
-                        <span class="fas fa-caret-right" id="accordion-disclosure"></span>
+                        <span class="fas fa-caret-@(string.IsNullOrEmpty(Model?.Feature?.Stub) ? "right" : "down")" id="accordion-disclosure"></span>
                         Display this feature in a pop-up
                     </button>
                 </div>
@@ -146,17 +147,23 @@
                 $("#accordion-header").removeClass("bg-info");
                 $("#popup-button").removeClass("text-white");
                 $("#popup-button").addClass("text-info");
-                $("#accordion-disclosure").removeClass("fa-caret-down");
-                $("#accordion-disclosure").addClass("fa-caret-right");
+                $("#accordion-disclosure").removeClass("fa-caret-right");
+                $("#accordion-disclosure").addClass("fa-caret-down");
             }
             else {
                 $("#accordion-header").addClass("bg-info");
                 $("#popup-button").addClass("text-white");
                 $("#popup-button").removeClass("text-info");
-                $("#accordion-disclosure").removeClass("fa-caret-right");
-                $("#accordion-disclosure").addClass("fa-caret-down");
+                $("#accordion-disclosure").removeClass("fa-caret-down");
+                $("#accordion-disclosure").addClass("fa-caret-right");
             }
         });
+    $( "#featureform" ).submit(function( event ) {
+            if ($("#accordion-header").hasClass("bg-info")) {
+                $("#Feature_Stub").val("");
+                $("#wmd-input").val("");
+            }
+    });
     $("button#popup-button").on("click", function () {
         if (!$("div#collapseDiv").hasClass("show")) {
             $("#feature-needsPopup").val("True");
@@ -176,6 +183,8 @@
             {
                 $("#collapseDiv").collapse('show');
                 $("#feature-needsPopup").val("True");
+                $("#accordion-disclosure").removeClass("fa-caret-right");
+                $("#accordion-disclosure").addClass("fa-caret-down");
             }
             $('.icon-picker').iconpicker();
             $('[data-toggle="tooltip"]').tooltip();

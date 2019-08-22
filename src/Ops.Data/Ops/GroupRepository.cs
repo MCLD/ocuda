@@ -10,7 +10,6 @@ using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models.Entities;
-using Ocuda.Ops.Data.Extensions;
 
 namespace Ocuda.Ops.Data.Ops
 {
