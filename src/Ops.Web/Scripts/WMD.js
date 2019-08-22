@@ -4,50 +4,51 @@
 
 "use strict";
 
-var commonmark = window.commonmark;
-var writer = new commonmark.HtmlRenderer({ sourcepos: true, smart: true, safe: true });
-var reader = new commonmark.Parser();
+function initializePreview() {
+    var commonmark = window.commonmark;
+    var writer = new commonmark.HtmlRenderer({ sourcepos: true, smart: true, safe: true });
+    var reader = new commonmark.Parser();
 
-function getQueryVariable(variable) {
-    var query = window.location.search.substring(1);
-    var vars = query.split("&");
-    for (var i = 0; i < vars.length; i++) {
-        var pair = vars[i].split("=");
-        if (pair[0] === variable) {
-            return decodeURIComponent(pair[1]);
+    function getQueryVariable(variable) {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split("=");
+            if (pair[0] === variable) {
+                return decodeURIComponent(pair[1]);
+            }
         }
+        return null;
     }
-    return null;
-}
 
-var render = function (parsed) {
-    if (parsed === undefined) {
-        return;
-    }
-    var result = writer.render(parsed);
-    var preview = $("#preview");
-    preview[0].innerHTML = result;
-    $("#preview a").attr("target", "_blank");
-};
+    var render = function (parsed) {
+        if (parsed === undefined) {
+            return;
+        }
+        var result = writer.render(parsed);
+        var preview = $("#preview");
+        preview[0].innerHTML = result;
+        $("#preview a").attr("target", "_blank");
+    };
 
-var parseAndRender = function () {
-    var textarea = $("#wmd-input");
-    var parsed = reader.parse(textarea.val());
-    render(parsed);
-};
+    var parseAndRender = function () {
+        var textarea = $("#wmd-input");
+        var parsed = reader.parse(textarea.val());
+        render(parsed);
+    };
 
-$(document).ready(function () {
-    var textarea = $("#wmd-input");
+    $(document).ready(function () {
+        var textarea = $("#wmd-input");
 
-    parseAndRender();
-
-    $('.wmd-button').click(function () {
         parseAndRender();
-    });
 
-    textarea.bind('input propertychange', parseAndRender);
-    textarea.on('keyup click focus', markSelection);
-});
+        $('.wmd-button').click(function () {
+            parseAndRender();
+        });
+
+        textarea.bind('input propertychange', parseAndRender);
+    });
+}
 //End of dingus
 
 // From Markdown.Converter
@@ -188,6 +189,8 @@ Markdown.HookCollection = HookCollection;
     // - run() actually starts the editor; should be called after all necessary plugins are registered. Calling this more than once is a no-op.
     // - refreshPreview() forces the preview to be updated. This method is only available after run() was called.
     Markdown.Editor = function (options) {
+
+        initializePreview();
 
         options = options || {};
         if (options.allowUploads == null) {
@@ -1097,7 +1100,7 @@ Markdown.HookCollection = HookCollection;
             }
             inputTab.innerHTML = '<a data-toggle="tab" class="' + navLinkClass + '" href="#inputUrl"><b>Input URL</b></a>';
             inputTab.className = "nav-item";
-            
+
             tabs.appendChild(inputTab);
 
             // Container for tab content
@@ -1174,7 +1177,7 @@ Markdown.HookCollection = HookCollection;
                 uploadFile.appendChild(uploadText);
 
                 var uploadForm = doc.createElement("form"),
-                style = uploadForm.style;
+                    style = uploadForm.style;
                 uploadForm.onsubmit = function () { return close(false, true); };
                 style.padding = "0";
                 style.margin = "0";
