@@ -215,6 +215,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.LocationFeatureRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILocationGroupRepository,
                 Data.Ops.LocationGroupRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ILocationHoursRepository,
+                Data.Ops.LocationHoursRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkLibraryRepository,
                 Data.Ops.LinkLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository,
@@ -245,6 +247,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IInsertSampleDataService, InsertSampleDataService>();
             services.AddScoped<ILdapService, LdapService>();
             services.AddScoped<ILocationService, LocationService>();
+            services.AddScoped<ILocationHoursService, LocationHoursService>();
             services.AddScoped<ILocationGroupService, LocationGroupService>();
             services.AddScoped<ILocationFeatureService, LocationFeatureService>();
             services.AddScoped<ILinkService, LinkService>();

@@ -29,6 +29,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     {
         private readonly ILocationService _locationService;
         private readonly ILocationFeatureService _locationFeatureService;
+        private readonly ILocationHoursService _locationHoursService;
         private readonly ILocationGroupService _locationGroupService;
         private readonly IFeatureService _featureService;
         private readonly IGroupService _groupService;
@@ -42,6 +43,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             IGroupService groupService,
             IFeatureService featureService,
             ILocationFeatureService locationFeatureService,
+            ILocationHoursService locationHoursService,
             ILocationGroupService locationGroupService) : base(context)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
@@ -55,6 +57,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 ?? throw new ArgumentNullException(nameof(locationGroupService));
             _locationFeatureService = locationFeatureService
                 ?? throw new ArgumentNullException(nameof(locationFeatureService));
+            _locationHoursService = locationHoursService
+                ?? throw new ArgumentNullException(nameof(locationHoursService));
         }
 
         [HttpGet("")]
@@ -104,8 +108,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     LocationGroups = await _locationGroupService.GetLocationGroupsByLocationAsync(location),
                     Groups = await _groupService.GetAllGroupsAsync(),
                     Features = await _featureService.GetAllFeaturesAsync(),
-                    Action = nameof(LocationsController.EditLocation)
+                    Action = nameof(LocationsController.EditLocation),
+                    AllLocationHours = await _locationHoursService.GetLocationHoursByIdAsync(location.Id)
                 };
+                viewModel.Location.LocationHours = await _locationService.GetFormattedWeeklyHoursAsync(viewModel.Location.Id);
                 viewModel.FeatureList = string.Join(",", viewModel.LocationFeatures.Select(_ => _.FeatureId));
                 viewModel.GroupList = string.Join(",", viewModel.LocationGroups.Select(_ => _.GroupId));
                 return View("LocationDetails", viewModel);
@@ -158,10 +164,20 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     });
                 }
 
-
                 try
                 {
                     await _locationService.AddLocationAsync(location);
+                    foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
+                    {
+                        var locationHours = new LocationHours
+                        {
+                            DayOfWeek = day,
+                            Open = false,
+                            Location = location,
+                            LocationId = location.Id
+                        };
+                        await _locationHoursService.AddLocationHoursAsync(locationHours);
+                    }
                     ShowAlertSuccess($"Added Location: {location.Name}");
                     location.IsNewLocation = true;
                     return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
@@ -188,6 +204,17 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             try
             {
+                var features = await _locationFeatureService.GetLocationFeaturesByLocationAsync(location);
+                var groups = await _locationGroupService.GetLocationGroupsByLocationAsync(location);
+                if(groups.Any() || features.Any())
+                {
+                    ShowAlertDanger($"You must delete all features and groups from {location.Name} before deleting it");
+                    return RedirectToAction(nameof(Index));
+                }
+                foreach (var hour in await _locationHoursService.GetLocationHoursByIdAsync(location.Id))
+                {
+                    await _locationHoursService.DeleteAsync(hour.Id);
+                }
                 await _locationService.DeleteAsync(location.Id);
                 ShowAlertSuccess($"Deleted Location: {location.Name}");
             }
@@ -222,7 +249,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                             _logger.LogError(ex, $"Problem looking up postal code for coordinates {location.Address}: {ex.Message}");
                             ShowAlertDanger($"Unable to find Location's address: {location.Address}");
                             location.IsNewLocation = true;
-
+                            location.LocationHours = await _locationService.GetFormattedWeeklyHoursAsync(location.Id);
                             return View("LocationDetails", new LocationViewModel
                             {
                                 Location = location,
@@ -241,6 +268,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     ShowAlertDanger($"Unable to Update Location {location.Name} : {ex.Message}");
                     _logger.LogError(ex, $"Problem updating location {location.Name}:", ex.Message);
                     location.IsNewLocation = false;
+                    location.LocationHours = await _locationService.GetFormattedWeeklyHoursAsync(location.Id);
                     var viewModel = new LocationViewModel
                     {
                         Location = location,
@@ -296,6 +324,35 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     var feature = await _featureService.GetFeatureByIdAsync(locationFeature.FeatureId);
                     ShowAlertDanger($"Failed to Update {location.Name}'s Feature: {feature.Name}");
                     _logger.LogError(ex,$"Unable to edit {ex.Message}: {ex}", ex.Message);
+                }
+            }
+            return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
+        }
+        [HttpPost]
+        [Route("[action]")]
+        [SaveModelState]
+        public async Task<IActionResult> EditLocationHours(LocationViewModel viewModel)
+        {
+            var location = await _locationService.GetLocationByIdAsync(viewModel.AllLocationHours[0].LocationId);
+            foreach (var hour in viewModel.AllLocationHours)
+            {
+                if (hour.Open && (hour.OpenTime == null || hour.CloseTime == null))
+                {
+                    ShowAlertDanger($"Location hours must be provided if Open");
+                    return RedirectToAction(nameof(Location), new { locationStub = location.Stub });
+                }
+            }
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _locationHoursService.EditAsync(viewModel.AllLocationHours);
+                    ShowAlertSuccess($"Updated {location.Name}'s Hours");
+                }
+                catch (OcudaException ex)
+                {
+                    ShowAlertDanger($"Failed to Update {location.Name}'s Hours");
+                    _logger.LogError(ex, $"Unable to edit {ex.Message}: {ex}", ex.Message);
                 }
             }
             return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
@@ -467,14 +524,18 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             if (objectType == "Group")
             {
                 viewModel.LocationGroup = await _locationGroupService.GetLocationGroupByIdAsync(itemId);
-
                 return PartialView("_EditGroupsPartial", viewModel);
             }
-            else
+            else if (objectType == "Feature")
             {
                 viewModel.LocationFeature = await _locationFeatureService.GetLocationFeatureByIdAsync(itemId);
                 viewModel.Features = await _featureService.GetAllFeaturesAsync();
                 return PartialView("_EditFeaturesPartial", viewModel);
+            }
+            else
+            {
+                viewModel.AllLocationHours = await _locationHoursService.GetLocationHoursByIdAsync(location.Id);
+                return PartialView("_EditHoursPartial", viewModel);
             }
         }
 

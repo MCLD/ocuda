@@ -48,6 +48,16 @@
     }
   },
   {
+    "outputFileName": "wwwroot/js/dt-picker.min.js",
+    "inputFiles": [
+      "Scripts/dt-picker.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    }
+  },
+  {
     "outputFileName": "wwwroot/css/main.min.css",
     "inputFiles": [
       "Scripts/Bootstrap/bootstrap.css",
@@ -82,6 +92,15 @@
     "outputFileName": "wwwroot/css/iconpicker.min.css",
     "inputFiles": [
       "Styles/fontawesome-iconpicker/main.css"
+    ],
+    "minify": {
+      "enabled": true
+    }
+  },
+  {
+    "outputFileName": "wwwroot/css/dt-picker.min.css",
+    "inputFiles": [
+      "Styles/dt-picker.css"
     ],
     "minify": {
       "enabled": true

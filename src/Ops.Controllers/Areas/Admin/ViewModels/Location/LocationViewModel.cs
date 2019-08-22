@@ -11,6 +11,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location
         public Promenade.Models.Entities.Location Location { get; set; }
         public Promenade.Models.Entities.LocationFeature LocationFeature { get; set; }
         public Promenade.Models.Entities.LocationGroup LocationGroup { get; set; }
+        public List<Promenade.Models.Entities.LocationHours> AllLocationHours { get; set; }
         public List<Promenade.Models.Entities.LocationFeature> LocationFeatures { get; set; }
         public List<Promenade.Models.Entities.Feature> Features { get; set; }
         public string FeatureList { get; set; }

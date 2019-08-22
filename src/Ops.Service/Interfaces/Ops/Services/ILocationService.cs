@@ -17,5 +17,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<Location> EditAsync(Location location);
         Task DeleteAsync(int id);
         Task<Location> GetLocationByIdAsync(int locationId);
+        Task<List<string>> GetFormattedWeeklyHoursAsync(int locationId);
     }
 }
