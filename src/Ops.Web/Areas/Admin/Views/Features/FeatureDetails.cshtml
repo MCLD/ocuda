@@ -36,8 +36,8 @@
     <div class="row">
         <div class="accordion offset-md-3 col-md-9" id="popup-accordion">
             <div class="card">
-                <div class="card-header" id="accordion-header">
-                    <button class="btn btn-link text-info"
+                <div class="card-header @(string.IsNullOrEmpty(Model?.Feature?.Stub) ? "" : "bg-info")" id="accordion-header">
+                    <button class="btn btn-link @(string.IsNullOrEmpty(Model?.Feature?.Stub) ? "text-info" : "text-white")"
                             style="text-decoration: none;"
                             id="popup-button"
                             type="button"
@@ -50,7 +50,7 @@
                     </button>
                 </div>
                 <div id="collapseDiv"
-                     class="collapse @(string.IsNullOrEmpty(Model?.Feature?.Stub) ? " " : " show")"
+                     class="collapse@(string.IsNullOrEmpty(Model?.Feature?.Stub) ? "" : " show")"
                      aria-labelledby="headingOne"
                      data-parent="#popup-accordion">
                     <div class="card-body">
@@ -147,31 +147,26 @@
                 $("#accordion-header").removeClass("bg-info");
                 $("#popup-button").removeClass("text-white");
                 $("#popup-button").addClass("text-info");
-                $("#accordion-disclosure").removeClass("fa-caret-right");
-                $("#accordion-disclosure").addClass("fa-caret-down");
+                $("#accordion-disclosure").removeClass("fa-caret-down");
+                $("#accordion-disclosure").addClass("fa-caret-right");
+                $("#feature-needsPopup").val("False");
             }
             else {
                 $("#accordion-header").addClass("bg-info");
                 $("#popup-button").addClass("text-white");
                 $("#popup-button").removeClass("text-info");
-                $("#accordion-disclosure").removeClass("fa-caret-down");
-                $("#accordion-disclosure").addClass("fa-caret-right");
+                $("#accordion-disclosure").removeClass("fa-caret-right");
+                $("#accordion-disclosure").addClass("fa-caret-down");
+                $("#feature-needsPopup").val("True");
             }
         });
     $( "#featureform" ).submit(function( event ) {
-            if ($("#accordion-header").hasClass("bg-info")) {
+            if (!$("#accordion-header").hasClass("bg-info")) {
+                $("#feature-needsPopup").val("False");
                 $("#Feature_Stub").val("");
                 $("#wmd-input").val("");
             }
     });
-    $("button#popup-button").on("click", function () {
-        if (!$("div#collapseDiv").hasClass("show")) {
-            $("#feature-needsPopup").val("True");
-            }
-        else {
-            $("#feature-needsPopup").val("False");
-            }
-        });
         function FormatStub(object) {
             updateStub($(object), $(object).val());
         }
@@ -179,12 +174,15 @@
         $(document).ready(function () {
             var editor = new Markdown.Editor({ allowUploads: false });
             editor.run();
-            if ($($("#Feature_Stub").next()).hasClass("field-validation-error"))
+            if ($("#Feature_Stub").next().hasClass("field-validation-error") || @(Model.Feature.NeedsPopup ? "true" : "false"))
             {
-                $("#collapseDiv").collapse('show');
-                $("#feature-needsPopup").val("True");
+                $("#accordion-header").addClass("bg-info");
+                $("#popup-button").addClass("text-white");
+                $("#popup-button").removeClass("text-info");
                 $("#accordion-disclosure").removeClass("fa-caret-right");
                 $("#accordion-disclosure").addClass("fa-caret-down");
+                $("#feature-needsPopup").val("True");
+                $("#collapseDiv").collapse('show');
             }
             $('.icon-picker').iconpicker();
             $('[data-toggle="tooltip"]').tooltip();

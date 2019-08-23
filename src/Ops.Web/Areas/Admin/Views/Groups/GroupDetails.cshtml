@@ -17,6 +17,7 @@
 <form method="post"
       asp-controller="@GroupsController.Name"
       asp-action="@Model.Action"
+      id="groupform"
       role="form"
       display="inline">
     <input asp-for="Group.Id" id="group-id" type="hidden" />
@@ -32,8 +33,8 @@
     <div class="row">
         <div class="accordion offset-md-3 col-md-9" id="popup-accordion">
             <div class="card">
-                <div class="card-header" id="accordion-header">
-                    <button class="btn btn-link text-info"
+                <div class="card-header @(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) ? "" : "bg-info")" id="accordion-header">
+                    <button class="btn btn-link @(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) ? "text-info" : "text-white")"
                             style="text-decoration: none;"
                             id="popup-button"
                             type="button"
@@ -41,12 +42,12 @@
                             data-target="#collapseDiv"
                             aria-expanded="true"
                             aria-controls="collapseDiv">
-                        <span class="fas fa-caret-right" id="accordion-disclosure"></span>
+                        <span class="fas fa-caret-@(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) ? "right" : "down")" id="accordion-disclosure"></span>
                         Is a Location Region
                     </button>
                 </div>
                 <div id="collapseDiv"
-                     class="collapse @(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) ? " " : " show")"
+                     class="collapse @(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) ? "" : " show")"
                      aria-labelledby="headingOne"
                      data-parent="#locationregion-accordion">
                     <div class="card-body">
@@ -103,6 +104,7 @@
                 $("#popup-button").addClass("text-info");
                 $("#accordion-disclosure").removeClass("fa-caret-down");
                 $("#accordion-disclosure").addClass("fa-caret-right");
+                $("#group-isLocationRegion").val("False");
             }
             else {
                 $("#accordion-header").addClass("bg-info");
@@ -110,6 +112,13 @@
                 $("#popup-button").removeClass("text-info");
                 $("#accordion-disclosure").removeClass("fa-caret-right");
                 $("#accordion-disclosure").addClass("fa-caret-down");
+                $("#group-isLocationRegion").val("True");
+            }
+        });
+        $( "#groupform" ).submit(function( event ) {
+            if (!$("#accordion-header").hasClass("bg-info")) {
+                $("#Group_SubscriptionUrl").val("");
+                $("#group-isLocationRegion").val("False");
             }
         });
         function FormatStub(object) {
@@ -120,23 +129,17 @@
         });
         $(document).ready(function () {
             var editor = new Markdown.Editor({ allowUploads: false });
-
             editor.run();
-        });
-        if ($("#Group_SubscriptionUrl").next().hasClass("field-validation-error"))
-        {
-            $("#collapseDiv").collapse('show');
-            $("#group-isLocationRegion").val("True");
-        }
-        $("button#popup-button").on("click", function () {
-
-            if (!$("div#collapseDiv").hasClass("show")) {
+            if ($("#Group_SubscriptionUrl").next().hasClass("field-validation-error") || @(Model.Group.IsLocationRegion ? "true" : "false"))
+            {
+                $("#accordion-header").removeClass("bg-info");
+                $("#popup-button").removeClass("text-white");
+                $("#popup-button").addClass("text-info");
                 $("#group-isLocationRegion").val("True");
-            }
-            else {
-                $("#group-isLocationRegion").val("False");
-            }
-        });
+                $("#accordion-disclosure").removeClass("fa-caret-right");
+                $("#accordion-disclosure").addClass("fa-caret-down");
+                }
+            });
 
     </script>
 }
