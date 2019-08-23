@@ -400,7 +400,7 @@
 
             },
             enableHTML: false,
-            buttonClass: 'btn form-control border border text-dark',
+            buttonClass: 'btn btn-default',
             inheritClass: false,
             buttonWidth: 'auto',
             buttonContainer: '<div class="btn-group" />',

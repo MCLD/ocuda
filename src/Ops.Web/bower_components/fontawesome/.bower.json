@@ -1,15 +1,14 @@
 {
   "name": "fontawesome",
   "homepage": "https://github.com/FortAwesome/Font-Awesome",
-  "version": "5.0.12",
-  "_release": "5.0.12",
+  "version": "5.10.2",
+  "_release": "5.10.2",
   "_resolution": {
     "type": "version",
-    "tag": "5.0.12",
-    "commit": "b60cbbecb438831419bbe83d838e33e6b7327b38"
+    "tag": "5.10.2",
+    "commit": "090e6148d3f63a45b40e7cd8679bd4d64e58d75d"
   },
   "_source": "https://github.com/FortAwesome/Font-Awesome.git",
-  "_target": "^5.0.12",
-  "_originalSource": "fontawesome",
-  "_direct": true
+  "_target": "^5.10.2",
+  "_originalSource": "fontawesome"
 }

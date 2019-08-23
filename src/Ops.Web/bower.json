@@ -15,13 +15,14 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": "^3.3.1",
-    "popper.js": "^1.14.3",
-    "bootstrap": "^4.1.1",
+    "jquery": "^3.4.1",
+    "popper.js": "^1.15.0",
+    "bootstrap": "^4.3.1",
     "bootstrap-multiselect": "^0.9.15",
-    "fontawesome": "^5.0.12",
-    "jquery-validation": "^1.17.0",
-    "jquery-validation-unobtrusive": "^3.2.9",
-    "commonmark": "^0.28.1"
+    "fontawesome": "^5.10.2",
+    "jquery-validation": "^1.19.1",
+    "jquery-validation-unobtrusive": "^3.2.11",
+    "commonmark": "^0.29",
+    "moment": "^2.24.0"
   }
 }
