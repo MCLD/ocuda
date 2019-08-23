@@ -93,6 +93,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 PaginateModel = paginateModel
             });
         }
+
         [HttpGet("{locationStub}")]
         [RestoreModelState]
         public async Task<IActionResult> Location(string locationStub)
@@ -206,7 +207,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 var features = await _locationFeatureService.GetLocationFeaturesByLocationAsync(location);
                 var groups = await _locationGroupService.GetLocationGroupsByLocationAsync(location);
-                if(groups.Any() || features.Any())
+                if(groups.Count > 0 || features.Count > 0)
                 {
                     ShowAlertDanger($"You must delete all features and groups from {location.Name} before deleting it");
                     return RedirectToAction(nameof(Index));
@@ -328,6 +329,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
         }
+
         [HttpPost]
         [Route("[action]")]
         [SaveModelState]
@@ -378,6 +380,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
         }
+
         [HttpPost]
         [Route("[action]")]
         [SaveModelState]
@@ -624,14 +627,12 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     }
                     catch (Exception ex)
                     {
-
                         _logger.LogError(ex,$"Error parsing Geocode API JSON: {ex.Message} - {stringResult}",ex.Message);
                         return Json(new
                         {
                             success
                         });
                     }
-
                 }
             }
             catch (Exception ex)
@@ -700,6 +701,5 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             return location;
         }
-
     }
 }

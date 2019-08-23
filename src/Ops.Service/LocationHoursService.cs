@@ -25,6 +25,7 @@ namespace Ocuda.Ops.Service
             _locationHoursRepository = locationHoursRepository
                 ?? throw new ArgumentNullException(nameof(locationHoursRepository));
         }
+
         public async Task<List<LocationHours>> GetLocationHoursByIdAsync(int locationId)
         {
             return await _locationHoursRepository.GetLocationHoursByLocationId(locationId);
@@ -81,6 +82,7 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException(ex.Message);
             }
         }
+
         private async Task ValidateAsync(LocationHours locationHour)
         {
             if (await _locationHoursRepository.IsDuplicateDayAsync(locationHour))
