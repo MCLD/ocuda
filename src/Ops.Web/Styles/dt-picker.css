@@ -6,30 +6,23 @@
     color: #8FA5C4;
 }
 
-    .bd-masthead h1 {
-        color: #144287;
-    }
+.bd-masthead h1 {
+    color: #144287;
+}
 
-    .bd-masthead #getstarted {
-        font-weight: 500;
-        color: #144287;
-        border-color: #144287;
-    }
-    
-        .bd-masthead #getstarted:active, .bd-masthead #getstarted:hover {
-            color: #fff;
-            background-color: #144287;
-            border-color: #144287;
-        }
+.bd-masthead #getstarted {
+    font-weight: 500;
+    color: #144287;
+    border-color: #144287;
+}
 
-
-/*!
- * Bootstrap Docs (https://getbootstrap.com/)
- * Copyright 2011-2018 The Bootstrap Authors
- * Copyright 2011-2018 Twitter, Inc.
- * Licensed under the Creative Commons Attribution 3.0 Unported License. For
- * details, see https://creativecommons.org/licenses/by/3.0/.
- */ .bd-navbar {
+.bd-masthead #getstarted:active, .bd-masthead #getstarted:hover {
+    color: #fff;
+    background-color: #144287;
+    border-color: #144287;
+}
+/*!* Bootstrap Docs (https://getbootstrap.com/)* Copyright 2011-2018 The Bootstrap Authors* Copyright 2011-2018 Twitter, Inc.* Licensed under the Creative Commons Attribution 3.0 Unported License. For* details, see https://creativecommons.org/licenses/by/3.0/.*/
+.bd-navbar {
     min-height: 4rem;
     background-color: #563d7c;
     box-shadow: 0 .5rem 1rem rgba(0,0,0,.05),inset 0 -1px 0 rgba(0,0,0,.1)
@@ -41,20 +34,20 @@
         padding-left: .5rem
     }
 
-        .bd-navbar .navbar-nav-scroll {
-            max-width: 100%;
-            height: 2.5rem;
-            margin-top: .25rem;
-            overflow: hidden;
-            font-size: .875rem
-        }
+    .bd-navbar .navbar-nav-scroll {
+        max-width: 100%;
+        height: 2.5rem;
+        margin-top: .25rem;
+        overflow: hidden;
+        font-size: .875rem
+    }
 
-            .bd-navbar .navbar-nav-scroll .navbar-nav {
-                padding-bottom: 2rem;
-                overflow-x: auto;
-                white-space: nowrap;
-                -webkit-overflow-scrolling: touch
-            }
+    .bd-navbar .navbar-nav-scroll .navbar-nav {
+        padding-bottom: 2rem;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch
+    }
 }
 
 @media (min-width:768px) {
@@ -74,14 +67,14 @@
     color: #cbbde2
 }
 
-    .bd-navbar .navbar-nav .nav-link.active, .bd-navbar .navbar-nav .nav-link:hover {
-        color: #fff;
-        background-color: transparent
-    }
+.bd-navbar .navbar-nav .nav-link.active, .bd-navbar .navbar-nav .nav-link:hover {
+    color: #fff;
+    background-color: transparent
+}
 
-    .bd-navbar .navbar-nav .nav-link.active {
-        font-weight: 500
-    }
+.bd-navbar .navbar-nav .nav-link.active {
+    font-weight: 500
+}
 
 .bd-navbar .navbar-nav-svg {
     display: inline-block;
@@ -98,8 +91,7 @@
     font-weight: 500;
     color: #212529;
     background-color: transparent;
-    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='%23292b2c' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
+    background-image: url("data:image/svg+xml; charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='%23292b2c' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3E%3C/svg%3E"); background-repeat: no-repeat;
     background-position: .4rem .6rem;
     background-size: .75rem .75rem
 }
@@ -109,21 +101,21 @@
     padding: 3rem 15px
 }
 
-    .bd-masthead h1 {
-        line-height: 1
-    }
+.bd-masthead h1 {
+    line-height: 1
+}
 
-    .bd-masthead .btn {
-        width: 100%;
-        padding: .8rem 2rem;
-        font-size: 1.25rem;
-        font-weight: 500
-    }
+.bd-masthead .btn {
+    width: 100%;
+    padding: .8rem 2rem;
+    font-size: 1.25rem;
+    font-weight: 500
+}
 
-    .bd-masthead .carbonad {
-        margin-top: 0 !important;
-        margin-bottom: -3rem !important
-    }
+.bd-masthead .carbonad {
+    margin-top: 0 !important;
+    margin-bottom: -3rem !important
+}
 
 @media (min-width:576px) {
     .bd-masthead {
@@ -131,9 +123,9 @@
         padding-bottom: 5rem
     }
 
-        .bd-masthead .carbonad {
-            margin-bottom: 0 !important
-        }
+    .bd-masthead .carbonad {
+        margin-bottom: 0 !important
+    }
 }
 
 @media (min-width:768px) {
@@ -173,10 +165,10 @@
     background-color: rgba(0,0,0,.05)
 }
 
-    #carbonads a {
-        color: #333;
-        text-decoration: none
-    }
+#carbonads a {
+    color: #333;
+    text-decoration: none
+}
 
 @media (min-width:576px) {
     #carbonads {
@@ -200,27 +192,27 @@
     order: 1
 }
 
-    .bd-content > h2[id], .bd-content > h3[id], .bd-content > h4[id] {
-        pointer-events: none
-    }
+.bd-content > h2[id], .bd-content > h3[id], .bd-content > h4[id] {
+    pointer-events: none
+}
 
-        .bd-content > h2[id] > a, .bd-content > h2[id] > div, .bd-content > h3[id] > a, .bd-content > h3[id] > div, .bd-content > h4[id] > a, .bd-content > h4[id] > div {
-            pointer-events: auto
-        }
+.bd-content > h2[id] > a, .bd-content > h2[id] > div, .bd-content > h3[id] > a, .bd-content > h3[id] > div, .bd-content > h4[id] > a, .bd-content > h4[id] > div {
+    pointer-events: auto
+}
 
-        .bd-content > h2[id]::before, .bd-content > h3[id]::before, .bd-content > h4[id]::before {
-            display: block;
-            height: 6rem;
-            margin-top: -6rem;
-            visibility: hidden;
-            content: ""
-        }
+.bd-content > h2[id]::before, .bd-content > h3[id]::before, .bd-content > h4[id]::before {
+    display: block;
+    height: 6rem;
+    margin-top: -6rem;
+    visibility: hidden;
+    content: ""
+}
 
-    .bd-content > table {
-        width: 100%;
-        max-width: 100%;
-        margin-bottom: 1rem
-    }
+.bd-content > table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1rem
+}
 
 @media (max-width:991.98px) {
     .bd-content > table {
@@ -229,9 +221,9 @@
         -ms-overflow-style: -ms-autohiding-scrollbar
     }
 
-        .bd-content > table.table-bordered {
-            border: 0
-        }
+    .bd-content > table.table-bordered {
+        border: 0
+    }
 }
 
 .bd-content > table > tbody > tr > td, .bd-content > table > tbody > tr > th, .bd-content > table > tfoot > tr > td, .bd-content > table > tfoot > tr > th, .bd-content > table > thead > tr > td, .bd-content > table > thead > tr > th {
@@ -240,9 +232,9 @@
     border: 1px solid #dee2e6
 }
 
-    .bd-content > table > tbody > tr > td > p:last-child, .bd-content > table > tbody > tr > th > p:last-child, .bd-content > table > tfoot > tr > td > p:last-child, .bd-content > table > tfoot > tr > th > p:last-child, .bd-content > table > thead > tr > td > p:last-child, .bd-content > table > thead > tr > th > p:last-child {
-        margin-bottom: 0
-    }
+.bd-content > table > tbody > tr > td > p:last-child, .bd-content > table > tbody > tr > th > p:last-child, .bd-content > table > tfoot > tr > td > p:last-child, .bd-content > table > tfoot > tr > th > p:last-child, .bd-content > table > thead > tr > td > p:last-child, .bd-content > table > thead > tr > th > p:last-child {
+    margin-bottom: 0
+}
 
 .bd-content > table td:first-child > code {
     white-space: nowrap
@@ -307,10 +299,10 @@
     outline: 0
 }
 
-    #skippy .skiplink-text {
-        padding: .5em;
-        outline: 1px dotted
-    }
+#skippy .skiplink-text {
+    padding: .5em;
+    outline: 1px dotted
+}
 
 .bd-toc {
     -ms-flex-order: 2;
@@ -335,28 +327,28 @@
     border-left: 1px solid #eee
 }
 
-    .section-nav ul {
-        padding-left: 1rem
-    }
+.section-nav ul {
+    padding-left: 1rem
+}
 
-        .section-nav ul ul {
-            display: none
-        }
+.section-nav ul ul {
+    display: none
+}
 
 .toc-entry {
     display: block
 }
 
-    .toc-entry a {
-        display: block;
-        padding: .125rem 1.5rem;
-        color: #99979c
-    }
+.toc-entry a {
+    display: block;
+    padding: .125rem 1.5rem;
+    color: #99979c
+}
 
-        .toc-entry a:hover {
-            color: #007bff;
-            text-decoration: none
-        }
+.toc-entry a:hover {
+    color: #007bff;
+    text-decoration: none
+}
 
 .bd-sidebar {
     -ms-flex-order: 0;
@@ -417,10 +409,10 @@
     border-bottom: 1px solid rgba(0,0,0,.05)
 }
 
-    .bd-search .form-control:focus {
-        border-color: #7952b3;
-        box-shadow: 0 0 0 3px rgba(121,82,179,.25)
-    }
+.bd-search .form-control:focus {
+    border-color: #7952b3;
+    box-shadow: 0 0 0 3px rgba(121,82,179,.25)
+}
 
 .bd-search-docs-toggle {
     line-height: 1;
@@ -438,30 +430,30 @@
     color: rgba(0,0,0,.65)
 }
 
-    .bd-toc-link:hover {
-        color: rgba(0,0,0,.85);
-        text-decoration: none
-    }
+.bd-toc-link:hover {
+    color: rgba(0,0,0,.85);
+    text-decoration: none
+}
 
 .bd-toc-item.active {
     margin-bottom: 1rem
 }
 
-    .bd-toc-item.active:not(:first-child) {
-        margin-top: 1rem
-    }
+.bd-toc-item.active:not(:first-child) {
+    margin-top: 1rem
+}
 
-    .bd-toc-item.active > .bd-toc-link {
-        color: rgba(0,0,0,.85)
-    }
+.bd-toc-item.active > .bd-toc-link {
+    color: rgba(0,0,0,.85)
+}
 
-        .bd-toc-item.active > .bd-toc-link:hover {
-            background-color: transparent
-        }
+.bd-toc-item.active > .bd-toc-link:hover {
+    background-color: transparent
+}
 
-    .bd-toc-item.active > .bd-sidenav {
-        display: block
-    }
+.bd-toc-item.active > .bd-sidenav {
+    display: block
+}
 
 .bd-sidebar .nav > li > a {
     display: block;
@@ -470,11 +462,11 @@
     color: rgba(0,0,0,.65)
 }
 
-    .bd-sidebar .nav > li > a:hover {
-        color: rgba(0,0,0,.85);
-        text-decoration: none;
-        background-color: transparent
-    }
+.bd-sidebar .nav > li > a:hover {
+    color: rgba(0,0,0,.85);
+    text-decoration: none;
+    background-color: transparent
+}
 
 .bd-sidebar .nav > .active:hover > a, .bd-sidebar .nav > .active > a {
     font-weight: 500;
@@ -488,18 +480,18 @@
     background-color: #f7f7f7
 }
 
-    .bd-footer a {
-        font-weight: 500;
-        color: #495057
-    }
+.bd-footer a {
+    font-weight: 500;
+    color: #495057
+}
 
-        .bd-footer a:focus, .bd-footer a:hover {
-            color: #007bff
-        }
+.bd-footer a:focus, .bd-footer a:hover {
+    color: #007bff
+}
 
-    .bd-footer p {
-        margin-bottom: 0
-    }
+.bd-footer p {
+    margin-bottom: 0
+}
 
 @media (min-width:576px) {
     .bd-footer {
@@ -512,13 +504,13 @@
     margin-bottom: 1rem
 }
 
-    .bd-footer-links li {
-        display: inline-block
-    }
+.bd-footer-links li {
+    display: inline-block
+}
 
-        .bd-footer-links li + li {
-            margin-left: 1rem
-        }
+.bd-footer-links li + li {
+    margin-left: 1rem
+}
 
 .bd-example-row .row > .col, .bd-example-row .row > [class^=col-] {
     padding-top: .75rem;
@@ -653,11 +645,11 @@
     border-width: .2rem 0 0
 }
 
-    .bd-example::after {
-        display: block;
-        clear: both;
-        content: ""
-    }
+.bd-example::after {
+    display: block;
+    clear: both;
+    content: ""
+}
 
 @media (min-width:576px) {
     .bd-example {
@@ -793,9 +785,9 @@
     z-index: 1072
 }
 
-    .modal .popover, .modal .tooltip {
-        z-index: 1073
-    }
+.modal .popover, .modal .tooltip {
+    z-index: 1073
+}
 
 .modal-backdrop {
     z-index: 1071
@@ -805,21 +797,21 @@
     background-color: #fafafa
 }
 
-    .bd-example-modal .modal {
-        position: relative;
-        top: auto;
-        right: auto;
-        bottom: auto;
-        left: auto;
-        z-index: 1;
-        display: block
-    }
+.bd-example-modal .modal {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    z-index: 1;
+    display: block
+}
 
-    .bd-example-modal .modal-dialog {
-        left: auto;
-        margin-right: auto;
-        margin-left: auto
-    }
+.bd-example-modal .modal-dialog {
+    left: auto;
+    margin-right: auto;
+    margin-left: auto
+}
 
 .bd-example-tabs .nav-tabs {
     margin-bottom: 1rem
@@ -830,13 +822,13 @@
     background-color: #f9f9f9
 }
 
-    .bd-example-popover-static .popover {
-        position: relative;
-        display: block;
-        float: left;
-        width: 260px;
-        margin: 1.25rem
-    }
+.bd-example-popover-static .popover {
+    position: relative;
+    display: block;
+    float: left;
+    width: 260px;
+    margin: 1.25rem
+}
 
 .tooltip-demo a {
     white-space: nowrap
@@ -908,10 +900,10 @@
     border: 0
 }
 
-    .highlight pre code {
-        font-size: inherit;
-        color: #212529
-    }
+.highlight pre code {
+    font-size: inherit;
+    color: #212529
+}
 
 .btn-bd-primary {
     font-weight: 500;
@@ -919,15 +911,15 @@
     border-color: #7952b3
 }
 
-    .btn-bd-primary:active, .btn-bd-primary:hover {
-        color: #fff;
-        background-color: #7952b3;
-        border-color: #7952b3
-    }
+.btn-bd-primary:active, .btn-bd-primary:hover {
+    color: #fff;
+    background-color: #7952b3;
+    border-color: #7952b3
+}
 
-    .btn-bd-primary:focus {
-        box-shadow: 0 0 0 3px rgba(121,82,179,.25)
-    }
+.btn-bd-primary:focus {
+    box-shadow: 0 0 0 3px rgba(121,82,179,.25)
+}
 
 .btn-bd-download {
     font-weight: 500;
@@ -935,15 +927,15 @@
     border-color: #ffe484
 }
 
-    .btn-bd-download:active, .btn-bd-download:hover {
-        color: #2a2730;
-        background-color: #ffe484;
-        border-color: #ffe484
-    }
+.btn-bd-download:active, .btn-bd-download:hover {
+    color: #2a2730;
+    background-color: #ffe484;
+    border-color: #ffe484
+}
 
-    .btn-bd-download:focus {
-        box-shadow: 0 0 0 3px rgba(255,228,132,.25)
-    }
+.btn-bd-download:focus {
+    box-shadow: 0 0 0 3px rgba(255,228,132,.25)
+}
 
 .bd-callout {
     padding: 1.25rem;
@@ -954,46 +946,46 @@
     border-radius: .25rem
 }
 
-    .bd-callout h4 {
-        margin-top: 0;
-        margin-bottom: .25rem
-    }
+.bd-callout h4 {
+    margin-top: 0;
+    margin-bottom: .25rem
+}
 
-    .bd-callout p:last-child {
-        margin-bottom: 0
-    }
+.bd-callout p:last-child {
+    margin-bottom: 0
+}
 
-    .bd-callout code {
-        border-radius: .25rem
-    }
+.bd-callout code {
+    border-radius: .25rem
+}
 
-    .bd-callout + .bd-callout {
-        margin-top: -.25rem
-    }
+.bd-callout + .bd-callout {
+    margin-top: -.25rem
+}
 
 .bd-callout-info {
     border-left-color: #5bc0de
 }
 
-    .bd-callout-info h4 {
-        color: #5bc0de
-    }
+.bd-callout-info h4 {
+    color: #5bc0de
+}
 
 .bd-callout-warning {
     border-left-color: #f0ad4e
 }
 
-    .bd-callout-warning h4 {
-        color: #f0ad4e
-    }
+.bd-callout-warning h4 {
+    color: #f0ad4e
+}
 
 .bd-callout-danger {
     border-left-color: #d9534f
 }
 
-    .bd-callout-danger h4 {
-        color: #d9534f
-    }
+.bd-callout-danger h4 {
+    color: #d9534f
+}
 
 .bd-examples .img-thumbnail {
     margin-bottom: .75rem
@@ -1013,10 +1005,10 @@
         margin-left: -.75rem
     }
 
-        .bd-examples > [class^=col-] {
-            padding-right: .75rem;
-            padding-left: .75rem
-        }
+    .bd-examples > [class^=col-] {
+        padding-right: .75rem;
+        padding-left: .75rem
+    }
 }
 
 .bd-browser-bugs td p {
@@ -1042,9 +1034,9 @@
     text-align: center
 }
 
-    .bd-brand-item + .bd-brand-item {
-        border-top: 1px solid #fff
-    }
+.bd-brand-item + .bd-brand-item {
+    border-top: 1px solid #fff
+}
 
 .bd-brand-logos .inverse {
     color: #fff;
@@ -1067,14 +1059,14 @@
         width: 1%
     }
 
-        .bd-brand-item + .bd-brand-item {
-            border-top: 0;
-            border-left: 1px solid #fff
-        }
+    .bd-brand-item + .bd-brand-item {
+        border-top: 0;
+        border-left: 1px solid #fff
+    }
 
-        .bd-brand-item h1 {
-            font-size: 4rem
-        }
+    .bd-brand-item h1 {
+        font-size: 4rem
+    }
 }
 
 .color-swatches {
@@ -1270,9 +1262,9 @@
     float: right
 }
 
-    .bd-clipboard + .highlight {
-        margin-top: 0
-    }
+.bd-clipboard + .highlight {
+    margin-top: 0
+}
 
 .btn-clipboard {
     position: absolute;
@@ -1289,10 +1281,10 @@
     border-radius: .25rem
 }
 
-    .btn-clipboard:hover {
-        color: #fff;
-        background-color: #027de7
-    }
+.btn-clipboard:hover {
+    color: #fff;
+    background-color: #027de7
+}
 
 @media (min-width:768px) {
     .bd-clipboard {
@@ -1567,10 +1559,10 @@
     transition: color .16s linear
 }
 
-    .anchorjs-link:hover {
-        color: #007bff;
-        text-decoration: none
-    }
+.anchorjs-link:hover {
+    color: #007bff;
+    text-decoration: none
+}
 
 .algolia-autocomplete {
     display: block !important;
@@ -1578,16 +1570,16 @@
     flex: 1
 }
 
-    .algolia-autocomplete .ds-dropdown-menu {
-        width: 100%;
-        min-width: 0 !important;
-        max-width: none !important;
-        padding: .75rem 0 !important;
-        background-color: #fff;
-        background-clip: padding-box;
-        border: 1px solid rgba(0,0,0,.1);
-        box-shadow: 0 .5rem 1rem rgba(0,0,0,.175)
-    }
+.algolia-autocomplete .ds-dropdown-menu {
+    width: 100%;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: .75rem 0 !important;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0,0,0,.1);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.175)
+}
 
 @media (min-width:768px) {
     .algolia-autocomplete .ds-dropdown-menu {
