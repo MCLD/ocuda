@@ -4,53 +4,49 @@
 
 "use strict";
 
-function initializePreview() {
-    var commonmark = window.commonmark;
-    var writer = new commonmark.HtmlRenderer({ sourcepos: true, smart: true, safe: true });
-    var reader = new commonmark.Parser();
+var commonmark = window.commonmark;
+var writer = new commonmark.HtmlRenderer({ sourcepos: true, smart: true, safe: true });
+var reader = new commonmark.Parser();
 
-    function getQueryVariable(variable) {
-        var query = window.location.search.substring(1);
-        var vars = query.split("&");
-        for (var i = 0; i < vars.length; i++) {
-            var pair = vars[i].split("=");
-            if (pair[0] === variable) {
-                return decodeURIComponent(pair[1]);
-            }
+function getQueryVariable(variable) {
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split("=");
+        if (pair[0] === variable) {
+            return decodeURIComponent(pair[1]);
         }
-        return null;
     }
+    return null;
+}
 
-    var render = function (parsed) {
-        if (parsed === undefined) {
-            return;
-        }
-        var result = writer.render(parsed);
-        var preview = $("#preview");
-        preview[0].innerHTML = result;
-        $("#preview a").attr("target", "_blank");
-    };
+var render = function (target, parsed) {
+    if (parsed === undefined) {
+        return;
+    }
+    var result = writer.render(parsed);
+    var preview = target.find(".md-preview")[0];
+    preview.innerHTML = result;
+    $("#preview a").attr("target", "_blank");
+};
 
-    var parseAndRender = function () {
-        var textarea = $("#wmd-input");
-        var parsed = reader.parse(textarea.val());
-        render(parsed);
-    };
+var parseAndRender = function (target) {
+    var textarea = target.find(".md-input");
+    var parsed = reader.parse(textarea.val());
+    render(target, parsed);
+};
 
-    $(document).ready(function () {
-        var textarea = $("#wmd-input");
+function initializePreview(target) {
+    var textarea = target.find(".md-input");
 
-        parseAndRender();
+    parseAndRender(target);
 
-        $('.wmd-button').click(function () {
-            parseAndRender();
-        });
-
-        textarea.bind('input propertychange', parseAndRender);
+    $('.md-button').click(function () {
+        parseAndRender(target);
     });
 
-    textarea.bind('input propertychange', parseAndRender);
-});
+    textarea.bind('input propertychange', parseAndRender(target));
+}
 //End of dingus
 
 // From Markdown.Converter
@@ -97,7 +93,6 @@ HookCollection.prototype = {
 
 Markdown.HookCollection = HookCollection;
 // End of From Markdown.Converter
-
 
 (function () {
 
@@ -190,9 +185,10 @@ Markdown.HookCollection = HookCollection;
     // - getConverter() returns the markdown converter object that was passed to the constructor
     // - run() actually starts the editor; should be called after all necessary plugins are registered. Calling this more than once is a no-op.
     // - refreshPreview() forces the preview to be updated. This method is only available after run() was called.
-    Markdown.Editor = function (options) {
+    Markdown.Editor = function (target, options) {
+        target = target.closest(".md-editor");
 
-        initializePreview();
+        initializePreview(target);
 
         options = options || {};
         if (options.allowUploads == null) {
@@ -225,7 +221,7 @@ Markdown.HookCollection = HookCollection;
             if (panels)
                 return; // already initialized
 
-            panels = new PanelCollection();
+            panels = new PanelCollection(target);
             var commandManager = new CommandManager(hooks, getString);
             var undoManager, uiManager;
 
@@ -239,8 +235,7 @@ Markdown.HookCollection = HookCollection;
                     f();
                 }
             }
-
-            uiManager = new UIManager(panels, undoManager, commandManager, options.allowUploads, options.allowImages, options.helpButton, getString);
+            uiManager = new UIManager(target, panels, undoManager, commandManager, options.allowUploads, options.allowImages, options.helpButton, getString);
             uiManager.setUndoRedoButtonStates();
         };
 
@@ -394,9 +389,9 @@ Markdown.HookCollection = HookCollection;
     // This ONLY affects Internet Explorer (tested on versions 6, 7
     // and 8) and ONLY on button clicks.  Keyboard shortcuts work
     // normally since the focus never leaves the textarea.
-    function PanelCollection() {
-        this.buttonBar = doc.getElementById("wmd-button-bar");
-        this.input = doc.getElementById("wmd-input");
+    function PanelCollection(target) {
+        this.buttonBar = target.find(".md-button-row")[0];
+        this.input = target.find(".md-input")[0];
     };
 
     // Returns true if the DOM element is visible, false if it's hidden.
@@ -926,7 +921,7 @@ Markdown.HookCollection = HookCollection;
         var background = doc.createElement("div"),
             style = background.style;
 
-        background.className = "wmd-prompt-background";
+        background.className = "md-prompt-background";
 
         style.position = "absolute";
         style.top = "0";
@@ -996,7 +991,7 @@ Markdown.HookCollection = HookCollection;
 
             if (isUpload && !isCancel) {
                 if (window.FormData !== undefined) {
-                    var fileUpload = $("#FileUpload").get(0);
+                    var fileUpload = $("#FileUpload")[0];
                     var files = fileUpload.files;
 
                     // Create FormData object  
@@ -1013,7 +1008,7 @@ Markdown.HookCollection = HookCollection;
                         var contentId = $("#contentId").val();
                         var contentType = $("#contentType").val();
                         fileData.append("contentId", contentId);
-                        fileData.append("contentType", contentType)
+                        fileData.append("contentType", contentType);
                     }
 
                     // Adding one more key to FormData object   
@@ -1078,7 +1073,7 @@ Markdown.HookCollection = HookCollection;
 
             // The main dialog box.
             dialog = doc.createElement("div");
-            dialog.className = "wmd-prompt-dialog";
+            dialog.className = "md-prompt-dialog";
             dialog.style.padding = "10px;";
             dialog.style.position = "fixed";
             dialog.style.width = "400px";
@@ -1262,8 +1257,7 @@ Markdown.HookCollection = HookCollection;
         }, 0);
     };
 
-    function UIManager(panels, undoManager, commandManager, allowUploads, allowImages, helpOptions, getString) {
-
+    function UIManager(target, panels, undoManager, commandManager, allowUploads, allowImages, helpOptions, getString) {
         var inputBox = panels.input,
             buttons = {}; // buttons.undo, buttons.link, etc. The actual DOM elements.
 
@@ -1285,56 +1279,56 @@ Markdown.HookCollection = HookCollection;
                 switch (keyCodeStr) {
                     case "b":
                         doClick(buttons.bold);
-                        parseAndRender();
+                        parseAndRender(target);
                         break;
                     case "i":
                         doClick(buttons.italic);
-                        parseAndRender();
+                        parseAndRender(target);
                         break;
                     case "l":
                         doClick(buttons.link);
-                        parseAndRender();
+                        parseAndRender(target);
                         break;
                     case "q":
                         doClick(buttons.quote);
-                        parseAndRender();
+                        parseAndRender(target);
                         break;
                     case "k":
                         doClick(buttons.code);
-                        parseAndRender();
+                        parseAndRender(target);
                         break;
                     case "g":
                         doClick(buttons.image);
-                        parseAndRender();
+                        parseAndRender(target);
                         break;
                     case "o":
                         doClick(buttons.olist);
-                        parseAndRender();
+                        parseAndRender(target);
                         break;
                     case "u":
                         doClick(buttons.ulist);
-                        parseAndRender();
+                        parseAndRender(target);
                         break;
                     case "h":
                         doClick(buttons.heading);
-                        parseAndRender();
+                        parseAndRender(target);
                         break;
                     case "r":
                         doClick(buttons.hr);
-                        parseAndRender();
+                        parseAndRender(target);
                         break;
                     case "y":
                         doClick(buttons.redo);
-                        parseAndRender();
+                        parseAndRender(target);
                         break;
                     case "z":
                         if (key.shiftKey) {
                             doClick(buttons.redo);
-                            parseAndRender();
+                            parseAndRender(target);
                         }
                         else {
                             doClick(buttons.undo);
-                            parseAndRender();
+                            parseAndRender(target);
                         }
                         break;
                     default:
@@ -1419,9 +1413,8 @@ Markdown.HookCollection = HookCollection;
                     if (chunks) {
                         state.setChunks(chunks);
                     }
-
                     state.restore();
-                    parseAndRender();
+                    parseAndRender(target);
                 };
 
                 var noCleanup = button.textOp(chunks, fixupInputArea);
@@ -1490,16 +1483,14 @@ Markdown.HookCollection = HookCollection;
             var buttonBar = panels.buttonBar;
 
             var buttonRow = document.createElement("ul");
-            buttonRow.id = "wmd-button-row";
-            buttonRow.className = 'wmd-button-row';
+            buttonRow.className = 'md-button-row';
             buttonRow = buttonBar.appendChild(buttonRow);
             var xPosition = 0;
-            var makeButton = function (id, title, faImage, textOp) {
+            var makeButton = function (title, faImage, textOp) {
                 var button = document.createElement("li");
-                button.className = "wmd-button " + faImage;
+                button.className = "md-button " + faImage;
                 button.style.left = xPosition + "px";
                 xPosition += 25;
-                button.id = id;
                 button.title = title;
                 if (textOp)
                     button.textOp = textOp;
@@ -1507,54 +1498,52 @@ Markdown.HookCollection = HookCollection;
                 buttonRow.appendChild(button);
                 return button;
             };
-            var makeSpacer = function (num) {
+            var makeSpacer = function () {
                 var spacer = document.createElement("li");
-                spacer.className = "wmd-spacer";
-                spacer.id = "wmd-spacer" + num;
+                spacer.className = "md-spacer";
                 spacer.style.left = xPosition - 5 + "px";
                 buttonRow.appendChild(spacer);
                 xPosition += 25;
-            }
+            };
 
-            buttons.bold = makeButton("wmd-bold-button", getString("bold"), "fas fa-bold", bindCommand("doBold"));
-            buttons.italic = makeButton("wmd-italic-button", getString("italic"), "fas fa-italic", bindCommand("doItalic"));
-            makeSpacer(1);
-            buttons.link = makeButton("wmd-link-button", getString("link"), "fas fa-link", bindCommand(function (chunk, postProcessing) {
+            buttons.bold = makeButton(getString("bold"), "fas fa-bold", bindCommand("doBold"));
+            buttons.italic = makeButton(getString("italic"), "fas fa-italic", bindCommand("doItalic"));
+            makeSpacer();
+            buttons.link = makeButton(getString("link"), "fas fa-link", bindCommand(function (chunk, postProcessing) {
                 return this.doLinkOrImage(chunk, postProcessing, false, allowUploads);
             }));
-            buttons.quote = makeButton("wmd-quote-button", getString("quote"), "fas fa-quote-left", bindCommand("doBlockquote"));
-            buttons.code = makeButton("wmd-code-button", getString("code"), "fas fa-code", bindCommand("doCode"));
+            buttons.quote = makeButton(getString("quote"), "fas fa-quote-left", bindCommand("doBlockquote"));
+            buttons.code = makeButton(getString("code"), "fas fa-code", bindCommand("doCode"));
             if (allowImages) {
-                buttons.image = makeButton("wmd-image-button", getString("image"), "fas fa-image", bindCommand(function (chunk, postProcessing) {
+                buttons.image = makeButton(getString("image"), "fas fa-image", bindCommand(function (chunk, postProcessing) {
                     return this.doLinkOrImage(chunk, postProcessing, true, allowUploads);
                 }));
             }
-            makeSpacer(2);
-            buttons.olist = makeButton("wmd-olist-button", getString("olist"), "fas fa-list-ol", bindCommand(function (chunk, postProcessing) {
+            makeSpacer();
+            buttons.olist = makeButton(getString("olist"), "fas fa-list-ol", bindCommand(function (chunk, postProcessing) {
                 this.doList(chunk, postProcessing, true);
             }));
-            buttons.ulist = makeButton("wmd-ulist-button", getString("ulist"), "fas fa-list-ul", bindCommand(function (chunk, postProcessing) {
+            buttons.ulist = makeButton(getString("ulist"), "fas fa-list-ul", bindCommand(function (chunk, postProcessing) {
                 this.doList(chunk, postProcessing, false);
             }));
-            buttons.heading = makeButton("wmd-heading-button", getString("heading"), "fas fa-heading", bindCommand("doHeading"));
-            buttons.hr = makeButton("wmd-hr-button", getString("hr"), "far fa-minus-square", bindCommand("doHorizontalRule"));
-            makeSpacer(3);
-            buttons.undo = makeButton("wmd-undo-button", getString("undo"), "fas fa-undo", null);
+            buttons.heading = makeButton(getString("heading"), "fas fa-heading", bindCommand("doHeading"));
+            buttons.hr = makeButton(getString("hr"), "far fa-minus-square", bindCommand("doHorizontalRule"));
+            makeSpacer();
+            buttons.undo = makeButton(getString("undo"), "fas fa-undo", null);
             buttons.undo.execute = function (manager) { if (manager) manager.undo(); };
 
             var redoTitle = /win/.test(nav.platform.toLowerCase()) ?
                 getString("redo") :
                 getString("redomac"); // mac and other non-Windows platforms
 
-            buttons.redo = makeButton("wmd-redo-button", redoTitle, "fas fa-redo", null);
+            buttons.redo = makeButton(redoTitle, "fas fa-redo", null);
             buttons.redo.execute = function (manager) { if (manager) manager.redo(); };
 
             if (helpOptions) {
                 var helpButton = document.createElement("li");
                 var helpButtonImage = document.createElement("span");
                 helpButton.appendChild(helpButtonImage);
-                helpButton.className = "wmd-button wmd-help-button";
-                helpButton.id = "wmd-help-button";
+                helpButton.className = "md-button md-help-button";
                 helpButton.XShift = "-240px";
                 helpButton.isHelp = true;
                 helpButton.style.right = "0px";

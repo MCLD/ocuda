@@ -13,8 +13,8 @@ namespace Ocuda.Utility.TagHelpers
     public class ButtonSpinnerTagHelper : TagHelper
     {
         private const string targetElement = "button";
-        private const string attributeName = "buttonSpinner";
-        private const string ignoreValidationAttributeName = "ignoreValidation";
+        private const string attributeName = "button-spinner";
+        private const string ignoreValidationAttributeName = "ignore-validation";
         private const string classAttribute = "class";
         private const string spinnerClass = "btn-spinner";
         private const string ignoreValidationClass = "spinner-ignore-validation";
@@ -50,6 +50,7 @@ namespace Ocuda.Utility.TagHelpers
             spinnerSpan.AddCssClass(spanClass);
 
             output.PostContent.SetHtmlContent(spinnerSpan);
+            output.Attributes.Remove(new TagHelperAttribute(attributeName));
         }
     }
 }

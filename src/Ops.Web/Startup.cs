@@ -162,8 +162,8 @@ namespace Ocuda.Ops.Web
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(_ =>
                 {
-                    _.AccessDeniedPath = "/Home/Unauthorized";
-                    _.LoginPath = "/Home/Authenticate";
+                    _.AccessDeniedPath = "/Unauthorized";
+                    _.LoginPath = "/Authenticate";
                 });
 
             services.AddSingleton<IAuthorizationHandler, SectionManagerHandler>();

@@ -20,7 +20,7 @@ $(".btn-spinner").on("click", function (e) {
         e.stopImmediatePropagation();
     }
     else {
-        var parentForm = $(this).parents("form:first");
+        var parentForm = $(this).closest("form");
 
         if (!$(this).hasClass("spinner-ignore-validation")
             && (parentForm.length > 0 && !parentForm.valid())) {
@@ -80,7 +80,7 @@ function updateStub(stub, text) {
 function SetValidation(target, message) {
     target.addClass("input-validation-error");
 
-    var validationMessage = target.siblings("span");
+    var validationMessage = target.closest(".form-group-inner").find(".validation-message");
     validationMessage.removeClass("field-validation-valid");
     validationMessage.addClass("field-validation-error");
     validationMessage.text(message);
@@ -89,16 +89,16 @@ function SetValidation(target, message) {
 function ClearValidation(target) {
     target.removeClass("input-validation-error");
 
-    var validationMessage = target.siblings("span");
+    var validationMessage = target.closest(".form-group-inner").find(".validation-message");
     validationMessage.text("");
     validationMessage.removeClass("field-validation-error");
     validationMessage.addClass("text-danger field-validation-valid");
 }
 
 function ValidateField(target, validateUrl, params) {
-    var validationMessage = target.siblings("span");
-
     ClearValidation(target);
+
+    var validationMessage = target.closest(".form-group-inner").find(".validation-message");
     validationMessage.removeClass("text-danger text-success");
     validationMessage.text("Checking...");
 

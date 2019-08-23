@@ -20,25 +20,9 @@
 
     <div class="form-group row">
         <label asp-for="Page.Content" class="col-md-3 col-form-label text-md-right"></label>
-        <div class="col-md-9">
-            <ul class="nav nav-tabs">
-                <li class="nav-item">
-                    <a class="nav-link active" data-toggle="tab" href="#md-edit" role="tab">Edit</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#md-preview" role="tab">Preview</a>
-                </li>
-            </ul>
-            <div class="tab-content" id="md-edit-preview">
-                <div class="tab-pane show active" id="md-edit" role="tabpanel">
-                    <div id="wmd-button-bar" class="wmd-button-row"></div>
-                    <textarea asp-for="Page.Content" class="form-control wmd-input" id="wmd-input"></textarea>
-                </div>
-                <div class="tab-pane" id="md-preview" role="tabpanel">
-                    <div id="preview" class="wmd-preview"></div>
-                </div>
-                <span asp-validation-for="Page.Content" class="text-danger"></span>
-            </div>
+        <div class="form-group-inner col-md-9">
+            <textarea asp-for="Page.Content" markdown-editor></textarea>
+            <span asp-validation-for="Page.Content" class="validation-message text-danger"></span>
         </div>
     </div>
 
@@ -54,11 +38,11 @@
             }
             else
             {
-                <button type="submit" name="Publish" value="False" class="btn btn-success" aria-label="Confirm" buttonspinner>
+                <button type="submit" name="Publish" value="False" class="btn btn-success" aria-label="Confirm" button-spinner>
                     <span class="fa fa-save" aria-hidden="true"></span>
                     Save as Draft
                 </button>
-                <button type="submit" name="Publish" value="True" class="btn btn-success" aria-label="Confirm" buttonspinner>
+                <button type="submit" name="Publish" value="True" class="btn btn-success" aria-label="Confirm" button-spinner>
                     <span class="fa fa-save" aria-hidden="true"></span>
                     Save and Publish
                 </button>
@@ -71,7 +55,7 @@
     <script src="~/js/md.min.js" asp-append-version="true"></script>
 
     <script>
-        var editor = new Markdown.Editor({ allowUploads: true });
+        var editor = new Markdown.Editor($("#Page_Content"), { allowUploads: true });
         editor.run();
 
         @if (!Model.Page.IsPublished)

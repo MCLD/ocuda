@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
-using Ocuda.Promenade.Data;
 
 namespace Ocuda.Ops.Data.Ops
 {

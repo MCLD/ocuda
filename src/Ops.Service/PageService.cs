@@ -36,6 +36,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<Page> CreateAsync(Page page)
         {
+            page.Content = page.Content?.Trim();
             page.Stub = page.Stub?.Trim().ToLower();
 
             await _pageRepository.AddAsync(page);
@@ -46,7 +47,7 @@ namespace Ocuda.Ops.Service
         public async Task<Page> EditAsync(Page page, bool publish = false)
         {
             var currentPage = await _pageRepository.FindAsync(page.Id);
-            currentPage.Content = page.Content;
+            currentPage.Content = page.Content?.Trim();
             currentPage.SocialCardId = page.SocialCardId;
 
             if (!currentPage.IsPublished)

@@ -4,7 +4,7 @@
     <div modal id="addModal" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addStub" asp-for="Page.Stub" formgroup />
         <select id="addType" asp-for="Page.Type" formgroup>
-            @foreach (var type in (PageType[]) Enum.GetValues(typeof(PageType)))
+            @foreach (var type in (PageType[])Enum.GetValues(typeof(PageType)))
             {
                 <option value="@Convert.ToInt32(type)">@type</option>
             }
@@ -34,48 +34,47 @@
 }
 else
 {
-    <table class="table table-sm table-bordered">
-        <thead>
-            <tr>
-                <th>Stub</th>
-                <th>Type</th>
-                <th>Published</th>
-                <th>&nbsp;</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var ocPage in Model.Pages)
-            {
-                <tr>
-                    <td>
-                        <a asp-action="@(nameof(PagesController.Edit))" asp-route-id="@ocPage.Id" class="rowlink">
-                            @if (string.IsNullOrWhiteSpace(ocPage.Stub))
-                            {
-                                @:(none)
-                            }
-                            else
-                            {
-                                @ocPage.Stub
-                            }
-                        </a>
-                    </td>
-                    <td>@ocPage.Type.ToString()</td>
-                    <td><span class="fas @(ocPage.IsPublished ? "fa-check"  : "fa-times") colored-icon"></span></td>
+    <div class="row">
+        <div class="col-12">
+            <div>
+                <table class="table table-sm table-bordered link-table">
+                    <thead>
+                        <tr>
+                            <th>Stub</th>
+                            <th>Type</th>
+                            <th>Published</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ocPage in Model.Pages)
+                        {
+                            <tr>
+                                <td class="td-class">
+                                    <a asp-action="@(nameof(PagesController.Edit))" asp-route-id="@ocPage.Id" class="rowlink">
+                                        @ocPage.Stub
+                                    </a>
+                                </td>
+                                <td>@ocPage.Type.ToString()</td>
+                                <td><span class="fas @(ocPage.IsPublished ? "fa-check"  : "fa-times") colored-icon"></span></td>
 
-                    <td align="center" class="on-top">
-                        <button type="button"
-                                class="btn btn-danger btn-xs"
-                                data-toggle="modal"
-                                data-target="#deleteModal"
-                                data-id="@ocPage.Id"
-                                data-stub="@ocPage.Stub">
-                            <span class="fa fa-times" aria-hidden="true"></span>
-                        </button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                                <td align="center" class="on-top">
+                                    <button type="button"
+                                            class="btn btn-danger btn-xs"
+                                            data-toggle="modal"
+                                            data-target="#deleteModal"
+                                            data-id="@ocPage.Id"
+                                            data-stub="@ocPage.Stub">
+                                        <span class="fa fa-times" aria-hidden="true"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
     @if (Model.PaginateModel.MaxPage > 1)
     {
@@ -83,9 +82,19 @@ else
     }
 }
 
-
 @section scripts {
     <script>
+        $(window).on("load", function() {
+            $('.td-class').each(function() {
+                $(this).children('a.rowlink').height($(this).height() + 11);
+            });
+        });
+        $(window).resize(function() {
+            $('.td-class').each(function() {
+                $(this).children('a.rowlink').height($(this).height() + 11);
+            });
+        });
+
         $("#addForm").submit(function (e) {
             e.preventDefault();
             var form = $(this);

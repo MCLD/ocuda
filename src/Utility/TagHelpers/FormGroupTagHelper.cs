@@ -28,8 +28,9 @@ namespace Ocuda.Utility.TagHelpers
         private const string defaultLabelLayoutClass = "col-md-3";
         private const string defaultLabelClass = "col-form-label text-md-right";
         private const string defaultInputClass = "form-control";
+        private const string defaultInnerDivClass = "form-group-inner col-md-9";
+        private const string defaultValidationMessageClass = "validation-message text-danger";
         private const string defaultFieldLayoutClass = "col-md-9";
-        private const string defaultValidationMessageClass = "text-danger";
         private const string validationIgnoreClass = "validation-ignore";
 
         private const string dateTimeGroupClass = "input-group date datetimepicker";
