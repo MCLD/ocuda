@@ -94,9 +94,9 @@ namespace Ocuda.Promenade.Models.Entities
 
         [NotMapped]
         public bool IsNewLocation { get; set; }
-      
+
         public int? SocialCardId { get; set; }
-      
+
         public SocialCard SocialCard { get; set; }
     }
 }
