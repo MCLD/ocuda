@@ -60,7 +60,6 @@
   {
     "outputFileName": "wwwroot/css/main.min.css",
     "inputFiles": [
-      "Scripts/Bootstrap/bootstrap.css",
       "bower_components/bootstrap-multiselect/dist/css/bootstrap-multiselect.css",
       "bower_components/fontawesome/web-fonts-with-css/css/fontawesome-all.css",
       "Styles/ops.css"
