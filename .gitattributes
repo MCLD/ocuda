@@ -9,8 +9,8 @@ dev/* linguist-documentation
 src/Ops.DataProvider.SqlServer.Ops/Migrations/* linguist-generated=true
 src/Ops.DataProvider.SqlServer.Promenade/Migrations/* linguist-generated=true
 
-src/Ops.Web/bower_components linguist-vendored
-src/Promenade.Web/bower_components linguist-vendored
+src/Ops.Web/node_modules linguist-vendored
+src/Promenade.Web/node_modules linguist-vendored
 
 # fix CHANGELOG.md to default to union merge
 CHANGELOG merge=union

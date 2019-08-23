@@ -23,12 +23,10 @@
       display="inline">
     <input asp-for="Feature.Id" id="feature-id" type="hidden" />
     <input asp-for="Feature.NeedsPopup" id="feature-needsPopup" type="hidden" />
-    <input
-           asp-for="Feature.Name"
+    <input asp-for="Feature.Name"
            formgroup
            autocomplete="off" />
-    <input
-           asp-for="Feature.FontAwesome"
+    <input asp-for="Feature.FontAwesome"
            class="form-control icon-picker"
            type="text"
            formgroup
@@ -54,8 +52,7 @@
                      aria-labelledby="headingOne"
                      data-parent="#popup-accordion">
                     <div class="card-body">
-                        <input
-                               asp-for="Feature.Stub"
+                        <input asp-for="Feature.Stub"
                                formgroup
                                autocomplete="off"
                                info-tooltip="The stub is the nickname/URL for the feature."
@@ -160,13 +157,13 @@
                 $("#feature-needsPopup").val("True");
             }
         });
-    $( "#featureform" ).submit(function( event ) {
+        $("#featureform").submit(function (event) {
             if (!$("#accordion-header").hasClass("bg-info")) {
                 $("#feature-needsPopup").val("False");
                 $("#Feature_Stub").val("");
                 $("#wmd-input").val("");
             }
-    });
+        });
         function FormatStub(object) {
             updateStub($(object), $(object).val());
         }

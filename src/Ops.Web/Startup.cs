@@ -274,21 +274,21 @@ namespace Ocuda.Ops.Web
                     FileProvider
                     = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
                         Path.Combine(Path.GetFullPath("Styles"))),
-                    RequestPath = new Microsoft.AspNetCore.Http.PathString("/devstyles")
+                    RequestPath = new PathString("/devstyles")
                 });
                 app.UseStaticFiles(new StaticFileOptions
                 {
                     FileProvider
                     = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
                         Path.Combine(Path.GetFullPath("Scripts"))),
-                    RequestPath = new Microsoft.AspNetCore.Http.PathString("/devscripts")
+                    RequestPath = new PathString("/devscripts")
                 });
                 app.UseStaticFiles(new StaticFileOptions
                 {
                     FileProvider
                     = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
-                        Path.Combine(Path.GetFullPath("bower_components"))),
-                    RequestPath = new Microsoft.AspNetCore.Http.PathString("/devbower")
+                        Path.Combine(Path.GetFullPath("node_modules"))),
+                    RequestPath = new PathString("/devmodules")
                 });
             }
             else

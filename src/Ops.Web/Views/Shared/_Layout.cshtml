@@ -6,14 +6,18 @@
     <title>@ViewData[Ocuda.Ops.Controllers.ViewDataKey.Title]</title>
     <environment include="Production">
         <link rel="stylesheet" href="~/css/main.min.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
     <environment include="Development">
-        <link rel="stylesheet" href="~/devstyles/Bootstrap/bootstrap.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/devbower/bootstrap-multiselect/dist/css/bootstrap-multiselect.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/devbower/fontawesome/web-fonts-with-css/css/fontawesome-all.css" asp-append-version="true" />
+        <link rel="stylesheet"
+              href="~/devmodules/bootstrap/dist/css/bootstrap.css"
+              asp-append-version="true" />
+        <link rel="stylesheet"
+              href="~/devmodules/bootstrap-multiselect/dist/css/bootstrap-multiselect.css"
+              asp-append-version="true" />
+        <link rel="stylesheet"
+              href="~/devmodules/@@fortawesome/fontawesome-free/css/all.css"
+              asp-append-version="true" />
         <link rel="stylesheet" href="~/devstyles/ops.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/devstyles/site.css" asp-append-version="true" />
     </environment>
     @if (Context.Items.ContainsKey(ItemKey.ExternalCSS))
     {
@@ -166,15 +170,19 @@
         <script src="~/js/main.min.js" asp-append-version="true"></script>
     </environment>
     <environment include="Development">
-        <script src="~/devbower/jquery/dist/jquery.js" asp-append-version="true"></script>
-        <script src="~/devbower/popper.js/dist/umd/popper.js" asp-append-version="true"></script>
-        <script src="~/devbower/bootstrap/dist/js/bootstrap.js" asp-append-version="true"></script>
-        <script src="~/devbower/bootstrap-multiselect/dist/js/bootstrap-multiselect.js" asp-append-version="true"></script>
-        <script src="~/devbower/jquery-validation/dist/jquery.validate.js" asp-append-version="true"></script>
-        <script src="~/devbower/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js" asp-append-version="true"></script>
+        <script src="~/devmodules/jquery/dist/jquery.js" asp-append-version="true"></script>
+        <script src="~/devmodules/popper.js/dist/umd/popper.js"
+                asp-append-version="true"></script>
+        <script src="~/devmodules/bootstrap/dist/js/bootstrap.js"
+                asp-append-version="true"></script>
+        <script src="~/devmodules/bootstrap-multiselect/dist/js/bootstrap-multiselect.js"
+                asp-append-version="true"></script>
+        <script src="~/devmodules/jquery-validation/dist/jquery.validate.js"
+                asp-append-version="true"></script>
+        <script src="~/devmodules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js"
+                asp-append-version="true"></script>
         <script src="~/devscripts/Layout.js" asp-append-version="true"></script>
         <script src="~/devscripts/ops.js" asp-append-version="true"></script>
-        <script src="~/devscripts/fontawesome-iconpicker/main.js" asp-append-version="true"></script>
     </environment>
     @if (Context.Items.ContainsKey(ItemKey.ExternalJS))
     {
