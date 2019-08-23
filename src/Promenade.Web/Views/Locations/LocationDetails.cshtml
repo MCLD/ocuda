@@ -28,21 +28,21 @@
                     <td class="hours">
                         @if (Model.Location.IsAlwaysOpen)
                         {
-                        <td>Open</td>
+                        <p>Open</p>
                         }
                         else
                         {
                             @foreach (var time in Model.Location.LocationHours)
                             {
                                 <text>
-                                    <td>@time</td>
+                                    <p>@time</p><br/>
                                 </text>
                             }
                         }
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
             <h2>Information</h2>
             <p>@Model.Location.Description</p>
             <div>

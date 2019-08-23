@@ -110,6 +110,22 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException(ex.Message);
             }
         }
+        public async Task<Location> EditAlwaysOpenAsync(Location location)
+        {
+            try
+            {
+                var currentLocation = await _locationRepository.FindAsync(location.Id);
+                currentLocation.IsAlwaysOpen = location.IsAlwaysOpen;
+                await ValidateAsync(currentLocation);
+                _locationRepository.Update(currentLocation);
+                await _locationRepository.SaveAsync();
+                return currentLocation;
+            }
+            catch (OcudaException ex)
+            {
+                throw new OcudaException(ex.Message);
+            }
+        }
 
         public async Task<List<string>> GetFormattedWeeklyHoursAsync(int locationId)
         {

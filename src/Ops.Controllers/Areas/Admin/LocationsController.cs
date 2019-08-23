@@ -334,6 +334,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         public async Task<IActionResult> EditLocationHours(LocationViewModel viewModel)
         {
             var location = await _locationService.GetLocationByIdAsync(viewModel.AllLocationHours[0].LocationId);
+            var updateAlwaysOpen = true;
             foreach (var hour in viewModel.AllLocationHours)
             {
                 if (hour.Open && (hour.OpenTime == null || hour.CloseTime == null))
@@ -341,6 +342,26 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     ShowAlertDanger($"Location hours must be provided if Open");
                     return RedirectToAction(nameof(Location), new { locationStub = location.Stub });
                 }
+                if (!hour.Open)
+                {
+                    hour.OpenTime = null;
+                    hour.CloseTime = null;
+                }
+                if (hour.Open)
+                {
+                    updateAlwaysOpen = false;
+                }
+            }
+            try
+            {
+                location.IsAlwaysOpen = updateAlwaysOpen;
+                await _locationService.EditAlwaysOpenAsync(location);
+                ShowAlertSuccess($"Updated {location.Name}'s Hours");
+            }
+            catch (OcudaException ex)
+            {
+                ShowAlertDanger($"Failed to Update {location.Name}'s Hours");
+                _logger.LogError(ex, $"Unable to edit {ex.Message}: {ex}", ex.Message);
             }
             if (ModelState.IsValid)
             {
