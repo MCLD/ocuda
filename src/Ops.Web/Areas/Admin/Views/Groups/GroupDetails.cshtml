@@ -31,7 +31,7 @@
            info-tooltip="The stub is the nickname/URL for the group."
            on-blur-js="FormatStub"/>
     <div class="row">
-        <div class="accordion offset-md-3 col-md-9" id="popup-accordion">
+        <div class="accordion offset-md-3 col-md-9" id="locationregion-accordion">
             <div class="card">
                 <div class="card-header @(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) && !Model.Group.IsLocationRegion ? "" : "bg-info")" id="accordion-header">
                     <button class="btn btn-link @(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) && !Model.Group.IsLocationRegion ? "text-info" : "text-white")"
@@ -47,7 +47,7 @@
                     </button>
                 </div>
                 <div id="collapseDiv"
-                     class="collapse @(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) && !Model.Group.IsLocationRegion ? "" : " show")"
+                     class="collapse@(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) && !Model.Group.IsLocationRegion ? "" : " show")"
                      aria-labelledby="headingOne"
                      data-parent="#locationregion-accordion">
                     <div class="card-body">
@@ -124,12 +124,10 @@
         function FormatStub(object) {
             updateStub($(object), $(object).val());
         }
-        $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
-        });
         $(document).ready(function () {
             var editor = new Markdown.Editor({ allowUploads: false });
             editor.run();
+            $('[data-toggle="tooltip"]').tooltip();
         });
 
     </script>

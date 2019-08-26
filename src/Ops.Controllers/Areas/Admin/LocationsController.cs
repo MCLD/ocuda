@@ -341,8 +341,21 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             {
                 if (hour.Open && (hour.OpenTime == null || hour.CloseTime == null))
                 {
-                    ShowAlertDanger($"Location hours must be provided if Open");
+                    ShowAlertDanger($"Location hours must be provided if open");
                     return RedirectToAction(nameof(Location), new { locationStub = location.Stub });
+                }
+                if (hour.CloseTime.HasValue && hour.OpenTime.HasValue)
+                {
+                    if (DateTime.Compare(hour.CloseTime.Value, hour.OpenTime.Value) < 0)
+                    {
+                        ShowAlertDanger($"Location can't close before it's opening time");
+                        return RedirectToAction(nameof(Location), new { locationStub = location.Stub });
+                    }
+                    if (DateTime.Compare(hour.CloseTime.Value, hour.OpenTime.Value) == 0)
+                    {
+                        ShowAlertDanger($"Location opening and closing times can't be equal.");
+                        return RedirectToAction(nameof(Location), new { locationStub = location.Stub });
+                    }
                 }
                 if (!hour.Open)
                 {

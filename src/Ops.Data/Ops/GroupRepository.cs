@@ -80,7 +80,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id != group.Id && string.Equals(_.GroupType, group.GroupType, StringComparison.OrdinalIgnoreCase))
+                .Where(_ => _.Id != group.Id && _.GroupType == group.GroupType)
                 .AnyAsync();
         }
 
@@ -88,7 +88,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id != group.Id && string.Equals(_.Stub, group.Stub, StringComparison.OrdinalIgnoreCase))
+                .Where(_ => _.Id != group.Id && _.Stub == group.Stub)
                 .AnyAsync();
         }
 
