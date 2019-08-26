@@ -357,11 +357,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                         return RedirectToAction(nameof(Location), new { locationStub = location.Stub });
                     }
                 }
-                if (!hour.Open)
-                {
-                    hour.OpenTime = null;
-                    hour.CloseTime = null;
-                }
                 if (hour.Open)
                 {
                     updateAlwaysOpen = false;
