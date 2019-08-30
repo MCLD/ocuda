@@ -25,10 +25,10 @@
                     </div>
                     <div class="row@(!Model.AllLocationHours[i].Open == true ? " d-none" : "")" style="width: inherit" id="hour-inputs-@Model.AllLocationHours[i].Id" data-hourid="@Model.AllLocationHours[i].Id">
                         <div class="col">
-                            <input asp-for="AllLocationHours[i].OpenTime" type="time" value="@Model.AllLocationHours[i].OpenTime?.ToString("HH:mm")" id="hour-open-@Model.AllLocationHours[i].DayOfWeek" data-hourid="@Model.AllLocationHours[i].Id" formgroup autocomplete="off" />
+                            <input asp-for="AllLocationHours[i].OpenTime" value="@Model.AllLocationHours[i].OpenTime?.ToString("HH:mm")" id="hour-open-@Model.AllLocationHours[i].DayOfWeek" data-hourid="@Model.AllLocationHours[i].Id" formgroup datetime-picker="DateTimePickerType.TimeOnly" autocomplete="off" />
                         </div>
                         <div class="col">
-                            <input asp-for="AllLocationHours[i].CloseTime" type="time" value="@Model.AllLocationHours[i].CloseTime?.ToString("HH:mm")" id="hour-close-@Model.AllLocationHours[i].DayOfWeek" data-hourid="@Model.AllLocationHours[i].Id" formgroup autocomplete="off" />
+                            <input asp-for="AllLocationHours[i].CloseTime" value="@Model.AllLocationHours[i].CloseTime?.ToString("HH:mm")" id="hour-close-@Model.AllLocationHours[i].DayOfWeek" data-hourid="@Model.AllLocationHours[i].Id" formgroup datetime-picker="DateTimePickerType.TimeOnly" autocomplete="off" />
                         </div>
                         <input value="@Model.AllLocationHours[i].Open" asp-for="AllLocationHours[i].Open" hidden />
                         <input value="@Model.AllLocationHours[i].Id" asp-for="AllLocationHours[i].Id" hidden />
@@ -43,3 +43,7 @@
             }
         </div>
     </div>
+
+<script>
+    $('.datetimepicker').datetimepicker({format: 'LT'});
+</script>

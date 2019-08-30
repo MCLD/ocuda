@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Ocuda.Utility.TagHelpers.Extensions;
 
 namespace Ocuda.Utility.TagHelpers
 {
@@ -22,6 +22,7 @@ namespace Ocuda.Utility.TagHelpers
         private const string onBlurJs = "on-blur-js";
         private const string labelClassAttribute = "label-class";
         private const string fieldClassAttribute = "field-class";
+        private const string dateTimePickerAttribute = "datetime-picker";
 
         private const string defaultWrapperDivClass = "row form-group";
         private const string defaultLabelLayoutClass = "col-md-3";
@@ -30,6 +31,16 @@ namespace Ocuda.Utility.TagHelpers
         private const string defaultFieldLayoutClass = "col-md-9";
         private const string defaultValidationMessageClass = "text-danger";
         private const string validationIgnoreClass = "validation-ignore";
+
+        private const string dateTimeGroupClass = "input-group date datetimepicker";
+        private const string dateTimeGroupAppendClass = "input-group-append";
+        private const string dateTimeGroupTextClass = "input-group-text";
+        private const string dateTimeIconCalendarClass = "far fa-calendar-alt";
+        private const string dateTimeIconClockClass = "far fa-clock";
+        private const string dateTimeInputClass = "datetimepicker-input";
+        private const string dateTimeInputType = "text";
+        private const string dateTimeTargetInput = "nearest";
+        private const string dateTimeToggle = "datetimepicker";
 
         private readonly IHtmlGenerator _htmlGenerator;
         public FormGroupTagHelper(IHtmlGenerator htmlGenerator)
@@ -56,6 +67,9 @@ namespace Ocuda.Utility.TagHelpers
         [HtmlAttributeName(fieldClassAttribute)]
         public string FieldClass { get; set; }
 
+        [HtmlAttributeName(dateTimePickerAttribute)]
+        public DateTimePickerType? DateTimePicker { get; set; }
+
         [ViewContext]
         [HtmlAttributeNotBound]
         public ViewContext ViewContext { get; set; }
@@ -64,7 +78,7 @@ namespace Ocuda.Utility.TagHelpers
         {
             // Manually create each child asp form tag helper element
             TagHelperOutput labelElement = await CreateLabelElement(context);
-            TagHelperOutput inputElement = await CreateInputElement(context, output);
+            TagHelperOutput inputElement = await CreateInputElement(output);
             TagHelperOutput validationMessageElement
                 = await CreateValidationMessageElement(context);
 
@@ -104,7 +118,7 @@ namespace Ocuda.Utility.TagHelpers
                     ViewContext = ViewContext
                 };
 
-            TagHelperOutput labelOutput = CreateTagHelperOutput("label");
+            TagHelperOutput labelOutput = CreateTagHelperOutput("label", null);
 
             await labelTagHelper.ProcessAsync(context, labelOutput);
 
@@ -129,23 +143,20 @@ namespace Ocuda.Utility.TagHelpers
             return labelOutput;
         }
 
-        private async Task<TagHelperOutput> CreateInputElement(TagHelperContext context,
-            TagHelperOutput output)
+        private async Task<TagHelperOutput> CreateInputElement(TagHelperOutput output)
         {
-            var inputOutput = CreateTagHelperOutput(output.TagName);
+            var attributes = new TagHelperAttributeList(output.Attributes);
 
-            var attributeList = output.Attributes;
-            attributeList.Add(new TagHelperAttribute("class", defaultInputClass));
-            foreach (var attribute in output.Attributes)
+            string inputId = null;
+            if (output.Attributes.TryGetAttribute("id", out var idAttribute))
             {
-                if (attribute.Name != attributeName)
-                {
-                    var attributes = inputOutput.Attributes
-                        .FirstOrDefault(a => a.Name == attribute.Name)?.Value;
-                    inputOutput.Attributes
-                        .SetAttribute(attribute.Name, $"{attributes} {attribute.Value}".Trim());
-                }
+                inputId = idAttribute.Value.ToString();
             }
+
+            attributes.AddCssClass(defaultInputClass);
+            attributes.RemoveAll(attributeName);
+            var inputOutput = CreateTagHelperOutput(output.TagName, attributes);
+
             inputOutput.Content.AppendHtml(output.PreContent.GetContent());
             inputOutput.Content.AppendHtml(output.Content.GetContent());
             inputOutput.Content.AppendHtml(await output.GetChildContentAsync());
@@ -154,6 +165,45 @@ namespace Ocuda.Utility.TagHelpers
             if (!string.IsNullOrEmpty(OnBlurJs))
             {
                 inputOutput.Attributes.Add("onblur", $"{OnBlurJs}(this)");
+            }
+
+            if (DateTimePicker.HasValue && !string.IsNullOrWhiteSpace(inputId))
+            {
+                var pickerId = $"{inputId}_datetimepicker";
+
+                var icon = new TagBuilder("span");
+                if (DateTimePicker.Value == DateTimePickerType.DateTime)
+                {
+                    icon.AddCssClass(dateTimeIconCalendarClass);
+                }
+                else
+                {
+                    icon.AddCssClass(dateTimeIconClockClass);
+                }
+
+                var inputGroupText = new TagBuilder("div");
+                inputGroupText.AddCssClass(dateTimeGroupTextClass);
+                inputGroupText.InnerHtml.SetHtmlContent(icon);
+
+                var inputGroupAppend = new TagBuilder("div");
+                inputGroupAppend.AddCssClass(dateTimeGroupAppendClass);
+                inputGroupAppend.Attributes.Add("data-target", $"#{pickerId}");
+                inputGroupAppend.Attributes.Add("data-toggle", dateTimeToggle);
+                inputGroupAppend.InnerHtml.SetHtmlContent(inputGroupText);
+
+                inputOutput.Attributes.RemoveAll("type");
+                inputOutput.Attributes.Add("type", dateTimeInputType);
+                inputOutput.Attributes.AddCssClass(dateTimeInputClass);
+                inputOutput.Attributes.Add("data-target", $"#{pickerId}");
+                inputOutput.Attributes.Add("data-toggle", dateTimeToggle);
+                inputOutput.PostElement.SetHtmlContent(inputGroupAppend);
+
+                var pickerGroup = new TagBuilder("div");
+                pickerGroup.Attributes.Add("id", pickerId);
+                pickerGroup.AddCssClass(dateTimeGroupClass);
+                pickerGroup.Attributes.Add("data-target-input", dateTimeTargetInput);
+                inputOutput.PreElement.AppendHtml(pickerGroup.RenderStartTag());
+                inputOutput.PostElement.AppendHtml(pickerGroup.RenderEndTag());
             }
 
             return inputOutput;
@@ -168,7 +218,7 @@ namespace Ocuda.Utility.TagHelpers
                     ViewContext = ViewContext
                 };
 
-            TagHelperOutput validationMessageOutput = CreateTagHelperOutput("span");
+            TagHelperOutput validationMessageOutput = CreateTagHelperOutput("span", null);
 
             var validatorClass = defaultValidationMessageClass;
 
@@ -197,11 +247,12 @@ namespace Ocuda.Utility.TagHelpers
             return div;
         }
 
-        private TagHelperOutput CreateTagHelperOutput(string tagName)
+        private TagHelperOutput CreateTagHelperOutput(string tagName,
+            TagHelperAttributeList attributes)
         {
             return new TagHelperOutput(
                 tagName: tagName,
-                attributes: new TagHelperAttributeList(),
+                attributes: attributes ?? new TagHelperAttributeList(),
                 getChildContentAsync: (_, __) =>
                 {
                     return Task.Factory.StartNew<TagHelperContent>(
@@ -209,5 +260,11 @@ namespace Ocuda.Utility.TagHelpers
                 }
             );
         }
+    }
+
+    public enum DateTimePickerType
+    {
+        DateTime,
+        TimeOnly
     }
 }

@@ -40,6 +40,7 @@
   {
     "outputFileName": "wwwroot/js/dt-picker.min.js",
     "inputFiles": [
+      "node_modules/moment/moment.js",
       "node_modules/tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4.js"
     ],
     "minify": {
