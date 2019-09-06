@@ -511,8 +511,7 @@
                     </text>
                 }
                 $("#itemEditModal").modal("show");
-                $("#updateItem").attr("action",
-                    "@Url.Action(nameof(LocationsController.EditLocationGroup),LocationsController.Name)");
+                $("#updateItem").attr("action","@Url.Action(nameof(LocationsController.EditLocationGroup),LocationsController.Name)");
                 $('#updateItem').attr('name', 'groups');
                 GetEditInfo($(this).data("locationgroupid"), "Group");
             });
@@ -536,15 +535,13 @@
                 }
                 $("#itemEditModal").modal("show");
                 $('#updateItem').attr('name', 'features');
-                $("#updateItem").attr("action",
-                    "@Url.Action(nameof(LocationsController.EditLocationFeature),LocationsController.Name)");
+                $("#updateItem").attr("action","@Url.Action(nameof(LocationsController.EditLocationFeature),LocationsController.Name)");
                 GetEditInfo($(this).data("locationfeatureid"), "Feature");
             });
             $("#editHoursButton").on('click', function (e) {
                 $("#editModalTitle").text("Edit @Model.Location.Name's Hours");
                 $("#itemEditModal").modal("show");
-                $("#updateItem").attr("action",
-                    "@Url.Action(nameof(LocationsController.EditLocationHours),LocationsController.Name)");
+                $("#updateItem").attr("action","@Url.Action(nameof(LocationsController.EditLocationHours),LocationsController.Name)");
                 $('#updateItem').attr('name', 'hours');
                 GetEditInfo(null, "Hours");
             });
@@ -601,15 +598,13 @@
             $('.deletegroupButton').on('click', function () {
                 $($("#deleteModal").find("button.btn-danger")).attr("data-locationgroupid",$(this).data("locationgroupid").toString());
                 $($("#deleteModal").find("button.btn-danger")).attr("id", "confirmDeleteGroup")
-                $("#deleteModal").find(".modal-body").html("Are you sure you want to remove the group '<strong>"
-                    + $(this).data("groupname") + "</strong>' from '<strong>@Model.Location.Name</strong>'")
+                $("#deleteModal").find(".modal-body").html("Are you sure you want to remove the group '<strong>" + $(this).data("groupname") + "</strong>' from '<strong>@Model.Location.Name</strong>'")
                 $("#deleteModal").modal("show");
             });
             $('.deleteFeatureButton').on('click', function () {
                 $($("#deleteModal").find("button.btn-danger")).attr("data-locationfeatureId",$(this).data("locationfeatureid").toString());
                 $($("#deleteModal").find("button.btn-danger")).attr("id", "confirmDeleteFeature")
-                $("#deleteModal").find(".modal-body").html("Are you sure you want to remove the feature '<strong>"
-                    + $(this).data("featurename") + "</strong>' from '<strong>@Model.Location.Name</strong>'")
+                $("#deleteModal").find(".modal-body").html("Are you sure you want to remove the feature '<strong>" + $(this).data("featurename") + "</strong>' from '<strong>@Model.Location.Name</strong>'")
                 $("#deleteModal").modal("show");
             });
             </text>

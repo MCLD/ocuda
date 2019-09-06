@@ -129,8 +129,6 @@ td.group-item:hover, td.feature-item:hover{
 tr.itemRow td {
     vertical-align: middle;
     word-wrap: break-word;
-    min-width: 160px;
-    max-width: 160px;
 }
 
 @media screen and (max-height: 500px) {
@@ -138,7 +136,7 @@ tr.itemRow td {
         padding-top: 15px;
     }
 
-        .navcolumn a {
-            font-size: 18px;
-        }
+    .navcolumn a {
+        font-size: 18px;
+    }
 }
