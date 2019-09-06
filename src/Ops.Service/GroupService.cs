@@ -15,17 +15,14 @@ namespace Ocuda.Ops.Service
 {
     public class GroupService : IGroupService
     {
-        private readonly ILogger<GroupService> _logger;
         private readonly IGroupRepository _groupRepository;
 
-        public GroupService(ILogger<GroupService> logger,
-            IGroupRepository groupRepository)
+        public GroupService(IGroupRepository groupRepository)
         {
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
             _groupRepository = groupRepository
                 ?? throw new ArgumentNullException(nameof(groupRepository));
         }
+
         public async Task<List<Group>> GetMissingGroups(List<int> locationGroupIds)
         {
             var allGroups = await _groupRepository.GetAllGroupsAsync();
@@ -67,6 +64,7 @@ namespace Ocuda.Ops.Service
         {
             return await _groupRepository.FindAsync(groupId);
         }
+
         public async Task<Group> GetGroupByStubAsync(string groupType)
         {
             var group = await _groupRepository.GetGroupByStubAsync(groupType);
@@ -79,59 +77,35 @@ namespace Ocuda.Ops.Service
                 return group;
             }
         }
+
         public async Task<Group> AddGroupAsync(Group group)
         {
-            try
-            {
-                group.GroupType = group.GroupType?.Trim();
-                group.Stub = group.Stub.Trim();
-                group.SubscriptionUrl = group.SubscriptionUrl?.Trim();
-                await ValidateAsync(group);
-                await _groupRepository.AddAsync(group);
-                await _groupRepository.SaveAsync();
-            }
-            catch (OcudaException ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new OcudaException(ex.Message);
-            }
-
-                return group;
+            group.GroupType = group.GroupType?.Trim();
+            group.Stub = group.Stub.Trim();
+            group.SubscriptionUrl = group.SubscriptionUrl?.Trim();
+            await ValidateAsync(group);
+            await _groupRepository.AddAsync(group);
+            await _groupRepository.SaveAsync();
+            return group;
         }
 
         public async Task<Group> EditAsync(Group group)
         {
-            try
-            {
-                var currentGroup = await _groupRepository.FindAsync(group.Id);
-                await ValidateAsync(currentGroup);
-                currentGroup.GroupType = group.GroupType?.Trim();
-                currentGroup.Stub = group.Stub.Trim();
-                currentGroup.IsLocationRegion = group.IsLocationRegion;
-                currentGroup.SubscriptionUrl = group.SubscriptionUrl?.Trim();
-                _groupRepository.Update(currentGroup);
-                await _groupRepository.SaveAsync();
-                return currentGroup;
-            }
-            catch (OcudaException ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new OcudaException(ex.Message);
-            }
+            var currentGroup = await _groupRepository.FindAsync(group.Id);
+            await ValidateAsync(currentGroup);
+            currentGroup.GroupType = group.GroupType?.Trim();
+            currentGroup.Stub = group.Stub.Trim();
+            currentGroup.IsLocationRegion = group.IsLocationRegion;
+            currentGroup.SubscriptionUrl = group.SubscriptionUrl?.Trim();
+            _groupRepository.Update(currentGroup);
+            await _groupRepository.SaveAsync();
+            return currentGroup;
         }
 
         public async Task DeleteAsync(int id)
         {
-            try
-            {
-                _groupRepository.Remove(id);
-                await _groupRepository.SaveAsync();
-            }
-            catch(OcudaException ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new OcudaException(ex.Message);
-            }
+            _groupRepository.Remove(id);
+            await _groupRepository.SaveAsync();
         }
 
         public async Task<DataWithCount<ICollection<Group>>> PageItemsAsync(

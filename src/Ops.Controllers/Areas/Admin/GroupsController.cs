@@ -22,15 +22,12 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     public class GroupsController: BaseController<GroupsController>
     {
         private readonly IGroupService _groupService;
-        private readonly IConfiguration _config;
 
         public static string Name { get { return "Groups"; } }
 
-        public GroupsController(IConfiguration config,
-            ServiceFacades.Controller<GroupsController> context,
+        public GroupsController(ServiceFacades.Controller<GroupsController> context,
             IGroupService groupService) : base(context)
         {
-            _config = config ?? throw new ArgumentNullException(nameof(config));
             _groupService = groupService
                 ?? throw new ArgumentNullException(nameof(groupService));
         }
@@ -67,6 +64,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 PaginateModel = paginateModel
             });
         }
+
         [HttpGet("{groupStub}")]
         [RestoreModelState]
         public async Task<IActionResult> Groups(string groupStub)
@@ -88,6 +86,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 return RedirectToAction(nameof(GroupsController.Index));
             }
         }
+
         [HttpGet("[action]")]
         [RestoreModelState]
         public IActionResult CreateGroup()
@@ -111,7 +110,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             if (group.IsLocationRegion && string.IsNullOrEmpty(group.SubscriptionUrl))
             {
                 ModelState.AddModelError("Group.SubscriptionUrl", "A 'Subscription URL' is required for a location region.");
-                ShowAlertDanger($"Invalid paramaters");
+                ShowAlertDanger("A 'Subscription URL' is required for a location region.");
                 group.IsNewGroup = true;
                 return RedirectToAction(nameof(CreateGroup));
             }
@@ -126,7 +125,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
                 catch (OcudaException ex)
                 {
-                    _logger.LogError(ex, $"Problem creating Group {group.GroupType}", ex.Message);
+                    _logger.LogError($"Problem creating Group {group.GroupType}: {ex.Message}");
                     ShowAlertDanger($"Unable to create Group: {ex.Message}");
                     group.IsNewGroup = true;
                     return View("GroupDetails", new GroupViewModel
@@ -138,7 +137,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             else
             {
-                ShowAlertDanger($"Invalid paramaters");
+                ShowAlertDanger("Invalid paramaters");
                 group.IsNewGroup = true;
                 return RedirectToAction(nameof(CreateGroup));
             }
@@ -157,7 +156,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             catch (OcudaException ex)
             {
                 ShowAlertDanger($"Unable to delete Group {group.GroupType}: {ex.Message}");
-                _logger.LogError(ex, $"Problem deleting Group {group.GroupType}", ex.Message);
+                _logger.LogError($"Problem deleting Group {group.GroupType}: {ex.Message}");
             }
 
             return RedirectToAction(nameof(GroupsController.Index));
@@ -171,7 +170,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             if (group.IsLocationRegion && string.IsNullOrEmpty(group.SubscriptionUrl))
             {
                 ModelState.AddModelError("Group.SubscriptionUrl", "A 'Subscription URL' is required for a location region.");
-                ShowAlertDanger($"Invalid paramaters");
+                ShowAlertDanger($"A 'Subscription URL' is required for a location region.");
                 group.IsNewGroup = false;
                 return View("GroupDetails", new GroupViewModel
                 {
@@ -191,7 +190,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 catch (OcudaException ex)
                 {
                     ShowAlertDanger($"Unable to update Group {group.GroupType} : {ex.Message}");
-                    _logger.LogError(ex, $"Problem updating {group.GroupType}",ex.Message);
+                    _logger.LogError($"Problem updating {group.GroupType}: {ex.Message}");
                     group.IsNewGroup = false;
                     return View("GroupDetails", new GroupViewModel
                     {

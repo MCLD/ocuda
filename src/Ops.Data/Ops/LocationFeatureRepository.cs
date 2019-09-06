@@ -27,12 +27,14 @@ namespace Ocuda.Ops.Data.Ops
                 .Where(_ => _.LocationId == location.Id)
                 .ToListAsync();
         }
+
         public async Task<List<LocationFeature>> GeAllLocationFeaturesAsync()
         {
             return await DbSet
                 .AsNoTracking()
                 .ToListAsync();
         }
+
         public async Task<List<LocationFeature>> GetLocationFeaturesByLocationId(int locationId)
         {
             return await DbSet
@@ -45,7 +47,9 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id != locationfeature.Id &&_.LocationId == locationfeature.LocationId && _.FeatureId == locationfeature.FeatureId)
+                .Where(_ => _.Id != locationfeature.Id
+                    &&_.LocationId == locationfeature.LocationId
+                    && _.FeatureId == locationfeature.FeatureId)
                 .AnyAsync();
         }
     }

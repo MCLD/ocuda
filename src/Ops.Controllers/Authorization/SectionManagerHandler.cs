@@ -32,7 +32,7 @@ namespace Ocuda.Ops.Controllers.Authorization
                 }
                 else
                 {
-                    if (context.Resource 
+                    if (context.Resource
                         is Microsoft.AspNetCore.Mvc.Filters.AuthorizationFilterContext resource)
                     {
                         var sectionName = resource.RouteData.Values["section"]?.ToString();

@@ -14,14 +14,10 @@ namespace Ocuda.Ops.Service
 {
     public class LocationFeatureService : ILocationFeatureService
     {
-        private readonly ILogger<LocationFeatureService> _logger;
         private readonly ILocationFeatureRepository _locationFeatureRepository;
 
-        public LocationFeatureService(ILogger<LocationFeatureService> logger,
-            ILocationFeatureRepository locationFeatureRepository)
+        public LocationFeatureService(ILocationFeatureRepository locationFeatureRepository)
         {
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
             _locationFeatureRepository = locationFeatureRepository
                 ?? throw new ArgumentNullException(nameof(locationFeatureRepository));
         }
@@ -30,6 +26,7 @@ namespace Ocuda.Ops.Service
         {
             return await _locationFeatureRepository.GeAllLocationFeaturesAsync();
         }
+
         public async Task<List<LocationFeature>> GetLocationFeaturesByLocationAsync(Location location)
         {
             return await _locationFeatureRepository.GetLocationFeaturesByLocationId(location.Id);
@@ -42,56 +39,34 @@ namespace Ocuda.Ops.Service
 
         public async Task<LocationFeature> AddLocationFeatureAsync(LocationFeature locationFeature)
         {
-            try
-            {
-                await ValidateAsync(locationFeature);
-                await _locationFeatureRepository.AddAsync(locationFeature);
-                await _locationFeatureRepository.SaveAsync();
-            }
-            catch (OcudaException ex)
-            {
-                throw new OcudaException(ex.Message);
-            }
-
-                return locationFeature;
+            await ValidateAsync(locationFeature);
+            await _locationFeatureRepository.AddAsync(locationFeature);
+            await _locationFeatureRepository.SaveAsync();
+            return locationFeature;
         }
 
         public async Task<LocationFeature> EditAsync(LocationFeature locationFeature)
         {
-            try
-            {
-                var currentLocationFeature = await _locationFeatureRepository.FindAsync(locationFeature.Id);
-                currentLocationFeature.Text = locationFeature.Text;
-                currentLocationFeature.RedirectUrl = locationFeature.RedirectUrl;
-                await ValidateAsync(currentLocationFeature);
-                _locationFeatureRepository.Update(currentLocationFeature);
-                await _locationFeatureRepository.SaveAsync();
-                return currentLocationFeature;
-            }
-            catch (OcudaException ex)
-            {
-                throw new OcudaException(ex.Message);
-            }
+            var currentLocationFeature = await _locationFeatureRepository.FindAsync(locationFeature.Id);
+            currentLocationFeature.Text = locationFeature.Text;
+            currentLocationFeature.RedirectUrl = locationFeature.RedirectUrl;
+            await ValidateAsync(currentLocationFeature);
+            _locationFeatureRepository.Update(currentLocationFeature);
+            await _locationFeatureRepository.SaveAsync();
+            return currentLocationFeature;
         }
 
         public async Task DeleteAsync(int id)
         {
-            try
-            {
-                _locationFeatureRepository.Remove(id);
-                await _locationFeatureRepository.SaveAsync();
-            }
-            catch(OcudaException ex)
-            {
-                throw new OcudaException(ex.Message);
-            }
+            _locationFeatureRepository.Remove(id);
+            await _locationFeatureRepository.SaveAsync();
         }
 
         private async Task ValidateAsync(LocationFeature locationfeature)
         {
             if (await _locationFeatureRepository.IsDuplicateAsync(locationfeature))
             {
-                throw new OcudaException($"Location Feature already exists.");
+                throw new OcudaException("Location's Feature, already exists.");
             }
         }
     }

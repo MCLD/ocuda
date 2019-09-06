@@ -16,6 +16,7 @@ namespace BranchLocator.Models.PlaceDetails
         [JsonProperty("status")]
         public string Status { get; set; }
     }
+
     public class PlaceDetailsResult
     {
         [JsonProperty("address_components")]
@@ -90,6 +91,7 @@ namespace BranchLocator.Models.PlaceDetails
         [JsonProperty("website")]
         public string Website { get; set; }
     }
+
     public partial class AddressComponent
     {
         [JsonProperty("long_name")]
@@ -100,8 +102,8 @@ namespace BranchLocator.Models.PlaceDetails
 
         [JsonProperty("types")]
         public string[] Types { get; set; }
-
     }
+
     public partial class ViewPort
     {
         [JsonProperty("northeast")]
@@ -110,6 +112,7 @@ namespace BranchLocator.Models.PlaceDetails
         [JsonProperty("southwest")]
         public SouthWest SouthWest { get; set; }
     }
+
     public partial class NorthEast
     {
         [JsonProperty("lat")]
@@ -117,8 +120,8 @@ namespace BranchLocator.Models.PlaceDetails
 
         [JsonProperty("lng")]
         public double Lng { get; set; }
-
     }
+
     public partial class SouthWest
     {
         [JsonProperty("lat")]
@@ -126,22 +129,13 @@ namespace BranchLocator.Models.PlaceDetails
 
         [JsonProperty("lng")]
         public double Lng { get; set; }
-
     }
 
     public partial class GeocodePlaceDetails
     {
         public static GeocodePlaceDetails FromJson(string json)
         {
-            return JsonConvert.DeserializeObject<GeocodePlaceDetails>(json, BranchLocator.Models.PlaceDetails.Converter.Settings);
-        }
-    }
-
-    public static class Serialize
-    {
-        public static string ToJson(this GeocodePlaceDetails self)
-        {
-            return JsonConvert.SerializeObject(self, BranchLocator.Models.PlaceDetails.Converter.Settings);
+            return JsonConvert.DeserializeObject<GeocodePlaceDetails>(json, Converter.Settings);
         }
     }
 

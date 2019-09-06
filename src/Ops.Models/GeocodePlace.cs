@@ -17,7 +17,8 @@ namespace BranchLocator.Models
         [JsonProperty("status")]
         public string Status { get; set; }
     }
-    public class PlaceResult
+
+    public partial class PlaceResult
     {
         [JsonProperty("formatted_address")]
         public string FormattedAddress { get; set; }
@@ -48,9 +49,8 @@ namespace BranchLocator.Models
 
         [JsonProperty("vicinity")]
         public string Vicinity { get; set; }
-
-
     }
+
     public partial class Geometry
     {
         [JsonProperty("location")]
@@ -58,8 +58,8 @@ namespace BranchLocator.Models
 
         [JsonProperty("viewport")]
         public ViewPort Viewport { get; set; }
-
     }
+
     public partial class PlusCode
     {
         [JsonProperty("compound_code")]
@@ -76,8 +76,8 @@ namespace BranchLocator.Models
 
         [JsonProperty("lng")]
         public double Lng { get; set; }
-
     }
+
     public partial class Photo
     {
         [JsonProperty("height")]
@@ -112,9 +112,8 @@ namespace BranchLocator.Models
 
         [JsonProperty("close")]
         public Close Close { get; set; }
-
-
     }
+
     public partial class Open
     {
         [JsonProperty("day")]
@@ -122,8 +121,8 @@ namespace BranchLocator.Models
 
         [JsonProperty("time")]
         public string Time { get; set; }
-
     }
+
     public partial class Close
     {
         [JsonProperty("day")]
@@ -131,8 +130,8 @@ namespace BranchLocator.Models
 
         [JsonProperty("time")]
         public string Time { get; set; }
-
     }
+
     public partial class Aspect
     {
         [JsonProperty("rating")]
@@ -140,7 +139,6 @@ namespace BranchLocator.Models
 
         [JsonProperty("type")]
         public string Type { get; set; }
-
     }
 
     public partial class GeocodePlace
@@ -148,14 +146,6 @@ namespace BranchLocator.Models
         public static GeocodePlace FromJson(string json)
         {
             return JsonConvert.DeserializeObject<GeocodePlace>(json, Converter.Settings);
-        }
-    }
-
-    public static class Serialize
-    {
-        public static string ToJson(this GeocodePlace self)
-        {
-            return JsonConvert.SerializeObject(self, Converter.Settings);
         }
     }
 

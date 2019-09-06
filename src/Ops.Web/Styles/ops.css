@@ -126,6 +126,12 @@ span.format-addr {
 td.group-item:hover, td.feature-item:hover{
     cursor: pointer;
 }
+tr.itemRow td {
+    vertical-align: middle;
+    word-wrap: break-word;
+    min-width: 160px;
+    max-width: 160px;
+}
 
 @media screen and (max-height: 500px) {
     .navcolumn {

@@ -2,24 +2,38 @@
     <div class="container">
         <div class="row">
             <div id="modalItemInfo" class="col-xs-12 col">
-                <input value="@Model.LocationFeature.Id" asp-for="LocationFeature.Id" type="hidden" />
-                <input value="@Model.LocationFeature.LocationId" asp-for="LocationFeature.LocationId" type="hidden" />
-                <input value="@Model.LocationFeature.FeatureId" asp-for="LocationFeature.FeatureId" type="hidden" />
+                <input value="@Model.LocationFeature.Id" 
+                       asp-for="LocationFeature.Id" 
+                       type="hidden" />
+                <input value="@Model.LocationFeature.LocationId" 
+                       asp-for="LocationFeature.LocationId" 
+                       type="hidden" />
+                <input value="@Model.LocationFeature.FeatureId" 
+                       asp-for="LocationFeature.FeatureId" 
+                       type="hidden" />
                 @foreach (var feature in Model.Features.Where(_ => _.Id == Model.LocationFeature.FeatureId))
                 {
                     if (string.IsNullOrEmpty(feature.Stub))
                     {
-                        <input value="@Model.LocationFeature.Text" asp-for="LocationFeature.Text" type="hidden" />
-                        <input value="@Model.LocationFeature.RedirectUrl" asp-for="LocationFeature.RedirectUrl" formgroup autocomplete="off" />
+                        <input value="@Model.LocationFeature.Text" 
+                               asp-for="LocationFeature.Text" 
+                               type="hidden" />
+                        <input value="@Model.LocationFeature.RedirectUrl" 
+                               asp-for="LocationFeature.RedirectUrl" 
+                               formgroup 
+                               autocomplete="off" />
                     }
                     else
                     {
-                        <input value="@Model.LocationFeature.RedirectUrl" asp-for="LocationFeature.RedirectUrl" type="hidden" />
+                        <input value="@Model.LocationFeature.RedirectUrl" 
+                               asp-for="LocationFeature.RedirectUrl" 
+                               type="hidden" />
                         <div class="row">
                             <div class="card-body">
                                 <div class="form-group row" id="text-div">
                                     <label asp-for="LocationFeature.Text"
-                                           class="col-md-3 col-form-label text-md-right"></label>
+                                           class="col-md-3 col-form-label text-md-right">
+                                    </label>
                                     <div class="col-md-9">
                                         <ul class="nav nav-tabs">
                                             <li class="nav-item">

@@ -111,7 +111,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             if(feature.NeedsPopup && string.IsNullOrEmpty(feature.Stub))
             {
                 ModelState.AddModelError("Feature.Stub", "A 'Stub' is required for a popup.");
-                ShowAlertDanger($"Invalid paramaters");
+                ShowAlertDanger("A 'Stub' is required for a popup.");
                 feature.IsNewFeature = true;
                 return RedirectToAction(nameof(CreateFeature));
             }

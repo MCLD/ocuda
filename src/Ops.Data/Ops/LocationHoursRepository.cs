@@ -41,7 +41,9 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id != locationHour.Id && _.LocationId == locationHour.LocationId && _.DayOfWeek == locationHour.DayOfWeek)
+                .Where(_ => _.Id != locationHour.Id
+                    && _.LocationId == locationHour.LocationId
+                    && _.DayOfWeek == locationHour.DayOfWeek)
                 .AnyAsync();
         }
     }

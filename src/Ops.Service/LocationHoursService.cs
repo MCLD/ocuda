@@ -33,54 +33,31 @@ namespace Ocuda.Ops.Service
 
         public async Task<LocationHours> AddLocationHoursAsync(LocationHours locationHours)
         {
-            try
-            {
-                    await ValidateAsync(locationHours);
-                    await _locationHoursRepository.AddAsync(locationHours);
-                    await _locationHoursRepository.SaveAsync();
-            }
-            catch (OcudaException ex)
-            {
-                throw new OcudaException(ex.Message);
-            }
-
-                return locationHours;
+            await ValidateAsync(locationHours);
+            await _locationHoursRepository.AddAsync(locationHours);
+            await _locationHoursRepository.SaveAsync();
+            return locationHours;
         }
 
         public async Task<List<LocationHours>> EditAsync(List<LocationHours> locationHours)
         {
-            try
+            foreach (var hour in locationHours)
             {
-                foreach (var hour in locationHours)
-                {
-                    var currentLocationHour = await _locationHoursRepository.FindAsync(hour.Id);
-                    currentLocationHour.Open = hour.Open;
-                    currentLocationHour.OpenTime = hour.OpenTime;
-                    currentLocationHour.CloseTime = hour.CloseTime;
-                    await ValidateAsync(currentLocationHour);
-                    _locationHoursRepository.Update(currentLocationHour);
-                    await _locationHoursRepository.SaveAsync();
-                }
-                return locationHours;
+                var currentLocationHour = await _locationHoursRepository.FindAsync(hour.Id);
+                currentLocationHour.Open = hour.Open;
+                currentLocationHour.OpenTime = hour.OpenTime;
+                currentLocationHour.CloseTime = hour.CloseTime;
+                await ValidateAsync(currentLocationHour);
+                _locationHoursRepository.Update(currentLocationHour);
+                await _locationHoursRepository.SaveAsync();
             }
-            catch (OcudaException ex)
-            {
-                throw new OcudaException(ex.Message);
-            }
+            return locationHours;
         }
 
         public async Task DeleteAsync(int id)
         {
-            try
-            {
-                _locationHoursRepository.Remove(id);
-                await _locationHoursRepository.SaveAsync();
-            }
-            catch(OcudaException ex)
-            {
-                _logger.LogError(ex, "Could not delete location", ex.Message);
-                throw new OcudaException(ex.Message);
-            }
+            _locationHoursRepository.Remove(id);
+            await _locationHoursRepository.SaveAsync();
         }
 
         private async Task ValidateAsync(LocationHours locationHour)

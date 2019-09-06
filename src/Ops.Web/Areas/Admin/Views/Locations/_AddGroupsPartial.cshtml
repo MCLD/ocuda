@@ -11,18 +11,18 @@ else
             <thead>
                 <tr>
                     <th>Group Type</th>
-                    <th width="100px">Is Location Region</th>
-                    <th width="44px">&nbsp;</th>
+                    <th>Is Location Region</th>
+                    <th>&nbsp;</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var group in Model.Groups)
                 {
                     <tr class="itemRow">
-                        <td style="vertical-align:middle;">
+                        <td>
                             @group.GroupType
                         </td>
-                        <td class="text-center" style="vertical-align:middle;">
+                        <td class="text-center">
                             @if (group.IsLocationRegion)
                             {
                                 <span class="fas fa-check"></span>

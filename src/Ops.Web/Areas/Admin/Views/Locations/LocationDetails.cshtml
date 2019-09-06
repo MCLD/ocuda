@@ -96,8 +96,14 @@
       display="inline">
     <input asp-for="GroupList" type="hidden" />
     <input asp-for="FeatureList" type="hidden" />
-    <input value="@Model.Location.Id" asp-for="Location.Id" id="location-id" type="hidden" />
-    <input value="@Model.Location.Name" asp-for="Location.Name" formgroup autocomplete="off" />
+    <input value="@Model.Location.Id" 
+           asp-for="Location.Id" 
+           id="location-id" 
+           type="hidden" />
+    <input value="@Model.Location.Name" 
+           asp-for="Location.Name" 
+           formgroup 
+           autocomplete="off" />
     <input value="@Model.Location.Stub"
            asp-for="Location.Stub"
            info-tooltip="The stub is the nickname/URL for the location."
@@ -112,9 +118,18 @@
            asp-for="Location.Address"
            formgroup
            autocomplete="off" />
-    <input value="@Model.Location.City" asp-for="Location.City" formgroup autocomplete="off" />
-    <input value="@Model.Location.State" asp-for="Location.State" formgroup autocomplete="off" />
-    <input value="@Model.Location.Zip" asp-for="Location.Zip" formgroup autocomplete="off" />
+    <input value="@Model.Location.City" 
+           asp-for="Location.City" 
+           formgroup 
+           autocomplete="off" />
+    <input value="@Model.Location.State" 
+           asp-for="Location.State" 
+           formgroup 
+           autocomplete="off" />
+    <input value="@Model.Location.Zip" 
+           asp-for="Location.Zip" 
+           formgroup 
+           autocomplete="off" />
     <input value="@Model.Location.MapLink"
            asp-for="Location.MapLink"
            formgroup
@@ -143,11 +158,16 @@
            autocomplete="off" />
     <div class="row">
         <div class="col-md-9 offset-md-3">
-            <a class="btn btn-secondary" id="return-home" asp-action="@nameof(LocationsController.Index)">Return to Locations</a>
+            <a class="btn btn-secondary" 
+               id="return-home" 
+               asp-action="@nameof(LocationsController.Index)">Return to Locations</a>
             @if (Model.Location.IsNewLocation)
             {
                 <text>
-                    <button type="submit" id="submit" value="Submit" class="btn btn-success btn-spinner">
+                    <button type="submit" 
+                            id="submit" 
+                            value="Submit" 
+                            class="btn btn-success btn-spinner">
                         <span class="buttonText">Add Location</span>
                         <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
                     </button>
@@ -156,7 +176,10 @@
             else
             {
                 <text>
-                    <button type="submit" id="submit" value="Submit" class="btn btn-success btn-spinner">
+                    <button type="submit" 
+                            id="submit" 
+                            value="Submit" 
+                            class="btn btn-success btn-spinner">
                         <span class="buttonText">Update Location</span>
                         <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
                     </button>
@@ -169,7 +192,10 @@
         <div class="col-3 card">
             <div class="card-header">
                 <h4 style="margin: 0; display: initial;">Hours</h4>
-                <button type="button" id="editHoursButton" class="btn btn-warning" style="float:right;">Edit Hours</button>
+                <button type="button" 
+                        id="editHoursButton" 
+                        class="btn btn-warning" 
+                        style="float:right;">Edit Hours</button>
             </div>
             @if (Model.Location.IsAlwaysOpen)
             {
@@ -194,7 +220,10 @@
         <div class="col-6 card">
             <div class="card-header">
                 <h4 style="margin: 0; display: initial;">Features</h4>
-                <button type="button" id="addFeatureButton" class="btn btn-warning" style="float:right;">Add Feature</button>
+                <button type="button" 
+                        id="addFeatureButton" 
+                        class="btn btn-warning" 
+                        style="float:right;">Add Feature</button>
             </div>
             @if (Model.LocationFeatures.Any())
             {
@@ -213,7 +242,8 @@
                             @foreach (var feature in Model.Features.Where(_ => _.Id == locationFeature.FeatureId))
                             {
                                 <tr>
-                                    <td class="td-class feature-item" data-locationFeatureId="@locationFeature.Id">@feature.Name</td>
+                                    <td class="td-class feature-item" 
+                                        data-locationFeatureId="@locationFeature.Id">@feature.Name</td>
                                     <td style="vertical-align:middle;">
                                         @if (!string.IsNullOrEmpty(locationFeature.Text))
                                         {
@@ -228,7 +258,14 @@
                                         }
                                     </td>
                                     <td style="vertical-align:middle;">@locationFeature.RedirectUrl</td>
-                                    <td><button type="button" class="btn btn-link btn-xs deleteFeatureButton" data-locationFeatureId="@locationFeature.Id" data-featureName="@feature.Name"><span class="fa fa-2x fas fa-minus-circle text-danger" aria-hidden="true"></span></button></td>
+                                    <td><button type="button" 
+                                                class="btn btn-link btn-xs deleteFeatureButton" 
+                                                data-locationFeatureId="@locationFeature.Id" 
+                                                data-featureName="@feature.Name">
+                                            <span class="fa fa-2x fas fa-minus-circle text-danger" 
+                                                  aria-hidden="true"></span>
+                                        </button>
+                                    </td>
                                 </tr>
                             }
                         }
@@ -243,7 +280,11 @@
         <div class="col-6 card">
             <div class="card-header">
                 <h4 style="margin: 0; display: initial;">Groups</h4>
-                <button type="button" id="addGroupButton" class="btn btn-warning" data-toggle="modal" style="float:right;">Add Group</button>
+                <button type="button" 
+                        id="addGroupButton" 
+                        class="btn btn-warning" 
+                        data-toggle="modal" 
+                        style="float:right;">Add Group</button>
             </div>
             @if (Model.LocationGroups.Any())
             {
@@ -261,16 +302,28 @@
                             @foreach (var group in Model.Groups.Where(_ => _.Id == locationGroup.GroupId))
                             {
                                 <tr>
-                                    <td style="vertical-align:middle;" class="group-item" data-locationgroupid="@locationGroup.Id">@group.GroupType</td>
+                                    <td style="vertical-align:middle;" 
+                                        class="group-item" 
+                                        data-locationgroupid="@locationGroup.Id">@group.GroupType</td>
                                     @if (group.IsLocationRegion)
                                     {
-                                        <td class="text-center" style="vertical-align:middle;"><span class="fas fa-check"></span></td>
+                                        <td class="text-center" 
+                                            style="vertical-align:middle;">
+                                            <span class="fas fa-check"></span>
+                                        </td>
                                     }
                                     else
                                     {
                                         <td></td>
                                     }
-                                    <td><button type="button" class="btn btn-link btn-xs deletegroupButton" data-locationgroupid="@locationGroup.Id" data-groupname="@group.GroupType"><span class="fa fa-2x fas fa-minus-circle text-danger" aria-hidden="true"></span></button></td>
+                                    <td>
+                                        <button type="button" 
+                                                class="btn btn-link btn-xs deletegroupButton" 
+                                                data-locationgroupid="@locationGroup.Id" 
+                                                data-groupname="@group.GroupType">
+                                            <span class="fa fa-2x fas fa-minus-circle text-danger" 
+                                                  aria-hidden="true"></span>
+                                        </button></td>
                                 </tr>
                             }
                         }
@@ -458,7 +511,8 @@
                     </text>
                 }
                 $("#itemEditModal").modal("show");
-                $("#updateItem").attr("action", "@Url.Action(nameof(LocationsController.EditLocationGroup),LocationsController.Name)");
+                $("#updateItem").attr("action",
+                    "@Url.Action(nameof(LocationsController.EditLocationGroup),LocationsController.Name)");
                 $('#updateItem').attr('name', 'groups');
                 GetEditInfo($(this).data("locationgroupid"), "Group");
             });
@@ -482,13 +536,15 @@
                 }
                 $("#itemEditModal").modal("show");
                 $('#updateItem').attr('name', 'features');
-                $("#updateItem").attr("action", "@Url.Action(nameof(LocationsController.EditLocationFeature),LocationsController.Name)");
+                $("#updateItem").attr("action",
+                    "@Url.Action(nameof(LocationsController.EditLocationFeature),LocationsController.Name)");
                 GetEditInfo($(this).data("locationfeatureid"), "Feature");
             });
             $("#editHoursButton").on('click', function (e) {
                 $("#editModalTitle").text("Edit @Model.Location.Name's Hours");
                 $("#itemEditModal").modal("show");
-                $("#updateItem").attr("action", "@Url.Action(nameof(LocationsController.EditLocationHours),LocationsController.Name)");
+                $("#updateItem").attr("action",
+                    "@Url.Action(nameof(LocationsController.EditLocationHours),LocationsController.Name)");
                 $('#updateItem').attr('name', 'hours');
                 GetEditInfo(null, "Hours");
             });
@@ -545,13 +601,15 @@
             $('.deletegroupButton').on('click', function () {
                 $($("#deleteModal").find("button.btn-danger")).attr("data-locationgroupid",$(this).data("locationgroupid").toString());
                 $($("#deleteModal").find("button.btn-danger")).attr("id", "confirmDeleteGroup")
-                $("#deleteModal").find(".modal-body").html("Are you sure you want to remove the group '<strong>" + $(this).data("groupname") + "</strong>' from '<strong>@Model.Location.Name</strong>'")
+                $("#deleteModal").find(".modal-body").html("Are you sure you want to remove the group '<strong>"
+                    + $(this).data("groupname") + "</strong>' from '<strong>@Model.Location.Name</strong>'")
                 $("#deleteModal").modal("show");
             });
             $('.deleteFeatureButton').on('click', function () {
                 $($("#deleteModal").find("button.btn-danger")).attr("data-locationfeatureId",$(this).data("locationfeatureid").toString());
                 $($("#deleteModal").find("button.btn-danger")).attr("id", "confirmDeleteFeature")
-                $("#deleteModal").find(".modal-body").html("Are you sure you want to remove the feature '<strong>" + $(this).data("featurename") + "</strong>' from '<strong>@Model.Location.Name</strong>'")
+                $("#deleteModal").find(".modal-body").html("Are you sure you want to remove the feature '<strong>"
+                    + $(this).data("featurename") + "</strong>' from '<strong>@Model.Location.Name</strong>'")
                 $("#deleteModal").modal("show");
             });
             </text>
