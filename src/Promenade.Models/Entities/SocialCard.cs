@@ -8,18 +8,18 @@ namespace Ocuda.Promenade.Models.Entities
         public int Id { get; set; }
 
         [Required]
-        [MaxLength(255)]
+        [MaxLength(70)]
         public string Title { get; set; }
 
         [Required]
-        [MaxLength(255)]
+        [MaxLength(200)]
         public string Description { get; set; }
 
         [Required]
         [MaxLength(255)]
         public string Image { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(420)]
         public string ImageAlt { get; set; }
 
         [NotMapped]

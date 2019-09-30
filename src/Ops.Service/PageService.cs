@@ -59,7 +59,7 @@ namespace Ocuda.Ops.Service
 
             _pageRepository.Update(currentPage);
             await _pageRepository.SaveAsync();
-            return page;
+            return currentPage;
         }
 
         public async Task DeleteAsync(int id)
