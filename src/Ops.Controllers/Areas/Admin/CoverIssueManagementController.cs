@@ -114,7 +114,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     ShowAlertSuccess($"Resolved issue for '{header.BibID}'");
                 }
             }
-            catch (OcudaException ex)
+            catch
             {
                 if (!type.HasMessage)
                 {

@@ -15,29 +15,22 @@ namespace Ocuda.Ops.Service
 {
     public class CoverIssueService : ICoverIssueService
     {
-        private readonly ILogger<EmailService> _logger;
-        private readonly ISiteSettingService _siteSettingService;
         private readonly IUserService _userService;
         private readonly ICoverIssueTypeRepository _coverIssueTypeRepository;
         private readonly ICoverIssueHeaderRepository _coverIssueHeaderRepository;
         private readonly ICoverIssueDetailRepository _coverIssueDetailRepository;
 
-        public CoverIssueService(ILogger<EmailService> logger,
-           ISiteSettingService siteSettingService,
-           IUserService userService,
+        public CoverIssueService(IUserService userService,
            ICoverIssueTypeRepository coverIssueTypeRepository,
            ICoverIssueHeaderRepository coverIssueHeaderRepository,
            ICoverIssueDetailRepository coverIssueDetailRepository)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _coverIssueTypeRepository = coverIssueTypeRepository
                 ?? throw new ArgumentNullException(nameof(coverIssueTypeRepository));
             _coverIssueHeaderRepository = coverIssueHeaderRepository
                 ?? throw new ArgumentNullException(nameof(coverIssueHeaderRepository));
             _coverIssueDetailRepository = coverIssueDetailRepository
                 ?? throw new ArgumentNullException(nameof(coverIssueDetailRepository));
-            _siteSettingService = siteSettingService
-                ?? throw new ArgumentNullException(nameof(siteSettingService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
