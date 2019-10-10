@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{78E83504-5DBE-4ECA-A04D-F8911E436164}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Clc.Polaris.Api</RootNamespace>
+    <AssemblyName>polaris-api-csharp</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\polaris-api-csharp.xml</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\polaris-api-csharp.xml</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AssemblyInfoFilePath>Properties\AssemblyInfo.cs</AssemblyInfoFilePath>
+    <UpdateAssemblyVersion>True</UpdateAssemblyVersion>
+    <UpdateAssemblyFileVersion>False</UpdateAssemblyFileVersion>
+    <UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
+    <AssemblyVersionSettings>None.None.IncrementOnDemand.DeltaDayStamp</AssemblyVersionSettings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Helpers\PatronTitleListHelper.cs" />
+    <Compile Include="Methods\AuthenticatePatron.cs" />
+    <Compile Include="Methods\ApiKeyValidate.cs" />
+    <Compile Include="Methods\DatesClosedGet.cs" />
+    <Compile Include="Methods\PatronAccountGet.cs" />
+    <Compile Include="Methods\PatronTitleListAddTitle.cs" />
+    <Compile Include="Methods\RecordSetRecordsGet.cs" />
+    <Compile Include="Methods\RecordSetRecordsPut.cs" />
+    <Compile Include="Models\DatesClosedGetResult.cs" />
+    <Compile Include="Models\PAPIResult.cs" />
+    <Compile Include="Models\NotificationStatus.cs" />
+    <Compile Include="Models\PatronAuthenicationResult.cs" />
+    <Compile Include="Models\RecordSetRecordsGetResult.cs" />
+    <Compile Include="Models\PatronAccountGetResult.cs" />
+    <Compile Include="Models\PatronAccountPayResult.cs" />
+    <Compile Include="Models\PatronCirculateBlocksResult.cs" />
+    <Compile Include="Models\PatronItemsOutGetStatus.cs" />
+    <Compile Include="Models\PatronTitleListAddTitleResult.cs" />
+    <Compile Include="Models\PaymentMethod.cs" />
+    <Compile Include="PapiClient.cs" />
+    <Compile Include="Extension\Extensions.cs" />
+    <Compile Include="Extension\StringExtensions.cs" />
+    <Compile Include="Helpers\HoldRequestHelper.cs" />
+    <Compile Include="Helpers\ItemRenewHelper.cs" />
+    <Compile Include="Helpers\PatronRegistrationHelper.cs" />
+    <Compile Include="Helpers\PatronUpdateHelper.cs" />
+    <Compile Include="Methods\AuthenticateStaffUser.cs" />
+    <Compile Include="Methods\BibGet.cs" />
+    <Compile Include="Methods\BibSearch.cs" />
+    <Compile Include="Methods\PatronSearch.cs" />
+    <Compile Include="Methods\CreatePatronBlocks.cs" />
+    <Compile Include="Methods\PatronAccountPay.cs" />
+    <Compile Include="Methods\PatronCirculateBlocksGet.cs" />
+    <Compile Include="Methods\PatronRegistrationCreate.cs" />
+    <Compile Include="Methods\SA_GetValueByOrg.cs" />
+    <Compile Include="Methods\OrganizationsGet.cs" />
+    <Compile Include="Methods\HoldRequestCancel.cs" />
+    <Compile Include="Methods\HoldRequestCancelAllForPatron.cs" />
+    <Compile Include="Methods\HoldRequestReactivate.cs" />
+    <Compile Include="Methods\HoldRequestReactivateAllForPatron.cs" />
+    <Compile Include="Methods\HoldRequestReply.cs" />
+    <Compile Include="Methods\HoldingsGet.cs" />
+    <Compile Include="Methods\HoldRequestCreate.cs" />
+    <Compile Include="Methods\HoldRequestSuspend.cs" />
+    <Compile Include="Methods\HoldRequestSuspendAllForPatron.cs" />
+    <Compile Include="Methods\ItemRenew.cs" />
+    <Compile Include="Methods\ItemRenewAllForPatron.cs" />
+    <Compile Include="Methods\NotificationUpdate.cs" />
+    <Compile Include="Methods\PatronBasicDataGet.cs" />
+    <Compile Include="Methods\PatronHoldRequestsGet.cs" />
+    <Compile Include="Methods\PatronItemsOutGet.cs" />
+    <Compile Include="Methods\PatronUpdate.cs" />
+    <Compile Include="Methods\PatronValidate.cs" />
+    <Compile Include="Methods\Patron_GetBarcodeFromID.cs" />
+    <Compile Include="Methods\Template.cs" />
+    <Compile Include="Models\PatronAddress.cs" />
+    <Compile Include="Models\BibGetResult.cs" />
+    <Compile Include="Models\BibHoldingsGetResult.cs" />
+    <Compile Include="Models\BibSearchOptions.cs" />
+    <Compile Include="Models\BibSearchResult.cs" />
+    <Compile Include="Models\BibSearchTypes.cs" />
+    <Compile Include="Models\BlockType.cs" />
+    <Compile Include="Models\CreatePatronBlocksResult.cs" />
+    <Compile Include="Models\HoldRequestActivationResult.cs" />
+    <Compile Include="Models\HoldRequestCancelAllResult.cs" />
+    <Compile Include="Models\GetBarcodeAndPatronIDResult.cs" />
+    <Compile Include="Models\HoldRequestCancelResult.cs" />
+    <Compile Include="Models\HoldRequestCreateParams.cs" />
+    <Compile Include="Models\HoldRequestReplyData.cs" />
+    <Compile Include="Models\HoldRequestResult.cs" />
+    <Compile Include="Models\HoldStatus.cs" />
+    <Compile Include="Models\HttpRequest.cs" />
+    <Compile Include="Models\HttpResponse.cs" />
+    <Compile Include="Models\ItemRenewOptions.cs" />
+    <Compile Include="Models\OrganizationsGetResult.cs" />
+    <Compile Include="Models\OrganizationType.cs" />
+    <Compile Include="Models\PapiResponse.cs" />
+    <Compile Include="Models\PapiResponseCommon.cs" />
+    <Compile Include="Models\PatronRegistrationCreateResult.cs" />
+    <Compile Include="Models\PatronRegistrationParams.cs" />
+    <Compile Include="Models\PatronSearchResult.cs" />
+    <Compile Include="Models\PatronSortKeys.cs" />
+    <Compile Include="Models\PatronUpdateParams.cs" />
+    <Compile Include="Models\PatronUpdateResult.cs" />
+    <Compile Include="Models\ItemsOutActionResult.cs" />
+    <Compile Include="Models\NotificationUpdateParams.cs" />
+    <Compile Include="Models\NotificationUpdateResult.cs" />
+    <Compile Include="Models\PatronBasicDataGetResult.cs" />
+    <Compile Include="Models\PatronHoldRequestsGetResult.cs" />
+    <Compile Include="Models\PatronItemsOutGetResult.cs" />
+    <Compile Include="Models\PatronValidateResult.cs" />
+    <Compile Include="Models\PolarisUser.cs" />
+    <Compile Include="Models\ProtectedToken.cs" />
+    <Compile Include="Models\SearchQualifiers.cs" />
+    <Compile Include="Models\SearchSortOptions.cs" />
+    <Compile Include="Models\StringResult.cs" />
+    <Compile Include="Models\SystemBlocks.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Validation\Require.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

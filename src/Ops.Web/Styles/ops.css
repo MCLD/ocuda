@@ -120,6 +120,15 @@
     background-color: lightskyblue;
     padding-left: 1.75rem;
 }
+tr.row-link {
+    cursor: pointer;
+}
+tr.row-link.selected {
+    background-color: lemonchiffon;
+}
+tr.row-link.selected:hover {
+    background-color: beige;
+}
 
 @media screen and (max-height: 500px) {
     .navcolumn {
