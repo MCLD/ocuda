@@ -130,6 +130,15 @@ tr.itemRow td {
     vertical-align: middle;
     word-wrap: break-word;
 }
+tr.row-link {
+    cursor: pointer;
+}
+tr.row-link.selected {
+    background-color: lemonchiffon;
+}
+tr.row-link.selected:hover {
+    background-color: beige;
+}
 
 @media screen and (max-height: 500px) {
     .navcolumn {

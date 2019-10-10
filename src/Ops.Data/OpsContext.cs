@@ -37,6 +37,9 @@ namespace Ocuda.Ops.Data
         #endregion IMigratableContext
 
         public DbSet<ClaimGroup> ClaimGroups { get; set; }
+        public DbSet<CoverIssueDetail> CoverIssueDetails { get; set; }
+        public DbSet<CoverIssueHeader> CoverIssueHeaders { get; set; }
+        public DbSet<CoverIssueType> CoverIssueTypes { get; set; }
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
         public DbSet<ExternalResource> ExternalResources { get; set; }
         public DbSet<File> Files { get; set; }

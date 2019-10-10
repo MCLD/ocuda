@@ -1,0 +1,140 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.CoverIssueManagement.CoverIssueManagementViewModel
+
+@if (!string.IsNullOrEmpty(Model.Search))
+{
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-info alert-dismissible">
+                Search for '<strong>@Model.Search</strong>' found @Model.SearchCount
+                @(Model.SearchCount == 1 ? "match." : "matches.")
+                <button type="button" class="close" id="clearSearch" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+    </div>
+}
+<div class="container">
+    <div class="row" style="padding: 10px 0;">
+        <div class="col-xs-12">
+            <div>
+                <table class="table table-condensed table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a class="sortable-column"
+                                   asp-route-Search="@Model.Search"
+                                   asp-route-OrderBy="0"
+                                   asp-route-OrderDesc="@(Model.OrderBy == 0 && Model.OrderDesc == false ? "true" : "false")">
+                                    BibId
+                                    @if (Model.OrderBy == 0)
+                                    {
+                                        <span class="fas fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
+                                    }
+                                </a>
+                            </th>
+                            <th>
+                                <a class="sortable-column"
+                                   asp-route-Search="@Model.Search"
+                                   asp-route-OrderBy="1"
+                                   asp-route-OrderDesc="@(Model.OrderBy == 1 && Model.OrderDesc == false ? "true" : "false")">
+                                    Has Issue?
+                                    @if (Model.OrderBy == 1)
+                                    {
+                                        <span class="fas fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
+                                    }
+                                </a>
+                            </th>
+                            <th>
+                                <a class="sortable-column"
+                                   asp-route-Search="@Model.Search"
+                                   asp-route-OrderBy="2"
+                                   asp-route-OrderDesc="@(Model.OrderBy == 2 && Model.OrderDesc == false ? "true" : "false")">
+                                    Created By
+                                    @if (Model.OrderBy == 2)
+                                    {
+                                        <span class="fas fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
+                                    }
+                                </a>
+                            </th>
+                            <th>
+                                <a class="sortable-column"
+                                   asp-route-Search="@Model.Search"
+                                   asp-route-OrderBy="3"
+                                   asp-route-OrderDesc="@(Model.OrderBy == 3 && Model.OrderDesc == false ? "true" : "false")">
+                                    Created At
+                                    @if (Model.OrderBy == 3)
+                                    {
+                                        <span class="fas fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
+                                    }
+                                </a>
+                            </th>
+                            <th>
+                                <a class="sortable-column"
+                                   asp-route-Search="@Model.Search"
+                                   asp-route-OrderBy="4"
+                                   asp-route-OrderDesc="@(Model.OrderBy == 4 && Model.OrderDesc == false ? "true" : "false")">
+                                    Last Resolved
+                                    @if (Model.OrderBy == 4)
+                                    {
+                                        <span class="fas fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
+                                    }
+                                </a>
+                            </th>
+                        </tr>
+                    </thead>
+                    @if (Model.AllCoverIssues.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="100">
+                                No Cover Issues Found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tbody>
+                            @foreach (var issue in Model.AllCoverIssues)
+                            {
+                                <tr class="row-link" data-id="@issue.BibID">
+                                    <td class="td-class">
+                                        @issue.BibID
+                                    </td>
+                                    <td>
+                                        @if (issue.HasIssue)
+                                        {
+
+                                            @Html.Raw("<span class='fas fa-check'></span>");
+                                        }
+                                    </td>
+                                    <td>@issue.CreatedBy</td>
+                                    <td>@issue.CreatedAt</td>
+                                    <td>
+                                        @(issue.LastResolved != null ? issue.LastResolved.ToString() : "Never")
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    }
+                </table>
+                @if (Model.PaginateModel.MaxPage > 1)
+                {
+                    <paginate paginateModel="@Model.PaginateModel"></paginate>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts {
+    <script>
+        $(".row-link").on("click", function () {
+            var link = "@Url.Action(nameof(CoverIssueManagementController.CoverIssue), new { bibId = -1})";
+            link = link.replace("-1", $(this).data("id"));
+            window.location.href = link;
+        });
+        $("#clearSearch").click(function () {
+            window.location.href = "@Url.Action(nameof(CoverIssueManagementController.Index))";
+        });
+
+    </script>
+}
