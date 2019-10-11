@@ -104,7 +104,7 @@ namespace Ocuda.Ops.Controllers
         }
 
         [Route("[action]")]
-        public async Task<IActionResult> SyndeticsSalutation()
+        public IActionResult SyndeticsSalutation()
         {
             return View("SyndeticsSalutation");
         }
