@@ -45,7 +45,7 @@
         </div>
     </div>
     <div>
-        <form id="createIssueForm" asp-controller="@HomeController.Name" 
+        <form id="createIssueForm" asp-controller="@HomeController.Name"
               asp-action="@nameof(HomeController.AddCoverIssue)"
               method="post"
               role="form">
@@ -54,15 +54,15 @@
             <input asp-for="Detail.Isbn" id="detailIsbn" value="@Model.ISBN" type="hidden" />
             <input asp-for="Detail.Message" id="detailMessage" type="hidden" />
             <input asp-for="Header.BibID" id="headerBibid" value="@Model.BibID" type="hidden" />
-            @foreach (var type in Model.CoverIssueTypes)
+            @foreach (var type in Model.CoverIssueTypes.Where(_ => !_.HasMessage))
             {
                 <div class="custom-control custom-radio">
-                    <input class="custom-control-input" 
-                           type="radio" 
-                           name="syndCover" 
-                           id="coverIssue@(type.Id)" 
-                           value="@type.Id"
-                           @(type.Id == Model.CoverIssueTypes.FirstOrDefault()?.Id ? "checked" : "")>
+                    <input class="custom-control-input"
+                            type="radio"
+                            name="syndCover"
+                            id="coverIssue@(type.Id)"
+                            value="@type.Id"
+                            @(type.Id == Model.CoverIssueTypes.FirstOrDefault()?.Id ? "checked" : "")>
                     <label class="custom-control-label" for="coverIssue@(type.Id)">@(type.Name)</label>
                 </div>
                 @if (type.HasMessage)
