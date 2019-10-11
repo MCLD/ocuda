@@ -17,6 +17,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.CoverIssueManagement
         public bool OrderDesc { get; set; }
         public string Search { get; set; }
         public int? SearchCount { get; set; }
-        public string CoverIssueImg { get; set; }
+        public string CoverIssueImgPath { get; set; }
+        public string CoverIssueLeapPath { get; set; }
     }
 }

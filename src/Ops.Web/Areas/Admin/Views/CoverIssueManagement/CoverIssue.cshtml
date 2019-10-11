@@ -2,7 +2,7 @@
 
 <div class="col">
     <div class="row">
-        <a href="https://mcldaz.org/LeapWebApp/circulation/index.html#bibrecords/@Model.Header.BibID">
+        <a href="@Model.CoverIssueLeapPath@Model.Header.BibID">
             <h3>Cover Issue - @Model.Header.BibID</h3>
         </a>
     </div>
@@ -169,7 +169,7 @@
         <script>
         var resolveUrl = "@Url.Action(nameof(CoverIssueManagementController.ResolveIssues))";
         $(".row-link").on("click", function () {
-            imgStr = "@Model.CoverIssueImg";
+            imgStr = "@Model.CoverIssueImgPath";
             imgArr = imgStr.split("isbn=");
             imgSrc = imgArr[0] + "isbn=" + $(this).data("isbn") + imgArr[1];
             if ($(this).data("upc") != "") {

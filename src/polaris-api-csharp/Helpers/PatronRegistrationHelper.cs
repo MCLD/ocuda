@@ -37,7 +37,6 @@ namespace Clc.Polaris.Api.Helpers
 
             doc.Add(root);
 
-
             return doc.ToString();
         }
     }

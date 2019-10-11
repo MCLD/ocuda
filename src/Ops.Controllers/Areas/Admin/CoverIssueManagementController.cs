@@ -90,7 +90,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     Header = header,
                     Details = await _coverIssueService.GetCoverIssueDetailsByHeaderAsync(header.Id),
                     Types = await _coverIssueService.GetAllCoverIssueTypesAsync(),
-                    CoverIssueImg = _config["CoverIssueImageUrl"]
+                    CoverIssueImgPath = _config["CoverIssueImageUrl"],
+                    CoverIssueLeapPath = _config["LeapRecordPath"]
                 };
                 return View(viewModel);
             }
