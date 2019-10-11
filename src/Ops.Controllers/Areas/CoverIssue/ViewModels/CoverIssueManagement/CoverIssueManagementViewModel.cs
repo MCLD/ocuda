@@ -4,7 +4,7 @@ using System.Text;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Utility.Models;
 
-namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.CoverIssueManagement
+namespace Ocuda.Ops.Controllers.Areas.CoverIssues.ViewModels.CoverIssueManagement
 {
     public class CoverIssueManagementViewModel
     {
