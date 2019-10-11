@@ -6,16 +6,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Ocuda.Ops.Controllers.Abstract;
-using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.CoverIssueManagement;
+using Ocuda.Ops.Controllers.Areas.CoverIssues.ViewModels.CoverIssueManagement;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 
-namespace Ocuda.Ops.Controllers.Areas.Admin
+namespace Ocuda.Ops.Controllers.Areas.CoverIssues
 {
-    [Area("Admin")]
+    [Area("CoverIssue")]
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]/[controller]")]
     public class CoverIssueManagementController : BaseController<CoverIssueManagementController>

@@ -20,7 +20,6 @@ namespace Ocuda.Ops.Controllers
     {
         public static string Name { get { return "Home"; } }
 
-        private readonly PapiHelper _papiHelper;
         private readonly ICoverIssueService _coverIssueService;
 
         public HomeController(ServiceFacades.Controller<HomeController> context,
@@ -29,11 +28,6 @@ namespace Ocuda.Ops.Controllers
         {
             _coverIssueService = coverIssueService
                 ?? throw new ArgumentNullException(nameof(coverIssueService));
-            _papiHelper = papiHelper;
-            if (!_papiHelper.IsConfigured())
-            {
-                _logger.LogCritical("PAPI not configured");
-            }
         }
 
         [HttpGet("")]
@@ -50,80 +44,6 @@ namespace Ocuda.Ops.Controllers
                 ReturnUrl = returnUrl,
                 Username = CurrentUsername
             });
-        }
-
-        [Route("[action]/{bibID}/{imgPath}")]
-        public async Task<IActionResult> SyndeticsCover(int bibID, string imgPath)
-        {
-            if (_papiHelper.IsConfigured())
-            {
-                var papi = new PapiClient
-                {
-                    AccessID = _papiHelper.AccessID,
-                    AccessKey = _papiHelper.AccessKey,
-                    BaseUrl = _papiHelper.BaseUrl,
-                    StaffOverrideAccount = _papiHelper.StaffOverrideAccount
-                };
-                var bibResult = papi.BibGet(bibID);
-                if (bibResult.Data.PAPIErrorCode == 0 && !string.IsNullOrEmpty(bibResult.Data.Title))
-                {
-                    var byteData = Convert.FromBase64String(imgPath);
-                    var imgStr = Encoding.UTF8.GetString(byteData);
-                    var strArr = imgStr.Split("&upc=");
-                    var dataVar = strArr[1].Split("&oclc=");
-                    var upc = dataVar[0];
-                    var oclc = "";
-                    if (dataVar.Length > 1)
-                    {
-                        oclc = dataVar[1];
-                    }
-                    var viewModel = new SyndeticsCoverViewModel()
-                    {
-                        Title = bibResult.Data.Title,
-                        Author = string.Join(", ", bibResult.Data.Author),
-                        ISBN = bibResult.Data.ISBN,
-                        UPC = upc,
-                        OCLC = oclc,
-                        ItemImagePath = imgStr,
-                        Format = bibResult.Data.Format,
-                        Summary = string.Join(", ", bibResult.Data.Summary),
-                        LCCN = bibResult.Data.LCCN,
-                        BibID = bibID,
-                        CoverIssueTypes = await _coverIssueService.GetAllCoverIssueTypesAsync()
-                    };
-                    return View(viewModel);
-                }
-                else
-                {
-                    ShowAlertDanger($"Could not find the Bib ID: {bibID}");
-                    return RedirectToAction(nameof(Index));
-                }
-            }
-            ShowAlertDanger("Papi is not configured.");
-            return RedirectToAction(nameof(Index));
-        }
-
-        [Route("[action]")]
-        public IActionResult SyndeticsSalutation()
-        {
-            return View("SyndeticsSalutation");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> AddCoverIssue(CoverIssueHeader header, CoverIssueDetail detail)
-        {
-            if (detail.CoverIssueTypeId != 0 && header.BibID != 0)
-            {
-                detail.CreatedBy = header.CreatedBy = CurrentUserId;
-                detail.CreatedAt = header.CreatedAt = DateTime.Now;
-                await _coverIssueService.CreateNewCoverIssue(detail,header);
-                return RedirectToAction(nameof(SyndeticsSalutation));
-            }
-            else
-            {
-                ShowAlertDanger("There was an error in your post");
-                return null;
-            }
         }
 
         [HttpGet("[action]")]

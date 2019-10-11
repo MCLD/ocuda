@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using Ocuda.Ops.Models.Entities;
 
-namespace Ocuda.Ops.Controllers.ViewModels.Home
+namespace Ocuda.Ops.Controllers.Areas.CoverIssues.ViewModels.CoverIssueReporting
 {
-    public class SyndeticsCoverViewModel
+    public class CoverIssueReportingViewModel
     {
         public int BibID { get; set; }
         public string Title { get; set; }
