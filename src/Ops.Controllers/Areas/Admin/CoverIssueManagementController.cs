@@ -74,7 +74,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         }
 
         [Route("[action]/{bibId}")]
-        [Route("{bibId}")]
         public async Task<IActionResult> CoverIssue(int bibId)
         {
             var header = _coverIssueService.GetCoverIssueHeaderByBibId(bibId);

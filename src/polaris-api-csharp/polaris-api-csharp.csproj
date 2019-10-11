@@ -4,8 +4,11 @@
     <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>polaris_api_csharp</RootNamespace>
-    <ApplicationIcon />
-    <StartupObject />
+    <Authors>Maricopa County Library District Web developers</Authors>
+    <Product>Ocuda</Product>
+    <Copyright>Copyright 2018 Maricopa County Library District</Copyright>
+    <RepositoryUrl>https://github.com/MCLD/ocuda/</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>

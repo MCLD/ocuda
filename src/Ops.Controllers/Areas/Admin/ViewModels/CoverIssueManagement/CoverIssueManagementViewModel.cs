@@ -13,6 +13,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.CoverIssueManagement
         public CoverIssueHeader Header { get; set; }
         public List<CoverIssueDetail> Details { get; set; }
         public List<CoverIssueType> Types { get; set; }
+        public CoverIssueType Type { get; set; }
         public int OrderBy { get; set; }
         public bool OrderDesc { get; set; }
         public string Search { get; set; }
