@@ -1,4 +1,4 @@
-﻿@model Ocuda.Ops.Controllers.Areas.CoverIssues.ViewModels.CoverIssueManagement.CoverIssueManagementViewModel
+﻿@model Ocuda.Ops.Controllers.Areas.CoverIssues.ViewModels.Management.ManagementViewModel
 
 <div class="col">
     <div class="row">
@@ -161,13 +161,13 @@
             <div class="row">
                 <a class="btn btn-primary"
                    id="return-home"
-                   asp-action="@nameof(CoverIssueManagementController.Index)">Cover Issue Management Home</a>
+                   asp-action="@nameof(ManagementController.Index)">Cover Issue Management Home</a>
             </div>
         </div>
     </div>
     @section scripts {
         <script>
-        var resolveUrl = "@Url.Action(nameof(CoverIssueManagementController.ResolveIssues))";
+        var resolveUrl = "@Url.Action(nameof(ManagementController.ResolveIssues))";
         $(".row-link").on("click", function () {
             imgStr = "@Model.CoverIssueImgPath";
             imgArr = imgStr.split("isbn=");
@@ -190,7 +190,7 @@
 
         });
         $("#clearSearch").click(function () {
-            window.location.href = "@Url.Action(nameof(CoverIssueManagementController.Index))";
+            window.location.href = "@Url.Action(nameof(ManagementController.Index))";
         });
 
         </script>

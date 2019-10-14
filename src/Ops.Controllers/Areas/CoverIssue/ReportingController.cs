@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
-using Ocuda.Ops.Controllers.Areas.CoverIssues.ViewModels.CoverIssueReporting;
+using Ocuda.Ops.Controllers.Areas.CoverIssues.ViewModels.Reporting;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Helpers;
@@ -19,22 +19,19 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssues
     [Area("CoverIssue")]
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]/[controller]")]
-    public class CoverIssueReportingController : BaseController<CoverIssueReportingController>
+    public class ReportingController : BaseController<ReportingController>
     {
-        public static string Name { get { return "CoverIssueReporting"; } }
+        public static string Name { get { return "Reporting"; } }
         private readonly ICoverIssueService _coverIssueService;
-        private readonly IConfiguration _config;
         private readonly PapiHelper _papiHelper;
 
-        public CoverIssueReportingController(
-            ServiceFacades.Controller<CoverIssueReportingController> context,
+        public ReportingController(
+            ServiceFacades.Controller<ReportingController> context,
             ICoverIssueService coverIssueService,
-            IConfiguration config,
             PapiHelper papiHelper) : base(context)
         {
             _coverIssueService = coverIssueService
                 ?? throw new ArgumentNullException(nameof(coverIssueService));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
             _papiHelper = papiHelper;
             if (!_papiHelper.IsConfigured())
             {
@@ -69,7 +66,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssues
                     {
                         oclc = dataVar[1];
                     }
-                    var viewModel = new CoverIssueReportingViewModel()
+                    var viewModel = new ReportingViewModel()
                     {
                         Title = bibResult.Data.Title,
                         Author = string.Join(", ", bibResult.Data.Author),

@@ -4,9 +4,9 @@ using System.Text;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Utility.Models;
 
-namespace Ocuda.Ops.Controllers.Areas.CoverIssues.ViewModels.CoverIssueManagement
+namespace Ocuda.Ops.Controllers.Areas.CoverIssues.ViewModels.Management
 {
-    public class CoverIssueManagementViewModel
+    public class ManagementViewModel
     {
         public ICollection<CoverIssueHeader> AllCoverIssues { get; set; }
         public PaginateModel PaginateModel { get; set; }

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Ocuda.Ops.Controllers.Abstract;
-using Ocuda.Ops.Controllers.Areas.CoverIssues.ViewModels.CoverIssueManagement;
+using Ocuda.Ops.Controllers.Areas.CoverIssues.ViewModels.Management;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Exceptions;
@@ -18,14 +18,14 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssues
     [Area("CoverIssue")]
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]/[controller]")]
-    public class CoverIssueManagementController : BaseController<CoverIssueManagementController>
+    public class ManagementController : BaseController<ManagementController>
     {
-        public static string Name { get { return "CoverIssueManagement"; } }
+        public static string Name { get { return "Management"; } }
         private readonly ICoverIssueService _coverIssueService;
         private readonly IConfiguration _config;
 
-        public CoverIssueManagementController(
-            ServiceFacades.Controller<CoverIssueManagementController> context,
+        public ManagementController(
+            ServiceFacades.Controller<ManagementController> context,
             ICoverIssueService coverIssueService,
             IConfiguration config) : base(context)
         {
@@ -62,7 +62,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssues
                 });
             }
 
-            return View(new CoverIssueManagementViewModel
+            return View(new ManagementViewModel
             {
                 AllCoverIssues = headers.Data,
                 PaginateModel = paginateModel,
@@ -74,7 +74,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssues
         }
 
         [Route("[action]/{bibId}")]
-        public async Task<IActionResult> CoverIssue(int bibId)
+        public async Task<IActionResult> IssueDetail(int bibId)
         {
             var header = _coverIssueService.GetCoverIssueHeaderByBibId(bibId);
             if (header == null)
@@ -84,7 +84,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssues
             }
             else
             {
-                var viewModel = new CoverIssueManagementViewModel
+                var viewModel = new ManagementViewModel
                 {
                     Header = header,
                     Details = await _coverIssueService.GetCoverIssueDetailsByHeaderAsync(header.Id),
@@ -125,7 +125,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssues
                     ShowAlertDanger($"Could not resolve issue for '{header.BibID}'");
                 }
             }
-            return RedirectToAction(nameof(CoverIssue), new { bibId = header.BibID });
+            return RedirectToAction(nameof(IssueDetail), new { bibId = header.BibID });
         }
     }
 }
