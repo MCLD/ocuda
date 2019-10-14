@@ -1,4 +1,4 @@
-﻿@model Ocuda.Ops.Controllers.Areas.CoverIssues.ViewModels.CoverIssueManagement.CoverIssueManagementViewModel;
+﻿@model Ocuda.Ops.Controllers.Areas.CoverIssues.ViewModels.Management.ManagementViewModel;
 
 @if (!string.IsNullOrEmpty(Model.Search))
 {
@@ -128,12 +128,12 @@
 @section scripts {
     <script>
         $(".row-link").on("click", function () {
-            var link = "@Url.Action(nameof(CoverIssueManagementController.CoverIssue), new { bibId = -1})";
+            var link = "@Url.Action(nameof(ManagementController.IssueDetail), new { bibId = -1})";
             link = link.replace("-1", $(this).data("id"));
             window.location.href = link;
         });
         $("#clearSearch").click(function () {
-            window.location.href = "@Url.Action(nameof(CoverIssueManagementController.Index))";
+            window.location.href = "@Url.Action(nameof(ManagementController.Index))";
         });
 
     </script>
