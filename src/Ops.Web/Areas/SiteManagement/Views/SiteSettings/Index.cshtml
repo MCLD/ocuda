@@ -1,0 +1,108 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.SiteSettings.IndexViewModel
+
+<form asp-controller="SiteSettings" asp-action="@(nameof(SiteSettingsController.Update))"
+      method="post" role="form">
+    <input asp-for="SiteSetting.Key" type="hidden" />
+    <div modal id="editModal" name="Site Setting" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <div class="row align-items-center">
+            <div class="col-md-4">
+                <label id="editName" class="col-form-label"></label>
+            </div>
+            <div class="col-md-8">
+                <select id="editValueBool" asp-for="SiteSetting.Value" class="form-control d-none valueInput" disabled="disabled">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+                <input id="editValueInt" asp-for="SiteSetting.Value" type="number" class="form-control d-none valueInput" disabled="disabled" />
+                <input id="editValueString" asp-for="SiteSetting.Value" class="form-control d-none valueInput" disabled="disabled" />
+                <span id="editValidation" asp-validation-for="SiteSetting.Value" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+@if (Model.SiteSettingsByCategory.Count() == 0)
+{
+    <div class="alert alert-warning">No Site Settings Found</div>
+}
+else
+{
+    @foreach (var category in Model.SiteSettingsByCategory.Keys)
+    {
+        <div class="row justify-content-center">
+            <h2>@category</h2>
+        </div>
+
+        @foreach (var setting in Model.SiteSettingsByCategory[category])
+        {
+            <div class="form-group row">
+                <label asp-for="@setting.Name" class="col-md-3 col-form-label text-md-right">
+                    @setting.Name
+                    <span class="far fa-question-circle ml-1" title="@setting.Description"
+                          data-toggle="tooltip" data-placement="top"></span>
+                </label>
+                <div class="d-flex col-md-9">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <button type="button"
+                                    class="btn btn-info"
+                                    data-toggle="modal"
+                                    data-target="#editModal"
+                                    data-key="@setting.Key"
+                                    data-name="@setting.Name"
+                                    data-value="@setting.Value"
+                                    data-type="@setting.Type">
+                                <span class="fa fa-pencil-alt" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                        @if (setting.Type == SiteSettingType.Bool)
+                        {
+                            <select class="form-control" asp-for="@setting.Value" disabled>
+                                <option value="false">No</option>
+                                <option value="true">Yes</option>
+                            </select>
+                        }
+                        else
+                        {
+                            <input class="form-control" asp-for="@setting.Value" disabled />
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}
+
+@section scripts {
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        }) 
+
+        $("#editModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var key = button.data("key");
+            var name = button.data("name");
+            var value = button.data("value");
+            var type = button.data("type");
+            var modal = $(this);
+
+            $("#SiteSetting_Key").val(key);
+            $("#editName").text(name);
+
+            $(".valueInput").addClass("d-none").attr("disabled", "disabled");
+            if (type == "Bool") {
+                $("#editValueBool").removeAttr("disabled").removeClass("input-validation-error d-none").val(value);
+            }
+            else if (type == "Int") {
+                $("#editValueInt").removeAttr("disabled").removeClass("input-validation-error d-none").val(value);
+            }
+            else {
+                $("#editValueString").removeAttr("disabled").removeClass("input-validation-error d-none").val(value);
+            }
+
+            $("#editValidation").children().remove();
+        });
+    </script>
+}
