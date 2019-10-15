@@ -196,9 +196,6 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Utility.Helpers.WebHelper>();
 
             // repositories
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageRepository,
-                Data.Promenade.PageRepository>();
-
             services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,
                 Data.Ops.ClaimGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IExternalResourceRepository,
@@ -238,6 +235,11 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserRepository,
                 Data.Ops.UserRepository>();
 
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageRepository,
+                Data.Promenade.PageRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ISocialCardRepository,
+                Data.Promenade.SocialCardRepository>();
+
             // services
             services.AddScoped<Service.Interfaces.Ops.Services.IAuthorizationService,
                 AuthorizationService>();
@@ -259,6 +261,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IPathResolverService, PathResolverService>();
             services.AddScoped<IRosterService, RosterService>();
             services.AddScoped<ISiteSettingService, SiteSettingService>();
+            services.AddScoped<ISocialCardService, SocialCardService>();
             services.AddScoped<IUserMetadataTypeService, UserMetadataTypeService>();
             services.AddScoped<IUserService, UserService>();
 

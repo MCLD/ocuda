@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
@@ -16,7 +17,9 @@ namespace Ocuda.Promenade.Models.Entities
         public PageType Type { get; set; }
         public bool IsPublished { get; set; }
 
+        [DisplayName("Social Card")]
         public int? SocialCardId { get; set; }
+
         public SocialCard SocialCard { get; set; }
     }
 

@@ -4,6 +4,7 @@
     <div modal id="addModal" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addStub" asp-for="Page.Stub" formgroup />
         <select id="addType" asp-for="Page.Type" formgroup>
+            <option></option>
             @foreach (var type in (PageType[])Enum.GetValues(typeof(PageType)))
             {
                 <option value="@Convert.ToInt32(type)">@type</option>
@@ -16,7 +17,7 @@
     <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
     <input id="deleteStub" asp-for="Page.Stub" type="hidden" />
     <input id="deleteId" asp-for="Page.Id" type="hidden" />
-    <div modal id="deleteModal" name="Post" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+    <div modal id="deleteModal" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
 </form>
 
 <div class="mb-2">
@@ -30,7 +31,6 @@
 @if (Model.Pages.Count() == 0)
 {
     <div class="alert alert-warning">No Pages Found</div>
-
 }
 else
 {
@@ -118,7 +118,7 @@ else
             var modal = $(this);
             $("#deleteStub").val(stub);
             $("#deleteId").val(id);
-            modal.find(".modal-text").text(" Are you sure you want to delete \"" + stub + "\"?");
+            modal.find(".modal-text").text("Are you sure you want to delete \"" + stub + "\"?");
         });
     </script>
 }

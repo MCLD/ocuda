@@ -25,13 +25,18 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(socialCardRepository));
         }
 
+        public async Task<ICollection<SocialCard>> GetListAsync()
+        {
+            return await _socialCardRepository.ToListAsync(_ => _.Title);
+        }
+
         public async Task<DataWithCount<ICollection<SocialCard>>> GetPaginatedListAsync(
             BaseFilter filter)
         {
             return await _socialCardRepository.GetPaginatedListAsync(filter);
         }
 
-        public async Task<SocialCard> GetByIdAsyn(int id)
+        public async Task<SocialCard> GetByIdAsync(int id)
         {
             return await _socialCardRepository.FindAsync(id);
         }

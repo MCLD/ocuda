@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages;
@@ -22,13 +23,17 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     public class PagesController : BaseController<PagesController>
     {
         private readonly IPageService _pageService;
+        private readonly ISocialCardService _socialCardService;
 
         public static string Name { get { return "Pages"; } }
 
         public PagesController(ServiceFacades.Controller<PagesController> context,
-            IPageService pageService) : base(context)
+            IPageService pageService,
+            ISocialCardService socialCardService) : base(context)
         {
             _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
+            _socialCardService = socialCardService
+                ?? throw new ArgumentNullException(nameof(socialCardService));
         }
 
         [Route("")]
@@ -101,7 +106,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var viewModel = new DetailViewModel
             {
                 Action = nameof(Edit),
-                Page = page
+                Page = page,
+                SocialCardList = new SelectList(await _socialCardService.GetListAsync(),
+                    nameof(SocialCard.Id), nameof(SocialCard.Title))
             };
 
             return View("Detail", viewModel);
@@ -130,7 +137,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 {
                     var page = await _pageService.EditAsync(model.Page, model.Publish);
                     ShowAlertSuccess($"Updated page: {page.Stub}");
-                    return RedirectToAction(nameof(Index));
                 }
                 catch (OcudaException ex)
                 {

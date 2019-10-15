@@ -11,7 +11,7 @@
     }
 
     <input asp-for="Page.Stub" formgroup readonly="@(Model.Page.IsPublished ? " readonly" : null)" />
-    <select id="addType" asp-for="Page.Type" formgroup readonly="@(Model.Page.IsPublished ? " readonly" : null)">
+    <select asp-for="Page.Type" formgroup readonly="@(Model.Page.IsPublished ? " readonly" : null)">
         @foreach (var type in (PageType[])Enum.GetValues(typeof(PageType)))
         {
             <option value="@Convert.ToInt32(type)">@type</option>
@@ -25,6 +25,10 @@
             <span asp-validation-for="Page.Content" class="validation-message text-danger"></span>
         </div>
     </div>
+
+    <select asp-for="Page.SocialCardId" asp-items="Model.SocialCardList" formgroup>
+        <option></option>
+    </select>
 
     <div class="row">
         <div class="offset-md-3 col-md-9">

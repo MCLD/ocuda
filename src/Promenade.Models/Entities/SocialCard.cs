@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Promenade.Models.Entities
@@ -19,6 +20,7 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string Image { get; set; }
 
+        [DisplayName("Image Alt")]
         [MaxLength(420)]
         public string ImageAlt { get; set; }
 

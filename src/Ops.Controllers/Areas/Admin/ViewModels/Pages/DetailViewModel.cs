@@ -1,4 +1,5 @@
-﻿using Ocuda.Promenade.Models.Entities;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages
 {
@@ -7,5 +8,6 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages
         public Page Page { get; set; }
         public bool Publish { get; set; }
         public string Action { get; set; }
+        public SelectList SocialCardList { get; set; }
     }
 }

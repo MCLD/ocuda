@@ -8,8 +8,9 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 {
     public interface ISocialCardService
     {
+        Task<ICollection<SocialCard>> GetListAsync();
         Task<DataWithCount<ICollection<SocialCard>>> GetPaginatedListAsync(BaseFilter filter);
-        Task<SocialCard> GetByIdAsyn(int id);
+        Task<SocialCard> GetByIdAsync(int id);
         Task<SocialCard> CreateAsync(SocialCard card);
         Task<SocialCard> EditAsync(SocialCard card);
         Task DeleteAsync(int id);
