@@ -26,6 +26,7 @@ namespace Ocuda.Ops.Data
         public new string GetCurrentMigration() => Database.GetAppliedMigrations().Last();
         #endregion IMigratableContext
 
+        public DbSet<Language> Languages { get; set; }
         public DbSet<LocationHours> LocationHours { get; set; }
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; set; }
         public DbSet<Location> Location { get; set; }
