@@ -1,0 +1,58 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location.FeatureListViewModel;
+
+@if (Model.Features.Count() == 0)
+{
+    <div class="alert alert-warning">No Items found</div>
+}
+else
+{
+    <div>
+        <table class="table table-sm table-bordered table-striped">
+            <thead>
+                <tr>
+                    <td>Name</td>
+                    <td>Stub</td>
+                    <td>General Body Text</td>
+                    <td>&nbsp;</td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var feature in Model.Features)
+                {
+                <tr class="itemRow">
+                    <td>
+                        @feature.Name
+                    </td>
+                    <td>
+                        @feature.Stub
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(feature.BodyText))
+                        {
+                            @if (feature.BodyText.Length > 200)
+                            {
+                                @(feature.BodyText.Substring(0, 200) + "...")
+                            }
+                        }
+                        else
+                        {
+                            @feature.BodyText
+                        }
+                    </td>
+                    <td style="vertical-align:middle;">
+                        <button type="button"
+                                class="btn btn-link btn-xs addfeatureButton"
+                                data-featureid="@feature.Id">
+                            <span class="fa fa-2x fa-plus-circle text-success" aria-hidden="true"></span>
+                        </button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    @if (Model.PaginateModel.MaxPage > 1)
+    {
+        <paginate paginateModel="@Model.PaginateModel" asButtons="true"></paginate>
+    }
+}

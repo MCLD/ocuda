@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Authorization
@@ -21,7 +22,7 @@ namespace Ocuda.Ops.Controllers.Authorization
         {
             var claims = context.User.Claims;
 
-            if (claims != null && claims.Any())
+            if (claims?.Any() == true)
             {
                 var isSiteManager = claims
                     .Any(_ => _.Type == ClaimType.SiteManager);
@@ -32,7 +33,7 @@ namespace Ocuda.Ops.Controllers.Authorization
                 }
                 else
                 {
-                    if (context.Resource 
+                    if (context.Resource
                         is Microsoft.AspNetCore.Mvc.Filters.AuthorizationFilterContext resource)
                     {
                         var sectionName = resource.RouteData.Values["section"]?.ToString();
@@ -66,7 +67,7 @@ namespace Ocuda.Ops.Controllers.Authorization
                     else
                     {
                         _logger.LogError($"Error decoding section name for authorizaton, resource is wrong type: {context.Resource.GetType()}");
-                        throw new Exception("Can't decode section name from context.");
+                        throw new OcudaException("Can't decode section name from context.");
                     }
                 }
             }
