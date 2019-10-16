@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
@@ -10,16 +12,15 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Service
 {
-    public class PageService : IPageService
+    public class PageService : BaseService<PageService>, IPageService
     {
-        private readonly ILogger<PageService> _logger;
         private readonly IPageRepository _pageRepository;
 
         public PageService(ILogger<PageService> logger,
+            IHttpContextAccessor httpContextAccessor,
             IPageRepository pageRepository)
+            : base(logger, httpContextAccessor)
         {
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
             _pageRepository = pageRepository
                 ?? throw new ArgumentNullException(nameof(pageRepository));
         }
@@ -38,6 +39,8 @@ namespace Ocuda.Ops.Service
         {
             page.Content = page.Content?.Trim();
             page.Stub = page.Stub?.Trim().ToLower();
+            page.CreatedAt = DateTime.Now;
+            page.CreatedBy = GetCurrentUserId();
 
             await _pageRepository.AddAsync(page);
             await _pageRepository.SaveAsync();
@@ -49,6 +52,8 @@ namespace Ocuda.Ops.Service
             var currentPage = await _pageRepository.FindAsync(page.Id);
             currentPage.Content = page.Content?.Trim();
             currentPage.SocialCardId = page.SocialCardId;
+            currentPage.UpdatedAt = DateTime.Now;
+            currentPage.UpdatedBy = GetCurrentUserId();
 
             if (!currentPage.IsPublished)
             {

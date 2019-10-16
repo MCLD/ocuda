@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -11,18 +13,17 @@ using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
-    public class LinkService : ILinkService
+    public class LinkService : BaseService<LinkService>, ILinkService
     {
-        private readonly ILogger<LinkService> _logger;
         private readonly ILinkLibraryRepository _linkLibraryRepository;
         private readonly ILinkRepository _linkRepository;
 
         public LinkService(ILogger<LinkService> logger,
+            IHttpContextAccessor httpContextAccessor,
             ILinkLibraryRepository linkLibraryRepository,
             ILinkRepository linkRepository)
+            : base(logger, httpContextAccessor)
         {
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
             _linkRepository = linkRepository
                 ?? throw new ArgumentNullException(nameof(linkRepository));
             _linkLibraryRepository = linkLibraryRepository
@@ -73,6 +74,8 @@ namespace Ocuda.Ops.Service
             currentLink.Name = link.Name?.Trim();
             currentLink.Url = link.Url?.Trim();
             currentLink.Icon = link.Icon;
+            currentLink.UpdatedAt = DateTime.Now;
+            currentLink.UpdatedBy = GetCurrentUserId();
 
             _linkRepository.Update(currentLink);
             await _linkRepository.SaveAsync();
@@ -113,6 +116,8 @@ namespace Ocuda.Ops.Service
             var currentLibrary = await _linkLibraryRepository.FindAsync(library.Id);
 
             currentLibrary.Name = library.Name?.Trim();
+            currentLibrary.UpdatedAt = DateTime.Now;
+            currentLibrary.UpdatedBy = GetCurrentUserId();
 
             _linkLibraryRepository.Update(currentLibrary);
             await _linkLibraryRepository.SaveAsync();

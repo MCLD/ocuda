@@ -9,12 +9,13 @@ using Ocuda.Ops.Models.Defaults;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Exceptions;
+using Microsoft.AspNetCore.Http;
+using Ocuda.Ops.Service.Abstract;
 
 namespace Ocuda.Ops.Service
 {
-    public class SiteSettingService : ISiteSettingService
+    public class SiteSettingService : BaseService<SiteSettingService>, ISiteSettingService
     {
-        private readonly ILogger _logger;
         private readonly IDistributedCache _cache;
         private readonly IConfiguration _config;
         private readonly ISiteSettingRepository _siteSettingRepository;
@@ -22,11 +23,12 @@ namespace Ocuda.Ops.Service
         private int CacheMinutes { get; set; }
 
         public SiteSettingService(ILogger<SiteSettingService> logger,
+            IHttpContextAccessor httpContextAccessor,
             IDistributedCache cache,
             IConfiguration config,
             ISiteSettingRepository siteSettingRepository)
+            : base(logger, httpContextAccessor)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _siteSettingRepository = siteSettingRepository
@@ -143,6 +145,8 @@ namespace Ocuda.Ops.Service
             }
 
             currentSetting.Value = value;
+            currentSetting.UpdatedAt = DateTime.Now;
+            currentSetting.UpdatedBy = GetCurrentUserId();
 
             await ValidateSiteSettingAsync(currentSetting);
 

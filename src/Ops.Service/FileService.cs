@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -14,22 +15,21 @@ using Ocuda.Utility.Helpers;
 
 namespace Ocuda.Ops.Service
 {
-    public class FileService : IFileService
+    public class FileService : BaseService<FileService>, IFileService
     {
-        private readonly ILogger<FileService> _logger;
         private readonly IFileLibraryRepository _fileLibraryRepository;
         private readonly IFileRepository _fileRepository;
         private readonly IFileTypeService _fileTypeService;
         private readonly IPathResolverService _pathResolver;
 
         public FileService(ILogger<FileService> logger,
+            IHttpContextAccessor httpContextAccessor,
             IFileLibraryRepository fileLibraryRepository,
             IFileRepository fileRepository,
             IFileTypeService fileTypeService,
             IPathResolverService pathResolver)
+            : base(logger, httpContextAccessor)
         {
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
             _fileLibraryRepository = fileLibraryRepository
                 ?? throw new ArgumentNullException(nameof(fileLibraryRepository));
             _fileRepository = fileRepository
@@ -117,6 +117,8 @@ namespace Ocuda.Ops.Service
 
             currentFile.Description = file.Description?.Trim();
             currentFile.Name = file.Name?.Trim();
+            currentFile.UpdatedAt = DateTime.Now;
+            currentFile.UpdatedBy = GetCurrentUserId();
 
             _fileRepository.Update(currentFile);
             await _fileRepository.SaveAsync();
@@ -294,6 +296,8 @@ namespace Ocuda.Ops.Service
             var currentLibrary = await _fileLibraryRepository.FindAsync(library.Id);
 
             currentLibrary.Name = currentLibrary.Name.Trim();
+            currentLibrary.UpdatedAt = DateTime.Now;
+            currentLibrary.UpdatedBy = GetCurrentUserId();
 
             var fileTypesToAdd = fileTypeIds
                 .Except(currentLibrary.FileTypes.Select(_ => _.FileTypeId))

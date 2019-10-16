@@ -1,24 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
-    public class UserService : IUserService
+    public class UserService : BaseService<UserService>, IUserService
     {
-        private readonly ILogger<UserService> _logger;
         private readonly IUserRepository _userRepository;
 
         public UserService(ILogger<UserService> logger,
+            IHttpContextAccessor httpContextAccessor,
             IUserRepository userRepository)
+            : base(logger, httpContextAccessor)
         {
-            _logger = logger
-               ?? throw new ArgumentNullException(nameof(logger));
             _userRepository = userRepository
                 ?? throw new ArgumentNullException(nameof(userRepository));
         }
@@ -92,6 +93,8 @@ namespace Ocuda.Ops.Service
         {
             User currentUser = await _userRepository.FindAsync(user.Id);
             currentUser.Nickname = user.Nickname;
+            currentUser.UpdatedAt = DateTime.Now;
+            currentUser.UpdatedBy = GetCurrentUserId();
 
             _userRepository.Update(currentUser);
             await _userRepository.SaveAsync();
@@ -109,6 +112,9 @@ namespace Ocuda.Ops.Service
             dbUser.Title = user.Title;
             dbUser.Phone = user.Phone;
             dbUser.SupervisorId = user.SupervisorId;
+            dbUser.UpdatedAt = DateTime.Now;
+            dbUser.UpdatedBy = GetCurrentUserId();
+
             _userRepository.Update(dbUser);
             await _userRepository.SaveAsync();
         }
@@ -121,6 +127,8 @@ namespace Ocuda.Ops.Service
             rosterUser.Nickname = user.Nickname;
             rosterUser.Phone = user.Phone;
             rosterUser.Username = user.Username;
+            rosterUser.UpdatedAt = DateTime.Now;
+            rosterUser.UpdatedBy = GetCurrentUserId();
 
             _userRepository.Update(rosterUser);
             await _userRepository.SaveAsync();

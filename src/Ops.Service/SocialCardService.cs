@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
@@ -11,16 +13,15 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Service
 {
-    public class SocialCardService : ISocialCardService
+    public class SocialCardService : BaseService<SocialCardService>, ISocialCardService
     {
-        private readonly ILogger<SocialCardService> _logger;
         private readonly ISocialCardRepository _socialCardRepository;
 
         public SocialCardService(ILogger<SocialCardService> logger,
+            IHttpContextAccessor httpContextAccessor,
             ISocialCardRepository socialCardRepository)
+            : base(logger, httpContextAccessor)
         {
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
             _socialCardRepository = socialCardRepository
                 ?? throw new ArgumentNullException(nameof(socialCardRepository));
         }
@@ -47,6 +48,8 @@ namespace Ocuda.Ops.Service
             card.Image = card.Image?.Trim();
             card.ImageAlt = card.ImageAlt?.Trim();
             card.Title = card.Title?.Trim();
+            card.CreatedAt = DateTime.Now;
+            card.CreatedBy = GetCurrentUserId();
 
             await _socialCardRepository.AddAsync(card);
             await _socialCardRepository.SaveAsync();
@@ -60,6 +63,8 @@ namespace Ocuda.Ops.Service
             currentCard.Image = card.Image?.Trim();
             currentCard.ImageAlt = card.ImageAlt?.Trim();
             currentCard.Title = card.Title?.Trim();
+            currentCard.CreatedAt = DateTime.Now;
+            currentCard.CreatedBy = GetCurrentUserId();
 
             _socialCardRepository.Update(currentCard);
             await _socialCardRepository.SaveAsync();
