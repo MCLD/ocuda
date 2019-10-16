@@ -74,7 +74,7 @@ namespace Ocuda.Ops.Service
             catch (OcudaException ex)
             {
                 _logger.LogError(ex.Message);
-                throw new OcudaException(ex.Message);
+                throw;
             }
 
             return feature;
@@ -107,7 +107,7 @@ namespace Ocuda.Ops.Service
                 catch (OcudaException ex)
                 {
                     _logger.LogError(ex.Message);
-                    throw new OcudaException(ex.Message);
+                    throw;
                 }
             }
             else
@@ -118,15 +118,8 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteAsync(int id)
         {
-            try
-            {
-                _featureRepository.Remove(id);
-                await _featureRepository.SaveAsync();
-            }
-            catch (OcudaException ex)
-            {
-                throw new OcudaException(ex.Message);
-            }
+            _featureRepository.Remove(id);
+            await _featureRepository.SaveAsync();
         }
 
         public async Task<DataWithCount<ICollection<Feature>>> PageItemsAsync(

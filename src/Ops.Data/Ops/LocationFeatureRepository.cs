@@ -13,7 +13,7 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class LocationFeatureRepository : GenericRepository<PromenadeContext,LocationFeature, int>, ILocationFeatureRepository
+    public class LocationFeatureRepository : GenericRepository<PromenadeContext, LocationFeature, int>, ILocationFeatureRepository
     {
         public LocationFeatureRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<LocationFeatureRepository> logger) : base(repositoryFacade, logger)
@@ -48,7 +48,7 @@ namespace Ocuda.Ops.Data.Ops
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.Id != locationfeature.Id
-                    &&_.LocationId == locationfeature.LocationId
+                    && _.LocationId == locationfeature.LocationId
                     && _.FeatureId == locationfeature.FeatureId)
                 .AnyAsync();
         }

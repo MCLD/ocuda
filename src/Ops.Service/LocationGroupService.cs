@@ -25,47 +25,39 @@ namespace Ocuda.Ops.Service
             _locationGroupRepository = locationGroupRepository
                 ?? throw new ArgumentNullException(nameof(locationGroupRepository));
         }
+
         public async Task<List<LocationGroup>> GetLocationGroupsByLocationAsync(Location location)
         {
             return await _locationGroupRepository.GetLocationGroupsByLocationAsync(location);
         }
+
         public async Task<LocationGroup> AddLocationGroupAsync(LocationGroup locationGroup)
         {
             await _locationGroupRepository.AddAsync(locationGroup);
             await _locationGroupRepository.SaveAsync();
             return locationGroup;
         }
+
         public async Task<LocationGroup> GetLocationGroupByIdAsync(int locationgroupId)
         {
             return await _locationGroupRepository.FindAsync(locationgroupId);
         }
+
         public async Task<LocationGroup> EditAsync(LocationGroup locationGroup)
         {
-            try
-            {
-                var currentLocationGroup = await _locationGroupRepository.FindAsync(locationGroup.Id);
-                await ValidateAsync(currentLocationGroup);
-                _locationGroupRepository.Update(currentLocationGroup);
-                await _locationGroupRepository.SaveAsync();
-                return currentLocationGroup;
-            }
-            catch (OcudaException ex)
-            {
-                throw new OcudaException(ex.Message);
-            }
+            var currentLocationGroup = await _locationGroupRepository.FindAsync(locationGroup.Id);
+            await ValidateAsync(currentLocationGroup);
+            _locationGroupRepository.Update(currentLocationGroup);
+            await _locationGroupRepository.SaveAsync();
+            return currentLocationGroup;
         }
+
         public async Task DeleteAsync(int id)
         {
-            try
-            {
-                _locationGroupRepository.Remove(id);
-                await _locationGroupRepository.SaveAsync();
-            }
-            catch (OcudaException ex)
-            {
-                throw new OcudaException(ex.Message);
-            }
+            _locationGroupRepository.Remove(id);
+            await _locationGroupRepository.SaveAsync();
         }
+
         private async Task ValidateAsync(LocationGroup locationGroup)
         {
             if (await _locationGroupRepository.IsDuplicateAsync(locationGroup))

@@ -19,7 +19,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Area("Admin")]
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]/[controller]")]
-    public class GroupsController: BaseController<GroupsController>
+    public class GroupsController : BaseController<GroupsController>
     {
         private readonly IGroupService _groupService;
 
@@ -53,9 +53,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             if (paginateModel.PastMaxPage)
             {
                 return RedirectToRoute(new
-                    {
-                        page = paginateModel.LastPage ?? 1
-                    });
+                {
+                    page = paginateModel.LastPage ?? 1
+                });
             }
 
             return View(new GroupViewModel
@@ -91,7 +91,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         [RestoreModelState]
         public IActionResult CreateGroup()
         {
-            var group = new Group {
+            var group = new Group
+            {
                 IsNewGroup = true
             };
 
@@ -125,7 +126,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 }
                 catch (OcudaException ex)
                 {
-                    _logger.LogError($"Problem creating Group {group.GroupType}: {ex.Message}");
+                    _logger.LogError(ex,
+                        "Problem creating Group {GroupType}: {Message}",
+                        group.GroupType,
+                        ex.Message);
                     ShowAlertDanger($"Unable to create Group: {ex.Message}");
                     group.IsNewGroup = true;
                     return View("GroupDetails", new GroupViewModel
@@ -156,7 +160,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             catch (OcudaException ex)
             {
                 ShowAlertDanger($"Unable to delete Group {group.GroupType}: {ex.Message}");
-                _logger.LogError($"Problem deleting Group {group.GroupType}: {ex.Message}");
+                _logger.LogError(ex,
+                    "Problem deleting Group {GroupType}: {Message}",
+                    group.GroupType,
+                    ex.Message);
             }
 
             return RedirectToAction(nameof(GroupsController.Index));
@@ -190,7 +197,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                 catch (OcudaException ex)
                 {
                     ShowAlertDanger($"Unable to update Group {group.GroupType} : {ex.Message}");
-                    _logger.LogError($"Problem updating {group.GroupType}: {ex.Message}");
+                    _logger.LogError(ex,
+                        "Problem updating {GroupType}: {Message}",
+                        group.GroupType,
+                        ex.Message);
                     group.IsNewGroup = false;
                     return View("GroupDetails", new GroupViewModel
                     {

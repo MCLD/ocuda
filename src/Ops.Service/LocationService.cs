@@ -47,7 +47,7 @@ namespace Ocuda.Ops.Service
         public async Task<Location> GetLocationByStubAsync(string locationStub)
         {
             var location = await _locationRepository.GetLocationByStub(locationStub);
-            if(location == null)
+            if (location == null)
             {
                 throw new OcudaException("Location not found.");
             }
@@ -55,7 +55,7 @@ namespace Ocuda.Ops.Service
             {
                 return location;
             }
-            
+
         }
 
         public async Task<Location> GetLocationByIdAsync(int locationId)
@@ -65,66 +65,45 @@ namespace Ocuda.Ops.Service
 
         public async Task<Location> AddLocationAsync(Location location)
         {
-            try
-            {
-                location.Name = location.Name?.Trim();
-                await ValidateAsync(location);
+            location.Name = location.Name?.Trim();
+            await ValidateAsync(location);
 
-                await _locationRepository.AddAsync(location);
-                await _locationRepository.SaveAsync();
-            }
-            catch (OcudaException ex)
-            {
-                throw new OcudaException(ex.Message);
-            }
+            await _locationRepository.AddAsync(location);
+            await _locationRepository.SaveAsync();
 
-                return location;
+            return location;
         }
 
         public async Task<Location> EditAsync(Location location)
         {
-            try
-            {
-                var currentLocation = await _locationRepository.FindAsync(location.Id);
-                currentLocation.Address = location.Address;
-                currentLocation.City = location.City;
-                currentLocation.Zip = location.Zip;
-                currentLocation.State = location.State;
-                currentLocation.Country = location.Country;
-                currentLocation.MapLink = location.MapLink;
-                currentLocation.Name = location.Name;
-                currentLocation.Stub = location.Stub;
-                currentLocation.Code = location.Code;
-                currentLocation.Phone = location.Phone;
-                currentLocation.Description = location.Description;
-                currentLocation.Facebook = location.Facebook;
-                currentLocation.EventLink = location.EventLink;
-                currentLocation.SubscriptionLink = location.SubscriptionLink;
-                await ValidateAsync(currentLocation);
-                _locationRepository.Update(currentLocation);
-                await _locationRepository.SaveAsync();
-                return currentLocation;
-            }
-            catch (OcudaException ex)
-            {
-                throw new OcudaException(ex.Message);
-            }
+            var currentLocation = await _locationRepository.FindAsync(location.Id);
+            currentLocation.Address = location.Address;
+            currentLocation.City = location.City;
+            currentLocation.Zip = location.Zip;
+            currentLocation.State = location.State;
+            currentLocation.Country = location.Country;
+            currentLocation.MapLink = location.MapLink;
+            currentLocation.Name = location.Name;
+            currentLocation.Stub = location.Stub;
+            currentLocation.Code = location.Code;
+            currentLocation.Phone = location.Phone;
+            currentLocation.Description = location.Description;
+            currentLocation.Facebook = location.Facebook;
+            currentLocation.EventLink = location.EventLink;
+            currentLocation.SubscriptionLink = location.SubscriptionLink;
+            await ValidateAsync(currentLocation);
+            _locationRepository.Update(currentLocation);
+            await _locationRepository.SaveAsync();
+            return currentLocation;
         }
         public async Task<Location> EditAlwaysOpenAsync(Location location)
         {
-            try
-            {
-                var currentLocation = await _locationRepository.FindAsync(location.Id);
-                currentLocation.IsAlwaysOpen = location.IsAlwaysOpen;
-                await ValidateAsync(currentLocation);
-                _locationRepository.Update(currentLocation);
-                await _locationRepository.SaveAsync();
-                return currentLocation;
-            }
-            catch (OcudaException ex)
-            {
-                throw new OcudaException(ex.Message);
-            }
+            var currentLocation = await _locationRepository.FindAsync(location.Id);
+            currentLocation.IsAlwaysOpen = location.IsAlwaysOpen;
+            await ValidateAsync(currentLocation);
+            _locationRepository.Update(currentLocation);
+            await _locationRepository.SaveAsync();
+            return currentLocation;
         }
 
         public async Task<List<string>> GetFormattedWeeklyHoursAsync(int locationId)
@@ -203,12 +182,13 @@ namespace Ocuda.Ops.Service
                 _locationRepository.Remove(id);
                 await _locationRepository.SaveAsync();
             }
-            catch(OcudaException ex)
+            catch (OcudaException ex)
             {
                 _logger.LogError(ex, "Could not delete location", ex.Message);
-                throw new OcudaException(ex.Message);
+                throw;
             }
         }
+
         private string GetFormattedDayGroupings(List<DayOfWeek> days)
         {
             var dayFormatter = new DateTimeFormatInfo();
