@@ -4,6 +4,7 @@ set -e
 
 BLD_PUSH=false
 BLD_BRANCH_FOUND=false
+BLD_RELEASE=false
 BLD_COMMIT=$(git rev-parse --short HEAD)
 BLD_VERSION=unknown
 BLD_VERSION_DATE=$(date -u +'%Y%m%d_%H%M%SZ')
@@ -23,16 +24,17 @@ fi
 if BLD_GITBRANCH=$(git symbolic-ref --short -q HEAD); then
   BLD_BRANCH=$BLD_GITBRANCH
   BLD_BRANCH_FOUND=true
+else
+  # Azure DevOps works in detached HEAD state, get branch from variable
+  BLD_GITBRANCH=$BUILD_SOURCEBRANCHNAME
+  if [[ -n $BLD_GITBRANCH ]]; then
+    BLD_BRANCH=$BLD_GITBRANCH
+	BLD_BRANCH_FOUND=true
+  fi
 fi
 
-if [[ $BLD_BRANCH_FOUND = "false" ]]; then
-  if BLD_GITBRANCH=$(git name-rev --name-only HEAD); then
-    # Microsoft VSTS works in detached HEAD state
-    BLD_BRANCH=${BLD_GITBRANCH#"remotes/origin/"}
-    BLD_BRANCH_FOUND=true
-  else
-    BLD_BRANCH="unknownbranch"
-  fi
+if [[ -z $BLD_BRANCH ]]; then
+  BLD_BRANCH="unknown-branch"
 fi
 
 if [[ $BLD_BRANCH = "master" ]]; then
