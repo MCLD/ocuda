@@ -6,7 +6,7 @@ WORKDIR /app
 COPY . ./
 
 # Run tests if they are present
-RUN if [ -d "test/Promenade" ]; then dotnet build && find test/Promenade -path "*/bin/*Test.dll" -type f -print0 |xargs -0 dotnet vstest --parallel; else echo "No tests found in test/Promenade."; fi
+RUN bash run-tests.bash test/Promenade
 
 # Publish
 RUN dotnet publish -c Release -o "/app/publish/promenade" "src/Promenade.Web"

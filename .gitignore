@@ -185,7 +185,6 @@ ClientBin/
 *.dbproj.schemaview
 *.pfx
 *.publishsettings
-node_modules/
 orleans.codegen.cs
 
 # RIA/Silverlight projects
@@ -257,3 +256,5 @@ src/Ops.DataProvider.*/Migrations/
 # Exclude publish results
 src/Ops.Web.WindowsAuth/Properties/PublishProfiles/
 
+# Include all node_modules files
+!**/node_modules/**

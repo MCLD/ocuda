@@ -216,6 +216,16 @@ namespace Ocuda.Ops.Web
                 Data.Ops.FileRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileTypeRepository,
                 Data.Ops.FileTypeRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IGroupRepository,
+                Data.Ops.GroupRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ILocationRepository,
+                Data.Ops.LocationRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ILocationFeatureRepository,
+                Data.Ops.LocationFeatureRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ILocationGroupRepository,
+                Data.Ops.LocationGroupRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ILocationHoursRepository,
+                Data.Ops.LocationHoursRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkLibraryRepository,
                 Data.Ops.LinkLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository,
@@ -242,9 +252,14 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IFeatureService, FeatureService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IFileTypeService, FileTypeService>();
+            services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IInitialSetupService, InitialSetupService>();
             services.AddScoped<IInsertSampleDataService, InsertSampleDataService>();
             services.AddScoped<ILdapService, LdapService>();
+            services.AddScoped<ILocationService, LocationService>();
+            services.AddScoped<ILocationHoursService, LocationHoursService>();
+            services.AddScoped<ILocationGroupService, LocationGroupService>();
+            services.AddScoped<ILocationFeatureService, LocationFeatureService>();
             services.AddScoped<ILinkService, LinkService>();
             services.AddScoped<IPathResolverService, PathResolverService>();
             services.AddScoped<IRosterService, RosterService>();
@@ -270,21 +285,21 @@ namespace Ocuda.Ops.Web
                     FileProvider
                     = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
                         Path.Combine(Path.GetFullPath("Styles"))),
-                    RequestPath = new Microsoft.AspNetCore.Http.PathString("/devstyles")
+                    RequestPath = new PathString("/devstyles")
                 });
                 app.UseStaticFiles(new StaticFileOptions
                 {
                     FileProvider
                     = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
                         Path.Combine(Path.GetFullPath("Scripts"))),
-                    RequestPath = new Microsoft.AspNetCore.Http.PathString("/devscripts")
+                    RequestPath = new PathString("/devscripts")
                 });
                 app.UseStaticFiles(new StaticFileOptions
                 {
                     FileProvider
                     = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
-                        Path.Combine(Path.GetFullPath("bower_components"))),
-                    RequestPath = new Microsoft.AspNetCore.Http.PathString("/devbower")
+                        Path.Combine(Path.GetFullPath("node_modules"))),
+                    RequestPath = new PathString("/devmodules")
                 });
             }
             else

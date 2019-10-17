@@ -31,6 +31,11 @@ namespace Ocuda.Ops.Service
             return await _featureRepository.GetPaginatedListAsync(filter);
         }
 
+        public async Task<List<Feature>> GetAllFeaturesAsync()
+        {
+            return await _featureRepository.GetAllFeaturesAsync();
+        }
+
         public async Task<Feature> GetFeatureByNameAsync(string featureName)
         {
             try
@@ -42,6 +47,11 @@ namespace Ocuda.Ops.Service
                 _logger.LogError(ex, "Problem finding feature: {Message}", ex.Message);
                 throw new OcudaException($"Could not find feature: {featureName}");
             }
+        }
+
+        public async Task<Feature> GetFeatureByIdAsync(int featureId)
+        {
+            return await _featureRepository.FindAsync(featureId);
         }
 
         public async Task<Feature> AddFeatureAsync(Feature feature)
@@ -64,7 +74,7 @@ namespace Ocuda.Ops.Service
             catch (OcudaException ex)
             {
                 _logger.LogError(ex.Message);
-                throw new OcudaException(ex.Message);
+                throw;
             }
 
             return feature;
@@ -97,7 +107,7 @@ namespace Ocuda.Ops.Service
                 catch (OcudaException ex)
                 {
                     _logger.LogError(ex.Message);
-                    throw new OcudaException(ex.Message);
+                    throw;
                 }
             }
             else
@@ -108,15 +118,18 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteAsync(int id)
         {
-            try
+            _featureRepository.Remove(id);
+            await _featureRepository.SaveAsync();
+        }
+
+        public async Task<DataWithCount<ICollection<Feature>>> PageItemsAsync(
+            FeatureFilter filter)
+        {
+            return new DataWithCount<ICollection<Feature>>
             {
-                _featureRepository.Remove(id);
-                await _featureRepository.SaveAsync();
-            }
-            catch (OcudaException ex)
-            {
-                throw new OcudaException(ex.Message);
-            }
+                Data = await _featureRepository.PageAsync(filter),
+                Count = await _featureRepository.CountAsync(filter)
+            };
         }
 
         private async Task ValidateAsync(Feature feature)

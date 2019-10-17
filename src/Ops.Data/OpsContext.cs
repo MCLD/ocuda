@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data
 {

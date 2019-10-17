@@ -1,0 +1,134 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Group.GroupViewModel
+
+@section styles {
+    <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/iconpicker.min.css" asp-append-version="true" />
+}
+
+<div class="group-save-container">
+    <div class="group-save-message"></div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h1>@(Model.Group.IsNewGroup ? "Add Group" : "Edit Group")</h1>
+    </div>
+</div>
+<form method="post"
+      asp-controller="@GroupsController.Name"
+      asp-action="@Model.Action"
+      id="groupform"
+      role="form"
+      display="inline">
+    <input asp-for="Group.Id" id="group-id" type="hidden" />
+    <input asp-for="Group.IsLocationRegion" id="group-isLocationRegion" type="hidden" />
+    <input asp-for="Group.GroupType"
+           formgroup
+           autocomplete="off" />
+    <input asp-for="Group.Stub"
+           formgroup
+           autocomplete="off" 
+           info-tooltip="The stub is the nickname/URL for the group."
+           on-blur-js="FormatStub"/>
+    <div class="row">
+        <div class="accordion offset-md-3 col-md-9" id="locationregion-accordion">
+            <div class="card">
+                <div class="card-header @(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) && !Model.Group.IsLocationRegion ? "" : "bg-info")" id="accordion-header">
+                    <button class="btn btn-link @(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) && !Model.Group.IsLocationRegion ? "text-info" : "text-white")"
+                            style="text-decoration: none;"
+                            id="popup-button"
+                            type="button"
+                            data-toggle="collapse"
+                            data-target="#collapseDiv"
+                            aria-expanded="true"
+                            aria-controls="collapseDiv">
+                        <span class="fas fa-caret-@(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) && !Model.Group.IsLocationRegion ? "right" : "down")" id="accordion-disclosure"></span>
+                        Is a Location Region
+                    </button>
+                </div>
+                <div id="collapseDiv"
+                     class="collapse@(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) && !Model.Group.IsLocationRegion ? "" : " show")"
+                     aria-labelledby="headingOne"
+                     data-parent="#locationregion-accordion">
+                    <div class="card-body">
+                        <input asp-for="Group.SubscriptionUrl"
+                               formgroup
+                               autocomplete="off"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="offset-md-3 col-md-9">
+            <div class="form-group">
+                <a class="btn btn-secondary"
+                   id="return-home"
+                   asp-action="@nameof(GroupsController.Index)">Return to Groups</a>
+                @if (Model.Group.IsNewGroup)
+                {
+                <text>
+                    <button type="submit"
+                            id="submit"
+                            value="Submit"
+                            class="btn btn-primary btn-spinner">
+                        <span class="buttonText">Add Group</span>
+                        <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
+                    </button>
+                </text>
+                }
+                else
+                {
+                <text>
+                    <button type="submit"
+                            id="submit"
+                            value="Submit"
+                            class="btn btn-primary btn-spinner">
+                        <span class="buttonText">Update Group</span>
+                        <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
+                    </button>
+                </text>
+                }
+            </div>
+        </div>
+    </div>
+</form>
+
+@section scripts{
+    <script src="~/js/md.min.js" asp-append-version="true"></script>
+    <script>
+        $("#popup-button").click(function () {
+            if ($("#accordion-header").hasClass("bg-info")) {
+                $("#accordion-header").removeClass("bg-info");
+                $("#popup-button").removeClass("text-white");
+                $("#popup-button").addClass("text-info");
+                $("#accordion-disclosure").removeClass("fa-caret-down");
+                $("#accordion-disclosure").addClass("fa-caret-right");
+                $("#group-isLocationRegion").val("False");
+            }
+            else {
+                $("#accordion-header").addClass("bg-info");
+                $("#popup-button").addClass("text-white");
+                $("#popup-button").removeClass("text-info");
+                $("#accordion-disclosure").removeClass("fa-caret-right");
+                $("#accordion-disclosure").addClass("fa-caret-down");
+                $("#group-isLocationRegion").val("True");
+            }
+        });
+        $( "#groupform" ).submit(function( event ) {
+            if (!$("#accordion-header").hasClass("bg-info")) {
+                $("#Group_SubscriptionUrl").val("");
+                $("#group-isLocationRegion").val("False");
+            }
+        });
+        function FormatStub(object) {
+            updateStub($(object), $(object).val());
+        }
+        $(document).ready(function () {
+            var editor = new Markdown.Editor({ allowUploads: false });
+            editor.run();
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+
+    </script>
+}

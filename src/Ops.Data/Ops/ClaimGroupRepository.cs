@@ -19,7 +19,7 @@ namespace Ocuda.Ops.Data.Ops
 
         public async Task<bool> IsClaimGroup(string claim, string group)
         {
-            if(string.IsNullOrEmpty(group) || string.IsNullOrEmpty(claim))
+            if (string.IsNullOrEmpty(group) || string.IsNullOrEmpty(claim))
             {
                 return false;
             }

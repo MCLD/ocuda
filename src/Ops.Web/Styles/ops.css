@@ -129,13 +129,23 @@ tr.row-link.selected {
 tr.row-link.selected:hover {
     background-color: beige;
 }
+span.format-addr {
+    font-style: italic;
+}
+td.group-item:hover, td.feature-item:hover{
+    cursor: pointer;
+}
+tr.itemRow td {
+    vertical-align: middle;
+    word-wrap: break-word;
+}
 
 @media screen and (max-height: 500px) {
     .navcolumn {
         padding-top: 15px;
     }
 
-        .navcolumn a {
-            font-size: 18px;
-        }
+    .navcolumn a {
+        font-size: 18px;
+    }
 }

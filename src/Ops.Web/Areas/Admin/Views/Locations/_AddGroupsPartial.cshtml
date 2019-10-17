@@ -1,0 +1,47 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location.GroupListViewModel;
+
+@if (Model.Groups.Count() == 0)
+{
+    <div class="alert alert-warning">No Items found</div>
+}
+else
+{
+    <div>
+        <table class="table table-sm table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Group Type</th>
+                    <th>Is Location Region</th>
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var group in Model.Groups)
+                {
+                    <tr class="itemRow">
+                        <td>
+                            @group.GroupType
+                        </td>
+                        <td class="text-center">
+                            @if (group.IsLocationRegion)
+                            {
+                                <span class="fas fa-check"></span>
+                            }
+                        </td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-link btn-xs addgroupButton"
+                                    data-groupid="@group.Id">
+                                <span class="fa fa-2x fa-plus-circle text-success" aria-hidden="true"></span>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    @if (Model.PaginateModel.MaxPage > 1)
+    {
+        <paginate paginateModel="@Model.PaginateModel" asButtons="true"></paginate>
+    }
+}

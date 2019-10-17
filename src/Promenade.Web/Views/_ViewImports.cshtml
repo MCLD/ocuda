@@ -1,5 +1,10 @@
+@using Ocuda.i18n.l10nKeys
 @using Ocuda.Promenade.Web
 @using Ocuda.Promenade.Controllers.ViewModels
+
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @addTagHelper *, Ocuda.Promenade.Controllers
 @addTagHelper *, Ocuda.Utility
+
+@inject Microsoft.Extensions.Localization.IStringLocalizer<Ocuda.i18n.Resources.Shared> SharedLocalizer
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<Ocuda.i18n.Resources.Shared> SharedHtmlLocalizer

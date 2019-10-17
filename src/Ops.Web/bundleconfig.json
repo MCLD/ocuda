@@ -2,12 +2,12 @@
   {
     "outputFileName": "wwwroot/js/main.min.js",
     "inputFiles": [
-      "bower_components/jquery/dist/jquery.js",
-      "bower_components/popper.js/dist/umd/popper.js",
-      "bower_components/bootstrap/dist/js/bootstrap.js",
-      "bower_components/bootstrap-multiselect/dist/js/bootstrap-multiselect.js",
-      "bower_components/jquery-validation/dist/jquery.validate.js",
-      "bower_components/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js",
+      "node_modules/jquery/dist/jquery.js",
+      "node_modules/popper.js/dist/umd/popper.js",
+      "node_modules/bootstrap/dist/js/bootstrap.js",
+      "node_modules/bootstrap-multiselect/dist/js/bootstrap-multiselect.js",
+      "node_modules/jquery-validation/dist/jquery.validate.js",
+      "node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js",
       "Scripts/Layout.js",
       "Scripts/ops.js"
     ],
@@ -17,19 +17,9 @@
     }
   },
   {
-    "outputFileName": "wwwroot/js/site.min.js",
-    "inputFiles": [
-      "Scripts/site.js"
-    ],
-    "minify": {
-      "enabled": true,
-      "renameLocals": true
-    }
-  },
-  {
     "outputFileName": "wwwroot/js/md.min.js",
     "inputFiles": [
-      "bower_components/commonmark/dist/commonmark.js",
+      "node_modules/commonmark/dist/commonmark.js",
       "Scripts/WMD.js"
     ],
     "minify": {
@@ -40,7 +30,18 @@
   {
     "outputFileName": "wwwroot/js/iconpicker.min.js",
     "inputFiles": [
-      "Scripts/fontawesome-iconpicker/main.js"
+      "node_modules/fontawesome-iconpicker/dist/js/fontawesome-iconpicker.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    }
+  },
+  {
+    "outputFileName": "wwwroot/js/dt-picker.min.js",
+    "inputFiles": [
+      "node_modules/moment/moment.js",
+      "node_modules/tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4.js"
     ],
     "minify": {
       "enabled": true,
@@ -50,23 +51,14 @@
   {
     "outputFileName": "wwwroot/css/main.min.css",
     "inputFiles": [
-      "Scripts/Bootstrap/bootstrap.css",
-      "bower_components/bootstrap-multiselect/dist/css/bootstrap-multiselect.css",
-      "bower_components/fontawesome/web-fonts-with-css/css/fontawesome-all.css",
+      "node_modules/bootstrap/dist/css/bootstrap.css",
+      "node_modules/bootstrap-multiselect/dist/css/bootstrap-multiselect.css",
+      "node_modules/@fortawesome/fontawesome-free/css/all.css",
       "Styles/ops.css"
     ],
     "minify": {
       "enabled": true,
       "adjustRelativePaths": false
-    }
-  },
-  {
-    "outputFileName": "wwwroot/css/site.min.css",
-    "inputFiles": [
-      "Styles/site.css"
-    ],
-    "minify": {
-      "enabled": true
     }
   },
   {
@@ -81,7 +73,17 @@
   {
     "outputFileName": "wwwroot/css/iconpicker.min.css",
     "inputFiles": [
-      "Styles/fontawesome-iconpicker/main.css"
+      "node_modules/fontawesome-iconpicker/dist/css/fontawesome-iconpicker.css",
+      "Styles/iconpicker-fix.css"
+    ],
+    "minify": {
+      "enabled": true
+    }
+  },
+  {
+    "outputFileName": "wwwroot/css/dt-picker.min.css",
+    "inputFiles": [
+      "node_modules/tempusdominus-bootstrap-4/build/css/tempusdominus-bootstrap-4.css"
     ],
     "minify": {
       "enabled": true

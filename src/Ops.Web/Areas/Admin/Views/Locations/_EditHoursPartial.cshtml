@@ -1,0 +1,88 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location.LocationViewModel;
+
+    <div class="container">
+        <div id="modalItemInfo" class="col-xs-12 col">
+            @for (int i = 0; i < 7; i++)
+            {
+                <div class="row container">
+                    <div class="row">
+                        <div class="col h5">@Enum.GetName(typeof(DayOfWeek), Model.AllLocationHours[i].DayOfWeek)</div>
+                        <div class="dropdown show col">
+                            @if (Model.AllLocationHours[i].Open)
+                            {
+                                <button type="button" 
+                                        class="btn btn-success dropdown-toggle" 
+                                        id="hour-selector-@Model.AllLocationHours[i].Id" 
+                                        data-toggle="dropdown" 
+                                        data-isopen="1" 
+                                        aria-haspopup="true" 
+                                        aria-expanded="false">Open</button>
+                            }
+                            else
+                            {
+                                <button type="button" 
+                                        class="btn btn-danger dropdown-toggle" 
+                                        id="hour-selector-@Model.AllLocationHours[i].Id" 
+                                        data-toggle="dropdown" 
+                                        data-isopen="0" 
+                                        aria-haspopup="true" 
+                                        aria-expanded="false">Closed</button>
+                            }
+                            <div class="dropdown-menu">
+                                <div class="dropdown-item hours-item" 
+                                     data-hourid="@Model.AllLocationHours[i].Id" 
+                                     data-indexval="@i" 
+                                     data-hourval="1" 
+                                     href="#">Open</div>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item hours-item" 
+                                     data-hourid="@Model.AllLocationHours[i].Id" 
+                                     data-indexval="@i" 
+                                     data-hourval="0" 
+                                     href="#">Closed</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row@(!Model.AllLocationHours[i].Open == true ? " d-none" : "")" 
+                         style="width: inherit" 
+                         id="hour-inputs-@Model.AllLocationHours[i].Id" 
+                         data-hourid="@Model.AllLocationHours[i].Id">
+                        <div class="col">
+                            <input asp-for="AllLocationHours[i].OpenTime" 
+                                   value="@Model.AllLocationHours[i].OpenTime?.ToString("HH:mm")" 
+                                   id="hour-open-@Model.AllLocationHours[i].DayOfWeek" 
+                                   data-hourid="@Model.AllLocationHours[i].Id" 
+                                   formgroup 
+                                   datetime-picker="DateTimePickerType.TimeOnly" 
+                                   autocomplete="off" />
+                        </div>
+                        <div class="col">
+                            <input asp-for="AllLocationHours[i].CloseTime" 
+                                   value="@Model.AllLocationHours[i].CloseTime?.ToString("HH:mm")" 
+                                   id="hour-close-@Model.AllLocationHours[i].DayOfWeek" 
+                                   data-hourid="@Model.AllLocationHours[i].Id" 
+                                   formgroup 
+                                   datetime-picker="DateTimePickerType.TimeOnly" 
+                                   autocomplete="off" />
+                        </div>
+                        <input value="@Model.AllLocationHours[i].Open" 
+                               asp-for="AllLocationHours[i].Open" hidden />
+                        <input value="@Model.AllLocationHours[i].Id" 
+                               asp-for="AllLocationHours[i].Id" hidden />
+                        <input value="@Model.AllLocationHours[i].LocationId" 
+                               asp-for="AllLocationHours[i].LocationId" hidden />
+                        <input value="@Model.AllLocationHours[i].DayOfWeek" 
+                               asp-for="AllLocationHours[i].DayOfWeek" hidden />
+                    </div>
+                </div>
+                if (i != 6)
+                {
+                    <div class="dropdown-divider"></div>
+                }
+            }
+        </div>
+    </div>
+
+<script>
+    $('.datetimepicker').datetimepicker({format: 'LT'});
+</script>

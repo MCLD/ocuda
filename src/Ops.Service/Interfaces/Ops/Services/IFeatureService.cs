@@ -15,5 +15,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<DataWithCount<ICollection<Feature>>> GetPaginatedListAsync(BaseFilter filter);
         Task<Feature> EditAsync(Feature feature);
         Task DeleteAsync(int id);
+        Task<Feature> GetFeatureByIdAsync(int featureId);
+        Task<DataWithCount<ICollection<Feature>>> PageItemsAsync(FeatureFilter filter);
+        Task<List<Feature>> GetAllFeaturesAsync();
     }
 }

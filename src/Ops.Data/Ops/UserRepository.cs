@@ -14,7 +14,7 @@ namespace Ocuda.Ops.Data.Ops
         : GenericRepository<OpsContext, User, int>, IUserRepository
     {
         public UserRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
-             ILogger<UserRepository> logger) : base(repositoryFacade, logger)
+            ILogger<UserRepository> logger) : base(repositoryFacade, logger)
         {
         }
 

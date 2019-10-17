@@ -2,21 +2,11 @@
   {
     "outputFileName": "wwwroot/js/main.min.js",
     "inputFiles": [
-      "bower_components/jquery/dist/jquery.js",
-      "bower_components/popper.js/dist/umd/popper.js",
-      "bower_components/bootstrap/dist/js/bootstrap.js",
-      "bower_components/jquery-validation/dist/jquery.validate.js",
-      "bower_components/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js"
-    ],
-    "minify": {
-      "enabled": true,
-      "renameLocals": true
-    }
-  },
-  {
-    "outputFileName": "wwwroot/js/site.min.js",
-    "inputFiles": [
-      "Scripts/site.js"
+      "node_modules/jquery/dist/jquery.js",
+      "node_modules/popper.js/dist/umd/popper.js",
+      "node_modules/bootstrap/dist/js/bootstrap.js",
+      "node_modules/jquery-validation/dist/jquery.validate.js",
+      "node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js"
     ],
     "minify": {
       "enabled": true,
@@ -26,21 +16,13 @@
   {
     "outputFileName": "wwwroot/css/main.min.css",
     "inputFiles": [
-      "Scripts/Bootstrap/bootstrap.css",
-      "bower_components/fontawesome/web-fonts-with-css/css/fontawesome-all.css"
+      "node_modules/bootstrap/dist/css/bootstrap.css",
+      "node_modules/@fortawesome/fontawesome-free/css/all.css"
     ],
     "minify": {
       "enabled": true,
       "adjustRelativePaths": false
     }
-  },
-  {
-    "outputFileName": "wwwroot/css/site.min.css",
-    "inputFiles": [
-      "Styles/site.css"
-    ],
-    "minify": {
-      "enabled": true
-    }
   }
 ]
+

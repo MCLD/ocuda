@@ -1,13 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Localization.Routing;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Ocuda.i18n;
+using Ocuda.i18n.RouteConstraint;
 using Ocuda.Promenade.Data;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility.Abstract;
@@ -23,8 +31,8 @@ namespace Ocuda.Promenade.Web
         private readonly bool _isDevelopment;
         private readonly ILogger _logger;
 
-        public Startup(IConfiguration configuration, 
-            IHostingEnvironment env, 
+        public Startup(IConfiguration configuration,
+            IHostingEnvironment env,
             ILogger<Startup> logger)
         {
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
@@ -35,13 +43,21 @@ namespace Ocuda.Promenade.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // set a default culture of en-US if none is specified
-            string culture = _config["Promenade.Culture"] ?? "en-US";
+            services.AddLocalization();
+
             services.Configure<RequestLocalizationOptions>(_ =>
             {
-                _.DefaultRequestCulture
-                    = new Microsoft.AspNetCore.Localization.RequestCulture(culture);
+                _.DefaultRequestCulture = new RequestCulture(Culture.DefaultCulture);
+                _.SupportedCultures = Culture.SupportedCultures;
+                _.SupportedUICultures = Culture.SupportedCultures;
+                _.RequestCultureProviders.Insert(0,
+                    new RouteDataRequestCultureProvider { Options = _ });
+                _.RequestCultureProviders
+                    .Remove(_.RequestCultureProviders
+                        .Single(p => p.GetType() == typeof(QueryStringRequestCultureProvider)));
             });
+
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // configure ef errors to throw, log, or ignore as appropriate for the environment
             // see https://docs.microsoft.com/en-us/ef/core/querying/related-data#ignored-includes
@@ -61,7 +77,7 @@ namespace Ocuda.Promenade.Web
                     throwEvents.Add(RelationalEventId.QueryClientEvaluationWarning);
                     throwEvents.Add(CoreEventId.FirstWithoutOrderByAndFilterWarning);
                 }
-                
+
                 throwEvents.Add(CoreEventId.IncludeIgnoredWarning);
             }
             else
@@ -86,8 +102,17 @@ namespace Ocuda.Promenade.Web
                     throw new System.Exception("No Ops.DatabaseProvider configured.");
             }
 
+            services.Configure<RouteOptions>(_ =>
+                _.ConstraintMap.Add("cultureConstraint", typeof(CultureRouteConstraint)));
+
             services.AddMvc()
-                .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_2);
+                .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_2)
+                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                .AddDataAnnotationsLocalization(_ =>
+                {
+                    _.DataAnnotationLocalizerProvider = (__, factory)
+                        => factory.Create(typeof(i18n.Resources.Shared));
+                });
 
             services.Configure<RouteOptions>(_ =>
             {
@@ -100,7 +125,11 @@ namespace Ocuda.Promenade.Web
             services.AddScoped(typeof(Data.ServiceFacade.Repository<>));
 
             // utilities
+            services.AddScoped<CultureContextProvider>();
             services.AddScoped<IDateTimeProvider, CurrentDateTimeProvider>();
+
+            // filters
+            services.AddScoped<i18n.Filter.LocalizationFilterAttribute>();
 
             // repositories
             services.AddScoped<Service.Interfaces.Repositories.IFeatureRepository,
@@ -151,6 +180,23 @@ namespace Ocuda.Promenade.Web
                 app.UseStatusCodePagesWithReExecute("/Error/{0}");
             }
 
+            var requestLocalizationOptions = new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture(Culture.DefaultCulture),
+                SupportedCultures = Culture.SupportedCultures,
+                SupportedUICultures = Culture.SupportedCultures
+            };
+            requestLocalizationOptions.RequestCultureProviders.Insert(0,
+                new RouteDataRequestCultureProvider { Options = requestLocalizationOptions });
+
+            requestLocalizationOptions
+                .RequestCultureProviders
+                .Remove(requestLocalizationOptions
+                    .RequestCultureProviders
+                    .Single(_ => _.GetType() == typeof(QueryStringRequestCultureProvider)));
+
+            app.UseRequestLocalization(requestLocalizationOptions);
+
             // insert remote address into the log context for each request
             app.Use(async (context, next) =>
             {
@@ -159,9 +205,6 @@ namespace Ocuda.Promenade.Web
                     await next.Invoke();
                 }
             });
-
-            // use the culture configured above in services
-            app.UseRequestLocalization();
 
             app.UseStaticFiles();
 
