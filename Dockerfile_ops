@@ -6,7 +6,7 @@ WORKDIR /app
 COPY . ./
 
 # Run tests if they are present
-RUN if [ -d "test/Ops" ]; then dotnet build && find test/Ops -path "*/bin/*Test.dll" -type f -print0 |xargs -0 dotnet vstest --parallel; else echo "No tests found in test/Ops"; fi
+RUN bash run-tests.bash test/Ops
 
 # Publish
 RUN dotnet publish -c Release -o "/app/publish/ops" "src/Ops.Web"
