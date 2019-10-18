@@ -1,0 +1,69 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.SectionViewModel
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a href="@Url.Action(nameof(SectionController.Section), new { sectionStub = Model.Section.Stub})" class="navbar-brand">@Model.Section.Name</a>
+    <a class="nav-link"
+       href="@Url.Action(nameof(SectionController.PostCategory),
+            new { sectionStub = Model.Section.Stub,
+            page=1})">
+        Posts
+    </a>
+    <a href="#">Files</a>
+</nav>
+<div class="col-9">
+    @if (!string.IsNullOrEmpty(Model.Section.EmbedVideoUrl))
+    {
+        <div class="row">
+            <iframe width="590" height="332" src="@Model.Section.EmbedVideoUrl" frameborder="0" allowfullscreen=""></iframe>
+        </div>
+    }
+<div class="col">
+    @if (!Model.AllPosts.Any())
+    {
+        <div class="row">
+            No Posts have been made.
+        </div>
+    }
+    else
+    {
+        <div class="col">
+            @foreach (var post in Model.AllPosts)
+            {
+                <div class="row m-3">
+                    <div class="card">
+                        <div class="card-header p-4">
+                            <div class="row" style="transform: rotate(0);">
+                                <div class="col">
+                                    <div class="h5 row font-italic">
+                                        @post.Title
+                                    </div>
+                                    <div class="row font-italic">Posted: @post.PublishedAt.ToString("MM/dd/yyyy hh:mm tt")</div>
+                                </div>
+                                <a href="@Url.Action(nameof(SectionController.Post), new { sectionStub = Model.Section.Stub, postId = post.Id})" class="stretched-link"></a>
+                            </div>
+                            <div class="row">
+                                @foreach (var category in Model.SectionCategories.Where(_ => _.Id == post.PostCategoryId))
+                                {
+                                    <i>Category: <a href="@Url.Action(nameof(SectionController.PostCategory), new { sectionStub = Model.Section.Stub, categoryStub = category.Stub, page = 1})" class="badge badge-pill badge-info" style="position: relative;">@category.Name</a></i>
+                                }
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            @post.Content.Substring(0, 250)...
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        @if (Model.PaginateModel.MaxPage > 1)
+        {
+            <paginate paginateModel="@Model.PaginateModel"></paginate>
+        }
+    }
+</div>
+    <div class="row">
+        <a href="@Url.Action(nameof(SectionController.Index))" class="btn btn-primary">View Sections</a>
+    </div>
+</div>
+<div class="col-3">
+
+</div>
