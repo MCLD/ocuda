@@ -120,6 +120,19 @@
     background-color: lightskyblue;
     padding-left: 1.75rem;
 }
+<<<<<<< HEAD
+=======
+
+tr.row-link {
+    cursor: pointer;
+}
+tr.row-link.selected {
+    background-color: lemonchiffon;
+}
+tr.row-link.selected:hover {
+    background-color: beige;
+}
+>>>>>>> 4838841... Merge branch 'feature/add-blog' of https://github.com/MCLD/ocuda into feature/add-blog
 span.format-addr {
     font-style: italic;
 }
@@ -129,6 +142,17 @@ td.group-item:hover, td.feature-item:hover{
 tr.itemRow td {
     vertical-align: middle;
     word-wrap: break-word;
+}
+.stretched-link::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    pointer-events: auto;
+    content: "";
+    background-color: rgba(0,0,0,0);
 }
 
 @media screen and (max-height: 500px) {
