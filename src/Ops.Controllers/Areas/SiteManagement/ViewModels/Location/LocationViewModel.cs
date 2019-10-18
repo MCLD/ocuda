@@ -2,7 +2,7 @@
 using Ocuda.Ops.Service.Models;
 using Ocuda.Utility.Models;
 
-namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location
+namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location
 {
     public class LocationViewModel
     {
