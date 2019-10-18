@@ -79,6 +79,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "i18n.Test", "test\i18n\i18n
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "polaris-api-csharp", "src\polaris-api-csharp\polaris-api-csharp.csproj", "{78E83504-5DBE-4ECA-A04D-F8911E436164}"
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "polaris-api-csharp", "src\polaris-api-csharp\polaris-api-csharp.csproj", "{586FD8B1-534D-4B16-A5F0-C2ED7C5E4EE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "i18n", "src\i18n\i18n.csproj", "{E00F5EBE-AB6C-4BE4-A977-A4988CA04A57}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "i18n", "i18n", "{1C0384E0-C8AD-46D9-9319-C75D67E6474E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "i18n.Test", "test\i18n\i18n.Test\i18n.Test.csproj", "{28C9B95E-DD9B-458B-86EC-37B265D66181}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "polaris-api-csharp", "src\polaris-api-csharp\polaris-api-csharp.csproj", "{586FD8B1-534D-4B16-A5F0-C2ED7C5E4EE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -162,6 +169,13 @@ Global
 		{78E83504-5DBE-4ECA-A04D-F8911E436164}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78E83504-5DBE-4ECA-A04D-F8911E436164}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78E83504-5DBE-4ECA-A04D-F8911E436164}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E00F5EBE-AB6C-4BE4-A977-A4988CA04A57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E00F5EBE-AB6C-4BE4-A977-A4988CA04A57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E00F5EBE-AB6C-4BE4-A977-A4988CA04A57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E00F5EBE-AB6C-4BE4-A977-A4988CA04A57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28C9B95E-DD9B-458B-86EC-37B265D66181}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28C9B95E-DD9B-458B-86EC-37B265D66181}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28C9B95E-DD9B-458B-86EC-37B265D66181}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{586FD8B1-534D-4B16-A5F0-C2ED7C5E4EE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{586FD8B1-534D-4B16-A5F0-C2ED7C5E4EE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{586FD8B1-534D-4B16-A5F0-C2ED7C5E4EE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
