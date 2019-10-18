@@ -3276,6 +3276,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Areas\PublicContentManagement\" />
     <Folder Include="Shared\" />
     <Folder Include="Views\Error\" />
   </ItemGroup>

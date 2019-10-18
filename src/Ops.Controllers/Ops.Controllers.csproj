@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Areas\PublicContentManagement\ViewModels\" />
     <Folder Include="ViewModels\Shared\" />
   </ItemGroup>
 

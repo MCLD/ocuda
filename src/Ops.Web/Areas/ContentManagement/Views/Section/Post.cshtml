@@ -1,0 +1,73 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.SectionViewModel
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a href="@Url.Action(nameof(SectionController.Section), new { sectionStub = Model.Section.Stub})" class="navbar-brand">@Model.Section.Name</a>
+        <a class="nav-link"
+            href="@Url.Action(nameof(SectionController.PostCategory),
+            new { sectionStub = Model.Section.Stub,
+            page=1})">
+            Posts
+        </a>
+        <a href="#">Files</a>
+
+    </nav>
+        <div class="col">
+            <div class="row">
+                <div class="col-3">
+                    <div class="row h5 mx-auto">
+                        View By
+                    </div>
+                    <div class="row">
+                        <div class="row">
+                            <div class="h6">By Category</div>
+                        </div>
+                        <div class="col-12">
+                            @foreach (var category in Model.SectionCategories)
+                            {
+                                <div class="row text-center">
+                                    <a href="@Url.Action(nameof(SectionController.PostCategory), new { sectionStub = Model.Section.Stub, categoryStub = category.Stub, page=1})" class="badge badge-light">@category.Name</a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="row">
+                            <h6>Recent Posts</h6>
+                        </div>
+                        <div class="col-12">
+                            @foreach (var post in Model.SectionsPosts)
+                            {
+                                <div class="row">
+                                    <a href="@Url.Action(nameof(SectionController.Post), new { sectionStub = Model.Section.Stub, postId = post.Id})" class="badge badge-light">@post.Title</a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="row">
+                        <h4>
+                            <a href="@Url.Action(nameof(SectionController.Section), new { sectionStub = Model.Section.Stub})">@Model.Section.Name</a>
+                        </h4>
+                    </div>
+                    <div class="row">
+                        <h5>
+                            @Model.Post.Title
+                        </h5>
+                    </div>
+                    <div class="row">
+                        <i>Posted: @Model.Post.PublishedAt.ToString("MM/dd/yyyy hh:mm tt")</i>
+                    </div>
+                    <div class="row">
+                        <i>Category: <a class="badge badge-pill badge-info" href="@Url.Action(nameof(SectionController.PostCategory), new { sectionStub = Model.Section.Stub, categoryStub = Model.Category.Stub, page = 1})">@Model.Category.Name</a></i>
+                    </div>
+                    <div class="row">
+                        @Model.Post.Content
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div>
+
+            </div>
+        </div>
