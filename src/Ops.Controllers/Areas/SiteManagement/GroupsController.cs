@@ -16,7 +16,7 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 {
-    [Area("Admin")]
+    [Area("SiteManagement")]
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]/[controller]")]
     public class GroupsController : BaseController<GroupsController>

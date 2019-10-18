@@ -11,7 +11,7 @@
 
 <div class="row">
     <div class="col-12">
-        <h1>@Model.Feature.IsNewFeature ? "Add Feature" : "Edit Feature"</h1>
+        <h1>@(Model.Feature.IsNewFeature ? "Add Feature" : "Edit Feature")</h1>
     </div>
 </div>
 
@@ -19,15 +19,14 @@
       asp-controller="@FeaturesController.Name"
       asp-action="@Model.Action"
       role="form"
+      id="featureform"
       display="inline">
     <input asp-for="Feature.Id" id="feature-id" type="hidden" />
     <input asp-for="Feature.NeedsPopup" id="feature-needsPopup" type="hidden" />
-    <input
-           asp-for="Feature.Name"
+    <input asp-for="Feature.Name"
            formgroup
            autocomplete="off" />
-    <input
-           asp-for="Feature.FontAwesome"
+    <input asp-for="Feature.FontAwesome"
            class="form-control icon-picker"
            type="text"
            formgroup
@@ -35,8 +34,8 @@
     <div class="row">
         <div class="accordion offset-md-3 col-md-9" id="popup-accordion">
             <div class="card">
-                <div class="card-header" id="accordion-header">
-                    <button class="btn btn-link text-info"
+                <div class="card-header @(string.IsNullOrEmpty(Model?.Feature?.Stub)&&!Model.Feature.NeedsPopup ? "" : "bg-info")" id="accordion-header">
+                    <button class="btn btn-link @(string.IsNullOrEmpty(Model?.Feature?.Stub)&&!Model.Feature.NeedsPopup ? "text-info" : "text-white")"
                             style="text-decoration: none;"
                             id="popup-button"
                             type="button"
@@ -44,17 +43,16 @@
                             data-target="#collapseDiv"
                             aria-expanded="true"
                             aria-controls="collapseDiv">
-                        <span class="fas fa-caret-right" id="accordion-disclosure"></span>
+                        <span class="fas fa-caret-@(string.IsNullOrEmpty(Model?.Feature?.Stub)&&!Model.Feature.NeedsPopup ? "right" : "down")" id="accordion-disclosure"></span>
                         Display this feature in a pop-up
                     </button>
                 </div>
                 <div id="collapseDiv"
-                     class="collapse @(string.IsNullOrEmpty(Model?.Feature?.Stub) ? " " : " show")"
+                     class="collapse@(string.IsNullOrEmpty(Model?.Feature?.Stub)&&!Model.Feature.NeedsPopup ? "" : " show")"
                      aria-labelledby="headingOne"
                      data-parent="#popup-accordion">
                     <div class="card-body">
-                        <input
-                               asp-for="Feature.Stub"
+                        <input asp-for="Feature.Stub"
                                formgroup
                                autocomplete="off"
                                info-tooltip="The stub is the nickname/URL for the feature."
@@ -114,7 +112,7 @@
                         <button type="submit"
                                 id="submit"
                                 value="Submit"
-                                class="btn btn-primary btn-spinner">
+                                class="btn btn-success btn-spinner">
                             <span class="buttonText">Add Feature</span>
                             <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
                         </button>
@@ -126,7 +124,7 @@
                         <button type="submit"
                                 id="submit"
                                 value="Submit"
-                                class="btn btn-primary btn-spinner">
+                                class="btn btn-success btn-spinner">
                             <span class="buttonText">Update Feature</span>
                             <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
                         </button>
@@ -138,8 +136,8 @@
 </form>
 
 @section scripts{
-    <script src="~/js/md.min.js" asp-append-version="true"></script>
     <script src="~/js/iconpicker.min.js" asp-append-version="true"></script>
+    <script src="~/js/md.min.js" asp-append-version="true"></script>
     <script>
         $("#popup-button").click(function () {
             if ($("#accordion-header").hasClass("bg-info")) {
@@ -148,6 +146,7 @@
                 $("#popup-button").addClass("text-info");
                 $("#accordion-disclosure").removeClass("fa-caret-down");
                 $("#accordion-disclosure").addClass("fa-caret-right");
+                $("#feature-needsPopup").val("False");
             }
             else {
                 $("#accordion-header").addClass("bg-info");
@@ -155,14 +154,14 @@
                 $("#popup-button").removeClass("text-info");
                 $("#accordion-disclosure").removeClass("fa-caret-right");
                 $("#accordion-disclosure").addClass("fa-caret-down");
+                $("#feature-needsPopup").val("True");
             }
         });
-    $("button#popup-button").on("click", function () {
-        if (!$("div#collapseDiv").hasClass("show")) {
-            $("#feature-needsPopup").val("True");
-            }
-        else {
-            $("#feature-needsPopup").val("False");
+        $("#featureform").submit(function (event) {
+            if (!$("#accordion-header").hasClass("bg-info")) {
+                $("#feature-needsPopup").val("False");
+                $("#Feature_Stub").val("");
+                $("#wmd-input").val("");
             }
         });
         function FormatStub(object) {
@@ -172,10 +171,6 @@
         $(document).ready(function () {
             var editor = new Markdown.Editor({ allowUploads: false });
             editor.run();
-            if ($($("#Feature_Stub").next()).hasClass("field-validation-error"))
-            {
-                $( "#collapseDiv" ).collapse('show');
-            }
             $('.icon-picker').iconpicker();
             $('[data-toggle="tooltip"]').tooltip();
         });

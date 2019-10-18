@@ -4,7 +4,7 @@ using System.Text;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Models;
 
-namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Location
+namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location
 {
     public class GroupListViewModel
     {
