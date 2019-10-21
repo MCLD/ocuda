@@ -103,6 +103,8 @@ namespace Ocuda.Ops.Service
 
         public async Task LoggedInUpdateAsync(User user)
         {
+            var systemAdminUser = await _userRepository.GetSystemAdministratorAsync();
+
             User dbUser = await GetByIdAsync(user.Id);
             dbUser.LastRosterUpdate = user.LastRosterUpdate;
             dbUser.LastSeen = DateTime.Now;
@@ -113,7 +115,7 @@ namespace Ocuda.Ops.Service
             dbUser.Phone = user.Phone;
             dbUser.SupervisorId = user.SupervisorId;
             dbUser.UpdatedAt = DateTime.Now;
-            dbUser.UpdatedBy = GetCurrentUserId();
+            dbUser.UpdatedBy = systemAdminUser.Id;
 
             _userRepository.Update(dbUser);
             await _userRepository.SaveAsync();
@@ -121,6 +123,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<User> UpdateRosterUserAsync(int rosterUserId, User user)
         {
+            var systemAdminUser = await _userRepository.GetSystemAdministratorAsync();
+
             User rosterUser = await GetByIdAsync(rosterUserId);
             rosterUser.Email = user.Email;
             rosterUser.Name = user.Name;
@@ -128,7 +132,7 @@ namespace Ocuda.Ops.Service
             rosterUser.Phone = user.Phone;
             rosterUser.Username = user.Username;
             rosterUser.UpdatedAt = DateTime.Now;
-            rosterUser.UpdatedBy = GetCurrentUserId();
+            rosterUser.UpdatedBy = systemAdminUser.Id;
 
             _userRepository.Update(rosterUser);
             await _userRepository.SaveAsync();
