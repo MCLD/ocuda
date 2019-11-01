@@ -836,8 +836,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
             if (model.UploadFile.Length > 0)
             {
-                using var fileStream = new FileStream(filePath, FileMode.Create);
-                await model.UploadFile.CopyToAsync(fileStream);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.UploadFile.CopyToAsync(fileStream);
+                }
             }
             await _fileService.CreatePrivateFileAsync(CurrentUserId, model.File, model.UploadFile);
             ShowAlertSuccess($"Added '{model.File.Name}' to '{fileLib.Name}'");

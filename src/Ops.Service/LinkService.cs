@@ -13,16 +13,12 @@ namespace Ocuda.Ops.Service
 {
     public class LinkService : ILinkService
     {
-        private readonly ILogger<LinkService> _logger;
         private readonly ILinkLibraryRepository _linkLibraryRepository;
         private readonly ILinkRepository _linkRepository;
 
-        public LinkService(ILogger<LinkService> logger,
-            ILinkLibraryRepository linkLibraryRepository,
+        public LinkService(ILinkLibraryRepository linkLibraryRepository,
             ILinkRepository linkRepository)
         {
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
             _linkRepository = linkRepository
                 ?? throw new ArgumentNullException(nameof(linkRepository));
             _linkLibraryRepository = linkLibraryRepository

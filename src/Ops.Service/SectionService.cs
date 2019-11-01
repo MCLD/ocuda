@@ -12,13 +12,10 @@ namespace Ocuda.Ops.Service
 {
     public class SectionService : ISectionService
     {
-        private readonly ILogger _logger;
         private readonly ISectionRepository _sectionRepository;
 
-        public SectionService(ILogger<SectionService> logger,
-            ISectionRepository sectionRepository)
+        public SectionService(ISectionRepository sectionRepository)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _sectionRepository = sectionRepository
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
         }
