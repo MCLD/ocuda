@@ -10,11 +10,14 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
     public interface IPostRepository : IRepository<Post, int>
     {
-        Task<List<Post>> GetPostsByCategoryIdAsync(int categoryId);
+        Task<List<Post>> GetPostsBySectionCategoryIdAsync(int categoryId, int sectionId);
 
-        Task<DataWithCount<ICollection<Post>>> GetPaginatedListAsync(
-            BaseFilter filter, int categoryId);
+        Task<DataWithCount<ICollection<Post>>> GetSectionCategoryPaginatedListAsync(
+            BaseFilter filter, int sectionId, int categoryId);
+
         Task<DataWithCount<ICollection<Post>>> GetSectionPaginatedListAsync(
-            BaseFilter filter, List<PostCategory> categories);
+            BaseFilter filter, int sectionId);
+
+        Task<List<Post>> GetTopSectionPosts(int sectionId, int count);
     }
 }

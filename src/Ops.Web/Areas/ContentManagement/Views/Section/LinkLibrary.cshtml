@@ -1,0 +1,265 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.SectionViewModel
+@section styles {
+    <link rel="stylesheet" href="~/css/iconpicker.min.css" asp-append-version="true" />
+}
+
+@{
+    var invalid = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid;
+}
+
+<div class="modal fade" id="listAddModal" tabindex="-1" role="dialog" aria-labelledby="listModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="row">
+            <div class="col-12 col-sm-10 col-sm-offset-1">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addModalTitle">Add Link</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form asp-action="@nameof(SectionController.AddLinkToLibrary)" method="post" role="form" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div id="modalItemList" class="col-12">
+                                <div class="col-sm-9">
+
+                                    <input asp-for="Section.Stub" value="@Model.Section.Stub" autocomplete="off" type="hidden" />
+                                    <input asp-for="LinkLibrary.Stub" value="@Model.LinkLibrary.Stub" autocomplete="off" type="hidden" />
+                                    <input asp-for="LinkLibrary.Id" value="@Model.LinkLibrary.Id" autocomplete="off" type="hidden" />
+                                    <input asp-for="Link.Name" autocomplete="off" formgroup />
+                                    <input asp-for="Link.Url" autocomplete="off" formgroup />
+                                    <input asp-for="Link.Icon" class="form-control icon-picker" autocomplete="off" formgroup />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" value="Submit" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal" style="margin-right: 1em;">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="listEditModal" tabindex="-1" role="dialog" aria-labelledby="listModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="row">
+            <div class="col-12 col-sm-10 col-sm-offset-1">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalTitle">Edit Link</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form asp-action="@nameof(SectionController.UpdateLinkFromLibrary)" method="post" role="form" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div id="modalItemList" class="col-12">
+                                <div class="col-sm-9">
+
+                                    <input asp-for="Section.Stub" value="@Model.Section.Stub" autocomplete="off" type="hidden" />
+                                    <input asp-for="LinkLibrary.Stub" value="@Model.LinkLibrary.Stub" autocomplete="off" type="hidden" />
+                                    <input asp-for="LinkLibrary.Id" value="@Model.LinkLibrary.Id" autocomplete="off" type="hidden" />
+                                    <input asp-for="Link.Id" autocomplete="off" type="hidden" />
+                                    <input asp-for="Link.Name" autocomplete="off" formgroup />
+                                    <input asp-for="Link.Url" autocomplete="off" formgroup />
+                                    <input asp-for="Link.Icon" class="form-control icon-picker" type="text" formgroup autocomplete="off" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" value="Submit" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal" style="margin-right: 1em;">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade"
+     id="deleteModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="deleteModalLabel">
+    <div class="modal-dialog" role="document">
+        <form asp-action="@nameof(SectionController.DeleteLinkFromLibrary)"
+              method="post"
+              role="form"
+              style="display:inline">
+            <input asp-for="Section.Stub" value="@Model.Section.Stub" type="hidden" />
+            <input asp-for="LinkLibrary.Stub" value="@Model.LinkLibrary.Stub" type="hidden" />
+            <input asp-for="Link.Id" type="hidden" />
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="deleteModalLabel">Delete Feature</h4>
+                    <button type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+                    <span id="modal-text"></span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-default"
+                            data-dismiss="modal"
+                            style="margin-right: 1em;">
+                        Cancel
+                    </button>
+                    <button id="delButton"
+                            type="submit"
+                            class="btn btn-danger pull-right"
+                            aria-label="Confirm">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a href="@Url.Action(nameof(SectionController.Index))" class="navbar-brand">Section</a>
+    <span class="navbar-brand">/</span>
+    <a href="@Url.Action(nameof(SectionController.Section), new { sectionStub = Model.Section.Stub})" class="navbar-brand">@Model.Section.Name</a>
+    <a class="nav-link"
+       href="@Url.Action(nameof(SectionController.Post),
+            new { sectionStub = Model.Section.Stub,
+            page=1})">
+        Posts
+    </a>
+</nav>
+<div class="col-6 mx-auto">
+    <div class="card">
+        <div class="card-header">
+            <div class="float-left h4">@Model.LinkLibrary.Name</div>
+            <div class="float-right align-middle">
+                <a role="button" class="text-success align-middle" id="addLinkButton">
+                    <span class="fas fa-plus-circle fa-lg align-middle"></span>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <table class="table table-condensed table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            Icon
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Url
+                        </th>
+                        <th>
+
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Links.Count > 0)
+                    {
+                        @foreach (var link in Model.Links)
+                        {
+                            <tr>
+                                <td class="mx-auto row-link"
+                                    data-id="@link.Id"
+                                    data-target="#listEditModal"
+                                    data-icon="@link.Icon"
+                                    data-name="@link.Name"
+                                    data-url="@link.Url"
+                                    style="transform: rotate(0);">
+                                    <span class="@link.Icon" style="font-size: 32px;"></span>
+                                </td>
+                                <td class="row-link"
+                                    data-id="@link.Id"
+                                    data-target="#listEditModal"
+                                    data-icon="@link.Icon"
+                                    data-name="@link.Name"
+                                    data-url="@link.Url"
+                                    style="transform: rotate(0);">
+                                    @link.Name
+                                </td>
+                                <td class="row-link"
+                                    data-id="@link.Id"
+                                    data-target="#listEditModal"
+                                    data-icon="@link.Icon"
+                                    data-name="@link.Name"
+                                    data-url="@link.Url"
+                                    style="transform: rotate(0);">
+                                    @link.Url
+                                </td>
+                                <td style="position: relative;">
+                                    <button type="button"
+                                            class="btn btn-link text-danger"
+                                            data-toggle="modal"
+                                            data-target="#deleteModal"
+                                            data-id="@link.Id"
+                                            data-name="@link.Name">
+                                        <span class="far fa-times-circle fa-lg"
+                                              aria-hidden="true"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4">No Links in @Model.LinkLibrary.Name</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (Model.PaginateModel.MaxPage > 1)
+        {
+            <div class="card-footer">
+                <paginate paginateModel="@Model.PaginateModel"></paginate>
+            </div>
+        }  
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/iconpicker.min.js" asp-append-version="true"></script>
+    <script>
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+            var modal = $(this);
+            modal.find("#modal-text").text("Are you sure you want to delete the link \"" + name + "\"?");
+            modal.find("#Link_Id").val(id);
+        });
+        $(".row-link").on('click', function (e) {
+            $("#listEditModal").modal("show");
+            var row = $(this);
+            var id = row.data("id");
+            var name = row.data("name");
+            var icon = row.data("icon");
+            var url = row.data("url");
+            var modal = $("#listEditModal");
+            modal.find("#Link_Id").val(id);
+            modal.find("#Link_Icon").val(icon);
+            modal.find("#Link_Name").val(name);
+            modal.find("#Link_Url").val(url);
+        });
+        $("#addLinkButton").on('click', function (e) {
+            $("#listAddModal").modal("show");
+        });
+        $("#delButton").on('click', function (e) {
+            this.innerHTML = 'Delete <span class="fa fa-spinner fa-spin"></span>';
+        });
+        $(document).ready(function () {
+            $('.icon-picker').iconpicker();
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+}

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Ocuda.Ops.Models.Entities
 {
-    public class PostCategory : Abstract.BaseEntity
+    public class Category : Abstract.BaseEntity
     {
         public int SectionId { get; set; }
 

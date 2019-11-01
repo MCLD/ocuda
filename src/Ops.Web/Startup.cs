@@ -224,8 +224,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.LinkRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPostRepository,
                 Data.Ops.PostRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IPostCategoryRepository,
-                Data.Ops.PostCategoryRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
+                Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterDetailRepository,
                 Data.Ops.RosterDetailRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterHeaderRepository,

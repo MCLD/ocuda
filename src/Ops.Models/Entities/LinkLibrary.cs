@@ -12,5 +12,7 @@ namespace Ocuda.Ops.Models.Entities
         public bool IsNavigation { get; set; }
 
         public ICollection<Link> Links { get; set; }
+
+        public string Stub { get; set; }
     }
 }

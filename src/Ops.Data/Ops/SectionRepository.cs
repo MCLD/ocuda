@@ -16,7 +16,8 @@ namespace Ocuda.Ops.Data.Ops
             ILogger<SectionRepository> logger) : base(repositoryFacade, logger)
         {
         }
-        public async Task<Section> GetSectionByStubAsync(string stub)
+
+        public Section GetSectionByStub(string stub)
         {
             return DbSet
             .AsNoTracking()
@@ -24,12 +25,19 @@ namespace Ocuda.Ops.Data.Ops
             .FirstOrDefault();
         }
 
-        public async Task<Section> GetSectionByNameAsync(string name)
+        public Section GetSectionByName(string name)
         {
             return DbSet
             .AsNoTracking()
             .Where(_ => _.Name == name)
             .FirstOrDefault();
+        }
+
+        public List<Section> GetAllSections()
+        {
+            return DbSet
+            .AsNoTracking()
+            .ToList();
         }
     }
 }

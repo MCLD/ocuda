@@ -34,5 +34,32 @@ namespace Ocuda.Ops.Data.Ops
                     .ToListAsync()
             };
         }
+
+        public List<LinkLibrary> GetLinkLibrariesBySectionId(int sectionId)
+        {
+            return _context.SectionLinkLibraries
+                .AsNoTracking()
+                .Where(_ => _.SectionId == sectionId)
+                .Select(_ => _.LinkLibrary)
+                .ToList();
+        }
+
+        public SectionLinkLibrary GetSectionLinkLibraryByLibraryId(int libId)
+        {
+            return _context.SectionLinkLibraries
+                .AsNoTracking()
+                .Where(_ => _.LinkLibraryId == libId)
+                .FirstOrDefault();
+        }
+
+        public void RemoveSectionLinkLibrary(SectionLinkLibrary sectionLinklibrary)
+        {
+            _context.SectionLinkLibraries.Remove(sectionLinklibrary);
+        }
+
+        public void AddSectionLinkLibrary(SectionLinkLibrary sectionLinklibrary)
+        {
+            _context.SectionLinkLibraries.Add(sectionLinklibrary);
+        }
     }
 }
