@@ -13,33 +13,38 @@ using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class PostCategoryRepository : GenericRepository<OpsContext, PostCategory, int>, IPostCategoryRepository
+    public class CategoryRepository : GenericRepository<OpsContext, Category, int>, ICategoryRepository
     {
-        public PostCategoryRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
-            ILogger<PostCategoryRepository> logger) : base(repositoryFacade, logger)
+        public CategoryRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
+            ILogger<CategoryRepository> logger) : base(repositoryFacade, logger)
         {
         }
 
-        public async Task<List<PostCategory>> GetPostsBySectionIdAsync(int sectionId)
+        public async Task<List<Category>> GetCategoriesBySectionIdAsync(int sectionId)
         {
-            return await DbSet
+            var sectionCats = await _context.SectionCategories
                 .AsNoTracking()
                 .Where(_ => _.SectionId == sectionId)
                 .ToListAsync();
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => sectionCats.Select(__ => __.CategoryId).Contains(_.Id))
+                .ToListAsync();
         }
 
-        public PostCategory GetPostCategoryByStub(string stub)
+        public Category GetCategoryByStub(string stub, int sectionId)
         {
             return DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub.ToLower() == stub.ToLower())
+                .Where(_ => _.Stub.ToLower() == stub.ToLower()
+                && _.SectionId == sectionId)
                 .FirstOrDefault();
         }
 
-        public async Task<DataWithCount<ICollection<PostCategory>>> GetPaginatedListAsync(
+        public async Task<DataWithCount<ICollection<Category>>> GetPaginatedListAsync(
             BaseFilter filter, int sectionId)
         {
-            return new DataWithCount<ICollection<PostCategory>>
+            return new DataWithCount<ICollection<Category>>
             {
                 Count = await DbSet
                     .AsNoTracking()

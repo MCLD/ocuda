@@ -1,0 +1,231 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.SectionViewModel
+@section styles {
+    <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
+}
+
+@{
+    var invalid = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid;
+}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a href="@Url.Action(nameof(SectionController.Index))" class="navbar-brand">Section</a>
+    <span class="navbar-brand">/</span>
+    <a href="@Url.Action(nameof(SectionController.Section),
+            new { sectionStub = Model.Section.Stub})"
+       class="navbar-brand">@Model.Section.Name</a>
+    <a class="nav-link"
+       href="@Url.Action(nameof(SectionController.Post),
+           new { sectionStub = Model.Section.Stub, categoryStub = "", page=1})">
+        Posts
+    </a>
+</nav>
+<div class="col-6">
+    <form id="modifyPostForm"
+          method="post"
+          role="form">
+        <input asp-for="Post.SectionId" value="@Model.Section.Id" hidden />
+        @if (Model.Action == "Edit")
+        {
+            <input asp-for="Post.Title" formgroup value="@Model.Post.Title" />
+            <input asp-for="Post.Stub" formgroup value="@Model.Post.Stub"/>
+        }
+        else
+        {
+            <input asp-for="Post.Title" formgroup />
+            <input asp-for="Post.Stub" formgroup />
+        }
+        <div class="row form-group">
+            <label class="col-form-label text-md-right col-md-3">
+                Post Category
+            </label>
+            <div class="col-md-9">
+                <div class="flex-md-grow-0">
+                    @if (Model.Action == "Edit")
+                    {
+                        <input asp-for="Post.CategoryId" value="@Model.Post.CategoryId" hidden />
+                    }
+                    else
+                    {
+                        <input asp-for="Post.CategoryId" hidden />
+                    }
+                    <div class="btn-group">
+                        <button id="catSelector" type="button" class="btn btn-secondary">
+                            @if (Model.Action == "Edit")
+                            {
+                                @foreach (var category in Model.SectionCategories.Where(_ => _.Id == Model.Post.CategoryId))
+                                {
+                                    <text>
+                                        @category.Name
+                                    </text>
+                                }
+
+                            }
+                            else
+                            {
+                                <text>
+                                    Post Category
+                                </text>
+                            }
+                        </button>
+                        <button type="button" 
+                                class="btn btn-secondary btn-sm dropdown-toggle" 
+                                id="dropdownMenuReference" 
+                                data-toggle="dropdown" 
+                                aria-haspopup="true" 
+                                aria-expanded="false" 
+                                data-reference="parent">
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuReference">
+                            @foreach (var category in Model.SectionCategories)
+                            {
+                                @if (Model.Action == "Edit")
+                                {
+                                    <a class="dropdown-item @(category.Id == Model.Post.CategoryId ? "active":"")"
+                                       href="#"
+                                       data-name="@category.Name"
+                                       data-category="@category.Id">
+                                        @category.Name
+                                    </a>
+
+                                }
+                                else
+                                {
+                                    <a class="dropdown-item" 
+                                       href="#" 
+                                       data-name="@category.Name" 
+                                       data-category="@category.Id">
+                                        @category.Name
+                                    </a>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+                <span class="text-danger field-validation-valid flex-md-grow-0" 
+                      data-valmsg-for="Post.CategoryId" 
+                      data-valmsg-replace="true"></span>
+            </div>
+        </div>
+        <div class="row form-group">
+            <label class="col-form-label text-md-right col-md-3 custom-control-label">
+                Show On HomePage
+            </label>
+            <div class="flex-md-grow-0">
+                <div class="custom-control custom-switch">
+                    @if (Model.Action == "Edit")
+                    {
+                        <input type="checkbox" 
+                               class="custom-control-input" 
+                               asp-for="Post.ShowOnHomePage" 
+                               value="@Model.Post.ShowOnHomePage" />
+                    }
+                    else
+                    {
+                        <input type="checkbox" 
+                               class="custom-control-input" 
+                               asp-for="Post.ShowOnHomePage" 
+                               value="false" />
+                    }
+                    <label class="col-form-label text-md-right col-md-3 custom-control-label text-hide" for="Post_ShowOnHomePage">
+                        Show On HomePage
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row" id="content-div">
+            <label asp-for="Post.Content"
+                   class="col-md-3 col-form-label text-md-right"></label>
+            <div class="col-md-9">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active"
+                           data-toggle="tab"
+                           href="#md-edit"
+                           role="tab">Edit</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           data-toggle="tab"
+                           href="#md-preview"
+                           role="tab">Preview</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="md-edit-preview">
+                    <div class="tab-pane show active"
+                         id="md-edit"
+                         role="tabpanel">
+                        <div id="wmd-button-bar"
+                             class="wmd-button-row"></div>
+                        @if (Model.Action == "Edit")
+                        {
+                            <textarea asp-for="Post.Content"
+                                      class="form-control wmd-input"
+                                      id="wmd-input"
+                                      value="@Model.Post.Content">
+                            </textarea>
+                        }
+                        else
+                        {
+                            <textarea asp-for="Post.Content"
+                                      class="form-control wmd-input"
+                                      id="wmd-input">
+                            </textarea>
+                        }
+                    </div>
+                    <div class="tab-pane" id="md-preview" role="tabpanel">
+                        <div id="preview" class="wmd-preview"></div>
+                    </div>
+                    <span asp-validation-for="Post.Content"
+                          class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row float-right">
+            <button type="submit" class="btn btn-primary col" aria-label="Confirm">
+                Save
+            </button>
+            <a href="@Url.Action(nameof(SectionController.Post), new { sectionStub = Model.Section.Stub})" 
+               class="btn btn-secondary col">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+@section scripts {
+    <script src="~/js/md.min.js" asp-append-version="true"></script>
+    <script>
+        var addLink = "@Url.Action(nameof(SectionController.CreatePost))";
+        var editLink = "@Url.Action(nameof(SectionController.CreatePost))";
+        $(document).ready(function () {
+            var editor = new Markdown.Editor({ allowUploads: false });
+            editor.run();
+            @if (Model.Action == "Edit") {
+                <text>
+                    $("#modifyPostForm").attr("action", addLink);
+                </text>
+            }
+            else {
+                <text>
+                    $("#modifyPostForm").attr("action", editLink);
+                </text>
+            }
+        });
+        $(".dropdown-item").click(function () {
+            $(".dropdown-item.active").removeClass("active");
+            $(this).addClass("active");
+            $("#catSelector").text($(this).data("name"));
+            $("#Post_CategoryId").val($(this).data("category"));
+        });
+        $("#Post_ShowOnHomePage").click(function () {
+            if ($(this).val() == "false") {
+                $(this).val("true");
+            }
+            else {
+                $(this).val("false");
+            }
+        });
+
+    </script>
+
+}

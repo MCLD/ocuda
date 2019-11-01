@@ -8,13 +8,13 @@ using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
-    public interface IPostCategoryRepository : IRepository<PostCategory, int>
+    public interface ICategoryRepository : IRepository<Category, int>
     {
-        Task<List<PostCategory>> GetPostsBySectionIdAsync(int sectionId);
+        Task<List<Category>> GetCategoriesBySectionIdAsync(int sectionId);
 
-        PostCategory GetPostCategoryByStub(string stub);
+        Category GetCategoryByStub(string stub, int sectionId);
 
-        Task<DataWithCount<ICollection<PostCategory>>> GetPaginatedListAsync(
+        Task<DataWithCount<ICollection<Category>>> GetPaginatedListAsync(
             BaseFilter filter, int sectionId);
     }
 }

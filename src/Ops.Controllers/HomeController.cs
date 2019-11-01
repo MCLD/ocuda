@@ -23,8 +23,7 @@ namespace Ocuda.Ops.Controllers
         private readonly ICoverIssueService _coverIssueService;
 
         public HomeController(ServiceFacades.Controller<HomeController> context,
-            ICoverIssueService coverIssueService,
-            PapiHelper papiHelper) : base(context)
+            ICoverIssueService coverIssueService) : base(context)
         {
             _coverIssueService = coverIssueService
                 ?? throw new ArgumentNullException(nameof(coverIssueService));

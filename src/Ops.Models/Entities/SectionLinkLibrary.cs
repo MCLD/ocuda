@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-
-namespace Ocuda.Ops.Models.Entities
+﻿namespace Ocuda.Ops.Models.Entities
 {
-    public class SectionLinkLibrary : Abstract.BaseEntity
+    public class SectionLinkLibrary
     {
-        [Required]
         public int SectionId { get; set; }
 
-        [Required]
+        public Section Section { get; set; }
+
         public int LinkLibraryId { get; set; }
+
+        public LinkLibrary LinkLibrary { get; set; }
     }
 }

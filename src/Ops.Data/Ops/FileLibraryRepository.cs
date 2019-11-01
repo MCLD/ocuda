@@ -66,5 +66,35 @@ namespace Ocuda.Ops.Data.Ops
                 .Select(_ => _.FileTypeId)
                 .ToListAsync();
         }
+
+        public List<FileLibrary> GetFileLibrariesBySectionId(int sectionId)
+        {
+            return _context.SectionFileLibraries
+                .AsNoTracking()
+                .Where(_ => _.SectionId == sectionId)
+                .Select(_=>_.FileLibrary)
+                .ToList();
+        }
+
+        public SectionFileLibrary GetSectionFileLibraryByLibraryId(int libId)
+        {
+            return _context.SectionFileLibraries
+                .AsNoTracking()
+                .Where(_ => _.FileLibraryId == libId)
+                .FirstOrDefault();
+        }
+
+        public async Task RemoveSectionFileLibraryAsync(SectionFileLibrary sectionFilelibrary)
+        {
+            _context.SectionFileLibraries.Remove(sectionFilelibrary);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<SectionFileLibrary> AddSectionFileLibraryAsync(SectionFileLibrary sectionFileLibrary)
+        {
+            var sectFileLib = _context.SectionFileLibraries.Add(sectionFileLibrary);
+            await _context.SaveChangesAsync();
+            return sectFileLib.Entity;
+        }
     }
 }

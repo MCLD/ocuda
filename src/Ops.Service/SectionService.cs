@@ -30,7 +30,7 @@ namespace Ocuda.Ops.Service
                 var sections = new List<Section>();
                 foreach (var name in names.OrderByDescending(_ => _).ToList())
                 {
-                    sections.Add(await _sectionRepository.GetSectionByNameAsync(name));
+                    sections.Add(_sectionRepository.GetSectionByName(name));
                 }
                 return sections;
             }
@@ -40,9 +40,19 @@ namespace Ocuda.Ops.Service
             }
         }
 
+        public async Task<Section> GetByIdAsync(int id)
+        {
+            return await _sectionRepository.FindAsync(id);
+        }
+
+        public async Task<List<Section>> GetAllSectionsAsync()
+        {
+            return _sectionRepository.GetAllSections();
+        }
+
         public async Task<Section> GetSectionByStubAsync(string stub)
         {
-            return await _sectionRepository.GetSectionByStubAsync(stub);
+            return _sectionRepository.GetSectionByStub(stub);
         }
     }
 }

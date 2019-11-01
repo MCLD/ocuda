@@ -124,10 +124,19 @@
 tr.row-link {
     cursor: pointer;
 }
+td.row-link {
+    cursor: pointer;
+}
 tr.row-link.selected {
     background-color: lemonchiffon;
 }
+td.row-link.selected {
+    background-color: lemonchiffon;
+}
 tr.row-link.selected:hover {
+    background-color: beige;
+}
+td.row-link.selected:hover {
     background-color: beige;
 }
 span.format-addr {
