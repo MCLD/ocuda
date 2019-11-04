@@ -192,7 +192,7 @@ namespace Ocuda.Promenade.Controllers
                 }
                 var neighbors = await _locationService.GetLocationsNeighborsAsync(locationStub);
                 locationViewModel.LocationNeighborGroup = await _locationService.GetLocationsNeighborGroup(locationStub);
-                if (neighbors.Count() > 0)
+                if (neighbors.Count > 0)
                 {
                     locationViewModel.NearbyLocations = neighbors;
                     locationViewModel.NearbyCount = locationViewModel.NearbyLocations.Count;
