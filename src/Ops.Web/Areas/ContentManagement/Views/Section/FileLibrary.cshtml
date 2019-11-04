@@ -264,10 +264,9 @@
                         fileId: $("#delFileId").val(),
                         fileLibId: $("#FileLibrary_Id").val()
                     },
-                    dataType: 'json',
-                    success: function (data) {
-                        window.location.href = data;
-                    }
+                    dataType: 'json'
+                }).done(function (data) {
+                    window.location.href = data;
                 });
             });
             $("#addFileButton").on('click', function (e) {

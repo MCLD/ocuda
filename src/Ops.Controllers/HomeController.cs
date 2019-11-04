@@ -7,16 +7,9 @@ namespace Ocuda.Ops.Controllers
     [Route("")]
     public class HomeController : BaseController<HomeController>
     {
-<<<<<<< HEAD
-        public HomeController(ServiceFacades.Controller<HomeController> context) : base(context)
-=======
         public static string Name { get { return "Home"; } }
 
-        private readonly ICoverIssueService _coverIssueService;
-
-        public HomeController(ServiceFacades.Controller<HomeController> context,
-            ICoverIssueService coverIssueService) : base(context)
->>>>>>> 92e0ab7... Finished changes
+        public HomeController(ServiceFacades.Controller<HomeController> context) : base(context)
         {
         }
 

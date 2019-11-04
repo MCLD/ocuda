@@ -120,9 +120,6 @@
     background-color: lightskyblue;
     padding-left: 1.75rem;
 }
-<<<<<<< HEAD
-=======
-
 tr.row-link {
     cursor: pointer;
 }
@@ -138,13 +135,9 @@ td.row-link.selected {
 tr.row-link.selected:hover {
     background-color: beige;
 }
-<<<<<<< HEAD
->>>>>>> 4838841... Merge branch 'feature/add-blog' of https://github.com/MCLD/ocuda into feature/add-blog
-=======
 td.row-link.selected:hover {
     background-color: beige;
 }
->>>>>>> 92e0ab7... Finished changes
 span.format-addr {
     font-style: italic;
 }
