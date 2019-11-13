@@ -4,17 +4,17 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.10.2",
+    "@fortawesome/fontawesome-free": "^5.11.2",
     "bootstrap": "^4.3.1",
-    "bootstrap-multiselect": "^0.9.13-1",
+    "bootstrap-multiselect": "^0.9.15",
     "commonmark": "^0.29.0",
     "fontawesome-iconpicker": "^3.2.0",
     "jquery": "^3.4.1",
     "jquery-validation": "^1.19.1",
     "jquery-validation-unobtrusive": "^3.2.11",
     "moment": "^2.24.0",
-    "moment-timezone": "^0.5.26",
-    "popper.js": "^1.15.0",
+    "moment-timezone": "^0.5.27",
+    "popper.js": "^1.16.0",
     "tempusdominus-bootstrap-4": "^5.1.2",
     "tempusdominus-core": "^5.0.3"
   }
