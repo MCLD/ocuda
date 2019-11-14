@@ -33,24 +33,21 @@ namespace Ocuda.Ops.Data.Ops
                     .SingleOrDefaultAsync();
         }
 
-        public async Task<ICollection<int>> GetAllIdsAsync()
+        public ICollection<int> GetAllIds()
         {
-            return await DbSet
+            return DbSet
                     .AsNoTracking()
                     .Select(_ => _.Id)
-                    .ToListAsync();
+                    .ToList();
         }
 
         public async Task<ICollection<FileType>> GetAllTypesByLibraryIdAsync(int libId)
         {
-            var types = await _context.FileLibraryFileTypes
+            return await _context.FileLibraryFileTypes
                 .AsNoTracking()
                 .Where(_ => _.FileLibraryId == libId)
+                .Select(_=>_.FileType)
                 .ToListAsync();
-            return await DbSet
-                    .AsNoTracking()
-                    .Where(_ => types.Select(__ => __.FileTypeId).Contains(_.Id))
-                    .ToListAsync();
         }
     }
 }

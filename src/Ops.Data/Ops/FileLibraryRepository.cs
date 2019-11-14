@@ -38,9 +38,32 @@ namespace Ocuda.Ops.Data.Ops
             base.Remove(id);
         }
 
-        public void RemoveLibraryFileTypes(IEnumerable<FileLibraryFileType> libraryFileTypes)
+        public async Task RemoveLibraryFileTypesAsync(List<int> fileTypeIds, int libraryId)
         {
-            _context.FileLibraryFileTypes.RemoveRange(libraryFileTypes);
+            foreach (var fileType in fileTypeIds)
+            {
+                var fileLibType = _context.FileLibraryFileTypes
+                     .Where(_ => _.FileTypeId == fileType && _.FileLibraryId == libraryId)
+                     .FirstOrDefault();
+                _context.FileLibraryFileTypes.Remove(fileLibType);
+            }
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddLibraryFileTypesAsync(List<int> fileTypeIds,int libraryId)
+        {
+            foreach(var fileType in fileTypeIds)
+            {
+                var fileLibType = new FileLibraryFileType()
+                {
+                    FileLibraryId = libraryId,
+                    FileLibrary = _context.FileLibraries.Find(libraryId),
+                    FileTypeId = fileType,
+                    FileType = _context.FileTypes.Find(libraryId)
+                };
+                await _context.FileLibraryFileTypes.AddAsync(fileLibType);
+            }
+            await _context.SaveChangesAsync();
         }
 
         public async Task<DataWithCount<ICollection<FileLibrary>>> GetPaginatedListAsync(
@@ -69,32 +92,10 @@ namespace Ocuda.Ops.Data.Ops
 
         public List<FileLibrary> GetFileLibrariesBySectionId(int sectionId)
         {
-            return _context.SectionFileLibraries
+            return DbSet
                 .AsNoTracking()
                 .Where(_ => _.SectionId == sectionId)
-                .Select(_=>_.FileLibrary)
                 .ToList();
-        }
-
-        public SectionFileLibrary GetSectionFileLibraryByLibraryId(int libId)
-        {
-            return _context.SectionFileLibraries
-                .AsNoTracking()
-                .Where(_ => _.FileLibraryId == libId)
-                .FirstOrDefault();
-        }
-
-        public async Task RemoveSectionFileLibraryAsync(SectionFileLibrary sectionFilelibrary)
-        {
-            _context.SectionFileLibraries.Remove(sectionFilelibrary);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<SectionFileLibrary> AddSectionFileLibraryAsync(SectionFileLibrary sectionFileLibrary)
-        {
-            var sectFileLib = _context.SectionFileLibraries.Add(sectionFileLibrary);
-            await _context.SaveChangesAsync();
-            return sectFileLib.Entity;
         }
     }
 }

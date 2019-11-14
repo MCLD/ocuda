@@ -14,5 +14,7 @@ namespace Ocuda.Ops.Models.Entities
         public ICollection<Link> Links { get; set; }
 
         public string Stub { get; set; }
+
+        public int SectionId { get; set; }
     }
 }

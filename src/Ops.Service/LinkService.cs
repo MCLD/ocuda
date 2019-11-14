@@ -111,14 +111,6 @@ namespace Ocuda.Ops.Service
 
             await _linkLibraryRepository.AddAsync(library);
             await _linkLibraryRepository.SaveAsync();
-
-            var sectLinkLib = new SectionLinkLibrary()
-            {
-                LinkLibraryId = library.Id,
-                SectionId = sectionId
-            };
-            _linkLibraryRepository.AddSectionLinkLibrary(sectLinkLib);
-            await _linkLibraryRepository.SaveAsync();
             return library;
         }
 
@@ -140,8 +132,6 @@ namespace Ocuda.Ops.Service
             {
                 throw new OcudaException("Cannot delete navigation link libraries.");
             }
-            var sectLinkLib = _linkLibraryRepository.GetSectionLinkLibraryByLibraryId(id);
-            _linkLibraryRepository.RemoveSectionLinkLibrary(sectLinkLib);
             _linkLibraryRepository.Remove(id);
             await _linkLibraryRepository.SaveAsync();
         }

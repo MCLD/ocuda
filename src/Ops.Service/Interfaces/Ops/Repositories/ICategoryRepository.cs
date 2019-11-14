@@ -12,9 +12,12 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
     {
         Task<List<Category>> GetCategoriesBySectionIdAsync(int sectionId);
 
-        Category GetCategoryByStub(string stub, int sectionId);
+        Category GetCategoryByStub(string stub);
 
         Task<DataWithCount<ICollection<Category>>> GetPaginatedListAsync(
             BaseFilter filter, int sectionId);
+
+        Task<bool> SectionHasCategoryAsync(int categoryId, int sectionId);
+
     }
 }

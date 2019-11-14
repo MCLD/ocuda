@@ -19,5 +19,13 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
             BaseFilter filter, int sectionId);
 
         Task<List<Post>> GetTopSectionPosts(int sectionId, int count);
+
+        Task<List<PostCategory>> GetPostCategory(int id);
+
+        Post GetPostByStub(string stub);
+
+        Task AddPostCategory(List<int> categories, int postId);
+
+        Task DeletePostCategory(List<int> categories, int postId);
     }
 }

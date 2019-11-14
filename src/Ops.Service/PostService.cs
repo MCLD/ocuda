@@ -53,22 +53,46 @@ namespace Ocuda.Ops.Service
         {
             if (post != null)
             {
-                post.Content = post.Content?.Trim();
-                post.Title = post.Title?.Trim();
-                post.Stub = post.Stub?.Trim();
+                var oldPost = await _postRepository.FindAsync(post.Id);
+                oldPost.Content = post.Content?.Trim();
+                oldPost.Title = post.Title?.Trim();
+                oldPost.Stub = post.Stub?.Trim();
 
-                _postRepository.Update(post);
+                _postRepository.Update(oldPost);
                 await _postRepository.SaveAsync();
             }
+        }
+
+        public Post GetPostByStub(string stub)
+        {
+            return _postRepository.GetPostByStub(stub);
         }
 
         public async Task RemovePost(Post post)
         {
             if (post != null)
             {
+                var currentCats = await _postRepository.GetPostCategory(post.Id);
+                await _postRepository.DeletePostCategory(currentCats.Select(_ => _.CategoryId).ToList(), post.Id);
                 _postRepository.Remove(post);
                 await _postRepository.SaveAsync();
             }
+        }
+
+        public async Task UpdatePostCategories(List<int> newCategoryIds, int postId)
+        {
+            var currentCats = await _postRepository.GetPostCategory(postId);
+            var currentCatIds = currentCats.Select(_ => _.CategoryId).ToList();
+
+            if (newCategoryIds == null)
+            {
+                newCategoryIds = new List<int>();
+            }
+            var catsToDelete = currentCatIds.Except(newCategoryIds).ToList();
+            var catsToAdd = newCategoryIds.Except(currentCatIds).ToList();
+
+            await _postRepository.DeletePostCategory(catsToDelete, postId);
+            await _postRepository.AddPostCategory(catsToAdd, postId);
         }
 
         public async Task<Category> GetCategoryByIdAsync(int id)
@@ -76,9 +100,10 @@ namespace Ocuda.Ops.Service
             return await _categoryRepository.FindAsync(id);
         }
 
-        public Category GetCategoryByStub(string stub, int sectionId)
+        public async Task<Category> GetSectionCategoryByStubAsync(string stub, int sectionId)
         {
-            return _categoryRepository.GetCategoryByStub(stub, sectionId);
+            var cat = _categoryRepository.GetCategoryByStub(stub);
+            return await _categoryRepository.SectionHasCategoryAsync(cat.Id, sectionId) ? cat : null;
         }
 
         public async Task<List<Category>> GetCategoriesBySectionIdAsync(int sectionId)
@@ -112,6 +137,22 @@ namespace Ocuda.Ops.Service
             BaseFilter filter, int sectionId)
         {
             return await _categoryRepository.GetPaginatedListAsync(filter, sectionId);
+        }
+
+        public async Task<List<PostCategory>> GetPostCategoriesByIds(List<int> postIds)
+        {
+            var postList = new List<PostCategory>();
+            foreach (var id in postIds)
+            {
+                var postcats = await _postRepository.GetPostCategory(id);
+                postList.AddRange(postcats);
+            }
+            return postList;
+        }
+
+        public async Task<List<PostCategory>> GetPostCategoriesById(int postId)
+        {
+                return await _postRepository.GetPostCategory(postId);
         }
     }
 }

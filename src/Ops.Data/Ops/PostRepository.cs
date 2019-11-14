@@ -23,31 +23,41 @@ namespace Ocuda.Ops.Data.Ops
 
         public async Task<List<Post>> GetPostsBySectionCategoryIdAsync(int categoryId, int sectionId)
         {
-            return await DbSet
+            var posts = await _context.PostCategories
                 .AsNoTracking()
-                .Where(_ => _.SectionId == sectionId && _.CategoryId == categoryId)
+                .Where(_ => _.CategoryId == categoryId)
+                .Select(_ => _.Post)
                 .ToListAsync();
+            return posts
+                .Where(_ => _.SectionId == sectionId)
+                .ToList();
+        }
+
+        public Post GetPostByStub(string stub)
+        {
+            return DbSet
+                .AsNoTracking()
+                .Where(_ => _.Stub == stub)
+                .FirstOrDefault();
         }
 
         public async Task<DataWithCount<ICollection<Post>>> GetSectionCategoryPaginatedListAsync(
             BaseFilter filter, int sectionId, int categoryId)
         {
-            var sectionCats = _context.SectionCategories
-                .AsNoTracking()
-                .Where(_ => _.SectionId == sectionId && _.CategoryId == categoryId)
-                .ToList();
+
             return new DataWithCount<ICollection<Post>>
             {
-                Count = await DbSet
+                Count = await _context.PostCategories
                     .AsNoTracking()
-                    .Where(_ => sectionCats.Select(__ => __.SectionId).Contains(_.SectionId)
-                        && sectionCats.Select(__ => __.CategoryId).Contains(_.CategoryId))
-                    .OrderByDescending(_ => _.PublishedAt)
+                    .Where(_ => _.CategoryId == categoryId
+                        && _.Post.SectionId == sectionId)
+                    .Select(_ => _.Post)
                     .CountAsync(),
-                Data = await DbSet.AsNoTracking()
-                    .OrderBy(_ => _.Title)
-                    .Where(_ => sectionCats.Select(__ => __.SectionId).Contains(_.SectionId)
-                        && sectionCats.Select(__ => __.CategoryId).Contains(_.CategoryId))
+                Data = await _context.PostCategories
+                    .AsNoTracking()
+                    .Where(_ => _.CategoryId == categoryId
+                        && _.Post.SectionId == sectionId)
+                    .Select(_=>_.Post)
                     .OrderByDescending(_ => _.PublishedAt)
                     .ApplyPagination(filter)
                     .ToListAsync()
@@ -57,20 +67,16 @@ namespace Ocuda.Ops.Data.Ops
         public async Task<DataWithCount<ICollection<Post>>> GetSectionPaginatedListAsync(
             BaseFilter filter, int sectionId)
         {
-            var sectionCats = _context.SectionCategories
-                .AsNoTracking()
-                .Where(_ => _.SectionId == sectionId)
-                .ToList();
             return new DataWithCount<ICollection<Post>>
             {
                 Count = await DbSet
                     .AsNoTracking()
-                    .Where(_ => sectionCats.Select(__ => __.SectionId).Contains(_.SectionId))
+                    .Where(_ => _.SectionId == sectionId)
                     .OrderByDescending(_=>_.PublishedAt)
                     .CountAsync(),
                 Data = await DbSet.AsNoTracking()
                     .OrderBy(_ => _.Title)
-                    .Where(_ => sectionCats.Select(__ => __.SectionId).Contains(_.SectionId))
+                    .Where(_ => _.SectionId == sectionId)
                     .OrderByDescending(_ => _.PublishedAt)
                     .ApplyPagination(filter)
                     .ToListAsync()
@@ -79,17 +85,49 @@ namespace Ocuda.Ops.Data.Ops
 
         public async Task<List<Post>> GetTopSectionPosts(int sectionId, int count)
         {
-            var sectionCats = await _context.SectionCategories
+            return await _context.PostCategories
                 .AsNoTracking()
-                .Where(_ => _.SectionId == sectionId)
-                .ToListAsync();
-            return await DbSet.AsNoTracking()
-                .OrderBy(_ => _.Title)
-                .Where(_ => sectionCats.Select(__ => __.SectionId).Contains(_.SectionId)
-                    && sectionCats.Select(__ => __.CategoryId).Contains(_.CategoryId))
+                .Where(_ => _.Post.SectionId == sectionId)
+                .Select(_ => _.Post)
                 .OrderByDescending(_ => _.PublishedAt)
                 .Take(count)
                 .ToListAsync();
+        }
+
+        public async Task<List<PostCategory>> GetPostCategory(int id)
+        {
+                return await _context.PostCategories
+                    .AsNoTracking()
+                    .Where(_ => _.PostId == id)
+                    .ToListAsync();
+        }
+
+        public async Task AddPostCategory(List<int> categories, int postId)
+        {
+            foreach (var category in categories)
+            {
+                var postCat = new PostCategory()
+                {
+                    PostId = postId,
+                    Post = _context.Posts.Find(postId),
+                    CategoryId = category,
+                    Category = _context.Categories.Find(postId)
+                };
+                _context.PostCategories.Add(postCat);
+            }
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeletePostCategory(List<int> categories, int postId)
+        {
+            foreach (var category in categories)
+            {
+                var postCat = _context.PostCategories
+                    .Where(_ => _.CategoryId == category && _.PostId == postId)
+                    .FirstOrDefault();
+                _context.PostCategories.Remove(postCat);
+            }
+            await _context.SaveChangesAsync();
         }
     }
 }

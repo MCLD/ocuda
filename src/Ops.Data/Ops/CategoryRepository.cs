@@ -22,41 +22,51 @@ namespace Ocuda.Ops.Data.Ops
 
         public async Task<List<Category>> GetCategoriesBySectionIdAsync(int sectionId)
         {
-            var sectionCats = await _context.SectionCategories
+            return await _context.SectionCategories
                 .AsNoTracking()
                 .Where(_ => _.SectionId == sectionId)
-                .ToListAsync();
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => sectionCats.Select(__ => __.CategoryId).Contains(_.Id))
+                .Select(__ => __.Category)
                 .ToListAsync();
         }
 
-        public Category GetCategoryByStub(string stub, int sectionId)
+        public Category GetCategoryByStub(string stub)
         {
             return DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub.ToLower() == stub.ToLower()
-                && _.SectionId == sectionId)
+                .Where(_ => _.Stub.ToLower() == stub.ToLower())
                 .FirstOrDefault();
+        }
+
+        public async Task<bool> SectionHasCategoryAsync(int categoryId, int sectionId)
+        {
+            return await _context.SectionCategories
+                .AsNoTracking()
+                .Where(_ => _.SectionId == sectionId
+                    && _.CategoryId == categoryId)
+                .AnyAsync();
         }
 
         public async Task<DataWithCount<ICollection<Category>>> GetPaginatedListAsync(
             BaseFilter filter, int sectionId)
         {
+            var sectionCats = _context.SectionCategories
+                .AsNoTracking()
+                .Where(_ => _.SectionId == sectionId)
+                .ToList();
             return new DataWithCount<ICollection<Category>>
             {
                 Count = await DbSet
                     .AsNoTracking()
-                    .Where(_ => _.SectionId == sectionId)
+                    .Where(_ => sectionCats.Any(__=>__.CategoryId == _.Id))
                     .CountAsync(),
                 Data = await DbSet
                     .AsNoTracking()
-                    .Where(_=>_.SectionId == sectionId)
+                    .Where(_=> sectionCats.Any(__ => __.CategoryId == _.Id))
                     .OrderBy(_ => _.Name)
                     .ApplyPagination(filter)
                     .ToListAsync()
             };
         }
+
     }
 }

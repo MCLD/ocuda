@@ -47,7 +47,7 @@ namespace Ocuda.Ops.Service
             return _sectionRepository.GetAllSections();
         }
 
-        public async Task<Section> GetSectionByStubAsync(string stub)
+        public Section GetSectionByStub(string stub)
         {
             return _sectionRepository.GetSectionByStub(stub);
         }

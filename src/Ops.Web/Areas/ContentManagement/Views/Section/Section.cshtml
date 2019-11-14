@@ -248,14 +248,14 @@
                             <div class="card-header p-4" style="transform: rotate(0);">
                                 <div class="float-left align-middle">
                                     <a class="float-left align-middle" href="@Url.Action(nameof(SectionController.PostDetails),
-                                        new { sectionStub = Model.Section.Stub, postId = post.Id})">
+                                        new { sectionStub = Model.Section.Stub, postStub = post.Stub})">
                                         <h5>
                                             @post.Title
                                         </h5>
                                     </a>
                                 </div>
                                 <div class="float-right align-middle h4">
-                                    <a href="@Url.Action(nameof(SectionController.EditPost), new { sectionStub = Model.Section.Stub, postId = post.Id})">
+                                    <a href="@Url.Action(nameof(SectionController.EditPost), new { sectionStub = Model.Section.Stub, postStub = post.Stub})">
                                         <span class="far fa-edit float-right"></span>
                                     </a>
                                 </div>
@@ -267,19 +267,25 @@
                                 <div class="row font-italic">
                                     Posted: @post.PublishedAt.ToString("MM/dd/yyyy hh:mm tt")
                                 </div>
-                                <div class="row">
-                                    <i>
-                                        Category:
-                                        <a href="@Url.Action(nameof(SectionController.Post),
-                                                    new { sectionStub = Model.Section.Stub,
-                                                    categoryStub = Model.SectionCategories.
-                                                    Where(_ => _.Id == post.CategoryId).FirstOrDefault().Stub, page = 1})"
-                                            class="badge badge-pill badge-info"
-                                            style="position: relative;">
-                                            @Model.SectionCategories.Where(_ => _.Id == post.CategoryId).FirstOrDefault().Name
-                                        </a>
-                                    </i>
-                                </div>
+                                @if (Model.PostCategories.Count > 0)
+                                {
+                                    <div class="font-italic">
+                                        Category:&nbsp;
+                                        <span>
+                                            @foreach (var category in Model.PostCategories
+                                               .Where(_ => _.PostId == post.Id)
+                                               .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
+                                            {
+                                                <a class="badge badge-pill badge-info"
+                                                   href="@Url.Action(nameof(SectionController.Post),
+                                        new { sectionStub = Model.Section.Stub,
+                                        categoryStub = category.Stub, page = 1})">
+                                                    @category.Name
+                                                </a>
+                                            }
+                                        </span>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>

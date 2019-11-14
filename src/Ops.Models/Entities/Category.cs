@@ -6,7 +6,6 @@ namespace Ocuda.Ops.Models.Entities
 {
     public class Category : Abstract.BaseEntity
     {
-        public int SectionId { get; set; }
 
         public string Name { get; set; }
 

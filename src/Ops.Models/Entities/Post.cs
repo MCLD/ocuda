@@ -10,8 +10,6 @@ namespace Ocuda.Ops.Models.Entities
     {
         public int SectionId { get; set; }
 
-        public int CategoryId { get; set; }
-
         [Required]
         public string Title { get; set; }
 
@@ -24,5 +22,8 @@ namespace Ocuda.Ops.Models.Entities
         public bool ShowOnHomePage { get; set; }
 
         public DateTime PublishedAt { get; set; }
+
+        [NotMapped]
+        public List<Category> Categories { get; set; }
     }
 }

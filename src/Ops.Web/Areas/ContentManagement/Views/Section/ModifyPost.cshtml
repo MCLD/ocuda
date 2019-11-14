@@ -21,91 +21,22 @@
 <div class="col-6">
     <form id="modifyPostForm"
           method="post"
-          role="form">
+          role="form"
+          action="@(Model.Action == "Edit" ? Url.Action(nameof(SectionController.UpdatePost)) : Url.Action(nameof(SectionController.CreatePost)))">
         <input asp-for="Post.SectionId" value="@Model.Section.Id" hidden />
         @if (Model.Action == "Edit")
         {
+            <input asp-for="Post.Id" value="@Model.Post.Id" hidden />
             <input asp-for="Post.Title" formgroup value="@Model.Post.Title" />
-            <input asp-for="Post.Stub" formgroup value="@Model.Post.Stub"/>
+            <input asp-for="Post.Stub" formgroup value="@Model.Post.Stub" />
         }
         else
         {
             <input asp-for="Post.Title" formgroup />
             <input asp-for="Post.Stub" formgroup />
         }
-        <div class="row form-group">
-            <label class="col-form-label text-md-right col-md-3">
-                Post Category
-            </label>
-            <div class="col-md-9">
-                <div class="flex-md-grow-0">
-                    @if (Model.Action == "Edit")
-                    {
-                        <input asp-for="Post.CategoryId" value="@Model.Post.CategoryId" hidden />
-                    }
-                    else
-                    {
-                        <input asp-for="Post.CategoryId" hidden />
-                    }
-                    <div class="btn-group">
-                        <button id="catSelector" type="button" class="btn btn-secondary">
-                            @if (Model.Action == "Edit")
-                            {
-                                @foreach (var category in Model.SectionCategories.Where(_ => _.Id == Model.Post.CategoryId))
-                                {
-                                    <text>
-                                        @category.Name
-                                    </text>
-                                }
-
-                            }
-                            else
-                            {
-                                <text>
-                                    Post Category
-                                </text>
-                            }
-                        </button>
-                        <button type="button" 
-                                class="btn btn-secondary btn-sm dropdown-toggle" 
-                                id="dropdownMenuReference" 
-                                data-toggle="dropdown" 
-                                aria-haspopup="true" 
-                                aria-expanded="false" 
-                                data-reference="parent">
-                            <span class="sr-only">Toggle Dropdown</span>
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuReference">
-                            @foreach (var category in Model.SectionCategories)
-                            {
-                                @if (Model.Action == "Edit")
-                                {
-                                    <a class="dropdown-item @(category.Id == Model.Post.CategoryId ? "active":"")"
-                                       href="#"
-                                       data-name="@category.Name"
-                                       data-category="@category.Id">
-                                        @category.Name
-                                    </a>
-
-                                }
-                                else
-                                {
-                                    <a class="dropdown-item" 
-                                       href="#" 
-                                       data-name="@category.Name" 
-                                       data-category="@category.Id">
-                                        @category.Name
-                                    </a>
-                                }
-                            }
-                        </div>
-                    </div>
-                </div>
-                <span class="text-danger field-validation-valid flex-md-grow-0" 
-                      data-valmsg-for="Post.CategoryId" 
-                      data-valmsg-replace="true"></span>
-            </div>
-        </div>
+        <select id="postCategoryIds" multiple="multiple" asp-for="CategoryIds" asp-items="Model.SelectionPostCategories" class="hidden" formgroup>
+        </select>
         <div class="row form-group">
             <label class="col-form-label text-md-right col-md-3 custom-control-label">
                 Show On HomePage
@@ -114,16 +45,16 @@
                 <div class="custom-control custom-switch">
                     @if (Model.Action == "Edit")
                     {
-                        <input type="checkbox" 
-                               class="custom-control-input" 
-                               asp-for="Post.ShowOnHomePage" 
+                        <input type="checkbox"
+                               class="custom-control-input"
+                               asp-for="Post.ShowOnHomePage"
                                value="@Model.Post.ShowOnHomePage" />
                     }
                     else
                     {
-                        <input type="checkbox" 
-                               class="custom-control-input" 
-                               asp-for="Post.ShowOnHomePage" 
+                        <input type="checkbox"
+                               class="custom-control-input"
+                               asp-for="Post.ShowOnHomePage"
                                value="false" />
                     }
                     <label class="col-form-label text-md-right col-md-3 custom-control-label text-hide" for="Post_ShowOnHomePage">
@@ -181,10 +112,10 @@
             </div>
         </div>
         <div class="row float-right">
-            <button type="submit" class="btn btn-primary col" aria-label="Confirm">
+            <button id="addPostBtn" type="submit"class="btn btn-primary col" aria-label="Confirm">
                 Save
             </button>
-            <a href="@Url.Action(nameof(SectionController.Post), new { sectionStub = Model.Section.Stub})" 
+            <a href="@Url.Action(nameof(SectionController.Post), new { sectionStub = Model.Section.Stub})"
                class="btn btn-secondary col">
                 Cancel
             </a>
@@ -196,27 +127,29 @@
     <script src="~/js/md.min.js" asp-append-version="true"></script>
     <script>
         var addLink = "@Url.Action(nameof(SectionController.CreatePost))";
-        var editLink = "@Url.Action(nameof(SectionController.CreatePost))";
+        var editLink = "@Url.Action(nameof(SectionController.UpdatePost))";
+
         $(document).ready(function () {
             var editor = new Markdown.Editor({ allowUploads: false });
             editor.run();
-            @if (Model.Action == "Edit") {
+            @if (Model.CategoryIds != null)
+            {
                 <text>
-                    $("#modifyPostForm").attr("action", addLink);
+                var categories = "@(string.Join<string>(",", Model.CategoryIds.Select(_=>_.ToString()).ToList()))";
                 </text>
+                @foreach (var id in Model.CategoryIds)
+                {
+                    @:$('#category-@id').click();
+                }
             }
-            else {
-                <text>
-                    $("#modifyPostForm").attr("action", editLink);
-                </text>
-            }
+            $("#postCategoryIds").multiselect({
+                nonSelectedText: "",
+                buttonClass: "form-control",
+                buttonWidth: "100%",
+                disableIfEmpty: true
+            });
         });
-        $(".dropdown-item").click(function () {
-            $(".dropdown-item.active").removeClass("active");
-            $(this).addClass("active");
-            $("#catSelector").text($(this).data("name"));
-            $("#Post_CategoryId").val($(this).data("category"));
-        });
+
         $("#Post_ShowOnHomePage").click(function () {
             if ($(this).val() == "false") {
                 $(this).val("true");
@@ -225,7 +158,6 @@
                 $(this).val("false");
             }
         });
-
     </script>
 
 }

@@ -102,10 +102,11 @@
     <div class="modal-dialog" role="document">
         <form id="delFileForm"
               method="post"
-              role="form">
-            <input id="delSectionStub" value="@Model.Section.Stub" type="hidden" />
-            <input id="delFileLibId" value="@Model.FileLibrary.Id" type="hidden" />
-            <input id="delFileId" type="hidden" />
+              role="form"
+              action="@Url.Action(nameof(SectionController.DeleteFileFromLibrary))">
+            <input id="delSectionStub" asp-for="Section.Stub"value="@Model.Section.Stub" type="hidden" />
+            <input id="delFileLibId" asp-for="FileLibrary.Id" value="@Model.FileLibrary.Id" type="hidden" />
+            <input id="delFileId" asp-for="File.Id" type="hidden" />
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title" id="deleteModalLabel">Delete Feature</h4>
@@ -129,7 +130,9 @@
                     </button>
                     <button class="btn btn-danger pull-right"
                             aria-label="Confirm"
-                            id="deleteItem">
+                            id="deleteItem"
+                            type="submit"
+                            value="Submit">
                         Delete
                     </button>
                 </div>
@@ -255,19 +258,6 @@
             });
             $("#deleteItem").click(function () {
                 this.innerHTML='Delete <span class="fa fa-spinner fa-spin"></span>';
-                $.ajax({
-                    type: "Post",
-                    url: delLink,
-                    data:
-                    {
-                        sectionStub: $("#Section_Stub").val(),
-                        fileId: $("#delFileId").val(),
-                        fileLibId: $("#FileLibrary_Id").val()
-                    },
-                    dataType: 'json'
-                }).done(function (data) {
-                    window.location.href = data;
-                });
             });
             $("#addFileButton").on('click', function (e) {
                 $("#listAddModal").modal("show");

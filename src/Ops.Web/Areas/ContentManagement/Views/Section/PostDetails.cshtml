@@ -99,7 +99,7 @@
                             {
                                 <li>
                                     <a href="@Url.Action(nameof(SectionController.PostDetails),
-                                       new { sectionStub = Model.Section.Stub, postId = post.Id })"
+                                       new { sectionStub = Model.Section.Stub, postStub = post.Stub })"
                                        class="badge badge-light text-left"
                                        style="margin: 5px 10px; padding: 5px 10px; width:80%">
                                         @post.Title
@@ -139,7 +139,7 @@
                         </h4>
                     </div>
                     <div class="float-right align-middle h4">
-                        <a href="@Url.Action(nameof(SectionController.EditPost), new { sectionStub = Model.Section.Stub, postId = Model.Post.Id})">
+                        <a href="@Url.Action(nameof(SectionController.EditPost), new { sectionStub = Model.Section.Stub, postStub = Model.Post.Stub})">
                             <span class="far fa-edit float-right"></span>
                         </a>
                     </div>
@@ -152,17 +152,25 @@
                         <div class="font-italic">
                             Posted: @Model.Post.PublishedAt.ToString("MM/dd/yyyy hh:mm tt")
                         </div>
-                        <div class="font-italic">
-                            Category:&nbsp;
-                            <span>
-                                <a class="badge badge-pill badge-info"
-                                   href="@Url.Action(nameof(SectionController.Post),
+                        @if (Model.PostCategories.Count > 0)
+                        {
+                            <div class="font-italic">
+                                Category:&nbsp;
+                                <span>
+                                    @foreach (var category in Model.PostCategories
+                                       .Where(_ => _.PostId == Model.Post.Id)
+                                       .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
+                                    {
+                                        <a class="badge badge-pill badge-info"
+                                           href="@Url.Action(nameof(SectionController.Post),
                                         new { sectionStub = Model.Section.Stub,
-                                        categoryStub = Model.Category.Stub, page = 1})">
-                                    @Model.Category.Name
-                                </a>
-                            </span>
-                        </div>
+                                        categoryStub = category.Stub, page = 1})">
+                                            @category.Name
+                                        </a>
+                                    }
+                                </span>
+                            </div>
+                        }
                     </div>
                     <div class="float-right align-middle">
                             <button class="btn btn-danger" type="submit" id="delPost">

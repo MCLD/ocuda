@@ -10,7 +10,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
     {
         Task<ICollection<FileType>> GetAllExtensionsAsync();
         Task<FileType> GetByExtensionAsync(string extension);
-        Task<ICollection<int>> GetAllIdsAsync();
+        ICollection<int> GetAllIds();
         Task<ICollection<FileType>> GetAllTypesByLibraryIdAsync(int libId);
     }
 }

@@ -9,10 +9,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IFileService
     {
-        Task<int> GetFileCountAsync();
-        Task<ICollection<File>> GetFilesAsync();
         Task<File> GetByIdAsync(int id);
-        Task<File> GetLatestByLibraryIdAsync(int id);
         Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter);
 
         Task<File> CreatePrivateFileAsync(int currentUserId,
@@ -35,19 +32,17 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<FileLibrary> CreateLibraryAsync(int currentUserId, FileLibrary library, int sectionId);
 
-        Task<FileLibrary> EditLibraryAsync(FileLibrary library, ICollection<int> fileTypeIds);
+        Task<FileLibrary> EditLibraryTypesAsync(FileLibrary library, ICollection<int> fileTypeIds);
+        Task UpdateLibrary(FileLibrary library);
         Task DeleteLibraryAsync(int id);
         Task<ICollection<int>> GetLibraryFileTypeIdsAsync(int libraryId);
         Task<ICollection<int>> GetFileTypeIdsInUseByLibraryAsync(int libraryId);
         Task<ICollection<FileType>> GetAllFileTypesAsync();
-        Task<ICollection<int>> GetAllFileTypeIdsAsync();
+        ICollection<int> GetAllFileTypeIds();
         Task<FileType> GetFileTypeByIdAsync(int id);
         Task<List<File>> GetFileLibraryFilesAsync(int id);
         Task DeleteFileTypesByLibrary(int libid);
         Task<List<FileLibrary>> GetFileLibrariesBySection(int sectionId);
-        Task<SectionFileLibrary> GetSectionFileLibraryByLibraryId(int libId);
         Task<ICollection<FileType>> GetFileLibrariesFileTypes(int libraryId);
-        Task UpdateLibraryFileTypes(ICollection<int> fileTypeIds, int libId);
-        Task UpdateLibraryAsync(FileLibrary library);
     }
 }

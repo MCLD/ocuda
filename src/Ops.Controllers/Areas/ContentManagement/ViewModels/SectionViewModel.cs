@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Utility.Models;
 
@@ -49,8 +51,15 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels
 
         public ICollection<Link> Links { get; set; }
 
-        public List<int> TypeIds { get; set; }
+        [DisplayName("Post Categories")]
+        public List<int> CategoryIds { get; set; }
 
         public string Action { get; set; }
+
+        public PostCategory PostCategory { get; set; }
+
+        public List<PostCategory> PostCategories { get; set; }
+
+        public SelectList SelectionPostCategories { get; set; }
     }
 }
