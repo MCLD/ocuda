@@ -236,7 +236,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 {
                     post.Content = CommonMark.CommonMarkConverter.Convert(post.Content);
                 }
-                viewModel.PostCategories = await _postService.GetPostCategoriesByIds(posts.Data.Select(_=>_.Id).ToList()); 
+                viewModel.PostCategories = await _postService.GetPostCategoriesByIds(posts.Data.Select(_=>_.Id).ToList());
                 paginateModel.ItemCount = posts.Count;
                 viewModel.PaginateModel = paginateModel;
                 viewModel.AllCategoryPosts = posts.Data;
@@ -291,7 +291,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]")]
         [HttpPost]
         [SaveModelState]
-        
         public async Task<IActionResult> CreatePost(SectionViewModel viewModel)
         {
             var section = await _sectionService.GetByIdAsync(viewModel.Post.SectionId);
@@ -821,9 +820,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 ShowAlertDanger("This library doesn't have any file types.");
                 return RedirectToAction(nameof(SectionController.Index));
             }
-            var fileType = libraryTypes.ToList()
-                .Where(_ => _.Extension.ToLower() == extension)
-                .FirstOrDefault();
+            var fileType = libraryTypes
+                .ToList()
+                .FirstOrDefault(_ => _.Extension.ToLower() == extension);
             if (fileType == null)
             {
                 _logger.LogError($"'{fileLib.Name}' does not allow '{extension}' files to be uploaded");
