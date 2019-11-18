@@ -9,10 +9,8 @@ namespace Ocuda.Ops.Models.Entities
     {
         public string Name { get; set; }
 
-        [Required(AllowEmptyStrings = true)]
         public string EmbedVideoUrl { get; set; }
 
-        [Required(AllowEmptyStrings = true)]
         public string Icon { get; set; }
 
         [Required]

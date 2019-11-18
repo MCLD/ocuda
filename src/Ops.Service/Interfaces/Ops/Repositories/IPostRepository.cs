@@ -22,7 +22,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 
         Task<List<PostCategory>> GetPostCategory(int id);
 
-        Post GetPostByStub(string stub);
+        Post GetSectionPostByStub(string stub, int sectionId);
 
         Task AddPostCategory(List<int> categories, int postId);
 

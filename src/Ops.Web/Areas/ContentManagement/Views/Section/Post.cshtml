@@ -73,13 +73,7 @@
                 </div>
             </div>
             <div class="row">
-                <span class="mx-auto"
-                   @if (Model.SectionCategories.Count == 0)
-                   {
-                       @:data-toggle="tooltip"
-                       @:data-placement="top"
-                       @:title="Please add categories first"
-                   }>
+                <span class="mx-auto">
                     <a href="@Url.Action(nameof(SectionController.AddPost),new { sectionStub = Model.Section.Stub})"
                        class="btn btn-success"
                        id="addPost">

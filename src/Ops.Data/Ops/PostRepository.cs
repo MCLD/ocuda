@@ -33,11 +33,11 @@ namespace Ocuda.Ops.Data.Ops
                 .ToList();
         }
 
-        public Post GetPostByStub(string stub)
+        public Post GetSectionPostByStub(string stub, int sectionId)
         {
             return DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == stub)
+                .Where(_ => _.Stub == stub && _.SectionId == sectionId)
                 .FirstOrDefault();
         }
 

@@ -41,7 +41,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task UpdatePost(Post post);
 
-        Post GetPostByStub(string stub);
+        Post GetSectionPostByStub(string stub, int sectionId);
 
         Task UpdatePostCategories(List<int> newCategoryIds, int postId);
     }

@@ -54,6 +54,7 @@ namespace Ocuda.Ops.Service
             if (post != null)
             {
                 var oldPost = await _postRepository.FindAsync(post.Id);
+                oldPost.ShowOnHomePage = post.ShowOnHomePage;
                 oldPost.Content = post.Content?.Trim();
                 oldPost.Title = post.Title?.Trim();
                 oldPost.Stub = post.Stub?.Trim();
@@ -63,9 +64,9 @@ namespace Ocuda.Ops.Service
             }
         }
 
-        public Post GetPostByStub(string stub)
+        public Post GetSectionPostByStub(string stub, int sectionId)
         {
-            return _postRepository.GetPostByStub(stub);
+            return _postRepository.GetSectionPostByStub(stub, sectionId);
         }
 
         public async Task RemovePost(Post post)

@@ -46,7 +46,7 @@
                                                 <input type="file"
                                                        multiple="multiple"
                                                        asp-for="UploadFile"
-                                                       accept=".docx,.doc,.pdf,.ppt,.pptx,xls,.xlsx"
+                                                       accept="@(string.Join(",",Model.FileTypes.Select(_=>_.Extension).ToList()))"
                                                        style="display: none;" />
                                             </span>
                                         </label>

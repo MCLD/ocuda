@@ -20,7 +20,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 {
     [Area("ContentManagement")]
     //[Authorize(Policy = nameof(ClaimType.SiteManager))]
-    [Route("[controller]")]
+    [Route("[area]/[controller]")]
     public class SectionController : BaseController<SectionController>
     {
         private readonly ISectionService _sectionService;
@@ -139,7 +139,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
             try
             {
-                var post = _postService.GetPostByStub(postStub);
+                var post = _postService.GetSectionPostByStub(postStub,section.Id);
                 post.Content = CommonMark.CommonMarkConverter.Convert(post.Content);
                 var viewModel = new SectionViewModel()
                 {
@@ -169,7 +169,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
             try
             {
-                var post = _postService.GetPostByStub(postStub);
+                var post = _postService.GetSectionPostByStub(postStub,section.Id);
                 var viewModel = new SectionViewModel()
                 {
                     Section = section,
@@ -295,36 +295,38 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         {
             var section = await _sectionService.GetByIdAsync(viewModel.Post.SectionId);
             viewModel.Section = section;
+            viewModel.SectionCategories = await _postService.GetCategoriesBySectionIdAsync(section.Id);
+            viewModel.SelectionPostCategories = new SelectList(viewModel.SectionCategories, "Id", "Name");
             if (string.IsNullOrEmpty(viewModel.Post.Stub))
             {
                 ModelState.AddModelError("Post.Stub", "A 'Post Stub' is required.");
                 ShowAlertDanger($"Could not create Post.");
-                return Json(new { msg = "A 'Post Stub' is required." });
+                return View("ModifyPost", viewModel);
             }
-            else if(_postService.GetPostByStub(viewModel.Post.Stub) != null)
+            else if(_postService.GetSectionPostByStub(viewModel.Post.Stub,section.Id) != null)
             {
                 ModelState.AddModelError("Post.Stub", "This 'Stub' already exists.");
                 ShowAlertDanger($"Could not create Post.");
-                return Json(new { msg = "This 'Stub' already exists." });
+                return View("ModifyPost", viewModel);
             }
             if (string.IsNullOrEmpty(viewModel.Post.Title))
             {
                 ModelState.AddModelError("Post.Title", "A 'Post Title' is required.");
                 ShowAlertDanger($"Could not create Post.");
-                return View("AddPost", viewModel);
+                return View("ModifyPost", viewModel);
             }
             if (string.IsNullOrEmpty(viewModel.Post.Content))
             {
                 ModelState.AddModelError("Post.Content", "'Post Content' is required.");
                 ShowAlertDanger($"Could not create Post.");
-                return View("AddPost", viewModel);
+                return View("ModifyPost", viewModel);
             }
             try
             {
                 viewModel.Post.CreatedAt = viewModel.Post.PublishedAt = DateTime.Now;
                 viewModel.Post.CreatedBy = CurrentUserId;
                 await _postService.CreatePost(viewModel.Post);
-                var post = _postService.GetPostByStub(viewModel.Post.Stub.Trim());
+                var post = _postService.GetSectionPostByStub(viewModel.Post.Stub.Trim(),section.Id);
                 await _postService.UpdatePostCategories(viewModel.CategoryIds, post.Id);
                 ShowAlertSuccess($"Added post '{viewModel.Post.Title}'");
                 return RedirectToAction(nameof(SectionController.PostDetails), new { sectionStub = section.Stub, postStub = post.Stub.Trim() });
