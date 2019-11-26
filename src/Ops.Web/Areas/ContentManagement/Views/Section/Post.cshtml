@@ -1,13 +1,13 @@
-﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.SectionViewModel
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.PostViewModel
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a href="@Url.Action(nameof(SectionController.Index))" class="navbar-brand">Section</a>
     <span class="navbar-brand">/</span>
     <a href="@Url.Action(nameof(SectionController.Section),
-            new { sectionStub = Model.Section.Stub})"
-       class="navbar-brand">@Model.Section.Name</a>
+            new { sectionStub = Model.SectionStub})"
+       class="navbar-brand">@Model.SectionName</a>
     <a class="nav-link"
        href="@Url.Action(nameof(SectionController.Post),
-           new { sectionStub = Model.Section.Stub, categoryStub = "", page=1})">
+           new { sectionStub = Model.SectionStub, categoryStub = "", page=1})">
         Posts
     </a>
 </nav>
@@ -26,7 +26,7 @@
                             {
                                 <li>
                                     <a href="@Url.Action(nameof(SectionController.Post),
-                                       new { sectionStub = Model.Section.Stub, categoryStub = category.Stub, page=1})"
+                                       new { sectionStub = Model.SectionStub, categoryStub = category.Stub, page=1})"
                                        class=" badge badge-light text-left"
                                        style="margin: 5px 10px; padding: 5px 10px; width:80%">
                                         @category.Name
@@ -55,7 +55,7 @@
                             {
                                 <li>
                                     <a href="@Url.Action(nameof(SectionController.PostDetails),
-                                       new { sectionStub = Model.Section.Stub, postStub = post.Stub })"
+                                       new { sectionStub = Model.SectionStub, postStub = post.Stub })"
                                        class="badge badge-light text-left"
                                        style="margin: 5px 10px; padding: 5px 10px; width:80%">
                                         @post.Title
@@ -74,7 +74,7 @@
             </div>
             <div class="row">
                 <span class="mx-auto">
-                    <a href="@Url.Action(nameof(SectionController.AddPost),new { sectionStub = Model.Section.Stub})"
+                    <a href="@Url.Action(nameof(SectionController.AddPost), new { sectionStub = Model.SectionStub})"
                        class="btn btn-success"
                        id="addPost">
                    Create Post
@@ -93,7 +93,7 @@
                                 <div class="float-left align-middle">
                                     <a class="float-left align-middle" 
                                        href="@Url.Action(nameof(SectionController.PostDetails),
-                                            new { sectionStub = Model.Section.Stub, postStub = post.Stub})">
+                                            new { sectionStub = Model.SectionStub, postStub = post.Stub})">
                                         <h5>
                                             @post.Title
                                         </h5>
@@ -101,7 +101,7 @@
                                 </div>
                                 <div class="float-right align-middle h4">
                                     <a href="@Url.Action(nameof(SectionController.EditPost), 
-                                            new { sectionStub = Model.Section.Stub, postStub = post.Stub})">
+                                            new { sectionStub = Model.SectionStub, postStub = post.Stub})">
                                         <span class="far fa-edit float-right"></span>
                                     </a>
                                 </div>
@@ -122,7 +122,7 @@
                                             {
                                                 <a class="badge badge-pill badge-info"
                                                    href="@Url.Action(nameof(SectionController.Post),
-                                        new { sectionStub = Model.Section.Stub,
+                                        new { sectionStub = Model.SectionStub,
                                         categoryStub = category.Stub, page = 1})">
                                                     @category.Name
                                                 </a>

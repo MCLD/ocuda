@@ -36,13 +36,15 @@ namespace Ocuda.Ops.Service
             return await _postRepository.FindAsync(id);
         }
 
-        public async Task CreatePost(Post post)
+        public async Task CreatePost(Post post, int userId)
         {
             if (post != null)
             {
                 post.Content = post.Content?.Trim();
                 post.Title = post.Title?.Trim();
                 post.Stub = post.Stub?.Trim();
+                post.CreatedBy = userId;
+                post.CreatedAt = post.PublishedAt = DateTime.Now;
 
                 await _postRepository.AddAsync(post);
                 await _postRepository.SaveAsync();

@@ -30,6 +30,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         private readonly IHostingEnvironment _hostingEnvironment;
 
         public static string Name { get { return "Section"; } }
+        public static string Area { get { return "ContentManagement"; } }
         public static string mimeType = "application/octet-stream";
 
         public SectionController(ServiceFacades.Controller<SectionController> context,
@@ -67,7 +68,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             {
                 sections = await _sectionService.GetAllSectionsAsync();
             }
-            var viewModel = new SectionViewModel()
+            var viewModel = new SectionIndexViewModel()
             {
                 UserSections = sections
             };
@@ -141,9 +142,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             {
                 var post = _postService.GetSectionPostByStub(postStub,section.Id);
                 post.Content = CommonMark.CommonMarkConverter.Convert(post.Content);
-                var viewModel = new SectionViewModel()
+                var viewModel = new PostDetailsViewModel()
                 {
-                    Section = section,
+                    SectionStub = section.Stub,
+                    SectionName = section.Name,
                     SectionCategories = await _postService.GetCategoriesBySectionIdAsync(section.Id),
                     SectionsPosts = await _postService.GetTopSectionPostsAsync(5, section.Id),
                     Post = post
@@ -154,38 +156,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             catch
             {
                 ShowAlertDanger($"The Post {postStub} does not exist.");
-                return RedirectToAction(nameof(SectionController.Section), new { sectionStub });
-            }
-        }
-
-        [Route("{sectionStub}/[action]/{postStub}")]
-        public async Task<IActionResult> EditPost(string sectionStub, string postStub)
-        {
-            var section = await ValidateSectionAccess(sectionStub);
-            if (section == null)
-            {
-                ShowAlertDanger($"Could not find section {sectionStub}.");
-                return RedirectToAction(nameof(SectionController.Index));
-            }
-            try
-            {
-                var post = _postService.GetSectionPostByStub(postStub,section.Id);
-                var viewModel = new SectionViewModel()
-                {
-                    Section = section,
-                    SectionCategories = await _postService.GetCategoriesBySectionIdAsync(section.Id),
-                    SectionsPosts = await _postService.GetTopSectionPostsAsync(5, section.Id),
-                    Post = post,
-                    Action = "Edit"
-                };
-                viewModel.SelectionPostCategories = new SelectList(viewModel.SectionCategories, "Id", "Name");
-                viewModel.PostCategories = await _postService.GetPostCategoriesById(viewModel.Post.Id);
-                viewModel.CategoryIds = viewModel.PostCategories.Select(_ => _.CategoryId).ToList();
-                return View("ModifyPost", viewModel);
-            }
-            catch
-            {
-                ShowAlertDanger($"The PostDetails Id {postStub} does not exist.");
                 return RedirectToAction(nameof(SectionController.Section), new { sectionStub });
             }
         }
@@ -223,9 +193,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             {
                 topPost.Content = CommonMark.CommonMarkConverter.Convert(topPost.Content);
             }
-            var viewModel = new SectionViewModel()
+            var viewModel = new PostViewModel()
             {
-                Section = section,
+                SectionStub = section.Stub,
+                SectionName = section.Name,
                 SectionCategories = await _postService.GetCategoriesBySectionIdAsync(section.Id),
                 SectionsPosts = topPosts
             };
@@ -257,7 +228,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                     viewModel.PostCategories = await _postService.GetPostCategoriesByIds(posts.Data.Select(_ => _.Id).ToList());
                     viewModel.PaginateModel = paginateModel;
                     viewModel.AllCategoryPosts = posts.Data;
-                    viewModel.Category = category;
                     return View(viewModel);
                 }
                 catch
@@ -268,7 +238,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
         }
 
-        [Route("{sectionStub}/[action]")]
+        [HttpGet("{sectionStub}/[action]")]
         [RestoreModelState]
         public async Task<IActionResult> AddPost(string sectionStub)
         {
@@ -278,102 +248,117 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 ShowAlertDanger($"Could not find section {sectionStub}.");
                 return RedirectToAction(nameof(SectionController.Index));
             }
-            var viewModel = new SectionViewModel()
+            var viewModel = new AddPostViewModel()
             {
-                Section = section,
-                SectionCategories = await _postService.GetCategoriesBySectionIdAsync(section.Id),
-                Action = "Add"
+                SectionStub = section.Stub,
+                SectionId = section.Id,
+                SectionName = section.Name,
+                SectionCategories = await _postService.GetCategoriesBySectionIdAsync(section.Id)
             };
             viewModel.SelectionPostCategories = new SelectList(viewModel.SectionCategories, "Id", "Name");
-            return View("ModifyPost", viewModel);
+            return View(viewModel);
         }
 
-        [Route("[action]")]
         [HttpPost]
+        [Route("{sectionStub}/[action]")]
         [SaveModelState]
-        public async Task<IActionResult> CreatePost(SectionViewModel viewModel)
+        public async Task<IActionResult> AddPost(AddPostViewModel viewModel)
         {
             var section = await _sectionService.GetByIdAsync(viewModel.Post.SectionId);
-            viewModel.Section = section;
-            viewModel.SectionCategories = await _postService.GetCategoriesBySectionIdAsync(section.Id);
-            viewModel.SelectionPostCategories = new SelectList(viewModel.SectionCategories, "Id", "Name");
-            if (string.IsNullOrEmpty(viewModel.Post.Stub))
-            {
-                ModelState.AddModelError("Post.Stub", "A 'Post Stub' is required.");
-                ShowAlertDanger($"Could not create Post.");
-                return View("ModifyPost", viewModel);
-            }
-            else if(_postService.GetSectionPostByStub(viewModel.Post.Stub,section.Id) != null)
+            if (_postService.GetSectionPostByStub(viewModel.Post.Stub, section.Id) != null)
             {
                 ModelState.AddModelError("Post.Stub", "This 'Stub' already exists.");
                 ShowAlertDanger($"Could not create Post.");
-                return View("ModifyPost", viewModel);
+                return RedirectToAction(nameof(AddPost), viewModel);
             }
-            if (string.IsNullOrEmpty(viewModel.Post.Title))
+            if (ModelState.IsValid)
             {
-                ModelState.AddModelError("Post.Title", "A 'Post Title' is required.");
-                ShowAlertDanger($"Could not create Post.");
-                return View("ModifyPost", viewModel);
+                viewModel.SectionCategories = await _postService.GetCategoriesBySectionIdAsync(section.Id);
+                viewModel.SelectionPostCategories = new SelectList(viewModel.SectionCategories, "Id", "Name");
+                try
+                {
+                    await _postService.CreatePost(viewModel.Post, CurrentUserId);
+                    var post = _postService.GetSectionPostByStub(viewModel.Post.Stub.Trim(), section.Id);
+                    await _postService.UpdatePostCategories(viewModel.CategoryIds, post.Id);
+                    ShowAlertSuccess($"Added post '{viewModel.Post.Title}'");
+                    return RedirectToAction(nameof(SectionController.PostDetails), 
+                        new { sectionStub = section.Stub, postStub = post.Stub.Trim() });
+                }
+                catch
+                {
+                    ShowAlertDanger("Could not create post.");
+                    return RedirectToAction(nameof(SectionController.PostDetails), 
+                        new { sectionStub = section.Stub, postStub = viewModel.Post.Stub.Trim() });
+                }
             }
-            if (string.IsNullOrEmpty(viewModel.Post.Content))
-            {
-                ModelState.AddModelError("Post.Content", "'Post Content' is required.");
-                ShowAlertDanger($"Could not create Post.");
-                return View("ModifyPost", viewModel);
-            }
-            try
-            {
-                viewModel.Post.CreatedAt = viewModel.Post.PublishedAt = DateTime.Now;
-                viewModel.Post.CreatedBy = CurrentUserId;
-                await _postService.CreatePost(viewModel.Post);
-                var post = _postService.GetSectionPostByStub(viewModel.Post.Stub.Trim(),section.Id);
-                await _postService.UpdatePostCategories(viewModel.CategoryIds, post.Id);
-                ShowAlertSuccess($"Added post '{viewModel.Post.Title}'");
-                return RedirectToAction(nameof(SectionController.PostDetails), new { sectionStub = section.Stub, postStub = post.Stub.Trim() });
-            }
-            catch
+            else
             {
                 ShowAlertDanger("Could not create post.");
-                return View("PostDetails", viewModel);
+                return RedirectToAction(nameof(SectionController.PostDetails),
+                    new { sectionStub = section.Stub, postStub = viewModel.Post.Stub.Trim() });
             }
         }
 
-        [Route("[action]")]
-        [HttpPost]
-        [SaveModelState]
-        public async Task<IActionResult> UpdatePost(SectionViewModel viewModel)
+        [HttpGet("{sectionStub}/[action]/{postStub}")]
+        [RestoreModelState]
+        public async Task<IActionResult> EditPost(string sectionStub, string postStub)
         {
-            var section = await _sectionService.GetByIdAsync(viewModel.Post.SectionId);
-            viewModel.Section = section;
-            if (string.IsNullOrEmpty(viewModel.Post.Stub))
+            var section = await ValidateSectionAccess(sectionStub);
+            if (section == null)
             {
-                ModelState.AddModelError("Post.Stub", "A 'Post Stub' is required.");
-                ShowAlertDanger($"Could not update Post.");
-                return View("ModifyPost", viewModel);
+                ShowAlertDanger($"Could not find section {sectionStub}.");
+                return RedirectToAction(nameof(SectionController.Index));
             }
-            if (string.IsNullOrEmpty(viewModel.Post.Title))
+            try
             {
-                ModelState.AddModelError("Post.Title", "A 'Post Title' is required.");
-                ShowAlertDanger($"Could not update Post.");
-                return View("ModifyPost", viewModel);
-            }
-            if (string.IsNullOrEmpty(viewModel.Post.Content))
-            {
-                ModelState.AddModelError("Post.Content", "'Post Content' is required.");
-                ShowAlertDanger($"Could not update Post.");
-                return View("ModifyPost", viewModel);
-            }
-            try {
-                await _postService.UpdatePost(viewModel.Post);
-                await _postService.UpdatePostCategories(viewModel.CategoryIds, viewModel.Post.Id);
-                ShowAlertSuccess($"Updated post '{viewModel.Post.Title}'");
-                return RedirectToAction(nameof(SectionController.PostDetails),
-                    new { sectionStub = section.Stub, postStub = viewModel.Post.Stub });
+                var post = _postService.GetSectionPostByStub(postStub, section.Id);
+                var sectionCategories = await _postService.GetCategoriesBySectionIdAsync(section.Id);
+                var viewModel = new EditPostViewModel()
+                {
+                    SectionStub = section.Stub,
+                    SectionId = section.Id,
+                    Post = post,
+                    SelectionPostCategories = new SelectList(sectionCategories, "Id", "Name"),
+                    PostCategories = await _postService.GetPostCategoriesById(post.Id)
+                };
+                viewModel.CategoryIds = viewModel.PostCategories.Select(_ => _.CategoryId).ToList();
+                return View(viewModel);
             }
             catch
             {
-                ShowAlertDanger($"Could not create Post.");
-                return View("ModifyPost", viewModel);
+                ShowAlertDanger($"The PostDetails Id {postStub} does not exist.");
+                return RedirectToAction(nameof(SectionController.Section), new { sectionStub });
+            }
+        }
+
+        [Route("{sectionStub}/[action]/{postStub}")]
+        [HttpPost]
+        [SaveModelState]
+        public async Task<IActionResult> EditPost(EditPostViewModel viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var section = await _sectionService.GetByIdAsync(viewModel.Post.SectionId);
+                    await _postService.UpdatePost(viewModel.Post);
+                    await _postService.UpdatePostCategories(viewModel.CategoryIds, viewModel.Post.Id);
+                    ShowAlertSuccess($"Updated post '{viewModel.Post.Title}'");
+                    return RedirectToAction(nameof(SectionController.PostDetails),
+                        new { sectionStub = section.Stub, postStub = viewModel.Post.Stub });
+                }
+                catch
+                {
+                    ShowAlertDanger($"Could not edit Post.");
+                    return RedirectToAction(nameof(SectionController.EditPost),
+                        new { sectionStub = viewModel.SectionStub, postStub = viewModel.Post.Stub });
+                }
+            }
+            else
+            {
+                ShowAlertDanger($"Could not edit Post.");
+                return RedirectToAction(nameof(SectionController.EditPost),
+                    new { sectionStub = viewModel.SectionStub, postStub = viewModel.Post.Stub });
             }
         }
 
@@ -421,10 +406,13 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 ItemsPerPage = filter.Take.Value,
                 ItemCount = files.Count
             };
-            var viewModel = new SectionViewModel()
+            var viewModel = new FileLibraryViewModel()
             {
-                Section = section,
-                FileLibrary = fileLib,
+                SectionStub = section.Stub,
+                SectionName = section.Name,
+                FileLibraryStub = fileLib.Stub,
+                FileLibraryId = fileLib.Id,
+                FileLibraryName = fileLib.Name,
                 Files = files.Data,
                 FileTypes = await _fileService.GetAllFileTypesAsync(),
                 PaginateModel = paginateModel
@@ -458,9 +446,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 ItemsPerPage = filter.Take.Value,
                 ItemCount = links.Count
             };
-            var viewModel = new SectionViewModel()
+            var viewModel = new LinkLibraryViewModel()
             {
-                Section = section,
+                SectionStub = section.Stub,
+                SectionName = section.Name,
                 LinkLibrary = linkLib,
                 Links = links.Data,
                 FileTypes = await _fileService.GetAllFileTypesAsync(),
@@ -486,26 +475,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var filePath = Path.Combine(
                 Directory.GetParent(_hostingEnvironment.WebRootPath).FullName, "shared");
             filePath = Path.Combine(filePath, "sections");
-            if (!Directory.Exists(filePath))
-            {
-                ShowAlertDanger($"'sections' directory not found at: { filePath}");
-                return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = section.Stub, fileLibStub = library.Stub });
-            }
             filePath = Path.Combine(filePath, section.Stub);
-            if (!Directory.Exists(filePath))
-            {
-                ShowAlertDanger($"'{section.Stub}' directory not found at: { filePath}");
-                return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = section.Stub, fileLibStub = library.Stub });
-            }
             filePath = Path.Combine(filePath, library.Stub);
-            if (!Directory.Exists(filePath))
-            {
-                ShowAlertDanger($"'{library.Stub}' directory not found at: { filePath}");
-                return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = section.Stub, fileLibStub = library.Stub });
-            }
             filePath = Path.Combine(filePath, file.Name + type.Extension);
             if (!System.IO.File.Exists(filePath))
             {
@@ -549,19 +520,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var filePath = Path.Combine(
                 Directory.GetParent(_hostingEnvironment.WebRootPath).FullName, "shared");
             filePath = Path.Combine(filePath, "sections");
-            if (!Directory.Exists(filePath))
-            {
-                ShowAlertDanger($"'sections' directory not found at: { filePath}");
-                return RedirectToAction(nameof(SectionController.Section),
-                    new { sectionStub = section.Stub });
-            }
             filePath = Path.Combine(filePath, section.Stub);
-            if (!Directory.Exists(filePath))
-            {
-                ShowAlertDanger($"'{section.Stub}' directory not found at: { filePath}");
-                return RedirectToAction(nameof(SectionController.Section),
-                    new { sectionStub = section.Stub });
-            }
             filePath = Path.Combine(filePath, fileLib.Stub);
             if (Directory.Exists(filePath))
             {
@@ -580,49 +539,37 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         [Route("[action]")]
         [HttpPost]
-        public async Task<RedirectToActionResult> UpdateFileLibrary(SectionViewModel viewModel)
+        public async Task<RedirectToActionResult> UpdateFileLibrary(FileLibraryViewModel viewModel)
         {
-            var section = _sectionService.GetSectionByStub(viewModel.Section.Stub);
+            var section = _sectionService.GetSectionByStub(viewModel.SectionStub);
             if (section == null)
             {
                 ShowAlertDanger("Invalid name for File Library.");
                 return RedirectToAction(nameof(SectionController.Section),
                     new { sectionStub = section.Stub });
             }
-            if (string.IsNullOrEmpty(viewModel.FileLibrary.Name))
+            if (string.IsNullOrEmpty(viewModel.FileLibraryName))
             {
                 ModelState.AddModelError("FileLibrary.Name", "A 'File Library Name' is required.");
                 return RedirectToAction(nameof(SectionController.Section),
                     new { sectionStub = section.Stub });
             }
-            if (string.IsNullOrEmpty(viewModel.FileLibrary.Stub))
+            if (string.IsNullOrEmpty(viewModel.FileLibraryStub))
             {
                 ShowAlertDanger("Invalid name for File Library.");
                 return RedirectToAction(nameof(SectionController.Section),
                     new { sectionStub = section.Stub });
             }
-            var oldLib = await _fileService.GetLibraryByIdAsync(viewModel.FileLibrary.Id);
+            var oldLib = await _fileService.GetLibraryByIdAsync(viewModel.FileLibraryId);
             var filePath = Path.Combine(
                 Directory.GetParent(_hostingEnvironment.WebRootPath).FullName, "shared");
             filePath = Path.Combine(filePath, "sections");
-            if (!Directory.Exists(filePath))
-            {
-                _logger.LogError($"'sections' directory not found at: { filePath}");
-                return RedirectToAction(nameof(SectionController.Section),
-                    new { sectionStub = section.Stub });
-            }
             filePath = Path.Combine(filePath, section.Stub);
-            if (!Directory.Exists(filePath))
-            {
-                _logger.LogError($"'{section.Stub}' directory not found at: { filePath}");
-                return RedirectToAction(nameof(SectionController.Section),
-                    new { sectionStub = section.Stub });
-            }
-            var newPath = Path.Combine(filePath, viewModel.FileLibrary.Stub);
+            var newPath = Path.Combine(filePath, viewModel.FileLibraryStub);
             var oldPath = Path.Combine(filePath, oldLib.Stub);
             if (Directory.Exists(newPath))
             {
-                ShowAlertDanger($"The File Library '{viewModel.FileLibrary.Name}' already exists for this section.");
+                ShowAlertDanger($"The File Library '{viewModel.FileLibraryName}' already exists for this section.");
                 return RedirectToAction(nameof(SectionController.Section),
                     new { sectionStub = section.Stub });
             }
@@ -640,13 +587,13 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 }
 
                 Directory.Delete(oldPath,true);
-                oldLib.Name = viewModel.FileLibrary.Name;
-                oldLib.Stub = viewModel.FileLibrary.Stub;
+                oldLib.Name = viewModel.FileLibraryName;
+                oldLib.Stub = viewModel.FileLibraryStub;
                 var types = new List<int>();
                 await _fileService.UpdateLibrary(oldLib);
                 await _fileService.EditLibraryTypesAsync(oldLib, types);
             }
-            ShowAlertSuccess($"Added '{viewModel.FileLibrary.Name}' to '{section.Name}'s File Library'");
+            ShowAlertSuccess($"Added '{viewModel.FileLibraryName}' to '{section.Name}'s File Library'");
             return RedirectToAction(nameof(SectionController.Section),
                 new { sectionStub = section.Stub });
         }
@@ -655,165 +602,94 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [HttpPost]
         public async Task<RedirectToActionResult> DeleteFileLibrary(SectionViewModel model)
         {
-            var section = _sectionService.GetSectionByStub(model.Section.Stub);
-            if (model.FileLibrary.Id == 0)
+            try
             {
-                ShowAlertDanger("A 'File Library Id' is required.");
-                return RedirectToAction(nameof(SectionController.Section),
-                    new { sectionStub = section.Stub });
-            }
+                var section = _sectionService.GetSectionByStub(model.Section.Stub);
+                var fileLib = await _fileService.GetLibraryByIdAsync(model.FileLibrary.Id);
+                var libFiles = await _fileService.GetFileLibraryFilesAsync(fileLib.Id);
+                if (libFiles.Count > 0)
+                {
+                    ShowAlertDanger($"Please delete all files before deleting {fileLib.Name}.");
+                    return RedirectToAction(nameof(SectionController.Section),
+                        new { sectionStub = section.Stub });
+                }
 
-            var fileLib = await _fileService.GetLibraryByIdAsync(model.FileLibrary.Id);
-            if (fileLib == null)
-            {
-                ShowAlertDanger("Could not find file library");
+                var filePath = Path.Combine(
+                    Directory.GetParent(_hostingEnvironment.WebRootPath).FullName, "shared");
+                filePath = Path.Combine(filePath, "sections");
+                filePath = Path.Combine(filePath, section.Stub);
+                filePath = Path.Combine(filePath, fileLib.Stub);
+                if (!Directory.Exists(filePath))
+                {
+                    _logger.LogError($"The File Library '{fileLib.Stub}' does not exist for this section.");
+                    ShowAlertDanger($"Failed to delete File Library '{fileLib.Name}'");
+                    return RedirectToAction(nameof(SectionController.Section),
+                        new { sectionStub = section.Stub });
+                }
+                else
+                {
+                    Directory.Delete(filePath);
+                    await _fileService.DeleteFileTypesByLibrary(fileLib.Id);
+                    await _fileService.DeleteLibraryAsync(fileLib.Id);
+                    ShowAlertSuccess($"Deleted '{fileLib.Name}' from '{section.Name}'s");
+                }
                 return RedirectToAction(nameof(SectionController.Section),
                     new { sectionStub = section.Stub });
             }
-
-            var libFiles = await _fileService.GetFileLibraryFilesAsync(fileLib.Id);
-            if (libFiles.Count > 0)
+            catch
             {
-                ShowAlertDanger($"Please delete all files before deleting {fileLib.Name}.");
-                return RedirectToAction(nameof(SectionController.Section),
-                    new { sectionStub = section.Stub });
-            }
-
-            var filePath = Path.Combine(
-                Directory.GetParent(_hostingEnvironment.WebRootPath).FullName, "shared");
-            filePath = Path.Combine(filePath, "sections");
-            if (!Directory.Exists(filePath))
-            {
-                _logger.LogError($"'sections' directory not found at: { filePath}");
-                ShowAlertDanger($"Failed to delete File Library '{fileLib.Name}'");
-                return RedirectToAction(nameof(SectionController.Section),
-                    new { sectionStub = section.Stub });
-            }
-            filePath = Path.Combine(filePath, section.Stub);
-            if (!Directory.Exists(filePath))
-            {
-                _logger.LogError($"'{section.Stub}' directory not found at: { filePath}");
-                ShowAlertDanger($"Failed to delete File Library '{fileLib.Name}'");
-                return RedirectToAction(nameof(SectionController.Section),
-                    new { sectionStub = section.Stub });
-            }
-            filePath = Path.Combine(filePath, fileLib.Stub);
-            if (!Directory.Exists(filePath))
-            {
-                _logger.LogError($"The File Library '{fileLib.Stub}' does not exist for this section.");
-                ShowAlertDanger($"Failed to delete File Library '{fileLib.Name}'");
-                return RedirectToAction(nameof(SectionController.Section),
-                    new { sectionStub = section.Stub });
-            }
-            else
-            {
-                Directory.Delete(filePath);
-                await _fileService.DeleteFileTypesByLibrary(fileLib.Id);
-                await _fileService.DeleteLibraryAsync(fileLib.Id);
-                ShowAlertSuccess($"Deleted '{fileLib.Name}' from '{section.Name}'s");
-            }
-            return RedirectToAction(nameof(SectionController.Section),
-                new { sectionStub = section.Stub });
-        }
-
-        [Route("[action]")]
-        [HttpPost]
-        public async Task<RedirectToActionResult> DeleteFileFromLibrary(SectionViewModel viewModel)
-        {
-            if (string.IsNullOrEmpty(viewModel.Section.Stub))
-            {
-                ShowAlertDanger("Could not find the section.");
-                return RedirectToAction(nameof(SectionController.Index));
-            }
-            var section = _sectionService.GetSectionByStub(viewModel.Section.Stub);
-            if (viewModel.FileLibrary.Id == 0)
-            {
-                ShowAlertDanger($"Failed to find File Library");
-                return RedirectToAction(nameof(SectionController.Section),
-                    new { sectionStub = section.Stub });
-            }
-            var fileLib = await _fileService.GetLibraryByIdAsync(viewModel.FileLibrary.Id);
-            if (viewModel.File.Id == 0)
-            {
-                ShowAlertDanger($"Failed to find File");
-                return RedirectToAction(nameof(SectionController.Section),
-                    new { sectionStub = section.Stub });
-            }
-            var file = await _fileService.GetByIdAsync(viewModel.File.Id);
-            var filePath = Path.Combine(
-                Directory.GetParent(_hostingEnvironment.WebRootPath).FullName, "shared");
-            filePath = Path.Combine(filePath, "sections");
-            var type = await _fileService.GetFileTypeByIdAsync(file.FileTypeId);
-            if (!Directory.Exists(filePath))
-            {
-                _logger.LogError($"'sections' directory not found at: { filePath}");
-                ShowAlertDanger($"Failed to delete File Library '{file.Name}'");
-                return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = section.Stub, fileLibStub = fileLib.Stub });
-            }
-            filePath = Path.Combine(filePath, section.Stub);
-            if (!Directory.Exists(filePath))
-            {
-                _logger.LogError($"'{section.Stub}' directory not found at: { filePath}");
-                ShowAlertDanger($"Failed to delete File Library '{file.Name}'");
-                return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = section.Stub, fileLibStub = fileLib.Stub });
-            }
-            filePath = Path.Combine(filePath, fileLib.Stub);
-            if (!Directory.Exists(filePath))
-            {
-                _logger.LogError($"'{fileLib.Stub}' directory not found at: { filePath}");
-                ShowAlertDanger($"Failed to delete File Library '{file.Name}'");
-                return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = section.Stub, fileLibStub = fileLib.Stub });
-            }
-            filePath = Path.Combine(filePath, file.Name+type.Extension);
-            if (!System.IO.File.Exists(filePath))
-            {
-                _logger.LogError($"'{file.Name}' file not found at: { filePath}");
-                ShowAlertDanger($"Failed to delete File Library '{file.Name}'");
-                return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = section.Stub, fileLibStub = fileLib.Stub });
-            }
-            else
-            {
-                System.IO.File.Delete(filePath);
-                await _fileService.DeletePrivateFileAsync(file.Id);
-                ShowAlertSuccess($"Deleted '{file.Name}' from '{fileLib.Name}'");
-                return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = section.Stub, fileLibStub = fileLib.Stub });
+                ShowAlertDanger($"Failed to delete File Library.");
+                return RedirectToAction(nameof(FileLibrary),
+                    new { sectionStub = model.Section.Stub});
             }
         }
 
         [Route("[action]")]
         [HttpPost]
-        public async Task<RedirectToActionResult> AddFileToLibrary(SectionViewModel model)
+        public async Task<RedirectToActionResult> DeleteFileFromLibrary(FileLibraryViewModel viewModel)
         {
-            var section = _sectionService.GetSectionByStub(model.Section.Stub);
-            if (section == null)
+            if (viewModel.File.Id !=0 && viewModel.FileLibraryId !=0 
+                && !string.IsNullOrEmpty(viewModel.SectionStub))
             {
-                ShowAlertDanger("Could not find the section.");
-                return RedirectToAction(nameof(SectionController.Index));
+                var section = _sectionService.GetSectionByStub(viewModel.SectionStub);
+                var fileLib = await _fileService.GetLibraryByIdAsync(viewModel.FileLibraryId);
+                var file = await _fileService.GetByIdAsync(viewModel.File.Id);
+                var filePath = Path.Combine(
+                    Directory.GetParent(_hostingEnvironment.WebRootPath).FullName, "shared");
+                filePath = Path.Combine(filePath, "sections");
+                var type = await _fileService.GetFileTypeByIdAsync(file.FileTypeId);
+                filePath = Path.Combine(filePath, section.Stub);
+                filePath = Path.Combine(filePath, fileLib.Stub);
+                filePath = Path.Combine(filePath, file.Name + type.Extension);
+                if (!System.IO.File.Exists(filePath))
+                {
+                    _logger.LogError($"'{file.Name}' file not found at: { filePath}");
+                    ShowAlertDanger($"Failed to delete File Library '{file.Name}'");
+                    return RedirectToAction(nameof(SectionController.FileLibrary),
+                        new { sectionStub = section.Stub, fileLibStub = fileLib.Stub });
+                }
+                else
+                {
+                    System.IO.File.Delete(filePath);
+                    await _fileService.DeletePrivateFileAsync(file.Id);
+                    ShowAlertSuccess($"Deleted '{file.Name}' from '{fileLib.Name}'");
+                    return RedirectToAction(nameof(SectionController.FileLibrary),
+                        new { sectionStub = section.Stub, fileLibStub = fileLib.Stub });
+                }
             }
-            var fileLib = await _fileService.GetLibraryByIdAsync(model.FileLibrary.Id);
-            if (fileLib == null)
+            else
             {
-                ShowAlertDanger("Could not find the File Library");
-                return RedirectToAction(nameof(SectionController.Section),
-                    new { sectionStub = section.Stub});
-            }
-            if (string.IsNullOrEmpty(model.File.Name))
-            {
-                ModelState.AddModelError("File.Name", "A 'File Name' is required.");
                 return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = section.Stub, fileLibStub = fileLib.Stub });
+                    new { sectionStub = viewModel.SectionStub, fileLibStub = viewModel.FileLibraryStub });
             }
-            if ((model.UploadFile) == null)
-            {
-                ModelState.AddModelError("UploadFile", "An 'Uploaded File' is required.");
-                return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = section.Stub, fileLibStub = fileLib.Stub });
-            }
+        }
+
+        [Route("[action]")]
+        [HttpPost]
+        public async Task<RedirectToActionResult> AddFileToLibrary(FileLibraryViewModel model)
+        {
+            var section = _sectionService.GetSectionByStub(model.SectionStub);
+            var fileLib = await _fileService.GetLibraryByIdAsync(model.FileLibraryId);
             model.File.FileLibraryId = fileLib.Id;
             var extension = Path.GetExtension(model.UploadFile.FileName).ToLower();
             var libraryTypes = await _fileService.GetFileLibrariesFileTypes(fileLib.Id);
@@ -833,31 +709,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                     new { sectionStub = section.Stub, fileLibStub = fileLib.Stub });
             }
             var filePath = Path.Combine(
-                Directory.GetParent(_hostingEnvironment.WebRootPath).FullName, "shared");
-            filePath = Path.Combine(filePath, "sections");
-            if (!Directory.Exists(filePath))
-            {
-                _logger.LogError($"'sections' directory not found at: { filePath}");
-                ShowAlertDanger($"Failed to delete File Library '{model.File.Name}'");
-                return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = section.Stub, fileLibStub = fileLib.Stub });
-            }
+                Directory.GetParent(_hostingEnvironment.WebRootPath).FullName, "shared/sections");
             filePath = Path.Combine(filePath, section.Stub);
-            if (!Directory.Exists(filePath))
-            {
-                _logger.LogError($"'{section.Stub}' directory not found at '{ filePath}'");
-                ShowAlertDanger($"Failed to delete File Library '{model.File.Name}'");
-                return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = section.Stub, fileLibStub = fileLib.Stub });
-            }
             filePath = Path.Combine(filePath, fileLib.Stub);
-            if (!Directory.Exists(filePath))
-            {
-                _logger.LogError($"'{fileLib.Stub}' directory not found at '{filePath}'");
-                ShowAlertDanger($"Failed to delete File Library '{model.File.Name}'");
-                return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = section.Stub, fileLibStub = fileLib.Stub });
-            }
             filePath = Path.Combine(filePath, model.File.Name + extension);
             if (System.IO.File.Exists(filePath))
             {
@@ -906,100 +760,118 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [HttpPost]
         public async Task<IActionResult> UpdateLinkLibrary(SectionViewModel viewModel)
         {
-            if (string.IsNullOrEmpty(viewModel.Section.Stub))
-            {
-                ModelState.AddModelError("Post.Content", "'Post Content' is required.");
-                ShowAlertDanger($"Could not update link library.");
-                return View("AddPost", viewModel);
-            }
-            var section = _sectionService.GetSectionByStub(viewModel.Section.Stub);
-            viewModel.Section = section;
-            if (string.IsNullOrEmpty(viewModel.LinkLibrary.Stub))
-            {
-                ModelState.AddModelError("Post.Stub", "A 'Post Stub' is required.");
-                ShowAlertDanger($"Could not update link library.");
-                return View("AddPost", viewModel);
-            }
             if (string.IsNullOrEmpty(viewModel.LinkLibrary.Name))
             {
-                ModelState.AddModelError("Post.Title", "A 'Post Title' is required.");
-                ShowAlertDanger($"Could not update link library.");
-                return View("AddPost", viewModel);
+                ModelState.AddModelError("LinkLibrary.Name", "A 'Link Library Name' is required.");
+                return RedirectToAction(nameof(SectionController.Section),
+                    new { sectionStub = viewModel.Section.Stub });
             }
-            var oldLib = await _linkService.GetLibraryByIdAsync(viewModel.LinkLibrary.Id);
-            oldLib.Name = viewModel.LinkLibrary.Name;
-            oldLib.Stub = viewModel.LinkLibrary.Stub;
-            await _linkService.UpdateLibraryAsync(oldLib);
-            ShowAlertSuccess($"Updated link library '{oldLib.Name}'");
-            return RedirectToAction(nameof(SectionController.Section),
-                new { sectionStub = section.Stub });
+            if (string.IsNullOrEmpty(viewModel.LinkLibrary.Stub))
+            {
+                ShowAlertDanger("Invalid name for File Library.");
+                return RedirectToAction(nameof(SectionController.Section),
+                    new { sectionStub = viewModel.Section.Stub });
+            }
+            if (viewModel.LinkLibrary.Id == 0)
+            {
+                ShowAlertDanger("A Link Library Id is required.");
+                return RedirectToAction(nameof(SectionController.Section),
+                    new { sectionStub = viewModel.Section.Stub });
+            }
+            if (ModelState.IsValid)
+            {
+                var section = _sectionService.GetSectionByStub(viewModel.Section.Stub);
+                var oldLib = await _linkService.GetLibraryByIdAsync(viewModel.LinkLibrary.Id);
+                oldLib.Name = viewModel.LinkLibrary.Name;
+                oldLib.Stub = viewModel.LinkLibrary.Stub;
+                await _linkService.UpdateLibraryAsync(oldLib);
+                ShowAlertSuccess($"Updated link library '{oldLib.Name}'");
+                return RedirectToAction(nameof(SectionController.Section),
+                    new { sectionStub = section.Stub });
+            }
+            else
+            {
+                ShowAlertDanger($"Could Not Update {viewModel.LinkLibrary.Name}");
+                return RedirectToAction(nameof(LinkLibrary),
+                    new { sectionStub = viewModel.Section.Stub, linkLibStub = viewModel.LinkLibrary.Stub});
+            }
         }
 
         [Route("[action]")]
         [HttpPost]
-        public async Task<RedirectToActionResult> AddLinkToLibrary(SectionViewModel model)
+        public async Task<RedirectToActionResult> AddLinkToLibrary(LinkLibraryViewModel model)
         {
-            if (string.IsNullOrEmpty(model.Link.Name))
+            if (ModelState.IsValid)
             {
-                ModelState.AddModelError("Link.Name", "A 'Link Name' is required.");
-                return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = model.Section.Stub, fileLibId = model.LinkLibrary.Stub });
-            }
-            if (string.IsNullOrEmpty(model.Link.Url))
-            {
-                ModelState.AddModelError("Link.Url", "A 'Link Url' is required.");
-                return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = model.Section.Stub, fileLibId = model.LinkLibrary.Stub });
-            }
-            if (string.IsNullOrEmpty(model.Link.Icon))
-            {
-                ModelState.AddModelError("Link.Icon", "A 'Link Icon' is required.");
-                return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = model.Section.Stub, fileLibId = model.LinkLibrary.Stub });
-            }
-            model.Link.LinkLibraryId = model.LinkLibrary.Id;
-            var link = await _linkService.CreateAsync(CurrentUserId, model.Link);
-            var linkLib = await _linkService.GetLibraryByIdAsync(model.LinkLibrary.Id);
+                model.Link.LinkLibraryId = model.LinkLibraryId;
+                var link = await _linkService.CreateAsync(CurrentUserId, model.Link);
+                var linkLib = await _linkService.GetLibraryByIdAsync(model.LinkLibraryId);
+                model.LinkLibrary = linkLib;
 
-            ShowAlertSuccess($"Added '{link.Name}' to '{linkLib.Name}'");
-            return RedirectToAction(nameof(SectionController.LinkLibrary),
-                new { sectionStub = model.Section.Stub, linkLibStub = linkLib.Stub });
+                ShowAlertSuccess($"Added '{link.Name}' to '{linkLib.Name}'");
+                return RedirectToAction(nameof(SectionController.LinkLibrary),
+                    new { sectionStub = model.SectionStub, linkLibStub = linkLib.Stub });
+            }
+            else
+            {
+                ShowAlertDanger($"Could not add Link to Library");
+                return RedirectToAction(nameof(SectionController.LinkLibrary),
+                    new { sectionStub = model.SectionStub, linkLibStub = model.LinkLibraryStub });
+            }
         }
 
         [Route("[action]")]
         [HttpPost]
-        public async Task<RedirectToActionResult> DeleteLinkFromLibrary(SectionViewModel model)
+        public async Task<RedirectToActionResult> DeleteLinkFromLibrary(LinkLibraryViewModel model)
         {
-            var link = await _linkService.GetByIdAsync(model.Link.Id);
-            try
+            if (model.Link.Id != 0)
             {
-                await _linkService.DeleteAsync(model.Link.Id);
-                ShowAlertSuccess($"Deleted link '{link.Name}'");
+                var link = await _linkService.GetByIdAsync(model.Link.Id);
+                try
+                {
+                    await _linkService.DeleteAsync(model.Link.Id);
+                    ShowAlertSuccess($"Deleted link '{link.Name}'");
+                }
+                catch
+                {
+                    ShowAlertDanger($"Failed to Delete '{link.Name}'");
+                }
+                return RedirectToAction(nameof(SectionController.LinkLibrary),
+                    new { sectionStub = model.SectionStub, linkLibStub = model.LinkLibraryStub });
             }
-            catch
+            else
             {
-                ShowAlertDanger($"Failed to Delete '{link.Name}'");
+                ShowAlertDanger($"Failed to Delete Link");
+                return RedirectToAction(nameof(SectionController.LinkLibrary),
+                    new { sectionStub = model.SectionStub, linkLibStub = model.LinkLibraryStub });
             }
-            return RedirectToAction(nameof(SectionController.LinkLibrary),
-                new { sectionStub = model.Section.Stub, linkLibStub = model.LinkLibrary.Stub });
         }
 
         [Route("[action]")]
         [HttpPost]
-        public async Task<RedirectToActionResult> UpdateLinkFromLibrary(SectionViewModel model)
+        public async Task<RedirectToActionResult> UpdateLinkFromLibrary(LinkLibraryViewModel model)
         {
-            var link = await _linkService.GetByIdAsync(model.Link.Id);
-            try
+            if (ModelState.IsValid)
             {
-                var updateLink = await _linkService.EditAsync(model.Link);
-                ShowAlertSuccess($"Updated link '{updateLink.Name}'");
+                var link = await _linkService.GetByIdAsync(model.Link.Id);
+                try
+                {
+                    var updateLink = await _linkService.EditAsync(model.Link);
+                    ShowAlertSuccess($"Updated link '{updateLink.Name}'");
+                }
+                catch
+                {
+                    ShowAlertDanger($"Failed to Update '{link.Name}'");
+                }
+                return RedirectToAction(nameof(SectionController.LinkLibrary),
+                    new { sectionStub = model.SectionStub, linkLibStub = model.LinkLibraryStub });
             }
-            catch
+            else
             {
-                ShowAlertDanger($"Failed to Update '{link.Name}'");
+                ShowAlertDanger($"Could not Update Link");
+                return RedirectToAction(nameof(SectionController.LinkLibrary),
+                    new { sectionStub = model.SectionStub, linkLibStub = model.LinkLibraryStub });
             }
-            return RedirectToAction(nameof(SectionController.LinkLibrary),
-                new { sectionStub = model.Section.Stub, linkLibStub = model.LinkLibrary.Stub });
         }
 
         [Route("[action]")]
@@ -1036,8 +908,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 new { sectionStub = section.Stub });
         }
 
-        [Route("{sectionStub}/[action]")]
-        public async Task<Section> ValidateSectionAccess(string sectionStub)
+        private async Task<Section> ValidateSectionAccess(string sectionStub)
         {
             var siteManager = UserClaim(ClaimType.SiteManager);
             if (string.IsNullOrEmpty(siteManager))

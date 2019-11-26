@@ -516,7 +516,7 @@
                         class: "input-validation-error"
                     }).attr("aria-describedby", "LinkLibrary_Id-error").appendTo('#deleteForm');
                 }
-                modal.find("#deleteForm").attr("action", "@nameof(SectionController.DeleteLinkLibrary)");
+                modal.find("#deleteForm").attr("action", "@Url.Action(nameof(SectionController.DeleteLinkLibrary))");
                 modal.find("#modal-text").text("Are you sure you want to delete the link library \"" + name + "\"?");
             }
             else {
@@ -535,7 +535,7 @@
                         class: "input-validation-error"
                     }).attr("aria-describedby", "FileLibrary_Id-error").appendTo('#deleteForm');
                 }
-                modal.find("#deleteForm").attr("action","@nameof(SectionController.DeleteFileLibrary)");
+                modal.find("#deleteForm").attr("action","@Url.Action(nameof(SectionController.DeleteFileLibrary))");
                 modal.find("#modal-text").text("Are you sure you want to delete the file library \"" + name + "\"?");
             }
         });

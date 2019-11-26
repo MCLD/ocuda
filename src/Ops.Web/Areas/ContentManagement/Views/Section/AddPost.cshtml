@@ -1,4 +1,4 @@
-﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.SectionViewModel
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.AddPostViewModel
 @section styles {
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
@@ -7,11 +7,11 @@
     <a href="@Url.Action(nameof(SectionController.Index))" class="navbar-brand">Section</a>
     <span class="navbar-brand">/</span>
     <a href="@Url.Action(nameof(SectionController.Section),
-            new { sectionStub = Model.Section.Stub})"
-       class="navbar-brand">@Model.Section.Name</a>
+            new { sectionStub = Model.SectionStub})"
+       class="navbar-brand">@Model.SectionName</a>
     <a class="nav-link"
        href="@Url.Action(nameof(SectionController.Post),
-           new { sectionStub = Model.Section.Stub, categoryStub = "", page=1})">
+           new { sectionStub = Model.SectionStub, categoryStub = "", page=1})">
         Posts
     </a>
 </nav>
@@ -19,19 +19,10 @@
     <form id="modifyPostForm"
           method="post"
           role="form"
-          action="@(Model.Action == "Edit" ? Url.Action(nameof(SectionController.UpdatePost)) : Url.Action(nameof(SectionController.CreatePost)))">
-        <input asp-for="Post.SectionId" value="@Model.Section.Id" hidden />
-        @if (Model.Action == "Edit")
-        {
-            <input asp-for="Post.Id" value="@Model.Post.Id" hidden />
-            <input asp-for="Post.Title" formgroup value="@Model.Post.Title" />
-            <input asp-for="Post.Stub" formgroup value="@Model.Post.Stub" />
-        }
-        else
-        {
+          action="@Url.Action(nameof(SectionController.AddPost))">
+        <input asp-for="Post.SectionId" value="@Model.SectionId" hidden />
             <input asp-for="Post.Title" formgroup />
             <input asp-for="Post.Stub" formgroup />
-        }
         <select id="postCategoryIds" multiple="multiple" asp-for="CategoryIds" asp-items="Model.SelectionPostCategories" class="hidden" formgroup>
         </select>
         <div class="row form-group">
@@ -40,20 +31,10 @@
             </label>
             <div class="flex-md-grow-0">
                 <div class="custom-control custom-switch">
-                    @if (Model.Action == "Edit")
-                    {
-                        <input type="checkbox"
-                               class="custom-control-input"
-                               asp-for="Post.ShowOnHomePage"
-                               value="@Model.Post.ShowOnHomePage" />
-                    }
-                    else
-                    {
                         <input type="checkbox"
                                class="custom-control-input"
                                asp-for="Post.ShowOnHomePage"
                                value="false" />
-                    }
                     <label class="col-form-label text-md-right col-md-3 custom-control-label text-hide" for="Post_ShowOnHomePage">
                         Show On HomePage
                     </label>
@@ -84,21 +65,10 @@
                          role="tabpanel">
                         <div id="wmd-button-bar"
                              class="wmd-button-row"></div>
-                        @if (Model.Action == "Edit")
-                        {
-                            <textarea asp-for="Post.Content"
-                                      class="form-control wmd-input"
-                                      id="wmd-input"
-                                      value="@Model.Post.Content">
-                            </textarea>
-                        }
-                        else
-                        {
                             <textarea asp-for="Post.Content"
                                       class="form-control wmd-input"
                                       id="wmd-input">
                             </textarea>
-                        }
                     </div>
                     <div class="tab-pane" id="md-preview" role="tabpanel">
                         <div id="preview" class="wmd-preview"></div>
@@ -112,7 +82,7 @@
             <button id="addPostBtn" type="submit"class="btn btn-primary col" aria-label="Confirm">
                 Save
             </button>
-            <a href="@Url.Action(nameof(SectionController.Post), new { sectionStub = Model.Section.Stub})"
+            <a href="@Url.Action(nameof(SectionController.Post), new { sectionStub = Model.SectionStub})"
                class="btn btn-secondary col">
                 Cancel
             </a>
@@ -123,9 +93,6 @@
 @section scripts {
     <script src="~/js/md.min.js" asp-append-version="true"></script>
     <script>
-        var addLink = "@Url.Action(nameof(SectionController.CreatePost))";
-        var editLink = "@Url.Action(nameof(SectionController.UpdatePost))";
-
         $(document).ready(function () {
             var editor = new Markdown.Editor({ allowUploads: false });
             editor.run();

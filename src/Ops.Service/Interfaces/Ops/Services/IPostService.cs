@@ -35,7 +35,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<List<PostCategory>> GetPostCategoriesById(int postId);
 
-        Task CreatePost(Post post);
+        Task CreatePost(Post post, int userId);
 
         Task RemovePost(Post post);
 

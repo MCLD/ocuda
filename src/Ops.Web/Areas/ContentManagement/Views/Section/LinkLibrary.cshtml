@@ -1,4 +1,4 @@
-﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.SectionViewModel
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.LinkLibraryViewModel
 @section styles {
     <link rel="stylesheet" href="~/css/iconpicker.min.css" asp-append-version="true" />
 }
@@ -18,10 +18,11 @@
                         <div class="modal-body">
                             <div id="modalItemList" class="col-12">
                                 <div class="col-sm-9">
-
-                                    <input asp-for="Section.Stub" value="@Model.Section.Stub" autocomplete="off" type="hidden" />
-                                    <input asp-for="LinkLibrary.Stub" value="@Model.LinkLibrary.Stub" autocomplete="off" type="hidden" />
-                                    <input asp-for="LinkLibrary.Id" value="@Model.LinkLibrary.Id" autocomplete="off" type="hidden" />
+                                    <input asp-for="SectionStub" value="@Model.SectionStub" autocomplete="off" type="hidden" />
+                                    <input asp-for="SectionName" value="@Model.SectionName" autocomplete="off" type="hidden" />
+                                    <input asp-for="LinkLibraryStub" value="@Model.LinkLibrary.Stub" autocomplete="off" type="hidden" />
+                                    <input asp-for="LinkLibraryId" value="@Model.LinkLibrary.Id" autocomplete="off" type="hidden" />
+                                    <input asp-for="LinkLibraryName" value="@Model.LinkLibrary.Name" autocomplete="off" type="hidden" />
                                     <input asp-for="Link.Name" autocomplete="off" formgroup />
                                     <input asp-for="Link.Url" autocomplete="off" formgroup />
                                     <input asp-for="Link.Icon" class="form-control icon-picker" autocomplete="off" formgroup />
@@ -54,9 +55,11 @@
                             <div id="modalItemList" class="col-12">
                                 <div class="col-sm-9">
 
-                                    <input asp-for="Section.Stub" value="@Model.Section.Stub" autocomplete="off" type="hidden" />
-                                    <input asp-for="LinkLibrary.Stub" value="@Model.LinkLibrary.Stub" autocomplete="off" type="hidden" />
-                                    <input asp-for="LinkLibrary.Id" value="@Model.LinkLibrary.Id" autocomplete="off" type="hidden" />
+                                    <input asp-for="SectionStub" value="@Model.SectionStub" autocomplete="off" type="hidden" />
+                                    <input asp-for="SectionName" value="@Model.SectionName" autocomplete="off" type="hidden" />
+                                    <input asp-for="LinkLibraryStub" value="@Model.LinkLibrary.Stub" autocomplete="off" type="hidden" />
+                                    <input asp-for="LinkLibraryId" value="@Model.LinkLibrary.Id" autocomplete="off" type="hidden" />
+                                    <input asp-for="LinkLibraryName" value="@Model.LinkLibrary.Name" autocomplete="off" type="hidden" />
                                     <input asp-for="Link.Id" autocomplete="off" type="hidden" />
                                     <input asp-for="Link.Name" autocomplete="off" formgroup />
                                     <input asp-for="Link.Url" autocomplete="off" formgroup />
@@ -84,8 +87,11 @@
               method="post"
               role="form"
               style="display:inline">
-            <input asp-for="Section.Stub" value="@Model.Section.Stub" type="hidden" />
-            <input asp-for="LinkLibrary.Stub" value="@Model.LinkLibrary.Stub" type="hidden" />
+            <input asp-for="SectionStub" value="@Model.SectionStub" autocomplete="off" type="hidden" />
+            <input asp-for="SectionName" value="@Model.SectionName" autocomplete="off" type="hidden" />
+            <input asp-for="LinkLibraryStub" value="@Model.LinkLibrary.Stub" autocomplete="off" type="hidden" />
+            <input asp-for="LinkLibraryId" value="@Model.LinkLibrary.Id" autocomplete="off" type="hidden" />
+            <input asp-for="LinkLibraryName" value="@Model.LinkLibrary.Name" autocomplete="off" type="hidden" />
             <input asp-for="Link.Id" type="hidden" />
             <div class="modal-content">
                 <div class="modal-header">
@@ -122,10 +128,10 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a href="@Url.Action(nameof(SectionController.Index))" class="navbar-brand">Section</a>
     <span class="navbar-brand">/</span>
-    <a href="@Url.Action(nameof(SectionController.Section), new { sectionStub = Model.Section.Stub})" class="navbar-brand">@Model.Section.Name</a>
+    <a href="@Url.Action(nameof(SectionController.Section), new { sectionStub = Model.SectionStub})" class="navbar-brand">@Model.SectionName</a>
     <a class="nav-link"
        href="@Url.Action(nameof(SectionController.Post),
-            new { sectionStub = Model.Section.Stub,
+            new { sectionStub = Model.SectionStub,
             page=1})">
         Posts
     </a>
