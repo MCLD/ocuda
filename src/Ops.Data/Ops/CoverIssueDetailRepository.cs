@@ -30,7 +30,7 @@ namespace Ocuda.Ops.Data.Ops
             }
 
             return await query
-                .OrderByDescending(_ => _.IsResolved)
+                .OrderBy(_ => _.IsResolved)
                 .ThenByDescending(_ => _.CreatedAt)
                 .ToListAsync();
         }
