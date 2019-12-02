@@ -1,52 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
-using Ocuda.Ops.Controllers.Areas.CoverIssues.ViewModels.Management;
+using Ocuda.Ops.Controllers.Areas.CoverIssue.ViewModels.Management;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 
-namespace Ocuda.Ops.Controllers.Areas.CoverIssues
+namespace Ocuda.Ops.Controllers.Areas.CoverIssue
 {
     [Area("CoverIssue")]
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]/[controller]")]
     public class ManagementController : BaseController<ManagementController>
     {
-        public static string Name { get { return "Management"; } }
         private readonly ICoverIssueService _coverIssueService;
-        private readonly IConfiguration _config;
 
-        public ManagementController(
-            ServiceFacades.Controller<ManagementController> context,
-            ICoverIssueService coverIssueService,
-            IConfiguration config) : base(context)
+        public static string Name { get { return "Management"; } }
+
+        public ManagementController(ServiceFacades.Controller<ManagementController> context,
+            ICoverIssueService coverIssueService) : base(context)
         {
             _coverIssueService = coverIssueService
                 ?? throw new ArgumentNullException(nameof(coverIssueService));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
         [Route("")]
         [Route("[action]")]
-        public async Task<IActionResult> Index(string search, int orderBy, bool orderDesc,
-            int page = 1)
+        public async Task<IActionResult> Index(int page = 1)
         {
-            search = search?.Trim();
-            var filter = new CoverIssueHeaderFilter(page)
-            {
-                Search = search,
-                OrderBy = (CoverIssueHeaderFilter.OrderType)orderBy,
-                OrderDesc = orderDesc
-            };
-            var headers = await _coverIssueService.PageHeaderItemsAsync(filter);
+            var filter = new BaseFilter(page);
+            var headers = await _coverIssueService.GetPaginatedHeaderListAsync(filter);
 
             var paginateModel = new PaginateModel
             {
@@ -62,70 +49,62 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssues
                 });
             }
 
-            return View(new ManagementViewModel
+            var viewModel = new IndexViewModel
             {
-                AllCoverIssues = headers.Data,
-                PaginateModel = paginateModel,
-                OrderBy = orderBy,
-                OrderDesc = orderDesc,
-                Search = search,
-                SearchCount = headers.Count
-            });
+                CoverIssueHeaders = headers.Data,
+                PaginateModel = paginateModel
+            };
+
+            return View(viewModel);
         }
 
-        [Route("[action]/{bibId}")]
-        public async Task<IActionResult> IssueDetail(int bibId)
+        [Route("[action]/{id}")]
+        public async Task<IActionResult> Issue(int id)
         {
-            var header = _coverIssueService.GetCoverIssueHeaderByBibId(bibId);
+            var header = await _coverIssueService.GetHeaderByIdAsync(id);
             if (header == null)
             {
-                ShowAlertDanger($"The BibID '{bibId}' does not have any pending or past issues.");
+                _logger.LogWarning("Cover issue report {id} could not be found.", id);
+                ShowAlertDanger($"The requested report could not be found.");
                 return RedirectToAction(nameof(Index));
             }
-            else
+
+            var viewModel = new DetailViewModel
             {
-                var viewModel = new ManagementViewModel
-                {
-                    Header = header,
-                    Details = await _coverIssueService.GetCoverIssueDetailsByHeaderAsync(header.Id),
-                    Types = await _coverIssueService.GetAllCoverIssueTypesAsync(),
-                    CoverIssueImgPath = _config["CoverIssueImageUrl"],
-                    CoverIssueLeapPath = _config["LeapRecordPath"]
-                };
-                return View(viewModel);
+                Header = header,
+                Details = await _coverIssueService.GetDetailsByHeaderIdAsync(header.Id)
+            };
+
+            var leapBibUrl = await _siteSettingService.GetSettingStringAsync(
+                Ops.Models.Keys.SiteSetting.CoverIssueReporting.LeapBibUrl);
+
+            if (!string.IsNullOrWhiteSpace(leapBibUrl))
+            {
+                viewModel.LeapPath = leapBibUrl + header.BibId;
             }
+
+            return View(viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> ResolveIssues(int detailId)
+        [Route("[action]")]
+        public async Task<IActionResult> ResolveIssue(DetailViewModel model)
         {
-            var detail = await _coverIssueService.GetCoverIssueDetailByIdAsync(detailId);
-            var header = await _coverIssueService.GetCoverIssueHeaderByDetailIdAsync(detailId);
-            var type = await _coverIssueService.GetCoverIssueTypeByIdAsync(detail.CoverIssueTypeId);
             try
             {
-                await _coverIssueService.ResolveCoverIssue(detailId);
-                if (!type.HasMessage)
-                {
-                    ShowAlertSuccess($"Resolved '{type.Name}' issues for '{header.BibID}'");
-                }
-                else
-                {
-                    ShowAlertSuccess($"Resolved issue for '{header.BibID}'");
-                }
+                var header = await _coverIssueService.GetHeaderByIdAsync(model.HeaderId);
+
+                await _coverIssueService.ResolveCoverIssueAsnyc(header.Id);
+                ShowAlertSuccess($"Issue marked as resolved!");
+                return RedirectToAction(nameof(Issue), new { id = header.Id });
             }
-            catch
+            catch (Exception ex)
             {
-                if (!type.HasMessage)
-                {
-                    ShowAlertDanger($"Could not resolve '{type.Name}' issues for '{header.BibID}'");
-                }
-                else
-                {
-                    ShowAlertDanger($"Could not resolve issue for '{header.BibID}'");
-                }
+                _logger.LogError(ex, "Error resolving cover issue for header {headerId}: {ex}",
+                    model.HeaderId, ex.Message);
+                ShowAlertDanger($"An error occured while trying to make the issue as resolved");
             }
-            return RedirectToAction(nameof(IssueDetail), new { bibId = header.BibID });
+            return RedirectToAction(nameof(Index));
         }
     }
 }

@@ -18,9 +18,7 @@ using Ocuda.Ops.Data;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Web.StartupHelper;
-using Ocuda.Utility.Helpers;
 using Ocuda.Utility.Keys;
-using Ops.Service;
 
 namespace Ocuda.Ops.Web
 {
@@ -195,7 +193,6 @@ namespace Ocuda.Ops.Web
 
             // helpers
             services.AddScoped<Utility.Helpers.WebHelper>();
-            services.AddScoped<PapiHelper>();
 
             // repositories
             services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,
@@ -204,8 +201,6 @@ namespace Ocuda.Ops.Web
                 Data.Ops.CoverIssueDetailRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICoverIssueHeaderRepository,
                 Data.Ops.CoverIssueHeaderRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.ICoverIssueTypeRepository,
-                Data.Ops.CoverIssueTypeRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IExternalResourceRepository,
                 Data.Ops.ExternalResourceRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFeatureRepository,
@@ -266,7 +261,6 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ISiteSettingService, SiteSettingService>();
             services.AddScoped<IUserMetadataTypeService, UserMetadataTypeService>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<PolarisService>();
 
             var serviceProvider = services.BuildServiceProvider();
             return serviceProvider;

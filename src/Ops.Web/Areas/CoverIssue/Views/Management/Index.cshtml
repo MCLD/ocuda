@@ -1,140 +1,52 @@
-﻿@model Ocuda.Ops.Controllers.Areas.CoverIssues.ViewModels.Management.ManagementViewModel;
+﻿@model Ocuda.Ops.Controllers.Areas.CoverIssue.ViewModels.Management.IndexViewModel
 
-@if (!string.IsNullOrEmpty(Model.Search))
+<h3>Cover Issues</h3>
+
+@if (Model.CoverIssueHeaders.Count == 0)
 {
-    <div class="row">
-        <div class="col-12">
-            <div class="alert alert-info alert-dismissible">
-                Search for '<strong>@Model.Search</strong>' found @Model.SearchCount
-                @(Model.SearchCount == 1 ? "match." : "matches.")
-                <button type="button" class="close" id="clearSearch" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        </div>
-    </div>
+    <div class="alert alert-warning">No Issues Found</div>
 }
-<div class="container">
-    <div class="row">
-        <div class="col-xs-12">
-            <div>
-                <table class="table table-condensed table-bordered table-hover">
-                    <thead>
-                        <tr>
-                            <th>
-                                <a class="sortable-column"
-                                   asp-route-Search="@Model.Search"
-                                   asp-route-OrderBy="0"
-                                   asp-route-OrderDesc="@(Model.OrderBy == 0 && Model.OrderDesc == false ? "true" : "false")">
-                                    BibId
-                                    @if (Model.OrderBy == 0)
-                                    {
-                                        <span class="fas fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
-                                    }
-                                </a>
-                            </th>
-                            <th>
-                                <a class="sortable-column"
-                                   asp-route-Search="@Model.Search"
-                                   asp-route-OrderBy="1"
-                                   asp-route-OrderDesc="@(Model.OrderBy == 1 && Model.OrderDesc == false ? "true" : "false")">
-                                    Has Issue?
-                                    @if (Model.OrderBy == 1)
-                                    {
-                                        <span class="fas fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
-                                    }
-                                </a>
-                            </th>
-                            <th>
-                                <a class="sortable-column"
-                                   asp-route-Search="@Model.Search"
-                                   asp-route-OrderBy="2"
-                                   asp-route-OrderDesc="@(Model.OrderBy == 2 && Model.OrderDesc == false ? "true" : "false")">
-                                    Created By
-                                    @if (Model.OrderBy == 2)
-                                    {
-                                        <span class="fas fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
-                                    }
-                                </a>
-                            </th>
-                            <th>
-                                <a class="sortable-column"
-                                   asp-route-Search="@Model.Search"
-                                   asp-route-OrderBy="3"
-                                   asp-route-OrderDesc="@(Model.OrderBy == 3 && Model.OrderDesc == false ? "true" : "false")">
-                                    Created At
-                                    @if (Model.OrderBy == 3)
-                                    {
-                                        <span class="fas fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
-                                    }
-                                </a>
-                            </th>
-                            <th>
-                                <a class="sortable-column"
-                                   asp-route-Search="@Model.Search"
-                                   asp-route-OrderBy="4"
-                                   asp-route-OrderDesc="@(Model.OrderBy == 4 && Model.OrderDesc == false ? "true" : "false")">
-                                    Last Resolved
-                                    @if (Model.OrderBy == 4)
-                                    {
-                                        <span class="fas fa-lg @(Model.OrderDesc ? "fa-sort-down" : "fa-sort-up")"></span>
-                                    }
-                                </a>
-                            </th>
-                        </tr>
-                    </thead>
-                    @if (Model.AllCoverIssues.Count == 0)
-                    {
-                        <tr>
-                            <td colspan="100">
-                                No Cover Issues Found.
-                            </td>
-                        </tr>
-                    }
-                    else
-                    {
-                        <tbody>
-                            @foreach (var issue in Model.AllCoverIssues)
-                            {
-                                <tr class="row-link" data-id="@issue.BibID">
-                                    <td class="td-class">
-                                        @issue.BibID
-                                    </td>
-                                    <td>
-                                        @if (issue.HasIssue)
-                                        {
 
-                                            @Html.Raw("<span class='fas fa-check'></span>");
-                                        }
-                                    </td>
-                                    <td>@issue.CreatedBy</td>
-                                    <td>@issue.CreatedAt</td>
-                                    <td>
-                                        @(issue.LastResolved != null ? issue.LastResolved.ToString() : "Never")
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    }
-                </table>
-                @if (Model.PaginateModel.MaxPage > 1)
-                {
-                    <paginate paginateModel="@Model.PaginateModel"></paginate>
-                }
-            </div>
-        </div>
-    </div>
-</div>
+<table class="table table-sm table-bordered link-table">
+    <thead>
+        <tr>
+            <th>Bib ID</th>
+            <th>Last Resolved</th>
+            <th>Pending Issues</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var header in Model.CoverIssueHeaders)
+        {
+            <tr>
+                <td>
+                    <a asp-action="@(nameof(ManagementController.Issue))" asp-route-id="@header.Id" class="rowlink">
+                        @header.BibId
+                    </a>
+                </td>
+                <td>@header.LastResolved?.ToShortDateString()</td>
+                <td><span class="@(header.HasPendingIssue ? "fas fa-exclamation-triangle" : "")"></span></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.PaginateModel.MaxPage > 1)
+{
+    <paginate paginateModel="@Model.PaginateModel"></paginate>
+}
+
 @section scripts {
     <script>
-        $(".row-link").on("click", function () {
-            var link = "@Url.Action(nameof(ManagementController.IssueDetail), new { bibId = -1})";
-            link = link.replace("-1", $(this).data("id"));
-            window.location.href = link;
+        $(window).on("load", function () {
+            $(".rowlink").each(function () {
+                $(this).height($(this).parent().height() + 11);
+            });
         });
-        $("#clearSearch").click(function () {
-            window.location.href = "@Url.Action(nameof(ManagementController.Index))";
+        $(window).resize(function () {
+            $(".rowlink").each(function () {
+                $(this).height($(this).parent().height() + 11);
+            });
         });
-
     </script>
 }

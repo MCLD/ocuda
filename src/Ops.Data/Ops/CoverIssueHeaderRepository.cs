@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Data.Extensions;
-using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
@@ -19,53 +19,28 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
-        public CoverIssueHeader GetCoverIssueHeaderByBibID(int BibID)
-        {
-            return DbSet
-                .AsNoTracking()
-                .Where(_ => _.BibID == BibID)
-                .FirstOrDefault();
-        }
-
-        public async Task<List<CoverIssueHeader>> GetAllHeadersAsync()
+        public async Task<CoverIssueHeader> GetByBibIdAsync(int BibId)
         {
             return await DbSet
                 .AsNoTracking()
-                .ToListAsync();
+                .Where(_ => _.BibId == BibId)
+                .SingleOrDefaultAsync();
         }
 
-        public async Task<int> CountAsync(CoverIssueHeaderFilter filter)
+        public async Task<DataWithCount<ICollection<CoverIssueHeader>>> GetPaginiatedListAsync(
+            BaseFilter filter)
         {
-            return await ApplyFilters(filter)
-                .CountAsync();
-        }
+            var query = DbSet.AsNoTracking();
 
-        private IQueryable<CoverIssueHeader> ApplyFilters(CoverIssueHeaderFilter filter)
-        {
-            var items = DbSet.AsNoTracking();
-            var orderBy = filter.OrderBy.ToString();
-            var propertyInfo = typeof(CoverIssueHeader).GetProperty(orderBy);
-            if (filter.OrderDesc)
+            return new DataWithCount<ICollection<CoverIssueHeader>>
             {
-                items = items.OrderByDescending(_ => propertyInfo.GetValue(_, null));
-            }
-            else
-            {
-                items = items.OrderBy(_ => propertyInfo.GetValue(_, null));
-            }
-            if (!string.IsNullOrEmpty(filter.Search))
-            {
-                items.Where(_ => _.BibID.ToString().Contains(filter.Search) ||
-                _.CreatedBy.ToString().Contains(filter.Search));
-            }
-            return items;
-        }
-
-        public async Task<ICollection<CoverIssueHeader>> PageAsync(CoverIssueHeaderFilter filter)
-        {
-            return await ApplyFilters(filter)
+                Count = await query.CountAsync(),
+                Data = await query
+                .OrderByDescending(_ => _.HasPendingIssue)
+                .ThenByDescending(_ => _.LastResolved)
                 .ApplyPagination(filter)
-                .ToListAsync();
+                .ToListAsync()
+            };
         }
     }
 }

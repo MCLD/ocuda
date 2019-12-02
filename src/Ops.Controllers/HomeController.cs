@@ -1,17 +1,6 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Home;
-using Clc.Polaris.Api.Models;
-using Clc.Polaris.Api;
-using System.Xml.Serialization;
-using Microsoft.Extensions.Logging;
-using Ocuda.Utility.Helpers;
-using Ops.Service;
-using System;
-using System.Text;
-using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Controllers
 {
@@ -20,14 +9,8 @@ namespace Ocuda.Ops.Controllers
     {
         public static string Name { get { return "Home"; } }
 
-        private readonly ICoverIssueService _coverIssueService;
-
-        public HomeController(ServiceFacades.Controller<HomeController> context,
-            ICoverIssueService coverIssueService,
-            PapiHelper papiHelper) : base(context)
+        public HomeController(ServiceFacades.Controller<HomeController> context) : base(context)
         {
-            _coverIssueService = coverIssueService
-                ?? throw new ArgumentNullException(nameof(coverIssueService));
         }
 
         [HttpGet("")]

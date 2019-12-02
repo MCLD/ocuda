@@ -1,181 +1,96 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Utility.Exceptions;
+using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Service
 {
-    public class CoverIssueService : ICoverIssueService
+    public class CoverIssueService : BaseService<CoverIssueService>, ICoverIssueService
     {
-        private readonly IUserService _userService;
-        private readonly ICoverIssueTypeRepository _coverIssueTypeRepository;
         private readonly ICoverIssueHeaderRepository _coverIssueHeaderRepository;
         private readonly ICoverIssueDetailRepository _coverIssueDetailRepository;
 
-        public CoverIssueService(IUserService userService,
-           ICoverIssueTypeRepository coverIssueTypeRepository,
-           ICoverIssueHeaderRepository coverIssueHeaderRepository,
-           ICoverIssueDetailRepository coverIssueDetailRepository)
+        public CoverIssueService(ILogger<CoverIssueService> logger,
+            IHttpContextAccessor httpContextAccessor,
+            ICoverIssueHeaderRepository coverIssueHeaderRepository,
+            ICoverIssueDetailRepository coverIssueDetailRepository)
+            : base(logger, httpContextAccessor)
         {
-            _coverIssueTypeRepository = coverIssueTypeRepository
-                ?? throw new ArgumentNullException(nameof(coverIssueTypeRepository));
             _coverIssueHeaderRepository = coverIssueHeaderRepository
                 ?? throw new ArgumentNullException(nameof(coverIssueHeaderRepository));
             _coverIssueDetailRepository = coverIssueDetailRepository
                 ?? throw new ArgumentNullException(nameof(coverIssueDetailRepository));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
-        public async Task<CoverIssueType> AddNewCoverIssueTypeAsync(CoverIssueType issueType) {
-            issueType.Name = issueType.Name.Trim();
-            await ValidateCoverIssueTypeAsync(issueType);
-            await _coverIssueTypeRepository.AddAsync(issueType);
-            await _coverIssueTypeRepository.SaveAsync();
-            return issueType;
-        }
-
-        public async Task<CoverIssueHeader> AddNewCoverIssueHeaderAsync(CoverIssueHeader issueHeader)
+        public async Task<DataWithCount<ICollection<CoverIssueHeader>>> GetPaginatedHeaderListAsync(
+            BaseFilter filter)
         {
-            await _coverIssueHeaderRepository.AddAsync(issueHeader);
-            await _coverIssueHeaderRepository.SaveAsync();
-            return issueHeader;
+            return await _coverIssueHeaderRepository.GetPaginiatedListAsync(filter);
         }
 
-        public async Task<CoverIssueDetail> AddNewCoverIssueDetailAsync(CoverIssueDetail issueDetail)
+        public async Task<CoverIssueHeader> GetHeaderByIdAsync(int id)
         {
-            issueDetail.Message = issueDetail.Message.Trim();
-            await _coverIssueDetailRepository.AddAsync(issueDetail);
-            await _coverIssueDetailRepository.SaveAsync();
-            return issueDetail;
+            return await _coverIssueHeaderRepository.FindAsync(id);
         }
 
-        public async Task<List<CoverIssueType>> GetAllCoverIssueTypesAsync()
+        public async Task<ICollection<CoverIssueDetail>> GetDetailsByHeaderIdAsync(int headerId)
         {
-            return await _coverIssueTypeRepository.GetAllTypesAsync();
+            return await _coverIssueDetailRepository.GetByHeaderIdAsync(headerId);
         }
 
-        public async Task<List<CoverIssueHeader>> GetAllCoverIssueHeadersAsync()
+        public async Task AddCoverIssueAsync(int bibId)
         {
-            return await _coverIssueHeaderRepository.GetAllHeadersAsync();
-        }
-
-        public async Task<DataWithCount<ICollection<CoverIssueHeader>>> PageHeaderItemsAsync(
-            CoverIssueHeaderFilter filter)
-        {
-            return new DataWithCount<ICollection<CoverIssueHeader>>
+            var header = await _coverIssueHeaderRepository.GetByBibIdAsync(bibId);
+            if (header == null)
             {
-                Data = await _coverIssueHeaderRepository.PageAsync(filter),
-                Count = await _coverIssueHeaderRepository.CountAsync(filter)
-            };
-        }
-
-        public CoverIssueHeader GetCoverIssueHeaderByBibId(int bibId)
-        {
-            return _coverIssueHeaderRepository.GetCoverIssueHeaderByBibID(bibId);
-        }
-
-        public async Task<CoverIssueHeader> GetCoverIssueHeaderByDetailIdAsync(int detailId)
-        {
-            var detail = await _coverIssueDetailRepository.FindAsync(detailId);
-            return await _coverIssueHeaderRepository.FindAsync(detail.CoverIssueHeaderId);
-        }
-
-        public async Task<List<CoverIssueDetail>> GetCoverIssueDetailsByHeaderAsync(int headerId)
-        {
-            var details = await _coverIssueDetailRepository.GetCoverIssueDetailsByHeader(headerId);
-            foreach (var item in details)
-            {
-                item.CreatedByUser = await _userService.GetByIdAsync(item.CreatedBy);
-            }
-            return details;
-        }
-
-        public async Task<CoverIssueDetail> GetCoverIssueDetailByIdAsync(int detailId)
-        {
-            return await _coverIssueDetailRepository.FindAsync(detailId);
-        }
-
-        public async Task<CoverIssueType> GetCoverIssueTypeByIdAsync(int typeId)
-        {
-            return await _coverIssueTypeRepository.FindAsync(typeId);
-        }
-
-        public async Task CreateNewCoverIssue(CoverIssueDetail detail, CoverIssueHeader header)
-        {
-            var issueHeader = _coverIssueHeaderRepository.GetCoverIssueHeaderByBibID(header.BibID);
-            if (issueHeader == null)
-            {
-                issueHeader = new CoverIssueHeader
+                header = new CoverIssueHeader
                 {
-                    BibID = header.BibID,
-                    CreatedAt = header.CreatedAt,
-                    CreatedBy = header.CreatedBy,
-                    HasIssue = true
+                    BibId = bibId,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = GetCurrentUserId(),
+                    HasPendingIssue = true
                 };
-                await _coverIssueHeaderRepository.AddAsync(issueHeader);
-                await _coverIssueHeaderRepository.SaveAsync();
-                issueHeader = _coverIssueHeaderRepository.GetCoverIssueHeaderByBibID(header.BibID);
+                await _coverIssueHeaderRepository.AddAsync(header);
             }
             else
             {
-                issueHeader.HasIssue = true;
-                _coverIssueHeaderRepository.Update(issueHeader);
-                await _coverIssueHeaderRepository.SaveAsync();
+                header.HasPendingIssue = true;
+                _coverIssueHeaderRepository.Update(header);
             }
-            detail.Message = detail.Message?.Trim();
-            detail.Isbn = detail.Isbn.Trim();
-            detail.UPC = detail.UPC?.Trim();
-            detail.OCLC = detail.OCLC?.Trim();
-            detail.IsOpenIssue = true;
-            detail.CoverIssueHeaderId = issueHeader.Id;
+
+            var detail = new CoverIssueDetail
+            {
+                CoverIssueHeader = header,
+                CreatedAt = DateTime.Now,
+                CreatedBy = GetCurrentUserId()
+            };
+
             await _coverIssueDetailRepository.AddAsync(detail);
             await _coverIssueDetailRepository.SaveAsync();
         }
 
-        public async Task ResolveCoverIssue(int detailId)
+        public async Task ResolveCoverIssueAsnyc(int headerId)
         {
-            var detail = await _coverIssueDetailRepository.FindAsync(detailId);
-            detail.IsOpenIssue = false;
-            _coverIssueDetailRepository.Update(detail);
-            await _coverIssueDetailRepository.SaveAsync();
-            var duplicates = await _coverIssueDetailRepository
-               .GetCoverIssueDetailsByHeader(detail.CoverIssueHeaderId);
-            var type = await _coverIssueTypeRepository.FindAsync(detail.CoverIssueTypeId);
-            if (!type.HasMessage)
-            {
-                foreach (var dupe in duplicates.Where(_ => _.IsOpenIssue
-                    && _.CoverIssueTypeId == type.Id))
-                {
-                    dupe.IsOpenIssue = false;
-                    _coverIssueDetailRepository.Update(dupe);
-                    await _coverIssueDetailRepository.SaveAsync();
-                }
-            }
-            if (!duplicates.Any(_ => _.IsOpenIssue))
-            {
-                var header = await _coverIssueHeaderRepository
-                    .FindAsync(detail.CoverIssueHeaderId);
-                header.HasIssue = false;
-                header.LastResolved = DateTime.Now;
-                _coverIssueHeaderRepository.Update(header);
-                await _coverIssueHeaderRepository.SaveAsync();
-            }
-        }
+            var header = await _coverIssueHeaderRepository.FindAsync(headerId);
+            header.HasPendingIssue = false;
+            header.LastResolved = DateTime.Now;
+            _coverIssueHeaderRepository.Update(header);
 
-        private async Task ValidateCoverIssueTypeAsync(CoverIssueType issueType)
-        {
-            if (await _coverIssueTypeRepository.IsDuplicateName(issueType))
+            var details = await _coverIssueDetailRepository.GetByHeaderIdAsync(header.Id, false);
+            foreach (var detail in details)
             {
-                throw new OcudaException($"Cover Issue Type '{issueType.Name}' already exists.");
+                detail.IsResolved = true;
             }
+            _coverIssueDetailRepository.UpdateRange(details);
+
+            await _coverIssueHeaderRepository.SaveAsync();
         }
     }
 }

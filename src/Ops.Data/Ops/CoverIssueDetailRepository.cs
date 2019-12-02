@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,12 +16,22 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
-        public async Task<List<CoverIssueDetail>> GetCoverIssueDetailsByHeader(int headerId)
+        public async Task<ICollection<CoverIssueDetail>> GetByHeaderIdAsync(int headerId,
+            bool? resolved = null)
         {
-            return await DbSet
+            var query = DbSet
                 .AsNoTracking()
-                .Where(_ => _.CoverIssueHeaderId == headerId)
-                .OrderBy(_ => _.CreatedAt)
+                .Include(_ => _.CreatedByUser)
+                .Where(_ => _.CoverIssueHeaderId == headerId);
+
+            if (resolved.HasValue)
+            {
+                query = query.Where(_ => _.IsResolved == resolved);
+            }
+
+            return await query
+                .OrderByDescending(_ => _.IsResolved)
+                .ThenByDescending(_ => _.CreatedAt)
                 .ToListAsync();
         }
     }

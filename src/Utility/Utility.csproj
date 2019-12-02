@@ -25,8 +25,4 @@
     <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\polaris-api-csharp\polaris-api-csharp.csproj" />
-  </ItemGroup>
-
 </Project>
