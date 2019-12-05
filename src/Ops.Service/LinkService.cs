@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
@@ -136,9 +135,11 @@ namespace Ocuda.Ops.Service
             await _linkLibraryRepository.SaveAsync();
         }
 
-        public async Task<List<LinkLibrary>> GetLinkLibrariesBySection(int sectionId)
+        public async Task<List<LinkLibrary>> GetLinkLibrariesBySectionAsync(int sectionId)
         {
-            var sectLinkLibs = _linkLibraryRepository.GetLinkLibrariesBySectionId(sectionId);
+            var sectLinkLibs = await _linkLibraryRepository
+                .GetLinkLibrariesBySectionIdAsync(sectionId);
+
             var linkLibs = new List<LinkLibrary>();
             if (sectLinkLibs != null)
             {

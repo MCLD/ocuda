@@ -10,7 +10,7 @@
             new { sectionStub = Model.SectionStub})"
        class="navbar-brand">@Model.SectionName</a>
     <a class="nav-link"
-       href="@Url.Action(nameof(SectionController.Post),
+       href="@Url.Action(nameof(SectionController.Posts),
            new { sectionStub = Model.SectionStub, categoryStub = "", page=1})">
         Posts
     </a>
@@ -32,10 +32,10 @@
             </label>
             <div class="flex-md-grow-0">
                 <div class="custom-control custom-switch">
-                        <input type="checkbox"
-                               class="custom-control-input"
-                               asp-for="Post.ShowOnHomePage"
-                               value="@Model.Post.ShowOnHomePage" />
+                    <input type="checkbox"
+                           class="custom-control-input"
+                           asp-for="Post.ShowOnHomePage"
+                           value="@Model.Post.ShowOnHomePage" />
                     <label class="col-form-label text-md-right col-md-3 custom-control-label text-hide" for="Post_ShowOnHomePage">
                         Show On HomePage
                     </label>
@@ -67,9 +67,9 @@
                         <div id="wmd-button-bar"
                              class="wmd-button-row"></div>
                         <textarea asp-for="Post.Content"
-                                    class="form-control wmd-input"
-                                    id="wmd-input"
-                                    value="@Model.Post.Content">
+                                  class="form-control wmd-input"
+                                  id="wmd-input"
+                                  value="@Model.Post.Content">
                         </textarea>
                     </div>
                     <div class="tab-pane" id="md-preview" role="tabpanel">
@@ -81,10 +81,10 @@
             </div>
         </div>
         <div class="row float-right">
-            <button id="addPostBtn" type="submit"class="btn btn-primary col" aria-label="Confirm">
+            <button id="addPostBtn" type="submit" class="btn btn-primary col" aria-label="Confirm">
                 Save
             </button>
-            <a href="@Url.Action(nameof(SectionController.Post), new { sectionStub = Model.SectionStub})"
+            <a href="@Url.Action(nameof(SectionController.Posts), new { sectionStub = Model.SectionStub})"
                class="btn btn-secondary col">
                 Cancel
             </a>

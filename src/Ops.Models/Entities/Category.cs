@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Ocuda.Ops.Models.Entities
+﻿namespace Ocuda.Ops.Models.Entities
 {
     public class Category : Abstract.BaseEntity
     {
-
         public string Name { get; set; }
 
         public string Stub { get; set; }

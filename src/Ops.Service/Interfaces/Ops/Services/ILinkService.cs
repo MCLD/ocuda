@@ -25,6 +25,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<LinkLibrary> CreateLibraryAsync(int currentUserId, LinkLibrary library, int sectionId);
         Task<LinkLibrary> UpdateLibraryAsync(LinkLibrary library);
         Task DeleteLibraryAsync(int id);
-        Task<List<LinkLibrary>> GetLinkLibrariesBySection(int sectionId);
+        Task<List<LinkLibrary>> GetLinkLibrariesBySectionAsync(int sectionId);
     }
 }

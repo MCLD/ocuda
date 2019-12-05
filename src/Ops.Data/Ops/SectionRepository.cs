@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -17,27 +15,27 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
-        public Section GetSectionByStub(string stub)
+        public async Task<Section> GetSectionByStubAsync(string stub)
         {
-            return DbSet
+            return await DbSet
             .AsNoTracking()
             .Where(_ => _.Stub == stub)
-            .FirstOrDefault();
+            .SingleOrDefaultAsync();
         }
 
-        public Section GetSectionByName(string name)
+        public async Task<Section> GetSectionByNameAsync(string name)
         {
-            return DbSet
+            return await DbSet
             .AsNoTracking()
             .Where(_ => _.Name == name)
-            .FirstOrDefault();
+            .SingleOrDefaultAsync();
         }
 
-        public List<Section> GetAllSections()
+        public async Task<List<Section>> GetAllSectionsAsync()
         {
-            return DbSet
+            return await DbSet
             .AsNoTracking()
-            .ToList();
+            .ToListAsync();
         }
     }
 }

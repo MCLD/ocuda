@@ -8,7 +8,6 @@ using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Models;
-using Ocuda.Promenade.Data;
 
 namespace Ocuda.Ops.Data.Ops
 {
@@ -47,6 +46,7 @@ namespace Ocuda.Ops.Data.Ops
                     .ToListAsync()
             };
         }
+
         public async Task<List<Link>> GetFileLibraryFilesAsync(int id)
         {
             return await DbSet

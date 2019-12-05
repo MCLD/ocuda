@@ -8,7 +8,6 @@ using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Models;
-using Ocuda.Promenade.Data;
 
 namespace Ocuda.Ops.Data.Ops
 {
@@ -50,16 +49,14 @@ namespace Ocuda.Ops.Data.Ops
             await _context.SaveChangesAsync();
         }
 
-        public async Task AddLibraryFileTypesAsync(List<int> fileTypeIds,int libraryId)
+        public async Task AddLibraryFileTypesAsync(List<int> fileTypeIds, int libraryId)
         {
-            foreach(var fileType in fileTypeIds)
+            foreach (var fileType in fileTypeIds)
             {
-                var fileLibType = new FileLibraryFileType()
+                var fileLibType = new FileLibraryFileType
                 {
                     FileLibraryId = libraryId,
-                    FileLibrary = _context.FileLibraries.Find(libraryId),
-                    FileTypeId = fileType,
-                    FileType = _context.FileTypes.Find(libraryId)
+                    FileTypeId = fileType
                 };
                 await _context.FileLibraryFileTypes.AddAsync(fileLibType);
             }
@@ -90,12 +87,12 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
-        public List<FileLibrary> GetFileLibrariesBySectionId(int sectionId)
+        public async Task<List<FileLibrary>> GetFileLibrariesBySectionIdAsync(int sectionId)
         {
-            return DbSet
+            return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.SectionId == sectionId)
-                .ToList();
+                .ToListAsync();
         }
     }
 }

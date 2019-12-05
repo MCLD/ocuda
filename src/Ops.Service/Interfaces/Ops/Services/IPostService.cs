@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
@@ -10,7 +8,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IPostService
     {
-        Task<Post> GetPostById(int id);
+        Task<Post> GetPostByIdAsync(int id);
 
         Task<List<Category>> GetCategoriesBySectionIdAsync(int sectionId);
 
@@ -20,9 +18,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<Category> GetSectionCategoryByStubAsync(string stub, int sectionId);
 
-        Task<DataWithCount<ICollection<Category>>> GetPaginatedCategoryListAsync(
-            BaseFilter filter, int sectionId);
-
         Task<DataWithCount<ICollection<Post>>> GetSectionCategoryPaginatedPostListAsync(
             BaseFilter filter, int sectionId, int categoryId);
 
@@ -31,18 +26,18 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<List<Post>> GetTopSectionPostsAsync(int take, int sectionId);
 
-        Task<List<PostCategory>> GetPostCategoriesByIds(List<int> postIds);
+        Task<List<PostCategory>> GetPostCategoriesByIdsAsync(List<int> postIds);
 
-        Task<List<PostCategory>> GetPostCategoriesById(int postId);
+        Task<List<PostCategory>> GetPostCategoriesByIdAsync(int postId);
 
-        Task CreatePost(Post post, int userId);
+        Task CreatePostAsync(Post post, int userId);
 
-        Task RemovePost(Post post);
+        Task RemovePostAsync(Post post);
 
-        Task UpdatePost(Post post);
+        Task UpdatePostAsync(Post post);
 
-        Post GetSectionPostByStub(string stub, int sectionId);
+        Task<Post> GetSectionPostByStubAsync(string stub, int sectionId);
 
-        Task UpdatePostCategories(List<int> newCategoryIds, int postId);
+        Task UpdatePostCategoriesAsync(List<int> newCategoryIds, int postId);
     }
 }

@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
-using Ocuda.Promenade.Data;
 
 namespace Ocuda.Ops.Data.Ops
 {
@@ -33,12 +32,12 @@ namespace Ocuda.Ops.Data.Ops
                     .SingleOrDefaultAsync();
         }
 
-        public ICollection<int> GetAllIds()
+        public async Task<ICollection<int>> GetAllIdsAsync()
         {
-            return DbSet
+            return await DbSet
                     .AsNoTracking()
                     .Select(_ => _.Id)
-                    .ToList();
+                    .ToListAsync();
         }
 
         public async Task<ICollection<FileType>> GetAllTypesByLibraryIdAsync(int libId)
@@ -46,7 +45,7 @@ namespace Ocuda.Ops.Data.Ops
             return await _context.FileLibraryFileTypes
                 .AsNoTracking()
                 .Where(_ => _.FileLibraryId == libId)
-                .Select(_=>_.FileType)
+                .Select(_ => _.FileType)
                 .ToListAsync();
         }
     }

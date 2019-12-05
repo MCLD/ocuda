@@ -19,8 +19,9 @@ namespace Ocuda.Ops.Data.Ops
             ILogger<SectionManagerGroupRepository> logger) : base(repositoryFacade, logger)
         {
         }
-        override public async Task<ICollection<SectionManagerGroup>>
-            ToListAsync(params Expression<Func<SectionManagerGroup, IComparable>>[] orderBys)
+
+        public override async Task<ICollection<SectionManagerGroup>> ToListAsync(
+            params Expression<Func<SectionManagerGroup, IComparable>>[] orderBys)
         {
             Contract.Requires(orderBys != null && orderBys.Any());
 

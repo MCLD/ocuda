@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -22,12 +20,12 @@ namespace Ocuda.Ops.Service
 
         public async Task<List<Section>> GetSectionsByNamesAsync(List<string> names)
         {
-            if (names.Count>0)
+            if (names.Count > 0)
             {
                 var sections = new List<Section>();
                 foreach (var name in names.OrderByDescending(_ => _).ToList())
                 {
-                    sections.Add(_sectionRepository.GetSectionByName(name));
+                    sections.Add(await _sectionRepository.GetSectionByNameAsync(name));
                 }
                 return sections;
             }
@@ -44,12 +42,12 @@ namespace Ocuda.Ops.Service
 
         public async Task<List<Section>> GetAllSectionsAsync()
         {
-            return _sectionRepository.GetAllSections();
+            return await _sectionRepository.GetAllSectionsAsync();
         }
 
-        public Section GetSectionByStub(string stub)
+        public async Task<Section> GetSectionByStubAsync(string stub)
         {
-            return _sectionRepository.GetSectionByStub(stub);
+            return await _sectionRepository.GetSectionByStubAsync(stub);
         }
     }
 }

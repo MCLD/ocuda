@@ -8,7 +8,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
     public interface ISectionManagerGroupRepository : IRepository<SectionManagerGroup, int>
     {
-        Task<ICollection<SectionManagerGroup>>
+        new Task<ICollection<SectionManagerGroup>>
             ToListAsync(params Expression<Func<SectionManagerGroup, IComparable>>[] orderBys);
     }
 }

@@ -8,8 +8,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
     public interface ISectionRepository : IRepository<Section, int>
     {
-        Section GetSectionByStub(string stub);
-        Section GetSectionByName(string name);
-        List<Section> GetAllSections();
+        Task<Section> GetSectionByStubAsync(string stub);
+        Task<Section> GetSectionByNameAsync(string name);
+        Task<List<Section>> GetAllSectionsAsync();
     }
 }

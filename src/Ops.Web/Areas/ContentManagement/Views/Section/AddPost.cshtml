@@ -1,4 +1,5 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.AddPostViewModel
+
 @section styles {
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
@@ -10,7 +11,7 @@
             new { sectionStub = Model.SectionStub})"
        class="navbar-brand">@Model.SectionName</a>
     <a class="nav-link"
-       href="@Url.Action(nameof(SectionController.Post),
+       href="@Url.Action(nameof(SectionController.Posts),
            new { sectionStub = Model.SectionStub, categoryStub = "", page=1})">
         Posts
     </a>
@@ -21,8 +22,8 @@
           role="form"
           action="@Url.Action(nameof(SectionController.AddPost))">
         <input asp-for="Post.SectionId" value="@Model.SectionId" hidden />
-            <input asp-for="Post.Title" formgroup />
-            <input asp-for="Post.Stub" formgroup />
+        <input asp-for="Post.Title" formgroup />
+        <input asp-for="Post.Stub" formgroup />
         <select id="postCategoryIds" multiple="multiple" asp-for="CategoryIds" asp-items="Model.SelectionPostCategories" class="hidden" formgroup>
         </select>
         <div class="row form-group">
@@ -31,10 +32,10 @@
             </label>
             <div class="flex-md-grow-0">
                 <div class="custom-control custom-switch">
-                        <input type="checkbox"
-                               class="custom-control-input"
-                               asp-for="Post.ShowOnHomePage"
-                               value="false" />
+                    <input type="checkbox"
+                           class="custom-control-input"
+                           asp-for="Post.ShowOnHomePage"
+                           value="false" />
                     <label class="col-form-label text-md-right col-md-3 custom-control-label text-hide" for="Post_ShowOnHomePage">
                         Show On HomePage
                     </label>
@@ -65,9 +66,9 @@
                          role="tabpanel">
                         <div id="wmd-button-bar"
                              class="wmd-button-row"></div>
-                            <textarea asp-for="Post.Content"
-                                      class="form-control wmd-input"
-                                      id="wmd-input">
+                        <textarea asp-for="Post.Content"
+                                  class="form-control wmd-input"
+                                  id="wmd-input">
                             </textarea>
                     </div>
                     <div class="tab-pane" id="md-preview" role="tabpanel">
@@ -79,10 +80,10 @@
             </div>
         </div>
         <div class="row float-right">
-            <button id="addPostBtn" type="submit"class="btn btn-primary col" aria-label="Confirm">
+            <button id="addPostBtn" type="submit" class="btn btn-primary col" aria-label="Confirm">
                 Save
             </button>
-            <a href="@Url.Action(nameof(SectionController.Post), new { sectionStub = Model.SectionStub})"
+            <a href="@Url.Action(nameof(SectionController.Posts), new { sectionStub = Model.SectionStub})"
                class="btn btn-secondary col">
                 Cancel
             </a>

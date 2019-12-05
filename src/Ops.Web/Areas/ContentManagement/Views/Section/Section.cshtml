@@ -20,24 +20,24 @@
                                 <div class="col-sm-9">
 
                                     <input asp-for="Section.Stub"
-                                        value="@Model.Section.Stub"
-                                        autocomplete="off"
-                                        type="hidden" />
+                                           value="@Model.Section.Stub"
+                                           autocomplete="off"
+                                           type="hidden" />
                                     <input asp-for="LinkLibrary.Stub"
-                                        autocomplete="off"
-                                        type="hidden" />
+                                           autocomplete="off"
+                                           type="hidden" />
                                     <input asp-for="LinkLibrary.Name"
-                                        autocomplete="off"
-                                        formgroup />
+                                           autocomplete="off"
+                                           formgroup />
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="submit" value="Submit" class="btn btn-primary">Save</button>
                             <button type="button"
-                                class="btn btn-default"
-                                data-dismiss="modal"
-                                style="margin-right: 1em;">
+                                    class="btn btn-default"
+                                    data-dismiss="modal"
+                                    style="margin-right: 1em;">
                                 Close
                             </button>
                         </div>
@@ -48,10 +48,10 @@
     </div>
 </div>
 
-<div class="modal fade" 
-     id="editLibModal" 
-     tabindex="-1" 
-     role="dialog" 
+<div class="modal fade"
+     id="editLibModal"
+     tabindex="-1"
+     role="dialog"
      aria-labelledby="listModalLabel">
     <div class="modal-dialog modal-lg" role="document">
         <div class="row">
@@ -82,10 +82,10 @@
                                            type="hidden" />
                                     <input asp-for="LinkLibrary.Id"
                                            autocomplete="off"
-                                           type="hidden" value="0"/>
+                                           type="hidden" value="0" />
                                     <input asp-for="FileLibrary.Id"
                                            autocomplete="off"
-                                           type="hidden" value="0"/>
+                                           type="hidden" value="0" />
                                     <input asp-for="FileLibrary.Name"
                                            autocomplete="off"
                                            formgroup />
@@ -135,15 +135,15 @@
                                 <div class="col-sm-9">
 
                                     <input asp-for="Section.Stub"
-                                        value="@Model.Section.Stub"
-                                        autocomplete="off"
-                                        type="hidden" />
+                                           value="@Model.Section.Stub"
+                                           autocomplete="off"
+                                           type="hidden" />
                                     <input asp-for="FileLibrary.Stub"
-                                        autocomplete="off"
-                                        type="hidden" />
+                                           autocomplete="off"
+                                           type="hidden" />
                                     <input asp-for="FileLibrary.Name"
-                                        autocomplete="off"
-                                        formgroup />
+                                           autocomplete="off"
+                                           formgroup />
                                 </div>
                             </div>
                         </div>
@@ -182,9 +182,9 @@
                 <div class="modal-header">
                     <h4 class="modal-title" id="deleteModalLabel">Delete Feature</h4>
                     <button type="button"
-                        class="close"
-                        data-dismiss="modal"
-                        aria-label="Close">
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -194,15 +194,15 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button"
-                        class="btn btn-default"
-                        data-dismiss="modal"
-                        style="margin-right: 1em;">
+                            class="btn btn-default"
+                            data-dismiss="modal"
+                            style="margin-right: 1em;">
                         Cancel
                     </button>
                     <button type="submit"
-                        class="btn btn-danger btn-spinner pull-right"
-                        aria-label="Confirm"
-                        id="confirmDelButton">
+                            class="btn btn-danger btn-spinner pull-right"
+                            aria-label="Confirm"
+                            id="confirmDelButton">
                         Delete
                     </button>
                 </div>
@@ -217,7 +217,7 @@
         new { sectionStub = Model.Section.Stub})"
        class="navbar-brand">@Model.Section.Name</a>
     <a class="nav-link"
-       href="@Url.Action(nameof(SectionController.Post),
+       href="@Url.Action(nameof(SectionController.Posts),
             new { sectionStub = Model.Section.Stub})">
         Posts
     </a>
@@ -228,10 +228,10 @@
         {
             <div class="col-9">
                 <iframe width="590"
-                    height="332"
-                    src="@Model.Section.EmbedVideoUrl"
-                    frameborder="0"
-                    allowfullscreen=""></iframe>
+                        height="332"
+                        src="@Model.Section.EmbedVideoUrl"
+                        frameborder="0"
+                        allowfullscreen=""></iframe>
             </div>
         }
         @if (!Model.AllPosts.Any())
@@ -261,7 +261,7 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                    @Html.Raw(post.Content)
+                                @Html.Raw(post.Content)
                             </div>
                             <div class="card-footer">
                                 <div class="row font-italic">
@@ -273,11 +273,11 @@
                                         Category:&nbsp;
                                         <span>
                                             @foreach (var category in Model.PostCategories
-                                               .Where(_ => _.PostId == post.Id)
-                                               .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
+                                             .Where(_ => _.PostId == post.Id)
+                                             .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
                                             {
                                                 <a class="badge badge-pill badge-info"
-                                                   href="@Url.Action(nameof(SectionController.Post),
+                                                   href="@Url.Action(nameof(SectionController.Posts),
                                         new { sectionStub = Model.Section.Stub,
                                         categoryStub = category.Stub, page = 1})">
                                                     @category.Name
@@ -305,8 +305,8 @@
                         <th colspan="3">
                             File Libraries
                             <div class="float-right align-middle">
-                                <a role="button" 
-                                   class="text-success align-middle" 
+                                <a role="button"
+                                   class="text-success align-middle"
                                    id="addFileLibrary"
                                    data-toggle="modal"
                                    data-target="#addFileLibModal">
@@ -321,35 +321,35 @@
                     {
                         @foreach (var library in Model.FileLibraries)
                         {
-                    <tr>
-                        <td class="row-link file-item text-center" data-stub="@library.Stub">
-                            @library.Name
-                        </td>
-                        <td style="position: relative;" class="text-center">
-                            <a role="button"
-                                class="text-danger h4 editfile text-center"
-                                data-toggle="modal"
-                                data-target="#editLibModal"
-                                data-id="@library.Id"
-                                data-name="@library.Name"
-                                data-stub="@library.Stub"
-                                data-type="file">
-                                <span class="far fa-edit float-right"></span>
-                            </a>
-                        </td>
-                        <td style="position: relative;" class="text-center">
-                            <button type="button"
-                                class="btn btn-danger"
-                                data-toggle="modal"
-                                data-target="#deleteModal"
-                                data-id="@library.Id"
-                                data-name="@library.Name"
-                                data-stub="@library.Stub"
-                                data-type="file">
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
+                            <tr>
+                                <td class="row-link file-item text-center" data-stub="@library.Stub">
+                                    @library.Name
+                                </td>
+                                <td style="position: relative;" class="text-center">
+                                    <a role="button"
+                                       class="text-danger h4 editfile text-center"
+                                       data-toggle="modal"
+                                       data-target="#editLibModal"
+                                       data-id="@library.Id"
+                                       data-name="@library.Name"
+                                       data-stub="@library.Stub"
+                                       data-type="file">
+                                        <span class="far fa-edit float-right"></span>
+                                    </a>
+                                </td>
+                                <td style="position: relative;" class="text-center">
+                                    <button type="button"
+                                            class="btn btn-danger"
+                                            data-toggle="modal"
+                                            data-target="#deleteModal"
+                                            data-id="@library.Id"
+                                            data-name="@library.Name"
+                                            data-stub="@library.Stub"
+                                            data-type="file">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
                         }
                     }
                     else
@@ -370,8 +370,8 @@
                         <th colspan="3">
                             Link Libraries
                             <div class="float-right align-middle">
-                                <a role="button" 
-                                   class="text-success align-middle" 
+                                <a role="button"
+                                   class="text-success align-middle"
                                    data-toggle="modal"
                                    data-target="#addLinkLibModal"
                                    id="addLinkLibrary">
@@ -386,35 +386,35 @@
                     {
                         @foreach (var library in Model.LinkLibraries)
                         {
-                    <tr>
-                        <td class="row-link link-item text-center" data-stub="@library.Stub">
-                            @library.Name
-                        </td>
-                        <td style="position: relative;" class="text-center align-middle">
-                            <a role="button"
-                                class="text-danger h4 editlink"
-                                data-toggle="modal"
-                                data-target="#editLibModal"
-                                data-id="@library.Id"
-                                data-name="@library.Name"
-                                data-stub="@library.Stub"
-                                data-type="link">
-                                <span class="far fa-edit float-right"></span>
-                            </a>
-                        </td>
-                        <td style="position: relative;" class="text-center">
-                            <button type="button"
-                                    class="btn btn-danger"
-                                    data-toggle="modal"
-                                    data-target="#deleteModal"
-                                    data-id="@library.Id"
-                                    data-name="@library.Name"
-                                    data-stub="@library.Stub"
-                                    data-type="link">
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
+                            <tr>
+                                <td class="row-link link-item text-center" data-stub="@library.Stub">
+                                    @library.Name
+                                </td>
+                                <td style="position: relative;" class="text-center align-middle">
+                                    <a role="button"
+                                       class="text-danger h4 editlink"
+                                       data-toggle="modal"
+                                       data-target="#editLibModal"
+                                       data-id="@library.Id"
+                                       data-name="@library.Name"
+                                       data-stub="@library.Stub"
+                                       data-type="link">
+                                        <span class="far fa-edit float-right"></span>
+                                    </a>
+                                </td>
+                                <td style="position: relative;" class="text-center">
+                                    <button type="button"
+                                            class="btn btn-danger"
+                                            data-toggle="modal"
+                                            data-target="#deleteModal"
+                                            data-id="@library.Id"
+                                            data-name="@library.Name"
+                                            data-stub="@library.Stub"
+                                            data-type="link">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
                         }
                     }
                     else

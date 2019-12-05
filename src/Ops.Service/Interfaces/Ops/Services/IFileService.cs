@@ -38,11 +38,11 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<ICollection<int>> GetLibraryFileTypeIdsAsync(int libraryId);
         Task<ICollection<int>> GetFileTypeIdsInUseByLibraryAsync(int libraryId);
         Task<ICollection<FileType>> GetAllFileTypesAsync();
-        ICollection<int> GetAllFileTypeIds();
+        Task<ICollection<int>> GetAllFileTypeIdsAsync();
         Task<FileType> GetFileTypeByIdAsync(int id);
         Task<List<File>> GetFileLibraryFilesAsync(int id);
         Task DeleteFileTypesByLibrary(int libid);
-        Task<List<FileLibrary>> GetFileLibrariesBySection(int sectionId);
-        Task<ICollection<FileType>> GetFileLibrariesFileTypes(int libraryId);
+        Task<List<FileLibrary>> GetFileLibrariesBySectionAsync(int sectionId);
+        Task<ICollection<FileType>> GetFileLibrariesFileTypesAsync(int libraryId);
     }
 }

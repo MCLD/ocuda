@@ -4,7 +4,7 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels
 {
-    public class PostViewModel
+    public class PostsViewModel
     {
         public PaginateModel PaginateModel { get; set; }
 

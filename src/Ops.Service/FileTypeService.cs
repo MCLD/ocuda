@@ -22,9 +22,9 @@ namespace Ocuda.Ops.Service
             return await _fileTypeRepository.ToListAsync(_ => _.Extension);
         }
 
-        public ICollection<int> GetAllIds()
+        public async Task<ICollection<int>> GetAllIdsAsync()
         {
-            return _fileTypeRepository.GetAllIds();
+            return await _fileTypeRepository.GetAllIdsAsync();
         }
 
         public async Task<ICollection<FileType>> GetTypesByLibraryIdsAsync(int libId)

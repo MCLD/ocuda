@@ -8,7 +8,6 @@ using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Models;
-using Ocuda.Promenade.Data;
 
 namespace Ocuda.Ops.Data.Ops
 {
@@ -35,12 +34,12 @@ namespace Ocuda.Ops.Data.Ops
             };
         }
 
-        public List<LinkLibrary> GetLinkLibrariesBySectionId(int sectionId)
+        public async Task<List<LinkLibrary>> GetLinkLibrariesBySectionIdAsync(int sectionId)
         {
-            return DbSet
+            return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.SectionId == sectionId)
-                .ToList();
+                .ToListAsync();
         }
     }
 }

@@ -144,7 +144,7 @@
     <span class="navbar-brand">/</span>
     <a href="@Url.Action(nameof(SectionController.Section), new { sectionStub = Model.SectionStub})" class="navbar-brand">@Model.SectionName</a>
     <a class="nav-link"
-       href="@Url.Action(nameof(SectionController.Post),
+       href="@Url.Action(nameof(SectionController.Posts),
             new { sectionStub = Model.SectionStub,
             page=1})">
         Posts
