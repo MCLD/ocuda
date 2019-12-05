@@ -1,0 +1,50 @@
+﻿@model Ocuda.Ops.Controllers.Areas.CoverIssue.ViewModels.Management.DetailViewModel
+
+<h3>
+    @if (!string.IsNullOrWhiteSpace(Model.LeapPath))
+    {
+        <a href="@Model.LeapPath" target="_blank">Cover Issue - Bib ID @Model.Header.BibId</a>
+    }
+    else
+    {
+        @:Cover Issue - Bib ID @Model.Header.BibId
+    }
+</h3>
+
+<div class="row mb-2 mt-4">
+    <div class="col-12">
+        <a asp-action="Index" class="btn btn-outline-secondary text-dark">Return to list</a>
+        @if (Model.Header.HasPendingIssue)
+        {
+            <form asp-action="@nameof(ManagementController.ResolveIssue)" class="d-inline-block" method="post" role="form">
+                <input asp-for="HeaderId" value="@Model.Header.Id" type="hidden" />
+
+                <button type="submit" class="btn btn-success">Mark resolved</button>
+            </form>
+        }
+    </div>
+</div>
+
+<h4>Reports</h4>
+
+<table class="table table-sm table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Reported By</th>
+            <th>Reported On</th>
+            <th>Resolved</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var detail in Model.Details)
+        {
+            <tr>
+                <td>@detail.CreatedByUser.Name</td>
+                <td>@detail.CreatedAt.ToShortDateString()</td>
+                <td>
+                    <span class="@(!detail.IsResolved ? "fas fa-times" : "fas fa-check")"></span>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

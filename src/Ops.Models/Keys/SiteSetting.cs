@@ -2,6 +2,11 @@
 {
     public struct SiteSetting
     {
+        public struct CoverIssueReporting
+        {
+            public const string LeapBibUrl = "CoverIssueReporting.LeapBibUrl";
+        }
+
         public struct Email
         {
             public const string FromName = "Email.FromName";

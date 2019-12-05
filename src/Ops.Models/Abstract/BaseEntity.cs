@@ -11,9 +11,12 @@ namespace Ocuda.Ops.Models.Abstract
 
         [ForeignKey(nameof(CreatedByUser))]
         public int CreatedBy { get; set; }
+
         public User CreatedByUser { get; set; }
+
         [NotMapped]
         public string CreatedByName { get; set; }
+
         [NotMapped]
         public string CreatedByUsername { get; set; }
     }

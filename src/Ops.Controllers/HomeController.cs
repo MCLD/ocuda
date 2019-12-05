@@ -7,6 +7,8 @@ namespace Ocuda.Ops.Controllers
     [Route("")]
     public class HomeController : BaseController<HomeController>
     {
+        public static string Name { get { return "Home"; } }
+
         public HomeController(ServiceFacades.Controller<HomeController> context) : base(context)
         {
         }
@@ -39,7 +41,7 @@ namespace Ocuda.Ops.Controllers
 
             TempData[TempDataKey.AlertWarning]
                 = $"Could not authenticate you for access to {returnUrl}.";
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
     }
 }
