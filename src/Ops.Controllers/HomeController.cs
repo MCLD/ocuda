@@ -41,7 +41,7 @@ namespace Ocuda.Ops.Controllers
 
             TempData[TempDataKey.AlertWarning]
                 = $"Could not authenticate you for access to {returnUrl}.";
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
     }
 }

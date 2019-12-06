@@ -198,6 +198,10 @@ namespace Ocuda.Ops.Web
             // repositories
             services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,
                 Data.Ops.ClaimGroupRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ICoverIssueDetailRepository,
+                Data.Ops.CoverIssueDetailRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ICoverIssueHeaderRepository,
+                Data.Ops.CoverIssueHeaderRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IExternalResourceRepository,
                 Data.Ops.ExternalResourceRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFeatureRepository,
@@ -244,6 +248,7 @@ namespace Ocuda.Ops.Web
             // services
             services.AddScoped<Service.Interfaces.Ops.Services.IAuthorizationService,
                 AuthorizationService>();
+            services.AddScoped<ICoverIssueService, CoverIssueService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IExternalResourceService, ExternalResourceService>();
             services.AddScoped<IFeatureService, FeatureService>();
