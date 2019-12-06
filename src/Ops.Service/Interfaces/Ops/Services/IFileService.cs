@@ -9,14 +9,11 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IFileService
     {
-        Task<int> GetFileCountAsync();
-        Task<ICollection<File>> GetFilesAsync();
         Task<File> GetByIdAsync(int id);
-        Task<File> GetLatestByLibraryIdAsync(int id);
         Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter);
 
         Task<File> CreatePrivateFileAsync(int currentUserId,
-            File file, IFormFile fileData, ICollection<IFormFile> thumbnailFiles);
+            File file, IFormFile fileDatas);
 
         Task<File> EditPrivateFileAsync(int currentUserId, File file, IFormFile fileData,
             ICollection<IFormFile> thumbnailFiles, int[] thumbnailIdsToKeep);
@@ -33,12 +30,19 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<DataWithCount<ICollection<FileLibrary>>> GetPaginatedLibraryListAsync(
             BlogFilter filter);
 
-        Task<FileLibrary> CreateLibraryAsync(int currentUserId, FileLibrary library,
-            ICollection<int> fileTypeIds);
+        Task<FileLibrary> CreateLibraryAsync(int currentUserId, FileLibrary library, int sectionId);
 
-        Task<FileLibrary> EditLibraryAsync(FileLibrary library, ICollection<int> fileTypeIds);
+        Task<FileLibrary> EditLibraryTypesAsync(FileLibrary library, ICollection<int> fileTypeIds);
+        Task UpdateLibrary(FileLibrary library);
         Task DeleteLibraryAsync(int id);
         Task<ICollection<int>> GetLibraryFileTypeIdsAsync(int libraryId);
         Task<ICollection<int>> GetFileTypeIdsInUseByLibraryAsync(int libraryId);
+        Task<ICollection<FileType>> GetAllFileTypesAsync();
+        Task<ICollection<int>> GetAllFileTypeIdsAsync();
+        Task<FileType> GetFileTypeByIdAsync(int id);
+        Task<List<File>> GetFileLibraryFilesAsync(int id);
+        Task DeleteFileTypesByLibrary(int libid);
+        Task<List<FileLibrary>> GetFileLibrariesBySectionAsync(int sectionId);
+        Task<ICollection<FileType>> GetFileLibrariesFileTypesAsync(int libraryId);
     }
 }

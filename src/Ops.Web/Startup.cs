@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Controllers;
 using Ocuda.Ops.Controllers.Authorization;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Service;
@@ -225,10 +226,16 @@ namespace Ocuda.Ops.Web
                 Data.Ops.LinkLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository,
                 Data.Ops.LinkRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPostRepository,
+                Data.Ops.PostRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
+                Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterDetailRepository,
                 Data.Ops.RosterDetailRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterHeaderRepository,
                 Data.Ops.RosterHeaderRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ISectionRepository,
+                Data.Ops.SectionRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ISectionManagerGroupRepository,
                 Data.Ops.SectionManagerGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ISiteSettingRepository,
@@ -257,8 +264,11 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ILocationFeatureService, LocationFeatureService>();
             services.AddScoped<ILinkService, LinkService>();
             services.AddScoped<IPathResolverService, PathResolverService>();
+            services.AddScoped<IPostService, PostService>();
             services.AddScoped<IRosterService, RosterService>();
+            services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<ISiteSettingService, SiteSettingService>();
+            services.AddScoped<Service.Abstract.IUserContextProvider, UserContextProvider>();
             services.AddScoped<IUserMetadataTypeService, UserMetadataTypeService>();
             services.AddScoped<IUserService, UserService>();
 

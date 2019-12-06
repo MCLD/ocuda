@@ -12,5 +12,9 @@ namespace Ocuda.Ops.Models.Entities
         public ICollection<FileLibraryFileType> FileTypes { get; set; }
 
         public ICollection<File> Files { get; set; }
+
+        public string Stub { get; set; }
+
+        public int SectionId { get; set; }
     }
 }

@@ -28,6 +28,10 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.FileLibraryId, _.FileTypeId });
             modelBuilder.Entity<UserMetadata>()
                 .HasKey(_ => new { _.UserId, _.UserMetadataTypeId });
+            modelBuilder.Entity<SectionCategory>()
+                .HasKey(_ => new { _.SectionId, _.CategoryId });
+            modelBuilder.Entity<PostCategory>()
+                .HasKey(_ => new { _.PostId, _.CategoryId });
         }
 
         #region IMigratableContext
@@ -47,8 +51,13 @@ namespace Ocuda.Ops.Data
         public DbSet<FileType> FileTypes { get; set; }
         public DbSet<Link> Links { get; set; }
         public DbSet<Link> LinkLibrary { get; set; }
+        public DbSet<PostCategory> PostCategories { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Category> Categories { get; set; }
         public DbSet<RosterHeader> RosterHeaders { get; set; }
         public DbSet<RosterDetail> RosterDetails { get; set; }
+        public DbSet<SectionCategory> SectionCategories { get; set; }
+        public DbSet<Section> Sections { get; set; }
         public DbSet<SectionManagerGroup> SectionManagerGroups { get; set; }
         public DbSet<Models.Entities.SiteSetting> SiteSettings { get; set; }
         public DbSet<User> Users { get; set; }

@@ -75,7 +75,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "i18n", "src\i18n\i18n.cspro
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "i18n", "i18n", "{1C0384E0-C8AD-46D9-9319-C75D67E6474E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "i18n.Test", "test\i18n\i18n.Test\i18n.Test.csproj", "{28C9B95E-DD9B-458B-86EC-37B265D66181}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "i18n.Test", "test\i18n\i18n.Test\i18n.Test.csproj", "{28C9B95E-DD9B-458B-86EC-37B265D66181}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,0 +1,177 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Feature.FeatureViewModel
+
+@section styles {
+    <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/iconpicker.min.css" asp-append-version="true" />
+}
+
+<div class="feature-save-container">
+    <div class="feature-save-message"></div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h1>@(Model.Feature.IsNewFeature ? "Add Feature" : "Edit Feature")</h1>
+    </div>
+</div>
+
+<form method="post"
+      asp-controller="@FeaturesController.Name"
+      asp-action="@Model.Action"
+      role="form"
+      id="featureform"
+      display="inline">
+    <input asp-for="Feature.Id" id="feature-id" type="hidden" />
+    <input asp-for="Feature.NeedsPopup" id="feature-needsPopup" type="hidden" />
+    <input asp-for="Feature.Name"
+           formgroup
+           autocomplete="off" />
+    <input asp-for="Feature.FontAwesome"
+           class="form-control icon-picker"
+           type="text"
+           formgroup
+           autocomplete="off" />
+    <div class="row">
+        <div class="accordion offset-md-3 col-md-9" id="popup-accordion">
+            <div class="card">
+                <div class="card-header @(string.IsNullOrEmpty(Model?.Feature?.Stub)&&!Model.Feature.NeedsPopup ? "" : "bg-info")" id="accordion-header">
+                    <button class="btn btn-link @(string.IsNullOrEmpty(Model?.Feature?.Stub)&&!Model.Feature.NeedsPopup ? "text-info" : "text-white")"
+                            style="text-decoration: none;"
+                            id="popup-button"
+                            type="button"
+                            data-toggle="collapse"
+                            data-target="#collapseDiv"
+                            aria-expanded="true"
+                            aria-controls="collapseDiv">
+                        <span class="fas fa-caret-@(string.IsNullOrEmpty(Model?.Feature?.Stub)&&!Model.Feature.NeedsPopup ? "right" : "down")" id="accordion-disclosure"></span>
+                        Display this feature in a pop-up
+                    </button>
+                </div>
+                <div id="collapseDiv"
+                     class="collapse@(string.IsNullOrEmpty(Model?.Feature?.Stub)&&!Model.Feature.NeedsPopup ? "" : " show")"
+                     aria-labelledby="headingOne"
+                     data-parent="#popup-accordion">
+                    <div class="card-body">
+                        <input asp-for="Feature.Stub"
+                               formgroup
+                               autocomplete="off"
+                               info-tooltip="The stub is the nickname/URL for the feature."
+                               on-blur-js="FormatStub" />
+                        <div class="form-group row" id="bodyText-div">
+                            <label asp-for="Feature.BodyText"
+                                   class="col-md-3 col-form-label text-md-right"></label>
+                            <div class="col-md-9">
+                                <ul class="nav nav-tabs">
+                                    <li class="nav-item">
+                                        <a class="nav-link active"
+                                           data-toggle="tab"
+                                           href="#md-edit"
+                                           role="tab">Edit</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link"
+                                           data-toggle="tab"
+                                           href="#md-preview"
+                                           role="tab">Preview</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content" id="md-edit-preview">
+                                    <div class="tab-pane show active"
+                                         id="md-edit"
+                                         role="tabpanel">
+                                        <div id="wmd-button-bar"
+                                             class="wmd-button-row"></div>
+                                        <textarea asp-for="Feature.BodyText"
+                                                  value="@Model.Feature.BodyText"
+                                                  class="form-control wmd-input"
+                                                  id="wmd-input"></textarea>
+                                    </div>
+                                    <div class="tab-pane" id="md-preview" role="tabpanel">
+                                        <div id="preview" class="wmd-preview"></div>
+                                    </div>
+                                    <span asp-validation-for="Feature.BodyText"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="offset-md-3 col-md-9">
+            <div class="form-group">
+                <a class="btn btn-secondary"
+                   id="return-home"
+                   asp-action="@nameof(FeaturesController.Index)">Return to Features</a>
+                @if (Model.Feature.IsNewFeature)
+                {
+                    <text>
+                        <button type="submit"
+                                id="submit"
+                                value="Submit"
+                                class="btn btn-success btn-spinner">
+                            <span class="buttonText">Add Feature</span>
+                            <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
+                        </button>
+                    </text>
+                }
+                else
+                {
+                    <text>
+                        <button type="submit"
+                                id="submit"
+                                value="Submit"
+                                class="btn btn-success btn-spinner">
+                            <span class="buttonText">Update Feature</span>
+                            <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
+                        </button>
+                    </text>
+                }
+            </div>
+        </div>
+    </div>
+</form>
+
+@section scripts{
+    <script src="~/js/iconpicker.min.js" asp-append-version="true"></script>
+    <script src="~/js/md.min.js" asp-append-version="true"></script>
+    <script>
+        $("#popup-button").click(function () {
+            if ($("#accordion-header").hasClass("bg-info")) {
+                $("#accordion-header").removeClass("bg-info");
+                $("#popup-button").removeClass("text-white");
+                $("#popup-button").addClass("text-info");
+                $("#accordion-disclosure").removeClass("fa-caret-down");
+                $("#accordion-disclosure").addClass("fa-caret-right");
+                $("#feature-needsPopup").val("False");
+            }
+            else {
+                $("#accordion-header").addClass("bg-info");
+                $("#popup-button").addClass("text-white");
+                $("#popup-button").removeClass("text-info");
+                $("#accordion-disclosure").removeClass("fa-caret-right");
+                $("#accordion-disclosure").addClass("fa-caret-down");
+                $("#feature-needsPopup").val("True");
+            }
+        });
+        $("#featureform").submit(function (event) {
+            if (!$("#accordion-header").hasClass("bg-info")) {
+                $("#feature-needsPopup").val("False");
+                $("#Feature_Stub").val("");
+                $("#wmd-input").val("");
+            }
+        });
+        function FormatStub(object) {
+            updateStub($(object), $(object).val());
+        }
+
+        $(document).ready(function () {
+            var editor = new Markdown.Editor({ allowUploads: false });
+            editor.run();
+            $('.icon-picker').iconpicker();
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+}
