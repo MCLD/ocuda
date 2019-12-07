@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
@@ -16,7 +18,9 @@ namespace Ocuda.Ops.Service
         private readonly ILinkLibraryRepository _linkLibraryRepository;
         private readonly ILinkRepository _linkRepository;
 
-        public LinkService(ILinkLibraryRepository linkLibraryRepository,
+        public LinkService(ILogger<LinkService> logger,
+            IHttpContextAccessor httpContextAccessor,
+            ILinkLibraryRepository linkLibraryRepository,
             ILinkRepository linkRepository)
             : base(logger, httpContextAccessor)
         {
