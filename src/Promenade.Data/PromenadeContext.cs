@@ -8,11 +8,11 @@ namespace Ocuda.Promenade.Data
         protected PromenadeContext(DbContextOptions options) : base(options) { }
 
         // Read-Only
-        public DbSet<Feature> Feature { get; }
-        public DbSet<Group> Group { get; }
-        public DbSet<Location> Location { get; }
-        public DbSet<LocationFeature> LocationFeature { get; }
-        public DbSet<LocationGroup> LocationGroup { get; }
+        public DbSet<Feature> Features { get; }
+        public DbSet<Group> Groups { get; }
+        public DbSet<Location> Locations { get; }
+        public DbSet<LocationFeature> LocationFeatures { get; }
+        public DbSet<LocationGroup> LocationGroups { get; }
         public DbSet<LocationHours> LocationHours { get; }
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; }
         public DbSet<Page> Pages { get; }
