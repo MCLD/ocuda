@@ -3,10 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Data.Extensions;
-using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
-using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data.Promenade
@@ -19,29 +16,21 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
-        public async Task<DataWithCount<ICollection<Page>>> GetPaginatedListAsync(BaseFilter filter)
-        {
-            var query = DbSet.AsNoTracking();
-
-            return new DataWithCount<ICollection<Page>>
-            {
-                Count = await query.CountAsync(),
-                Data = await query
-                    .OrderBy(_ => _.Stub)
-                    .ApplyPagination(filter)
-                    .ToListAsync()
-            };
-        }
-
-        public async Task<bool> StubInUseAsync(Page page)
+        public async Task<ICollection<Page>> GetByHeaderIdAsync(int id)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id != page.Id
-                    && _.Stub == page.Stub
-                    && _.Type == page.Type
-                    && _.IsPublished)
-                .AnyAsync();
+                .Where(_ => _.PageHeaderId == id)
+                .ToListAsync();
+        }
+
+        public async Task<Page> GetByHeaderAndLanguageAsync(int headerId, int languageId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Include(_ => _.PageHeader)
+                .Where(_ => _.PageHeaderId == headerId && _.LanguageId == languageId)
+                .SingleOrDefaultAsync();
         }
     }
 }

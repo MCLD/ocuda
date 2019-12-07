@@ -21,7 +21,6 @@ namespace Ocuda.Utility.TagHelpers
         private const string infoTooltipAttributeName = "info-tooltip";
         private const string onBlurJs = "on-blur-js";
         private const string labelClassAttribute = "label-class";
-        private const string fieldClassAttribute = "field-class";
         private const string dateTimePickerAttribute = "datetime-picker";
 
         private const string defaultWrapperDivClass = "row form-group";
@@ -30,7 +29,6 @@ namespace Ocuda.Utility.TagHelpers
         private const string defaultInputClass = "form-control";
         private const string defaultInnerDivClass = "form-group-inner col-md-9";
         private const string defaultValidationMessageClass = "validation-message text-danger";
-        private const string defaultFieldLayoutClass = "col-md-9";
         private const string validationIgnoreClass = "validation-ignore";
 
         private const string dateTimeGroupClass = "input-group date datetimepicker";
@@ -65,9 +63,6 @@ namespace Ocuda.Utility.TagHelpers
         [HtmlAttributeName(labelClassAttribute)]
         public string LabelClass { get; set; }
 
-        [HtmlAttributeName(fieldClassAttribute)]
-        public string FieldClass { get; set; }
-
         [HtmlAttributeName(dateTimePickerAttribute)]
         public DateTimePickerType? DateTimePicker { get; set; }
 
@@ -90,7 +85,7 @@ namespace Ocuda.Utility.TagHelpers
                         inputElement,
                         validationMessageElement
                     },
-                    string.IsNullOrEmpty(FieldClass) ? defaultFieldLayoutClass : FieldClass
+                    defaultInnerDivClass
                 );
 
             // Wrap all elements with a form group div

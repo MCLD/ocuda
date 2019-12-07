@@ -105,5 +105,15 @@ namespace Ocuda.Promenade.Service
 
             await _languageRepository.SaveAsync();
         }
+
+        public async Task<int> GetDefaultLanguageIdAsync()
+        {
+            return await _languageRepository.GetDefaultLanguageId();
+        }
+
+        public async Task<int> GetLanguageIdAsync(string culture)
+        {
+            return await _languageRepository.GetLanguageId(culture);
+        }
     }
 }

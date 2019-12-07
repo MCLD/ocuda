@@ -68,7 +68,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<ICollection<SiteSetting>> GetAllAsync()
         {
-            return await _siteSettingRepository.ToListAsync(_ => _.Name);
+            return await _siteSettingRepository.ToListAsync(_ => _.Category, _ => _.Name);
         }
 
         public async Task<bool> GetSettingBoolAsync(string key)

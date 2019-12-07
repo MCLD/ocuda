@@ -22,6 +22,7 @@ namespace Ocuda.Promenade.Data
 
         // Read/Write 
         public DbSet<Language> Languages { get; set; }
+        public DbSet<PageHeader> PageHeaders { get; set; }
         public DbSet<UrlRedirectAccess> UrlRedirectAccesses { get; set; }
     }
 }

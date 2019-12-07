@@ -74,6 +74,17 @@ namespace Ocuda.Ops.Models.Defaults
                 Type = SiteSettingType.Int
             },
             #endregion
+            #region SiteManagement
+            new SiteSetting
+            {
+                Key = Keys.SiteSetting.SiteManagement.PromenadeUrl,
+                Name = "Promenade Url",
+                Description = "Promenade url with scheme and host",
+                Category = "Site Management",
+                Value = "",
+                Type = SiteSettingType.String_Emptiable
+            },
+            #endregion
             #region UserInterface
             new SiteSetting
             {

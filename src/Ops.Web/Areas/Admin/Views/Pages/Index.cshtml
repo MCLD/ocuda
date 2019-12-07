@@ -2,8 +2,9 @@
 
 <form id="addForm" role="form">
     <div modal id="addModal" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
-        <input id="addStub" asp-for="Page.Stub" formgroup />
-        <select id="addType" asp-for="Page.Type" formgroup>
+        <input id="addName" asp-for="PageHeader.PageName" formgroup />
+        <input id="addStub" asp-for="PageHeader.Stub" formgroup />
+        <select id="addType" asp-for="PageHeader.Type" formgroup>
             <option></option>
             @foreach (var type in (PageType[])Enum.GetValues(typeof(PageType)))
             {
@@ -13,10 +14,25 @@
     </div>
 </form>
 
+<form id="editForm" role="form">
+    <input id="editId" asp-for="PageHeader.Id" type="hidden" />
+    <div modal id="editModal" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <input id="editName" asp-for="PageHeader.PageName" formgroup />
+        <input id="editStub" asp-for="PageHeader.Stub" formgroup readonly />
+        <select id="editType" asp-for="PageHeader.Type" formgroup disabled>
+            @foreach (var type in (PageType[])Enum.GetValues(typeof(PageType)))
+            {
+                <option value="@Convert.ToInt32(type)">@type</option>
+            }
+        </select>
+    </div>
+</form>
+
+
 <form asp-controller="Pages" asp-action="@(nameof(PagesController.Delete))" method="post" role="form">
     <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
-    <input id="deleteStub" asp-for="Page.Stub" type="hidden" />
-    <input id="deleteId" asp-for="Page.Id" type="hidden" />
+    <input id="deleteId" asp-for="PageHeader.Id" type="hidden" />
+    <input id="deleteName" asp-for="PageHeader.PageName" type="hidden" />
     <div modal id="deleteModal" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
 </form>
 
@@ -28,7 +44,7 @@
     </button>
 </div>
 
-@if (Model.Pages.Count() == 0)
+@if (Model.PageHeaders.Count() == 0)
 {
     <div class="alert alert-warning">No Pages Found</div>
 }
@@ -40,32 +56,43 @@ else
                 <table class="table table-sm table-bordered link-table">
                     <thead>
                         <tr>
+                            <th>Name</th>
                             <th>Stub</th>
                             <th>Type</th>
-                            <th>Published</th>
+                            <th>Languages</th>
                             <th>&nbsp;</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var ocPage in Model.Pages)
+                        @foreach (var header in Model.PageHeaders)
                         {
                             <tr>
                                 <td class="td-class">
-                                    <a asp-action="@(nameof(PagesController.Edit))" asp-route-id="@ocPage.Id" class="rowlink">
-                                        @ocPage.Stub
+                                    <a asp-action="@(nameof(PagesController.Detail))" asp-route-id="@header.Id" class="rowlink">
+                                        @header.PageName
                                     </a>
                                 </td>
-                                <td>@ocPage.Type.ToString()</td>
-                                <td><span class="fas @(ocPage.IsPublished ? "fa-check"  : "fa-times") colored-icon"></span></td>
-
+                                <td>@header.Stub</td>
+                                <td>@header.Type.ToString()</td>
+                                <td> @string.Join(", ", header.PageLanguages)</td>
                                 <td align="center" class="on-top">
+                                    <button type="button"
+                                            class="btn btn-primary btn-xs"
+                                            data-toggle="modal"
+                                            data-target="#editModal"
+                                            data-id="@header.Id"
+                                            data-name="@header.PageName"
+                                            data-stub="@header.Stub"
+                                            data-type="@((int)header.Type)">
+                                        <span class="fas fa-edit" aria-hidden="true"></span>
+                                    </button>
                                     <button type="button"
                                             class="btn btn-danger btn-xs"
                                             data-toggle="modal"
                                             data-target="#deleteModal"
-                                            data-id="@ocPage.Id"
-                                            data-stub="@ocPage.Stub">
-                                        <span class="fa fa-times" aria-hidden="true"></span>
+                                            data-id="@header.Id"
+                                            data-name="@header.PageName">
+                                        <span class="fas fa-times" aria-hidden="true"></span>
                                     </button>
                                 </td>
                             </tr>
@@ -95,18 +122,65 @@ else
             });
         });
 
+        var addStub = $("#addStub");
+
+        addStub.on("blur", function () {
+            if (addStub.valid()) {
+                updateStub(addStub, addStub.val());
+                var addType = $("#addType");
+                if (addType.val() != "") {
+                    setTimeout(function () {
+                        ValidateField(addStub,
+                            "@Url.Action(nameof(PagesController.StubInUse), PagesController.Name)",
+                            [addStub.serialize(), addType.serialize()].join("&"));
+                    }, 200);
+                }
+            }
+        })
+
         $("#addForm").submit(function (e) {
             e.preventDefault();
             var form = $(this);
+            if (addStub.valid()) {
+                updateStub(addStub, addStub.val());
+            }
             $.post("@(Url.Action(nameof(PagesController.Create), PagesController.Name))",
                 form.serialize(),
                 function (response) {
                     if (response.success == true) {
-                        var url = "@(Url.Action(nameof(PagesController.Edit), PagesController.Name))/" + response.entityId;
-                        location.href = url;
+                        location.href = response.url;
                     }
                     else {
                         alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
+        });
+
+        $("#editModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+            var stub = button.data("stub");
+            var type = button.data("type");
+            $("#editId").val(id);
+            $("#editName").val(name);
+            $("#editStub").val(stub);
+            $("#editType").val(type);
+        });
+
+        $("#editForm").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.post("@(Url.Action(nameof(PagesController.Edit), PagesController.Name))",
+                form.serialize(),
+                function (response) {
+                    if (response.success == true) {
+                        location.reload();
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
                     }
                 });
         });
@@ -114,11 +188,11 @@ else
         $("#deleteModal").on("show.bs.modal", function (e) {
             var button = $(e.relatedTarget);
             var id = button.data("id");
-            var stub = button.data("stub");
+            var name = button.data("name");
             var modal = $(this);
-            $("#deleteStub").val(stub);
             $("#deleteId").val(id);
-            modal.find(".modal-text").text("Are you sure you want to delete \"" + stub + "\"?");
+            $("#deleteName").val(name);
+            modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
         });
     </script>
 }

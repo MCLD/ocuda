@@ -5,6 +5,6 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
     public interface IPageRepository
     {
-        Task<Page> GetByStubAndTypeAsync(string stub, PageType type);
+        Task<Page> GetPublishedByStubAndTypeAsync(string stub, PageType type, int languageId);
     }
 }

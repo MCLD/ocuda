@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
+using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Service
 {
@@ -21,6 +24,16 @@ namespace Ocuda.Ops.Service
             _l10nOptions = l10nOptions ?? throw new ArgumentNullException(nameof(l10nOptions));
             _languageRepository = languageRepository
                 ?? throw new ArgumentNullException(nameof(languageRepository));
+        }
+
+        public async Task<ICollection<Language>> GetActiveAsync()
+        {
+            return await _languageRepository.GetActiveAsync();
+        }
+
+        public async Task<Language> GetActiveByIdAsync(int id)
+        {
+            return await _languageRepository.GetActiveByIdAsync(id);
         }
     }
 }

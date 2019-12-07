@@ -15,11 +15,19 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<Page> GetByStubAndTypeAsync(string stub, PageType type)
+        public async Task<Page> GetPublishedByStubAndTypeAsync(string stub, PageType type,
+            int languageId)
         {
+            var pageHeaderId = _context.PageHeaders
+                .AsNoTracking()
+                .Where(_ => _.Stub == stub && _.Type == type)
+                .Select(_ => _.Id);
+
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == stub && _.Type == type && _.IsPublished)
+                .Where(_ => pageHeaderId.Contains(_.PageHeaderId)
+                    && _.LanguageId == languageId
+                    && _.IsPublished)
                 .SingleOrDefaultAsync();
         }
     }

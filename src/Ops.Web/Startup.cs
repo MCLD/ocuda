@@ -235,8 +235,12 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserRepository,
                 Data.Ops.UserRepository>();
 
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILanguageRepository,
+                Data.Promenade.LanguageRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageRepository,
                 Data.Promenade.PageRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageHeaderRepository,
+                Data.Promenade.PageHeaderRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISocialCardRepository,
                 Data.Promenade.SocialCardRepository>();
 
@@ -251,6 +255,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IInitialSetupService, InitialSetupService>();
             services.AddScoped<IInsertSampleDataService, InsertSampleDataService>();
+            services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<ILdapService, LdapService>();
             services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<ILocationHoursService, LocationHoursService>();

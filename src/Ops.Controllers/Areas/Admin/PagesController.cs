@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,15 +24,19 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
     [Route("[area]/[controller]")]
     public class PagesController : BaseController<PagesController>
     {
+        private readonly ILanguageService _languageService;
         private readonly IPageService _pageService;
         private readonly ISocialCardService _socialCardService;
 
         public static string Name { get { return "Pages"; } }
 
         public PagesController(ServiceFacades.Controller<PagesController> context,
+            ILanguageService languageService,
             IPageService pageService,
             ISocialCardService socialCardService) : base(context)
         {
+            _languageService = languageService
+                ?? throw new ArgumentNullException(nameof(languageService));
             _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
             _socialCardService = socialCardService
                 ?? throw new ArgumentNullException(nameof(socialCardService));
@@ -42,11 +48,11 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             var filter = new BaseFilter(page);
 
-            var pageList = await _pageService.GetPaginatedListAsync(filter);
+            var headerList = await _pageService.GetPaginatedHeaderListAsync(filter);
 
             var paginateModel = new PaginateModel
             {
-                ItemCount = pageList.Count,
+                ItemCount = headerList.Count,
                 CurrentPage = page,
                 ItemsPerPage = filter.Take.Value
             };
@@ -59,10 +65,15 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
                     });
             }
 
+            foreach (var header in headerList.Data)
+            {
+                header.PageLanguages = await _pageService.GetHeaderLanguagesByIdAsync(header.Id);
+            }
+
             var viewModel = new IndexViewModel
             {
-                PaginateModel = paginateModel,
-                Pages = pageList.Data
+                PageHeaders = headerList.Data,
+                PaginateModel = paginateModel
             };
 
             return View(viewModel);
@@ -74,29 +85,254 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         {
             JsonResponse response;
 
-            model.Page.IsPublished = false;
-
-            try
+            var checkStub = new Regex(@"^[\w\-]*$");
+            if (!checkStub.IsMatch(model.PageHeader.Stub))
             {
-                var newPage = await _pageService.CreateAsync(model.Page);
-                response = new JsonResponse
-                {
-                    Success = true,
-                    EntityId = newPage.Id
-                };
+                ModelState.AddModelError("PageHeader.Stub", "Invalid stub; only letters, numbers, hyphens and underscores are allowed.");
             }
-            catch (OcudaException ex)
+
+            if (ModelState.IsValid)
             {
+                try
+                {
+                    var header = await _pageService.CreateHeaderAsync(model.PageHeader);
+                    response = new JsonResponse
+                    {
+                        Success = true,
+                        Url = Url.Action(nameof(Detail), new { id = header.Id })
+                    };
+                    ShowAlertSuccess($"Created page: {header.PageName}");
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
+            }
+            else
+            {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
                 response = new JsonResponse
                 {
                     Success = false,
-                    Message = ex.Message
+                    Message = string.Join(Environment.NewLine, errors)
                 };
             }
 
             return Json(response);
         }
 
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> Edit(IndexViewModel model)
+        {
+            JsonResponse response;
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var header = await _pageService.EditHeaderAsync(model.PageHeader);
+                    response = new JsonResponse
+                    {
+                        Success = true
+                    };
+                    ShowAlertSuccess($"Updated page: {header.PageName}");
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
+            }
+            else
+            {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
+                };
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> Delete(IndexViewModel model)
+        {
+            try
+            {
+                await _pageService.DeleteHeaderAsync(model.PageHeader.Id);
+                ShowAlertSuccess($"Deleted page: {model.PageHeader.PageName}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting page header: {ex}", ex);
+                ShowAlertDanger("Unable to delete page: ", ex.Message);
+            }
+
+            return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<JsonResult> StubInUse(PageHeader pageHeader)
+        {
+            var response = new JsonResponse
+            {
+                Success = !(await _pageService.StubInUseAsync(pageHeader))
+            };
+
+            if (!response.Success)
+            {
+                response.Message = "The chosen stub is already in use for that page type. Please choose a different stub.";
+            }
+
+            return Json(response);
+        }
+
+        [Route("[action]/{id}")]
+        [RestoreModelState]
+        public async Task<IActionResult> Detail(int id, string language)
+        {
+            var header = await _pageService.GetHeaderByIdAsync(id);
+
+            var languages = await _languageService.GetActiveAsync();
+
+            var selectedLanguage = languages
+                .FirstOrDefault(_ => _.Name.Equals(language, StringComparison.OrdinalIgnoreCase))
+                ?? languages.Single(_ => _.IsDefault);
+
+            var page = await _pageService.GetByHeaderAndLanguageAsync(id, selectedLanguage.Id);
+
+            var viewModel = new DetailViewModel
+            {
+                Page = page,
+                HeaderId = header.Id,
+                HeaderName = header.PageName,
+                HeaderStub = header.Stub,
+                NewPage = page == null,
+                SelectedLanguageId = selectedLanguage.Id,
+                LanguageList = new SelectList(languages, nameof(Language.Name),
+                    nameof(Language.Description), selectedLanguage.Name),
+                SocialCardList = new SelectList(await _socialCardService.GetListAsync(),
+                    nameof(SocialCard.Id), nameof(SocialCard.Title), page?.SocialCardId)
+            };
+
+            if (page?.IsPublished == true)
+            {
+                var baseUrl = await _siteSettingService
+                    .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.PromenadeUrl);
+
+                if (!string.IsNullOrWhiteSpace(baseUrl))
+                {
+                    viewModel.PageUrl = $"{baseUrl}{page.PageHeader.Type.ToString()}/{page.PageHeader.Stub}";
+                }
+            }
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [Route("[action]/{id?}")]
+        [SaveModelState]
+        public async Task<IActionResult> Detail(DetailViewModel model)
+        {
+            var language = await _languageService.GetActiveByIdAsync(model.SelectedLanguageId);
+
+            var currentPage = await _pageService.GetByHeaderAndLanguageAsync(
+                    model.HeaderId, language.Id);
+
+            if (ModelState.IsValid)
+            {
+                var page = model.Page;
+                page.LanguageId = language.Id;
+                page.PageHeaderId = model.HeaderId;
+
+                if (currentPage == null)
+                {
+                    await _pageService.CreateAsync(page);
+
+                    ShowAlertSuccess("Added page content!");
+                }
+                else
+                {
+                    await _pageService.EditAsync(page);
+
+                    ShowAlertSuccess("Updated page content!");
+                }
+            }
+
+            return RedirectToAction(nameof(Detail), new
+            {
+                id = model.HeaderId,
+                language = language.Name
+            });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeletePage(DetailViewModel model)
+        {
+            var page = await _pageService.GetByHeaderAndLanguageAsync(model.HeaderId,
+                model.SelectedLanguageId);
+
+            await _pageService.DeleteAsync(page.Id);
+
+            var language = await _languageService.GetActiveByIdAsync(model.SelectedLanguageId);
+
+            ShowAlertSuccess($"Deleted page content!");
+
+            return RedirectToAction(nameof(Detail),
+                new
+                {
+                    id = model.HeaderId,
+                    language = language.Name
+                });
+        }
+
+        [Route("[action]/{headerId}")]
+        public async Task<IActionResult> Preview(int headerId, int languageId)
+        {
+            try
+            {
+                var page = await _pageService.GetByHeaderAndLanguageAsync(headerId, languageId);
+                var language = await _languageService.GetActiveByIdAsync(languageId);
+
+                var viewModel = new PreviewViewModel
+                {
+                    HeaderId = headerId,
+                    Language = language.Name,
+                    Content = CommonMark.CommonMarkConverter.Convert(page.Content),
+                    Stub = page.PageHeader.Stub
+                };
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "Error previewing header {header} in language {language}: {ex}",
+                    headerId, languageId, ex);
+                ShowAlertWarning("Unable to preview page");
+                return RedirectToAction("Index");
+            }
+        }
+
+        /*
         [Route("[action]/{id}")]
         [RestoreModelState]
         public async Task<IActionResult> Edit(int id)
@@ -147,40 +383,9 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
             return RedirectToAction(nameof(Edit), new { id = model.Page.Id });
         }
+        */
 
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> Delete(IndexViewModel model)
-        {
-            try
-            {
-                await _pageService.DeleteAsync(model.Page.Id);
-                ShowAlertSuccess($"Deleted page: {model.Page.Stub}");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error deleting page: {ex}", ex);
-                ShowAlertDanger("Unable to delete page: ", ex.Message);
-            }
 
-            return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
-        }
 
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<JsonResult> StubInUse(Page page)
-        {
-            var response = new JsonResponse
-            {
-                Success = !(await _pageService.StubInUseAsync(page))
-            };
-
-            if (!response.Success)
-            {
-                response.Message = "The chosen stub is already in use for that page type. Please choose a different stub.";
-            }
-
-            return Json(response);
-        }
     }
 }

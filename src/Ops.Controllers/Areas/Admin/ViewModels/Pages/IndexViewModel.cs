@@ -6,8 +6,8 @@ namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages
 {
     public class IndexViewModel
     {
-        public ICollection<Page> Pages { get; set; }
+        public ICollection<PageHeader> PageHeaders { get; set; }
         public PaginateModel PaginateModel { get; set; }
-        public Page Page { get; set; }
+        public PageHeader PageHeader { get; set; }
     }
 }
