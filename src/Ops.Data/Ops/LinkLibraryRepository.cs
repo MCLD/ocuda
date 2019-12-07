@@ -33,5 +33,13 @@ namespace Ocuda.Ops.Data.Ops
                     .ToListAsync()
             };
         }
+
+        public async Task<List<LinkLibrary>> GetLinkLibrariesBySectionIdAsync(int sectionId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.SectionId == sectionId)
+                .ToListAsync();
+        }
     }
 }

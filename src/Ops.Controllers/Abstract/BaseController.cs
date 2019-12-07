@@ -1,7 +1,10 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Filters;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
 
@@ -15,10 +18,13 @@ namespace Ocuda.Ops.Controllers.Abstract
     {
         protected readonly ILogger _logger;
         protected readonly ISiteSettingService _siteSettingService;
+        protected readonly IUserContextProvider _userContextProvider;
+
         protected BaseController(ServiceFacades.Controller<T> context)
         {
             _logger = context.Logger;
             _siteSettingService = context.SiteSettingService;
+            _userContextProvider = context.UserContextProvider;
         }
 
         protected string AlertDanger
@@ -36,6 +42,7 @@ namespace Ocuda.Ops.Controllers.Abstract
                 TempData[TempDataKey.AlertWarning] = value;
             }
         }
+
         protected string AlertInfo
         {
             set
@@ -43,11 +50,20 @@ namespace Ocuda.Ops.Controllers.Abstract
                 TempData[TempDataKey.AlertInfo] = value;
             }
         }
+
         protected string AlertSuccess
         {
             set
             {
                 TempData[TempDataKey.AlertSuccess] = value;
+            }
+        }
+
+        protected ClaimsPrincipal AuthUser
+        {
+            get
+            {
+                return HttpContext.User;
             }
         }
 
@@ -96,6 +112,16 @@ namespace Ocuda.Ops.Controllers.Abstract
             {
                 return HttpContext.User.Identity.Name;
             }
+        }
+
+        protected string UserClaim(string claimType)
+        {
+            return _userContextProvider.UserClaim(AuthUser, claimType);
+        }
+
+        protected List<string> UserClaims(string claimType)
+        {
+            return _userContextProvider.UserClaims(AuthUser, claimType);
         }
 
         protected int CurrentUserId

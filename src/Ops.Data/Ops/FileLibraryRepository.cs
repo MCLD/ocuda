@@ -37,9 +37,30 @@ namespace Ocuda.Ops.Data.Ops
             base.Remove(id);
         }
 
-        public void RemoveLibraryFileTypes(IEnumerable<FileLibraryFileType> libraryFileTypes)
+        public async Task RemoveLibraryFileTypesAsync(List<int> fileTypeIds, int libraryId)
         {
-            _context.FileLibraryFileTypes.RemoveRange(libraryFileTypes);
+            foreach (var fileType in fileTypeIds)
+            {
+                var fileLibType = _context.FileLibraryFileTypes
+                     .Where(_ => _.FileTypeId == fileType && _.FileLibraryId == libraryId)
+                     .FirstOrDefault();
+                _context.FileLibraryFileTypes.Remove(fileLibType);
+            }
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddLibraryFileTypesAsync(List<int> fileTypeIds, int libraryId)
+        {
+            foreach (var fileType in fileTypeIds)
+            {
+                var fileLibType = new FileLibraryFileType
+                {
+                    FileLibraryId = libraryId,
+                    FileTypeId = fileType
+                };
+                await _context.FileLibraryFileTypes.AddAsync(fileLibType);
+            }
+            await _context.SaveChangesAsync();
         }
 
         public async Task<DataWithCount<ICollection<FileLibrary>>> GetPaginatedListAsync(
@@ -63,6 +84,14 @@ namespace Ocuda.Ops.Data.Ops
                 .AsNoTracking()
                 .Where(_ => _.FileLibraryId == libraryId)
                 .Select(_ => _.FileTypeId)
+                .ToListAsync();
+        }
+
+        public async Task<List<FileLibrary>> GetFileLibrariesBySectionIdAsync(int sectionId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.SectionId == sectionId)
                 .ToListAsync();
         }
     }

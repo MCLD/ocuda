@@ -46,5 +46,13 @@ namespace Ocuda.Ops.Data.Ops
                     .ToListAsync()
             };
         }
+
+        public async Task<List<Link>> GetFileLibraryFilesAsync(int id)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.LinkLibraryId == id)
+                .ToListAsync();
+        }
     }
 }

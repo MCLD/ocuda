@@ -166,15 +166,64 @@ a.rowlink {
     background-color: lightskyblue;
     padding-left: 1.75rem;
 }
+
 span.format-addr {
     font-style: italic;
 }
+
 td.group-item:hover, td.feature-item:hover{
     cursor: pointer;
 }
+
 tr.itemRow td {
     vertical-align: middle;
     word-wrap: break-word;
+}
+tr.row-link {
+    cursor: pointer;
+}
+tr.row-link.selected {
+    background-color: lemonchiffon;
+}
+tr.row-link.selected:hover {
+    background-color: beige;
+}
+.stretched-link::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    pointer-events: auto;
+    content: "";
+    background-color: rgba(0,0,0,0);
+}
+
+.link-table {
+    position: relative;
+}
+
+.rowlink::before {
+    content: "";
+    display: block;
+    height: inherit; /* don't forget to set the height! */
+    left: 0;
+    margin-top: -5px;
+    position: absolute;
+    width: 100%;
+}
+
+.rowlink:hover::before {
+    background-color: #EAEAEA;
+    background-color: rgba(51, 51, 51, .1);
+    cursor: pointer;
+}
+
+a.rowlink {
+    color: #515151;
+    height: 30px;
+    text-decoration: none;
 }
 
 @media screen and (max-height: 500px) {
