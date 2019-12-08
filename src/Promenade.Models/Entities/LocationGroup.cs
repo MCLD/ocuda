@@ -1,12 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Ocuda.Promenade.Models.Abstract;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class LocationGroup
+    public class LocationGroup : BaseEntity
     {
-        [Required]
-        public int Id { get; set; }
-
         public int LocationId { get; set; }
 
         public int GroupId { get; set; }
