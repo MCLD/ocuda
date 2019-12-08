@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -11,18 +13,17 @@ using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Service
 {
-    public class PostService : IPostService
+    public class PostService : BaseService<PostService>, IPostService
     {
-        private readonly ILogger<PostService> _logger;
         private readonly IPostRepository _postRepository;
         private readonly ICategoryRepository _categoryRepository;
 
         public PostService(ILogger<PostService> logger,
+            IHttpContextAccessor httpContextAccessor,
             IPostRepository postRepository,
             ICategoryRepository categoryRepository)
+            : base(logger, httpContextAccessor)
         {
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
             _postRepository = postRepository
                 ?? throw new ArgumentNullException(nameof(postRepository));
             _categoryRepository = categoryRepository
@@ -34,15 +35,18 @@ namespace Ocuda.Ops.Service
             return await _postRepository.FindAsync(id);
         }
 
-        public async Task CreatePostAsync(Post post, int userId)
+        public async Task CreatePostAsync(Post post)
         {
             if (post != null)
             {
+                var now = DateTime.Now;
+
                 post.Content = post.Content?.Trim();
                 post.Title = post.Title?.Trim();
                 post.Stub = post.Stub?.Trim();
-                post.CreatedBy = userId;
-                post.CreatedAt = post.PublishedAt = DateTime.Now;
+                post.PublishedAt = now;
+                post.CreatedAt = now;
+                post.CreatedBy = GetCurrentUserId();
 
                 await _postRepository.AddAsync(post);
                 await _postRepository.SaveAsync();
@@ -58,6 +62,8 @@ namespace Ocuda.Ops.Service
                 oldPost.Content = post.Content?.Trim();
                 oldPost.Title = post.Title?.Trim();
                 oldPost.Stub = post.Stub?.Trim();
+                oldPost.UpdatedAt = DateTime.Now;
+                oldPost.UpdatedBy = GetCurrentUserId();
 
                 _postRepository.Update(oldPost);
                 await _postRepository.SaveAsync();

@@ -11,14 +11,12 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
     {
         Task<File> GetByIdAsync(int id);
         Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter);
+        Task<File> CreatePrivateFileAsync(File file, IFormFile fileDatas);
 
-        Task<File> CreatePrivateFileAsync(int currentUserId,
-            File file, IFormFile fileDatas);
-
-        Task<File> EditPrivateFileAsync(int currentUserId, File file, IFormFile fileData,
+        Task<File> EditPrivateFileAsync(File file, IFormFile fileData,
             ICollection<IFormFile> thumbnailFiles, int[] thumbnailIdsToKeep);
 
-        Task<File> CreatePublicFileAsync(int currentUserId, File file, IFormFile fileData);
+        Task<File> CreatePublicFileAsync(File file, IFormFile fileData);
         string GetPublicFilePath(File file);
         string GetPrivateFilePath(File file);
         Task DeletePrivateFileAsync(int id);
@@ -30,7 +28,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<DataWithCount<ICollection<FileLibrary>>> GetPaginatedLibraryListAsync(
             BlogFilter filter);
 
-        Task<FileLibrary> CreateLibraryAsync(int currentUserId, FileLibrary library, int sectionId);
+        Task<FileLibrary> CreateLibraryAsync(FileLibrary library, int sectionId);
 
         Task<FileLibrary> EditLibraryTypesAsync(FileLibrary library, ICollection<int> fileTypeIds);
         Task UpdateLibrary(FileLibrary library);

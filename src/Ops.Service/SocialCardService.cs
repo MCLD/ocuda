@@ -63,8 +63,8 @@ namespace Ocuda.Ops.Service
             currentCard.Image = card.Image?.Trim();
             currentCard.ImageAlt = card.ImageAlt?.Trim();
             currentCard.Title = card.Title?.Trim();
-            currentCard.CreatedAt = DateTime.Now;
-            currentCard.CreatedBy = GetCurrentUserId();
+            currentCard.UpdatedAt = DateTime.Now;
+            currentCard.UpdatedBy = GetCurrentUserId();
 
             _socialCardRepository.Update(currentCard);
             await _socialCardRepository.SaveAsync();

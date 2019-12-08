@@ -240,7 +240,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
 
                 if (!string.IsNullOrWhiteSpace(baseUrl))
                 {
-                    viewModel.PageUrl = $"{baseUrl}{page.PageHeader.Type.ToString()}/{page.PageHeader.Stub}";
+                    viewModel.PageUrl = $"{baseUrl}{selectedLanguage.Name}/{page.PageHeader.Type.ToString()}/{page.PageHeader.Stub}";
                 }
             }
 

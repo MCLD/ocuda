@@ -283,7 +283,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 viewModel.SelectionPostCategories = new SelectList(viewModel.SectionCategories, "Id", "Name");
                 try
                 {
-                    await _postService.CreatePostAsync(viewModel.Post, CurrentUserId);
+                    await _postService.CreatePostAsync(viewModel.Post);
 
                     var post = await _postService.GetSectionPostByStubAsync(
                         viewModel.Post.Stub.Trim(), section.Id);
@@ -520,8 +520,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                     new { sectionStub = section.Stub });
             }
             viewModel.FileLibrary.SectionId = section.Id;
-            await _fileService.CreateLibraryAsync(CurrentUserId,
-                viewModel.FileLibrary, section.Id);
+            await _fileService.CreateLibraryAsync(viewModel.FileLibrary, section.Id);
             var fileLibs = await _fileService.GetFileLibrariesBySectionAsync(section.Id);
             var fileLib = fileLibs.Find(_ => _.Stub == viewModel.FileLibrary.Stub.Trim());
             var fileTypes = await _fileService.GetAllFileTypeIdsAsync();
@@ -732,7 +731,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                     await model.UploadFile.CopyToAsync(fileStream);
                 }
             }
-            await _fileService.CreatePrivateFileAsync(CurrentUserId, model.File, model.UploadFile);
+            await _fileService.CreatePrivateFileAsync(model.File, model.UploadFile);
             ShowAlertSuccess($"Added '{model.File.Name}' to '{fileLib.Name}'");
             return RedirectToAction(nameof(SectionController.FileLibrary),
                 new { sectionStub = section.Stub, fileLibStub = fileLib.Stub });
@@ -756,7 +755,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
             var section = await _sectionService.GetSectionByStubAsync(model.Section.Stub);
             model.LinkLibrary.SectionId = section.Id;
-            var linkLib = await _linkService.CreateLibraryAsync(CurrentUserId, model.LinkLibrary, section.Id);
+            var linkLib = await _linkService.CreateLibraryAsync(model.LinkLibrary, section.Id);
             ShowAlertSuccess($"Added Link Library '{linkLib.Name}' to '{section.Name}'");
             return RedirectToAction(nameof(SectionController.Section),
                 new { sectionStub = model.Section.Stub });
@@ -810,7 +809,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             if (ModelState.IsValid)
             {
                 model.Link.LinkLibraryId = model.LinkLibraryId;
-                var link = await _linkService.CreateAsync(CurrentUserId, model.Link);
+                var link = await _linkService.CreateAsync(model.Link);
                 var linkLib = await _linkService.GetLibraryByIdAsync(model.LinkLibraryId);
                 model.LinkLibrary = linkLib;
 

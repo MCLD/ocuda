@@ -30,7 +30,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<List<PostCategory>> GetPostCategoriesByIdAsync(int postId);
 
-        Task CreatePostAsync(Post post, int userId);
+        Task CreatePostAsync(Post post);
 
         Task RemovePostAsync(Post post);
 
