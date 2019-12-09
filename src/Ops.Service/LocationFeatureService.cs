@@ -1,22 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
-    public class LocationFeatureService : ILocationFeatureService
+    public class LocationFeatureService : BaseService<LocationFeatureService>, ILocationFeatureService
     {
         private readonly ILocationFeatureRepository _locationFeatureRepository;
 
-        public LocationFeatureService(ILocationFeatureRepository locationFeatureRepository)
+        public LocationFeatureService(ILogger<LocationFeatureService> logger,
+            IHttpContextAccessor httpContextAccessor,
+            ILocationFeatureRepository locationFeatureRepository)
+            : base(logger, httpContextAccessor)
         {
             _locationFeatureRepository = locationFeatureRepository
                 ?? throw new ArgumentNullException(nameof(locationFeatureRepository));
@@ -40,6 +42,10 @@ namespace Ocuda.Ops.Service
         public async Task<LocationFeature> AddLocationFeatureAsync(LocationFeature locationFeature)
         {
             await ValidateAsync(locationFeature);
+
+            locationFeature.CreatedAt = DateTime.Now;
+            locationFeature.CreatedBy = GetCurrentUserId();
+
             await _locationFeatureRepository.AddAsync(locationFeature);
             await _locationFeatureRepository.SaveAsync();
             return locationFeature;
@@ -50,6 +56,8 @@ namespace Ocuda.Ops.Service
             var currentLocationFeature = await _locationFeatureRepository.FindAsync(locationFeature.Id);
             currentLocationFeature.Text = locationFeature.Text;
             currentLocationFeature.RedirectUrl = locationFeature.RedirectUrl;
+            currentLocationFeature.UpdatedAt = DateTime.Now;
+            currentLocationFeature.UpdatedBy = GetCurrentUserId();
             await ValidateAsync(currentLocationFeature);
             _locationFeatureRepository.Update(currentLocationFeature);
             await _locationFeatureRepository.SaveAsync();

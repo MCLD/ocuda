@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
 namespace Ocuda.Promenade.Web
@@ -23,6 +24,13 @@ namespace Ocuda.Promenade.Web
             var version = Assembly.GetEntryAssembly()
                     .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                     .InformationalVersion;
+
+            // perform initialization
+            using (IServiceScope scope = webHost.Services.CreateScope())
+            {
+                var web = new Web(scope);
+                Task.Run(() => web.InitalizeAsync()).Wait();
+            }
 
             try
             {

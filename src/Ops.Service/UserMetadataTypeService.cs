@@ -58,6 +58,8 @@ namespace Ocuda.Ops.Service
 
             currentMetadataType.Name = metadataType.Name?.Trim();
             currentMetadataType.IsPublic = metadataType.IsPublic;
+            currentMetadataType.UpdatedAt = DateTime.Now;
+            currentMetadataType.UpdatedBy = GetCurrentUserId();
 
             await ValidateAsync(currentMetadataType);
 

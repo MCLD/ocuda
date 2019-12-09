@@ -35,7 +35,6 @@ namespace Ocuda.Promenade.Controllers
         [HttpGet("[action]/{latitude}/{longitude}")]
         public async Task<IActionResult> Find(double latitude = 0, double longitude = 0, string zip = null)
         {
-
             if (!string.IsNullOrWhiteSpace(zip) && (latitude.Equals(0) && longitude.Equals(0)))
             {
                 var viewModel = new LocationViewModel
@@ -170,6 +169,7 @@ namespace Ocuda.Promenade.Controllers
                     Location = await _locationService.GetLocationByStubAsync(locationStub)
                 };
                 locationViewModel.Location.LocationHours = await _locationService.GetFormattedWeeklyHoursAsync(locationViewModel.Location.Id);
+                locationViewModel.StructuredLocationHours = await _locationService.GetFormattedWeeklyHoursAsync(locationViewModel.Location.Id, true);
                 var features = await _locationService.GetLocationsFeaturesAsync(locationStub);
 
                 foreach (var feature in features.OrderBy(_ => _.Name).ToList())
@@ -193,7 +193,7 @@ namespace Ocuda.Promenade.Controllers
                 }
                 var neighbors = await _locationService.GetLocationsNeighborsAsync(locationStub);
                 locationViewModel.LocationNeighborGroup = await _locationService.GetLocationsNeighborGroup(locationStub);
-                if (neighbors.Any())
+                if (neighbors.Count > 0)
                 {
                     locationViewModel.NearbyLocations = neighbors;
                     locationViewModel.NearbyCount = locationViewModel.NearbyLocations.Count;

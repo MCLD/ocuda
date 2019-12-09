@@ -17,6 +17,7 @@
                 return null;
             }
         }
+
         public int? PreviousPage
         {
             get
@@ -28,6 +29,7 @@
                 return null;
             }
         }
+
         public int? FirstPage
         {
             get
@@ -39,6 +41,7 @@
                 return null;
             }
         }
+
         public int? LastPage
         {
             get
@@ -54,6 +57,7 @@
                 return null;
             }
         }
+
         public int MaxPage
         {
             get

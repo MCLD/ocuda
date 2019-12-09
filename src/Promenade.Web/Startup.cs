@@ -136,6 +136,8 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.FeatureRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IGroupRepository,
                 Data.Promenade.GroupRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ILanguageRepository,
+                Data.Promenade.LanguageRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ILocationRepository,
                 Data.Promenade.LocationRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ILocationFeatureRepository,
@@ -160,6 +162,7 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.UrlRedirectRepository>();
 
             // services
+            services.AddScoped<LanguageService>();
             services.AddScoped<LocationService>();
             services.AddScoped<PageService>();
             services.AddScoped<RedirectService>();

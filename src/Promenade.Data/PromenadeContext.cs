@@ -8,11 +8,11 @@ namespace Ocuda.Promenade.Data
         protected PromenadeContext(DbContextOptions options) : base(options) { }
 
         // Read-Only
-        public DbSet<Feature> Feature { get; }
-        public DbSet<Group> Group { get; }
-        public DbSet<Location> Location { get; }
-        public DbSet<LocationFeature> LocationFeature { get; }
-        public DbSet<LocationGroup> LocationGroup { get; }
+        public DbSet<Feature> Features { get; }
+        public DbSet<Group> Groups { get; }
+        public DbSet<Location> Locations { get; }
+        public DbSet<LocationFeature> LocationFeatures { get; }
+        public DbSet<LocationGroup> LocationGroups { get; }
         public DbSet<LocationHours> LocationHours { get; }
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; }
         public DbSet<Page> Pages { get; }
@@ -21,6 +21,8 @@ namespace Ocuda.Promenade.Data
         public DbSet<UrlRedirect> UrlRedirects { get; }
 
         // Read/Write 
+        public DbSet<Language> Languages { get; set; }
+        public DbSet<PageHeader> PageHeaders { get; set; }
         public DbSet<UrlRedirectAccess> UrlRedirectAccesses { get; set; }
     }
 }
