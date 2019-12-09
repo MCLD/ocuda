@@ -20,7 +20,7 @@
     "outputFileName": "wwwroot/js/md.min.js",
     "inputFiles": [
       "node_modules/commonmark/dist/commonmark.js",
-      "Scripts/WMD.js"
+      "Scripts/md-editor.js"
     ],
     "minify": {
       "enabled": true,
@@ -64,7 +64,7 @@
   {
     "outputFileName": "wwwroot/css/md.min.css",
     "inputFiles": [
-      "Styles/WMD.css"
+      "Styles/md-editor.css"
     ],
     "minify": {
       "enabled": true

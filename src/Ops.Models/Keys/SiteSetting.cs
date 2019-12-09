@@ -2,6 +2,11 @@
 {
     public struct SiteSetting
     {
+        public struct CoverIssueReporting
+        {
+            public const string LeapBibUrl = "CoverIssueReporting.LeapBibUrl";
+        }
+
         public struct Email
         {
             public const string FromName = "Email.FromName";
@@ -17,6 +22,11 @@
             public const string MaxUploadBytes = "FileManagement.MaxFileSizeBytes";
             public const string MaxThumbnailCount = "FileManagement.MaxThumbnailCount";
             public const string ThumbnailTypes = "FileManagement.ThumbnailTypes";
+        }
+
+        public struct SiteManagement
+        {
+            public const string PromenadeUrl = "SiteManagement.PromenadeUrl";
         }
 
         public struct UserInterface

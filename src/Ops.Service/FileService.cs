@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -14,22 +15,21 @@ using Ocuda.Utility.Helpers;
 
 namespace Ocuda.Ops.Service
 {
-    public class FileService : IFileService
+    public class FileService : BaseService<FileService>, IFileService
     {
-        private readonly ILogger<FileService> _logger;
         private readonly IFileLibraryRepository _fileLibraryRepository;
         private readonly IFileRepository _fileRepository;
         private readonly IFileTypeService _fileTypeService;
         private readonly IPathResolverService _pathResolver;
 
         public FileService(ILogger<FileService> logger,
+            IHttpContextAccessor httpContextAccessor,
             IFileLibraryRepository fileLibraryRepository,
             IFileRepository fileRepository,
             IFileTypeService fileTypeService,
             IPathResolverService pathResolver)
+            : base(logger, httpContextAccessor)
         {
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
             _fileLibraryRepository = fileLibraryRepository
                 ?? throw new ArgumentNullException(nameof(fileLibraryRepository));
             _fileRepository = fileRepository
@@ -40,24 +40,9 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(pathResolver));
         }
 
-        public async Task<int> GetFileCountAsync()
-        {
-            return await _fileRepository.CountAsync();
-        }
-
-        public async Task<ICollection<File>> GetFilesAsync()
-        {
-            return await _fileRepository.ToListAsync(_ => _.Name);
-        }
-
         public async Task<File> GetByIdAsync(int id)
         {
             return await _fileRepository.FindAsync(id);
-        }
-
-        public async Task<File> GetLatestByLibraryIdAsync(int id)
-        {
-            return await _fileRepository.GetLatestByLibraryIdAsync(id);
         }
 
         public async Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter)
@@ -65,10 +50,9 @@ namespace Ocuda.Ops.Service
             return await _fileRepository.GetPaginatedListAsync(filter);
         }
 
-        public async Task<File> CreatePrivateFileAsync(int currentUserId,
-            File file, IFormFile fileData, ICollection<IFormFile> thumbnailFiles)
+        public async Task<File> CreatePrivateFileAsync(File file, IFormFile fileDatas)
         {
-            var extension = System.IO.Path.GetExtension(fileData.FileName);
+            var extension = System.IO.Path.GetExtension(fileDatas.FileName);
             var fileType = await _fileTypeService.GetByExtensionAsync(extension);
 
             if (fileType == null)
@@ -80,20 +64,19 @@ namespace Ocuda.Ops.Service
             file.Description = file.Description?.Trim();
             file.Name = file.Name?.Trim();
             file.CreatedAt = DateTime.Now;
-            file.CreatedBy = currentUserId;
+            file.CreatedBy = GetCurrentUserId();
             file.FileTypeId = fileType.Id;
 
             await _fileRepository.AddAsync(file);
             await _fileRepository.SaveAsync();
 
             file.FileType = fileType;
-            await WritePrivateFileAsync(file, fileData);
+            await WritePrivateFileAsync(file, fileDatas);
 
             return file;
         }
 
-        public async Task<File> EditPrivateFileAsync(int currentUserId,
-            File file,
+        public async Task<File> EditPrivateFileAsync(File file,
             IFormFile fileData,
             ICollection<IFormFile> thumbnailFiles,
             int[] thumbnailIdsToKeep)
@@ -117,6 +100,8 @@ namespace Ocuda.Ops.Service
 
             currentFile.Description = file.Description?.Trim();
             currentFile.Name = file.Name?.Trim();
+            currentFile.UpdatedAt = DateTime.Now;
+            currentFile.UpdatedBy = GetCurrentUserId();
 
             _fileRepository.Update(currentFile);
             await _fileRepository.SaveAsync();
@@ -194,7 +179,7 @@ namespace Ocuda.Ops.Service
             }
         }
 
-        public async Task<File> CreatePublicFileAsync(int currentUserId, File file, IFormFile fileData)
+        public async Task<File> CreatePublicFileAsync(File file, IFormFile fileData)
         {
             var extension = System.IO.Path.GetExtension(fileData.FileName);
             var fileType = await _fileTypeService.GetByExtensionAsync(extension);
@@ -209,7 +194,7 @@ namespace Ocuda.Ops.Service
             file.Description = file.Description?.Trim();
             file.FileTypeId = fileType.Id;
             file.CreatedAt = DateTime.Now;
-            file.CreatedBy = currentUserId;
+            file.CreatedBy = GetCurrentUserId();
 
             await _fileRepository.AddAsync(file);
             await _fileRepository.SaveAsync();
@@ -221,7 +206,8 @@ namespace Ocuda.Ops.Service
             return file;
         }
 
-        private async Task WritePublicFileAsync(File file, IFormFile fileData, string oldFilePath = null)
+        private async Task WritePublicFileAsync(File file, IFormFile fileData,
+            string oldFilePath = null)
         {
             string filePath = GetPublicFilePath(file);
             byte[] fileBytes = IFormFileHelper.GetFileBytes(fileData);
@@ -271,16 +257,12 @@ namespace Ocuda.Ops.Service
             return await _fileLibraryRepository.GetPaginatedListAsync(filter);
         }
 
-        public async Task<FileLibrary> CreateLibraryAsync(int currentUserId, FileLibrary library,
-            ICollection<int> fileTypeIds)
+        public async Task<FileLibrary> CreateLibraryAsync(FileLibrary library, int sectionId)
         {
             library.Name = library.Name?.Trim();
+            library.Stub = library.Stub?.Trim();
             library.CreatedAt = DateTime.Now;
-            library.CreatedBy = currentUserId;
-            library.FileTypes = fileTypeIds.Select(_ => new FileLibraryFileType
-            {
-                FileTypeId = _
-            }).ToList();
+            library.CreatedBy = GetCurrentUserId();
 
             await _fileLibraryRepository.AddAsync(library);
             await _fileLibraryRepository.SaveAsync();
@@ -288,31 +270,34 @@ namespace Ocuda.Ops.Service
             return library;
         }
 
-        public async Task<FileLibrary> EditLibraryAsync(FileLibrary library,
+        public async Task UpdateLibrary(FileLibrary library)
+        {
+            library.Name = library.Name?.Trim();
+            library.Stub = library.Stub?.Trim();
+            library.UpdatedAt = DateTime.Now;
+            library.UpdatedBy = GetCurrentUserId();
+
+            _fileLibraryRepository.Update(library);
+
+            await _fileLibraryRepository.SaveAsync();
+        }
+
+        public async Task<FileLibrary> EditLibraryTypesAsync(FileLibrary library,
             ICollection<int> fileTypeIds)
         {
-            var currentLibrary = await _fileLibraryRepository.FindAsync(library.Id);
+            var currentTypes = await _fileTypeService.GetTypesByLibraryIdsAsync(library.Id);
+            var currentTypeIds = currentTypes.Select(_ => _.Id).ToList();
 
-            currentLibrary.Name = currentLibrary.Name.Trim();
-
-            var fileTypesToAdd = fileTypeIds
-                .Except(currentLibrary.FileTypes.Select(_ => _.FileTypeId))
-                .Select(_ => new FileLibraryFileType
-                {
-                    FileLibrary = currentLibrary,
-                    FileTypeId = _
-                });
-            foreach (var fileType in fileTypesToAdd)
+            if (fileTypeIds == null)
             {
-                currentLibrary.FileTypes.Add(fileType);
+                fileTypeIds = new List<int>();
             }
 
-            var fileTypesToRemove = currentLibrary.FileTypes
-                .Where(_ => !fileTypeIds.Contains(_.FileTypeId));
+            var typesToDelete = currentTypeIds.Except(fileTypeIds).ToList();
+            var typessToAdd = fileTypeIds.Except(currentTypeIds).ToList();
 
-            _fileLibraryRepository.Update(currentLibrary);
-            _fileLibraryRepository.RemoveLibraryFileTypes(fileTypesToRemove);
-            await _fileLibraryRepository.SaveAsync();
+            await _fileLibraryRepository.AddLibraryFileTypesAsync(typessToAdd, library.Id);
+            await _fileLibraryRepository.RemoveLibraryFileTypesAsync(typesToDelete, library.Id);
 
             return library;
         }
@@ -323,6 +308,17 @@ namespace Ocuda.Ops.Service
             await _fileLibraryRepository.SaveAsync();
         }
 
+        public async Task DeleteFileTypesByLibrary(int libid)
+        {
+            var currentLibrary = await _fileLibraryRepository.FindAsync(libid);
+            var fileTypeIds = await GetLibraryFileTypeIdsAsync(libid);
+            var fileTypesToRemove = currentLibrary.FileTypes
+                .Where(_ => fileTypeIds.Any(__ => __ == _.FileTypeId))
+                .Select(_ => _.FileTypeId)
+                .ToList();
+            await _fileLibraryRepository.RemoveLibraryFileTypesAsync(fileTypesToRemove, currentLibrary.Id);
+        }
+
         public async Task<ICollection<int>> GetLibraryFileTypeIdsAsync(int libraryId)
         {
             return await _fileLibraryRepository.GetLibraryFileTypeIdsAsync(libraryId);
@@ -331,6 +327,37 @@ namespace Ocuda.Ops.Service
         public async Task<ICollection<int>> GetFileTypeIdsInUseByLibraryAsync(int libraryId)
         {
             return await _fileRepository.GetFileTypeIdsInUseByLibraryAsync(libraryId);
+        }
+
+        public async Task<ICollection<FileType>> GetAllFileTypesAsync()
+        {
+            return await _fileTypeService.GetAllAsync();
+        }
+
+        public async Task<ICollection<int>> GetAllFileTypeIdsAsync()
+        {
+            return await _fileTypeService.GetAllIdsAsync();
+        }
+
+        public async Task<FileType> GetFileTypeByIdAsync(int id)
+        {
+            var types = await GetAllFileTypesAsync();
+            return types.FirstOrDefault(_ => _.Id == id);
+        }
+
+        public async Task<List<File>> GetFileLibraryFilesAsync(int id)
+        {
+            return await _fileRepository.GetFileLibraryFilesAsync(id);
+        }
+
+        public async Task<List<FileLibrary>> GetFileLibrariesBySectionAsync(int sectionId)
+        {
+            return await _fileLibraryRepository.GetFileLibrariesBySectionIdAsync(sectionId);
+        }
+
+        public async Task<ICollection<FileType>> GetFileLibrariesFileTypesAsync(int libraryId)
+        {
+            return await _fileTypeService.GetTypesByLibraryIdsAsync(libraryId);
         }
     }
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Ocuda.Promenade.Models.Entities;
 
@@ -21,13 +18,6 @@ namespace Ocuda.Promenade.Controllers.TagHelpers
         private const string twCard = "tw:card";
         private const string twCardValue = "summary_large_image";
         private const string twSite = "tw:site";
-
-        private readonly IHtmlGenerator _htmlGenerator;
-        public SocialCardTagHelper(IHtmlGenerator htmlGenerator)
-        {
-            _htmlGenerator = htmlGenerator
-                ?? throw new ArgumentNullException(nameof(htmlGenerator));
-        }
 
         [HtmlAttributeName(attributeName)]
         public SocialCard Card { get; set; }

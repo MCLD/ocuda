@@ -1,0 +1,271 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.FileLibraryViewModel
+
+@{
+    var invalid = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid;
+}
+
+<div class="modal fade" 
+     id="listAddModal" 
+     tabindex="-1" 
+     role="dialog" 
+     aria-labelledby="listModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="row">
+            <div class="col-12 col-sm-10 col-sm-offset-1">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addModalTitle">Add File</h5>
+                        <button type="button" 
+                                class="close" 
+                                data-dismiss="modal" 
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form asp-action="@nameof(SectionController.AddFileToLibrary)"
+                          id="addFileLib"
+                          method="post"
+                          role="form"
+                          enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div id="modalItemList" class="col-12">
+                                <div class="col-sm-9">
+
+                                    <input asp-for="SectionStub"
+                                           value="@Model.SectionStub"
+                                           autocomplete="off"
+                                           type="hidden" />
+                                    <input asp-for="FileLibraryId"
+                                           value="@Model.FileLibraryId"
+                                           autocomplete="off"
+                                           type="hidden" />
+                                    <div class="input-group">
+                                        <label class="input-group-btn">
+                                            <span class="btn btn-light btn-file">
+                                                <span class="far fa-file-image"></span> Select file(s)...
+                                                <input type="file"
+                                                       multiple="multiple"
+                                                       asp-for="UploadFile"
+                                                       accept="@(string.Join(",",Model.FileTypes.Select(_=>_.Extension).ToList()))"
+                                                       style="display: none;" />
+                                            </span>
+                                        </label>
+                                        <input type="text" class="form-control
+                                               @(ViewData.ModelState.GetValidationState("UploadFile") == invalid
+                                                   ? "input-validation-error" : "")" readonly />
+                                    </div>
+                                    <span asp-validation-for="UploadFile" class="text-danger"></span>
+                                    <input asp-for="File.Name" autocomplete="off" formgroup />
+                                    <input asp-for="File.Description" autocomplete="off" formgroup />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" value="Submit" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal" style="margin-right: 1em;">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade"
+     id="editTypesModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="deleteModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="row form-group">
+                <label class="col-form-label text-md-right col-md-3">File Types</label>
+                <select class="custom-select col-md-9" id="typeSelection" multiple="multiple">
+                    @foreach (var type in Model.FileTypes)
+                    {
+                        <option class="typeId"
+                                data-typeid="@type.Id"
+                                value="@type.Id">
+                            @type.Extension
+                        </option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade"
+        id="deleteModal"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="deleteModalLabel">
+    <div class="modal-dialog" role="document">
+        <form id="delFileForm"
+              method="post"
+              role="form"
+              action="@Url.Action(nameof(SectionController.DeleteFileFromLibrary))">
+            <input id="delSectionStub" asp-for="SectionStub"value="@Model.SectionStub" type="hidden" />
+            <input id="delFileLibId" asp-for="FileLibraryId" value="@Model.FileLibraryId" type="hidden" />
+            <input id="delFileId" asp-for="File.Id" type="hidden" />
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="deleteModalLabel">Delete Feature</h4>
+                    <button type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+                    <span id="modal-text"></span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-light"
+                            data-dismiss="modal"
+                            style="margin-right: 1em;">
+                        Cancel
+                    </button>
+                    <button class="btn btn-danger pull-right"
+                            aria-label="Confirm"
+                            id="deleteItem"
+                            type="submit"
+                            value="Submit">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a href="@Url.Action(nameof(SectionController.Index))" class="navbar-brand">Section</a>
+    <span class="navbar-brand">/</span>
+    <a href="@Url.Action(nameof(SectionController.Section), new { sectionStub = Model.SectionStub})" class="navbar-brand">@Model.SectionName</a>
+    <a class="nav-link"
+       href="@Url.Action(nameof(SectionController.Posts),
+            new { sectionStub = Model.SectionStub,
+            page=1})">
+        Posts
+    </a>
+</nav>
+    <div class="col-6 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <div class="float-left h4">@Model.FileLibraryName</div>
+                <div class="float-right align-middle">
+                    <a role="button" class="text-success align-middle" id="addFileButton">
+                        <span class="fas fa-plus-circle fa-lg align-middle"></span>
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-condensed table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>
+                                Name
+                            </th>
+                            <th>
+                                Description
+                            </th>
+                            <th>
+
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Files.Count > 0)
+                        {
+                            @foreach (var file in Model.Files)
+                            {
+                                <tr>
+                                    <td class="mx-auto row-link" data-id="@file.Id" style="transform: rotate(0);">
+                                        <span class="@Model.FileTypes.Where(_ => _.Id == file.FileTypeId).FirstOrDefault().Icon" style="font-size: 32px;"></span>
+                                        <a href="@Url.Action(nameof(SectionController.GetFile), new { fileLibId = Model.FileLibraryId, fileId=file.Id })"
+                                           class="stretched-link"></a>
+                                    </td>
+                                    <td class="row-link" data-id="@file.Id" style="transform: rotate(0);">
+                                        @file.Name
+                                        <a href="@Url.Action(nameof(SectionController.GetFile), new { fileLibId = Model.FileLibraryId, fileId=file.Id })"
+                                           class="stretched-link"></a>
+                                    </td>
+                                    <td class="row-link" data-id="@file.Id" style="transform: rotate(0);">
+                                        @file.Description
+                                        <a href="@Url.Action(nameof(SectionController.GetFile), new { fileLibId = Model.FileLibraryId, fileId=file.Id })"
+                                           class="stretched-link"></a>
+                                    </td>
+                                    <td style="position: relative;">
+                                        <button type="button"
+                                                class="btn btn-link text-danger"
+                                                data-toggle="modal"
+                                                data-target="#deleteModal"
+                                                data-id="@file.Id"
+                                                data-name="@file.Name">
+                                            <span class="far fa-times-circle fa-lg"
+                                                  aria-hidden="true"></span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4">No Files in Library</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if (Model.PaginateModel.MaxPage > 1)
+            {
+                <div class="card-footer">
+                    <paginate paginateModel="@Model.PaginateModel"></paginate>
+                </div>
+            }
+        </div>
+    </div>
+
+    @section scripts {
+        <script>
+            var delLink = "@Url.Action(nameof(SectionController.DeleteFileFromLibrary))";
+            var FileLibraryrary =
+            {
+                'Id' : 0,
+                'Name' : null,
+                'FileTypes' : null,
+                'Files' : null,
+                'Stub' : null
+            };
+            var Section =
+            {
+                'Id' : null,
+                'Name': null,
+                'Stub': null,
+                'EmbedVideoUrl' : null
+            }
+            $("#deleteModal").on("show.bs.modal", function (e) {
+                var button = $(e.relatedTarget);
+                var id = button.data("id");
+                var name = button.data("name");
+                var modal = $(this);
+                modal.find("#modal-text").text("Are you sure you want to delete the file \"" + name + "\"?");
+                modal.find("#delFileId").val(String(id));
+            });
+            $("#deleteItem").click(function () {
+                this.innerHTML='Delete <span class="fa fa-spinner fa-spin"></span>';
+            });
+            $("#addFileButton").on('click', function (e) {
+                $("#listAddModal").modal("show");
+            });
+            $('#typeSelection').multiselect({
+                templates: {
+                    li: '<li><a href="javascript:void(0);"><label class="pl-2"></label></a></li>'
+                }
+            });
+            
+        </script>
+    }

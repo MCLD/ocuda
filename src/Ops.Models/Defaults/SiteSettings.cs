@@ -7,6 +7,17 @@ namespace Ocuda.Ops.Models.Defaults
     {
         public static IEnumerable<SiteSetting> Get { get; } = new[]
         {
+            #region CoverIssueReporting
+            new SiteSetting
+            {
+                Key = Keys.SiteSetting.CoverIssueReporting.LeapBibUrl,
+                Name = "Leap bib records url",
+                Description = "Leap bib records url with scheme, host and path",
+                Category = "CoverIssueReporting",
+                Value = "",
+                Type = SiteSettingType.String_Emptiable
+            },
+            #endregion
             #region Email
             new SiteSetting
             {
@@ -72,6 +83,17 @@ namespace Ocuda.Ops.Models.Defaults
                 Category = "File Management",
                 Value = "2097152",
                 Type = SiteSettingType.Int
+            },
+            #endregion
+            #region SiteManagement
+            new SiteSetting
+            {
+                Key = Keys.SiteSetting.SiteManagement.PromenadeUrl,
+                Name = "Promenade Url",
+                Description = "Promenade url with scheme and host",
+                Category = "Site Management",
+                Value = "",
+                Type = SiteSettingType.String_Emptiable
             },
             #endregion
             #region UserInterface

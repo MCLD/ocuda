@@ -1,11 +1,10 @@
 ﻿using System;
+using Ocuda.Promenade.Models.Abstract;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class LocationHours
+    public class LocationHours: BaseEntity
     {
-        public int Id { get; set; }
-
         public int LocationId { get; set; }
         public Location Location { get; set; }
 

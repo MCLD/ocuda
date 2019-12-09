@@ -1,0 +1,77 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location.LocationViewModel;
+    <div class="container">
+        <div class="row">
+            <div id="modalItemInfo" class="col-xs-12 col">
+                <input value="@Model.LocationFeature.Id" 
+                       asp-for="LocationFeature.Id" 
+                       type="hidden" />
+                <input value="@Model.LocationFeature.LocationId" 
+                       asp-for="LocationFeature.LocationId" 
+                       type="hidden" />
+                <input value="@Model.LocationFeature.FeatureId" 
+                       asp-for="LocationFeature.FeatureId" 
+                       type="hidden" />
+                @foreach (var feature in Model.Features.Where(_ => _.Id == Model.LocationFeature.FeatureId))
+                {
+                    if (string.IsNullOrEmpty(feature.Stub))
+                    {
+                        <input value="@Model.LocationFeature.Text" 
+                               asp-for="LocationFeature.Text" 
+                               type="hidden" />
+                        <input value="@Model.LocationFeature.RedirectUrl" 
+                               asp-for="LocationFeature.RedirectUrl" 
+                               formgroup 
+                               autocomplete="off" />
+                    }
+                    else
+                    {
+                        <input value="@Model.LocationFeature.RedirectUrl" 
+                               asp-for="LocationFeature.RedirectUrl" 
+                               type="hidden" />
+                        <div class="row">
+                            <div class="card-body">
+                                <div class="form-group row" id="text-div">
+                                    <label asp-for="LocationFeature.Text"
+                                           class="col-md-3 col-form-label text-md-right">
+                                    </label>
+                                    <div class="col-md-9">
+                                        <ul class="nav nav-tabs">
+                                            <li class="nav-item">
+                                                <a class="nav-link active"
+                                                   data-toggle="tab"
+                                                   href="#md-edit"
+                                                   role="tab">Edit</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link"
+                                                   data-toggle="tab"
+                                                   href="#md-preview"
+                                                   role="tab">Preview</a>
+                                            </li>
+                                        </ul>
+                                        <div class="tab-content" id="md-edit-preview">
+                                            <div class="tab-pane show active"
+                                                 id="md-edit"
+                                                 role="tabpanel">
+                                                <div id="wmd-button-bar"
+                                                     class="wmd-button-row"></div>
+                                                <textarea asp-for="LocationFeature.Text"
+                                                          value="@Model.LocationFeature.Text"
+                                                          class="form-control wmd-input"
+                                                          id="wmd-input"></textarea>
+                                            </div>
+                                            <div class="tab-pane" id="md-preview" role="tabpanel">
+                                                <div id="preview" class="wmd-preview"></div>
+                                            </div>
+                                            <span asp-validation-for="LocationFeature.Text"
+                                                  class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>

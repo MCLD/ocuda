@@ -40,7 +40,6 @@ namespace Ocuda.Ops.Web.StartupHelper
                 var initialSetup = scope.ServiceProvider.GetRequiredService<IInitialSetupService>();
                 Task.Run(() => initialSetup.VerifyInitialSetupAsync()).Wait();
             }
-
         }
 
         private void MigrateContext(IMigratableContext context, string contextName)

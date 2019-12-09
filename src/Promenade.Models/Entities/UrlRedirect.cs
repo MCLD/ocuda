@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Ocuda.Promenade.Models.Abstract;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class UrlRedirect
+    public class UrlRedirect : BaseEntity
     {
-        public int Id { get; set; }
         public bool IsActive { get; set; }
         public bool IsPermanent { get; set; }
 

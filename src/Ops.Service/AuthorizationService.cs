@@ -13,6 +13,7 @@ namespace Ocuda.Ops.Service
     {
         private readonly ISectionManagerGroupRepository _sectionManagerGroupRepository;
         private readonly IClaimGroupRepository _claimGroupRepository;
+
         public AuthorizationService(ISectionManagerGroupRepository sectionManagerGroupRepository,
             IClaimGroupRepository claimGroupRepository)
         {

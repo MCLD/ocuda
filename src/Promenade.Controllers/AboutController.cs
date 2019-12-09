@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +11,7 @@ using Ocuda.Promenade.Service;
 namespace Ocuda.Promenade.Controllers
 {
     [Route("[Controller]")]
+    [Route("{culture:cultureConstraint}/[Controller]")]
     public class AboutController : BaseController<AboutController>
     {
         private readonly PageService _pageService;

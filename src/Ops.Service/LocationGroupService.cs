@@ -1,27 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
-    public class LocationGroupService : ILocationGroupService
+    public class LocationGroupService : BaseService<LocationGroupService>, ILocationGroupService
     {
-        private readonly ILogger<LocationService> _logger;
         private readonly ILocationGroupRepository _locationGroupRepository;
 
-        public LocationGroupService(ILogger<LocationService> logger,
+        public LocationGroupService(ILogger<LocationGroupService> logger,
+            IHttpContextAccessor httpContextAccessor,
             ILocationGroupRepository locationGroupRepository)
+            : base(logger, httpContextAccessor)
         {
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
             _locationGroupRepository = locationGroupRepository
                 ?? throw new ArgumentNullException(nameof(locationGroupRepository));
         }
@@ -33,6 +31,9 @@ namespace Ocuda.Ops.Service
 
         public async Task<LocationGroup> AddLocationGroupAsync(LocationGroup locationGroup)
         {
+            locationGroup.CreatedAt = DateTime.Now;
+            locationGroup.CreatedBy = GetCurrentUserId();
+
             await _locationGroupRepository.AddAsync(locationGroup);
             await _locationGroupRepository.SaveAsync();
             return locationGroup;
@@ -47,6 +48,10 @@ namespace Ocuda.Ops.Service
         {
             var currentLocationGroup = await _locationGroupRepository.FindAsync(locationGroup.Id);
             await ValidateAsync(currentLocationGroup);
+
+            currentLocationGroup.UpdatedAt = DateTime.Now;
+            currentLocationGroup.UpdatedBy = GetCurrentUserId();
+
             _locationGroupRepository.Update(currentLocationGroup);
             await _locationGroupRepository.SaveAsync();
             return currentLocationGroup;

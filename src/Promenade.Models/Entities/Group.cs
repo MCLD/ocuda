@@ -1,13 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Ocuda.Promenade.Models.Abstract;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class Group
+    public class Group : BaseEntity
     {
-        [Required]
-        public int Id { get; set; }
-
         [Required]
         public string Stub { get; set; }
 

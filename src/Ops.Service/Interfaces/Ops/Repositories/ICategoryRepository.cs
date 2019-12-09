@@ -1,0 +1,14 @@
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Ocuda.Ops.Models.Entities;
+
+namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
+{
+    public interface ICategoryRepository : IRepository<Category, int>
+    {
+        Task<List<Category>> GetCategoriesBySectionIdAsync(int sectionId);
+        Task<Category> GetCategoryByStubAsync(string stub);
+        Task<bool> SectionHasCategoryAsync(int categoryId, int sectionId);
+
+    }
+}

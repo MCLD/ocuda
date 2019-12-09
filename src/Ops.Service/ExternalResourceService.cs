@@ -64,6 +64,8 @@ namespace Ocuda.Ops.Service
 
             currentResource.Name = resource.Name?.Trim();
             currentResource.Url = resource.Url?.Trim();
+            currentResource.UpdatedAt = DateTime.Now;
+            currentResource.UpdatedBy = GetCurrentUserId();
 
             _externalResourceRepository.Update(currentResource);
             await _externalResourceRepository.SaveAsync();
@@ -102,8 +104,16 @@ namespace Ocuda.Ops.Service
             var resourceInPosition = await _externalResourceRepository.GetBySortOrderAsync(
                 resource.Type, newSortOrder);
 
+            var now = DateTime.Now;
+            var currentUserId = GetCurrentUserId();
+
             resourceInPosition.SortOrder = resource.SortOrder;
+            resourceInPosition.UpdatedAt = now;
+            resourceInPosition.UpdatedBy = currentUserId;
+
             resource.SortOrder = newSortOrder;
+            resource.UpdatedAt = now;
+            resource.UpdatedBy = currentUserId;
 
             _externalResourceRepository.Update(resource);
             _externalResourceRepository.Update(resourceInPosition);
@@ -123,8 +133,16 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException("Resource is already in the last position.");
             }
 
+            var now = DateTime.Now;
+            var currentUserId = GetCurrentUserId();
+
             resourceInPosition.SortOrder = resource.SortOrder;
+            resourceInPosition.UpdatedAt = now;
+            resourceInPosition.UpdatedBy = currentUserId;
+
             resource.SortOrder = newSortOrder;
+            resource.UpdatedAt = now;
+            resource.UpdatedBy = currentUserId;
 
             _externalResourceRepository.Update(resource);
             _externalResourceRepository.Update(resourceInPosition);

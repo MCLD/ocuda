@@ -60,6 +60,11 @@ namespace Ocuda.Ops.Data
             DbSet.Remove(DbSet.Find(id));
         }
 
+        public virtual void RemoveRange(ICollection<TEntity> entities)
+        {
+            DbSet.RemoveRange(entities);
+        }
+
         public virtual void Update(TEntity entity)
         {
             DbSet.Update(entity);
@@ -110,7 +115,7 @@ namespace Ocuda.Ops.Data
             await _context.SaveChangesAsync();
         }
 
-        private IOrderedQueryable<TEntity>
+        protected IOrderedQueryable<TEntity>
             DbSetOrdered(Expression<Func<TEntity, IComparable>>[] orderBys)
         {
             IOrderedQueryable<TEntity> query = null;
