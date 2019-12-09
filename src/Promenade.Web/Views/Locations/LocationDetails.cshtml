@@ -22,7 +22,7 @@
                             <br />
                             @Model.Location.City, @Model.Location.State @Model.Location.Zip
                             <br />
-                            <a href="tel:+1 @Model.Location.Phone">@Model.Location.Phone</a>
+                            <a href="tel:@Model.Location.Phone">@Model.Location.Phone</a>
                         </p>
                     </td>
                     <td class="hours">
@@ -194,6 +194,41 @@
                         $('#myInput').trigger('focus')
                     });
                 });
+            </script>
+            <script type="application/ld+json">
+                {
+                "@@context": "http://schema.org",
+                "@@type": "@Model.Location.SDType",
+                "name": "@Model.Location.Name",
+                "areaServed": {
+                "@@type": "@Model.Location.SDAreaServedType",
+                "name": "@Model.Location.SDAreaServedName"
+                },
+                "email": "@Model.Location.SDEmail",
+                "address": {
+                "@@id": "_:@Model.Location.SDLocationId",
+                "@@type": "PostalAddress",
+                "addressCountry": "US",
+                "addressRegion": "@Model.Location.State",
+                "addressLocality": "@Model.Location.City",
+                "contactType": "Location address",
+                "postalCode": "@Model.Location.Zip",
+                "streetAddress": "@Model.Location.Address"
+                },
+                "location": { "@@id": "_:@Model.Location.SDLocationId" },
+                "parentOrganization": "@Model.Location.SDParentOrganization",
+                "telephone": "@Html.Raw(@Model.Location.Phone)",
+                "openingHours": @Html.Raw(Json.Serialize(@Model.StructuredLocationHours)),
+                "image": "@Model.Location.ImagePath",
+                "isAccessibleForFree": true,
+                "priceRange" : "$000 - $000",
+                "sameAs": ["@Model.Location.MapLink"
+                @if (!string.IsNullOrEmpty(Model.Location.Facebook))
+                {
+                    @:, "@Model.Location.Facebook"
+                }]
+                }
+
             </script>
         }
     </body>

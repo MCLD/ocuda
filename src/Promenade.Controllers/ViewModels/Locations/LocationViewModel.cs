@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Ocuda.Promenade.Models.Entities;
 
@@ -19,5 +20,8 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Locations
         public Group LocationNeighborGroup { get; set; }
 
         public bool LocationSearchable { get; set; }
+
+        [NotMapped]
+        public List<string> StructuredLocationHours { get; set; }
     }
 }

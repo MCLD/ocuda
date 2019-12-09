@@ -189,7 +189,7 @@ namespace Ocuda.Promenade.Service
             return null;
         }
 
-        public async Task<List<string>> GetFormattedWeeklyHoursAsync(int locationId)
+        public async Task<List<string>> GetFormattedWeeklyHoursAsync(int locationId, bool isStructuredData = false)
         {
             var location = await _locationRepository.FindAsync(locationId);
             if (location.IsAlwaysOpen)
@@ -230,26 +230,28 @@ namespace Ocuda.Promenade.Service
             var formattedDayGroupings = new List<string>();
             foreach (var (DaysOfWeek, OpenTime, CloseTime) in dayGroupings)
             {
-                var days = GetFormattedDayGroupings(DaysOfWeek);
-
-                var openTime = new StringBuilder(OpenTime.ToString("%h"));
-                if (OpenTime.Minute != 0)
+                var days = isStructuredData ? GetFormattedDayGroupings(DaysOfWeek, true)
+                    : GetFormattedDayGroupings(DaysOfWeek);
+                var openTime = isStructuredData ? new StringBuilder(OpenTime.ToString("%H"))
+                    : new StringBuilder(OpenTime.ToString("%h"));
+                if (OpenTime.Minute != 0 || isStructuredData)
                 {
                     openTime.Append(OpenTime.ToString(":mm"));
                 }
-                openTime.Append(OpenTime.ToString(" tt").ToLower());
+                openTime.Append(isStructuredData ? "" : OpenTime.ToString(" tt").ToLower());
 
-                var closeTime = new StringBuilder(CloseTime.ToString("%h"));
-                if (CloseTime.Minute != 0)
+                var closeTime = isStructuredData ? new StringBuilder(CloseTime.ToString("%H"))
+                    : new StringBuilder(CloseTime.ToString("%h"));
+                if (CloseTime.Minute != 0 || isStructuredData)
                 {
                     closeTime.Append(CloseTime.ToString(":mm"));
                 }
-                closeTime.Append(CloseTime.ToString(" tt").ToLower());
+                closeTime.Append(isStructuredData ? "" : CloseTime.ToString(" tt").ToLower());
 
                 formattedDayGroupings.Add($"{days} {openTime}{ndash}{closeTime}");
             }
 
-            if (closedDays.Count > 0)
+            if (closedDays.Count > 0 && !isStructuredData)
             {
                 var formattedClosedDays = GetFormattedDayGroupings(closedDays);
                 formattedDayGroupings.Add($"{formattedClosedDays} Closed");
@@ -258,25 +260,44 @@ namespace Ocuda.Promenade.Service
             return formattedDayGroupings;
         }
 
-        private string GetFormattedDayGroupings(List<DayOfWeek> days)
+        private string GetFormattedDayGroupings(List<DayOfWeek> days, bool isStructuredData=false)
         {
             var dayFormatter = new DateTimeFormatInfo();
             if (days.Count == 1)
             {
-                return dayFormatter.GetAbbreviatedDayName(days[0]);
+                return isStructuredData ? dayFormatter.GetAbbreviatedDayName(days[0]).Substring(0,2)
+                    : dayFormatter.GetAbbreviatedDayName(days[0]);
             }
             else
             {
                 var firstDay = days[0];
                 var lastDay = days.Last();
 
-                if (days.Count == lastDay - firstDay + 1)
+                if (days.Count == 2)
                 {
-                    return $"{dayFormatter.GetAbbreviatedDayName(firstDay)}{ndash}{dayFormatter.GetAbbreviatedDayName(lastDay)}";
+                    if (isStructuredData)
+                    {
+                        return $"{dayFormatter.GetAbbreviatedDayName(firstDay).Substring(0, 2)}" +
+                            $"{ndash}{dayFormatter.GetAbbreviatedDayName(lastDay).Substring(0, 2)}";
+                    }
+                    else
+                    {
+                        return $"{dayFormatter.GetAbbreviatedDayName(firstDay)}" +
+                            $" & {dayFormatter.GetAbbreviatedDayName(lastDay)}";
+                    }
                 }
-                else if (days.Count == 2)
+                else if (days.Count == lastDay - firstDay + 1)
                 {
-                    return $"{dayFormatter.GetAbbreviatedDayName(firstDay)} & {dayFormatter.GetAbbreviatedDayName(lastDay)}";
+                    if (isStructuredData)
+                    {
+                        return $"{dayFormatter.GetAbbreviatedDayName(firstDay).Substring(0,2)}" +
+                            $"{ndash}{dayFormatter.GetAbbreviatedDayName(lastDay).Substring(0, 2)}";
+                    }
+                    else
+                    {
+                        return $"{dayFormatter.GetAbbreviatedDayName(firstDay)}" +
+                            $"{ndash}{dayFormatter.GetAbbreviatedDayName(lastDay)}";
+                    }
                 }
                 else
                 {
