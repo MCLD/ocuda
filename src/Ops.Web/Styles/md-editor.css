@@ -1,4 +1,4 @@
-﻿.wmd-input {
+﻿.md-input {
     width: 100%;
     resize: vertical;
     height: 300px;
@@ -7,7 +7,7 @@
     color: black;
 }
 
-.wmd-preview {
+.md-preview {
     width: 100%;
     border: 1px solid #a9a9a9;
     border-radius: 4px;
@@ -15,17 +15,13 @@
     margin-top: 1rem;
 }
 
-.wmd-selected {
-    background-color: #eeeeee;
-}
-
-.wmd-preview blockquote {
+.md-preview blockquote {
     border-left: 2px dotted #888;
     padding-left: 5px;
     background: #d0f0ff;
 }
 
-.wmd-button-row {
+.md-button-row {
     position: relative;
     margin-left: 5px;
     margin-right: 5px;
@@ -35,7 +31,7 @@
     height: 20px;
 }
 
-.wmd-spacer {
+.md-spacer {
     width: 1px;
     height: 16px;
     margin-left: 14px;
@@ -45,7 +41,7 @@
     list-style: none;
 }
 
-.wmd-button {
+.md-button {
     width: 20px;
     height: 20px;
     padding-left: 2px;
@@ -56,37 +52,37 @@
     cursor: pointer;
 }
 
-.wmd-prompt-background {
+.md-prompt-background {
     background-color: Black;
     z-index: 1100;
 }
 
-.wmd-prompt-dialog {
+.md-prompt-dialog {
     border: 1px solid #999999;
     background-color: #F5F5F5;
     z-index: 1101;
     padding: 0.5rem 0;
 }
     
-    .wmd-prompt-dialog > .nav {
+    .md-prompt-dialog > .nav {
         padding: 0 0.5rem;
     }
 
-    .wmd-prompt-dialog > .tab-content {
+    .md-prompt-dialog > .tab-content {
         padding: 0 0.5rem;
     }
 
-    .wmd-prompt-dialog > div {
+    .md-prompt-dialog > div {
         font-size: 0.8em;
     }
 
 
-    .wmd-prompt-dialog > form > input[type="text"] {
+    .md-prompt-dialog > form > input[type="text"] {
         border: 1px solid #999999;
         color: black;
     }
 
-    .wmd-prompt-dialog > form > input[type="button"] {
+    .md-prompt-dialog > form > input[type="button"] {
         border: 1px solid #888888;
         font-size: 0.8em;
         font-weight: bold;

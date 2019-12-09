@@ -1,12 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Ocuda.Promenade.Models.Abstract;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class LocationHoursOverride
+    public class LocationHoursOverride : BaseEntity
     {
-        public int Id { get; set; }
-
         public int? LocationId { get; set; }
         public Location Location { get; set; }
 

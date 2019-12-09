@@ -4,7 +4,9 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -14,20 +16,19 @@ using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
-    public class LocationService : ILocationService
+    public class LocationService : BaseService<LocationService>, ILocationService
     {
         private const string ndash = "\u2013";
 
-        private readonly ILogger<LocationService> _logger;
         private readonly ILocationRepository _locationRepository;
         private readonly ILocationHoursRepository _locationHoursRepository;
 
         public LocationService(ILogger<LocationService> logger,
+            IHttpContextAccessor httpContextAccessor,
             ILocationRepository locationRepository,
             ILocationHoursRepository locationHoursRepository)
+            : base(logger, httpContextAccessor)
         {
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
             _locationRepository = locationRepository
                 ?? throw new ArgumentNullException(nameof(locationRepository));
             _locationHoursRepository = locationHoursRepository
@@ -65,6 +66,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<Location> AddLocationAsync(Location location)
         {
+            location.CreatedAt = DateTime.Now;
+            location.CreatedBy = GetCurrentUserId();
             location.Name = location.Name?.Trim();
             await ValidateAsync(location);
 
@@ -91,16 +94,25 @@ namespace Ocuda.Ops.Service
             currentLocation.Facebook = location.Facebook;
             currentLocation.EventLink = location.EventLink;
             currentLocation.SubscriptionLink = location.SubscriptionLink;
+            currentLocation.UpdatedAt = DateTime.Now;
+            currentLocation.UpdatedBy = GetCurrentUserId();
+
             await ValidateAsync(currentLocation);
+
             _locationRepository.Update(currentLocation);
             await _locationRepository.SaveAsync();
             return currentLocation;
         }
+
         public async Task<Location> EditAlwaysOpenAsync(Location location)
         {
             var currentLocation = await _locationRepository.FindAsync(location.Id);
             currentLocation.IsAlwaysOpen = location.IsAlwaysOpen;
+            currentLocation.UpdatedAt = DateTime.Now;
+            currentLocation.UpdatedBy = GetCurrentUserId();
+
             await ValidateAsync(currentLocation);
+
             _locationRepository.Update(currentLocation);
             await _locationRepository.SaveAsync();
             return currentLocation;

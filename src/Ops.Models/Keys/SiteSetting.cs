@@ -24,6 +24,11 @@
             public const string ThumbnailTypes = "FileManagement.ThumbnailTypes";
         }
 
+        public struct SiteManagement
+        {
+            public const string PromenadeUrl = "SiteManagement.PromenadeUrl";
+        }
+
         public struct UserInterface
         {
             public const string ItemsPerPage = "UserInterface.ItemsPerPage";

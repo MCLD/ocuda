@@ -1,11 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Ocuda.Promenade.Models.Abstract;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class SiteSetting
+    public class SiteSetting : BaseEntity
     {
-        public int Id { get; set; }
-
         [Required]
         [MaxLength(255)]
         public string Key { get; set; }

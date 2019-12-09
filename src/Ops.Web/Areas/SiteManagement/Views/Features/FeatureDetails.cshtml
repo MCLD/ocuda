@@ -57,41 +57,11 @@
                                autocomplete="off"
                                info-tooltip="The stub is the nickname/URL for the feature."
                                on-blur-js="FormatStub" />
-                        <div class="form-group row" id="bodyText-div">
-                            <label asp-for="Feature.BodyText"
-                                   class="col-md-3 col-form-label text-md-right"></label>
-                            <div class="col-md-9">
-                                <ul class="nav nav-tabs">
-                                    <li class="nav-item">
-                                        <a class="nav-link active"
-                                           data-toggle="tab"
-                                           href="#md-edit"
-                                           role="tab">Edit</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link"
-                                           data-toggle="tab"
-                                           href="#md-preview"
-                                           role="tab">Preview</a>
-                                    </li>
-                                </ul>
-                                <div class="tab-content" id="md-edit-preview">
-                                    <div class="tab-pane show active"
-                                         id="md-edit"
-                                         role="tabpanel">
-                                        <div id="wmd-button-bar"
-                                             class="wmd-button-row"></div>
-                                        <textarea asp-for="Feature.BodyText"
-                                                  value="@Model.Feature.BodyText"
-                                                  class="form-control wmd-input"
-                                                  id="wmd-input"></textarea>
-                                    </div>
-                                    <div class="tab-pane" id="md-preview" role="tabpanel">
-                                        <div id="preview" class="wmd-preview"></div>
-                                    </div>
-                                    <span asp-validation-for="Feature.BodyText"
-                                          class="text-danger"></span>
-                                </div>
+                        <div class="form-group row">
+                            <label asp-for="Feature.BodyText" class="col-md-3 col-form-label text-md-right"></label>
+                            <div class="form-group-inner col-md-9">
+                                <textarea asp-for="Feature.BodyText" markdown-editor></textarea>
+                                <span asp-validation-for="Feature.BodyText" class="validation-message text-danger"></span>
                             </div>
                         </div>
                     </div>
@@ -168,7 +138,7 @@
         }
 
         $(document).ready(function () {
-            var editor = new Markdown.Editor({ allowUploads: false });
+            var editor = new Markdown.Editor($("#Feature_BodyText"), { allowUploads: false });
             editor.run();
             $('.icon-picker').iconpicker();
             $('[data-toggle="tooltip"]').tooltip();

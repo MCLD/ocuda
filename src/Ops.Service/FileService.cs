@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -15,22 +15,21 @@ using Ocuda.Utility.Helpers;
 
 namespace Ocuda.Ops.Service
 {
-    public class FileService : IFileService
+    public class FileService : BaseService<FileService>, IFileService
     {
-        private readonly ILogger<FileService> _logger;
         private readonly IFileLibraryRepository _fileLibraryRepository;
         private readonly IFileRepository _fileRepository;
         private readonly IFileTypeService _fileTypeService;
         private readonly IPathResolverService _pathResolver;
 
         public FileService(ILogger<FileService> logger,
+            IHttpContextAccessor httpContextAccessor,
             IFileLibraryRepository fileLibraryRepository,
             IFileRepository fileRepository,
             IFileTypeService fileTypeService,
             IPathResolverService pathResolver)
+            : base(logger, httpContextAccessor)
         {
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
             _fileLibraryRepository = fileLibraryRepository
                 ?? throw new ArgumentNullException(nameof(fileLibraryRepository));
             _fileRepository = fileRepository
@@ -51,8 +50,7 @@ namespace Ocuda.Ops.Service
             return await _fileRepository.GetPaginatedListAsync(filter);
         }
 
-        public async Task<File> CreatePrivateFileAsync(int currentUserId,
-            File file, IFormFile fileDatas)
+        public async Task<File> CreatePrivateFileAsync(File file, IFormFile fileDatas)
         {
             var extension = System.IO.Path.GetExtension(fileDatas.FileName);
             var fileType = await _fileTypeService.GetByExtensionAsync(extension);
@@ -66,7 +64,7 @@ namespace Ocuda.Ops.Service
             file.Description = file.Description?.Trim();
             file.Name = file.Name?.Trim();
             file.CreatedAt = DateTime.Now;
-            file.CreatedBy = currentUserId;
+            file.CreatedBy = GetCurrentUserId();
             file.FileTypeId = fileType.Id;
 
             await _fileRepository.AddAsync(file);
@@ -78,8 +76,7 @@ namespace Ocuda.Ops.Service
             return file;
         }
 
-        public async Task<File> EditPrivateFileAsync(int currentUserId,
-            File file,
+        public async Task<File> EditPrivateFileAsync(File file,
             IFormFile fileData,
             ICollection<IFormFile> thumbnailFiles,
             int[] thumbnailIdsToKeep)
@@ -103,6 +100,8 @@ namespace Ocuda.Ops.Service
 
             currentFile.Description = file.Description?.Trim();
             currentFile.Name = file.Name?.Trim();
+            currentFile.UpdatedAt = DateTime.Now;
+            currentFile.UpdatedBy = GetCurrentUserId();
 
             _fileRepository.Update(currentFile);
             await _fileRepository.SaveAsync();
@@ -180,8 +179,7 @@ namespace Ocuda.Ops.Service
             }
         }
 
-        public async Task<File> CreatePublicFileAsync(int currentUserId, File file,
-            IFormFile fileData)
+        public async Task<File> CreatePublicFileAsync(File file, IFormFile fileData)
         {
             var extension = System.IO.Path.GetExtension(fileData.FileName);
             var fileType = await _fileTypeService.GetByExtensionAsync(extension);
@@ -196,7 +194,7 @@ namespace Ocuda.Ops.Service
             file.Description = file.Description?.Trim();
             file.FileTypeId = fileType.Id;
             file.CreatedAt = DateTime.Now;
-            file.CreatedBy = currentUserId;
+            file.CreatedBy = GetCurrentUserId();
 
             await _fileRepository.AddAsync(file);
             await _fileRepository.SaveAsync();
@@ -259,13 +257,12 @@ namespace Ocuda.Ops.Service
             return await _fileLibraryRepository.GetPaginatedListAsync(filter);
         }
 
-        public async Task<FileLibrary> CreateLibraryAsync(int currentUserId, FileLibrary library,
-            int sectionId)
+        public async Task<FileLibrary> CreateLibraryAsync(FileLibrary library, int sectionId)
         {
             library.Name = library.Name?.Trim();
             library.Stub = library.Stub?.Trim();
             library.CreatedAt = DateTime.Now;
-            library.CreatedBy = currentUserId;
+            library.CreatedBy = GetCurrentUserId();
 
             await _fileLibraryRepository.AddAsync(library);
             await _fileLibraryRepository.SaveAsync();
@@ -277,6 +274,9 @@ namespace Ocuda.Ops.Service
         {
             library.Name = library.Name?.Trim();
             library.Stub = library.Stub?.Trim();
+            library.UpdatedAt = DateTime.Now;
+            library.UpdatedBy = GetCurrentUserId();
+
             _fileLibraryRepository.Update(library);
 
             await _fileLibraryRepository.SaveAsync();

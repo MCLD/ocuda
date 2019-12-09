@@ -47,14 +47,17 @@ namespace Ocuda.Ops.Service
 
         public async Task AddCoverIssueAsync(int bibId)
         {
+            var now = DateTime.Now;
+            var currentUserId = GetCurrentUserId();
+
             var header = await _coverIssueHeaderRepository.GetByBibIdAsync(bibId);
             if (header == null)
             {
                 header = new CoverIssueHeader
                 {
                     BibId = bibId,
-                    CreatedAt = DateTime.Now,
-                    CreatedBy = GetCurrentUserId(),
+                    CreatedAt = now,
+                    CreatedBy = currentUserId,
                     HasPendingIssue = true
                 };
                 await _coverIssueHeaderRepository.AddAsync(header);
@@ -68,8 +71,8 @@ namespace Ocuda.Ops.Service
             var detail = new CoverIssueDetail
             {
                 CoverIssueHeader = header,
-                CreatedAt = DateTime.Now,
-                CreatedBy = GetCurrentUserId()
+                CreatedAt = now,
+                CreatedBy = currentUserId
             };
 
             await _coverIssueDetailRepository.AddAsync(detail);
@@ -79,14 +82,23 @@ namespace Ocuda.Ops.Service
         public async Task ResolveCoverIssueAsnyc(int headerId)
         {
             var header = await _coverIssueHeaderRepository.FindAsync(headerId);
+
+            var now = DateTime.Now;
+            var currentUserId = GetCurrentUserId();
+
             header.HasPendingIssue = false;
-            header.LastResolved = DateTime.Now;
+            header.LastResolved = now;
+            header.UpdatedAt = now;
+            header.UpdatedBy = currentUserId;
+
             _coverIssueHeaderRepository.Update(header);
 
             var details = await _coverIssueDetailRepository.GetByHeaderIdAsync(header.Id, false);
             foreach (var detail in details)
             {
                 detail.IsResolved = true;
+                detail.UpdatedAt = now;
+                detail.UpdatedBy = currentUserId;
             }
             _coverIssueDetailRepository.UpdateRange(details);
 

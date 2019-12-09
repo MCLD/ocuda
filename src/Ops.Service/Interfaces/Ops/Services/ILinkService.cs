@@ -13,7 +13,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<Link> GetByIdAsync(int id);
         Task<Link> GetLatestByLibraryIdAsync(int id);
         Task<DataWithCount<ICollection<Link>>> GetPaginatedListAsync(BlogFilter filter);
-        Task<Link> CreateAsync(int currentUserId, Link link);
+        Task<Link> CreateAsync(Link link);
         Task<Link> EditAsync(Link link);
         Task DeleteAsync(int id);
         Task<List<Link>> GetLinkLibraryLinksAsync(int id);
@@ -22,7 +22,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<DataWithCount<ICollection<LinkLibrary>>> GetPaginatedLibraryListAsync(
             BlogFilter filter);
 
-        Task<LinkLibrary> CreateLibraryAsync(int currentUserId, LinkLibrary library, int sectionId);
+        Task<LinkLibrary> CreateLibraryAsync(LinkLibrary library, int sectionId);
         Task<LinkLibrary> UpdateLibraryAsync(LinkLibrary library);
         Task DeleteLibraryAsync(int id);
         Task<List<LinkLibrary>> GetLinkLibrariesBySectionAsync(int sectionId);

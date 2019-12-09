@@ -3,6 +3,44 @@
     padding-bottom: 1rem;
 }
 
+.link-table {
+    position: relative;
+}
+
+.rowlink::before {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: inherit; /* don't forget to set the height! */
+    margin-top: -5px;
+}
+
+.rowlink:hover::before {
+    background-color: #EAEAEA;
+    background-color: rgba(51, 51, 51, .1);
+    cursor: pointer;
+}
+
+a.rowlink {
+    color: #515151;
+    text-decoration: none;
+    height: 30px;
+}
+
+.on-top {
+    position: relative;
+    z-index: 100;
+    background-color: white;
+    background-clip: padding-box;
+}
+
+.on-top-nobg {
+    z-index: 100;
+    position: relative;
+}
+
 .page-link {
     height: 36px;
 }
@@ -28,6 +66,14 @@
 .input-validation-error {
     border: 1px solid #f00;
     background-color: #fee;
+}
+
+.colored-icon.fa-times {
+    color: red;
+}
+
+.colored-icon.fa-check {
+    color: green;
 }
 
 .navbar .dropdown-item:hover {

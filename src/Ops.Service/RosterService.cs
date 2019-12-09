@@ -4,14 +4,16 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ExcelDataReader;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Service
 {
-    public class RosterService : IRosterService
+    public class RosterService : BaseService<RosterService>, IRosterService
     {
         public const string NameHeading = "Name";
         public const string EmployeeIdHeading = "ID";
@@ -24,19 +26,19 @@ namespace Ocuda.Ops.Service
         public const string EmailHeading = "Email Address";
         public const string AsOfHeading = "As Of Date";
 
-        private readonly ILogger _logger;
         private readonly ILdapService _ldapService;
         private readonly IRosterDetailRepository _rosterDetailRepository;
         private readonly IRosterHeaderRepository _rosterHeaderRepository;
         private readonly IUserRepository _userRepository;
 
         public RosterService(ILogger<RosterService> logger,
+            IHttpContextAccessor httpContextAccessor,
             ILdapService ldapService,
             IRosterDetailRepository rosterDetailRepository,
             IRosterHeaderRepository rosterHeaderRepository,
             IUserRepository userRepository)
+            : base(logger, httpContextAccessor)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _ldapService = ldapService ?? throw new ArgumentNullException(nameof(ldapService));
             _rosterDetailRepository = rosterDetailRepository
                 ?? throw new ArgumentNullException(nameof(rosterDetailRepository));
@@ -287,6 +289,9 @@ namespace Ocuda.Ops.Service
                 {
                     user.SupervisorId = null;
                 }
+
+                user.UpdatedAt = DateTime.Now;
+                user.UpdatedBy = GetCurrentUserId();
             }
 
             _userRepository.UpdateRange(rosterUsers);

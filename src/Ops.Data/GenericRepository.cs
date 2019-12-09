@@ -60,6 +60,11 @@ namespace Ocuda.Ops.Data
             DbSet.Remove(DbSet.Find(id));
         }
 
+        public virtual void RemoveRange(ICollection<TEntity> entities)
+        {
+            DbSet.RemoveRange(entities);
+        }
+
         public virtual void Update(TEntity entity)
         {
             DbSet.Update(entity);

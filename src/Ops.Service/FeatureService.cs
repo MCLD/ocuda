@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -11,16 +13,15 @@ using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
-    public class FeatureService : IFeatureService
+    public class FeatureService : BaseService<FeatureService>, IFeatureService
     {
-        private readonly ILogger<FeatureService> _logger;
         private readonly IFeatureRepository _featureRepository;
 
         public FeatureService(ILogger<FeatureService> logger,
+            IHttpContextAccessor httpContextAccessor,
             IFeatureRepository featureRepository)
+            : base(logger, httpContextAccessor)
         {
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
             _featureRepository = featureRepository
                 ?? throw new ArgumentNullException(nameof(featureRepository));
         }
@@ -66,6 +67,8 @@ namespace Ocuda.Ops.Service
                 feature.Name = feature.Name?.Trim();
                 feature.BodyText = feature.BodyText?.Trim();
                 feature.Stub = feature.Stub?.Trim();
+                feature.CreatedAt = DateTime.Now;
+                feature.CreatedBy = GetCurrentUserId();
 
                 await ValidateAsync(feature);
                 await _featureRepository.AddAsync(feature);
@@ -100,6 +103,9 @@ namespace Ocuda.Ops.Service
                     currentFeature.FontAwesome = feature.FontAwesome;
                     currentFeature.Name = feature.Name?.Trim();
                     currentFeature.Stub = feature.Stub?.Trim();
+                    currentFeature.UpdatedAt = DateTime.Now;
+                    currentFeature.UpdatedBy = GetCurrentUserId();
+
                     _featureRepository.Update(feature);
                     await _featureRepository.SaveAsync();
                     return await _featureRepository.FindAsync(currentFeature.Id);

@@ -15,6 +15,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         Task<TEntity> FindAsync(TKeyType id);
         void Remove(TEntity entity);
         void Remove(TKeyType id);
+        void RemoveRange(ICollection<TEntity> entities);
         Task SaveAsync();
         Task<ICollection<TEntity>> ToListAsync(int skip, int take, params Expression<Func<TEntity, IComparable>>[] orderBys);
         Task<ICollection<TEntity>> ToListAsync(params Expression<Func<TEntity, IComparable>>[] orderBys);

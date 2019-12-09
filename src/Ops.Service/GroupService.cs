@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -13,11 +13,14 @@ using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
-    public class GroupService : IGroupService
+    public class GroupService : BaseService<GroupService>, IGroupService
     {
         private readonly IGroupRepository _groupRepository;
 
-        public GroupService(IGroupRepository groupRepository)
+        public GroupService(ILogger<GroupService> logger,
+            IHttpContextAccessor httpContextAccessor,
+            IGroupRepository groupRepository)
+            : base (logger, httpContextAccessor)
         {
             _groupRepository = groupRepository
                 ?? throw new ArgumentNullException(nameof(groupRepository));
@@ -80,6 +83,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<Group> AddGroupAsync(Group group)
         {
+            group.CreatedAt = DateTime.Now;
+            group.CreatedBy = GetCurrentUserId();
             group.GroupType = group.GroupType?.Trim();
             group.Stub = group.Stub.Trim();
             group.SubscriptionUrl = group.SubscriptionUrl?.Trim();
@@ -97,6 +102,8 @@ namespace Ocuda.Ops.Service
             currentGroup.Stub = group.Stub.Trim();
             currentGroup.IsLocationRegion = group.IsLocationRegion;
             currentGroup.SubscriptionUrl = group.SubscriptionUrl?.Trim();
+            currentGroup.UpdatedAt = DateTime.Now;
+            currentGroup.UpdatedBy = GetCurrentUserId();
             _groupRepository.Update(currentGroup);
             await _groupRepository.SaveAsync();
             return currentGroup;

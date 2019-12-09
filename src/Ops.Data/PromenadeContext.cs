@@ -26,13 +26,15 @@ namespace Ocuda.Ops.Data
         public new string GetCurrentMigration() => Database.GetAppliedMigrations().Last();
         #endregion IMigratableContext
 
+        public DbSet<Feature> Features { get; set; }
+        public DbSet<Group> Groups { get; set; }
+        public DbSet<Language> Languages { get; set; }
         public DbSet<LocationHours> LocationHours { get; set; }
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; set; }
-        public DbSet<Location> Location { get; set; }
-        public DbSet<Feature> Feature { get; set; }
-        public DbSet<Group> Group { get; set; }
-        public DbSet<LocationFeature> LocationFeature { get; set; }
-        public DbSet<LocationGroup> LocationGroup { get; set; }
+        public DbSet<Location> Locations { get; set; }
+        public DbSet<LocationFeature> LocationFeatures { get; set; }
+        public DbSet<LocationGroup> LocationGroups { get; set; }
+        public DbSet<PageHeader> PageHeaders { get; }
         public DbSet<Page> Pages { get; set; }
         public DbSet<SiteSetting> SiteSettings { get; set; }
         public DbSet<SocialCard> SocialCards { get; set; }

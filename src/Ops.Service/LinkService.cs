@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -10,13 +13,16 @@ using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
-    public class LinkService : ILinkService
+    public class LinkService : BaseService<LinkService>, ILinkService
     {
         private readonly ILinkLibraryRepository _linkLibraryRepository;
         private readonly ILinkRepository _linkRepository;
 
-        public LinkService(ILinkLibraryRepository linkLibraryRepository,
+        public LinkService(ILogger<LinkService> logger,
+            IHttpContextAccessor httpContextAccessor,
+            ILinkLibraryRepository linkLibraryRepository,
             ILinkRepository linkRepository)
+            : base(logger, httpContextAccessor)
         {
             _linkRepository = linkRepository
                 ?? throw new ArgumentNullException(nameof(linkRepository));
@@ -54,7 +60,7 @@ namespace Ocuda.Ops.Service
             return await _linkRepository.GetPaginatedListAsync(filter);
         }
 
-        public async Task<Link> CreateAsync(int currentUserId, Link link)
+        public async Task<Link> CreateAsync(Link link)
         {
             var newLink = new Link
             {
@@ -63,7 +69,7 @@ namespace Ocuda.Ops.Service
                 Icon = link.Icon.Trim(),
                 LinkLibraryId = link.LinkLibraryId,
                 CreatedAt = DateTime.Now,
-                CreatedBy = currentUserId
+                CreatedBy = GetCurrentUserId()
             };
 
             await _linkRepository.AddAsync(newLink);
@@ -78,6 +84,8 @@ namespace Ocuda.Ops.Service
             currentLink.Name = link.Name?.Trim();
             currentLink.Url = link.Url?.Trim();
             currentLink.Icon = link.Icon;
+            currentLink.UpdatedAt = DateTime.Now;
+            currentLink.UpdatedBy = GetCurrentUserId();
 
             _linkRepository.Update(currentLink);
             await _linkRepository.SaveAsync();
@@ -101,12 +109,12 @@ namespace Ocuda.Ops.Service
             return await _linkLibraryRepository.GetPaginatedListAsync(filter);
         }
 
-        public async Task<LinkLibrary> CreateLibraryAsync(int currentUserId, LinkLibrary library, int sectionId)
+        public async Task<LinkLibrary> CreateLibraryAsync(LinkLibrary library, int sectionId)
         {
             library.IsNavigation = false;
             library.Name = library.Name?.Trim();
             library.CreatedAt = DateTime.Now;
-            library.CreatedBy = currentUserId;
+            library.CreatedBy = GetCurrentUserId();
 
             await _linkLibraryRepository.AddAsync(library);
             await _linkLibraryRepository.SaveAsync();
@@ -117,6 +125,8 @@ namespace Ocuda.Ops.Service
         {
             library.Name = library.Name?.Trim();
             library.Stub = library.Stub?.Trim();
+            library.UpdatedAt = DateTime.Now;
+            library.UpdatedBy = GetCurrentUserId();
 
             _linkLibraryRepository.Update(library);
             await _linkLibraryRepository.SaveAsync();

@@ -18,6 +18,7 @@ using Ocuda.Ops.Controllers.Authorization;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Ops.Web.StartupHelper;
 using Ocuda.Utility.Keys;
 
@@ -162,8 +163,8 @@ namespace Ocuda.Ops.Web
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(_ =>
                 {
-                    _.AccessDeniedPath = "/Home/Unauthorized";
-                    _.LoginPath = "/Home/Authenticate";
+                    _.AccessDeniedPath = "/Unauthorized";
+                    _.LoginPath = "/Authenticate";
                 });
 
             services.AddSingleton<IAuthorizationHandler, SectionManagerHandler>();
@@ -245,6 +246,15 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserRepository,
                 Data.Ops.UserRepository>();
 
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILanguageRepository,
+                Data.Promenade.LanguageRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageRepository,
+                Data.Promenade.PageRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageHeaderRepository,
+                Data.Promenade.PageHeaderRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ISocialCardRepository,
+                Data.Promenade.SocialCardRepository>();
+
             // services
             services.AddScoped<Service.Interfaces.Ops.Services.IAuthorizationService,
                 AuthorizationService>();
@@ -257,17 +267,20 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IInitialSetupService, InitialSetupService>();
             services.AddScoped<IInsertSampleDataService, InsertSampleDataService>();
+            services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<ILdapService, LdapService>();
             services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<ILocationHoursService, LocationHoursService>();
             services.AddScoped<ILocationGroupService, LocationGroupService>();
             services.AddScoped<ILocationFeatureService, LocationFeatureService>();
             services.AddScoped<ILinkService, LinkService>();
+            services.AddScoped<IPageService, PageService>();
             services.AddScoped<IPathResolverService, PathResolverService>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IRosterService, RosterService>();
             services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<ISiteSettingService, SiteSettingService>();
+            services.AddScoped<ISocialCardService, SocialCardService>();
             services.AddScoped<Service.Abstract.IUserContextProvider, UserContextProvider>();
             services.AddScoped<IUserMetadataTypeService, UserMetadataTypeService>();
             services.AddScoped<IUserService, UserService>();
@@ -281,7 +294,7 @@ namespace Ocuda.Ops.Web
             IPathResolverService pathResolver)
         {
             // configure error page handling and development IDE linking
-            if (env.IsDevelopment())
+            if (_isDevelopment)
             {
                 app.UseDeveloperExceptionPage();
                 app.UseStaticFiles(new StaticFileOptions

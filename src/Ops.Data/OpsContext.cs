@@ -50,7 +50,7 @@ namespace Ocuda.Ops.Data
         public DbSet<FileLibraryFileType> FileLibraryFileTypes { get; set; }
         public DbSet<FileType> FileTypes { get; set; }
         public DbSet<Link> Links { get; set; }
-        public DbSet<Link> LinkLibrary { get; set; }
+        public DbSet<LinkLibrary> LinkLibraries { get; set; }
         public DbSet<PostCategory> PostCategories { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Category> Categories { get; set; }

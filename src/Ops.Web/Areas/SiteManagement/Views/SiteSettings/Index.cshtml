@@ -56,7 +56,7 @@ else
                                 <span class="fa fa-pencil-alt" aria-hidden="true"></span>
                             </button>
                         </div>
-                        @if (setting.Type == SiteSettingType.Bool)
+                        @if (setting.Type == Ocuda.Ops.Models.Entities.SiteSettingType.Bool)
                         {
                             <select class="form-control" asp-for="@setting.Value" disabled>
                                 <option value="false">No</option>

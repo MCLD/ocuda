@@ -1,27 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
-    public class LocationHoursService : ILocationHoursService
+    public class LocationHoursService : BaseService<LocationHoursService>, ILocationHoursService
     {
-        private readonly ILogger<LocationHoursService> _logger;
         private readonly ILocationHoursRepository _locationHoursRepository;
 
         public LocationHoursService(ILogger<LocationHoursService> logger,
+            IHttpContextAccessor httpContextAccessor,
             ILocationHoursRepository locationHoursRepository)
+            : base(logger, httpContextAccessor)
         {
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
             _locationHoursRepository = locationHoursRepository
                 ?? throw new ArgumentNullException(nameof(locationHoursRepository));
         }
@@ -33,7 +31,11 @@ namespace Ocuda.Ops.Service
 
         public async Task<LocationHours> AddLocationHoursAsync(LocationHours locationHours)
         {
+            locationHours.CreatedAt = DateTime.Now;
+            locationHours.CreatedBy = GetCurrentUserId();
+
             await ValidateAsync(locationHours);
+
             await _locationHoursRepository.AddAsync(locationHours);
             await _locationHoursRepository.SaveAsync();
             return locationHours;
@@ -47,6 +49,9 @@ namespace Ocuda.Ops.Service
                 currentLocationHour.Open = hour.Open;
                 currentLocationHour.OpenTime = hour.OpenTime;
                 currentLocationHour.CloseTime = hour.CloseTime;
+                currentLocationHour.UpdatedAt = DateTime.Now;
+                currentLocationHour.UpdatedBy = GetCurrentUserId();
+
                 await ValidateAsync(currentLocationHour);
                 _locationHoursRepository.Update(currentLocationHour);
                 await _locationHoursRepository.SaveAsync();
