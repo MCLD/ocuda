@@ -56,6 +56,18 @@ namespace Ocuda.Promenade.Models.Entities
 
         public string State { get; set; }
 
+        public string SDType { get; set; }
+
+        public string SDEmail { get; set; }
+
+        public string SDAreaServedName { get; set; }
+
+        public string SDAreaServedType { get; set; }
+
+        public string SDLocationId { get; set; }
+
+        public string SDParentOrganization { get; set; }
+
         [MaxLength(255)]
         public string GeoLocation { get; set; }
 
