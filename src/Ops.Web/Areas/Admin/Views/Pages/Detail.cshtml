@@ -1,0 +1,123 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages.DetailViewModel
+
+@section styles {
+    <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
+}
+
+<form asp-controller="Pages" asp-action="@(nameof(PagesController.DeletePage))" method="post" role="form">
+    <input id="deleteHeaderId" asp-for="HeaderId" type="hidden" />
+    <input id="deleteLanguageId" asp-for="SelectedLanguageId" type="hidden" />
+    <div modal id="deleteModal" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+</form>
+
+<div class="row" style="padding-top: 1rem;">
+    <div class="col-12">
+        <input asp-for="HeaderName" formgroup readonly />
+        <input asp-for="HeaderStub" formgroup readonly />
+        <select asp-for="SelectedLanguage" asp-items="Model.LanguageList" formgroup></select>
+    </div>
+</div>
+
+@if (!Model.NewPage)
+{
+    <div class="row">
+        <div class="col-12 col-md-9 offset-md-3">
+            <div class="row">
+                <div class="col-6">
+                    @if (!string.IsNullOrWhiteSpace(Model.PageUrl))
+                    {
+                        <label class="control-label">Link to page</label>
+                        <br />
+                        <a href="@Model.PageUrl"
+                           target="_blank">
+                            @Model.PageUrl
+                        </a>
+                    }
+                </div>
+                <div class="col-6">
+                    <a asp-action="@nameof(PagesController.Preview)"
+                       asp-route-headerId="@Model.HeaderId"
+                       asp-route-languageId="@Model.SelectedLanguageId"
+                       class="btn btn-outline-secondary text-dark float-right">
+                        Preview
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row" style="padding-bottom: 1rem;">
+    <div class="col-12 col-md-9 offset-md-3">
+        <hr />
+    </div>
+</div>
+
+<form asp-action="@nameof(PagesController.Detail)" method="post" role="form">
+    @if (!Model.NewPage)
+    {
+        <input asp-for="Page.Id" type="hidden" />
+    }
+
+    <input asp-for="HeaderId" type="hidden" />
+    <input asp-for="SelectedLanguageId" type="hidden" />
+    <input asp-for="NewPage" type="hidden" />
+
+    <input asp-for="Page.Title" formgroup />
+
+    <div class="form-group row">
+        <label asp-for="Page.Content" class="col-md-3 col-form-label text-md-right"></label>
+        <div class="form-group-inner col-md-9">
+            <textarea asp-for="Page.Content" markdown-editor></textarea>
+            <span asp-validation-for="Page.Content" class="validation-message text-danger"></span>
+        </div>
+    </div>
+
+    <select asp-for="Page.SocialCardId" asp-items="Model.SocialCardList" formgroup>
+        <option></option>
+    </select>
+
+    <select asp-for="Page.IsPublished" formgroup>
+        <option value="True">Yes</option>
+        <option value="False">No</option>
+    </select>
+
+    <div class="row">
+        <div class="offset-md-3 col-md-9">
+            <a asp-action="Index" class="btn btn-outline-secondary text-dark">Cancel</a>
+            <button type="submit" class="btn btn-success" buttonspinner>
+                Save
+            </button>
+            @if (!Model.NewPage)
+            {
+                <button type="button"
+                        class="btn btn-danger pull-right"
+                        data-toggle="modal"
+                        data-target="#deleteModal"
+                        data-headerId="@Model.Page.Id"
+                        data-languageId="@Model.SelectedLanguageId">
+                    Delete
+                </button>
+            }
+        </div>
+    </div>
+</form>
+
+@section scripts {
+    <script src="~/js/md.min.js" asp-append-version="true"></script>
+
+    <script>
+        var editor = new Markdown.Editor($("#Page_Content"), { allowUploads: true });
+        editor.run();
+
+        var pageUrl = "@Url.Action(nameof(PagesController.Detail), new { id = Model.HeaderId})";
+
+        $("#SelectedLanguage").on("change", function () {
+            window.location.href = pageUrl + "?language=" + $(this).val();
+        });
+
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            $(this).find(".modal-text").text("Are you sure you want to delete this page content?");
+        });
+    </script>
+}

@@ -1,0 +1,158 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.PostsViewModel
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a href="@Url.Action(nameof(SectionController.Index))" class="navbar-brand">Section</a>
+    <span class="navbar-brand">/</span>
+    <a href="@Url.Action(nameof(SectionController.Section),
+            new { sectionStub = Model.SectionStub})"
+       class="navbar-brand">@Model.SectionName</a>
+    <a class="nav-link"
+       href="@Url.Action(nameof(SectionController.Posts),
+           new { sectionStub = Model.SectionStub, categoryStub = "", page=1})">
+        Posts
+    </a>
+</nav>
+
+<div class="col-9 mx-auto">
+    <div class="row">
+        <div class="col-2 text-center">
+            <div class="row">
+                <div class="card mx-auto">
+                    <div class="card-header">
+                        By Category
+                    </div>
+                    @if (Model.SectionCategories.Count != 0)
+                    {
+                        <ul class="nav nav-pills flex-column">
+                            @foreach (var category in Model.SectionCategories)
+                            {
+                                <li>
+                                    <a href="@Url.Action(nameof(SectionController.Posts),
+                                       new { sectionStub = Model.SectionStub, categoryStub = category.Stub, page=1})"
+                                       class=" badge badge-light text-left"
+                                       style="margin: 5px 10px; padding: 5px 10px; width:80%">
+                                        @category.Name
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="col card-body">
+                            No Categories
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="card mx-auto">
+                    <div class="card-header">
+                        Recent Posts
+                    </div>
+                    @if (Model.SectionsPosts.Count != 0)
+                    {
+                        <ul class="nav nav-pills flex-column">
+                            @foreach (var post in Model.SectionsPosts)
+                            {
+                                <li>
+                                    <a href="@Url.Action(nameof(SectionController.PostDetails),
+                                       new { sectionStub = Model.SectionStub, postStub = post.Stub })"
+                                       class="badge badge-light text-left"
+                                       style="margin: 5px 10px; padding: 5px 10px; width:80%">
+                                        @post.Title
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="card-body">
+                            No Posts
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <span class="mx-auto">
+                    <a href="@Url.Action(nameof(SectionController.AddPost), new { sectionStub = Model.SectionStub})"
+                       class="btn btn-success"
+                       id="addPost">
+                   Create Post
+                </a>
+                </span>
+            </div>
+        </div>
+        <div class="col-10">
+            @if (Model.AllCategoryPosts != null)
+            {
+                @foreach (var post in Model.AllCategoryPosts)
+                {
+                    <div class="mx-auto">
+                        <div class="card m-3">
+                            <div class="card-header">
+                                <div class="float-left align-middle">
+                                    <a class="float-left align-middle" 
+                                       href="@Url.Action(nameof(SectionController.PostDetails),
+                                            new { sectionStub = Model.SectionStub, postStub = post.Stub})">
+                                        <h5>
+                                            @post.Title
+                                        </h5>
+                                    </a>
+                                </div>
+                                <div class="float-right align-middle h4">
+                                    <a href="@Url.Action(nameof(SectionController.EditPost), 
+                                            new { sectionStub = Model.SectionStub, postStub = post.Stub})">
+                                        <span class="far fa-edit float-right"></span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                @Html.Raw(post.Content)
+                            </div>
+                            <div class="card-footer">
+                                <div class="font-italic">Posted: @post.PublishedAt.ToString("MM/dd/yyyy hh:mm tt")</div>
+                                @if (Model.PostCategories.Count > 0)
+                                {
+                                    <div class="font-italic">
+                                        Category:&nbsp;
+                                        <span>
+                                            @foreach (var category in Model.PostCategories
+                                                .Where(_=>_.PostId == post.Id)
+                                                .Select(_=>Model.SectionCategories.Where(__=>__.Id == _.CategoryId).FirstOrDefault()).ToList())
+                                            {
+                                                <a class="badge badge-pill badge-info"
+                                                   href="@Url.Action(nameof(SectionController.Posts),
+                                        new { sectionStub = Model.SectionStub,
+                                        categoryStub = category.Stub, page = 1})">
+                                                    @category.Name
+                                                </a>
+                                            }
+                                        </span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            @if (Model.PaginateModel.MaxPage > 1)
+            {
+                <paginate paginateModel="@Model.PaginateModel"></paginate>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(function () {
+            @if (Model.SectionCategories.Count == 0)
+            {
+                @:$("#addPost").addClass("disabled");
+                @:$('[data-toggle="tooltip"]').tooltip();
+            }
+        });
+    </script>
+}

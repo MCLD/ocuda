@@ -1,0 +1,23 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.SectionIndexViewModel
+
+    <div class="col-6">
+        @if (Model.UserSections != null)
+        {
+            @foreach (var userSection in Model.UserSections)
+            {
+                <div class="card">
+                    <div class="card-body">
+                        <span class="@userSection.Icon"></span>
+                        <h4 class="card-title">@userSection.Name</h4>
+                        <a href="@Url.Action(nameof(SectionController.Section), new { sectionStub = userSection.Stub})" class="stretched-link"></a>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div>
+                You dont manage any sections
+            </div>
+        }
+    </div>

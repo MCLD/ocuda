@@ -8,7 +8,6 @@ using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Models;
-using Ocuda.Promenade.Data;
 
 namespace Ocuda.Ops.Data.Ops
 {
@@ -65,6 +64,14 @@ namespace Ocuda.Ops.Data.Ops
                 .Where(_ => _.FileLibraryId == libraryId)
                 .Select(_ => _.FileTypeId)
                 .Distinct()
+                .ToListAsync();
+        }
+
+        public async Task<List<File>> GetFileLibraryFilesAsync(int id)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.FileLibraryId == id)
                 .ToListAsync();
         }
     }

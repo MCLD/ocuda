@@ -224,7 +224,8 @@ namespace Ocuda.Ops.Controllers.Filters
                                 var claimList = claimGroups.Where(_ => _.GroupName == groupName);
                                 foreach (var claim in claimList)
                                 {
-                                    if (!claimantOf.ContainsKey(claim.ClaimType))
+                                    if (claim.ClaimType != ClaimType.SectionManager
+                                        && !claimantOf.ContainsKey(claim.ClaimType))
                                     {
                                         claimantOf.Add(claim.ClaimType, groupName);
                                     }
@@ -235,9 +236,9 @@ namespace Ocuda.Ops.Controllers.Filters
 
                                 foreach (var sectionManaged in sectionsManaged)
                                 {
-                                    if (!sectionManagerOf.Contains(sectionManaged.SectionName))
+                                    if (!sectionManagerOf.Contains(sectionManaged.Section.Name))
                                     {
-                                        sectionManagerOf.Add(sectionManaged.SectionName);
+                                        sectionManagerOf.Add(sectionManaged.Section.Name);
                                     }
                                 }
 
@@ -273,7 +274,7 @@ namespace Ocuda.Ops.Controllers.Filters
                             foreach (var sectionName in sectionManagerOf)
                             {
                                 claims.Add(new Claim(ClaimType.SectionManager,
-                                    sectionName.ToLower()));
+                                    sectionName));
                             }
                         }
 
