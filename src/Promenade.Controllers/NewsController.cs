@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -12,6 +10,7 @@ using Ocuda.Promenade.Service;
 namespace Ocuda.Promenade.Controllers
 {
     [Route("[Controller]")]
+    [Route("{culture:cultureConstraint}/[Controller]")]
     public class NewsController : BaseController<NewsController>
     {
         private readonly PageService _pageService;
@@ -37,24 +36,28 @@ namespace Ocuda.Promenade.Controllers
 
             if (page == null)
             {
-                var queryParams = Request.Query.ToDictionary(_ => _.Key, _ => _.Value.ToString());
-
-                var redirect = await _redirectService.GetUrlRedirectByPathAsync(Request.Path,
-                    queryParams);
+                var redirect = await _redirectService.GetUrlRedirectByPathAsync(Request.Path);
 
                 if (redirect != null)
                 {
+                    var redirectUrl = redirect.Url;
+
+                    if (Request.QueryString.HasValue)
+                    {
+                        redirectUrl += Request.QueryString;
+                    }
+
                     if (redirect.IsPermanent)
                     {
-                        return RedirectPermanent(redirect.Url);
+                        return RedirectPermanent(redirectUrl);
                     }
                     else
                     {
-                        return Redirect(redirect.Url);
+                        return Redirect(redirectUrl);
                     }
                 }
 
-                _logger.LogWarning($"No News article or redirect found for stub \"{stub}\": {Request.Path}");
+                _logger.LogWarning($"No News page or redirect found for stub \"{stub}\": {Request.Path}");
                 return View("PageNotFound");
             }
 

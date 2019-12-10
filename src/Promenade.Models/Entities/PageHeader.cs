@@ -25,6 +25,9 @@ namespace Ocuda.Promenade.Models.Entities
 
     public enum PageType
     {
-        About
+        About,
+        Home,
+        News,
+        Subject
     }
 }
