@@ -28,14 +28,14 @@
                     <td class="hours">
                         @if (Model.Location.IsAlwaysOpen)
                         {
-                        <p>Open</p>
+                            <p>Open</p>
                         }
                         else
                         {
                             @foreach (var time in Model.Location.LocationHours)
                             {
                                 <text>
-                                    <p>@time</p><br/>
+                                    <p>@time</p><br />
                                 </text>
                             }
                         }
@@ -43,111 +43,117 @@
                 </tr>
             </tbody>
         </table>
-            <h2>Information</h2>
-            <p>@Model.Location.Description</p>
+        <h2>Information</h2>
+        @Html.Raw(Model.Location.Description)
+        <div>
             <div>
-                <div>
-                    <a href="@Model.Location.EventLink" target="_blank">Browse Events</a>
-                </div>
-                <div>
-                    <a href="@Model.Location.SubscriptionLink" target="_blank">Send Me Events</a>
-                </div>
+                <a href="@Model.Location.EventLink" target="_blank">Browse Events</a>
             </div>
-            <div class="row branch-features text-center">
-                @foreach (var feature in Model.LocationFeatures)
-                {
-                    @if (string.IsNullOrEmpty(feature.RedirectUrl))
-                    {
-                        <text>
-                            <div class="col-xs-2">
-                                <a asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub= "@Model.Location.Stub" asp-route-featureStub="@feature.Stub" class="bring-modal" data-toggle="modal" data-target="#featureModal" target="_blank" data-feature="@feature.Stub">
-                                    <span class="fa-stack fa-2x" style="color:#007bff">
-                                        <span class="fa fa-square fa-stack-2x"></span>
-                                        <span class="@feature.FontAwesome" @if(!string.IsNullOrEmpty(feature.InnerSpan)) { @:style="color:white"
-                                                                                                                        }>
-                                            @if (!string.IsNullOrEmpty(feature.InnerSpan))
-                                            {
-                                                @Html.Raw(feature.InnerSpan.ToString());
-                                            }
-                                        </span>
-                                    </span>
-                                </a>
-                                <div>
-                                    <a class="bring-modal" data-toggle="modal" data-target="#featureModal" asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub="@Model.Location.Stub" asp-route-featureStub="@feature.Stub" data-feature="@feature.Stub"> @feature.Name</a>
-                                </div>
-                            </div>
-                        </text>
-                    }
-                    else
-                    {
-                        <text>
-                            <div class="col-xs-2">
-                                <a href="@feature.RedirectUrl" target="_blank">
-                                    <span class="fa-stack fa-2x" style="color:#007bff">
-                                        <span class="fa fa-square fa-stack-2x"></span>
-                                        <span class="@feature.FontAwesome">
-                                        </span>
-                                    </span>
-                                </a>
-                                <div>
-                                    <a href="@feature.RedirectUrl" data-feature="@feature.Stub" target="_blank">@feature.Name</a>
-                                </div>
-                            </div>
-                        </text>
-                    }
-                }
+            <div>
+                <a href="@Model.Location.SubscriptionLink" target="_blank">Send Me Events</a>
             </div>
-            @if (Model.NearbyCount > 1)
+        </div>
+        <div class="row branch-features text-center">
+            @foreach (var feature in Model.LocationFeatures)
             {
-                <div>
-                    <a name="nearby"></a>
-                    <h2>Nearby Locations</h2>
-                    <p>The @Model.Location.Name has other locations nearby.</p>
-                    <div class="row">
-                        <div class="col-xs-4">
-
+                @if (string.IsNullOrEmpty(feature.RedirectUrl))
+                {
+                    <text>
+                        <div class="col-xs-2">
+                            <a asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub="@Model.Location.Stub" asp-route-featureStub="@feature.Stub" class="bring-modal" data-toggle="modal" data-target="#featureModal" target="_blank" data-feature="@feature.Stub">
+                                <span class="fa-stack fa-2x" style="color:#007bff">
+                                    <span class="fa fa-square fa-stack-2x"></span>
+                                    <span class="@feature.FontAwesome" @if(!string.IsNullOrEmpty(feature.InnerSpan)) { @:style="color:white"
+                                          }>
+                                        @if (!string.IsNullOrEmpty(feature.InnerSpan))
+                                        {
+                                            @Html.Raw(feature.InnerSpan.ToString());
+                                        }
+                                    </span>
+                                </span>
+                            </a>
+                            <div>
+                                <a class="bring-modal" data-toggle="modal" data-target="#featureModal" asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub="@Model.Location.Stub" asp-route-featureStub="@feature.Stub" data-feature="@feature.Stub"> @feature.Name</a>
+                            </div>
                         </div>
-                        <div class="col-xs-7">
-                            <table class="neighbor-locations">
-                                <tbody>
-                                    @{ int counter = 1;}
-                                    @foreach (var location in Model.NearbyLocations)
-                                    {
-                                        <text>
-                                            <tr>
-                                                <td>@counter</td>
-                                                <td>
-                                                    <a asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub = "@location.Stub">@location.Name</a>
-                                                </td>
-                                                <td>
-                                                    <a href="@location.EventLink"><span class="fa fa-calendar"></span> Events</a>
-                                                    <a href="@location.SubscriptionLink"><span class="fa fa-envelope-o"></span> Mailing List</a>
-                                                </td>
-                                            </tr>
-                                        </text>
-                                        counter++;
-                                    }
-                                    <tr>
-                                        <td colspan="2">&nbsp;</td>
-                                        <td>
-                                            <a href="@Model.LocationNeighborGroup.SubscriptionUrl" class="btn btn-default btn-sm" target="_blank">
-                                                <text><span class="fa fa-envelope-o"></span>Updates from all @Model.NearbyLocations.Count() locations</text>
-                                            </a>
-                                        </td>
-
-                                    </tr>
-
-                                </tbody>
-
-                            </table>
-
+                    </text>
+                }
+                else
+                {
+                    <text>
+                        <div class="col-xs-2">
+                            <a href="@feature.RedirectUrl" target="_blank">
+                                <span class="fa-stack fa-2x" style="color:#007bff">
+                                    <span class="fa fa-square fa-stack-2x"></span>
+                                    <span class="@feature.FontAwesome">
+                                    </span>
+                                </span>
+                            </a>
+                            <div>
+                                <a href="@feature.RedirectUrl" data-feature="@feature.Stub" target="_blank">@feature.Name</a>
+                            </div>
                         </div>
+                    </text>
+                }
+            }
+        </div>
+        @if (!string.IsNullOrEmpty(Model.Location.PostFeatureDescr))
+        {
+            <div class="row">
+                @Html.Raw(Model.Location.PostFeatureDescr)
+            </div>
+        }
+        @if (Model.NearbyCount > 1)
+        {
+            <div>
+                <a name="nearby"></a>
+                <h2>Nearby Locations</h2>
+                <p>The @Model.Location.Name has other locations nearby.</p>
+                <div class="row">
+                    <div class="col-xs-4">
+
+                    </div>
+                    <div class="col-xs-7">
+                        <table class="neighbor-locations">
+                            <tbody>
+                                @{ int counter = 1;}
+                                @foreach (var location in Model.NearbyLocations)
+                                {
+                                    <text>
+                                        <tr>
+                                            <td>@counter</td>
+                                            <td>
+                                                <a asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub="@location.Stub">@location.Name</a>
+                                            </td>
+                                            <td>
+                                                <a href="@location.EventLink"><span class="fa fa-calendar"></span> Events</a>
+                                                <a href="@location.SubscriptionLink"><span class="fa fa-envelope-o"></span> Mailing List</a>
+                                            </td>
+                                        </tr>
+                                    </text>
+                                    counter++;
+                                }
+                                <tr>
+                                    <td colspan="2">&nbsp;</td>
+                                    <td>
+                                        <a href="@Model.LocationNeighborGroup.SubscriptionUrl" class="btn btn-default btn-sm" target="_blank">
+                                            <text><span class="fa fa-envelope-o"></span>Updates from all @Model.NearbyLocations.Count() locations</text>
+                                        </a>
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
 
                     </div>
 
                 </div>
-            }
-        </div>
+
+            </div>
+        }
+    </div>
         <div class="modal fade" id="featureModal" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
