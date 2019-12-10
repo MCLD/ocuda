@@ -14,12 +14,6 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string RequestPath { get; set; }
 
-        [MaxLength(255)]
-        public string QueryKey { get; set; }
-
-        [MaxLength(255)]
-        public string QueryValue { get; set; }
-
         [MaxLength(500)]
         public string Url { get; set; }
     }

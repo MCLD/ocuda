@@ -27,32 +27,9 @@ namespace Ocuda.Promenade.Service
                 ?? throw new ArgumentNullException(nameof(urlRedirectRepository));
         }
 
-        public async Task<UrlRedirect> GetUrlRedirectByPathAsync(string path,
-            Dictionary<string, string> queryParams)
+        public async Task<UrlRedirect> GetUrlRedirectByPathAsync(string path)
         {
-            var redirects = await _urlRedirectRepository.GetRedirectsByPathAsync(path.TrimEnd('/'));
-            UrlRedirect redirect = null;
-
-            if (queryParams.Count > 0)
-            {
-                var queryRedirects = redirects.Where(_ => !string.IsNullOrWhiteSpace(_.QueryKey)
-                    && queryParams.Any(q => q.Key == _.QueryKey && q.Value == _.QueryValue));
-
-                if (queryRedirects.Count() == 1)
-                {
-                    redirect = queryRedirects.Single();
-                }
-            }
-
-            if (redirect == null)
-            {
-                var nonQueryRedirects = redirects.Where(_ => string.IsNullOrWhiteSpace(_.QueryKey));
-
-                if (nonQueryRedirects.Count() == 1)
-                {
-                    redirect = nonQueryRedirects.Single();
-                }
-            }
+            var redirect = await _urlRedirectRepository.GetRedirectsByPathAsync(path.TrimEnd('/'));
 
             if (redirect != null)
             {

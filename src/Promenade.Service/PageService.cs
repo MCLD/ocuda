@@ -44,32 +44,25 @@ namespace Ocuda.Promenade.Service
                 .UICulture?
                 .Name;
 
+            Page page = null;
+
             if (!string.IsNullOrWhiteSpace(currentCultureName))
             {
                 var currentLangaugeId = await _languageService
                     .GetLanguageIdAsync(currentCultureName);
-                var localPage = await _pageRepository.GetPublishedByStubAndTypeAsync(formattedStub,
+                page = await _pageRepository.GetPublishedByStubAndTypeAsync(formattedStub,
                     type, currentLangaugeId);
 
-                if (localPage != null)
-                {
-                    return localPage;
-                }
             }
 
-            var defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync();
-            var defaultPage = await _pageRepository.GetPublishedByStubAndTypeAsync(formattedStub,
-                type, defaultLanguageId);
-
-            if (defaultPage != null)
+            if (page == null)
             {
-                return defaultPage;
-            }
-            else
-            {
-                throw new OcudaException("The requested page could not be accessed or does not exist.");
+                var defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync();
+                page = await _pageRepository.GetPublishedByStubAndTypeAsync(formattedStub,
+                    type, defaultLanguageId);
             }
 
+            return page;
         }
     }
 }

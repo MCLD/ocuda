@@ -1,10 +1,7 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model Ocuda.Promenade.Controllers.ViewModels.Shared.PageViewModel
+
+@section metadata {
+    <socialcard card="@Model.SocialCard"></socialcard>
 }
 
-<div class="col-sm-12">
-    <p>
-        Hello, world.
-        <span class="far fa-smile"></span>
-    </p>
-</div>
+@Html.Raw(Model.Content)
