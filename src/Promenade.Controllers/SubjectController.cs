@@ -11,13 +11,13 @@ namespace Ocuda.Promenade.Controllers
 {
     [Route("[Controller]")]
     [Route("{culture:cultureConstraint}/[Controller]")]
-    public class AboutController : BaseController<AboutController>
+    public class SubjectController : BaseController<SubjectController>
     {
         private readonly PageService _pageService;
         private readonly RedirectService _redirectService;
         private readonly SocialCardService _socialCardService;
 
-        public AboutController(ServiceFacades.Controller<AboutController> context,
+        public SubjectController(ServiceFacades.Controller<SubjectController> context,
             PageService pageService,
             RedirectService redirectService,
             SocialCardService socialCardService) : base(context)
@@ -32,7 +32,7 @@ namespace Ocuda.Promenade.Controllers
         [Route("{stub?}")]
         public async Task<IActionResult> Page(string stub)
         {
-            var page = await _pageService.GetByStubAndType(stub, PageType.About);
+            var page = await _pageService.GetByStubAndType(stub, PageType.Subject);
 
             if (page == null)
             {
@@ -57,7 +57,7 @@ namespace Ocuda.Promenade.Controllers
                     }
                 }
 
-                _logger.LogWarning($"No About page or redirect found for stub \"{stub}\": {Request.Path}");
+                _logger.LogWarning($"No Subject page or redirect found for stub \"{stub}\": {Request.Path}");
                 return View("PageNotFound");
             }
 

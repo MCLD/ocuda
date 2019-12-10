@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
@@ -38,19 +36,24 @@ namespace Ocuda.Promenade.Controllers
 
             if (id == 404)
             {
-                var queryParams = Request.Query.ToDictionary(_ => _.Key, _ => _.Value.ToString());
+                var redirect = await _redirectService.GetUrlRedirectByPathAsync(Request.Path);
 
-                var redirect = await _redirectService.GetUrlRedirectByPathAsync(originalPath,
-                    queryParams);
                 if (redirect != null)
                 {
+                    var redirectUrl = redirect.Url;
+
+                    if (Request.QueryString.HasValue)
+                    {
+                        redirectUrl += Request.QueryString;
+                    }
+
                     if (redirect.IsPermanent)
                     {
-                        return RedirectPermanent(redirect.Url);
+                        return RedirectPermanent(redirectUrl);
                     }
                     else
                     {
-                        return Redirect(redirect.Url);
+                        return Redirect(redirectUrl);
                     }
                 }
 
