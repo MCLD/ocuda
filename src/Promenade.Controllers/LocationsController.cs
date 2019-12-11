@@ -169,7 +169,7 @@ namespace Ocuda.Promenade.Controllers
                     Location = await _locationService.GetLocationByStubAsync(locationStub)
                 };
                 locationViewModel.Location.Description = CommonMark.CommonMarkConverter.Convert(locationViewModel.Location.Description);
-                locationViewModel.Location.PostFeatureDescr = CommonMark.CommonMarkConverter.Convert(locationViewModel.Location.PostFeatureDescr);
+                locationViewModel.Location.PostFeatureDescription = CommonMark.CommonMarkConverter.Convert(locationViewModel.Location.PostFeatureDescription);
                 locationViewModel.Location.LocationHours = await _locationService.GetFormattedWeeklyHoursAsync(locationViewModel.Location.Id);
                 locationViewModel.StructuredLocationHours = await _locationService.GetFormattedWeeklyHoursAsync(locationViewModel.Location.Id, true);
                 var features = await _locationService.GetLocationsFeaturesAsync(locationStub);

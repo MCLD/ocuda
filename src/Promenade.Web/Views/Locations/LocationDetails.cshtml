@@ -97,10 +97,10 @@
                 }
             }
         </div>
-        @if (!string.IsNullOrEmpty(Model.Location.PostFeatureDescr))
+        @if (!string.IsNullOrEmpty(Model.Location.PostFeatureDescription))
         {
             <div class="row">
-                @Html.Raw(Model.Location.PostFeatureDescr)
+                @Html.Raw(Model.Location.PostFeatureDescription)
             </div>
         }
         @if (Model.NearbyCount > 1)
