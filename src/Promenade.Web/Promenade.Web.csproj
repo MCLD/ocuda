@@ -64,4 +64,9 @@
     <ProjectReference Include="..\Promenade.Service\Promenade.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\css\" />
+    <Folder Include="wwwroot\js\" />
+  </ItemGroup>
+
 </Project>

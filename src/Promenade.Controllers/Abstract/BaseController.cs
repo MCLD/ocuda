@@ -5,11 +5,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Ocuda.i18n.Filter;
+using Ocuda.Promenade.Controllers.Filters;
 using Ocuda.Promenade.Service;
 
 namespace Ocuda.Promenade.Controllers.Abstract
 {
-    [ServiceFilter(typeof(LocalizationFilterAttribute), Order = 1)]
+    [ServiceFilter(typeof(LocalizationFilterAttribute), Order = 10)]
+    [ServiceFilter(typeof(NavigationFilter), Order = 20)]
     [MiddlewareFilter(typeof(i18n.Middleware.LocalizationMiddleware))]
     public abstract class BaseController<T> : Controller
     {
@@ -31,7 +33,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
                 Models.Keys.SiteSetting.Site.IsTLS);
 
             var scheme = isTLS ? Uri.UriSchemeHttps : Uri.UriSchemeHttp;
-            
+
             return Url.Action(null, null, null, scheme);
         }
     }
