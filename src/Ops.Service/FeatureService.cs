@@ -59,10 +59,10 @@ namespace Ocuda.Ops.Service
         {
             try
             {
-                feature.FontAwesome = "fa-inverse " + feature.FontAwesome + " fa-stack-1x";
-                if (!feature.FontAwesome.Contains("fab"))
+                feature.Icon = "fa-inverse " + feature.Icon + " fa-stack-1x";
+                if (!feature.Icon.Contains("fab"))
                 {
-                    feature.FontAwesome = "fa " + feature.FontAwesome;
+                    feature.Icon = "fa " + feature.Icon;
                 }
                 feature.Name = feature.Name?.Trim();
                 feature.BodyText = feature.BodyText?.Trim();
@@ -91,16 +91,16 @@ namespace Ocuda.Ops.Service
             {
                 try
                 {
-                    if (!feature.FontAwesome.Contains("fa-inverse"))
+                    if (!feature.Icon.Contains("fa-inverse"))
                     {
-                        feature.FontAwesome = "fa-inverse " + feature.FontAwesome + " fa-stack-1x";
-                        if (!feature.FontAwesome.Contains("fab"))
+                        feature.Icon = "fa-inverse " + feature.Icon + " fa-stack-1x";
+                        if (!feature.Icon.Contains("fab"))
                         {
-                            feature.FontAwesome = "fa " + feature.FontAwesome;
+                            feature.Icon = "fa " + feature.Icon;
                         }
                     }
                     currentFeature.BodyText = feature.BodyText?.Trim();
-                    currentFeature.FontAwesome = feature.FontAwesome;
+                    currentFeature.Icon = feature.Icon;
                     currentFeature.Name = feature.Name?.Trim();
                     currentFeature.Stub = feature.Stub?.Trim();
                     currentFeature.UpdatedAt = DateTime.Now;

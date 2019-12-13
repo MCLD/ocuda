@@ -159,7 +159,7 @@
                 <a asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub="@Model.Location.Stub" asp-route-featureStub="@feature.Stub" class="bring-modal" data-toggle="modal" data-target="#featureModal" target="_blank" data-feature="@feature.Stub">
                     <span class="fa-stack fa-2x" style="color:#007bff">
                         <span class="fa fa-square fa-stack-2x"></span>
-                        <span class="@feature.FontAwesome" style="@(!string.IsNullOrEmpty(feature.InnerSpan) ? "color:white" : "")">
+                        <span class="@feature.Icon" style="@(!string.IsNullOrEmpty(feature.InnerSpan) ? "color:white" : "")">
                             @if (!string.IsNullOrEmpty(feature.InnerSpan))
                             {
                                 @Html.Raw(feature.InnerSpan.ToString());
@@ -178,7 +178,7 @@
                 <a href="@feature.RedirectUrl" target="_blank">
                     <span class="fa-stack fa-2x" style="color:#007bff">
                         <span class="fa fa-square fa-stack-2x"></span>
-                        <span class="@feature.FontAwesome">
+                        <span class="@feature.Icon">
                         </span>
                     </span>
                 </a>

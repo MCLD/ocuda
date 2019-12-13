@@ -10,7 +10,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Locations
         public string Name { get; set; }
 
         [MaxLength(48)]
-        public string FontAwesome { get; set; }
+        public string Icon { get; set; }
 
         [MaxLength(255)]
         public string ImagePath { get; set; }
