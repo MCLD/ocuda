@@ -206,11 +206,9 @@
                 <table class="table table-sm table-bordered">
                     <tr>
                         <td>
-                            @foreach (var time in Model.Location.LocationHours)
+                            @foreach (var dayGrouping in Model.Location.LocationHours)
                             {
-                                <text>
-                                    <p>@time</p>
-                                </text>
+                                <strong>@dayGrouping.Days</strong> <span>@dayGrouping.Time</span>
                             }
                         </td>
                     </tr>

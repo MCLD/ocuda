@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.ViewModels.Locations;
-using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service;
 
 namespace Ocuda.Promenade.Controllers
@@ -31,126 +30,136 @@ namespace Ocuda.Promenade.Controllers
 
         [HttpGet("")]
         [HttpGet("[action]")]
-        [HttpGet("[action]/{zip}")]
+        [HttpGet("[action]/{Zip}")]
         [HttpGet("[action]/{latitude}/{longitude}")]
-        public async Task<IActionResult> Find(double latitude = 0, double longitude = 0, string zip = null)
+        public async Task<IActionResult> Find(double? latitude = null, double? longitude = null,
+            string zip = null)
         {
-            if (!string.IsNullOrWhiteSpace(zip) && (latitude.Equals(0) && longitude.Equals(0)))
+            var apiKey = _config[Utility.Keys.Configuration.PromAPIGoogleMaps];
+
+            var viewModel = new LocationViewModel
             {
-                var viewModel = new LocationViewModel
-                {
-                    LocationSearchable = true
-                };
-                var location = new Location();
+                CanSearchAddress = !string.IsNullOrWhiteSpace(apiKey),
+                Zip = zip?.Trim()
+            };
 
-                using (var client = new HttpClient())
-                {
-                    try
-                    {
-                        var apikey = _config[Utility.Keys.Configuration.PromAPIGoogleMaps];
+            var searchLatitude = latitude;
+            var searchLongitude = longitude;
 
-                        var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?address={zip}&key={apikey}");
-                        response.EnsureSuccessStatusCode();
-
-                        var stringResult = await response.Content.ReadAsStringAsync();
-                        dynamic jsonResult = JsonConvert.DeserializeObject(stringResult);
-
-                        if (jsonResult.results.Count > 0)
-                        {
-                            var result = jsonResult.results[0];
-                            double newLat = result.geometry.location.lat;
-                            double newLong = result.geometry.location.lng;
-
-                            return View("Locations", await LookupLocationAsync(newLat, newLong));
-                        }
-                        else
-                        {
-                            _logger.LogError($"No geocoding results for a \"{zip}\"");
-                            TempData["AlertDanger"] = $"Unable to locate zip <strong>\"{zip}\"</strong>.";
-                        }
-                    }
-                    catch (HttpRequestException ex)
-                    {
-                        _logger.LogCritical(ex, $"Google API error: {ex.Message}");
-                        TempData["AlertDanger"] = "An error occured, please try again later.";
-                        viewModel.LocationSearchable = false;
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogCritical(ex, ex.Message);
-                        TempData["AlertDanger"] = "An error occured, please try again later.";
-                    }
-                }
-                location.CloseLocations = (await _locationService.GetAllLocationsAsync()).OrderBy(c => c.Name).ToList();
-                viewModel.Location = location;
-                return View("Locations", viewModel);
-            }
-            else if (!latitude.Equals(0) && !longitude.Equals(0) && string.IsNullOrEmpty(zip))
+            if (!string.IsNullOrWhiteSpace(apiKey))
             {
-                var viewModel = await LookupLocationAsync(latitude, longitude);
-                var latlng = $"{latitude},{longitude}";
-
-                // try to get the zip code to display to the user
-                try
+                if (!string.IsNullOrWhiteSpace(zip))
                 {
                     using (var client = new HttpClient())
                     {
-                        var apikey = _config[Ocuda.Utility.Keys.Configuration.PromAPIGoogleMaps];
-
-                        GeocodeResult geoResult = null;
-                        string stringResult = null;
-
                         try
                         {
-                            var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?latlng={latlng}&key={apikey}");
+                            var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?address={zip}&key={apiKey}");
                             response.EnsureSuccessStatusCode();
 
-                            stringResult = await response.Content.ReadAsStringAsync();
+                            var stringResult = await response.Content.ReadAsStringAsync();
+                            dynamic jsonResult = JsonConvert.DeserializeObject(stringResult);
 
-                            geoResult = JsonConvert.DeserializeObject<GeocodeResult>(stringResult);
+                            if (jsonResult.results.Count > 0)
+                            {
+                                var result = jsonResult.results[0];
+                                searchLatitude = result.geometry.location.lat;
+                                searchLongitude = result.geometry.location.lng;
+                            }
+                            else
+                            {
+                                _logger.LogError($"No geocoding results for a \"{zip}\"");
+                                TempData["AlertDanger"] = $"Unable to locate zip <strong>\"{zip}\"</strong>.";
+                            }
+                        }
+                        catch (HttpRequestException ex)
+                        {
+                            _logger.LogCritical(ex, $"Google API error: {ex.Message}");
+                            TempData["AlertDanger"] = "An error occured, please try again later.";
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError($"Error parsing Geocode API JSON: {ex.Message} - {stringResult}");
-                        }
-
-                        if (geoResult?.Results?.Count() > 0)
-                        {
-                            viewModel.Address = geoResult.Results?
-                                .FirstOrDefault(_ => _.Types.Any(__ => __ == "postal_code"))?
-                                .AddressComponents?
-                                .FirstOrDefault()?
-                                .ShortName;
-                            if (string.IsNullOrEmpty(viewModel.Address))
-                            {
-                                _logger.LogInformation($"Could not find postal code when geocoding {latlng}");
-                            }
+                            _logger.LogCritical(ex, ex.Message);
+                            TempData["AlertDanger"] = "An error occured, please try again later.";
                         }
                     }
                 }
-                catch (Exception ex)
+                else if (latitude.HasValue && longitude.HasValue)
                 {
-                    _logger.LogError(ex, $"Problem looking up postal code for coordinates {latlng}: {ex.Message}");
+                    // try to get the zip code to display to the user
+                    var latlng = $"{latitude},{longitude}";
+                    try
+                    {
+                        using (var client = new HttpClient())
+                        {
+                            GeocodeResult geoResult = null;
+                            string stringResult = null;
+
+                            try
+                            {
+
+                                var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?latlng={latlng}&key={apiKey}");
+                                response.EnsureSuccessStatusCode();
+
+                                stringResult = await response.Content.ReadAsStringAsync();
+
+                                geoResult = JsonConvert.DeserializeObject<GeocodeResult>(stringResult);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError($"Error parsing Geocode API JSON: {ex.Message} - {stringResult}");
+                            }
+
+                            if (geoResult?.Results?.Count() > 0)
+                            {
+                                viewModel.Zip = geoResult.Results?
+                                    .FirstOrDefault(_ => _.Types.Any(__ => __ == "postal_code"))?
+                                    .AddressComponents?
+                                    .FirstOrDefault()?
+                                    .ShortName;
+                                if (string.IsNullOrEmpty(viewModel.Zip))
+                                {
+                                    _logger.LogWarning($"Could not find postal code when reverse geocoding {latlng}");
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"Problem looking up postal code for coordinates {latlng}: {ex.Message}");
+                    }
+                    return View("Locations", viewModel);
                 }
-                return View("Locations", viewModel);
             }
-            else
+
+            viewModel.Locations = await _locationService.GetAllLocationsAsync();
+
+            foreach (var location in viewModel.Locations)
             {
-                var location = new Location
-                {
-                    CloseLocations = (await _locationService.GetAllLocationsAsync()).OrderBy(c => c.Name).ToList()
-                };
-                var viewModel = new LocationViewModel
-                {
-                    Location = location,
-                    LocationSearchable = false
-                };
-                foreach (var item in viewModel.Location.CloseLocations)
-                {
-                    item.WeeklyHours = await _locationService.GetFormattedWeeklyHoursAsync(item.Id);
-                }
-                return View("Locations", viewModel);
+                location.CurrentStatus = await _locationService.GetCurrentStatusAsync(location.Id);
             }
+
+            if (searchLatitude.HasValue && searchLongitude.HasValue)
+            {
+                foreach (var location in viewModel.Locations)
+                {
+                    var geolocation = location.GeoLocation
+                        .Split(',')
+                        .Select(_ => Convert.ToDouble(_)).ToList();
+                    location.Distance = HaversineHelper.Calculate(geolocation[0], geolocation[1],
+                        searchLatitude.Value, searchLongitude.Value);
+                }
+
+                viewModel.Locations = viewModel.Locations.OrderBy(_ => _.Distance)
+                    .Select(_ =>
+                    {
+                        _.Distance = Math.Ceiling(_.Distance);
+                        return _;
+                    })
+                    .ToList();
+            }
+
+            return View("Locations", viewModel);
         }
 
         [HttpGet("{locationStub}")]
@@ -163,20 +172,21 @@ namespace Ocuda.Promenade.Controllers
             }
             else if (string.IsNullOrEmpty(featureStub))
             {
-                var locationViewModel = new LocationViewModel
+                var viewModel = new LocationDetailViewModel
                 {
                     LocationFeatures = new List<LocationsFeaturesViewModel>(),
                     Location = await _locationService.GetLocationByStubAsync(locationStub)
                 };
-                locationViewModel.Location.Description = CommonMark.CommonMarkConverter.Convert(locationViewModel.Location.Description);
-                locationViewModel.Location.PostFeatureDescription = CommonMark.CommonMarkConverter.Convert(locationViewModel.Location.PostFeatureDescription);
-                locationViewModel.Location.LocationHours = await _locationService.GetFormattedWeeklyHoursAsync(locationViewModel.Location.Id);
-                locationViewModel.StructuredLocationHours = await _locationService.GetFormattedWeeklyHoursAsync(locationViewModel.Location.Id, true);
+                viewModel.Location.Description = CommonMark.CommonMarkConverter.Convert(viewModel.Location.Description);
+                viewModel.Location.PostFeatureDescription = CommonMark.CommonMarkConverter.Convert(viewModel.Location.PostFeatureDescription);
+                viewModel.Location.LocationHours = await _locationService.GetFormattedWeeklyHoursAsync(viewModel.Location.Id);
+                viewModel.StructuredLocationHours = (await _locationService.GetFormattedWeeklyHoursAsync(viewModel.Location.Id, true))
+                    .Select(_ => $"{_.Days} {_.Time}").ToList();
                 var features = await _locationService.GetLocationsFeaturesAsync(locationStub);
 
                 foreach (var feature in features.OrderBy(_ => _.Name).ToList())
                 {
-                    var locationFeature = await _locationService.GetLocationFeatureByIds(locationViewModel.Location.Id, feature.Id);
+                    var locationFeature = await _locationService.GetLocationFeatureByIds(viewModel.Location.Id, feature.Id);
                     var locationfeatureModel = new LocationsFeaturesViewModel
                     {
                         BodyText = CommonMark.CommonMarkConverter.Convert(feature.BodyText),
@@ -191,32 +201,32 @@ namespace Ocuda.Promenade.Controllers
                     {
                         locationfeatureModel.InnerSpan = "<strong>7</strong>";
                     }
-                    locationViewModel.LocationFeatures.Add(locationfeatureModel);
+                    viewModel.LocationFeatures.Add(locationfeatureModel);
                 }
                 var neighbors = await _locationService.GetLocationsNeighborsAsync(locationStub);
-                locationViewModel.LocationNeighborGroup = await _locationService.GetLocationsNeighborGroup(locationStub);
+                viewModel.LocationNeighborGroup = await _locationService.GetLocationsNeighborGroup(locationStub);
                 if (neighbors.Count > 0)
                 {
-                    locationViewModel.NearbyLocations = neighbors;
-                    locationViewModel.NearbyCount = locationViewModel.NearbyLocations.Count;
+                    viewModel.NearbyLocations = neighbors;
+                    viewModel.NearbyCount = viewModel.NearbyLocations.Count;
                 }
                 else
                 {
-                    locationViewModel.NearbyCount = 0;
+                    viewModel.NearbyCount = 0;
                 }
 
-                return View("LocationDetails", locationViewModel);
+                return View("LocationDetails", viewModel);
             }
             else
             {
-                var locationViewModel = new LocationViewModel();
+                var viewModel = new LocationDetailViewModel();
                 var locationFeatureViewModel = new List<LocationsFeaturesViewModel>();
 
-                locationViewModel.Location = await _locationService.GetLocationByStubAsync(locationStub);
+                viewModel.Location = await _locationService.GetLocationByStubAsync(locationStub);
                 var feature = (await _locationService.GetLocationsFeaturesAsync(locationStub)).SingleOrDefault(_ => _.Stub == featureStub);
                 if (feature != null)
                 {
-                    var locationFeature = await _locationService.GetLocationFeatureByIds(locationViewModel.Location.Id, feature.Id);
+                    var locationFeature = await _locationService.GetLocationFeatureByIds(viewModel.Location.Id, feature.Id);
 
                     var locationfeatureModel = new LocationsFeaturesViewModel
                     {
@@ -230,40 +240,15 @@ namespace Ocuda.Promenade.Controllers
                     };
 
                     locationFeatureViewModel.Add(locationfeatureModel);
-                    locationViewModel.LocationFeatures = locationFeatureViewModel;
+                    viewModel.LocationFeatures = locationFeatureViewModel;
 
-                    return View("LocationFeatureDetails", locationViewModel);
+                    return View("LocationFeatureDetails", viewModel);
                 }
                 else
                 {
                     return await Locations(locationStub, "");
                 }
             }
-        }
-
-        [NonAction]
-        public async Task<Location> LookupLocationAsync(double latitude, double longitude)
-        {
-            var viewModel = new Location();
-            var locations = (await _locationService.GetAllLocationsAsync()).OrderBy(c => c.Name).ToList();
-
-            foreach (var location in locations)
-            {
-                var geolocation = location.GeoLocation
-                    .Split(',')
-                    .Select(_ => Convert.ToDouble(_)).ToList();
-                location.Distance = HaversineHelper
-                    .Calculate(geolocation[1], geolocation[0], latitude, longitude);
-                location.MapLink = $"https://maps.googleapis.com/maps/api/staticmap?center={latitude},{longitude}&zoom=12&maptype=roadmap&format=png&visual_refresh=true";
-            }
-            viewModel.CloseLocations = locations.OrderBy(_ => _.Distance).ToList();
-            viewModel.CloseLocations = viewModel.CloseLocations.Select(_ =>
-            {
-                _.Distance = Math.Ceiling(_.Distance);
-                return _;
-            }).ToList();
-
-            return viewModel;
         }
     }
 }

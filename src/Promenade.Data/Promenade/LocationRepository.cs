@@ -21,6 +21,7 @@ namespace Ocuda.Promenade.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
+                .OrderBy(_ => _.Name)
                 .ToListAsync();
         }
 

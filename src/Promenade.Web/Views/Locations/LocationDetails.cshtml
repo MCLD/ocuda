@@ -1,15 +1,82 @@
-﻿@model Ocuda.Promenade.Controllers.ViewModels.Locations.LocationViewModel
-@using Ocuda.Promenade.Controllers;
+﻿@model Ocuda.Promenade.Controllers.ViewModels.Locations.LocationDetailViewModel
+
 @{
-    ViewData["Title"] = "LocationDetails";
+    ViewData["Title"] = @Model.Location.Name;
 }
-<html>
-<body>
-    <div id="content" class="location-page">
-        <img src="@Model.Location.ImagePath" class="branch-image" />
-        <h1>
+
+@section styles {
+    <style>
+        .location-image {
+            float: right;
+            width: 250px;
+            height: 160px;
+            border: 1px solid #888b8d;
+        }
+
+        .location-header {
+            color: #307fe2;
+            margin-bottom: 1rem;
+            line-height: 2.1rem;
+        }
+
+        .map-button {
+            margin-left: 1rem;
+        }
+
+        .address-hours {
+            width: 450px;
+        }
+
+            .address-hours td {
+                vertical-align: top;
+                width: 50%;
+            }
+
+        .location-subheading {
+            color: #3a66a0;
+            border-bottom: 1px solid #acccf3;
+            margin-top: 2rem;
+            padding-bottom: 5px;
+        }
+
+        .location-features a {
+            color: #307fe2;
+            text-decoration: none;
+            font-size: 1rem;
+            line-height: 1.5rem;
+        }
+
+        .region-map {
+            border: 1px solid #307fe2;
+        }
+
+        .nearby-locations-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .nearby-locations-table tr {
+                height: 3.5em;
+            }
+
+                .nearby-locations-table tr td {
+                    vertical-align: middle;
+                    border-bottom: 1px solid #888b8d;
+                    padding: .25rem;
+                }
+
+                    .nearby-locations-table tr td:last-child {
+                        text-align: right;
+                    }
+    </style>
+}
+
+<div class="row">
+    <div class="col-12">
+        <img src="@Model.Location.ImagePath" class="location-image" />
+        <h1 class="location-header">
             @Model.Location.Name
-            <a href="@Model.Location.MapLink" class="btn btn-default map-button" target="_blank">
+            <a href="@Model.Location.MapLink" class="btn btn-outline-secondary text-dark map-button" target="_blank">
                 <span class="fas fa-map-marker-alt"></span> Map
             </a>
         </h1>
@@ -25,163 +92,193 @@
                             <a href="tel:@Model.Location.Phone">@Model.Location.Phone</a>
                         </p>
                     </td>
-                    <td class="hours">
+                    <td>
                         @if (Model.Location.IsAlwaysOpen)
                         {
                             <p>Open</p>
                         }
                         else
                         {
-                            @foreach (var time in Model.Location.LocationHours)
-                            {
-                                <text>
-                                    <p>@time</p><br />
-                                </text>
-                            }
+                            <p>
+                                @foreach (var dayGrouping in Model.Location.LocationHours)
+                                {
+                                    <strong>@dayGrouping.Days</strong> <span>@dayGrouping.Time</span>
+                                    <br />
+                                }
+                            </p>
                         }
                     </td>
                 </tr>
             </tbody>
         </table>
-        <h2>Information</h2>
-        @Html.Raw(Model.Location.Description)
-        <div>
-            <div>
-                <a href="@Model.Location.EventLink" target="_blank">Browse Events</a>
-            </div>
-            <div>
-                <a href="@Model.Location.SubscriptionLink" target="_blank">Send Me Events</a>
-            </div>
-        </div>
-        <div class="row branch-features text-center">
-            @foreach (var feature in Model.LocationFeatures)
-            {
-                @if (string.IsNullOrEmpty(feature.RedirectUrl))
-                {
-                    <text>
-                        <div class="col-xs-2">
-                            <a asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub="@Model.Location.Stub" asp-route-featureStub="@feature.Stub" class="bring-modal" data-toggle="modal" data-target="#featureModal" target="_blank" data-feature="@feature.Stub">
-                                <span class="fa-stack fa-2x" style="color:#007bff">
-                                    <span class="fa fa-square fa-stack-2x"></span>
-                                    <span class="@feature.FontAwesome" @if(!string.IsNullOrEmpty(feature.InnerSpan)) { @:style="color:white"
-                                          }>
-                                        @if (!string.IsNullOrEmpty(feature.InnerSpan))
-                                        {
-                                            @Html.Raw(feature.InnerSpan.ToString());
-                                        }
-                                    </span>
-                                </span>
-                            </a>
-                            <div>
-                                <a class="bring-modal" data-toggle="modal" data-target="#featureModal" asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub="@Model.Location.Stub" asp-route-featureStub="@feature.Stub" data-feature="@feature.Stub"> @feature.Name</a>
-                            </div>
-                        </div>
-                    </text>
-                }
-                else
-                {
-                    <text>
-                        <div class="col-xs-2">
-                            <a href="@feature.RedirectUrl" target="_blank">
-                                <span class="fa-stack fa-2x" style="color:#007bff">
-                                    <span class="fa fa-square fa-stack-2x"></span>
-                                    <span class="@feature.FontAwesome">
-                                    </span>
-                                </span>
-                            </a>
-                            <div>
-                                <a href="@feature.RedirectUrl" data-feature="@feature.Stub" target="_blank">@feature.Name</a>
-                            </div>
-                        </div>
-                    </text>
-                }
-            }
-        </div>
-        @if (!string.IsNullOrEmpty(Model.Location.PostFeatureDescription))
-        {
-            <div class="row">
-                @Html.Raw(Model.Location.PostFeatureDescription)
-            </div>
-        }
-        @if (Model.NearbyCount > 1)
-        {
-            <div>
-                <a name="nearby"></a>
-                <h2>Nearby Locations</h2>
-                <p>The @Model.Location.Name has other locations nearby.</p>
-                <div class="row">
-                    <div class="col-xs-4">
-
-                    </div>
-                    <div class="col-xs-7">
-                        <table class="neighbor-locations">
-                            <tbody>
-                                @{ int counter = 1;}
-                                @foreach (var location in Model.NearbyLocations)
-                                {
-                                    <text>
-                                        <tr>
-                                            <td>@counter</td>
-                                            <td>
-                                                <a asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub="@location.Stub">@location.Name</a>
-                                            </td>
-                                            <td>
-                                                <a href="@location.EventLink"><span class="fa fa-calendar"></span> Events</a>
-                                                <a href="@location.SubscriptionLink"><span class="fa fa-envelope-o"></span> Mailing List</a>
-                                            </td>
-                                        </tr>
-                                    </text>
-                                    counter++;
-                                }
-                                <tr>
-                                    <td colspan="2">&nbsp;</td>
-                                    <td>
-                                        <a href="@Model.LocationNeighborGroup.SubscriptionUrl" class="btn btn-default btn-sm" target="_blank">
-                                            <text><span class="fa fa-envelope-o"></span>Updates from all @Model.NearbyLocations.Count() locations</text>
-                                        </a>
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </div>
-        }
     </div>
-        <div class="modal fade" id="featureModal" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalTitle">Details</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div>
-                            <div id="modal-body">
-                            </div>
-                        </div>
-                        <div>
-                            <div id="modal-text">
+</div>
 
-                            </div>
-                        </div>
+<h2 class="location-subheading">Library Information</h2>
+
+<div class="row">
+    <div class="col-12">
+        @Html.Raw(Model.Location.Description)
+    </div>
+</div>
+
+<div class="row location-features text-center">
+    <div class="col-2 mb-3">
+        <a href="@Model.Location.EventLink" target="_blank">
+            <span class="fa-stack fa-2x">
+                <span class="fas fa-square fa-stack-2x"></span>
+                <span class="fas fa-inverse fa-calendar-alt fa-stack-1x"></span>
+            </span>
+        </a>
+        <br>
+        <a href="@Model.Location.EventLink" target="_blank">
+            Browse<br>
+            Events
+        </a>
+    </div>
+
+    <div class="col-2 mb-3">
+        <a href="@Model.Location.SubscriptionLink" target="_blank">
+            <span class="fa-stack fa-2x">
+                <span class="fas fa-square fa-stack-2x"></span>
+                <span class="far fa-inverse fa-envelope fa-stack-1x"></span>
+            </span>
+        </a>
+        <br>
+        <a href="@Model.Location.SubscriptionLink" target="_blank">
+            Send me<br>
+            Events
+        </a>
+    </div>
+
+    @foreach (var feature in Model.LocationFeatures)
+    {
+        @if (string.IsNullOrEmpty(feature.RedirectUrl))
+        {
+            <div class="col-2 mb-3">
+                <a asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub="@Model.Location.Stub" asp-route-featureStub="@feature.Stub" class="bring-modal" data-toggle="modal" data-target="#featureModal" target="_blank" data-feature="@feature.Stub">
+                    <span class="fa-stack fa-2x" style="color:#007bff">
+                        <span class="fa fa-square fa-stack-2x"></span>
+                        <span class="@feature.FontAwesome" style="@(!string.IsNullOrEmpty(feature.InnerSpan) ? "color:white" : "")">
+                            @if (!string.IsNullOrEmpty(feature.InnerSpan))
+                            {
+                                @Html.Raw(feature.InnerSpan.ToString());
+                            }
+                        </span>
+                    </span>
+                </a>
+                <div>
+                    <a class="bring-modal" data-toggle="modal" data-target="#featureModal" asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub="@Model.Location.Stub" asp-route-featureStub="@feature.Stub" data-feature="@feature.Stub"> @feature.Name</a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-2 mb-3">
+                <a href="@feature.RedirectUrl" target="_blank">
+                    <span class="fa-stack fa-2x" style="color:#007bff">
+                        <span class="fa fa-square fa-stack-2x"></span>
+                        <span class="@feature.FontAwesome">
+                        </span>
+                    </span>
+                </a>
+                <div>
+                    <a href="@feature.RedirectUrl" data-feature="@feature.Stub" target="_blank">@feature.Name</a>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Location.PostFeatureDescription))
+{
+    <div class="row">
+        <div class="col-12">
+            @Html.Raw(Model.Location.PostFeatureDescription)
+        </div>
+    </div>
+}
+
+@if (Model.NearbyCount > 1)
+{
+    <h2 class="location-subheading">Nearby Locations</h2>
+
+    <p>The @Model.Location.Name has other libraries nearby.</p>
+
+    <p>Interested in updates from every library in this area? <a href="@Model.LocationNeighborGroup.SubscriptionUrl" target="_blank">Get updates from all @Model.NearbyCount libraries.</a></p>
+
+    <div class="row">
+        <div class="col-4">
+            <a href="@Model.LocationNeighborGroup.MapImage" id="regionmap">
+                <img src="@Model.LocationNeighborGroup.MapImage" class="region-map img-responsive" alt="@Model.LocationNeighborGroup.Description">
+            </a>
+        </div>
+        <div class="col-7">
+            <table class="nearby-locations-table">
+                <tbody>
+                    @{ int counter = 1;}
+                    @foreach (var location in Model.NearbyLocations)
+                    {
+                        <tr>
+                            <td>@counter</td>
+                            <td>
+                                <a asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub="@location.Stub">@location.Name</a>
+                            </td>
+                            <td>
+                                <a href="@location.EventLink" class="btn btn-sm btn-outline-secondary text-dark"><span class="fas fa-calendar-alt"></span> Events</a>
+                                <a href="@location.SubscriptionLink" class="btn btn-sm btn-outline-secondary text-dark"><span class="far fa-envelope"></span> Mailing List</a>
+                            </td>
+                        </tr>
+                        counter++;
+                    }
+                    <tr>
+                        <td colspan="2">&nbsp;</td>
+                        <td>
+                            <a href="@Model.LocationNeighborGroup.SubscriptionUrl" class="btn btn-sm btn-outline-secondary text-dark" target="_blank">
+                                <text><span class="far fa-envelope"></span> Updates from all @Model.NearbyLocations.Count() locations</text>
+                            </a>
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+}
+
+<div class="modal fade" id="featureModal" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <div id="modal-body">
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+                <div>
+                    <div id="modal-text">
+
                     </div>
                 </div>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
         </div>
-        @section Scripts{
-            <script>
+    </div>
+</div>
+@section Scripts{
+    <script>
                 $('.bring-modal').on('click', function () {
                     @foreach (var feature in Model.LocationFeatures)
                     {
@@ -200,42 +297,40 @@
                         $('#myInput').trigger('focus')
                     });
                 });
-            </script>
-            <script type="application/ld+json">
-                {
-                "@@context": "http://schema.org",
-                "@@type": "@Model.Location.SDType",
-                "name": "@Model.Location.Name",
-                "areaServed": {
-                "@@type": "@Model.Location.SDAreaServedType",
-                "name": "@Model.Location.SDAreaServedName"
-                },
-                "email": "@Model.Location.SDEmail",
-                "address": {
-                "@@id": "_:@Model.Location.SDLocationId",
-                "@@type": "PostalAddress",
-                "addressCountry": "US",
-                "addressRegion": "@Model.Location.State",
-                "addressLocality": "@Model.Location.City",
-                "contactType": "Location address",
-                "postalCode": "@Model.Location.Zip",
-                "streetAddress": "@Model.Location.Address"
-                },
-                "location": { "@@id": "_:@Model.Location.SDLocationId" },
-                "parentOrganization": "@Model.Location.SDParentOrganization",
-                "telephone": "@Html.Raw(@Model.Location.Phone)",
-                "openingHours": @Html.Raw(Json.Serialize(@Model.StructuredLocationHours)),
-                "image": "@Model.Location.ImagePath",
-                "isAccessibleForFree": true,
-                "priceRange" : "$000 - $000",
-                "sameAs": ["@Model.Location.MapLink"
-                @if (!string.IsNullOrEmpty(Model.Location.Facebook))
-                {
-                    @:, "@Model.Location.Facebook"
-                }]
-                }
-
-            </script>
+    </script>
+    <script type="application/ld+json">
+        {
+        "@@context": "http://schema.org",
+        "@@type": "@Model.Location.SDType",
+        "name": "@Model.Location.Name",
+        "areaServed": {
+        "@@type": "@Model.Location.SDAreaServedType",
+        "name": "@Model.Location.SDAreaServedName"
+        },
+        "email": "@Model.Location.SDEmail",
+        "address": {
+        "@@id": "_:@Model.Location.SDLocationId",
+        "@@type": "PostalAddress",
+        "addressCountry": "US",
+        "addressRegion": "@Model.Location.State",
+        "addressLocality": "@Model.Location.City",
+        "contactType": "Location address",
+        "postalCode": "@Model.Location.Zip",
+        "streetAddress": "@Model.Location.Address"
+        },
+        "location": { "@@id": "_:@Model.Location.SDLocationId" },
+        "parentOrganization": "@Model.Location.SDParentOrganization",
+        "telephone": "@Html.Raw(@Model.Location.Phone)",
+        "openingHours": @Html.Raw(Json.Serialize(@Model.StructuredLocationHours)),
+        "image": "@Model.Location.ImagePath",
+        "isAccessibleForFree": true,
+        "priceRange" : "$000 - $000",
+        "sameAs": ["@Model.Location.MapLink"
+        @if (!string.IsNullOrEmpty(Model.Location.Facebook))
+        {
+            @:, "@Model.Location.Facebook"
+        }]
         }
-    </body>
-</html>
+
+    </script>
+}

@@ -26,6 +26,9 @@ namespace Ocuda.Promenade.Models.Entities
         public string MapLink { get; set; }
 
         [MaxLength(255)]
+        public string MapImagePath { get; set; }
+
+        [MaxLength(255)]
         public string Address { get; set; }
 
         [MaxLength(50)]
@@ -50,6 +53,8 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string EventLink { get; set; }
 
+        public bool HasEvents { get; set; }
+
         public string AdministrativeArea { get; set; }
 
         public string Country { get; set; }
@@ -71,26 +76,29 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string GeoLocation { get; set; }
 
-        public double Longitude { get; set; }
-
-        public double Latitude { get; set; }
-
-        [NotMapped]
-        public double Distance { get; set; }
-
-        public bool Open { get; set; }
-
-        public bool ShowLocation { get; set; }
-
         public string PAbbreviation { get; set; }
 
         public bool IsAlwaysOpen { get; set; }
+
+        [MaxLength(255)]
+        public string LocatorName { get; set; }
+
+        [MaxLength(50)]
+        public string LocatorNotes { get; set; }
+
+        [NotMapped]
+        public double Distance { get; set; }
+        [NotMapped]
+        public bool Open { get; set; }
 
         [NotMapped]
         public List<Location> CloseLocations { get; set; }
 
         [NotMapped]
-        public List<string> LocationHours { get; set; }
+        public List<LocationDayGrouping> LocationHours { get; set; }
+
+        [NotMapped]
+        public LocationHoursResult CurrentStatus { get; set; }
 
         [NotMapped]
         public string FormattedAddress { get; set; }
