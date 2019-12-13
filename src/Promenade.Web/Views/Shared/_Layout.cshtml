@@ -7,6 +7,22 @@
     <link rel="stylesheet" href="~/css/styles.min.css" asp-append-version="true" />
     <link rel="shortcut icon" href="#" />
     @RenderSection("metadata", required: false)
+    @{
+        var googleAnalyticsTrackingCode = Context.Items[Ocuda.Promenade.Controllers.ItemKey.GoogleAnalyticsTrackingCode] as string;
+        if (!string.IsNullOrEmpty(googleAnalyticsTrackingCode))
+        {
+            <!-- Global site tag (gtag.js) - Google Analytics -->
+            <script async src="https://www.googletagmanager.com/gtag/js?id=@googleAnalyticsTrackingCode"></script>
+            <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag() { dataLayer.push(arguments); }
+                gtag('js', new Date());
+
+                gtag('config', '@googleAnalyticsTrackingCode');
+            </script>
+        }
+    }
+    @RenderSection("Styles", required: false)
 </head>
 <body>
     <div class="container-fluid prom-content">

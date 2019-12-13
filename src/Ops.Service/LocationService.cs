@@ -11,6 +11,7 @@ using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Models;
+using Ocuda.Promenade.Models;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 
@@ -118,7 +119,7 @@ namespace Ocuda.Ops.Service
             return currentLocation;
         }
 
-        public async Task<List<string>> GetFormattedWeeklyHoursAsync(int locationId)
+        public async Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId)
         {
             var location = await _locationRepository.FindAsync(locationId);
             if (location.IsAlwaysOpen)
@@ -156,7 +157,7 @@ namespace Ocuda.Ops.Service
                 }
             }
 
-            var formattedDayGroupings = new List<string>();
+            var formattedDayGroupings = new List<LocationDayGrouping>();
             foreach (var (DaysOfWeek, OpenTime, CloseTime) in dayGroupings)
             {
                 var days = GetFormattedDayGroupings(DaysOfWeek);
@@ -175,13 +176,21 @@ namespace Ocuda.Ops.Service
                 }
                 closeTime.Append(CloseTime.ToString(" tt").ToLower());
 
-                formattedDayGroupings.Add($"{days} {openTime}{ndash}{closeTime}");
+                formattedDayGroupings.Add(new LocationDayGrouping
+                {
+                    Days = days,
+                    Time = $"{openTime} {ndash} {closeTime}"
+                });
             }
 
             if (closedDays.Count > 0)
             {
                 var formattedClosedDays = GetFormattedDayGroupings(closedDays);
-                formattedDayGroupings.Add($"{formattedClosedDays} Closed");
+                formattedDayGroupings.Add(new LocationDayGrouping
+                {
+                    Days = formattedClosedDays,
+                    Time = "Closed"
+                });
             }
 
             return formattedDayGroupings;

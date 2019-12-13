@@ -12,6 +12,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Models;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Helpers;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Ops.Service
 {

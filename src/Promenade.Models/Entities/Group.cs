@@ -15,6 +15,12 @@ namespace Ocuda.Promenade.Models.Entities
 
         public string SubscriptionUrl { get; set; }
 
+        [MaxLength(255)]
+        public string MapImage { get; set; }
+
+        [MaxLength(255)]
+        public string Description { get; set; }
+
         [NotMapped]
         public bool IsNewGroup { get; set; }
     }
