@@ -24,7 +24,7 @@ namespace Ocuda.Promenade.Controllers
         [Route("")]
         public async Task<IActionResult> Index()
         {
-            var emediaViewModel = new EmediaViewModel()
+            var emediaViewModel = new EmediaViewModel
             {
                 AllEmedia = await _emediaService.GetAllEmediaAsync()
             };

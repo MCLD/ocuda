@@ -35,7 +35,6 @@ namespace Ocuda.Promenade.Service
         public async Task<List<Emedia>> GetAllEmediaAsync()
         {
             var emedia =  await _emediaRepository.GetAllEmedia();
-            var categories = await _categoryRepository.GetAllCategories();
 
             foreach(var media in emedia)
             {
