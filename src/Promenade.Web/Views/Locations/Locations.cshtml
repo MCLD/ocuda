@@ -8,20 +8,16 @@
     <style>
         .location-tile {
             border: 1px solid #b8b9bb;
-            display: block;
-            margin-right: auto;
-            margin-left: auto;
-            width: 222px;
         }
 
         .location-tile-background {
             background-color: #fcf6e6;
-            padding: 10px;
+            padding: 0.75rem;
         }
 
         .location-tile-table {
             margin: 0 auto;
-            padding: 10px;
+            padding: 0.75rem;
             text-align: center;
             width: 100%;
         }
@@ -36,8 +32,7 @@
     </style>
 }
 
-
-<h1>Find My Library</h1>
+<h1>Locations</h1>
 
 @if (Model.CanSearchAddress)
 {
@@ -46,7 +41,7 @@
             <form asp-action="@nameof(LocationsController.Find)" method="get" role="form">
                 <div class="input-group">
                     <input asp-for="Zip"
-                           placeholder="Enter your zip code"
+                           placeholder="Enter your ZIP Code to find your closest library"
                            class="form-control default-text" />
                     <duv class="input-group-append">
                         <button class="btn btn-primary">
@@ -78,10 +73,10 @@
     {
         @foreach (var location in Model.Locations)
         {
-            <div class="col-xs-12 col-sm-4 mt-2 mb-4">
+            <div class="col-12 col-md-6 col-lg-4 mt-2 mb-4">
                 <div class="location-tile">
                     <div class="@(location.CurrentStatus.IsCurrentlyOpen ? "traffic-green" : "traffic-red")" style="border-bottom:5px solid; width: 100%;">
-                        <a href="@location.MapLink" target="_blank">
+                        <a href="@location.MapLink">
                             <img src="@location.MapImagePath" style="width:220px;" />
                         </a>
                     </div>
@@ -90,7 +85,7 @@
                             <tbody>
                                 <tr>
                                     <td style="padding-bottom:10px;">
-                                        <strong style="font-size: 17.5px;">
+                                        <span class="h3">
                                             @if (!string.IsNullOrWhiteSpace(location.LocatorName))
                                             {
                                                 @Html.Raw(location.LocatorName)
@@ -99,8 +94,8 @@
                                             {
                                                 @location.Name
                                             }
-                                        </strong>
-                                        <em style="font-size:12px;">
+                                        </span>
+                                        <em>
                                             @if (location.Distance != 0)
                                             {
                                                 <text>(@location.Distance mi.)</text>
@@ -109,7 +104,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td style="padding-bottom:10px;font-size:13px;">
+                                    <td style="padding-bottom:10px">
                                         @location.Address<br>
                                         @location.City  @location.State, @location.Zip
                                     </td>
@@ -126,22 +121,19 @@
                                         <a asp-action="@nameof(LocationsController.Locations)"
                                            asp-route-locationStub="@location.Stub"
                                            class="btn btn-light btn-outline-secondary text-dark"
-                                           style="font-size: 14px;"
-                                           target="_blank">
-                                            Location Info
+                                           style="font-size: 14px;">
+                                            More Info
                                         </a>
                                         @if (location.HasEvents)
                                         {
                                             <a href="@location.EventLink"
-                                               class="btn btn-light btn-outline-secondary text-dark float-right"
-                                               style="font-size: 14px;"
-                                               target="_blank">
+                                               class="btn btn-light btn-outline-secondary text-dark float-right">
                                                 Events
                                             </a>
                                         }
                                         else
                                         {
-                                            <em class="float-right" style="font-size:11px; padding-top:10px;">@location.LocatorNotes</em>
+                                            <em class="float-right" style="padding-top:10px;">@location.LocatorNotes</em>
                                         }
                                     </td>
 
