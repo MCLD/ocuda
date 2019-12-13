@@ -71,7 +71,7 @@ namespace Ocuda.Promenade.Controllers.Filters
             context.HttpContext.Items[ItemKey.L10n] = cultureList;
 
 
-            int topNavigationId
+            var topNavigationId
                 = await _siteSettingService.GetSettingIntAsync(SiteSetting.Site.NavigationIdTop);
             if (topNavigationId > 0)
             {
@@ -79,7 +79,7 @@ namespace Ocuda.Promenade.Controllers.Filters
                     = await _navigationService.GetNavigation(topNavigationId);
             }
 
-            int middleNavigationId
+            var middleNavigationId
                 = await _siteSettingService.GetSettingIntAsync(SiteSetting.Site.NavigationIdMiddle);
             if (middleNavigationId > 0)
             {
@@ -87,7 +87,7 @@ namespace Ocuda.Promenade.Controllers.Filters
                     = await _navigationService.GetNavigation(middleNavigationId);
             }
 
-            int leftNavigationId
+            var leftNavigationId
                 = await _siteSettingService.GetSettingIntAsync(SiteSetting.Site.NavigationIdLeft);
             if (leftNavigationId > 0)
             {
@@ -95,7 +95,7 @@ namespace Ocuda.Promenade.Controllers.Filters
                     = await _navigationService.GetNavigation(leftNavigationId);
             }
 
-            int footerNavigationId
+            var footerNavigationId
                 = await _siteSettingService.GetSettingIntAsync(SiteSetting.Site.NavigationIdFooter);
             if (leftNavigationId > 0)
             {
@@ -107,6 +107,9 @@ namespace Ocuda.Promenade.Controllers.Filters
                 = await _siteSettingService.GetSettingStringAsync(SiteSetting.Site.BannerImage);
             context.HttpContext.Items[ItemKey.BannerImageAlt]
                 = await _siteSettingService.GetSettingStringAsync(SiteSetting.Site.BannerImageAlt);
+
+            context.HttpContext.Items[ItemKey.GoogleAnalyticsTrackingCode]
+                = await _siteSettingService.GetSettingStringAsync(SiteSetting.Site.GoogleTrackingCode);
 
             await next();
         }
