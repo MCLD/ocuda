@@ -180,14 +180,14 @@ namespace Ocuda.Promenade.Controllers
                     var locationfeatureModel = new LocationsFeaturesViewModel
                     {
                         BodyText = CommonMark.CommonMarkConverter.Convert(feature.BodyText),
-                        FontAwesome = feature.FontAwesome,
+                        Icon = feature.Icon,
                         ImagePath = feature.ImagePath,
                         Name = feature.Name,
                         RedirectUrl = locationFeature.RedirectUrl,
                         Stub = feature.Stub,
                         Text = CommonMark.CommonMarkConverter.Convert(locationFeature.Text)
                     };
-                    if (!feature.FontAwesome.Contains("fa-inverse"))
+                    if (!feature.Icon.Contains("fa-inverse"))
                     {
                         locationfeatureModel.InnerSpan = "<strong>7</strong>";
                     }
@@ -221,7 +221,7 @@ namespace Ocuda.Promenade.Controllers
                     var locationfeatureModel = new LocationsFeaturesViewModel
                     {
                         BodyText = CommonMark.CommonMarkConverter.Convert(feature.BodyText),
-                        FontAwesome = feature.FontAwesome,
+                        Icon = feature.Icon,
                         ImagePath = feature.ImagePath,
                         Name = feature.Name,
                         RedirectUrl = locationFeature.RedirectUrl,

@@ -12,7 +12,7 @@ namespace Ocuda.Promenade.Models.Entities
 
         [MaxLength(48)]
         [Required]
-        public string FontAwesome { get; set; }
+        public string Icon { get; set; }
 
         [MaxLength(255)]
         public string ImagePath { get; set; }
