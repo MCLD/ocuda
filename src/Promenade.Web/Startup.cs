@@ -19,6 +19,7 @@ using Ocuda.i18n.RouteConstraint;
 using Ocuda.Promenade.Data;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Providers;
 using Serilog.Context;
@@ -87,7 +88,7 @@ namespace Ocuda.Promenade.Web
             }
 
             string promCs = _config.GetConnectionString("Promenade")
-                ?? throw new Exception("ConnectionString:Promenade not configured.");
+                ?? throw new OcudaException("ConnectionString:Promenade not configured.");
             switch (_config["Promenade.DatabaseProvider"])
             {
                 case "SqlServer":
@@ -99,7 +100,7 @@ namespace Ocuda.Promenade.Web
                             .Ignore(ignoreEvents.ToArray())));
                     break;
                 default:
-                    throw new System.Exception("No Ops.DatabaseProvider configured.");
+                    throw new OcudaException("No Ops.DatabaseProvider configured.");
             }
 
             services.Configure<RouteOptions>(_ =>
@@ -130,8 +131,15 @@ namespace Ocuda.Promenade.Web
 
             // filters
             services.AddScoped<i18n.Filter.LocalizationFilterAttribute>();
+            services.AddScoped<Controllers.Filters.NavigationFilter>();
 
             // repositories
+            services.AddScoped<Service.Interfaces.Repositories.ICategoryRepository,
+                Data.Promenade.CategoryRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IEmediaRepository,
+                Data.Promenade.EmediaRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IEmediaCategoryRepository,
+                Data.Promenade.EmediaCategoryRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IFeatureRepository,
                 Data.Promenade.FeatureRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IGroupRepository,
@@ -148,6 +156,10 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.LocationHoursRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ILocationHoursOverrideRepository,
                 Data.Promenade.LocationHoursOverrideRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.INavigationRepository,
+                Data.Promenade.NavigationRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.INavigationTextRepository,
+                Data.Promenade.NavigationTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IPageRepository,
                 Data.Promenade.PageRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ISiteAlertRepository,
@@ -162,8 +174,15 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.UrlRedirectRepository>();
 
             // services
+            services.AddScoped<Utility.Services.Interfaces.IPathResolverService,
+                Utility.Services.PathResolverService>();
+
+            // promenade servicews
+            services.AddScoped<CategoryService>();
+            services.AddScoped<EmediaService>();
             services.AddScoped<LanguageService>();
             services.AddScoped<LocationService>();
+            services.AddScoped<NavigationService>();
             services.AddScoped<PageService>();
             services.AddScoped<RedirectService>();
             services.AddScoped<SiteAlertService>();
@@ -171,7 +190,8 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<SocialCardService>();
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app,
+            Utility.Services.Interfaces.IPathResolverService pathResolver)
         {
             // configure error page handling and development IDE linking
             if (_isDevelopment)
@@ -211,8 +231,22 @@ namespace Ocuda.Promenade.Web
 
             app.UseStaticFiles();
 
+            // configure shared content directory
+            var contentFilePath = pathResolver.GetPublicContentFilePath();
+            var contentUrl = pathResolver.GetPublicContentUrl();
+            if (!contentUrl.StartsWith("/", StringComparison.OrdinalIgnoreCase))
+            {
+                contentUrl = $"/{contentUrl}";
+            }
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider
+                    = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(contentFilePath),
+                RequestPath = new PathString(contentUrl)
+            });
+
             app.UseMvc();
         }
     }
 }
-

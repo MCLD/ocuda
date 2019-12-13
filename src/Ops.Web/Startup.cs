@@ -20,6 +20,7 @@ using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Ops.Web.StartupHelper;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Web
@@ -58,9 +59,9 @@ namespace Ocuda.Ops.Web
                 case "Redis":
                     string redisConfiguration
                         = _config[Configuration.OpsDistributedCacheRedisConfiguration]
-                        ?? throw new Exception($"{Configuration.OpsDistributedCache} has Redis selected but {Configuration.OpsDistributedCacheRedisConfiguration} is not set.");
+                        ?? throw new OcudaException($"{Configuration.OpsDistributedCache} has Redis selected but {Configuration.OpsDistributedCacheRedisConfiguration} is not set.");
                     string instanceName = CacheInstance.OcudaOps;
-                    if (!instanceName.EndsWith("."))
+                    if (!instanceName.EndsWith(".", StringComparison.OrdinalIgnoreCase))
                     {
                         instanceName += ".";
                     }
@@ -114,9 +115,9 @@ namespace Ocuda.Ops.Web
             }
 
             string opsCs = _config.GetConnectionString("Ops")
-                ?? throw new Exception("ConnectionString:Ops not configured.");
+                ?? throw new OcudaException("ConnectionString:Ops not configured.");
             string promCs = _config.GetConnectionString("Promenade")
-                ?? throw new Exception("ConnectionString:Promenade not configured.");
+                ?? throw new OcudaException("ConnectionString:Promenade not configured.");
 
             var provider = _config[Configuration.OpsDatabaseProvider];
             switch (provider)
@@ -139,7 +140,7 @@ namespace Ocuda.Ops.Web
                 default:
                     _logger.LogCritical("No {0} configured in settings. Exiting.",
                         Configuration.OpsDatabaseProvider);
-                    throw new Exception($"No {Configuration.OpsDatabaseProvider} configured.");
+                    throw new OcudaException($"No {Configuration.OpsDatabaseProvider} configured.");
             }
 
             // stoer the data protection key in the context
@@ -275,7 +276,8 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ILocationFeatureService, LocationFeatureService>();
             services.AddScoped<ILinkService, LinkService>();
             services.AddScoped<IPageService, PageService>();
-            services.AddScoped<IPathResolverService, PathResolverService>();
+            services.AddScoped<Utility.Services.Interfaces.IPathResolverService,
+                Utility.Services.PathResolverService>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IRosterService, RosterService>();
             services.AddScoped<ISectionService, SectionService>();
@@ -285,13 +287,11 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IUserMetadataTypeService, UserMetadataTypeService>();
             services.AddScoped<IUserService, UserService>();
 
-            var serviceProvider = services.BuildServiceProvider();
-            return serviceProvider;
+            return services.BuildServiceProvider();
         }
 
         public void Configure(IApplicationBuilder app,
-            IHostingEnvironment env,
-            IPathResolverService pathResolver)
+            Utility.Services.Interfaces.IPathResolverService pathResolver)
         {
             // configure error page handling and development IDE linking
             if (_isDevelopment)
@@ -346,7 +346,7 @@ namespace Ocuda.Ops.Web
             // configure shared content directory
             var contentFilePath = pathResolver.GetPublicContentFilePath();
             var contentUrl = pathResolver.GetPublicContentUrl();
-            if (!contentUrl.StartsWith("/"))
+            if (!contentUrl.StartsWith("/", StringComparison.OrdinalIgnoreCase))
             {
                 contentUrl = $"/{contentUrl}";
             }
@@ -355,7 +355,7 @@ namespace Ocuda.Ops.Web
             {
                 FileProvider
                     = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(contentFilePath),
-                RequestPath = new Microsoft.AspNetCore.Http.PathString(contentUrl)
+                RequestPath = new PathString(contentUrl)
             });
 
             app.UseSession();

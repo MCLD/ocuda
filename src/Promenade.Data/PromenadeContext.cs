@@ -8,6 +8,9 @@ namespace Ocuda.Promenade.Data
         protected PromenadeContext(DbContextOptions options) : base(options) { }
 
         // Read-Only
+        public DbSet<Category> Categories { get; }
+        public DbSet<Emedia> Emedia { get; set; }
+        public DbSet<EmediaCategory> EmediaCategories { get; set; }
         public DbSet<Feature> Features { get; }
         public DbSet<Group> Groups { get; }
         public DbSet<Location> Locations { get; }
@@ -15,6 +18,8 @@ namespace Ocuda.Promenade.Data
         public DbSet<LocationGroup> LocationGroups { get; }
         public DbSet<LocationHours> LocationHours { get; }
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; }
+        public DbSet<Navigation> Navigations { get; }
+        public DbSet<NavigationText> NavigationTexts { get; }
         public DbSet<Page> Pages { get; }
         public DbSet<SiteSetting> SiteSettings { get; }
         public DbSet<SocialCard> SocialCards { get; }

@@ -1,13 +1,11 @@
 ﻿using System;
-using System.IO;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
-namespace Ocuda.Ops.Service
+namespace Ocuda.Utility.Services
 {
-    public class PathResolverService : IPathResolverService
+    public class PathResolverService : Interfaces.IPathResolverService
     {
         private const string DefaultPublicDirectory = "public";
         private const string DefaultPrivateDirectory = "private";
@@ -24,18 +22,22 @@ namespace Ocuda.Ops.Service
 
         public string GetPublicContentUrl(params object[] pathElement)
         {
-            var path = new StringBuilder(_config[Utility.Keys.Configuration.OpsUrlSharedContent]);
+            var path = new StringBuilder(_config[Keys.Configuration.OcudaUrlSharedContent]);
             if (path.Length == 0)
             {
                 path.Append("content");
             }
-            foreach (var element in pathElement)
+            if (pathElement != null)
             {
-                if (!path.ToString().EndsWith("/") && !element.ToString().StartsWith("/"))
+                foreach (var element in pathElement)
                 {
-                    path.Append("/");
+                    if (!path.ToString().EndsWith("/", StringComparison.OrdinalIgnoreCase)
+                        && !element.ToString().StartsWith("/", StringComparison.OrdinalIgnoreCase))
+                    {
+                        path.Append("/");
+                    }
+                    path.Append(element);
                 }
-                path.Append(element);
             }
             return path.ToString();
         }
@@ -60,13 +62,12 @@ namespace Ocuda.Ops.Service
                 ? DefaultPrivateDirectory
                 : DefaultPublicDirectory;
 
-            string path
-                = Utility.Files.SharedPath.Get(_config[Utility.Keys.Configuration.OpsFileShared]);
+            string path = Files.SharedPath.Get(_config[Keys.Configuration.OcudaFileShared]);
 
             try
             {
-                path = Path.Combine(path, publicPrivateRoot);
-                Directory.CreateDirectory(path);
+                path = System.IO.Path.Combine(path, publicPrivateRoot);
+                System.IO.Directory.CreateDirectory(path);
             }
             catch (Exception ex)
             {
@@ -77,11 +78,11 @@ namespace Ocuda.Ops.Service
 
             foreach (var element in pathElement)
             {
-                path = Path.Combine(path, element.ToString());
+                path = System.IO.Path.Combine(path, element.ToString());
 
                 try
                 {
-                    Directory.CreateDirectory(path);
+                    System.IO.Directory.CreateDirectory(path);
                 }
                 catch (Exception ex)
                 {
@@ -93,7 +94,7 @@ namespace Ocuda.Ops.Service
 
             if (!string.IsNullOrEmpty(fileName))
             {
-                path = Path.Combine(path, fileName);
+                path = System.IO.Path.Combine(path, fileName);
             }
 
             return path;
