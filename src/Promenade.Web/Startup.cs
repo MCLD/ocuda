@@ -132,6 +132,12 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<i18n.Filter.LocalizationFilterAttribute>();
 
             // repositories
+            services.AddScoped<Service.Interfaces.Repositories.ICategoryRepository,
+                Data.Promenade.CategoryRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IEmediaRepository,
+                Data.Promenade.EmediaRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IEmediaCategoryRepository,
+                Data.Promenade.EmediaCategoryRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IFeatureRepository,
                 Data.Promenade.FeatureRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IGroupRepository,
@@ -162,6 +168,8 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.UrlRedirectRepository>();
 
             // services
+            services.AddScoped<CategoryService>();
+            services.AddScoped<EmediaService>();
             services.AddScoped<LanguageService>();
             services.AddScoped<LocationService>();
             services.AddScoped<PageService>();
