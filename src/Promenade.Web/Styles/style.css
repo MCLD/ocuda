@@ -1,0 +1,166 @@
+﻿body {
+    background-color: #ccc;
+}
+
+span.prom-fa-space {
+    margin-right: 0.5rem;
+}
+
+.hidden-xxs {
+    display: none;
+}
+
+@media (min-width: 385px) {
+    .hidden-xxs {
+        display: inline;
+    }
+}
+
+/* top nav bar */
+.prom-nav-top {
+    background-color: #666;
+    color: white;
+    line-height: normal;
+}
+
+    .prom-nav-top .prom-language-dropdown {
+        margin: 10px 0;
+        color: white;
+    }
+
+    .prom-nav-top > .prom-right-nav > div {
+        padding: 1rem 0.5rem;
+        float: right;
+    }
+
+        .prom-nav-top > .prom-right-nav > div > a {
+            color: white;
+        }
+
+/* logo nav bar */
+.prom-nav-logo {
+    background-color: #333;
+}
+
+    .prom-nav-logo > img {
+        padding: 10px;
+        max-width: 90vw;
+    }
+
+/* bottom nav bar */
+.prom-nav-middle {
+    background-color: white;
+}
+
+    .prom-nav-middle .prom-nav-dropdown {
+        padding-top: 4px;
+        padding-bottom: 4px;
+        cursor: pointer;
+    }
+
+    .prom-nav-middle .prom-dropdown-swap-link {
+        display: none;
+    }
+
+    .prom-nav-middle .prom-nav-link {
+        display: block;
+    }
+
+
+@media (min-width: 374px) {
+    .prom-nav-middle .prom-dropdown-swap-link {
+        display: block;
+    }
+
+    .prom-nav-middle .prom-nav-link {
+        display: none;
+    }
+}
+
+/* content */
+.prom-content-container {
+    background-color: #ccc;
+}
+
+/* footer */
+footer {
+    background-color: #333;
+    height: 51px;
+}
+
+    footer a, footer a:hover {
+        color: white;
+        padding: 0.75rem 0;
+        text-decoration: none;
+    }
+
+        footer a:hover .prom-footer-link-text {
+            text-decoration: underline;
+        }
+
+.prom-leftnav .prom-leftnav-section {
+    background-color: white;
+    margin-bottom: 0.5rem;
+    padding: 0.25rem;
+}
+
+.prom-leftnav .prom-leftnav-header {
+    cursor: pointer;
+}
+
+    .prom-leftnav .prom-leftnav-header:first-child {
+        padding-left: 0.25rem;
+    }
+
+.prom-leftnav .prom-leftnav-content {
+    font-size: 0.9rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.1rem;
+}
+
+    .prom-leftnav .prom-leftnav-content ul {
+        margin-bottom: 0.25rem;
+    }
+
+/* body content */
+.prom-body-content-container {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.prom-body-content {
+    background-color: white;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+    padding: 0.5rem 1rem;
+}
+
+@media (min-width: 576px) {
+    .prom-body-content-container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .prom-body-content {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+}
+
+.prom-leftnav-header[data-toggle="collapse"]::after {
+    font-weight: 900;
+    display: inline-block;
+    float: right;
+    margin-right: 0.5rem;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: "Font Awesome 5 Free";
+    content: "\f0d7";
+    transform: rotate(180deg);
+    transition: all linear 0.25s;
+}
+
+.prom-leftnav-header[data-toggle="collapse"].collapsed::after {
+    transform: rotate(0deg);
+}

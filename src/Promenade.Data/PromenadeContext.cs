@@ -15,6 +15,8 @@ namespace Ocuda.Promenade.Data
         public DbSet<LocationGroup> LocationGroups { get; }
         public DbSet<LocationHours> LocationHours { get; }
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; }
+        public DbSet<Navigation> Navigations { get; }
+        public DbSet<NavigationText> NavigationTexts { get; }
         public DbSet<Page> Pages { get; }
         public DbSet<SiteSetting> SiteSettings { get; }
         public DbSet<SocialCard> SocialCards { get; }

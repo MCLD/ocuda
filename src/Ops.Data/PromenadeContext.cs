@@ -18,6 +18,11 @@ namespace Ocuda.Ops.Data
             {
                 relationship.DeleteBehavior = DeleteBehavior.Restrict;
             }
+
+            // configure composite keys
+            // https://docs.microsoft.com/en-us/ef/core/modeling/keys
+            modelBuilder.Entity<NavigationText>()
+                .HasKey(_ => new { _.Id, _.LanguageId });
         }
 
         #region IMigratableContext
@@ -34,6 +39,8 @@ namespace Ocuda.Ops.Data
         public DbSet<Location> Locations { get; set; }
         public DbSet<LocationFeature> LocationFeatures { get; set; }
         public DbSet<LocationGroup> LocationGroups { get; set; }
+        public DbSet<Navigation> Navigations { get; set; }
+        public DbSet<NavigationText> NavigationTexts { get; set; }
         public DbSet<PageHeader> PageHeaders { get; }
         public DbSet<Page> Pages { get; set; }
         public DbSet<SiteSetting> SiteSettings { get; set; }
