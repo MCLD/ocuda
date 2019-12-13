@@ -692,9 +692,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                         if (lat.HasValue && lng.HasValue)
                         {
-                            location.Latitude = lat.Value;
-                            location.Longitude = lng.Value;
-                            location.GeoLocation = lng.ToString() + ", " + lat.ToString();
+                            location.GeoLocation = lat.ToString() + "," + lng.ToString();
                         }
                         else
                         {

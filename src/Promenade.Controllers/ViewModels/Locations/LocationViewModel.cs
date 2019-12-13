@@ -1,27 +1,19 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Controllers.ViewModels.Locations
 {
     public class LocationViewModel
     {
-        public Location Location { get; set; }
+        public ICollection<Location> Locations { get; set; }
 
-        public List<LocationsFeaturesViewModel> LocationFeatures { get; set; }
+        public string Zip { get; set; }
 
-        public string Address { get; set; }
+        public bool CanSearchAddress { get; set; }
 
-        public List<Location> NearbyLocations { get; set; }
+        public bool IsMobile { get; set; }
 
-        public int NearbyCount { get; set; }
-
-        public Group LocationNeighborGroup { get; set; }
-
-        public bool LocationSearchable { get; set; }
-
-        [NotMapped]
-        public List<string> StructuredLocationHours { get; set; }
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
     }
 }

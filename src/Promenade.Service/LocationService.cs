@@ -189,7 +189,7 @@ namespace Ocuda.Promenade.Service
             return null;
         }
 
-        public async Task<List<string>> GetFormattedWeeklyHoursAsync(int locationId, bool isStructuredData = false)
+        public async Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId, bool isStructuredData = false)
         {
             var location = await _locationRepository.FindAsync(locationId);
             if (location.IsAlwaysOpen)
@@ -199,7 +199,7 @@ namespace Ocuda.Promenade.Service
 
             var weeklyHours = await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
             // Order weeklyHours to start on Monday
-            weeklyHours = weeklyHours.OrderBy(_ => ((int)_.DayOfWeek + 1) % 8).ToList();
+            weeklyHours = weeklyHours.OrderBy(_ => ((int)_.DayOfWeek + 6) % 7).ToList();
 
             var dayGroupings = new List<(List<DayOfWeek> DaysOfWeek, DateTime OpenTime, DateTime CloseTime)>();
             var closedDays = new List<DayOfWeek>();
@@ -227,7 +227,7 @@ namespace Ocuda.Promenade.Service
                 }
             }
 
-            var formattedDayGroupings = new List<string>();
+            var formattedDayGroupings = new List<LocationDayGrouping>();
             foreach (var (DaysOfWeek, OpenTime, CloseTime) in dayGroupings)
             {
                 var days = isStructuredData ? GetFormattedDayGroupings(DaysOfWeek, true)
@@ -248,24 +248,32 @@ namespace Ocuda.Promenade.Service
                 }
                 closeTime.Append(isStructuredData ? "" : CloseTime.ToString(" tt").ToLower());
 
-                formattedDayGroupings.Add($"{days} {openTime}{ndash}{closeTime}");
+                formattedDayGroupings.Add(new LocationDayGrouping
+                {
+                    Days = days,
+                    Time = $"{openTime} {ndash} {closeTime}"
+                });
             }
 
             if (closedDays.Count > 0 && !isStructuredData)
             {
                 var formattedClosedDays = GetFormattedDayGroupings(closedDays);
-                formattedDayGroupings.Add($"{formattedClosedDays} Closed");
+                formattedDayGroupings.Add(new LocationDayGrouping
+                {
+                    Days = formattedClosedDays,
+                    Time = "Closed"
+                });
             }
 
             return formattedDayGroupings;
         }
 
-        private string GetFormattedDayGroupings(List<DayOfWeek> days, bool isStructuredData=false)
+        private string GetFormattedDayGroupings(List<DayOfWeek> days, bool isStructuredData = false)
         {
             var dayFormatter = new DateTimeFormatInfo();
             if (days.Count == 1)
             {
-                return isStructuredData ? dayFormatter.GetAbbreviatedDayName(days[0]).Substring(0,2)
+                return isStructuredData ? dayFormatter.GetAbbreviatedDayName(days[0]).Substring(0, 2)
                     : dayFormatter.GetAbbreviatedDayName(days[0]);
             }
             else
@@ -290,13 +298,13 @@ namespace Ocuda.Promenade.Service
                 {
                     if (isStructuredData)
                     {
-                        return $"{dayFormatter.GetAbbreviatedDayName(firstDay).Substring(0,2)}" +
+                        return $"{dayFormatter.GetAbbreviatedDayName(firstDay).Substring(0, 2)}" +
                             $"{ndash}{dayFormatter.GetAbbreviatedDayName(lastDay).Substring(0, 2)}";
                     }
                     else
                     {
                         return $"{dayFormatter.GetAbbreviatedDayName(firstDay)}" +
-                            $"{ndash}{dayFormatter.GetAbbreviatedDayName(lastDay)}";
+                            $" {ndash} {dayFormatter.GetAbbreviatedDayName(lastDay)}";
                     }
                 }
                 else
