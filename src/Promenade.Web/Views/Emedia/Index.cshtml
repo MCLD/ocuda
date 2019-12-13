@@ -1,0 +1,74 @@
+﻿@model Ocuda.Promenade.Controllers.ViewModels.Emedias.EmediaViewModel
+@using Ocuda.Promenade.Controllers;
+@{
+    ViewData["Title"] = "Index";
+}
+<div class="modal fade" tabindex="-1" role="dialog" id="helpModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="emedia-content">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2>eMedia</h2>
+<p>Electronic downloads and streaming available 24/7 for tablets, smartphones, eReaders, and computers! Need help? See our tutorials,  <a href="https://extranet.mcldaz.org/"><strong>contact us online</strong></a>, or call us: <a href="tel:6026523000">602-652-3000</a>.</p>
+<p><strong>New  <a href="/About/ebooks">publisher policies</a>  may impact your eBook reading.</strong></p>
+
+<div class="justify-content-center  d-flex align-items-center flex-wrap">
+    @foreach (var emedia in Model.AllEmedia)
+    {
+        <div class="col-xs-12 col-sm-4 space-above">
+            <div class="card">
+                <div class="card-header">
+                    <a href="@emedia.RedirectUrl">@emedia.Name</a>
+                    @if (!string.IsNullOrEmpty(emedia.Details))
+                    {
+                        <button type="button" class="btn btn-warning float-right help-btn" data-emedia="@emedia.Name" data-toggle="modal" data-target="#helpModal">Help</button>
+                    }
+                </div>
+                <div class="card-body">
+                    @Html.Raw(emedia.Description)
+                </div>
+                <div class="card-footer">
+                    @foreach (var category in emedia.Categories)
+                    {
+                        <span class="badge @category.Class">@category.Name</span>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+
+        $(".help-btn").on('click', function () {
+            @foreach (var emedia in Model.AllEmedia)
+            {
+                <text>
+                if ("@emedia.Name" == $(this).data("emedia"))
+                {
+                    $("#modalTitle").text("@emedia.Name Help");
+                    $("#emedia-content").html($("#emedia-content").html("@Html.Raw(emedia.Details).ToString()").text());
+                }
+                </text>
+            }
+        });
+    </script>
+}
