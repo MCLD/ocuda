@@ -8,6 +8,9 @@
         public static readonly string OcudaLoggingRollingFile = "Ocuda.LoggingRollingFile";
         public static readonly string OcudaLoggingRollingHttpFile = "Ocuda.LoggingRollingHttpFile";
 
+        public static readonly string OcudaUrlSharedContent = "Ocuda.UrlSharedContent";
+        public static readonly string OcudaFileShared = "Ocuda.FileShared";
+
         public static readonly string ThrowQueryWarningsInDev = "ThrowQueryWarningsInDev";
 
         public static readonly string OpsAuthBlankRequestRedirect = "Ops.AuthBlankRequestRedirect";
@@ -24,7 +27,6 @@
             = "Ops.DistributedCache.RedisConfiguration";
 
         public static readonly string OpsDomainName = "Ops.DomainName";
-        public static readonly string OpsFileShared = "Ops.FileShared";
         public static readonly string OpsHttpErrorFileTag = "Ops.HttpErrorFileTag";
         public static readonly string OpsLdapDn = "Ops.LDAPDN";
         public static readonly string OpsLdapPassword = "Ops.LDAPPassword";
@@ -35,7 +37,6 @@
         public static readonly string OpsSiteManagerGroup = "Ops.SiteManagerGroup";
         public static readonly string OpsSiteSettingCacheMinutes = "Ops.SiteSettingCacheMinutes";
         public static readonly string OpsSessionTimeoutMinutes = "Ops.SessionTimeoutMinutes";
-        public static readonly string OpsUrlSharedContent = "Ops.UrlSharedContent";
 
         public static readonly string PromAPIGoogleMaps = "Promenade.API.GoogleMaps";
         public static readonly string OpsAPIGoogleMaps = "Ops.API.GoogleMaps";
