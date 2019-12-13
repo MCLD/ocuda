@@ -35,6 +35,14 @@ namespace Ocuda.Promenade.Models.Defaults
                 Category = "Site",
                 Type = SiteSettingType.StringNullable
             },
+             new SiteSetting
+            {
+                Key = Keys.SiteSetting.Site.GoogleTrackingCode,
+                Name = "Google Analytics Tracking Code",
+                Description = "Google Analytics Tracking Code",
+                Category = "Site",
+                Type = SiteSettingType.String
+            },
             new SiteSetting
             {
                 Key = Keys.SiteSetting.Site.IsTLS,
