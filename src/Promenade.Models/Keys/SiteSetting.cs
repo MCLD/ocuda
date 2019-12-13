@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Ocuda.Promenade.Models.Keys
+﻿namespace Ocuda.Promenade.Models.Keys
 {
     public struct SiteSetting
     {
@@ -13,7 +9,13 @@ namespace Ocuda.Promenade.Models.Keys
 
         public struct Site
         {
+            public const string BannerImage = "Site.BannerImage";
+            public const string BannerImageAlt = "Site.BannerImageAlt";
             public const string IsTLS = "Site.IsTLS";
+            public const string NavigationIdFooter = "Site.NavigationIdFooter";
+            public const string NavigationIdLeft = "Site.NavigationIdLeft";
+            public const string NavigationIdMiddle = "Site.NavigationIdMiddle";
+            public const string NavigationIdTop = "Site.NavigationIdTop";
         }
     }
 }

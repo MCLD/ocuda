@@ -1,6 +1,6 @@
 [
   {
-    "outputFileName": "wwwroot/js/main.min.js",
+    "outputFileName": "wwwroot/js/scripts.min.js",
     "inputFiles": [
       "node_modules/jquery/dist/jquery.js",
       "node_modules/popper.js/dist/umd/popper.js",
@@ -14,10 +14,11 @@
     }
   },
   {
-    "outputFileName": "wwwroot/css/main.min.css",
+    "outputFileName": "wwwroot/css/styles.min.css",
     "inputFiles": [
       "node_modules/bootstrap/dist/css/bootstrap.css",
-      "node_modules/@fortawesome/fontawesome-free/css/all.css"
+      "node_modules/@fortawesome/fontawesome-free/css/all.css",
+      "Styles/style.css"
     ],
     "minify": {
       "enabled": true,
@@ -25,4 +26,3 @@
     }
   }
 ]
-
