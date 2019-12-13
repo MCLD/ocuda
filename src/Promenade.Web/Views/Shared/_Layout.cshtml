@@ -4,15 +4,194 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="~/css/main.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/styles.min.css" asp-append-version="true" />
     <link rel="shortcut icon" href="#" />
     @RenderSection("metadata", required: false)
 </head>
 <body>
-    <div class="container body-content">
-        @RenderBody()
+    <div class="container-fluid prom-content">
+        <header>
+            <div class="row prom-nav-top">
+                @{
+                    var topNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.TopNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
+                    var l10n = Context.Items[Ocuda.Promenade.Controllers.ItemKey.L10n] as IDictionary<string, string>;
+                    if (topNavigation?.Navigations.Count() > 0 || l10n?.Count() > 1)
+                    {
+                        if (l10n?.Count() > 1)
+                        {
+                            <div class="@(topNavigation?.Navigations.Count() == 0 ? "col-12" : "col-3")">
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-dark btn-sm dropdown-toggle prom-language-dropdown"
+                                            type="button"
+                                            id="languageDropdown"
+                                            data-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="true">
+                                        English <span class="caret"></span>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        @foreach (var l10nItem in l10n)
+                                        {
+                                            <a href="/@l10nItem.Value" class="dropdown-item">@l10nItem.Key</a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        if (topNavigation?.Navigations.Count() > 0)
+                        {
+                            <div class="@(l10n?.Count() > 1 ? "col-9" : "col-12") prom-right-nav">
+                                @foreach (var item in topNavigation.Navigations)
+                                {
+                                    <div>
+                                        <a href="@(string.IsNullOrEmpty(item.Link) ? "#" : item.Link)"
+                                           title="@item.NavigationText.Title"
+                                           aria-label="@item.NavigationText.AriaLabel"
+                                           class="@(item.NavigationText.Label == null ? "" : "d-flex align-items-center")">
+                                            @if (!string.IsNullOrEmpty(item.Icon))
+                                            {
+                                                <span class="@item.Icon @(item.NavigationText.Label == null ? "" : "prom-fa-space")"></span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(item.NavigationText.Label))
+                                            {
+                                                <span class="@(item.HideTextWhenExtraSmall ? "hidden-xxs" : "")">@item.NavigationText.Label</span>
+                                            }
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                }
+            </div>
+            @{
+                var bannerImage = Context.Items[Ocuda.Promenade.Controllers.ItemKey.BannerImage] as string;
+                if (!string.IsNullOrEmpty(bannerImage))
+                {
+                    <div class="row prom-nav-logo">
+                        <img src="@bannerImage"
+                             alt="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.BannerImageAlt]" />
+                    </div>
+                }
+                var middleNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.MiddleNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
+                if (middleNavigation?.Navigations.Count() > 0)
+                {
+                    <div class="row prom-nav-middle">
+                        <ul class="nav nav-pills">
+                            @foreach (var item in middleNavigation.Navigations)
+                            {
+                                if (item.ChangeToLinkWhenExtraSmall || item.Navigations.Count() == 0)
+                                {
+                                    <li role="presentation" class="nav-item prom-nav-link">
+                                        <a href="@item.Link"
+                                           class="nav-link prom-nav-link"
+                                           title="@item.NavigationText.Title"
+                                           aria-label="@item.NavigationText.AriaLabel">@item.NavigationText.Label</a>
+                                    </li>
+                                }
+                                if (item.Navigations.Count() > 0)
+                                {
+                                    <li role="presentation"
+                                        class="nav-item dropdown @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : "")">
+                                        <a class="nav-link dropdown-toggle"
+                                           data-toggle="dropdown"
+                                           href="#"
+                                           role="button"
+                                           aria-haspopup="true"
+                                           aria-expanded="false"><span class="@(item.Icon != null ? item.Icon : "")"></span>@item.NavigationText.Label<span class="caret"></span></a>
+                                        <div class="dropdown-menu prom-nav-dropdown">
+                                            @foreach (var subItem in item.Navigations)
+                                            {
+                                                <a href="@subItem.Link"
+                                                   class="dropdown-item"
+                                                   aria-label="@subItem.NavigationText.AriaLabel">
+                                                    @if (!string.IsNullOrEmpty(subItem.Icon))
+                                                    {
+                                                        <span class="@subItem.Icon"></span>
+                                                    }
+                                                    @subItem.NavigationText.Label
+                                                </a>
+                                            }
+                                        </div>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                }
+            }
+        </header>
+        <div class="row prom-content-container">
+            @{
+                var leftNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.LeftNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
+                int leftNavigationSectionNumber = 0;
+            }
+            <div class="col-12 @(leftNavigation?.Navigations.Count() > 0 ? "col-sm-9 order-sm-last" : "") prom-body-content-container">
+                <div class="prom-body-content">
+                    @RenderBody()
+                </div>
+            </div>
+
+            @if (leftNavigation?.Navigations.Count() > 0)
+            {
+                <div class="col-12 col-sm-3 order-sm-first" style="padding: 1rem 0.5rem;">
+                    <div class="prom-leftnav">
+                        @foreach (var item in leftNavigation.Navigations)
+                        {
+                            leftNavigationSectionNumber++;
+                            <div class="prom-leftnav-section">
+                                <div class="prom-leftnav-header collapsed"
+                                     data-toggle="collapse"
+                                     href="#left-navigation-@leftNavigationSectionNumber"
+                                     role="button"
+                                     aria-expanded="false"
+                                     aria-controls="left-navigation-@leftNavigationSectionNumber">
+                                    @item.NavigationText.Label
+                                </div>
+                                <div class="row prom-leftnav-content collapse"
+                                     id="left-navigation-@leftNavigationSectionNumber">
+                                    <ul>
+                                        @foreach (var subItem in item.Navigations)
+                                        {
+                                            <li>
+                                                <a href="@subItem.Link"
+                                                   @(subItem.TargetNewWindow ? "target=\"_blank\"" : "")
+                                                   aria-label="@subItem.NavigationText.AriaLabel">@subItem.NavigationText.Label</a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+        @{
+            var footerNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.FooterNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
+            if (footerNavigation?.Navigations.Count() > 0)
+            {
+                <footer class="row">
+                    <div class="col-12">
+                        @foreach (var item in footerNavigation.Navigations)
+                        {
+                            <div>
+                                <a href="@item.Link"
+                                   aria-label="@item.NavigationText.AriaLabel"
+                                   class="@(item.NavigationText.Label == null ? "" : "d-flex align-items-center")">
+                                    @if (!string.IsNullOrEmpty(item.Icon))
+                                    {
+                                        <span class="@item.Icon @(item.NavigationText.Label == null ? "" : "prom-fa-space")"></span>
+                                    }
+                                    <span class="prom-footer-link-text">@item.NavigationText.Label</span>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </footer>
+            }
+        }
     </div>
-    <script src="~/js/main.min.js" asp-append-version="true"></script>
+    <script src="~/js/scripts.min.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>
