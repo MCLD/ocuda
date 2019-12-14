@@ -11,7 +11,7 @@ using Ocuda.Promenade.Service;
 namespace Ocuda.Promenade.Controllers.Abstract
 {
     [ServiceFilter(typeof(LocalizationFilterAttribute), Order = 10)]
-    [ServiceFilter(typeof(NavigationFilter), Order = 20)]
+    [ServiceFilter(typeof(LayoutFilter), Order = 20)]
     [MiddlewareFilter(typeof(i18n.Middleware.LocalizationMiddleware))]
     public abstract class BaseController<T> : Controller
     {

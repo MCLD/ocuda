@@ -40,9 +40,9 @@ namespace Ocuda.Promenade.Data.Promenade
 
         public async Task<NavigationText> FindAsync(int id, int languageId)
         {
-            var entity = await DbSet.Where(_ => _.Id == id && _.LanguageId == languageId).SingleAsync();
-            _context.Entry(entity).State = EntityState.Detached;
-            return entity;
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Id == id && _.LanguageId == languageId).SingleAsync();
         }
     }
 }
