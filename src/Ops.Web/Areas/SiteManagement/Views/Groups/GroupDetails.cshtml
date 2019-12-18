@@ -32,7 +32,7 @@
            on-blur-js="FormatStub"/>
     <div class="row">
         <div class="accordion offset-md-3 col-md-9" id="locationregion-accordion">
-            <div class="card">
+            <div class="card" style="overflow:visible;">
                 <div class="card-header @(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) && !Model.Group.IsLocationRegion ? "" : "bg-info")" id="accordion-header">
                     <button class="btn btn-link @(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) && !Model.Group.IsLocationRegion ? "text-info" : "text-white")"
                             style="text-decoration: none;"
@@ -53,7 +53,10 @@
                     <div class="card-body">
                         <input asp-for="Group.SubscriptionUrl"
                                formgroup
-                               autocomplete="off"/>
+                               autocomplete="off" />
+                        <select asp-for="Group.LocationIdOverride" asp-items="Model.SelectLocations" class="hidden" formgroup>
+                            <option value="">None</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -119,7 +122,9 @@
             if (!$("#accordion-header").hasClass("bg-info")) {
                 $("#Group_SubscriptionUrl").val("");
                 $("#group-isLocationRegion").val("False");
+                $("#Group_LocationIdSpecific").val("");
             }
+
         });
         function FormatStub(object) {
             updateStub($(object), $(object).val());

@@ -99,6 +99,7 @@ namespace Ocuda.Ops.Service
             var currentGroup = await _groupRepository.FindAsync(group.Id);
             await ValidateAsync(currentGroup);
             currentGroup.GroupType = group.GroupType?.Trim();
+            currentGroup.LocationIdOverride = group.LocationIdOverride;
             currentGroup.Stub = group.Stub.Trim();
             currentGroup.IsLocationRegion = group.IsLocationRegion;
             currentGroup.SubscriptionUrl = group.SubscriptionUrl?.Trim();

@@ -180,8 +180,11 @@ namespace Ocuda.Promenade.Controllers
                 viewModel.Location.Description = CommonMark.CommonMarkConverter.Convert(viewModel.Location.Description);
                 viewModel.Location.PostFeatureDescription = CommonMark.CommonMarkConverter.Convert(viewModel.Location.PostFeatureDescription);
                 viewModel.Location.LocationHours = await _locationService.GetFormattedWeeklyHoursAsync(viewModel.Location.Id);
-                viewModel.StructuredLocationHours = (await _locationService.GetFormattedWeeklyHoursAsync(viewModel.Location.Id, true))
-                    .Select(_ => $"{_.Days} {_.Time}").ToList();
+                if (viewModel.Location.LocationHours != null)
+                {
+                    viewModel.StructuredLocationHours = (await _locationService.GetFormattedWeeklyHoursAsync(viewModel.Location.Id, true))
+                        .Select(_ => $"{_.Days} {_.Time}").ToList();
+                }
                 var features = await _locationService.GetLocationsFeaturesAsync(locationStub);
 
                 foreach (var feature in features.OrderBy(_ => _.Name).ToList())
@@ -203,16 +206,19 @@ namespace Ocuda.Promenade.Controllers
                     }
                     viewModel.LocationFeatures.Add(locationfeatureModel);
                 }
-                var neighbors = await _locationService.GetLocationsNeighborsAsync(locationStub);
                 viewModel.LocationNeighborGroup = await _locationService.GetLocationsNeighborGroup(locationStub);
-                if (neighbors.Count > 0)
+                if (viewModel.LocationNeighborGroup != null)
                 {
-                    viewModel.NearbyLocations = neighbors;
-                    viewModel.NearbyCount = viewModel.NearbyLocations.Count;
-                }
-                else
-                {
-                    viewModel.NearbyCount = 0;
+                    var neighbors = await _locationService.GetLocationsNeighborsAsync(viewModel.LocationNeighborGroup.Id);
+                    if (neighbors.Count > 0)
+                    {
+                        viewModel.NearbyLocations = neighbors;
+                        viewModel.NearbyCount = viewModel.NearbyLocations.Count;
+                    }
+                    else
+                    {
+                        viewModel.NearbyCount = 0;
+                    }
                 }
 
                 return View("LocationDetails", viewModel);

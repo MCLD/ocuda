@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Ocuda.Promenade.Models.Abstract;
 
@@ -12,6 +13,9 @@ namespace Ocuda.Promenade.Models.Entities
         public string GroupType { get; set; }
 
         public bool IsLocationRegion { get; set; }
+
+        [DisplayName("Location Override")]
+        public int? LocationIdOverride { get; set; }
 
         public string SubscriptionUrl { get; set; }
 
