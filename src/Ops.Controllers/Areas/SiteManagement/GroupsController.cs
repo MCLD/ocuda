@@ -82,9 +82,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return View("GroupDetails", new GroupViewModel
                 {
                     Group = group,
-                    Action = nameof(GroupsController.EditGroup),
-                    AllLocations = await _locationService.GetAllLocationsAsync(),
-                    SelectLocations = new SelectList(await _locationService.GetAllLocationsAsync(), "Id", "Name")
+                    Action = nameof(GroupsController.EditGroup)
                 });
             }
             catch (OcudaException ex)
@@ -106,9 +104,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return View("GroupDetails", new GroupViewModel
             {
                 Group = group,
-                Action = nameof(GroupsController.CreateGroup),
-                AllLocations = await _locationService.GetAllLocationsAsync(),
-                SelectLocations = new SelectList(await _locationService.GetAllLocationsAsync(), "Id", "Name")
+                Action = nameof(GroupsController.CreateGroup)
         });
         }
 
