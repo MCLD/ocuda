@@ -8,6 +8,8 @@
     <style>
         .location-tile {
             border: 1px solid #b8b9bb;
+            margin: 0 auto;
+            max-width: 322px;
         }
 
         .location-tile-background {
@@ -77,7 +79,7 @@
                 <div class="location-tile">
                     <div class="@(location.CurrentStatus.IsCurrentlyOpen ? "traffic-green" : "traffic-red")" style="border-bottom:5px solid; width: 100%;">
                         <a href="@location.MapLink">
-                            <img src="@location.MapImagePath" style="width:220px;" />
+                            <img src="@location.MapImagePath" class="img-fluid" />
                         </a>
                     </div>
                     <div class="location-tile-background">
