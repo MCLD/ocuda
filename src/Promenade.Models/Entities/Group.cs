@@ -14,9 +14,6 @@ namespace Ocuda.Promenade.Models.Entities
 
         public bool IsLocationRegion { get; set; }
 
-        [DisplayName("Location Override")]
-        public int? LocationIdOverride { get; set; }
-
         public string SubscriptionUrl { get; set; }
 
         [MaxLength(255)]

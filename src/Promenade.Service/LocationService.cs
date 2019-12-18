@@ -168,35 +168,9 @@ namespace Ocuda.Promenade.Service
             }
             return locations;
         }
-        public async Task<Group> GetLocationsNeighborGroup(string locationStub)
+        public async Task<Group> GetLocationsNeighborGroup(int groupId)
         {
-            var location = await GetLocationByStubAsync(locationStub);
-            var allGroups = await _groupRepository.GetAllGroups();
-            var locationSpec = allGroups.Where(_ => _.LocationIdOverride == location.Id && _.IsLocationRegion).FirstOrDefault();
-            if (locationSpec != null)
-            {
-                return locationSpec;
-            }
-            else
-            {
-                var locationGroups = await _locationGroupRepository.GetGroupByLocationIdAsync(location.Id);
-                if (locationGroups.Count == 1)
-                {
-                    return await _groupRepository.FindAsync(locationGroups.FirstOrDefault().GroupId);
-                }
-                else
-                {
-                    foreach (var locationGroup in locationGroups)
-                    {
-                        var group = await _groupRepository.FindAsync(locationGroup.GroupId);
-                        if (group.IsLocationRegion && group.LocationIdOverride == null)
-                        {
-                            return group;
-                        }
-                    }
-                }
-            }
-            return null;
+            return await _groupRepository.FindAsync(groupId);
         }
 
         public async Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId, bool isStructuredData = false)

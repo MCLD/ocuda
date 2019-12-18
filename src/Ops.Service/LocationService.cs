@@ -95,6 +95,7 @@ namespace Ocuda.Ops.Service
             currentLocation.Facebook = location.Facebook;
             currentLocation.EventLink = location.EventLink;
             currentLocation.SubscriptionLink = location.SubscriptionLink;
+            currentLocation.GroupId = location.GroupId;
             currentLocation.UpdatedAt = DateTime.Now;
             currentLocation.UpdatedBy = GetCurrentUserId();
 

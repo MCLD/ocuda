@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using Ocuda.Ops.Service.Models;
 using Ocuda.Utility.Models;
 
@@ -22,5 +23,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location
         public Promenade.Models.Entities.Group Group { get; set; }
         public string Action { get; set; }
         public PaginateModel PaginateModel { get; set; }
+        public bool IsLocationsGroup { get; set; }
     }
 }

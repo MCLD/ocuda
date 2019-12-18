@@ -1,9 +1,38 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location.LocationViewModel;
 
-<div class="row">
-    <input value="@Model.LocationGroup.Id" 
-           asp-for="LocationGroup.Id" 
-           type="hidden" 
-           autocomplete="off"/>
-    <p>Nothing to edit for now</p>
-</div>
+    <div class="col">
+        <input value="@Model.LocationGroup.Id"
+               asp-for="LocationGroup.Id"
+               type="hidden"
+               autocomplete="off" />
+        <input value="@Model.LocationGroup.LocationId"
+               asp-for="LocationGroup.LocationId"
+               type="hidden"
+               autocomplete="off" />
+        <input value="@Model.LocationGroup.GroupId"
+                asp-for="LocationGroup.GroupId"
+                type="hidden"
+                autocomplete="off" />
+        @if (Model.Group.IsLocationRegion)
+        {
+            <div class="row form-group">
+                <label class="col-form-label text-md-right col-md-3">
+                    Set as Location's Mapped Region?
+                </label>
+                <div class="flex-md-grow-0">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox"
+                               class="custom-control-input"
+                               asp-for="IsLocationsGroup"
+                               value="@Model.IsLocationsGroup"
+                               id="locationMapGroup" />
+                        <label class="col-form-label text-md-right col-md-3 custom-control-label text-hide" for="locationMapGroup"></label>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <p>Nothing to edit for now</p>
+        }
+    </div>
