@@ -34,6 +34,7 @@ namespace Ocuda.Ops.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Emedia> Emedia { get; set; }
         public DbSet<EmediaCategory> EmediaCategories { get; set; }
+        public DbSet<ExternalResource> ExternalResources { get; set; }
         public DbSet<Feature> Features { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<Language> Languages { get; set; }

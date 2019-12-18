@@ -4,7 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="~/css/styles.min.css" asp-append-version="true" />
     <link rel="shortcut icon" href="#" />
     @RenderSection("metadata", required: false)
     @{
@@ -20,6 +19,14 @@
 
                 gtag('config', '@googleAnalyticsTrackingCode');
             </script>
+        }
+    }
+    <link rel="stylesheet" href="~/css/styles.min.css" asp-append-version="true" />
+    @if (Context.Items.ContainsKey(ItemKey.ExternalCSS))
+    {
+        foreach (var cssUrl in (List<string>)Context.Items[ItemKey.ExternalCSS])
+        {
+            <link rel="stylesheet" href="@cssUrl" />
         }
     }
     @RenderSection("Styles", required: false)
@@ -85,7 +92,8 @@
                 {
                     <div class="row prom-nav-logo">
                         <img src="@bannerImage"
-                             alt="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.BannerImageAlt]" />
+                             alt="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.BannerImageAlt]"
+                             style="max-width: 100%;" />
                     </div>
                 }
                 var middleNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.MiddleNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
@@ -113,7 +121,7 @@
                                            href="#"
                                            role="button"
                                            aria-haspopup="true"
-                                           aria-expanded="false"><span class="@(item.Icon != null ? item.Icon : "")"></span>@item.NavigationText.Label<span class="caret"></span></a>
+                                           aria-expanded="false"><span class="nav-link-icon @(item.Icon != null ? item.Icon : "")"></span><span class="nav-link-text">@item.NavigationText.Label</span><span class="caret"></span></a>
                                         <div class="dropdown-menu prom-nav-dropdown">
                                             @foreach (var subItem in item.Navigations)
                                             {
@@ -149,7 +157,7 @@
 
             @if (leftNavigation?.Navigations.Count() > 0)
             {
-                <div class="col-12 col-sm-3 order-sm-first" style="padding: 1rem 0.5rem;">
+                <div class="col-12 col-sm-3 order-sm-first prom-leftnav-container">
                     <div class="prom-leftnav">
                         @foreach (var item in leftNavigation.Navigations)
                         {
@@ -208,6 +216,13 @@
         }
     </div>
     <script src="~/js/scripts.min.js" asp-append-version="true"></script>
+    @if (Context.Items.ContainsKey(ItemKey.ExternalJS))
+    {
+        foreach (var jsUrl in (List<string>)Context.Items[ItemKey.ExternalJS])
+        {
+            <script src="@jsUrl" asp-append-version="true"></script>
+        }
+    }
     @RenderSection("Scripts", required: false)
 </body>
 </html>

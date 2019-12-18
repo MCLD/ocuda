@@ -98,6 +98,10 @@ footer {
             text-decoration: underline;
         }
 
+.prom-leftnav-container {
+    padding: 1rem 0.5rem;
+}
+
 .prom-leftnav .prom-leftnav-section {
     background-color: white;
     margin-bottom: 0.5rem;
