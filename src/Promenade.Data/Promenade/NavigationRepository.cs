@@ -19,7 +19,9 @@ namespace Ocuda.Promenade.Data.Promenade
 
         public async Task<ICollection<Navigation>> GetChildren(int parentNavigationId)
         {
-            return await DbSet.Where(_ => _.NavigationId == parentNavigationId)
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.NavigationId == parentNavigationId)
                 .OrderBy(_ => _.Order)
                 .ToListAsync();
         }

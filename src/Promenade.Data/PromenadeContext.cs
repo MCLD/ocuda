@@ -11,6 +11,7 @@ namespace Ocuda.Promenade.Data
         public DbSet<Category> Categories { get; }
         public DbSet<Emedia> Emedia { get; set; }
         public DbSet<EmediaCategory> EmediaCategories { get; set; }
+        public DbSet<ExternalResource> ExternalResources { get; set; }
         public DbSet<Feature> Features { get; }
         public DbSet<Group> Groups { get; }
         public DbSet<Location> Locations { get; }

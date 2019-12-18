@@ -12,20 +12,24 @@ using Ocuda.Promenade.Service;
 
 namespace Ocuda.Promenade.Controllers.Filters
 {
-    public class NavigationFilter : IAsyncResourceFilter
+    public class LayoutFilter : IAsyncResourceFilter
     {
-        private readonly ILogger<NavigationFilter> _logger;
+        private readonly ILogger<LayoutFilter> _logger;
         private readonly IOptions<RequestLocalizationOptions> _l10nOptions;
+        private readonly ExternalResourceService _externalResourceService;
         private readonly NavigationService _navigationService;
         private readonly SiteSettingService _siteSettingService;
 
-        public NavigationFilter(ILogger<NavigationFilter> logger,
+        public LayoutFilter(ILogger<LayoutFilter> logger,
             IOptions<RequestLocalizationOptions> l10nOptions,
+            ExternalResourceService externalResourceService,
             NavigationService navigationService,
             SiteSettingService siteSettingService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _l10nOptions = l10nOptions ?? throw new ArgumentNullException(nameof(l10nOptions));
+            _externalResourceService = externalResourceService
+                ?? throw new ArgumentNullException(nameof(externalResourceService));
             _navigationService = navigationService
                 ?? throw new ArgumentNullException(nameof(navigationService));
             _siteSettingService = siteSettingService
@@ -44,6 +48,14 @@ namespace Ocuda.Promenade.Controllers.Filters
             {
                 throw new ArgumentNullException(nameof(next));
             }
+
+            var css = await _externalResourceService
+                .GetAllAsync(Models.Entities.ExternalResourceType.CSS);
+            context.HttpContext.Items[ItemKey.ExternalCSS] = css.Select(_ => _.Url).ToList();
+
+            var js = await _externalResourceService
+                .GetAllAsync(Models.Entities.ExternalResourceType.JS);
+            context.HttpContext.Items[ItemKey.ExternalJS] = js.Select(_ => _.Url).ToList();
 
             // generate list for drop-down
             var cultureList = new Dictionary<string, string>();
@@ -72,7 +84,7 @@ namespace Ocuda.Promenade.Controllers.Filters
 
 
             var topNavigationId
-                = await _siteSettingService.GetSettingIntAsync(SiteSetting.Site.NavigationIdTop);
+                = await _siteSettingService.GetSettingIntAsync(Models.Keys.SiteSetting.Site.NavigationIdTop);
             if (topNavigationId > 0)
             {
                 context.HttpContext.Items[ItemKey.TopNavigation]

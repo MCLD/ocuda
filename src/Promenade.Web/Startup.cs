@@ -131,7 +131,7 @@ namespace Ocuda.Promenade.Web
 
             // filters
             services.AddScoped<i18n.Filter.LocalizationFilterAttribute>();
-            services.AddScoped<Controllers.Filters.NavigationFilter>();
+            services.AddScoped<Controllers.Filters.LayoutFilter>();
 
             // repositories
             services.AddScoped<Service.Interfaces.Repositories.ICategoryRepository,
@@ -140,6 +140,8 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.EmediaRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IEmediaCategoryRepository,
                 Data.Promenade.EmediaCategoryRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IExternalResourceRepository,
+                Data.Promenade.ExternalResourceRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IFeatureRepository,
                 Data.Promenade.FeatureRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IGroupRepository,
@@ -180,6 +182,7 @@ namespace Ocuda.Promenade.Web
             // promenade servicews
             services.AddScoped<CategoryService>();
             services.AddScoped<EmediaService>();
+            services.AddScoped<ExternalResourceService>();
             services.AddScoped<LanguageService>();
             services.AddScoped<LocationService>();
             services.AddScoped<NavigationService>();
