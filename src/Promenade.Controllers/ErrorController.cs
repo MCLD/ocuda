@@ -36,7 +36,7 @@ namespace Ocuda.Promenade.Controllers
 
             if (id == 404)
             {
-                var redirect = await _redirectService.GetUrlRedirectByPathAsync(Request.Path);
+                var redirect = await _redirectService.GetUrlRedirectByPathAsync(originalPath);
 
                 if (redirect != null)
                 {
