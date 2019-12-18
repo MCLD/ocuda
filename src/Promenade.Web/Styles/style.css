@@ -102,6 +102,7 @@ footer {
     background-color: white;
     margin-bottom: 0.5rem;
     padding: 0.25rem;
+    position: relative;
 }
 
 .prom-leftnav .prom-leftnav-header {
@@ -110,6 +111,7 @@ footer {
 
     .prom-leftnav .prom-leftnav-header:first-child {
         padding-left: 0.25rem;
+        padding-right: 1.5rem;
     }
 
 .prom-leftnav .prom-leftnav-content {
@@ -150,9 +152,9 @@ footer {
 
 .prom-leftnav-header[data-toggle="collapse"]::after {
     font-weight: 900;
-    display: inline-block;
-    float: right;
-    margin-right: 0.5rem;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.25rem;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
