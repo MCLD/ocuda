@@ -155,38 +155,22 @@ namespace Ocuda.Promenade.Service
             return features;
         }
 
-        public async Task<List<Location>> GetLocationsNeighborsAsync(string locationStub)
+        public async Task<List<Location>> GetLocationsNeighborsAsync(int groupId)
         {
-            var locationGroups = await _locationGroupRepository.GetGroupByLocationIdAsync((await GetLocationByStubAsync(locationStub)).Id);
+            var locationIds = await _locationGroupRepository.GetLocationsByGroupIdAsync(groupId);
             var locations = new List<Location>();
-            foreach (var locationGroup in locationGroups)
+            foreach (var location in locationIds)
             {
-                if ((await _groupRepository.FindAsync(locationGroup.GroupId)).IsLocationRegion)
+                if (location.HasSubscription)
                 {
-                    var locationIds = await _locationGroupRepository.GetLocationsByGroupIdAsync(locationGroup.GroupId);
-                    foreach (var location in locationIds)
-                    {
-                        if (location.HasSubscription)
-                        {
-                            locations.Add(await _locationRepository.FindAsync(location.LocationId));
-                        }
-                    }
+                    locations.Add(await _locationRepository.FindAsync(location.LocationId));
                 }
             }
             return locations;
         }
-        public async Task<Group> GetLocationsNeighborGroup(string locationStub)
+        public async Task<Group> GetLocationsNeighborGroup(int groupId)
         {
-            var locationGroups = await _locationGroupRepository.GetGroupByLocationIdAsync((await GetLocationByStubAsync(locationStub)).Id);
-            foreach (var locationGroup in locationGroups)
-            {
-                var group = await _groupRepository.FindAsync(locationGroup.GroupId);
-                if (group.IsLocationRegion)
-                {
-                    return group;
-                }
-            }
-            return null;
+            return await _groupRepository.FindAsync(groupId);
         }
 
         public async Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId, bool isStructuredData = false)

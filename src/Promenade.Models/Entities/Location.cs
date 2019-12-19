@@ -40,6 +40,10 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(15)]
         public string Phone { get; set; }
 
+        public int? DisplayGroupId { get; set; }
+
+        public Group DisplayGroup { get; set; }
+
         public string Description { get; set; }
 
         public string PostFeatureDescription { get; set; }

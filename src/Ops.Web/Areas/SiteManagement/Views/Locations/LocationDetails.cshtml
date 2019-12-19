@@ -291,6 +291,7 @@
                         <tr>
                             <th>Group Type</th>
                             <th>Location Region?</th>
+                            <th>Location's Map Group</th>
                             <th width="44px">&nbsp;</th>
                         </tr>
                     </thead>
@@ -314,6 +315,15 @@
                                     {
                                         <td></td>
                                     }
+                                    <td class="text-center"
+                                        style="vertical-align:middle;">
+                                        @if (Model.Location.DisplayGroupId == group.Id)
+                                        {
+                                            <text>
+                                                <span class="fas fa-check"></span>
+                                            </text>
+                                        }
+                                    </td>
                                     <td>
                                         <button type="button" 
                                                 class="btn btn-link btn-xs deletegroupButton" 
@@ -373,7 +383,8 @@
                             page: page
                         }, function (response) {
                             $("#modalItemList").html(response);
-                        });
+                    });
+                    $("#locationMapGroup").bootstrapSwitch('state', true);
                 }
                 else if (objType == "Feature") {
                     $.get("@Url.Action(nameof(LocationsController.GetItemsList))",
@@ -463,6 +474,14 @@
                         });
                 }
             }
+            $(document).on("click", "#locationMapGroup", function(e){
+                if ($("#locationMapGroup").val().toLowerCase() == "true") {
+                    $("#locationMapGroup").val("false");
+                }
+                else {
+                    $("#locationMapGroup").val("true");
+                }
+            });
             $("#addGroupButton").on('click', function (e) {
                 $("#listAddModal").modal("show");
                 $("#addModalTitle").text("Add a group");
