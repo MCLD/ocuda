@@ -294,11 +294,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     if (locationGroupInfo.IsLocationsGroup)
                     {
-                        location.GroupId = locationGroupInfo.LocationGroup.GroupId;
+                        location.DisplayGroupId = locationGroupInfo.LocationGroup.GroupId;
                     }
                     else
                     {
-                        location.GroupId = 0;
+                        location.DisplayGroupId = null;
                     }
                     await _locationService.EditAsync(location);
                     var group = await _groupService.GetGroupByIdAsync(locationGroupInfo.LocationGroup.GroupId);
@@ -565,7 +565,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 viewModel.LocationGroup = await _locationGroupService.GetLocationGroupByIdAsync(itemId);
                 viewModel.Group = await _groupService.GetGroupByIdAsync(viewModel.LocationGroup.GroupId);
-                viewModel.IsLocationsGroup = location.GroupId == viewModel.Group.Id ? true : false;
+                viewModel.IsLocationsGroup = location.DisplayGroupId == viewModel.Group.Id ? true : false;
                 return PartialView("_EditGroupsPartial", viewModel);
             }
             else if (objectType == "Feature")

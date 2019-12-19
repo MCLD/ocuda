@@ -206,10 +206,14 @@ namespace Ocuda.Promenade.Controllers
                     }
                     viewModel.LocationFeatures.Add(locationfeatureModel);
                 }
-                viewModel.LocationNeighborGroup = await _locationService.GetLocationsNeighborGroup(viewModel.Location.GroupId);
-                if (viewModel.LocationNeighborGroup != null)
+
+                if (viewModel.Location.DisplayGroupId.HasValue)
                 {
-                    var neighbors = await _locationService.GetLocationsNeighborsAsync(viewModel.LocationNeighborGroup.Id);
+                    viewModel.LocationNeighborGroup = await _locationService
+                        .GetLocationsNeighborGroup(viewModel.Location.DisplayGroupId.Value);
+
+                    var neighbors = await _locationService
+                        .GetLocationsNeighborsAsync(viewModel.Location.DisplayGroupId.Value);
                     if (neighbors.Count > 0)
                     {
                         viewModel.NearbyLocations = neighbors;
