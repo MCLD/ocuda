@@ -4,9 +4,8 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
-    public interface IGroupRepository : IGenericRepository<Group, int>
+    public interface IExternalResourceRepository : IGenericRepository<ExternalResource, int>
     {
-        Task<List<Group>> GetAllGroups();
+        Task<ICollection<ExternalResource>> GetAllAsync(ExternalResourceType? type);
     }
 }
-

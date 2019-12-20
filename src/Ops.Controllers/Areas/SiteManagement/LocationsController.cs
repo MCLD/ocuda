@@ -285,20 +285,28 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpPost]
         [Route("[action]")]
         [SaveModelState]
-        public async Task<IActionResult> EditLocationGroup(LocationGroup locationGroup)
+        public async Task<IActionResult> EditLocationGroup(LocationViewModel locationGroupInfo)
         {
-            var location = await _locationService.GetLocationByIdAsync(locationGroup.LocationId);
+            var location = await _locationService.GetLocationByIdAsync(locationGroupInfo.LocationGroup.LocationId);
             if (ModelState.IsValid)
             {
                 try
                 {
-                    await _locationGroupService.EditAsync(locationGroup);
-                    var group = await _groupService.GetGroupByIdAsync(locationGroup.GroupId);
+                    if (locationGroupInfo.IsLocationsGroup)
+                    {
+                        location.DisplayGroupId = locationGroupInfo.LocationGroup.GroupId;
+                    }
+                    else
+                    {
+                        location.DisplayGroupId = null;
+                    }
+                    await _locationService.EditAsync(location);
+                    var group = await _groupService.GetGroupByIdAsync(locationGroupInfo.LocationGroup.GroupId);
                     ShowAlertSuccess($"Updated {location.Name}'s Group: {group.GroupType}");
                 }
                 catch (OcudaException ex)
                 {
-                    var group = await _groupService.GetGroupByIdAsync(locationGroup.GroupId);
+                    var group = await _groupService.GetGroupByIdAsync(locationGroupInfo.LocationGroup.GroupId);
                     ShowAlertDanger($"problem Updating {location.Name}'s Group: {group.GroupType}");
                     _logger.LogError(ex, $"Problem updating {location.Name}'s Group: {group.GroupType}", ex.Message);
                 }
@@ -556,6 +564,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (objectType == "Group")
             {
                 viewModel.LocationGroup = await _locationGroupService.GetLocationGroupByIdAsync(itemId);
+                viewModel.Group = await _groupService.GetGroupByIdAsync(viewModel.LocationGroup.GroupId);
+                viewModel.IsLocationsGroup = location.DisplayGroupId == viewModel.Group.Id ? true : false;
                 return PartialView("_EditGroupsPartial", viewModel);
             }
             else if (objectType == "Feature")

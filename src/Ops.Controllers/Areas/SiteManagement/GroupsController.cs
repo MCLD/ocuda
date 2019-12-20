@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
@@ -22,12 +23,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     public class GroupsController : BaseController<GroupsController>
     {
         private readonly IGroupService _groupService;
+        private readonly ILocationService _locationService;
 
         public static string Name { get { return "Groups"; } }
 
         public GroupsController(ServiceFacades.Controller<GroupsController> context,
+            ILocationService locationService,
             IGroupService groupService) : base(context)
         {
+            _locationService = locationService
+            ?? throw new ArgumentNullException(nameof(locationService));
             _groupService = groupService
                 ?? throw new ArgumentNullException(nameof(groupService));
         }
@@ -89,7 +94,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpGet("[action]")]
         [RestoreModelState]
-        public IActionResult CreateGroup()
+        public async Task<IActionResult> CreateGroup()
         {
             var group = new Group
             {
@@ -100,7 +105,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 Group = group,
                 Action = nameof(GroupsController.CreateGroup)
-            });
+        });
         }
 
         [HttpPost]
