@@ -1,0 +1,270 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Category.CategoryViewModel
+@section styles {
+    <style>
+        .editCategory:hover, #addCategoryButton {
+            cursor:pointer;
+        }
+    </style>
+}
+<div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="listModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="row">
+            <div class="col-12 col-sm-10 col-sm-offset-1">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addModalTitle">Add Category</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form asp-action="@nameof(CategoriesController.AddCategory)"
+                          id="addCategoryForm"
+                          method="post"
+                          role="form"
+                          enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div id="modalItemList" class="col-12">
+                                <div class="col-sm-9">
+                                    <input asp-for="Category.Class"
+                                           autocomplete="off"
+                                           id="addClass"
+                                           type="hidden" />
+                                    <input asp-for="Category.Name"
+                                           autocomplete="off"
+                                           id="addName"
+                                           formgroup />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" value="Submit" class="btn btn-primary">Save</button>
+                            <button type="button"
+                                    class="btn btn-default"
+                                    data-dismiss="modal"
+                                    style="margin-right: 1em;">
+                                Close
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade"
+     id="editCategoryModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="listModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="row">
+            <div class="col-12 col-sm-10 col-sm-offset-1">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addModalTitle"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post"
+                          asp-action="@nameof(CategoriesController.EditCategory)"
+                          role="form"
+                          id="editForm">
+                        <div class="modal-body">
+                            <div id="modalItemList" class="col-12">
+                                <div class="col-sm-9">
+                                    <input asp-for="Category.Class"
+                                           autocomplete="off"
+                                           id="editClass"
+                                           type="hidden" />
+                                    <input asp-for="Category.Id"
+                                           autocomplete="off"
+                                           id="editId"
+                                           type="hidden" value="0" />
+                                    <input asp-for="Category.Name"
+                                           autocomplete="off"
+                                           id="editName"
+                                           formgroup />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" value="submit" class="btn btn-primary">Save</button>
+                            <button type="button"
+                                    class="btn btn-default"
+                                    data-dismiss="modal"
+                                    style="margin-right: 1em;">
+                                Close
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="modal fade"
+             id="deleteModal"
+             tabindex="-1"
+             role="dialog"
+             aria-labelledby="deleteModalLabel">
+            <div class="modal-dialog" role="document">
+                <form asp-action="@nameof(CategoriesController.DeleteCategory)"
+                      method="post"
+                      role="form"
+                      style="display:inline">
+                    <input asp-for="Category.Id" id="delId" type="hidden" />
+                    <input asp-for="Category.Name" id="delName" type="hidden" />
+                    <input asp-for="Category.Class" id="delClass" type="hidden" />
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="deleteModalLabel">Delete Category</h4>
+                            <button type="button"
+                                    class="close"
+                                    data-dismiss="modal"
+                                    aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+                            <span id="modal-text"></span>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button"
+                                    class="btn btn-default"
+                                    data-dismiss="modal"
+                                    style="margin-right: 1em;">
+                                Cancel
+                            </button>
+                            <button id="deleteCategory"
+                                    type="submit"
+                                    class="btn btn-danger btn-spinner pull-right"
+                                    aria-label="Confirm">
+                                Delete
+                                <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none" id="deleteSpinner"></span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div>
+            <div class="card">
+                <div class="card-header">
+                    <span class="h5">Categories</span>
+                    <a role="button"
+                       data-toggle="modal"
+                       data-target="#addCategoryModal"
+                       class="text-success float-right"
+                       id="addCategoryButton">
+                        <span class="fas fa-plus-circle fa-lg"></span>
+                    </a>
+                </div>
+                @if (Model.AllCategories.Count() == 0)
+                {
+                    <div class="alert alert-warning">No Locations found.</div>
+                }
+                else
+                {
+
+                    <div class="card-body">
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>class</th>
+                                    <th>&nbsp;</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var category in Model.AllCategories)
+                                {
+                                    <tr>
+                                        <td class="td-class">
+                                            <a role="button"
+                                               class="editCategory"
+                                               data-toggle="modal"
+                                               data-target="#editCategoryModal"
+                                               data-id="@category.Id"
+                                               data-name="@category.Name"
+                                               data-class="@category.Class">
+                                               @category.Name
+                                            </a>
+                                        </td>
+                                        <td>
+                                            @category.Class
+                                        </td>
+                                        <td class="on-top gra-mc-icon">
+                                            <button type="button"
+                                                    class="btn btn-link text-danger"
+                                                    data-toggle="modal"
+                                                    data-target="#deleteModal"
+                                                    data-id="@category.Id"
+                                                    data-name="@category.Name"
+                                                    data-class="@category.Class">
+                                                <span class="far fa-times-circle fa-lg"
+                                                      aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    @if (Model.PaginateModel.MaxPage > 1)
+                    {
+                        <div class="card-footer">
+                            <paginate paginateModel="@Model.PaginateModel"></paginate>
+                        </div>
+                    }
+
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+    {
+    <script>
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+            var catclass = button.data("class");
+            var modal = $(this);
+            modal.find("#modal-text").text("Are you sure you want to delete the category \"" + name + "\"?");
+            $("#delId").val(id);
+            $("#delName").val(name);
+            $("#delClass").val(catclass);
+        });
+        $("#deleteCategory").on("click", function () {
+            $("#deleteSpinner").removeClass("d-none");
+        });
+        $("#editCategoryModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+            var catclass = button.data("class");
+            var modal = $(this);
+            modal.find("#addModalTitle").text("Edit Category "+name);
+            modal.find("#editId").val(id);
+            modal.find("#editName").val(name);
+            modal.find("#editClass").val(catclass);
+        });
+        $("#addCategoryForm").submit(function (event) {
+            var stub = $("#addName").val().toLowerCase().replace(/ /g,"-").replace(/[^a-zA-Z0-9]/g, '');
+            $("#addCategoryModal").find("#addClass").val(stub);
+        });
+        $("#editForm").submit(function (event) {
+            stub = $("#editName").val().toLowerCase().replace(/ /g, "-").replace(/[^a-zA-Z0-9]/g, '');
+            $("#editForm").find("#editClass").val(stub);
+        });
+    </script>
+}

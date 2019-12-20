@@ -14,6 +14,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<Emedia> GetByStubAsync(string emediaStub);
         Task<ICollection<EmediaCategory>> GetEmediaCategoriesById(int emediaId);
         Task UpdateEmediaCategoryAsync(List<int> newCategoryIds, int emediaId);
+        Task<ICollection<EmediaCategory>> GetEmediaCategoriesByCategoryId(int categoryId);
         Task AddEmedia(Emedia emedia);
         Task UpdateEmedia(Emedia emedia);
         Task DeleteAsync(int id);

@@ -42,8 +42,8 @@ namespace Ocuda.Ops.Service
         {
             category.Name = category.Name.Trim();
             category.Class = category.Class.ToLower().Trim();
-            category.UpdatedAt = DateTime.Now;
-            category.UpdatedBy = GetCurrentUserId();
+            category.CreatedAt = DateTime.Now;
+            category.CreatedBy = GetCurrentUserId();
             await _categoryRepository.AddAsync(category);
             await _categoryRepository.SaveAsync();
         }
@@ -62,7 +62,7 @@ namespace Ocuda.Ops.Service
             currentCategory.Class = category.Class.ToLower().Trim();
             currentCategory.UpdatedAt = DateTime.Now;
             currentCategory.UpdatedBy = GetCurrentUserId();
-            await _categoryRepository.AddAsync(currentCategory);
+            _categoryRepository.Update(currentCategory);
             await _categoryRepository.SaveAsync();
         }
 

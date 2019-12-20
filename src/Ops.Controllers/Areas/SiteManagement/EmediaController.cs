@@ -202,14 +202,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     await _emediaService.AddEmedia(viewModel.Emedia);
                     var emedia = await _emediaService.GetByStubAsync(viewModel.Emedia.Stub.ToLower().Trim());
                     await _emediaService.UpdateEmediaCategoryAsync(viewModel.CategoryIds, emedia.Id);
-                    ShowAlertSuccess($"Added Feature: {emedia.Name}");
+                    ShowAlertSuccess($"Added emedia: {emedia.Name}");
                     return RedirectToAction(nameof(EmediaController.EditEmedia),
                         new { emediaStub = viewModel.Emedia.Stub });
                 }
                 catch (OcudaException ex)
                 {
-                    ShowAlertDanger($"Unable to Create Feature: {ex.Message}");
-                    _logger.LogError(ex, "Problem creating feature: {Message}", ex.Message);
+                    ShowAlertDanger($"Unable to Create emedia: {ex.Message}");
+                    _logger.LogError(ex, "Problem creating emedia: {Message}", ex.Message);
                     return RedirectToAction(nameof(EmediaController.AddEmedia));
                 }
             }

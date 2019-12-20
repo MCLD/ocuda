@@ -72,6 +72,11 @@ namespace Ocuda.Ops.Service
             return await _emediaCategoryRepository.GetByEmediaIdAsync(emediaId);
         }
 
+        public async Task<ICollection<EmediaCategory>> GetEmediaCategoriesByCategoryId(int categoryId)
+        {
+            return await _emediaCategoryRepository.GetByCategoryIdAsync(categoryId);
+        }
+
         public async Task AddEmediaCategory(EmediaCategory emediaCategory)
         {
             emediaCategory.UpdatedAt = DateTime.Now;
