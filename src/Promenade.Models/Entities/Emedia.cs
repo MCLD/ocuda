@@ -15,6 +15,10 @@ namespace Ocuda.Promenade.Models.Entities
 
         [MaxLength(255)]
         [Required]
+        public string Stub { get; set; }
+
+        [MaxLength(255)]
+        [Required]
         public string Description { get; set; }
 
         public string Details { get; set; }

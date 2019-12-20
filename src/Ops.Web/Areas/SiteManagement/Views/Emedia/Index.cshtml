@@ -1,0 +1,138 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Emedia.EmediaViewModel
+<div class="container">
+    <div class="row">
+        <div class="modal fade"
+             id="deleteModal"
+             tabindex="-1"
+             role="dialog"
+             aria-labelledby="deleteModalLabel">
+            <div class="modal-dialog" role="document">
+                <form asp-action="@nameof(EmediaController.DeleteEmedia)"
+                      method="post"
+                      role="form"
+                      style="display:inline">
+                    <input asp-for="Emedia.Id" type="hidden" />
+                    <input asp-for="Emedia.Name" type="hidden" />
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="deleteModalLabel">Delete Emedia</h4>
+                            <button type="button"
+                                    class="close"
+                                    data-dismiss="modal"
+                                    aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+                            <span id="modal-text"></span>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button"
+                                    class="btn btn-default"
+                                    data-dismiss="modal"
+                                    style="margin-right: 1em;">
+                                Cancel
+                            </button>
+                            <button id="deleteEmedia"
+                                    type="submit"
+                                    class="btn btn-danger btn-spinner pull-right"
+                                    aria-label="Confirm">
+                                Delete
+                                <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none" id="deleteSpinner"></span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div>
+            <div class="card">
+                <div class="card-header">
+                    <span class="h5">Locations</span>
+                    <a asp-action="@nameof(EmediaController.AddEmedia)"
+                       class="text-success float-right">
+                        <span class="fas fa-plus-circle fa-lg"></span>
+                    </a>
+                </div>
+                @if (Model.AllEmedia.Count() == 0)
+                {
+                    <div class="alert alert-warning">No Locations found.</div>
+                }
+                else
+                {
+
+                    <div class="card-body">
+                        <table class="table table-sm table-bordered link-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Redirect URL</th>
+                                    <th>&nbsp;</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var emedia in Model.AllEmedia)
+                                {
+                                    <tr>
+                                        <td class="td-class">
+                                            <a asp-controller="@EmediaController.Name"
+                                               asp-action="@nameof(EmediaController.EditEmedia)"
+                                               asp-route-emediaStub="@emedia.Stub">
+                                                @emedia.Name
+                                            </a>
+                                        </td>
+                                        <td>
+                                            @emedia.Description
+                                        </td>
+                                        <td>@emedia.RedirectUrl</td>
+                                        <td class="on-top gra-mc-icon">
+                                            <button type="button"
+                                                    class="btn btn-link text-danger"
+                                                    data-toggle="modal"
+                                                    data-target="#deleteModal"
+                                                    data-id="@emedia.Id"
+                                                    data-name="@emedia.Name">
+                                                <span class="far fa-times-circle fa-lg"
+                                                      aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    @if (Model.PaginateModel.MaxPage > 1)
+                    {
+                        <div class="card-footer">
+                            <paginate paginateModel="@Model.PaginateModel"></paginate>
+                        </div>
+                    }
+
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+    {
+    <script>
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+            var modal = $(this);
+            modal.find("#modal-text").text("Are you sure you want to delete the emedia \"" + name + "\"?");
+            modal.find("#Emedia_Id").val(id);
+            modal.find("#Emedia_Name").val(name);
+        });
+        $("#deleteEmedia").on("click", function () {
+            $("#deleteSpinner").removeClass("d-none");
+        });
+    </script>
+}
