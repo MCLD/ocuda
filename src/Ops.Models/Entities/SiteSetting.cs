@@ -6,9 +6,10 @@ namespace Ocuda.Ops.Models.Entities
 {
     public class SiteSetting : BaseEntity
     {
+        [Key]
         [Required]
         [MaxLength(255)]
-        public string Key { get; set; }
+        public new string Id { get; set; }
 
         [Column(TypeName = "int")]
         public SiteSettingType Type { get; set; }
@@ -34,6 +35,6 @@ namespace Ocuda.Ops.Models.Entities
         Bool,
         Int,
         String,
-        String_Emptiable
+        StringNullable
     }
 }

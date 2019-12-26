@@ -54,7 +54,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 try
                 {
-                    var key = model.SiteSetting.Key;
+                    if(model == null)
+                    {
+                        throw new OcudaException("No site setting provided to update.");
+                    }
+
+                    var key = model.SiteSetting.Id;
                     var value = model.SiteSetting.Value;
                     var siteSetting = await _siteSettingService.UpdateAsync(key, value);
                     ShowAlertSuccess($"Updated {siteSetting.Name}");

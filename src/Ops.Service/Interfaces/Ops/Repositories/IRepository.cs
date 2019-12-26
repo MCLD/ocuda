@@ -7,7 +7,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
     public interface IRepository<TEntity, TKeyType>
         where TEntity : class
-        where TKeyType : struct
     {
         Task AddAsync(TEntity entity);
         Task AddRangeAsync(ICollection<TEntity> entities);

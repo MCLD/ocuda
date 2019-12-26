@@ -8,27 +8,18 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 namespace Ocuda.Ops.Data.Ops
 {
     public class SiteSettingRepository
-        : GenericRepository<OpsContext, SiteSetting, int>, ISiteSettingRepository
+        : GenericRepository<OpsContext, SiteSetting, string>, ISiteSettingRepository
     {
         public SiteSettingRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
             ILogger<SiteSettingRepository> logger) : base(repositoryFacade, logger)
         {
         }
 
-        public async Task<SiteSetting> FindByKeyAsync(string key)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.Key == key)
-                .FirstOrDefaultAsync();
-        }
-
         public async Task<bool> IsDuplicateKey(SiteSetting setting)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Key == setting.Key
-                         && _.Id != setting.Id)
+                .Where(_ => _.Id != setting.Id)
                 .AnyAsync();
         }
     }

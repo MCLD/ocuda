@@ -10,7 +10,7 @@ namespace Ocuda.Promenade.Models.Defaults
             #region Social
             new SiteSetting
             {
-                Key = Keys.SiteSetting.Social.TwitterSite,
+                Id = Keys.SiteSetting.Social.TwitterSite,
                 Name = "Twitter Site",
                 Description = "@username for the website used in the Twitter card footer.",
                 Category = "Social",
@@ -21,7 +21,7 @@ namespace Ocuda.Promenade.Models.Defaults
             #region Site
             new SiteSetting
             {
-                Key = Keys.SiteSetting.Site.BannerImage,
+                Id = Keys.SiteSetting.Site.BannerImage,
                 Name = "Banner Image",
                 Description = "URL to the banner image at the top of the page",
                 Category="Site",
@@ -29,7 +29,7 @@ namespace Ocuda.Promenade.Models.Defaults
             },
             new SiteSetting
             {
-                Key = Keys.SiteSetting.Site.BannerImageAlt,
+                Id = Keys.SiteSetting.Site.BannerImageAlt,
                 Name = "Banner Image Alt",
                 Description = "Alt text when a banner image is displayed",
                 Category = "Site",
@@ -37,7 +37,7 @@ namespace Ocuda.Promenade.Models.Defaults
             },
              new SiteSetting
             {
-                Key = Keys.SiteSetting.Site.GoogleTrackingCode,
+                Id = Keys.SiteSetting.Site.GoogleTrackingCode,
                 Name = "Google Analytics Tracking Code",
                 Description = "Google Analytics Tracking Code",
                 Category = "Site",
@@ -45,7 +45,7 @@ namespace Ocuda.Promenade.Models.Defaults
             },
             new SiteSetting
             {
-                Key = Keys.SiteSetting.Site.IsTLS,
+                Id = Keys.SiteSetting.Site.IsTLS,
                 Name = "TLS Enabled",
                 Description = "Is the website enabled to use TLS?",
                 Category = "Site",
@@ -54,7 +54,7 @@ namespace Ocuda.Promenade.Models.Defaults
             },
             new SiteSetting
             {
-                Key = Keys.SiteSetting.Site.NavigationIdFooter,
+                Id = Keys.SiteSetting.Site.NavigationIdFooter,
                 Name = "Footer Navigation Id",
                 Description = "Id of the Navigation object to use in the footer",
                 Category = "Site",
@@ -62,7 +62,7 @@ namespace Ocuda.Promenade.Models.Defaults
             },
             new SiteSetting
             {
-                Key = Keys.SiteSetting.Site.NavigationIdLeft,
+                Id = Keys.SiteSetting.Site.NavigationIdLeft,
                 Name = "Left Navigation Id",
                 Description = "Id of the Navigation object to use on the left",
                 Category = "Site",
@@ -70,7 +70,7 @@ namespace Ocuda.Promenade.Models.Defaults
             },
             new SiteSetting
             {
-                Key = Keys.SiteSetting.Site.NavigationIdMiddle,
+                Id = Keys.SiteSetting.Site.NavigationIdMiddle,
                 Name = "Middle Navigation Id",
                 Description = "Id of the Navigation object to use in the middle",
                 Category = "Site",
@@ -78,7 +78,7 @@ namespace Ocuda.Promenade.Models.Defaults
             },
             new SiteSetting
             {
-                Key = Keys.SiteSetting.Site.NavigationIdTop,
+                Id = Keys.SiteSetting.Site.NavigationIdTop,
                 Name = "Top Navigation Id",
                 Description = "Id of the Navigation object to use on the top",
                 Category = "Site",
@@ -86,7 +86,7 @@ namespace Ocuda.Promenade.Models.Defaults
             },
             new SiteSetting
             {
-                Key = Keys.SiteSetting.Site.PageTitleSuffix,
+                Id = Keys.SiteSetting.Site.PageTitleSuffix,
                 Name = "Page Title Suffix",
                 Description = "Name to append to the end of page titles",
                 Category = "Site",
