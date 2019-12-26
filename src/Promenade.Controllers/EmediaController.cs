@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.ViewModels.Emedias;
-using Ocuda.Promenade.Controllers.ViewModels.Shared;
-using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service;
 
 namespace Ocuda.Promenade.Controllers
@@ -33,6 +30,9 @@ namespace Ocuda.Promenade.Controllers
                 emedia.Description = CommonMark.CommonMarkConverter.Convert(emedia.Description);
                 emedia.Details = CommonMark.CommonMarkConverter.Convert(emedia.Details);
             }
+
+            PageTitle = "eMedia";
+
             return View(emediaViewModel);
         }
     }

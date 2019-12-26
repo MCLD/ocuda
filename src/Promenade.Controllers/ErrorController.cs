@@ -58,10 +58,16 @@ namespace Ocuda.Promenade.Controllers
                 }
 
                 _logger.LogWarning($"HTTP Error {id}: {originalPath}");
+
+                PageTitle = "Page not found";
+
                 return View("PageNotFound");
             }
 
             _logger.LogCritical($"HTTP Error {id}: {originalPath}");
+
+            PageTitle = "Error";
+
             return View("Error", new ErrorViewModel
             {
                 RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
