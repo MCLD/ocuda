@@ -17,6 +17,7 @@
             public const string NavigationIdLeft = "Site.NavigationIdLeft";
             public const string NavigationIdMiddle = "Site.NavigationIdMiddle";
             public const string NavigationIdTop = "Site.NavigationIdTop";
+            public const string PageTitleSuffix = "Site.PageTitleSuffix";
         }
     }
 }

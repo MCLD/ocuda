@@ -159,6 +159,8 @@ namespace Ocuda.Promenade.Controllers
                     .ToList();
             }
 
+            PageTitle = "Find my library";
+
             return View("Locations", viewModel);
         }
 
@@ -225,6 +227,8 @@ namespace Ocuda.Promenade.Controllers
                     }
                 }
 
+                PageTitle = viewModel.Location.Name;
+
                 return View("LocationDetails", viewModel);
             }
             else
@@ -251,6 +255,8 @@ namespace Ocuda.Promenade.Controllers
 
                     locationFeatureViewModel.Add(locationfeatureModel);
                     viewModel.LocationFeatures = locationFeatureViewModel;
+
+                    PageTitle = feature.Name;
 
                     return View("LocationFeatureDetails", viewModel);
                 }
