@@ -78,19 +78,16 @@ namespace Ocuda.Promenade.Service
 
         private async Task<string> GetSettingValueAsync(string key)
         {
-            var siteSetting = await _siteSettingRepository.FindByKeyAsync(key);
+            var siteSetting = await _siteSettingRepository.FindAsync(key);
             if (siteSetting == null)
             {
-                _logger.LogError($"Promenade site setting key \"{key}\" not found.");
                 siteSetting = GetDefaultSetting(key);
             }
 
-            return siteSetting.Value;
+            return siteSetting?.Value;
         }
 
-        private SiteSetting GetDefaultSetting(string key)
-        {
-            return Models.Defaults.SiteSettings.Get.Where(_ => _.Key == key).Single();
-        }
+        private static SiteSetting GetDefaultSetting(string key)
+            => Models.Defaults.SiteSettings.Get.Single(_ => _.Id == key);
     }
 }

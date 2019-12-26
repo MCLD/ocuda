@@ -11,7 +11,6 @@ namespace Ocuda.Promenade.Data
     public class GenericRepository<TContext, TEntity, TKeyType>
         where TContext : DbContextBase
         where TEntity : class
-        where TKeyType : struct
     {
         protected readonly TContext _context;
         protected readonly ILogger _logger;
@@ -26,9 +25,10 @@ namespace Ocuda.Promenade.Data
                 throw new ArgumentNullException(nameof(repositoryFacade));
             }
 
-            _context = repositoryFacade.context ?? throw new ArgumentNullException();
+            _context = repositoryFacade.context
+                ?? throw new ArgumentNullException(nameof(repositoryFacade));
             _dateTimeProvider = repositoryFacade.dateTimeProvider;
-            _logger = logger ?? throw new ArgumentNullException();
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         protected DbSet<TEntity> DbSet
@@ -42,7 +42,10 @@ namespace Ocuda.Promenade.Data
         public async Task<TEntity> FindAsync(TKeyType id)
         {
             var entity = await DbSet.FindAsync(id);
-            _context.Entry(entity).State = EntityState.Detached;
+            if (entity != null)
+            {
+                _context.Entry(entity).State = EntityState.Detached;
+            }
             return entity;
         }
     }

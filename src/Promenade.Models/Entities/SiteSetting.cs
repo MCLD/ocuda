@@ -5,9 +5,10 @@ namespace Ocuda.Promenade.Models.Entities
 {
     public class SiteSetting : BaseEntity
     {
+        [Key]
         [Required]
         [MaxLength(255)]
-        public string Key { get; set; }
+        public new string Id { get; set; }
 
         public SiteSettingType Type { get; set; }
 

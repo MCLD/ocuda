@@ -5,6 +5,6 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
     public interface ISiteSettingRepository
     {
-        Task<SiteSetting> FindByKeyAsync(string key);
+        Task<SiteSetting> FindAsync(string key);
     }
 }

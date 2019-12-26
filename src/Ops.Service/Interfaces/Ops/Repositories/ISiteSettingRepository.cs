@@ -3,9 +3,8 @@ using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
-    public interface ISiteSettingRepository : IRepository<SiteSetting, int>
+    public interface ISiteSettingRepository : IRepository<SiteSetting, string>
     {
-        Task<SiteSetting> FindByKeyAsync(string key);
         Task<bool> IsDuplicateKey(SiteSetting setting);
     }
 }
