@@ -90,7 +90,7 @@ namespace Ocuda.Utility.TagHelpers
 
             // Wrap all elements with a form group div
             IHtmlContent formGroupDiv = WrapElementsWithDiv(
-                    new List<IHtmlContent>()
+                    new List<IHtmlContent>
                     {
                         labelElement,
                         innerDiv

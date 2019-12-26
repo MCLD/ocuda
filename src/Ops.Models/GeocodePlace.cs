@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using BranchLocator.Models.PlaceDetails;
 using Newtonsoft.Json;
-using BranchLocator.Models.PlaceDetails;
 
 namespace BranchLocator.Models
 {
-    public partial class GeocodePlace
+    // todo one class per file
+
+    public class GeocodePlace
     {
         [JsonProperty("html_attributions")]
         public string[] HtmlAtrributions { get; set; }
@@ -16,9 +15,15 @@ namespace BranchLocator.Models
 
         [JsonProperty("status")]
         public string Status { get; set; }
+
+        // todo separate data objects from functionality
+        public static GeocodePlace FromJson(string json)
+        {
+            return JsonConvert.DeserializeObject<GeocodePlace>(json, Converter.Settings);
+        }
     }
 
-    public partial class PlaceResult
+    public class PlaceResult
     {
         [JsonProperty("formatted_address")]
         public string FormattedAddress { get; set; }
@@ -51,7 +56,7 @@ namespace BranchLocator.Models
         public string Vicinity { get; set; }
     }
 
-    public partial class Geometry
+    public class Geometry
     {
         [JsonProperty("location")]
         public Locate Locate { get; set; }
@@ -60,7 +65,7 @@ namespace BranchLocator.Models
         public ViewPort Viewport { get; set; }
     }
 
-    public partial class PlusCode
+    public class PlusCode
     {
         [JsonProperty("compound_code")]
         public string CompoundCode { get; set; }
@@ -69,7 +74,7 @@ namespace BranchLocator.Models
         public string GlobalCode { get; set; }
     }
 
-    public partial class Locate
+    public class Locate
     {
         [JsonProperty("lat")]
         public double Lat { get; set; }
@@ -78,7 +83,7 @@ namespace BranchLocator.Models
         public double Lng { get; set; }
     }
 
-    public partial class Photo
+    public class Photo
     {
         [JsonProperty("height")]
         public int Height { get; set; }
@@ -93,7 +98,7 @@ namespace BranchLocator.Models
         public string PhotoReference { get; set; }
     }
 
-    public partial class OpeningHours
+    public class OpeningHours
     {
         [JsonProperty("open_now")]
         public bool OpenNow { get; set; }
@@ -105,7 +110,7 @@ namespace BranchLocator.Models
         public string[] GetWeekDayText { get; set; }
     }
 
-    public partial class Period
+    public class Period
     {
         [JsonProperty("open")]
         public Open Open { get; set; }
@@ -114,7 +119,7 @@ namespace BranchLocator.Models
         public Close Close { get; set; }
     }
 
-    public partial class Open
+    public class Open
     {
         [JsonProperty("day")]
         public string Day { get; set; }
@@ -123,7 +128,7 @@ namespace BranchLocator.Models
         public string Time { get; set; }
     }
 
-    public partial class Close
+    public class Close
     {
         [JsonProperty("day")]
         public string Day { get; set; }
@@ -132,21 +137,13 @@ namespace BranchLocator.Models
         public string Time { get; set; }
     }
 
-    public partial class Aspect
+    public class Aspect
     {
         [JsonProperty("rating")]
         public int Rating { get; set; }
 
         [JsonProperty("type")]
         public string Type { get; set; }
-    }
-
-    public partial class GeocodePlace
-    {
-        public static GeocodePlace FromJson(string json)
-        {
-            return JsonConvert.DeserializeObject<GeocodePlace>(json, Converter.Settings);
-        }
     }
 
     public static class Converter

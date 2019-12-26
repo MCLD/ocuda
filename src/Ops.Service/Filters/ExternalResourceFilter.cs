@@ -1,4 +1,4 @@
-﻿using Ocuda.Ops.Models.Entities;
+﻿using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service.Filters
 {

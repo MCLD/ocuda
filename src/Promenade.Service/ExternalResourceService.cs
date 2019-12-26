@@ -6,6 +6,7 @@ using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Abstract;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Promenade.Service
 {
@@ -22,7 +23,7 @@ namespace Ocuda.Promenade.Service
                 ?? throw new ArgumentNullException(nameof(externalResourceRepository));
         }
 
-        public async Task<ICollection<ExternalResource>> GetAllAsync(ExternalResourceType? type)
+        public async Task<ICollection<ExternalResource>> GetAllAsync(ExternalResourceType? type = null)
         {
             return await _externalResourceRepository.GetAllAsync(type);
         }

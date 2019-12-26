@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Ocuda.i18n;
 using Ocuda.Promenade.Models.Keys;
 using Ocuda.Promenade.Service;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Promenade.Controllers.Filters
 {
@@ -49,13 +50,15 @@ namespace Ocuda.Promenade.Controllers.Filters
                 throw new ArgumentNullException(nameof(next));
             }
 
-            var css = await _externalResourceService
-                .GetAllAsync(Models.Entities.ExternalResourceType.CSS);
-            context.HttpContext.Items[ItemKey.ExternalCSS] = css.Select(_ => _.Url).ToList();
+            var externalResources = await _externalResourceService.GetAllAsync();
 
-            var js = await _externalResourceService
-                .GetAllAsync(Models.Entities.ExternalResourceType.JS);
-            context.HttpContext.Items[ItemKey.ExternalJS] = js.Select(_ => _.Url).ToList();
+            context.HttpContext.Items[ItemKey.ExternalCSS] = externalResources
+                .Where(_ => _.Type == ExternalResourceType.CSS)
+                .Select(_ => _.Url).ToList();
+
+            context.HttpContext.Items[ItemKey.ExternalJS] = externalResources
+                .Where(_ => _.Type == ExternalResourceType.JS)
+                .Select(_ => _.Url).ToList();
 
             // generate list for drop-down
             var cultureList = new Dictionary<string, string>();

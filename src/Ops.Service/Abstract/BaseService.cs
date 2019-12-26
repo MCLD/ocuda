@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Service.Abstract
@@ -31,7 +32,7 @@ namespace Ocuda.Ops.Service.Abstract
             }
             else
             {
-                throw new Exception($"Could not convert '{ClaimType.UserId}' to a number.");
+                throw new OcudaException($"Could not convert '{ClaimType.UserId}' to a number.");
             }
         }
     }

@@ -3,7 +3,7 @@ using Ocuda.Promenade.Models.Abstract;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class LocationHours: BaseEntity
+    public class LocationHours : BaseEntity
     {
         public int LocationId { get; set; }
         public Location Location { get; set; }
