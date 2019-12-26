@@ -31,37 +31,6 @@ namespace Ocuda.Promenade.Controllers.Abstract
             _siteSettingService = context.SiteSettingService;
         }
 
-        /*
-        public async Task OnActionExecutedAsync(ActionExecutedContext context)
-        {
-            base.OnActionExecuted(context);
-
-            string pageTitle;
-            var titleSuffix = await _siteSettingService.GetSettingStringAsync(
-                SiteSetting.Site.PageTitleSuffix);
-
-            if (context.Controller is BaseController<T> controller
-                && !string.IsNullOrWhiteSpace(controller.PageTitle))
-            {
-                if (!string.IsNullOrEmpty(titleSuffix)
-                    && !titleSuffix.Equals(controller.PageTitle, StringComparison.OrdinalIgnoreCase))
-                {
-                    pageTitle = $"{controller.PageTitle} - {titleSuffix}";
-                }
-                else
-                {
-                    pageTitle = controller.PageTitle;
-                }
-            }
-            else
-            {
-                pageTitle = !string.IsNullOrWhiteSpace(titleSuffix) ? titleSuffix : string.Empty;
-            }
-
-            ViewData[Utility.Keys.ViewData.Title] = pageTitle;
-        }
-        */
-
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             await base.OnActionExecutionAsync(context, next);
