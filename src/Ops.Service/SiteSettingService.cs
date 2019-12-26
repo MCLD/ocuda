@@ -1,26 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Models.Defaults;
+using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Exceptions;
-using Microsoft.AspNetCore.Http;
-using Ocuda.Ops.Service.Abstract;
 
 namespace Ocuda.Ops.Service
 {
     public class SiteSettingService : BaseService<SiteSettingService>, ISiteSettingService
     {
         private readonly IDistributedCache _cache;
-        private readonly IConfiguration _config;
         private readonly ISiteSettingRepository _siteSettingRepository;
 
-        private int CacheMinutes { get; set; }
+        private int CacheMinutes { get; }
 
         public SiteSettingService(ILogger<SiteSettingService> logger,
             IHttpContextAccessor httpContextAccessor,
@@ -30,14 +29,19 @@ namespace Ocuda.Ops.Service
             : base(logger, httpContextAccessor)
         {
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
             _siteSettingRepository = siteSettingRepository
                 ?? throw new ArgumentNullException(nameof(siteSettingRepository));
 
             string timeoutSetting
-                = _config[Utility.Keys.Configuration.OpsSiteSettingCacheMinutes] ?? "60";
-            int.TryParse(timeoutSetting, out int timeout);
-            CacheMinutes = timeout;
+                = config[Utility.Keys.Configuration.OpsSiteSettingCacheMinutes] ?? "60";
+            if (int.TryParse(timeoutSetting, out int timeout))
+            {
+                CacheMinutes = timeout;
+            }
         }
 
         /// <summary>
@@ -47,10 +51,9 @@ namespace Ocuda.Ops.Service
         {
             var settingsToAdd = new List<SiteSetting>();
 
-            var defaultSiteSettings = SiteSettings.Get;
-            foreach (var defaultSetting in defaultSiteSettings)
+            foreach (var defaultSetting in SiteSettings.Get)
             {
-                var siteSetting = await _siteSettingRepository.FindByKeyAsync(defaultSetting.Key);
+                var siteSetting = await _siteSettingRepository.FindAsync(defaultSetting.Id);
                 if (siteSetting == null)
                 {
                     defaultSetting.CreatedAt = DateTime.Now;
@@ -108,7 +111,7 @@ namespace Ocuda.Ops.Service
         {
             if (CacheMinutes == 0)
             {
-                var siteSetting = await _siteSettingRepository.FindByKeyAsync(key);
+                var siteSetting = await _siteSettingRepository.FindAsync(key);
                 return siteSetting.Value;
             }
             else
@@ -117,7 +120,7 @@ namespace Ocuda.Ops.Service
                 var value = await _cache.GetStringAsync(key);
                 if (value == null)
                 {
-                    var siteSetting = await _siteSettingRepository.FindByKeyAsync(key);
+                    var siteSetting = await _siteSettingRepository.FindAsync(key);
                     value = siteSetting.Value;
                     await _cache.SetStringAsync(cacheKey, value, new DistributedCacheEntryOptions()
                             .SetAbsoluteExpiration(new TimeSpan(0, CacheMinutes, 0)));
@@ -128,7 +131,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<SiteSetting> UpdateAsync(string key, string value)
         {
-            var currentSetting = await _siteSettingRepository.FindByKeyAsync(key);
+            var currentSetting = await _siteSettingRepository.FindAsync(key);
 
             if (currentSetting.Type == SiteSettingType.Bool)
             {
@@ -165,10 +168,15 @@ namespace Ocuda.Ops.Service
 
         public async Task ValidateSiteSettingAsync(SiteSetting siteSetting)
         {
+            if (siteSetting == null)
+            {
+                throw new ArgumentNullException(nameof(siteSetting));
+            }
+
             if (await _siteSettingRepository.IsDuplicateKey(siteSetting))
             {
-                var message = $"Site Setting with key '{siteSetting.Key}' already exists.";
-                _logger.LogWarning(message, siteSetting.Key);
+                var message = $"Site Setting with key '{siteSetting.Id}' already exists.";
+                _logger.LogWarning(message, siteSetting.Id);
                 throw new OcudaException(message);
             }
 
@@ -181,7 +189,7 @@ namespace Ocuda.Ops.Service
                     throw new OcudaException(message);
                 }
             }
-            else if (siteSetting.Type == SiteSettingType.Int 
+            else if (siteSetting.Type == SiteSettingType.Int
                 && !int.TryParse(siteSetting.Value, out int result))
             {
                 var message = $"{siteSetting.Name} requires a value of type {siteSetting.Type}.";

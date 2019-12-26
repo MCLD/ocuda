@@ -10,18 +10,18 @@ namespace Ocuda.Ops.Models.Defaults
             #region CoverIssueReporting
             new SiteSetting
             {
-                Key = Keys.SiteSetting.CoverIssueReporting.LeapBibUrl,
+                Id = Keys.SiteSetting.CoverIssueReporting.LeapBibUrl,
                 Name = "Leap bib records url",
                 Description = "Leap bib records url with scheme, host and path",
                 Category = "CoverIssueReporting",
                 Value = "",
-                Type = SiteSettingType.String_Emptiable
+                Type = SiteSettingType.StringNullable
             },
             #endregion
             #region Email
             new SiteSetting
             {
-                Key = Keys.SiteSetting.Email.FromAddress,
+                Id = Keys.SiteSetting.Email.FromAddress,
                 Name = "Email from address",
                 Description = "Email address that outgoing system mails are from",
                 Category = "Email",
@@ -30,7 +30,7 @@ namespace Ocuda.Ops.Models.Defaults
             },
             new SiteSetting
             {
-                Key = Keys.SiteSetting.Email.FromName,
+                Id = Keys.SiteSetting.Email.FromName,
                 Name = "Email from name",
                 Description = "Name that outgoing system mails are from",
                 Category = "Email",
@@ -39,7 +39,7 @@ namespace Ocuda.Ops.Models.Defaults
             },
             new SiteSetting
             {
-                Key = Keys.SiteSetting.Email.OutgoingHost,
+                Id = Keys.SiteSetting.Email.OutgoingHost,
                 Name = "Email outgoing host",
                 Description = "Outgoing host name for emails",
                 Category = "Email",
@@ -48,25 +48,25 @@ namespace Ocuda.Ops.Models.Defaults
             },
             new SiteSetting
             {
-                Key = Keys.SiteSetting.Email.OutgoingLogin,
+                Id = Keys.SiteSetting.Email.OutgoingLogin,
                 Name = "Email outgoing login",
                 Description = "Login name for the outgoing host",
                 Category = "Email",
                 Value = "",
-                Type = SiteSettingType.String_Emptiable
+                Type = SiteSettingType.StringNullable
             },
             new SiteSetting
             {
-                Key = Keys.SiteSetting.Email.OutgoingPassword,
+                Id = Keys.SiteSetting.Email.OutgoingPassword,
                 Name = "Email outgoing password",
                 Description = "Password for the outgoing host",
                 Category = "Email",
                 Value = "",
-                Type = SiteSettingType.String_Emptiable
+                Type = SiteSettingType.StringNullable
             },
             new SiteSetting
             {
-                Key = Keys.SiteSetting.Email.OutgoingPort,
+                Id = Keys.SiteSetting.Email.OutgoingPort,
                 Name = "Email outgoing port",
                 Description = "Port used for outgoing emails",
                 Category = "Email",
@@ -77,7 +77,7 @@ namespace Ocuda.Ops.Models.Defaults
             #region FileManagement
             new SiteSetting
             {
-                Key = Keys.SiteSetting.FileManagement.MaxUploadBytes,
+                Id = Keys.SiteSetting.FileManagement.MaxUploadBytes,
                 Name = "Maximum file size",
                 Description = "Maximum file upload size (in bytes)",
                 Category = "File Management",
@@ -88,18 +88,18 @@ namespace Ocuda.Ops.Models.Defaults
             #region SiteManagement
             new SiteSetting
             {
-                Key = Keys.SiteSetting.SiteManagement.PromenadeUrl,
+                Id = Keys.SiteSetting.SiteManagement.PromenadeUrl,
                 Name = "Promenade Url",
                 Description = "Promenade url with scheme and host",
                 Category = "Site Management",
                 Value = "",
-                Type = SiteSettingType.String_Emptiable
+                Type = SiteSettingType.StringNullable
             },
             #endregion
             #region UserInterface
             new SiteSetting
             {
-                Key = Keys.SiteSetting.FileManagement.MaxThumbnailCount,
+                Id = Keys.SiteSetting.FileManagement.MaxThumbnailCount,
                 Name = "Maximum Thumbnail Count",
                 Description = "Maximum number of thumbnails that can be attached to a file",
                 Category = "File Management",
@@ -108,7 +108,7 @@ namespace Ocuda.Ops.Models.Defaults
             },
             new SiteSetting
             {
-                Key = Keys.SiteSetting.FileManagement.ThumbnailTypes,
+                Id = Keys.SiteSetting.FileManagement.ThumbnailTypes,
                 Name = "Thumbnail Types",
                 Description = "Comma separated list of acceptable file type extensions for thumbnails",
                 Category = "File Management",
@@ -117,7 +117,7 @@ namespace Ocuda.Ops.Models.Defaults
             },
             new SiteSetting
             {
-                Key = Keys.SiteSetting.UserInterface.ModelStateTimeoutMinutes,
+                Id = Keys.SiteSetting.UserInterface.ModelStateTimeoutMinutes,
                 Name = "Web request validation timeout",
                 Description = "Timeout for submitted pages to perform validation",
                 Category = "User Interface",
@@ -126,7 +126,7 @@ namespace Ocuda.Ops.Models.Defaults
             },
             new SiteSetting
             {
-                Key = Keys.SiteSetting.UserInterface.ItemsPerPage,
+                Id = Keys.SiteSetting.UserInterface.ItemsPerPage,
                 Name = "Items per page",
                 Description = "Items shown on each page for pagination",
                 Category = "User Interface",

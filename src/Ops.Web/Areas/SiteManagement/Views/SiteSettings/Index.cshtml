@@ -2,7 +2,7 @@
 
 <form asp-controller="SiteSettings" asp-action="@(nameof(SiteSettingsController.Update))"
       method="post" role="form">
-    <input asp-for="SiteSetting.Key" type="hidden" />
+    <input asp-for="SiteSetting.Id" type="hidden" />
     <div modal id="editModal" name="Site Setting" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
         <div class="row align-items-center">
             <div class="col-md-4">
@@ -49,7 +49,7 @@ else
                                     class="btn btn-info"
                                     data-toggle="modal"
                                     data-target="#editModal"
-                                    data-key="@setting.Key"
+                                    data-key="@setting.Id"
                                     data-name="@setting.Name"
                                     data-value="@setting.Value"
                                     data-type="@setting.Type">

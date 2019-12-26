@@ -14,7 +14,6 @@ namespace Ocuda.Ops.Data
     public abstract class GenericRepository<TContext, TEntity, TKeyType>
         where TContext : DbContextBase
         where TEntity : class
-        where TKeyType : struct
     {
         protected readonly TContext _context;
         protected readonly ILogger _logger;
@@ -75,6 +74,11 @@ namespace Ocuda.Ops.Data
             DbSet.UpdateRange(entities);
         }
 
+        public virtual async Task<int> CountAsync()
+        {
+            return await DbSet.CountAsync();
+        }
+
         public virtual async Task<ICollection<TEntity>>
             ToListAsync(params Expression<Func<TEntity, IComparable>>[] orderBys)
         {
@@ -83,11 +87,6 @@ namespace Ocuda.Ops.Data
             return await DbSetOrdered(orderBys)
                 .AsNoTracking()
                 .ToListAsync();
-        }
-
-        public virtual async Task<int> CountAsync()
-        {
-            return await DbSet.CountAsync();
         }
 
         public virtual async Task<ICollection<TEntity>> ToListAsync(int skip,
@@ -106,7 +105,10 @@ namespace Ocuda.Ops.Data
         public virtual async Task<TEntity> FindAsync(TKeyType id)
         {
             var entity = await DbSet.FindAsync(id);
-            _context.Entry(entity).State = EntityState.Detached;
+            if (entity != null)
+            {
+                _context.Entry(entity).State = EntityState.Detached;
+            }
             return entity;
         }
 
@@ -120,11 +122,14 @@ namespace Ocuda.Ops.Data
         {
             IOrderedQueryable<TEntity> query = null;
 
-            foreach (var orderBy in orderBys)
+            if (orderBys != null)
             {
-                query = query == null
-                    ? DbSet.OrderBy(orderBy)
-                    : query.ThenBy(orderBy);
+                foreach (var orderBy in orderBys)
+                {
+                    query = query == null
+                        ? DbSet.OrderBy(orderBy)
+                        : query.ThenBy(orderBy);
+                }
             }
 
             return query;
