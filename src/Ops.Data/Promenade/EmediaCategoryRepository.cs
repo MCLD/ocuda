@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +8,8 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data.Promenade
 {
-    public class EmediaCategoryRepository : GenericRepository<PromenadeContext, EmediaCategory, int>, IEmediaCategoryRepository
+    public class EmediaCategoryRepository 
+        : GenericRepository<PromenadeContext, EmediaCategory, int>, IEmediaCategoryRepository
     {
         public EmediaCategoryRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<EmediaCategoryRepository> logger) : base(repositoryFacade, logger)
@@ -27,7 +27,7 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_=>_.EmediaId == emediaId)
+                .Where(_ => _.EmediaId == emediaId)
                 .ToListAsync();
         }
 

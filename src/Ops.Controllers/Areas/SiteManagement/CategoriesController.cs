@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -77,7 +75,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> EditCategory(CategoryViewModel viewModel)
         {
-            if (!string.IsNullOrEmpty(viewModel.Category.Class))
+            if (!string.IsNullOrEmpty(viewModel?.Category?.Class))
             {
                 var currCategory = _categoryService.GetByClass(viewModel.Category.Class);
                 if (currCategory != null && currCategory.Id != viewModel.Category.Id)
@@ -139,7 +137,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> AddCategory(CategoryViewModel viewModel)
         {
-            if (!string.IsNullOrEmpty(viewModel.Category.Class))
+            if (!string.IsNullOrEmpty(viewModel?.Category?.Class))
             {
                 var currCategory = _categoryService.GetByClass(viewModel.Category.Class);
                 if (currCategory != null)

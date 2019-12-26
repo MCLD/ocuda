@@ -11,7 +11,8 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data.Promenade
 {
-    public class EmediaRepository : GenericRepository<PromenadeContext, Emedia, int>, IEmediaRepository
+    public class EmediaRepository 
+        : GenericRepository<PromenadeContext, Emedia, int>, IEmediaRepository
     {
         public EmediaRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<EmediaRepository> logger) : base(repositoryFacade, logger)

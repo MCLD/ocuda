@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Emedia;
 using Ocuda.Ops.Controllers.Filters;
-using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
@@ -142,19 +139,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
         }
 
-        [Route("[action]")]
-        [RestoreModelState]
-        public async Task<IActionResult> AddEmedia()
-        {
-            var categories = await _categoryService.GetAllCategories();
-            var viewModel = new EmediaViewModel
-            {
-                Emedia = new Emedia(),
-                SelectionEmediaCategories = new SelectList(categories, "Id", "Name")
-            };
-            return View(viewModel);
-        }
-
         [HttpPost]
         [Route("[action]")]
         [SaveModelState]
@@ -178,6 +162,19 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        [Route("[action]")]
+        [RestoreModelState]
+        public async Task<IActionResult> AddEmedia()
+        {
+            var categories = await _categoryService.GetAllCategories();
+            var viewModel = new EmediaViewModel
+            {
+                Emedia = new Emedia(),
+                SelectionEmediaCategories = new SelectList(categories, "Id", "Name")
+            };
+            return View(viewModel);
         }
 
         [HttpPost]
