@@ -83,6 +83,14 @@ namespace Ocuda.Promenade.Models.Defaults
                 Description = "Id of the Navigation object to use on the top",
                 Category = "Site",
                 Type = SiteSettingType.Int
+            },
+            new SiteSetting
+            {
+                Key = Keys.SiteSetting.Site.PageTitleSuffix,
+                Name = "Page Title Suffix",
+                Description = "Name to append to the end of page titles",
+                Category = "Site",
+                Type = SiteSettingType.StringNullable
             }
             #endregion
         };

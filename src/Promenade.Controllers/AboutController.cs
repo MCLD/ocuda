@@ -73,6 +73,8 @@ namespace Ocuda.Promenade.Controllers
                 viewModel.SocialCard = card;
             }
 
+            PageTitle = page.Title;
+
             return View(viewModel);
         }
     }
