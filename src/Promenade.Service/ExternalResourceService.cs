@@ -23,7 +23,12 @@ namespace Ocuda.Promenade.Service
                 ?? throw new ArgumentNullException(nameof(externalResourceRepository));
         }
 
-        public async Task<ICollection<ExternalResource>> GetAllAsync(ExternalResourceType? type = null)
+        public async Task<ICollection<ExternalResource>> GetAllAsync()
+        {
+            return await GetAllAsync(null);
+        }
+
+        public async Task<ICollection<ExternalResource>> GetAllAsync(ExternalResourceType? type)
         {
             return await _externalResourceRepository.GetAllAsync(type);
         }
