@@ -18,17 +18,24 @@ namespace Ocuda.Promenade.Data.Promenade
         public async Task<Page> GetPublishedByStubAndTypeAsync(string stub, PageType type,
             int languageId)
         {
-            var pageHeaderId = _context.PageHeaders
-                .AsNoTracking()
-                .Where(_ => _.Stub == stub && _.Type == type)
-                .Select(_ => _.Id);
+            Page page = null;
 
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => pageHeaderId.Contains(_.PageHeaderId)
-                    && _.LanguageId == languageId
-                    && _.IsPublished)
-                .SingleOrDefaultAsync();
+            if (_context.PageHeaders != null)
+            {
+                var pageHeaderId = _context.PageHeaders
+                    .AsNoTracking()
+                    .Where(_ => _.Stub == stub && _.Type == type)
+                    .Select(_ => _.Id);
+
+                page = await DbSet
+                    .AsNoTracking()
+                    .Where(_ => pageHeaderId.Contains(_.PageHeaderId)
+                        && _.LanguageId == languageId
+                        && _.IsPublished)
+                    .SingleOrDefaultAsync();
+            }
+
+            return page;
         }
     }
 }

@@ -21,7 +21,7 @@ namespace Ocuda.Ops.Models.Entities
         public string Name { get; set; }
 
         [Required]
-        [MaxLength(1000)]
+        [MaxLength(255)]
         public string Description { get; set; }
 
         [MaxLength(255)]

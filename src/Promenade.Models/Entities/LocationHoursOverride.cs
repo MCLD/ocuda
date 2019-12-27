@@ -10,7 +10,7 @@ namespace Ocuda.Promenade.Models.Entities
         public Location Location { get; set; }
 
         [Required]
-        [MaxLength(1000)]
+        [MaxLength(255)]
         public string Reason { get; set; }
 
         public DateTime Date { get; set; }

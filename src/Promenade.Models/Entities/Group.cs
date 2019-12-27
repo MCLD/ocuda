@@ -7,12 +7,15 @@ namespace Ocuda.Promenade.Models.Entities
     public class Group : BaseEntity
     {
         [Required]
+        [MaxLength(255)]
         public string Stub { get; set; }
 
+        [MaxLength(255)]
         public string GroupType { get; set; }
 
         public bool IsLocationRegion { get; set; }
 
+        [MaxLength(255)]
         public string SubscriptionUrl { get; set; }
 
         [MaxLength(255)]
