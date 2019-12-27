@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Ocuda.Promenade.Models.Abstract;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -26,13 +27,5 @@ namespace Ocuda.Promenade.Models.Entities
 
         [MaxLength(255)]
         public string Category { get; set; }
-    }
-
-    public enum SiteSettingType
-    {
-        Bool,
-        Int,
-        String,
-        StringNullable
     }
 }

@@ -94,7 +94,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpGet("[action]")]
         [RestoreModelState]
-        public async Task<IActionResult> CreateGroup()
+        public IActionResult CreateGroup()
         {
             var group = new Group
             {

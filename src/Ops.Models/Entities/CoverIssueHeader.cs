@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using Ocuda.Ops.Models.Abstract;
 
 namespace Ocuda.Ops.Models.Entities
@@ -13,6 +11,6 @@ namespace Ocuda.Ops.Models.Entities
 
         public bool HasPendingIssue { get; set; }
 
-        public DateTime? LastResolved {get; set;}
+        public DateTime? LastResolved { get; set; }
     }
 }

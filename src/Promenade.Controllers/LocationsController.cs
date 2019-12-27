@@ -68,13 +68,13 @@ namespace Ocuda.Promenade.Controllers
                             }
                             else
                             {
-                                _logger.LogError($"No geocoding results for a \"{zip}\"");
-                                TempData["AlertDanger"] = $"Unable to locate zip <strong>\"{zip}\"</strong>.";
+                                _logger.LogError("No geocoding results for {Zip}", zip);
+                                TempData["AlertDanger"] = $"Unable to locate ZIP Code: <strong>{zip}</strong>.";
                             }
                         }
                         catch (HttpRequestException ex)
                         {
-                            _logger.LogCritical(ex, $"Google API error: {ex.Message}");
+                            _logger.LogCritical(ex, "Google API error: {Message}", ex.Message);
                             TempData["AlertDanger"] = "An error occured, please try again later.";
                         }
                         catch (Exception ex)
@@ -107,26 +107,32 @@ namespace Ocuda.Promenade.Controllers
                             }
                             catch (Exception ex)
                             {
-                                _logger.LogError($"Error parsing Geocode API JSON: {ex.Message} - {stringResult}");
+                                _logger.LogError("Error parsing Geocode API JSON: {Message} - {Result}",
+                                    ex.Message,
+                                    stringResult);
                             }
 
                             if (geoResult?.Results?.Count() > 0)
                             {
-                                viewModel.Zip = geoResult.Results?
+                                viewModel.Zip = geoResult?
+                                    .Results?
                                     .FirstOrDefault(_ => _.Types.Any(__ => __ == "postal_code"))?
                                     .AddressComponents?
                                     .FirstOrDefault()?
                                     .ShortName;
                                 if (string.IsNullOrEmpty(viewModel.Zip))
                                 {
-                                    _logger.LogWarning($"Could not find postal code when reverse geocoding {latlng}");
+                                    _logger.LogWarning("Could not find postal code when reverse geocoding {Coordinates}",
+                                        latlng);
                                 }
                             }
                         }
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, $"Problem looking up postal code for coordinates {latlng}: {ex.Message}");
+                        _logger.LogError(ex, "Problem looking up postal code for coordinates {Coordinates}: {Message}",
+                            latlng,
+                            ex.Message);
                     }
                     return View("Locations", viewModel);
                 }

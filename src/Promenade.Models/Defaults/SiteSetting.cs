@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Promenade.Models.Defaults
 {

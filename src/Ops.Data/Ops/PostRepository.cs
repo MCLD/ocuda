@@ -85,7 +85,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             foreach (var category in categories)
             {
-                var postCategory = new PostCategory()
+                var postCategory = new PostCategory
                 {
                     PostId = postId,
                     CategoryId = category

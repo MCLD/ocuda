@@ -37,7 +37,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var metadataTypeList = await _userMetadataTypeService.GetPaginatedListAsync(filter);
 
-            var paginateModel = new PaginateModel()
+            var paginateModel = new PaginateModel
             {
                 ItemCount = metadataTypeList.Count,
                 CurrentPage = page,

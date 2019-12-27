@@ -406,7 +406,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var group = await _groupService.GetGroupByIdAsync(groupId);
             try
             {
-                var locationGroup = new LocationGroup()
+                var locationGroup = new LocationGroup
                 {
                     GroupId = groupId,
                     LocationId = locationId
@@ -436,7 +436,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var feature = await _featureService.GetFeatureByIdAsync(featureId);
             try
             {
-                var locationFeature = new LocationFeature()
+                var locationFeature = new LocationFeature
                 {
                     FeatureId = featureId,
                     LocationId = locationId
@@ -689,18 +689,20 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                     if (geoResult?.Results?.Count() > 0)
                     {
-                        var lat = geoResult.Results?
+                        var lat = geoResult?
+                            .Results?
                             .FirstOrDefault(_ => _.Types.Any(__ => __ == "premise"))?
                             .Geometry?
                             .Location?
                             .Lat;
-                        var lng = geoResult.Results?
+                        var lng = geoResult?
+                            .Results?
                             .FirstOrDefault(_ => _.Types.Any(__ => __ == "premise"))?
                             .Geometry?
                             .Location?
                             .Lng;
 
-                        if (lat.HasValue && lng.HasValue)
+                        if (lat != null && lng != null)
                         {
                             location.GeoLocation = lat.ToString() + "," + lng.ToString();
                         }
