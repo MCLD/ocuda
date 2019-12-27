@@ -10,9 +10,11 @@ namespace Ocuda.Ops.Models.Entities
         public int SectionId { get; set; }
 
         [Required]
+        [MaxLength(255)]
         public string Title { get; set; }
 
         [Required]
+        [MaxLength(255)]
         public string Stub { get; set; }
 
         [Required]
