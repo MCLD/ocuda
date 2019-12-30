@@ -13,7 +13,7 @@
     <RepositoryType>Git</RepositoryType>
     <RepositoryUrl>https://github.com/MCLD/ocuda/</RepositoryUrl>
     <RootNamespace>Ocuda.Ops.Web</RootNamespace>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <UserSecretsId>6c6caf47-6455-4913-81a0-5bc95b0b8612</UserSecretsId>

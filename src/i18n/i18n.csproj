@@ -11,7 +11,7 @@
     <RepositoryType>Git</RepositoryType>
     <RepositoryUrl>https://github.com/MCLD/ocuda/</RepositoryUrl>
     <RootNamespace>Ocuda.i18n</RootNamespace>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>

@@ -10,7 +10,7 @@
     <Product>Ocuda</Product>
     <RepositoryType>Git</RepositoryType>
     <RepositoryUrl>https://github.com/MCLD/ocuda/</RepositoryUrl>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>eb6c2377-84db-46df-9f5d-fde6a5ab4b8f</UserSecretsId>
     <Version>0.0.1</Version>
   </PropertyGroup>
