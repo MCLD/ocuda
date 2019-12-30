@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +16,7 @@ namespace Ocuda.Promenade.Web
             var webHost = CreateHostBuilder(args).Build();
             var config = (IConfiguration)webHost.Services.GetService(typeof(IConfiguration));
 
-            Log.Logger = new Utility.Logging.Configuration().Build(config).CreateLogger();
+            Log.Logger = Utility.Logging.Configuration.Build(config).CreateLogger();
 
             var instanceConfig = config[Utility.Keys.Configuration.OcudaInstance];
             var instance = string.IsNullOrEmpty(instanceConfig) ? null : $" ({instanceConfig})";
@@ -33,18 +32,24 @@ namespace Ocuda.Promenade.Web
                 Task.Run(() => web.InitalizeAsync()).Wait();
             }
 
+            string product = $"Ocuda.Promenade{instance}";
+
             try
             {
-                Log.Information($"Ocuda.Promenade{instance} v{version} starting up");
+                Log.Information("{Product} v{Version} starting up", product, version);
                 webHost.Run();
                 return 0;
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
-                Log.Fatal(ex,
-                    $"Ocuda.Promenade{instance} v{version} exited unexpectedly: {ex.Message}");
+                Log.Fatal(ex, "{Product} v{Version} exited unexpectedly: {Message}",
+                    product,
+                    version,
+                    ex.Message);
                 return 1;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
             finally
             {
                 Log.CloseAndFlush();
@@ -53,10 +58,7 @@ namespace Ocuda.Promenade.Web
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                })
+                .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
                 .UseSerilog();
     }
 }

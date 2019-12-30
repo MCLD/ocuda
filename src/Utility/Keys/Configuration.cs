@@ -38,6 +38,8 @@
         public static readonly string OpsSiteSettingCacheMinutes = "Ops.SiteSettingCacheMinutes";
         public static readonly string OpsSessionTimeoutMinutes = "Ops.SessionTimeoutMinutes";
 
+        public static readonly string PromenadeDatabaseProvider = "Promenade.DatabaseProvider";
+
         public static readonly string PromAPIGoogleMaps = "Promenade.API.GoogleMaps";
         public static readonly string OpsAPIGoogleMaps = "Ops.API.GoogleMaps";
     }

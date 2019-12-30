@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers;
 using Ocuda.Ops.Controllers.Authorization;
 using Ocuda.Ops.Data;
@@ -31,23 +29,22 @@ namespace Ocuda.Ops.Web
 
         private readonly IConfiguration _config;
         private readonly bool _isDevelopment;
-        private readonly ILogger _logger;
 
         public Startup(IConfiguration configuration,
-            IWebHostEnvironment env,
-            ILogger<Startup> logger)
+            IWebHostEnvironment env)
         {
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
             _isDevelopment = env.IsDevelopment();
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // build a temporary logger for this method call
+            using var logger = Utility.Logging.Configuration.Build(_config).CreateLogger();
+
             // set a default culture of en-US if none is specified
             string culture = _config[Configuration.OpsCulture] ?? DefaultCulture;
-            _logger.LogInformation("Configuring for culture: {0}", culture);
+            logger.Information("Configuring for culture: {0}", culture);
             services.Configure<RequestLocalizationOptions>(_ =>
             {
                 _.DefaultRequestCulture
@@ -72,7 +69,7 @@ namespace Ocuda.Ops.Web
                     {
                         instanceName = $"{instanceName}{cacheDiscriminator}.";
                     }
-                    _logger.LogInformation("Using Redis distributed cache {0} instance {1}",
+                    logger.Information("Using Redis distributed cache {0} instance {1}",
                         redisConfiguration,
                         instanceName);
                     services.AddDistributedRedisCache(_ =>
@@ -82,16 +79,10 @@ namespace Ocuda.Ops.Web
                     });
                     break;
                 default:
-                    _logger.LogInformation("Using memory-based distributed cache");
+                    logger.Information("Using memory-based distributed cache");
                     services.AddDistributedMemoryCache();
                     break;
             }
-
-            // configure ef errors to throw, log, or ignore as appropriate for the environment
-            // see https://docs.microsoft.com/en-us/ef/core/querying/related-data#ignored-includes
-            var throwEvents = new List<EventId>();
-            var logEvents = new List<EventId>();
-            var ignoreEvents = new List<EventId>();
 
             string opsCs = _config.GetConnectionString("Ops")
                 ?? throw new OcudaException("ConnectionString:Ops not configured.");
@@ -102,22 +93,14 @@ namespace Ocuda.Ops.Web
             switch (provider)
             {
                 case "SqlServer":
-                    _logger.LogInformation("Using {0} data provider", provider);
+                    logger.Information("Using {0} data provider", provider);
                     services.AddDbContextPool<OpsContext,
-                        DataProvider.SqlServer.Ops.Context>(_ => _.UseSqlServer(opsCs)
-                        .ConfigureWarnings(w => w
-                            .Throw(throwEvents.ToArray())
-                            .Log(logEvents.ToArray())
-                            .Ignore(ignoreEvents.ToArray())));
+                        DataProvider.SqlServer.Ops.Context>(_ => _.UseSqlServer(opsCs));
                     services.AddDbContextPool<PromenadeContext,
-                        DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs)
-                        .ConfigureWarnings(w => w
-                            .Throw(throwEvents.ToArray())
-                            .Log(logEvents.ToArray())
-                            .Ignore(ignoreEvents.ToArray())));
+                        DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
                     break;
                 default:
-                    _logger.LogCritical("No {0} configured in settings. Exiting.",
+                    logger.Fatal("No {0} configured in settings. Exiting.",
                         Configuration.OpsDatabaseProvider);
                     throw new OcudaException($"No {Configuration.OpsDatabaseProvider} configured.");
             }
@@ -129,7 +112,7 @@ namespace Ocuda.Ops.Web
             if (int.TryParse(_config[Configuration.OpsSessionTimeoutMinutes],
                 out int configuredTimeout))
             {
-                _logger.LogInformation("Session timeout configured for {0} minutes",
+                logger.Information("Session timeout configured for {0} minutes",
                     configuredTimeout);
                 sessionTimeout = TimeSpan.FromMinutes(configuredTimeout);
             }
@@ -269,6 +252,11 @@ namespace Ocuda.Ops.Web
         public void Configure(IApplicationBuilder app,
             Utility.Services.Interfaces.IPathResolverService pathResolver)
         {
+            if (pathResolver == null)
+            {
+                throw new ArgumentNullException(nameof(pathResolver));
+            }
+
             // configure error page handling and development IDE linking
             if (_isDevelopment)
             {
@@ -340,6 +328,8 @@ namespace Ocuda.Ops.Web
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
     }
 }

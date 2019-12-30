@@ -6,7 +6,7 @@ using Serilog.Filters;
 
 namespace Ocuda.Utility.Logging
 {
-    public class Configuration
+    public static class Configuration
     {
         private const string DefaultErrorControllerName = "Controllers.ErrorController";
 
@@ -16,8 +16,13 @@ namespace Ocuda.Utility.Logging
         public static readonly string InstanceEnrichment = "Instance";
         public static readonly string RemoteAddressEnrichment = "RemoteAddress";
 
-        public LoggerConfiguration Build(IConfiguration config)
+        public static LoggerConfiguration Build(IConfiguration config)
         {
+            if(config == null)
+            {
+                throw new System.ArgumentNullException(nameof(config));
+            }
+
             LoggerConfiguration loggerConfig = new LoggerConfiguration()
                 .ReadFrom.Configuration(config)
                 .Enrich.WithProperty(ApplicationEnrichment,
