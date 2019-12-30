@@ -8,10 +8,10 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers;
 using Ocuda.Ops.Controllers.Authorization;
@@ -34,7 +34,7 @@ namespace Ocuda.Ops.Web
         private readonly ILogger _logger;
 
         public Startup(IConfiguration configuration,
-            IHostingEnvironment env,
+            IWebHostEnvironment env,
             ILogger<Startup> logger)
         {
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
@@ -43,7 +43,7 @@ namespace Ocuda.Ops.Web
             _isDevelopment = env.IsDevelopment();
         }
 
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             // set a default culture of en-US if none is specified
             string culture = _config[Configuration.OpsCulture] ?? DefaultCulture;
@@ -92,27 +92,6 @@ namespace Ocuda.Ops.Web
             var throwEvents = new List<EventId>();
             var logEvents = new List<EventId>();
             var ignoreEvents = new List<EventId>();
-
-            if (_isDevelopment)
-            {
-                if (string.IsNullOrEmpty(_config[Configuration.ThrowQueryWarningsInDev]))
-                {
-                    logEvents.Add(RelationalEventId.QueryClientEvaluationWarning);
-                    logEvents.Add(CoreEventId.FirstWithoutOrderByAndFilterWarning);
-                }
-                else
-                {
-                    throwEvents.Add(RelationalEventId.QueryClientEvaluationWarning);
-                    throwEvents.Add(CoreEventId.FirstWithoutOrderByAndFilterWarning);
-                }
-
-                throwEvents.Add(CoreEventId.IncludeIgnoredWarning);
-            }
-            else
-            {
-                logEvents.Add(RelationalEventId.QueryClientEvaluationWarning);
-                logEvents.Add(CoreEventId.IncludeIgnoredWarning);
-            }
 
             string opsCs = _config.GetConnectionString("Ops")
                 ?? throw new OcudaException("ConnectionString:Ops not configured.");
@@ -178,8 +157,7 @@ namespace Ocuda.Ops.Web
                     policy => policy.RequireClaim(nameof(ClaimType.SiteManager)));
             });
 
-            services.AddMvc()
-                .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_2)
+            services.AddControllersWithViews()
                 .AddSessionStateTempDataProvider();
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -286,8 +264,6 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Abstract.IUserContextProvider, UserContextProvider>();
             services.AddScoped<IUserMetadataTypeService, UserMetadataTypeService>();
             services.AddScoped<IUserService, UserService>();
-
-            return services.BuildServiceProvider();
         }
 
         public void Configure(IApplicationBuilder app,
@@ -360,9 +336,10 @@ namespace Ocuda.Ops.Web
 
             app.UseSession();
 
-            app.UseAuthentication();
+            app.UseRouting();
 
-            app.UseMvc();
+            app.UseAuthentication();
+            app.UseAuthorization();
         }
     }
 }

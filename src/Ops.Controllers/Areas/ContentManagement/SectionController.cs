@@ -27,7 +27,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         private readonly IPostService _postService;
         private readonly IFileService _fileService;
         private readonly ILinkService _linkService;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
         public static string Name { get { return "Section"; } }
         public static string Area { get { return "ContentManagement"; } }
@@ -39,7 +39,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             IPostService postService,
             IFileService fileService,
             ILinkService linkService,
-            IHostingEnvironment hostingEnvironment) : base(context)
+            IWebHostEnvironment hostingEnvironment) : base(context)
         {
             _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(sectionService));

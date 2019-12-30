@@ -5,6 +5,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace Ocuda.Promenade.Web
@@ -13,7 +14,7 @@ namespace Ocuda.Promenade.Web
     {
         public static int Main(string[] args)
         {
-            var webHost = CreateWebHostBuilder(args).Build();
+            var webHost = CreateHostBuilder(args).Build();
             var config = (IConfiguration)webHost.Services.GetService(typeof(IConfiguration));
 
             Log.Logger = new Utility.Logging.Configuration().Build(config).CreateLogger();
@@ -50,9 +51,12 @@ namespace Ocuda.Promenade.Web
             }
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                })
                 .UseSerilog();
     }
 }

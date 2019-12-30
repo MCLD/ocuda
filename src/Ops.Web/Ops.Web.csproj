@@ -13,7 +13,7 @@
     <RepositoryType>Git</RepositoryType>
     <RepositoryUrl>https://github.com/MCLD/ocuda/</RepositoryUrl>
     <RootNamespace>Ocuda.Ops.Web</RootNamespace>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <UserSecretsId>6c6caf47-6455-4913-81a0-5bc95b0b8612</UserSecretsId>
@@ -37,12 +37,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BuildBundlerMinifier" Version="3.1.430" />
-    <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="2.2.0" />
+    <PackageReference Include="BuildBundlerMinifier" Version="3.2.435" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.2.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" PrivateAssets="All" />
-    <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" PrivateAssets="All" />
+    <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
   </ItemGroup>
 
   <ItemGroup>

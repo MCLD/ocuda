@@ -76,18 +76,18 @@ namespace Ocuda.Utility.Logging
                         restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information,
                         columnOptions: new Serilog.Sinks.MSSqlServer.ColumnOptions
                         {
-                            AdditionalDataColumns = new System.Data.DataColumn[]
+                            AdditionalColumns = new Serilog.Sinks.MSSqlServer.SqlColumn[]
                             {
-                                new System.Data.DataColumn(ApplicationEnrichment,
-                                    typeof(string)) { MaxLength = 255 },
-                                new System.Data.DataColumn(VersionEnrichment,
-                                    typeof(string)) { MaxLength = 255 },
-                                new System.Data.DataColumn(IdentifierEnrichment,
-                                    typeof(string)) { MaxLength = 255 },
-                                new System.Data.DataColumn(InstanceEnrichment,
-                                    typeof(string)) { MaxLength = 255 },
-                                new System.Data.DataColumn(RemoteAddressEnrichment,
-                                    typeof(string)) { MaxLength = 255 }
+                                new Serilog.Sinks.MSSqlServer.SqlColumn(ApplicationEnrichment,
+                                    System.Data.SqlDbType.NVarChar) { DataLength = 255 },
+                                new Serilog.Sinks.MSSqlServer.SqlColumn(VersionEnrichment,
+                                    System.Data.SqlDbType.NVarChar) { DataLength = 255 },
+                                new Serilog.Sinks.MSSqlServer.SqlColumn(IdentifierEnrichment,
+                                    System.Data.SqlDbType.NVarChar) { DataLength = 255 },
+                                new Serilog.Sinks.MSSqlServer.SqlColumn(InstanceEnrichment,
+                                    System.Data.SqlDbType.NVarChar) { DataLength = 255 },
+                                new Serilog.Sinks.MSSqlServer.SqlColumn(RemoteAddressEnrichment,
+                                    System.Data.SqlDbType.NVarChar) { DataLength = 255 }
                             }
                         }));
             }

@@ -106,8 +106,7 @@ namespace Ocuda.Promenade.Web
             services.Configure<RouteOptions>(_ =>
                 _.ConstraintMap.Add("cultureConstraint", typeof(CultureRouteConstraint)));
 
-            services.AddMvc()
-                .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_2)
+            services.AddControllersWithViews()
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization(_ =>
                 {
@@ -249,7 +248,7 @@ namespace Ocuda.Promenade.Web
                 RequestPath = new PathString(contentUrl)
             });
 
-            app.UseMvc();
+            app.UseRouting();
         }
     }
 }
