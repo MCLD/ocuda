@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Ocuda.Utility.TagHelpers
 {
@@ -17,7 +15,7 @@ namespace Ocuda.Utility.TagHelpers
 
         public ActiveTagHelper(IUrlHelperFactory urlHelperFactory)
         {
-            _urlHelperFactory = urlHelperFactory 
+            _urlHelperFactory = urlHelperFactory
                 ?? throw new ArgumentNullException(nameof(urlHelperFactory));
         }
 

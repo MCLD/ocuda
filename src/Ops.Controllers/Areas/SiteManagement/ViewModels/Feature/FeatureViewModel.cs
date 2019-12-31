@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Ocuda.Ops.Service.Models;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Feature

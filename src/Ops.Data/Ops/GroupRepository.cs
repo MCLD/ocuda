@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -13,7 +11,7 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class GroupRepository : GenericRepository<PromenadeContext,Group, int>, IGroupRepository
+    public class GroupRepository : GenericRepository<PromenadeContext, Group, int>, IGroupRepository
     {
         public GroupRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<LinkRepository> logger) : base(repositoryFacade, logger)

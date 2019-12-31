@@ -6,7 +6,7 @@ using Serilog.Filters;
 
 namespace Ocuda.Utility.Logging
 {
-    public class Configuration
+    public static class Configuration
     {
         private const string DefaultErrorControllerName = "Controllers.ErrorController";
 
@@ -16,8 +16,13 @@ namespace Ocuda.Utility.Logging
         public static readonly string InstanceEnrichment = "Instance";
         public static readonly string RemoteAddressEnrichment = "RemoteAddress";
 
-        public LoggerConfiguration Build(IConfiguration config)
+        public static LoggerConfiguration Build(IConfiguration config)
         {
+            if(config == null)
+            {
+                throw new System.ArgumentNullException(nameof(config));
+            }
+
             LoggerConfiguration loggerConfig = new LoggerConfiguration()
                 .ReadFrom.Configuration(config)
                 .Enrich.WithProperty(ApplicationEnrichment,
@@ -76,20 +81,29 @@ namespace Ocuda.Utility.Logging
                         restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information,
                         columnOptions: new Serilog.Sinks.MSSqlServer.ColumnOptions
                         {
-                            AdditionalDataColumns = new System.Data.DataColumn[]
+                            AdditionalColumns = new []
                             {
-                                new System.Data.DataColumn(ApplicationEnrichment,
-                                    typeof(string)) { MaxLength = 255 },
-                                new System.Data.DataColumn(VersionEnrichment,
-                                    typeof(string)) { MaxLength = 255 },
-                                new System.Data.DataColumn(IdentifierEnrichment,
-                                    typeof(string)) { MaxLength = 255 },
-                                new System.Data.DataColumn(InstanceEnrichment,
-                                    typeof(string)) { MaxLength = 255 },
-                                new System.Data.DataColumn(RemoteAddressEnrichment,
-                                    typeof(string)) { MaxLength = 255 }
+                                new Serilog.Sinks.MSSqlServer.SqlColumn(ApplicationEnrichment,
+                                    System.Data.SqlDbType.NVarChar) { DataLength = 255 },
+                                new Serilog.Sinks.MSSqlServer.SqlColumn(VersionEnrichment,
+                                    System.Data.SqlDbType.NVarChar) { DataLength = 255 },
+                                new Serilog.Sinks.MSSqlServer.SqlColumn(IdentifierEnrichment,
+                                    System.Data.SqlDbType.NVarChar) { DataLength = 255 },
+                                new Serilog.Sinks.MSSqlServer.SqlColumn(InstanceEnrichment,
+                                    System.Data.SqlDbType.NVarChar) { DataLength = 255 },
+                                new Serilog.Sinks.MSSqlServer.SqlColumn(RemoteAddressEnrichment,
+                                    System.Data.SqlDbType.NVarChar) { DataLength = 255 }
                             }
                         }));
+            }
+
+            string seqEndpoint = config[Keys.Configuration.OcudaSeqEndpoint];
+            if(!string.IsNullOrEmpty(seqEndpoint))
+            {
+                loggerConfig
+                    .WriteTo.Logger(_ => _
+                        .Filter.ByExcluding(Matching.FromSource(errorControllerName))
+                        .WriteTo.Seq(seqEndpoint));
             }
 
             return loggerConfig;

@@ -23,6 +23,5 @@ namespace Ocuda.Promenade.Models.Entities
 
         [NotMapped]
         public List<Category> Categories { get; set; }
-
     }
 }

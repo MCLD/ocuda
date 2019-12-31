@@ -27,19 +27,19 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         private readonly IPostService _postService;
         private readonly IFileService _fileService;
         private readonly ILinkService _linkService;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
         public static string Name { get { return "Section"; } }
         public static string Area { get { return "ContentManagement"; } }
 
-        private static string mimeType = "application/octet-stream";
+        private static readonly string mimeType = "application/octet-stream";
 
         public SectionController(ServiceFacades.Controller<SectionController> context,
             ISectionService sectionService,
             IPostService postService,
             IFileService fileService,
             ILinkService linkService,
-            IHostingEnvironment hostingEnvironment) : base(context)
+            IWebHostEnvironment hostingEnvironment) : base(context)
         {
             _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(sectionService));
@@ -132,7 +132,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             return View(viewModel);
         }
-
 
         [Route("{sectionStub}/[action]")]
         [Route("{sectionStub}/[action]/{page}")]
@@ -727,10 +726,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
             if (model.UploadFile.Length > 0)
             {
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await model.UploadFile.CopyToAsync(fileStream);
-                }
+                using var fileStream = new FileStream(filePath, FileMode.Create);
+                await model.UploadFile.CopyToAsync(fileStream);
             }
             await _fileService.CreatePrivateFileAsync(model.File, model.UploadFile);
             ShowAlertSuccess($"Added '{model.File.Name}' to '{fileLib.Name}'");

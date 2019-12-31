@@ -17,7 +17,7 @@ namespace Ocuda.Utility.TagHelpers
 
         public PaginateTagHelper(IUrlHelperFactory urlHelperFactory)
         {
-            _urlHelperFactory = urlHelperFactory ?? 
+            _urlHelperFactory = urlHelperFactory ??
                 throw new ArgumentNullException(nameof(urlHelperFactory));
         }
 

@@ -25,12 +25,12 @@ namespace Ocuda.Utility.Data
 
         protected IEnumerable<string> GetPendingMigrationList() => Database.GetPendingMigrations();
 
-        protected async Task<IEnumerable<string>> GetPendingMigrationListAsync() 
+        protected async Task<IEnumerable<string>> GetPendingMigrationListAsync()
             => await Database.GetPendingMigrationsAsync();
 
         protected string GetCurrentMigration() => Database.GetAppliedMigrations().Last();
 
-        protected async Task<string> GetCurrentMigrationAsync() 
+        protected async Task<string> GetCurrentMigrationAsync()
             => (await Database.GetAppliedMigrationsAsync()).Last();
     }
 }

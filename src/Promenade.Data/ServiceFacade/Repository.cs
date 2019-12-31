@@ -18,7 +18,7 @@ namespace Ocuda.Promenade.Data.ServiceFacade
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
             this.config = config ?? throw new ArgumentNullException(nameof(config));
-            this.dateTimeProvider = dateTimeProvider 
+            this.dateTimeProvider = dateTimeProvider
                 ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         }
     }

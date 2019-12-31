@@ -85,7 +85,6 @@ namespace Ocuda.Promenade.Controllers.Filters
             context.HttpContext.Items[ItemKey.HrefLang] = cultureHrefLang;
             context.HttpContext.Items[ItemKey.L10n] = cultureList;
 
-
             var topNavigationId
                 = await _siteSettingService.GetSettingIntAsync(Models.Keys.SiteSetting.Site.NavigationIdTop);
             if (topNavigationId > 0)

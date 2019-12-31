@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages
+﻿namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.Pages
 {
     public class PreviewViewModel
     {

@@ -8,7 +8,7 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 
 namespace Ocuda.Promenade.Data.Promenade
 {
-    public class LocationRepository 
+    public class LocationRepository
         : GenericRepository<PromenadeContext, Location, int>, ILocationRepository
     {
         public LocationRepository(

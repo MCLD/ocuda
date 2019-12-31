@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Ocuda.Utility.TagHelpers
@@ -23,7 +18,6 @@ namespace Ocuda.Utility.TagHelpers
 
         [HtmlAttributeName(ignoreValidationAttributeName)]
         public bool IgnoreValidation { get; set; }
-
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {

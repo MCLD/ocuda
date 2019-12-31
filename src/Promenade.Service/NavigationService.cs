@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
@@ -43,14 +42,14 @@ namespace Ocuda.Promenade.Service
             return nav;
         }
 
-        private async Task<ICollection<Navigation>> GetNavigationChildren(int navigationId, 
+        private async Task<ICollection<Navigation>> GetNavigationChildren(int navigationId,
             int languageId)
         {
             var children = await _navigationRepository.GetChildren(navigationId);
-            foreach(var child in children)
+            foreach (var child in children)
             {
                 child.Navigations = await GetNavigationChildren(child.Id, languageId);
-                if(child.NavigationTextId != null)
+                if (child.NavigationTextId != null)
                 {
                     child.NavigationText = await _navigationTextRepository
                         .FindAsync((int)child.NavigationTextId, languageId);
