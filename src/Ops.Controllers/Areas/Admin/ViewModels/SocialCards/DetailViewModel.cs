@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Ocuda.Promenade.Models.Entities;
+﻿using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Controllers.Areas.Admin.ViewModels.SocialCards
 {

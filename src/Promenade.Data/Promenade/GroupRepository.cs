@@ -14,6 +14,7 @@ namespace Ocuda.Promenade.Data.Promenade
             ILogger<GroupRepository> logger) : base(repositoryFacade, logger)
         {
         }
+
         public async Task<List<Group>> GetAllGroups()
         {
             return await DbSet

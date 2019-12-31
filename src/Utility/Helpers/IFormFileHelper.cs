@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace Ocuda.Utility.Helpers
 {
@@ -13,11 +10,9 @@ namespace Ocuda.Utility.Helpers
 
             using (var fileStream = file.OpenReadStream())
             {
-                using (var ms = new System.IO.MemoryStream())
-                {
-                    fileStream.CopyTo(ms);
-                    fileBytes = ms.ToArray();
-                }
+                using var ms = new System.IO.MemoryStream();
+                fileStream.CopyTo(ms);
+                fileBytes = ms.ToArray();
             }
 
             return fileBytes;

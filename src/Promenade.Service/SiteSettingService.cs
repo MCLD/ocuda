@@ -45,7 +45,6 @@ namespace Ocuda.Promenade.Service
             }
         }
 
-
         public async Task<int> GetSettingIntAsync(string key)
         {
             var settingValue = await GetSettingValueAsync(key);

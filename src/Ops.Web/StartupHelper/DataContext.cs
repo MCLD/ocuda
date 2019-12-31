@@ -22,24 +22,22 @@ namespace Ocuda.Ops.Web.StartupHelper
 
         public void InitialSetup()
         {
-            using (var scope = _app.ApplicationServices.CreateScope())
+            using var scope = _app.ApplicationServices.CreateScope();
+            // migration
+            _logger = scope.ServiceProvider.GetRequiredService<ILogger<DataContext>>();
+            using (var context = scope.ServiceProvider.GetRequiredService<OpsContext>())
             {
-                // migration
-                _logger = scope.ServiceProvider.GetRequiredService<ILogger<DataContext>>();
-                using (var context = scope.ServiceProvider.GetRequiredService<OpsContext>())
-                {
-                    MigrateContext(context, "OpsContext");
-                }
-
-                using (var context = scope.ServiceProvider.GetRequiredService<PromenadeContext>())
-                {
-                    MigrateContext(context, "PromenadeContext");
-                }
-
-                // verify initial setup data is accurate
-                var initialSetup = scope.ServiceProvider.GetRequiredService<IInitialSetupService>();
-                Task.Run(() => initialSetup.VerifyInitialSetupAsync()).Wait();
+                MigrateContext(context, "OpsContext");
             }
+
+            using (var context = scope.ServiceProvider.GetRequiredService<PromenadeContext>())
+            {
+                MigrateContext(context, "PromenadeContext");
+            }
+
+            // verify initial setup data is accurate
+            var initialSetup = scope.ServiceProvider.GetRequiredService<IInitialSetupService>();
+            Task.Run(() => initialSetup.VerifyInitialSetupAsync()).Wait();
         }
 
         private void MigrateContext(IMigratableContext context, string contextName)

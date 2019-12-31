@@ -20,13 +20,9 @@ Both projects have the some common layout items:
 - `*.Data` - handles data storage and retrieval
 - `*.DataProviders.*` - Entity Framework data providers to connect to persistence back-ends
 
-### Ops
+Ops is the administration portion of the application which also can function as an intranet.
 
-This is the administration portion of the application which also can function as an intranet.
-
-### Promenade
-
-This is the public-facing portion of the application.
+Promenade is the public-facing portion of the application.
 
 ## Initial build and run
 
@@ -72,15 +68,15 @@ _Eventually this should be moved to the user documentation._
 - `Ocuda.FileShared` - defaults to "shared" - a file location shared among any instances of the site which are running for handling site assets
 - `Ocuda.UrlSharedContent` - defaults to "content" - a mapping to the public shared file directory (which is "public" under the configured `Ocuda.FileShared`)
 
-- `OpsAuthBlankRequestRedirect` - *used only by Ops.Web.WindowsAuth* - if the authentication site is loaded with no id or directive then redirect to this URL
+- `OpsAuthBlankRequestRedirect` - _used only by Ops.Web.WindowsAuth_ - if the authentication site is loaded with no id or directive then redirect to this URL
 - `Ops.AuthRedirect` - URL to the deployed Ops.Web.WindowsAuth site - if not specified authentication will not function
 - `Ops.AuthTimeoutMinutes` - defaults to 2 minutes - timeout for authentication bits (cookie and distributed cache elements)
 - `Ops.Culture` - defaults to "en-US", the culture to use for displaying things like dates and times - for valid options see the language tags listed in the [Microsoft National Language Support (NLS) API Reference](http://go.microsoft.com/fwlink/?LinkId=200048)
 - `Ops.DistributedCache` - when unset, defaults to memory-based distributed cache - a cache strategy to use: currently either unset or 'Redis' are valid
 - `Ops.DistributedCacheInstanceDiscriminator` - if set, appends the string to distributed cache keys in order to isolate them from other instances (e.g. if multiple developers are using the same distributed cache)
-- `Ops.DistributedCache.RedisConfiguration` - *also used by Ops.Web.WindowsAuth* - if *Ops.DistributedCache* is set to 'Redis' this must be set with Redis configuration information, see the [RedisCacheOptions.Configuration property](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.caching.redis.rediscacheoptions.configuration)
+- `Ops.DistributedCache.RedisConfiguration` - _also used by Ops.Web.WindowsAuth_ - if _Ops.DistributedCache_ is set to 'Redis' this must be set with Redis configuration information, see the [RedisCacheOptions.Configuration property](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.caching.redis.rediscacheoptions.configuration)
 - `Ops.DomainName` - an Active Directory domain name to remove from the beginning of authenticated users (do not include the slash)
-- `Ops.HttpErrorFileTag` - if *Ops.RollingLogLocation* is set, this will write out http error logs in the same location but with the value of this setting in the filename
+- `Ops.HttpErrorFileTag` - if _Ops.RollingLogLocation_ is set, this will write out http error logs in the same location but with the value of this setting in the filename
 - `Ops.Instance` - configure an instance name for more specific logging
 - `Ops.LDAPDN` - Distinguished name of an LDAP user for performing lookups, similar to "CN=Users Real Name,OU=Organizational Unit,DC=domain,DC=tld"
 - `Ops.LDAPPassword` - Password for the LDAPDN user

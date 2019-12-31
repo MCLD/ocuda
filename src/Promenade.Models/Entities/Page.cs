@@ -22,10 +22,12 @@ namespace Ocuda.Promenade.Models.Entities
 
         [Required]
         public int LanguageId { get; set; }
+
         public Language Language { get; set; }
 
         [Required]
         public int PageHeaderId { get; set; }
+
         public PageHeader PageHeader { get; set; }
     }
 }

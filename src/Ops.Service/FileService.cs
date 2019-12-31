@@ -170,14 +170,10 @@ namespace Ocuda.Ops.Service
         {
             string filePath = GetPrivateFilePath(file);
 
-            using (var fileStream = System.IO.File.OpenRead(filePath))
-            {
-                using (var ms = new System.IO.MemoryStream())
-                {
-                    await fileStream.CopyToAsync(ms);
-                    return ms.ToArray();
-                }
-            }
+            using var fileStream = System.IO.File.OpenRead(filePath);
+            using var ms = new System.IO.MemoryStream();
+            await fileStream.CopyToAsync(ms);
+            return ms.ToArray();
         }
 
         public async Task<File> CreatePublicFileAsync(File file, IFormFile fileData)

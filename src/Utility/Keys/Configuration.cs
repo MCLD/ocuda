@@ -11,6 +11,8 @@
         public static readonly string OcudaUrlSharedContent = "Ocuda.UrlSharedContent";
         public static readonly string OcudaFileShared = "Ocuda.FileShared";
 
+        public static readonly string OcudaSeqEndpoint = "Ocuda.SeqEndpoint";
+
         public static readonly string ThrowQueryWarningsInDev = "ThrowQueryWarningsInDev";
 
         public static readonly string OpsAuthBlankRequestRedirect = "Ops.AuthBlankRequestRedirect";

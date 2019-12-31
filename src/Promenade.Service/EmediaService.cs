@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
@@ -34,13 +33,13 @@ namespace Ocuda.Promenade.Service
 
         public async Task<List<Emedia>> GetAllEmediaAsync()
         {
-            var emedia =  await _emediaRepository.GetAllEmedia();
+            var emedia = await _emediaRepository.GetAllEmedia();
 
-            foreach(var media in emedia)
+            foreach (var media in emedia)
             {
                 var categoryList = new List<Category>();
                 var categoryIds = await _emediaCategoryRepository.GetEmediaCategoriesByEmediaId(media.Id);
-                foreach (var id in categoryIds.Select(_=>_.CategoryId))
+                foreach (var id in categoryIds.Select(_ => _.CategoryId))
                 {
                     var category = await _categoryRepository.FindAsync(id);
                     categoryList.Add(category);

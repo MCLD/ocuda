@@ -23,6 +23,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
         protected readonly SiteSettingService _siteSettingService;
 
         protected string PageTitle { get; set; }
+
         protected BaseController(ServiceFacades.Controller<T> context)
         {
             _logger = context.Logger;
@@ -34,7 +35,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             await base.OnActionExecutionAsync(context, next);
-            
+
             string pageTitle;
             var titleSuffix = await _siteSettingService.GetSettingStringAsync(
                 SiteSetting.Site.PageTitleSuffix);

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Logging;
@@ -81,7 +79,7 @@ namespace Ocuda.Promenade.Service
                     }
                     if (doUpdate)
                     {
-                       _languageRepository.Update(dbCulture);
+                        _languageRepository.Update(dbCulture);
                     }
                 }
             }

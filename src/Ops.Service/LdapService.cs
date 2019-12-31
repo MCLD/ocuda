@@ -71,75 +71,73 @@ namespace Ocuda.Ops.Service
                 {
                     int.TryParse(_config[Configuration.OpsLdapPort], out port);
                 }
-                using (var cn = new LdapConnection())
+                using var cn = new LdapConnection();
+                try
                 {
-                    try
+                    var constraints = new LdapSearchConstraints
                     {
-                        var constraints = new LdapSearchConstraints
-                        {
-                            MaxResults = 1
-                        };
-                        cn.Connect(ldapServer, port);
-                        cn.Bind(ldapDn, ldapPassword);
+                        MaxResults = 1
+                    };
+                    cn.Connect(ldapServer, port);
+                    cn.Bind(ldapDn, ldapPassword);
 
-                        LdapSearchQueue queue = cn.Search(ldapSearchBase,
-                            LdapConnection.SCOPE_SUB,
-                            filter,
-                            AttributesToReturn,
-                            false,
-                            null,
-                            constraints);
+                    LdapSearchQueue queue = cn.Search(ldapSearchBase,
+                        LdapConnection.SCOPE_SUB,
+                        filter,
+                        AttributesToReturn,
+                        false,
+                        null,
+                        constraints);
 
-                        LdapMessage message = queue.getResponse();
-                        var now = DateTime.Now;
-                        while (message.Type == LDAPSearchResponse)
+                    LdapMessage message = queue.getResponse();
+                    var now = DateTime.Now;
+                    while (message.Type == LDAPSearchResponse)
+                    {
+                        var entry = ((LdapSearchResult)message).Entry;
+                        var attributes = entry.getAttributeSet().GetEnumerator();
+                        while (attributes.MoveNext())
                         {
-                            var entry = ((LdapSearchResult)message).Entry;
-                            var attributes = entry.getAttributeSet().GetEnumerator();
-                            while (attributes.MoveNext())
+                            var attribute = (LdapAttribute)attributes.Current;
+                            switch (attribute.Name)
                             {
-                                var attribute = (LdapAttribute)attributes.Current;
-                                switch (attribute.Name)
-                                {
-                                    case ADsAMAccountName:
-                                        if (string.IsNullOrEmpty(user.Username))
-                                        {
-                                            user.Username = attribute.StringValue;
-                                        }
-                                        break;
-                                    case ADDisplayName:
-                                        user.Name = attribute.StringValue;
-                                        break;
-                                    case ADTelephoneNumber:
-                                        user.Phone = attribute.StringValue;
-                                        break;
-                                    case ADTitle:
-                                        if (string.IsNullOrEmpty(user.Title))
-                                        {
-                                            user.Title = attribute.StringValue;
-                                        }
-                                        break;
-                                    case ADMail:
-                                        user.Email = attribute.StringValue;
-                                        break;
-                                    case ADGivenName:
-                                        if (string.IsNullOrWhiteSpace(user.Nickname))
-                                        {
-                                            user.Nickname = attribute.StringValue;
-                                        }
-                                        break;
-                                }
+                                case ADsAMAccountName:
+                                    if (string.IsNullOrEmpty(user.Username))
+                                    {
+                                        user.Username = attribute.StringValue;
+                                    }
+                                    break;
+                                case ADDisplayName:
+                                    user.Name = attribute.StringValue;
+                                    break;
+                                case ADTelephoneNumber:
+                                    user.Phone = attribute.StringValue;
+                                    break;
+                                case ADTitle:
+                                    if (string.IsNullOrEmpty(user.Title))
+                                    {
+                                        user.Title = attribute.StringValue;
+                                    }
+                                    break;
+                                case ADMail:
+                                    user.Email = attribute.StringValue;
+                                    break;
+                                case ADGivenName:
+                                    if (string.IsNullOrWhiteSpace(user.Nickname))
+                                    {
+                                        user.Nickname = attribute.StringValue;
+                                    }
+                                    break;
                             }
-                            user.LastLdapUpdate = now;
-                            message = queue.getResponse();
                         }
-                        user.LastLdapCheck = now;
-                        cn.Disconnect();
+                        user.LastLdapUpdate = now;
+                        message = queue.getResponse();
                     }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Problem connecting to LDAP: {Message}", ex);
-                    }
+                    user.LastLdapCheck = now;
+                    cn.Disconnect();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Problem connecting to LDAP: {Message}", ex);
                 }
             }
             return user;

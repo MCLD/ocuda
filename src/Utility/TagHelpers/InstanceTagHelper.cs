@@ -7,6 +7,7 @@ namespace Ocuda.Utility.TagHelpers
     public class InstanceTagHelper : TagHelper
     {
         private readonly IConfiguration _config;
+
         public InstanceTagHelper(IConfiguration config)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));

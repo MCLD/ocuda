@@ -168,6 +168,7 @@ namespace Ocuda.Promenade.Service
             }
             return locations;
         }
+
         public async Task<Group> GetLocationsNeighborGroup(int groupId)
         {
             return await _groupRepository.FindAsync(groupId);

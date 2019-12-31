@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using BranchLocator.Models;
+﻿using BranchLocator.Models;
 using BranchLocator.Models.PlaceDetails;
 using Newtonsoft.Json;
 

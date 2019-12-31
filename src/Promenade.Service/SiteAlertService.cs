@@ -18,7 +18,7 @@ namespace Ocuda.Promenade.Service
             ISiteAlertRepository siteAlertRepository)
             : base(logger, dateTimeProvider)
         {
-            _siteAlertRepository = siteAlertRepository 
+            _siteAlertRepository = siteAlertRepository
                 ?? throw new ArgumentNullException(nameof(siteAlertRepository));
         }
 

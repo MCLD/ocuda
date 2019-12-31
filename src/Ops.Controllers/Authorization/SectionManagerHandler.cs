@@ -17,7 +17,9 @@ namespace Ocuda.Ops.Controllers.Authorization
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
             SectionManagerRequirement requirement)
         {
             var claims = context.User.Claims;

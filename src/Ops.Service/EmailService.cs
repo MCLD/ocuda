@@ -84,41 +84,39 @@ namespace Ocuda.Ops.Service
             }
             message.Body = builder.ToMessageBody();
 
-            using (var client = new SmtpClient())
+            using var client = new SmtpClient();
+            // accept any STARTTLS certificate
+            client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+
+            var outgoingHost = await _siteSettingService.GetSettingStringAsync(
+                Ops.Models.Keys.SiteSetting.Email.OutgoingHost);
+            var outgoingPort = await _siteSettingService.GetSettingIntAsync(
+                Ops.Models.Keys.SiteSetting.Email.OutgoingPort);
+
+            await client.ConnectAsync(outgoingHost, outgoingPort, false);
+
+            client.AuthenticationMechanisms.Remove("XOAUTH2");
+
+            var outgoingLogin = await _siteSettingService.GetSettingStringAsync(
+                Ops.Models.Keys.SiteSetting.Email.OutgoingLogin);
+            var outgoingPassword = await _siteSettingService.GetSettingStringAsync(
+                Ops.Models.Keys.SiteSetting.Email.OutgoingPassword);
+            if (!string.IsNullOrEmpty(outgoingLogin)
+                && !string.IsNullOrEmpty(outgoingPassword))
             {
-                // accept any STARTTLS certificate
-                client.ServerCertificateValidationCallback = (s, c, h, e) => true;
-
-                var outgoingHost = await _siteSettingService.GetSettingStringAsync(
-                    Ops.Models.Keys.SiteSetting.Email.OutgoingHost);
-                var outgoingPort = await _siteSettingService.GetSettingIntAsync(
-                    Ops.Models.Keys.SiteSetting.Email.OutgoingPort);
-
-                await client.ConnectAsync(outgoingHost, outgoingPort, false);
-
-                client.AuthenticationMechanisms.Remove("XOAUTH2");
-
-                var outgoingLogin = await _siteSettingService.GetSettingStringAsync(
-                    Ops.Models.Keys.SiteSetting.Email.OutgoingLogin);
-                var outgoingPassword = await _siteSettingService.GetSettingStringAsync(
-                    Ops.Models.Keys.SiteSetting.Email.OutgoingPassword);
-                if (!string.IsNullOrEmpty(outgoingLogin)
-                    && !string.IsNullOrEmpty(outgoingPassword))
-                {
-                    client.Authenticate(outgoingLogin, outgoingPassword);
-                }
-
-                try
-                {
-                    await client.SendAsync(message);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"Unable to send email: {ex.Message}");
-                    throw new OcudaException("Unable to send email.", ex);
-                }
-                await client.DisconnectAsync(true);
+                client.Authenticate(outgoingLogin, outgoingPassword);
             }
+
+            try
+            {
+                await client.SendAsync(message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Unable to send email: {ex.Message}");
+                throw new OcudaException("Unable to send email.", ex);
+            }
+            await client.DisconnectAsync(true);
         }
     }
 }

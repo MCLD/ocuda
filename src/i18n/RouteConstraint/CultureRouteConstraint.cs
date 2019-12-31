@@ -10,6 +10,7 @@ namespace Ocuda.i18n.RouteConstraint
     public class CultureRouteConstraint : IRouteConstraint
     {
         private readonly IOptions<RequestLocalizationOptions> _l10nOptions;
+
         public CultureRouteConstraint(IOptions<RequestLocalizationOptions> l10nOptions)
         {
             _l10nOptions = l10nOptions ?? throw new ArgumentNullException(nameof(l10nOptions));

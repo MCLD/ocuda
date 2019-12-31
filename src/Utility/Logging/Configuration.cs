@@ -81,7 +81,7 @@ namespace Ocuda.Utility.Logging
                         restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information,
                         columnOptions: new Serilog.Sinks.MSSqlServer.ColumnOptions
                         {
-                            AdditionalColumns = new Serilog.Sinks.MSSqlServer.SqlColumn[]
+                            AdditionalColumns = new []
                             {
                                 new Serilog.Sinks.MSSqlServer.SqlColumn(ApplicationEnrichment,
                                     System.Data.SqlDbType.NVarChar) { DataLength = 255 },
@@ -95,6 +95,15 @@ namespace Ocuda.Utility.Logging
                                     System.Data.SqlDbType.NVarChar) { DataLength = 255 }
                             }
                         }));
+            }
+
+            string seqEndpoint = config[Keys.Configuration.OcudaSeqEndpoint];
+            if(!string.IsNullOrEmpty(seqEndpoint))
+            {
+                loggerConfig
+                    .WriteTo.Logger(_ => _
+                        .Filter.ByExcluding(Matching.FromSource(errorControllerName))
+                        .WriteTo.Seq(seqEndpoint));
             }
 
             return loggerConfig;

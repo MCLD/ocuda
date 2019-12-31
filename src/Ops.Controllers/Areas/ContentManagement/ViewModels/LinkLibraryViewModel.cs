@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Utility.Models;
 
@@ -11,10 +9,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels
     public class LinkLibraryViewModel
     {
         public PaginateModel PaginateModel { get; set; }
-        
+
         [Required]
         public string SectionStub { get; set; }
-        
+
         [Required]
         public string SectionName { get; set; }
 

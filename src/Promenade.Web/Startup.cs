@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -13,7 +12,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Ocuda.i18n;
 using Ocuda.i18n.RouteConstraint;
 using Ocuda.Promenade.Data;
@@ -63,17 +61,17 @@ namespace Ocuda.Promenade.Web
                 ?? throw new OcudaException("ConnectionString:Promenade not configured.");
 
             var provider = _config[Configuration.PromenadeDatabaseProvider];
-            switch (provider)
+            if (provider == "SqlServer")
             {
-                case "SqlServer":
-                    logger.Information("Using {0} data provider", provider);
-                    services.AddDbContextPool<PromenadeContext, DataProvider.SqlServer.Promenade.Context>(_ =>
-                        _.UseSqlServer(promCs));
-                    break;
-                default:
-                    logger.Fatal("No {0} configured in settings. Exiting.",
-                        Configuration.PromenadeDatabaseProvider);
-                    throw new OcudaException($"No {Configuration.PromenadeDatabaseProvider} configured.");
+                logger.Information("Using {0} data provider", provider);
+                services.AddDbContextPool<PromenadeContext, DataProvider.SqlServer.Promenade.Context>(_ =>
+                    _.UseSqlServer(promCs));
+            }
+            else
+            {
+                logger.Fatal("No {0} configured in settings. Exiting.",
+                    Configuration.PromenadeDatabaseProvider);
+                throw new OcudaException($"No {Configuration.PromenadeDatabaseProvider} configured.");
             }
 
             services.Configure<RouteOptions>(_ =>
