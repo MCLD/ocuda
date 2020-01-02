@@ -7,17 +7,16 @@
     <Company>Maricopa County Library District</Company>
     <Copyright>2018 Maricopa County Library District</Copyright>
     <LangVersion>Latest</LangVersion>
-    <PackageId>MCLD.Controllers</PackageId>
     <Product>Maricopa County Library District</Product>
     <RepositoryType>Git</RepositoryType>
     <RootNamespace>Ocuda.Promenade.Controllers</RootNamespace>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <Version>0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CommonMark.NET" Version="0.15.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
   <ItemGroup>

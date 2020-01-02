@@ -11,6 +11,8 @@
         public static readonly string OcudaUrlSharedContent = "Ocuda.UrlSharedContent";
         public static readonly string OcudaFileShared = "Ocuda.FileShared";
 
+        public static readonly string OcudaSeqEndpoint = "Ocuda.SeqEndpoint";
+
         public static readonly string ThrowQueryWarningsInDev = "ThrowQueryWarningsInDev";
 
         public static readonly string OpsAuthBlankRequestRedirect = "Ops.AuthBlankRequestRedirect";
@@ -37,6 +39,8 @@
         public static readonly string OpsSiteManagerGroup = "Ops.SiteManagerGroup";
         public static readonly string OpsSiteSettingCacheMinutes = "Ops.SiteSettingCacheMinutes";
         public static readonly string OpsSessionTimeoutMinutes = "Ops.SessionTimeoutMinutes";
+
+        public static readonly string PromenadeDatabaseProvider = "Promenade.DatabaseProvider";
 
         public static readonly string PromAPIGoogleMaps = "Promenade.API.GoogleMaps";
         public static readonly string OpsAPIGoogleMaps = "Ops.API.GoogleMaps";

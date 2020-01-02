@@ -7,7 +7,6 @@ using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Abstract;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
 using Ocuda.Utility.Abstract;
-using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Promenade.Service
 {
@@ -52,7 +51,6 @@ namespace Ocuda.Promenade.Service
                     .GetLanguageIdAsync(currentCultureName);
                 page = await _pageRepository.GetPublishedByStubAndTypeAsync(formattedStub,
                     type, currentLangaugeId);
-
             }
 
             if (page == null)

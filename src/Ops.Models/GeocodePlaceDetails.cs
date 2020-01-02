@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace BranchLocator.Models.PlaceDetails
 {
@@ -92,7 +89,7 @@ namespace BranchLocator.Models.PlaceDetails
         public string Website { get; set; }
     }
 
-    public partial class AddressComponent
+    public class AddressComponent
     {
         [JsonProperty("long_name")]
         public string LongName { get; set; }
@@ -104,7 +101,7 @@ namespace BranchLocator.Models.PlaceDetails
         public string[] Types { get; set; }
     }
 
-    public partial class ViewPort
+    public class ViewPort
     {
         [JsonProperty("northeast")]
         public NorthEast NorthEast { get; set; }
@@ -113,7 +110,7 @@ namespace BranchLocator.Models.PlaceDetails
         public SouthWest SouthWest { get; set; }
     }
 
-    public partial class NorthEast
+    public class NorthEast
     {
         [JsonProperty("lat")]
         public double Lat { get; set; }
@@ -122,7 +119,7 @@ namespace BranchLocator.Models.PlaceDetails
         public double Lng { get; set; }
     }
 
-    public partial class SouthWest
+    public class SouthWest
     {
         [JsonProperty("lat")]
         public double Lat { get; set; }

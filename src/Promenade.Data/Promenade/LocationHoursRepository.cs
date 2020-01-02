@@ -9,7 +9,7 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 
 namespace Ocuda.Promenade.Data.Promenade
 {
-    public class LocationHoursRepository 
+    public class LocationHoursRepository
         : GenericRepository<PromenadeContext, LocationHours, int>, ILocationHoursRepository
     {
         public LocationHoursRepository(

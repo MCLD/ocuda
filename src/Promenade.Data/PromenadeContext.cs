@@ -7,6 +7,16 @@ namespace Ocuda.Promenade.Data
     {
         protected PromenadeContext(DbContextOptions options) : base(options) { }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // configure composite keys
+            // https://docs.microsoft.com/en-us/ef/core/modeling/keys
+            modelBuilder.Entity<NavigationText>()
+                .HasKey(_ => new { _.Id, _.LanguageId });
+            modelBuilder.Entity<EmediaCategory>()
+                .HasKey(_ => new { _.CategoryId, _.EmediaId });
+        }
+
         // Read-Only
         public DbSet<Category> Categories { get; }
         public DbSet<Emedia> Emedia { get; set; }
@@ -22,13 +32,13 @@ namespace Ocuda.Promenade.Data
         public DbSet<Navigation> Navigations { get; }
         public DbSet<NavigationText> NavigationTexts { get; }
         public DbSet<Page> Pages { get; }
+        public DbSet<PageHeader> PageHeaders { get; }
         public DbSet<SiteSetting> SiteSettings { get; }
         public DbSet<SocialCard> SocialCards { get; }
         public DbSet<UrlRedirect> UrlRedirects { get; }
 
         // Read/Write 
         public DbSet<Language> Languages { get; set; }
-        public DbSet<PageHeader> PageHeaders { get; set; }
         public DbSet<UrlRedirectAccess> UrlRedirectAccesses { get; set; }
     }
 }

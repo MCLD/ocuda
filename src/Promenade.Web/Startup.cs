@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,11 +8,10 @@ using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
 using Ocuda.i18n;
 using Ocuda.i18n.RouteConstraint;
 using Ocuda.Promenade.Data;
@@ -30,20 +28,19 @@ namespace Ocuda.Promenade.Web
     {
         private readonly IConfiguration _config;
         private readonly bool _isDevelopment;
-        private readonly ILogger _logger;
 
         public Startup(IConfiguration configuration,
-            IHostingEnvironment env,
-            ILogger<Startup> logger)
+            IWebHostEnvironment env)
         {
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
             _isDevelopment = env.IsDevelopment();
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // build a temporary logger for this method call
+            using var logger = Utility.Logging.Configuration.Build(_config).CreateLogger();
+
             services.AddLocalization();
 
             services.Configure<RequestLocalizationOptions>(_ =>
@@ -60,54 +57,27 @@ namespace Ocuda.Promenade.Web
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            // configure ef errors to throw, log, or ignore as appropriate for the environment
-            // see https://docs.microsoft.com/en-us/ef/core/querying/related-data#ignored-includes
-            var throwEvents = new List<EventId>();
-            var logEvents = new List<EventId>();
-            var ignoreEvents = new List<EventId>();
+            string promCs = _config.GetConnectionString("Promenade")
+                ?? throw new OcudaException("ConnectionString:Promenade not configured.");
 
-            if (_isDevelopment)
+            var provider = _config[Configuration.PromenadeDatabaseProvider];
+            if (provider == "SqlServer")
             {
-                if (string.IsNullOrEmpty(_config[Configuration.ThrowQueryWarningsInDev]))
-                {
-                    logEvents.Add(RelationalEventId.QueryClientEvaluationWarning);
-                    logEvents.Add(CoreEventId.FirstWithoutOrderByAndFilterWarning);
-                }
-                else
-                {
-                    throwEvents.Add(RelationalEventId.QueryClientEvaluationWarning);
-                    throwEvents.Add(CoreEventId.FirstWithoutOrderByAndFilterWarning);
-                }
-
-                throwEvents.Add(CoreEventId.IncludeIgnoredWarning);
+                logger.Information("Using {0} data provider", provider);
+                services.AddDbContextPool<PromenadeContext, DataProvider.SqlServer.Promenade.Context>(_ =>
+                    _.UseSqlServer(promCs));
             }
             else
             {
-                logEvents.Add(RelationalEventId.QueryClientEvaluationWarning);
-                logEvents.Add(CoreEventId.IncludeIgnoredWarning);
-            }
-
-            string promCs = _config.GetConnectionString("Promenade")
-                ?? throw new OcudaException("ConnectionString:Promenade not configured.");
-            switch (_config["Promenade.DatabaseProvider"])
-            {
-                case "SqlServer":
-                    services.AddDbContextPool<PromenadeContext, DataProvider.SqlServer.Promenade.Context>(_ =>
-                        _.UseSqlServer(promCs)
-                        .ConfigureWarnings(w => w
-                            .Throw(throwEvents.ToArray())
-                            .Log(logEvents.ToArray())
-                            .Ignore(ignoreEvents.ToArray())));
-                    break;
-                default:
-                    throw new OcudaException("No Ops.DatabaseProvider configured.");
+                logger.Fatal("No {0} configured in settings. Exiting.",
+                    Configuration.PromenadeDatabaseProvider);
+                throw new OcudaException($"No {Configuration.PromenadeDatabaseProvider} configured.");
             }
 
             services.Configure<RouteOptions>(_ =>
                 _.ConstraintMap.Add("cultureConstraint", typeof(CultureRouteConstraint)));
 
-            services.AddMvc()
-                .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_2)
+            services.AddControllersWithViews()
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization(_ =>
                 {
@@ -249,7 +219,9 @@ namespace Ocuda.Promenade.Web
                 RequestPath = new PathString(contentUrl)
             });
 
-            app.UseMvc();
+            app.UseRouting();
+
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
     }
 }

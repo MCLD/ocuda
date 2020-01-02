@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Ocuda.Utility.TagHelpers.Extensions;
@@ -31,7 +27,6 @@ namespace Ocuda.Utility.TagHelpers
 
         private const string activeClass = "active";
         private const string showClass = "show";
-
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {

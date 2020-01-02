@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Ocuda.Ops.Service.Models;
 
 using Ocuda.Utility.Models;
 

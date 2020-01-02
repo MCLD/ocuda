@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Home;
+using Microsoft.Extensions.Logging;
 
 namespace Ocuda.Ops.Controllers
 {
@@ -16,6 +17,7 @@ namespace Ocuda.Ops.Controllers
         [HttpGet("")]
         public IActionResult Index()
         {
+            _logger.LogInformation("Hello, world.");
             return View();
         }
 

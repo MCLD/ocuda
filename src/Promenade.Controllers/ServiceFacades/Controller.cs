@@ -29,6 +29,7 @@ namespace Ocuda.Promenade.Controllers.ServiceFacades
                 return _config;
             }
         }
+
         public IStringLocalizer<Shared> SharedLocalizer
         {
             get

@@ -72,94 +72,92 @@ namespace Ocuda.Ops.Service
                 int emailColId = 0;
                 int asOfColId = 0;
                 int rows = 0;
-                using (var excelReader = ExcelReaderFactory.CreateReader(stream))
+                using var excelReader = ExcelReaderFactory.CreateReader(stream);
+                while (excelReader.Read())
                 {
-                    while (excelReader.Read())
+                    rows++;
+                    if (rows == 1)
                     {
-                        rows++;
-                        if (rows == 1)
+                        for (int i = 0; i < excelReader.FieldCount; i++)
                         {
-                            for (int i = 0; i < excelReader.FieldCount; i++)
+                            switch (excelReader.GetString(i).Trim() ?? $"Column{i}")
                             {
-                                switch (excelReader.GetString(i).Trim() ?? $"Column{i}")
-                                {
-                                    case NameHeading:
-                                        nameColId = i;
-                                        break;
-                                    case EmployeeIdHeading:
-                                        employeeIdColId = i;
-                                        break;
-                                    case PositionHeading:
-                                        positionColId = i;
-                                        break;
-                                    case TitleHeading:
-                                        titleColId = i;
-                                        break;
-                                    case HireDateHeading:
-                                        hireDateColId = i;
-                                        break;
-                                    case RehireDateHeading:
-                                        rehireDateColId = i;
-                                        break;
-                                    case ReportsToIdHeading:
-                                        reportToIdColId = i;
-                                        break;
-                                    case ReportsToPosHeading:
-                                        reportToPosColId = i;
-                                        break;
-                                    case EmailHeading:
-                                        emailColId = i;
-                                        break;
-                                    case AsOfHeading:
-                                        asOfColId = i;
-                                        break;
-                                }
+                                case NameHeading:
+                                    nameColId = i;
+                                    break;
+                                case EmployeeIdHeading:
+                                    employeeIdColId = i;
+                                    break;
+                                case PositionHeading:
+                                    positionColId = i;
+                                    break;
+                                case TitleHeading:
+                                    titleColId = i;
+                                    break;
+                                case HireDateHeading:
+                                    hireDateColId = i;
+                                    break;
+                                case RehireDateHeading:
+                                    rehireDateColId = i;
+                                    break;
+                                case ReportsToIdHeading:
+                                    reportToIdColId = i;
+                                    break;
+                                case ReportsToPosHeading:
+                                    reportToPosColId = i;
+                                    break;
+                                case EmailHeading:
+                                    emailColId = i;
+                                    break;
+                                case AsOfHeading:
+                                    asOfColId = i;
+                                    break;
                             }
                         }
-                        else
+                    }
+                    else
+                    {
+                        var name = excelReader.GetString(nameColId)?.Trim();
+
+                        if (!string.IsNullOrWhiteSpace(name))
                         {
-                            var name = excelReader.GetString(nameColId)?.Trim();
-
-                            if (!string.IsNullOrWhiteSpace(name))
+                            var entry = new RosterDetail
                             {
-                                var entry = new RosterDetail()
-                                {
-                                    RosterHeader = rosterHeader,
-                                    Name = name,
-                                    PositionNum = int.Parse(excelReader.GetString(positionColId)),
-                                    JobTitle = excelReader.GetString(titleColId)?.Trim(),
-                                    ReportsToId = int.Parse(excelReader.GetString(reportToIdColId)),
-                                    ReportsToPos = int.Parse(excelReader.GetString(reportToPosColId)),
-                                    AsOf = DateTime.Parse(excelReader.GetString(asOfColId)),
-                                    IsVacant = string.Equals(name, "Vacant",
-                                        StringComparison.OrdinalIgnoreCase),
-                                    CreatedAt = now,
-                                    CreatedBy = currentUserId
-                                };
+                                RosterHeader = rosterHeader,
+                                Name = name,
+                                PositionNum = int.Parse(excelReader.GetString(positionColId)),
+                                JobTitle = excelReader.GetString(titleColId)?.Trim(),
+                                ReportsToId = int.Parse(excelReader.GetString(reportToIdColId)),
+                                ReportsToPos = int.Parse(excelReader.GetString(reportToPosColId)),
+                                AsOf = DateTime.Parse(excelReader.GetString(asOfColId)),
+                                IsVacant = string.Equals(name, "Vacant",
+                                    StringComparison.OrdinalIgnoreCase),
+                                CreatedAt = now,
+                                CreatedBy = currentUserId
+                            };
 
-                                if (!entry.IsVacant)
-                                {
-                                    entry.EmployeeId = int.Parse(excelReader.GetString(employeeIdColId));
-                                    entry.EmailAddress = excelReader.GetString(emailColId)?.Trim();
+                            if (!entry.IsVacant)
+                            {
+                                entry.EmployeeId = int.Parse(excelReader.GetString(employeeIdColId));
+                                entry.EmailAddress = excelReader.GetString(emailColId)?.Trim();
 
-                                    var hireDate = excelReader.GetString(hireDateColId);
-                                    if (DateTime.TryParse(hireDate, out DateTime hireDateTime))
-                                    {
-                                        entry.HireDate = hireDateTime;
-                                    }
-                                    var rehireDate = excelReader.GetString(rehireDateColId);
-                                    if (DateTime.TryParse(rehireDate, out DateTime rehireDateTime))
-                                    {
-                                        entry.RehireDate = rehireDateTime;
-                                    }
+                                var hireDate = excelReader.GetString(hireDateColId);
+                                if (DateTime.TryParse(hireDate, out DateTime hireDateTime))
+                                {
+                                    entry.HireDate = hireDateTime;
                                 }
-
-                                // Check if position has already been added to the list
-                                if (!rosterDetails.Select(_ => _.PositionNum)
-                                    .Contains(entry.PositionNum))
+                                var rehireDate = excelReader.GetString(rehireDateColId);
+                                if (DateTime.TryParse(rehireDate, out DateTime rehireDateTime))
                                 {
-                                    rosterDetails.Add(entry);
+                                    entry.RehireDate = rehireDateTime;
                                 }
+                            }
+
+                            // Check if position has already been added to the list
+                            if (!rosterDetails.Select(_ => _.PositionNum)
+                                .Contains(entry.PositionNum))
+                            {
+                                rosterDetails.Add(entry);
                             }
                         }
                     }

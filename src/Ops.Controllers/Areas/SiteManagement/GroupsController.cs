@@ -2,8 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Group;
@@ -94,7 +92,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpGet("[action]")]
         [RestoreModelState]
-        public async Task<IActionResult> CreateGroup()
+        public IActionResult CreateGroup()
         {
             var group = new Group
             {
@@ -105,7 +103,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 Group = group,
                 Action = nameof(GroupsController.CreateGroup)
-        });
+            });
         }
 
         [HttpPost]

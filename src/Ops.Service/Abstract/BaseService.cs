@@ -2,17 +2,18 @@
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Service.Abstract
 {
-    public abstract class BaseService<Service>
+    public abstract class BaseService<TService>
     {
-        protected readonly ILogger<Service> _logger;
+        protected readonly ILogger<TService> _logger;
 
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        protected BaseService(ILogger<Service> logger,
+        protected BaseService(ILogger<TService> logger,
             IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -31,7 +32,7 @@ namespace Ocuda.Ops.Service.Abstract
             }
             else
             {
-                throw new Exception($"Could not convert '{ClaimType.UserId}' to a number.");
+                throw new OcudaException($"Could not convert '{ClaimType.UserId}' to a number.");
             }
         }
     }

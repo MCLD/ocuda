@@ -23,6 +23,8 @@ namespace Ocuda.Ops.Data
             // https://docs.microsoft.com/en-us/ef/core/modeling/keys
             modelBuilder.Entity<NavigationText>()
                 .HasKey(_ => new { _.Id, _.LanguageId });
+            modelBuilder.Entity<EmediaCategory>()
+                .HasKey(_ => new { _.CategoryId, _.EmediaId });
         }
 
         #region IMigratableContext
@@ -38,18 +40,18 @@ namespace Ocuda.Ops.Data
         public DbSet<Feature> Features { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<Language> Languages { get; set; }
-        public DbSet<LocationHours> LocationHours { get; set; }
-        public DbSet<LocationHoursOverride> LocationHoursOverrides { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<LocationFeature> LocationFeatures { get; set; }
         public DbSet<LocationGroup> LocationGroups { get; set; }
+        public DbSet<LocationHours> LocationHours { get; set; }
+        public DbSet<LocationHoursOverride> LocationHoursOverrides { get; set; }
         public DbSet<Navigation> Navigations { get; set; }
         public DbSet<NavigationText> NavigationTexts { get; set; }
-        public DbSet<PageHeader> PageHeaders { get; }
         public DbSet<Page> Pages { get; set; }
+        public DbSet<PageHeader> PageHeaders { get; set; }
         public DbSet<SiteSetting> SiteSettings { get; set; }
         public DbSet<SocialCard> SocialCards { get; set; }
-        public DbSet<UrlRedirectAccess> UrlRedirectAccesses { get; set; }
         public DbSet<UrlRedirect> UrlRedirects { get; set; }
+        public DbSet<UrlRedirectAccess> UrlRedirectAccesses { get; set; }
     }
 }

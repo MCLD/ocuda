@@ -8,7 +8,7 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 
 namespace Ocuda.Promenade.Data.Promenade
 {
-    public class LanguageRepository 
+    public class LanguageRepository
         : GenericRepository<PromenadeContext, Language, int>, ILanguageRepository
     {
         public LanguageRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,

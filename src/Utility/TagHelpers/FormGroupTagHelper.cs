@@ -42,6 +42,7 @@ namespace Ocuda.Utility.TagHelpers
         private const string dateTimeToggle = "datetimepicker";
 
         private readonly IHtmlGenerator _htmlGenerator;
+
         public FormGroupTagHelper(IHtmlGenerator htmlGenerator)
         {
             _htmlGenerator = htmlGenerator
@@ -80,7 +81,7 @@ namespace Ocuda.Utility.TagHelpers
 
             // Wrap input and validation with column div
             IHtmlContent innerDiv = WrapElementsWithDiv(
-                    new List<IHtmlContent>()
+                    new List<IHtmlContent>
                     {
                         inputElement,
                         validationMessageElement
@@ -90,7 +91,7 @@ namespace Ocuda.Utility.TagHelpers
 
             // Wrap all elements with a form group div
             IHtmlContent formGroupDiv = WrapElementsWithDiv(
-                    new List<IHtmlContent>()
+                    new List<IHtmlContent>
                     {
                         labelElement,
                         innerDiv

@@ -1,8 +1,8 @@
 ﻿namespace Ocuda.Ops.Service.Models
 {
-    public class DataWithCount<DataType>
+    public class DataWithCount<TDataType>
     {
-        public DataType Data { get; set; }
+        public TDataType Data { get; set; }
         public int Count { get; set; }
     }
 }

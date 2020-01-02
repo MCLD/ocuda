@@ -11,12 +11,17 @@ namespace Ocuda.Promenade.Models.Entities
         public bool TargetNewWindow { get; set; }
         public IEnumerable<Navigation> Navigations { get; set; }
         public int Order { get; set; }
+
         [MaxLength(255)]
         public string Icon { get; set; }
+
         [MaxLength(255)]
+
         public string Link { get; set; }
+
         [MaxLength(255)]
         public string Name { get; set; }
+
         public int? NavigationTextId { get; set; }
 
         [NotMapped]

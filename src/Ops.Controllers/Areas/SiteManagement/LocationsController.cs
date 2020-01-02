@@ -406,7 +406,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var group = await _groupService.GetGroupByIdAsync(groupId);
             try
             {
-                var locationGroup = new LocationGroup()
+                var locationGroup = new LocationGroup
                 {
                     GroupId = groupId,
                     LocationId = locationId
@@ -436,7 +436,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var feature = await _featureService.GetFeatureByIdAsync(featureId);
             try
             {
-                var locationFeature = new LocationFeature()
+                var locationFeature = new LocationFeature
                 {
                     FeatureId = featureId,
                     LocationId = locationId
@@ -608,49 +608,47 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             try
             {
-                using (var client = new HttpClient())
+                using var client = new HttpClient();
+                GeocodePlace geoPlace = null;
+                string stringResult = null;
+                try
                 {
-                    GeocodePlace geoPlace = null;
-                    string stringResult = null;
-                    try
+                    var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/place/textsearch/json?query=establishment+in+{addrstr}&key={apikey}");
+                    response.EnsureSuccessStatusCode();
+
+                    stringResult = await response.Content.ReadAsStringAsync();
+
+                    geoPlace = JsonConvert.DeserializeObject<GeocodePlace>(stringResult);
+                    var results = new List<PlaceDetailsResult>();
+                    foreach (var result in geoPlace.Results.Where(_ => !_.PlaceId.Equals("") || _.PlaceId != null))
                     {
-                        var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/place/textsearch/json?query=establishment+in+{addrstr}&key={apikey}");
-                        response.EnsureSuccessStatusCode();
+                        string stringDetailResult = null;
 
-                        stringResult = await response.Content.ReadAsStringAsync();
+                        var detailResponse = await client.GetAsync($"https://maps.googleapis.com/maps/api/place/details/json?placeid={result.PlaceId}&key={apikey}");
+                        detailResponse.EnsureSuccessStatusCode();
 
-                        geoPlace = JsonConvert.DeserializeObject<GeocodePlace>(stringResult);
-                        var results = new List<PlaceDetailsResult>();
-                        foreach (var result in geoPlace.Results.Where(_ => !_.PlaceId.Equals("") || _.PlaceId != null))
+                        stringDetailResult = await detailResponse.Content.ReadAsStringAsync();
+                        var geoDetailPlace = JsonConvert.DeserializeObject<GeocodePlaceDetails>(stringDetailResult);
+                        if (geoDetailPlace != null)
                         {
-                            string stringDetailResult = null;
-
-                            var detailResponse = await client.GetAsync($"https://maps.googleapis.com/maps/api/place/details/json?placeid={result.PlaceId}&key={apikey}");
-                            detailResponse.EnsureSuccessStatusCode();
-
-                            stringDetailResult = await detailResponse.Content.ReadAsStringAsync();
-                            var geoDetailPlace = JsonConvert.DeserializeObject<GeocodePlaceDetails>(stringDetailResult);
-                            if (geoDetailPlace != null)
-                            {
-                                results.Add(geoDetailPlace.Results);
-                            }
+                            results.Add(geoDetailPlace.Results);
                         }
-                        string data = JsonConvert.SerializeObject(results);
-                        success = true;
-                        return Json(new
-                        {
-                            success,
-                            data
-                        });
                     }
-                    catch (Exception ex)
+                    string data = JsonConvert.SerializeObject(results);
+                    success = true;
+                    return Json(new
                     {
-                        _logger.LogError(ex,$"Error parsing Geocode API JSON: {ex.Message} - {stringResult}",ex.Message);
-                        return Json(new
-                        {
-                            success
-                        });
-                    }
+                        success,
+                        data
+                    });
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Error parsing Geocode API JSON: {ex.Message} - {stringResult}", ex.Message);
+                    return Json(new
+                    {
+                        success
+                    });
                 }
             }
             catch (Exception ex)
@@ -667,47 +665,47 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             try
             {
-                using (var client = new HttpClient())
+                using var client = new HttpClient();
+                var apikey = _config[Configuration.OpsAPIGoogleMaps];
+
+                GeocodeResult geoResult = null;
+                string stringResult = null;
+                try
                 {
-                    var apikey = _config[Configuration.OpsAPIGoogleMaps];
+                    var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?address={location.Address},{location.City},{location.State}&key={apikey}");
+                    response.EnsureSuccessStatusCode();
 
-                    GeocodeResult geoResult = null;
-                    string stringResult = null;
-                    try
+                    stringResult = await response.Content.ReadAsStringAsync();
+
+                    geoResult = JsonConvert.DeserializeObject<GeocodeResult>(stringResult);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Error parsing Geocode API JSON: - {stringResult}", ex.Message);
+                }
+
+                if (geoResult?.Results?.Count() > 0)
+                {
+                    var lat = geoResult?
+                        .Results?
+                        .FirstOrDefault(_ => _.Types.Any(__ => __ == "premise"))?
+                        .Geometry?
+                        .Location?
+                        .Lat;
+                    var lng = geoResult?
+                        .Results?
+                        .FirstOrDefault(_ => _.Types.Any(__ => __ == "premise"))?
+                        .Geometry?
+                        .Location?
+                        .Lng;
+
+                    if (lat != null && lng != null)
                     {
-                        var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?address={location.Address},{location.City},{location.State}&key={apikey}");
-                        response.EnsureSuccessStatusCode();
-
-                        stringResult = await response.Content.ReadAsStringAsync();
-
-                        geoResult = JsonConvert.DeserializeObject<GeocodeResult>(stringResult);
+                        location.GeoLocation = lat.ToString() + "," + lng.ToString();
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        _logger.LogError(ex,$"Error parsing Geocode API JSON: - {stringResult}",ex.Message);
-                    }
-
-                    if (geoResult?.Results?.Count() > 0)
-                    {
-                        var lat = geoResult.Results?
-                            .FirstOrDefault(_ => _.Types.Any(__ => __ == "premise"))?
-                            .Geometry?
-                            .Location?
-                            .Lat;
-                        var lng = geoResult.Results?
-                            .FirstOrDefault(_ => _.Types.Any(__ => __ == "premise"))?
-                            .Geometry?
-                            .Location?
-                            .Lng;
-
-                        if (lat.HasValue && lng.HasValue)
-                        {
-                            location.GeoLocation = lat.ToString() + "," + lng.ToString();
-                        }
-                        else
-                        {
-                            _logger.LogInformation($"Could not find latitude and longitude when geocoding {location.Address}");
-                        }
+                        _logger.LogInformation($"Could not find latitude and longitude when geocoding {location.Address}");
                     }
                 }
             }

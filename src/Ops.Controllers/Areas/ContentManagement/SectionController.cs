@@ -27,18 +27,19 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         private readonly IPostService _postService;
         private readonly IFileService _fileService;
         private readonly ILinkService _linkService;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
         public static string Name { get { return "Section"; } }
         public static string Area { get { return "ContentManagement"; } }
-        public static string mimeType = "application/octet-stream";
+
+        private static readonly string mimeType = "application/octet-stream";
 
         public SectionController(ServiceFacades.Controller<SectionController> context,
             ISectionService sectionService,
             IPostService postService,
             IFileService fileService,
             ILinkService linkService,
-            IHostingEnvironment hostingEnvironment) : base(context)
+            IWebHostEnvironment hostingEnvironment) : base(context)
         {
             _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(sectionService));
@@ -70,7 +71,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 sections = await _sectionService.GetAllSectionsAsync();
             }
 
-            var viewModel = new SectionIndexViewModel()
+            var viewModel = new SectionIndexViewModel
             {
                 UserSections = sections
             };
@@ -108,7 +109,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                     });
             }
 
-            var viewModel = new SectionViewModel()
+            var viewModel = new SectionViewModel
             {
                 Section = section,
                 SectionCategories = await _postService.GetCategoriesBySectionIdAsync(section.Id),
@@ -131,7 +132,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             return View(viewModel);
         }
-
 
         [Route("{sectionStub}/[action]")]
         [Route("{sectionStub}/[action]/{page}")]
@@ -166,7 +166,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             {
                 topPost.Content = CommonMark.CommonMarkConverter.Convert(topPost.Content);
             }
-            var viewModel = new PostsViewModel()
+            var viewModel = new PostsViewModel
             {
                 SectionStub = section.Stub,
                 SectionName = section.Name,
@@ -226,7 +226,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             {
                 var post = await _postService.GetSectionPostByStubAsync(postStub, section.Id);
                 post.Content = CommonMark.CommonMarkConverter.Convert(post.Content);
-                var viewModel = new PostDetailsViewModel()
+                var viewModel = new PostDetailsViewModel
                 {
                     SectionStub = section.Stub,
                     SectionName = section.Name,
@@ -254,7 +254,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 ShowAlertDanger($"Could not find section {sectionStub}.");
                 return RedirectToAction(nameof(SectionController.Index));
             }
-            var viewModel = new AddPostViewModel()
+            var viewModel = new AddPostViewModel
             {
                 SectionStub = section.Stub,
                 SectionId = section.Id,
@@ -322,7 +322,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             {
                 var post = await _postService.GetSectionPostByStubAsync(postStub, section.Id);
                 var sectionCategories = await _postService.GetCategoriesBySectionIdAsync(section.Id);
-                var viewModel = new EditPostViewModel()
+                var viewModel = new EditPostViewModel
                 {
                     SectionStub = section.Stub,
                     SectionId = section.Id,
@@ -415,7 +415,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 ItemsPerPage = filter.Take.Value,
                 ItemCount = files.Count
             };
-            var viewModel = new FileLibraryViewModel()
+            var viewModel = new FileLibraryViewModel
             {
                 SectionStub = section.Stub,
                 SectionName = section.Name,
@@ -455,7 +455,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 ItemsPerPage = filter.Take.Value,
                 ItemCount = links.Count
             };
-            var viewModel = new LinkLibraryViewModel()
+            var viewModel = new LinkLibraryViewModel
             {
                 SectionStub = section.Stub,
                 SectionName = section.Name,
@@ -726,10 +726,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
             if (model.UploadFile.Length > 0)
             {
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await model.UploadFile.CopyToAsync(fileStream);
-                }
+                using var fileStream = new FileStream(filePath, FileMode.Create);
+                await model.UploadFile.CopyToAsync(fileStream);
             }
             await _fileService.CreatePrivateFileAsync(model.File, model.UploadFile);
             ShowAlertSuccess($"Added '{model.File.Name}' to '{fileLib.Name}'");

@@ -50,38 +50,36 @@ namespace Ocuda.Promenade.Controllers
             {
                 if (!string.IsNullOrWhiteSpace(zip))
                 {
-                    using (var client = new HttpClient())
+                    using var client = new HttpClient();
+                    try
                     {
-                        try
-                        {
-                            var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?address={zip}&key={apiKey}");
-                            response.EnsureSuccessStatusCode();
+                        var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?address={zip}&key={apiKey}");
+                        response.EnsureSuccessStatusCode();
 
-                            var stringResult = await response.Content.ReadAsStringAsync();
-                            dynamic jsonResult = JsonConvert.DeserializeObject(stringResult);
+                        var stringResult = await response.Content.ReadAsStringAsync();
+                        dynamic jsonResult = JsonConvert.DeserializeObject(stringResult);
 
-                            if (jsonResult.results.Count > 0)
-                            {
-                                var result = jsonResult.results[0];
-                                searchLatitude = result.geometry.location.lat;
-                                searchLongitude = result.geometry.location.lng;
-                            }
-                            else
-                            {
-                                _logger.LogError($"No geocoding results for a \"{zip}\"");
-                                TempData["AlertDanger"] = $"Unable to locate zip <strong>\"{zip}\"</strong>.";
-                            }
-                        }
-                        catch (HttpRequestException ex)
+                        if (jsonResult.results.Count > 0)
                         {
-                            _logger.LogCritical(ex, $"Google API error: {ex.Message}");
-                            TempData["AlertDanger"] = "An error occured, please try again later.";
+                            var result = jsonResult.results[0];
+                            searchLatitude = result.geometry.location.lat;
+                            searchLongitude = result.geometry.location.lng;
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            _logger.LogCritical(ex, ex.Message);
-                            TempData["AlertDanger"] = "An error occured, please try again later.";
+                            _logger.LogError("No geocoding results for {Zip}", zip);
+                            TempData["AlertDanger"] = $"Unable to locate ZIP Code: <strong>{zip}</strong>.";
                         }
+                    }
+                    catch (HttpRequestException ex)
+                    {
+                        _logger.LogCritical(ex, "Google API error: {Message}", ex.Message);
+                        TempData["AlertDanger"] = "An error occured, please try again later.";
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogCritical(ex, ex.Message);
+                        TempData["AlertDanger"] = "An error occured, please try again later.";
                     }
                 }
                 else if (latitude.HasValue && longitude.HasValue)
@@ -90,43 +88,46 @@ namespace Ocuda.Promenade.Controllers
                     var latlng = $"{latitude},{longitude}";
                     try
                     {
-                        using (var client = new HttpClient())
+                        using var client = new HttpClient();
+                        GeocodeResult geoResult = null;
+                        string stringResult = null;
+
+                        try
                         {
-                            GeocodeResult geoResult = null;
-                            string stringResult = null;
+                            var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?latlng={latlng}&key={apiKey}");
+                            response.EnsureSuccessStatusCode();
 
-                            try
+                            stringResult = await response.Content.ReadAsStringAsync();
+
+                            geoResult = JsonConvert.DeserializeObject<GeocodeResult>(stringResult);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError("Error parsing Geocode API JSON: {Message} - {Result}",
+                                ex.Message,
+                                stringResult);
+                        }
+
+                        if (geoResult?.Results?.Count() > 0)
+                        {
+                            viewModel.Zip = geoResult?
+                                .Results?
+                                .FirstOrDefault(_ => _.Types.Any(__ => __ == "postal_code"))?
+                                .AddressComponents?
+                                .FirstOrDefault()?
+                                .ShortName;
+                            if (string.IsNullOrEmpty(viewModel.Zip))
                             {
-
-                                var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?latlng={latlng}&key={apiKey}");
-                                response.EnsureSuccessStatusCode();
-
-                                stringResult = await response.Content.ReadAsStringAsync();
-
-                                geoResult = JsonConvert.DeserializeObject<GeocodeResult>(stringResult);
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogError($"Error parsing Geocode API JSON: {ex.Message} - {stringResult}");
-                            }
-
-                            if (geoResult?.Results?.Count() > 0)
-                            {
-                                viewModel.Zip = geoResult.Results?
-                                    .FirstOrDefault(_ => _.Types.Any(__ => __ == "postal_code"))?
-                                    .AddressComponents?
-                                    .FirstOrDefault()?
-                                    .ShortName;
-                                if (string.IsNullOrEmpty(viewModel.Zip))
-                                {
-                                    _logger.LogWarning($"Could not find postal code when reverse geocoding {latlng}");
-                                }
+                                _logger.LogWarning("Could not find postal code when reverse geocoding {Coordinates}",
+                                    latlng);
                             }
                         }
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, $"Problem looking up postal code for coordinates {latlng}: {ex.Message}");
+                        _logger.LogError(ex, "Problem looking up postal code for coordinates {Coordinates}: {Message}",
+                            latlng,
+                            ex.Message);
                     }
                     return View("Locations", viewModel);
                 }

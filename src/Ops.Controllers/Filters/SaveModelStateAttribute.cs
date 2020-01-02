@@ -14,14 +14,12 @@ namespace Ocuda.Ops.Controllers.Filters
                     || context.Result is RedirectToRouteResult
                     || context.Result is RedirectToActionResult))
             {
-                using (var controller = context.Controller as Controller)
+                using var controller = context.Controller as Controller;
+                if (controller != null && context.ModelState != null)
                 {
-                    if (controller != null && context.ModelState != null)
-                    {
-                        var key = ModelStateHelper.GetModelStateKey(context.RouteData.Values);
-                        controller.TempData[key] = ModelStateHelper
-                            .SerializeModelState(context.ModelState);
-                    }
+                    var key = ModelStateHelper.GetModelStateKey(context.RouteData.Values);
+                    controller.TempData[key] = ModelStateHelper
+                        .SerializeModelState(context.ModelState);
                 }
             }
 

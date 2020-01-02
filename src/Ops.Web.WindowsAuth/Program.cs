@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Reflection;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -18,7 +17,7 @@ namespace Ops.Web.WindowsAuth
             var version = Assembly.GetExecutingAssembly().GetName().Version;
 
             string logPath = "logs";
-            string logFile = "log-{Date}.txt";
+            const string logFile = "log-{Date}.txt";
 
             // build a WebHost so that we can access configuration
             IWebHost webHost = CreateWebHostBuilder(args).Build();
@@ -65,7 +64,6 @@ namespace Ops.Web.WindowsAuth
             {
                 Log.CloseAndFlush();
             }
-
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>

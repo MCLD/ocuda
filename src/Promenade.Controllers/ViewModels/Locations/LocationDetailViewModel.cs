@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Controllers.ViewModels.Locations

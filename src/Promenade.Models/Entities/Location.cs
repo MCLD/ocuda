@@ -44,8 +44,10 @@ namespace Ocuda.Promenade.Models.Entities
 
         public Group DisplayGroup { get; set; }
 
+        [MaxLength(2000)]
         public string Description { get; set; }
 
+        [MaxLength(2000)]
         public string PostFeatureDescription { get; set; }
 
         [MaxLength(255)]
@@ -59,27 +61,37 @@ namespace Ocuda.Promenade.Models.Entities
 
         public bool HasEvents { get; set; }
 
+        [MaxLength(255)]
         public string AdministrativeArea { get; set; }
 
+        [MaxLength(255)]
         public string Country { get; set; }
 
+        [MaxLength(255)]
         public string State { get; set; }
 
+        [MaxLength(255)]
         public string SDType { get; set; }
 
+        [MaxLength(255)]
         public string SDEmail { get; set; }
 
+        [MaxLength(255)]
         public string SDAreaServedName { get; set; }
 
+        [MaxLength(255)]
         public string SDAreaServedType { get; set; }
 
+        [MaxLength(255)]
         public string SDLocationId { get; set; }
 
+        [MaxLength(255)]
         public string SDParentOrganization { get; set; }
 
         [MaxLength(255)]
         public string GeoLocation { get; set; }
 
+        [MaxLength(255)]
         public string PAbbreviation { get; set; }
 
         public bool IsAlwaysOpen { get; set; }
@@ -92,6 +104,7 @@ namespace Ocuda.Promenade.Models.Entities
 
         [NotMapped]
         public double Distance { get; set; }
+
         [NotMapped]
         public bool Open { get; set; }
 

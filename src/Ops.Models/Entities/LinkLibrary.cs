@@ -13,6 +13,7 @@ namespace Ocuda.Ops.Models.Entities
 
         public ICollection<Link> Links { get; set; }
 
+        [MaxLength(255)]
         public string Stub { get; set; }
 
         public int SectionId { get; set; }

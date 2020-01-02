@@ -21,7 +21,7 @@ namespace Ocuda.Utility.Helpers
                 })
                 .ToList();
 
-            var storage = new ModelStateStorage()
+            var storage = new ModelStateStorage
             {
                 ModelStateItems = itemList,
                 Time = DateTimeOffset.Now.ToUnixTimeSeconds()
@@ -53,5 +53,4 @@ namespace Ocuda.Utility.Helpers
             return $"ModelState_{routeString}";
         }
     }
-
 }

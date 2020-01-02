@@ -6,7 +6,7 @@
         <input id="addUrl" asp-for="ExternalResource.Url" formgroup autocomplete="off" />
         <select id="addType" asp-for="ExternalResource.Type" formgroup autocomplete="off">
             <option></option>
-            @foreach (var resourceType in (ExternalResourceType[])Enum.GetValues(typeof(ExternalResourceType)))
+            @foreach (var resourceType in (Ocuda.Utility.Models.ExternalResourceType[])Enum.GetValues(typeof(Ocuda.Utility.Models.ExternalResourceType)))
             {
                 <option value="@resourceType" selected="@(resourceType == Model.Type ? "selected" : null)">@resourceType</option>
             }    
@@ -20,7 +20,7 @@
         <input id="editName" asp-for="ExternalResource.Name" formgroup autocomplete="off" />
         <input id="editUrl" asp-for="ExternalResource.Url" formgroup autocomplete="off" />
         <select id="editType" asp-for="ExternalResource.Type" formgroup autocomplete="off" disabled="disabled">
-            @foreach (var resourceType in (ExternalResourceType[])Enum.GetValues(typeof(ExternalResourceType)))
+            @foreach (var resourceType in (Ocuda.Utility.Models.ExternalResourceType[])Enum.GetValues(typeof(Ocuda.Utility.Models.ExternalResourceType)))
             {
                 <option value="@resourceType" selected="@(resourceType == Model.Type ? "selected" : null)">@resourceType</option>
             }
@@ -35,7 +35,7 @@
 
 <div class="mb-2">
     <ul class="nav nav-pills">
-        @foreach (var resourceType in (ExternalResourceType[])Enum.GetValues(typeof(ExternalResourceType)))
+        @foreach (var resourceType in (Ocuda.Utility.Models.ExternalResourceType[])Enum.GetValues(typeof(Ocuda.Utility.Models.ExternalResourceType)))
         {
             <li class="nav-item">
                 <a class="nav-link @(resourceType == Model.Type ? "active" : "")" asp-action="Index" asp-route-type="@resourceType">@resourceType</a>

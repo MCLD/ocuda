@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers
@@ -46,7 +46,7 @@ namespace Ocuda.Ops.Controllers
                     var distinct = claim.Select(_ => _.Value).Distinct();
                     if (distinct.Count() > 1)
                     {
-                        throw new Exception(string.Format("User {0} has multiple {1} claims: {2}",
+                        throw new OcudaException(string.Format("User {0} has multiple {1} claims: {2}",
                             userId,
                             claimType,
                             string.Join(",", claim.Select(_ => _.Value))));
