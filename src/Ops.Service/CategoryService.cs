@@ -46,7 +46,6 @@ namespace Ocuda.Ops.Service
             await _categoryRepository.SaveAsync();
         }
 
-
         public async Task<DataWithCount<ICollection<Category>>> GetPaginatedListAsync(
             BaseFilter filter)
         {

@@ -11,7 +11,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     {
         Task<ICollection<Emedia>> GetAllAsync();
 
-        Emedia GetByClass(string emediaStub);
+        Emedia GetByStub(string emediaStub);
 
         Task<DataWithCount<ICollection<Emedia>>> GetPaginatedListAsync(
             BaseFilter filter);

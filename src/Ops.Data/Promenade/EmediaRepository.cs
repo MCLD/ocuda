@@ -26,7 +26,7 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
-        public Emedia GetByClass(string emediaStub)
+        public Emedia GetByStub(string emediaStub)
         {
             return DbSet
                 .AsNoTracking()

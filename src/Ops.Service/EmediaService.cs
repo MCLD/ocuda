@@ -54,7 +54,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<Emedia> GetByStubAsync(string emediaStub)
         {
-            var emedia = _emediaRepository.GetByClass(emediaStub);
+            var emedia = _emediaRepository.GetByStub(emediaStub);
             if (emedia != null)
             {
                 var emediaCategories = new List<Category>();
