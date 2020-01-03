@@ -85,8 +85,6 @@ namespace Ocuda.Ops.Service
             {
                 throw new ArgumentNullException(nameof(emediaCategory));
             }
-            emediaCategory.UpdatedAt = DateTime.Now;
-            emediaCategory.UpdatedBy = GetCurrentUserId();
             await _emediaCategoryRepository.AddAsync(emediaCategory);
             await _emediaCategoryRepository.SaveAsync();
         }
@@ -104,9 +102,7 @@ namespace Ocuda.Ops.Service
                 var emediaCategory = new EmediaCategory
                 {
                     EmediaId = emediaId,
-                    CategoryId = category,
-                    CreatedAt = DateTime.Now,
-                    CreatedBy = GetCurrentUserId()
+                    CategoryId = category
                 };
                 await _emediaCategoryRepository.AddAsync(emediaCategory);
             }
