@@ -50,6 +50,9 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(2000)]
         public string PostFeatureDescription { get; set; }
 
+        [MaxLength(2000)]
+        public string PreFeatureDescription { get; set; }
+
         [MaxLength(255)]
         public string Facebook { get; set; }
 

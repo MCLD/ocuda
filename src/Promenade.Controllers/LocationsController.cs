@@ -182,6 +182,7 @@ namespace Ocuda.Promenade.Controllers
                 };
                 viewModel.Location.Description = CommonMark.CommonMarkConverter.Convert(viewModel.Location.Description);
                 viewModel.Location.PostFeatureDescription = CommonMark.CommonMarkConverter.Convert(viewModel.Location.PostFeatureDescription);
+                viewModel.Location.PreFeatureDescription = CommonMark.CommonMarkConverter.Convert(viewModel.Location.PreFeatureDescription);
                 viewModel.Location.LocationHours = await _locationService.GetFormattedWeeklyHoursAsync(viewModel.Location.Id);
                 if (viewModel.Location.LocationHours != null)
                 {

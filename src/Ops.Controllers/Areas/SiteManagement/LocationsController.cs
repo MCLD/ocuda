@@ -238,8 +238,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     var oldLocation = await _locationService.GetLocationByIdAsync(location.Id);
                     if (!(oldLocation.Address.Equals(location.Address) && oldLocation.City.Equals(location.City)
-                        && oldLocation.State.Equals(location.State) && oldLocation.Zip.Equals(location.Zip)
-                        && oldLocation.Country.Equals(location.Country)))
+                        && oldLocation.State.Equals(location.State) && oldLocation.Zip.Equals(location.Zip)))
                     {
                         try
                         {

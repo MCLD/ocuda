@@ -96,13 +96,13 @@
       display="inline">
     <input asp-for="GroupList" type="hidden" />
     <input asp-for="FeatureList" type="hidden" />
-    <input value="@Model.Location.Id" 
-           asp-for="Location.Id" 
-           id="location-id" 
+    <input value="@Model.Location.Id"
+           asp-for="Location.Id"
+           id="location-id"
            type="hidden" />
-    <input value="@Model.Location.Name" 
-           asp-for="Location.Name" 
-           formgroup 
+    <input value="@Model.Location.Name"
+           asp-for="Location.Name"
+           formgroup
            autocomplete="off" />
     <input value="@Model.Location.Stub"
            asp-for="Location.Stub"
@@ -118,17 +118,17 @@
            asp-for="Location.Address"
            formgroup
            autocomplete="off" />
-    <input value="@Model.Location.City" 
-           asp-for="Location.City" 
-           formgroup 
+    <input value="@Model.Location.City"
+           asp-for="Location.City"
+           formgroup
            autocomplete="off" />
-    <input value="@Model.Location.State" 
-           asp-for="Location.State" 
-           formgroup 
+    <input value="@Model.Location.State"
+           asp-for="Location.State"
+           formgroup
            autocomplete="off" />
-    <input value="@Model.Location.Zip" 
-           asp-for="Location.Zip" 
-           formgroup 
+    <input value="@Model.Location.Zip"
+           asp-for="Location.Zip"
+           formgroup
            autocomplete="off" />
     <input value="@Model.Location.MapLink"
            asp-for="Location.MapLink"
@@ -144,6 +144,82 @@
               rows="5"
               formgroup
               autocomplete="off"></textarea>
+    <div class="form-group row" id="prefeat-div">
+        <label asp-for="Location.PreFeatureDescription"
+               class="col-md-3 col-form-label text-md-right"></label>
+        <div class="col-md-9">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active"
+                       data-toggle="tab"
+                       href="#md-edit"
+                       role="tab">Edit</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       data-toggle="tab"
+                       href="#md-preview"
+                       role="tab">Preview</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="md-edit-preview">
+                <div class="tab-pane show active"
+                     id="md-edit"
+                     role="tabpanel">
+                    <div id="wmd-button-bar"
+                         class="wmd-button-row"></div>
+                    <textarea asp-for="Location.PreFeatureDescription"
+                              class="form-control wmd-input"
+                              id="wmd-input"
+                              value="@Model.Location.PreFeatureDescription">
+                        </textarea>
+                </div>
+                <div class="tab-pane" id="md-preview" role="tabpanel">
+                    <div id="preview" class="wmd-preview"></div>
+                </div>
+                <span asp-validation-for="Location.PreFeatureDescription"
+                      class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group row" id="postfeat-div">
+        <label asp-for="Location.PostFeatureDescription"
+               class="col-md-3 col-form-label text-md-right"></label>
+        <div class="col-md-9">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active"
+                       data-toggle="tab"
+                       href="#md-edit"
+                       role="tab">Edit</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       data-toggle="tab"
+                       href="#md-preview"
+                       role="tab">Preview</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="md-edit-preview">
+                <div class="tab-pane show active"
+                     id="md-edit"
+                     role="tabpanel">
+                    <div id="wmd-button-bar"
+                         class="wmd-button-row"></div>
+                    <textarea asp-for="Location.PostFeatureDescription"
+                              class="form-control wmd-input"
+                              id="wmd-input"
+                              value="@Model.Location.PostFeatureDescription">
+                        </textarea>
+                </div>
+                <div class="tab-pane" id="md-preview" role="tabpanel">
+                    <div id="preview" class="wmd-preview"></div>
+                </div>
+                <span asp-validation-for="Location.PostFeatureDescription"
+                      class="text-danger"></span>
+            </div>
+        </div>
+    </div>
     <input value="@Model.Location.Facebook"
            asp-for="Location.Facebook"
            formgroup
@@ -158,15 +234,15 @@
            autocomplete="off" />
     <div class="row">
         <div class="col-md-9 offset-md-3">
-            <a class="btn btn-secondary" 
-               id="return-home" 
+            <a class="btn btn-secondary"
+               id="return-home"
                asp-action="@nameof(LocationsController.Index)">Return to Locations</a>
             @if (Model.Location.IsNewLocation)
             {
                 <text>
-                    <button type="submit" 
-                            id="submit" 
-                            value="Submit" 
+                    <button type="submit"
+                            id="submit"
+                            value="Submit"
                             class="btn btn-success btn-spinner">
                         <span class="buttonText">Add Location</span>
                         <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
@@ -176,9 +252,9 @@
             else
             {
                 <text>
-                    <button type="submit" 
-                            id="submit" 
-                            value="Submit" 
+                    <button type="submit"
+                            id="submit"
+                            value="Submit"
                             class="btn btn-success btn-spinner">
                         <span class="buttonText">Update Location</span>
                         <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
@@ -192,10 +268,12 @@
         <div class="col-3 card">
             <div class="card-header">
                 <h4 style="margin: 0; display: initial;">Hours</h4>
-                <button type="button" 
-                        id="editHoursButton" 
-                        class="btn btn-warning" 
-                        style="float:right;">Edit Hours</button>
+                <button type="button"
+                        id="editHoursButton"
+                        class="btn btn-warning"
+                        style="float:right;">
+                    Edit Hours
+                </button>
             </div>
             @if (Model.Location.IsAlwaysOpen)
             {
@@ -218,10 +296,12 @@
         <div class="col-6 card">
             <div class="card-header">
                 <h4 style="margin: 0; display: initial;">Features</h4>
-                <button type="button" 
-                        id="addFeatureButton" 
-                        class="btn btn-warning" 
-                        style="float:right;">Add Feature</button>
+                <button type="button"
+                        id="addFeatureButton"
+                        class="btn btn-warning"
+                        style="float:right;">
+                    Add Feature
+                </button>
             </div>
             @if (Model.LocationFeatures.Any())
             {
@@ -240,8 +320,10 @@
                             @foreach (var feature in Model.Features.Where(_ => _.Id == locationFeature.FeatureId))
                             {
                                 <tr>
-                                    <td class="td-class feature-item" 
-                                        data-locationFeatureId="@locationFeature.Id">@feature.Name</td>
+                                    <td class="td-class feature-item"
+                                        data-locationFeatureId="@locationFeature.Id">
+                                        @feature.Name
+                                    </td>
                                     <td style="vertical-align:middle;">
                                         @if (!string.IsNullOrEmpty(locationFeature.Text))
                                         {
@@ -256,11 +338,12 @@
                                         }
                                     </td>
                                     <td style="vertical-align:middle;">@locationFeature.RedirectUrl</td>
-                                    <td><button type="button" 
-                                                class="btn btn-link btn-xs deleteFeatureButton" 
-                                                data-locationFeatureId="@locationFeature.Id" 
+                                    <td>
+                                        <button type="button"
+                                                class="btn btn-link btn-xs deleteFeatureButton"
+                                                data-locationFeatureId="@locationFeature.Id"
                                                 data-featureName="@feature.Name">
-                                            <span class="fa fa-2x fas fa-minus-circle text-danger" 
+                                            <span class="fa fa-2x fas fa-minus-circle text-danger"
                                                   aria-hidden="true"></span>
                                         </button>
                                     </td>
@@ -278,11 +361,13 @@
         <div class="col-6 card">
             <div class="card-header">
                 <h4 style="margin: 0; display: initial;">Groups</h4>
-                <button type="button" 
-                        id="addGroupButton" 
-                        class="btn btn-warning" 
-                        data-toggle="modal" 
-                        style="float:right;">Add Group</button>
+                <button type="button"
+                        id="addGroupButton"
+                        class="btn btn-warning"
+                        data-toggle="modal"
+                        style="float:right;">
+                    Add Group
+                </button>
             </div>
             @if (Model.LocationGroups.Any())
             {
@@ -301,12 +386,14 @@
                             @foreach (var group in Model.Groups.Where(_ => _.Id == locationGroup.GroupId))
                             {
                                 <tr>
-                                    <td style="vertical-align:middle;" 
-                                        class="group-item" 
-                                        data-locationgroupid="@locationGroup.Id">@group.GroupType</td>
+                                    <td style="vertical-align:middle;"
+                                        class="group-item"
+                                        data-locationgroupid="@locationGroup.Id">
+                                        @group.GroupType
+                                    </td>
                                     @if (group.IsLocationRegion)
                                     {
-                                        <td class="text-center" 
+                                        <td class="text-center"
                                             style="vertical-align:middle;">
                                             <span class="fas fa-check"></span>
                                         </td>
@@ -325,13 +412,14 @@
                                         }
                                     </td>
                                     <td>
-                                        <button type="button" 
-                                                class="btn btn-link btn-xs deletegroupButton" 
-                                                data-locationgroupid="@locationGroup.Id" 
+                                        <button type="button"
+                                                class="btn btn-link btn-xs deletegroupButton"
+                                                data-locationgroupid="@locationGroup.Id"
                                                 data-groupname="@group.GroupType">
-                                            <span class="fa fa-2x fas fa-minus-circle text-danger" 
+                                            <span class="fa fa-2x fas fa-minus-circle text-danger"
                                                   aria-hidden="true"></span>
-                                        </button></td>
+                                        </button>
+                                    </td>
                                 </tr>
                             }
                         }
