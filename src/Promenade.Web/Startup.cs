@@ -134,6 +134,10 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.NavigationTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IPageRepository,
                 Data.Promenade.PageRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ISegmentRepository,
+                Data.Promenade.SegmentRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ISegmentTextRepository,
+                Data.Promenade.SegmentTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ISiteAlertRepository,
                 Data.Promenade.SiteAlertRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ISiteSettingRepository,
@@ -158,6 +162,7 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<NavigationService>();
             services.AddScoped<PageService>();
             services.AddScoped<RedirectService>();
+            services.AddScoped<SegmentService>();
             services.AddScoped<SiteAlertService>();
             services.AddScoped<SiteSettingService>();
             services.AddScoped<SocialCardService>();

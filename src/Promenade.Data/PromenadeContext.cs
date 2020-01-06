@@ -33,6 +33,8 @@ namespace Ocuda.Promenade.Data
         public DbSet<NavigationText> NavigationTexts { get; }
         public DbSet<Page> Pages { get; }
         public DbSet<PageHeader> PageHeaders { get; }
+        public DbSet<Segment> Segments { get; }
+        public DbSet<SegmentText> SegmentTexts { get; }
         public DbSet<SiteSetting> SiteSettings { get; }
         public DbSet<SocialCard> SocialCards { get; }
         public DbSet<UrlRedirect> UrlRedirects { get; }

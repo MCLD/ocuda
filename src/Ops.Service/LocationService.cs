@@ -92,8 +92,6 @@ namespace Ocuda.Ops.Service
             currentLocation.Code = location.Code;
             currentLocation.Phone = location.Phone;
             currentLocation.Description = location.Description;
-            currentLocation.PreFeatureDescription = location.PreFeatureDescription?.Trim();
-            currentLocation.PostFeatureDescription = location.PostFeatureDescription?.Trim();
             currentLocation.Facebook = location.Facebook;
             currentLocation.EventLink = location.EventLink;
             currentLocation.SubscriptionLink = location.SubscriptionLink;
