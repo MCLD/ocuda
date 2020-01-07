@@ -628,7 +628,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 filePath = Path.Combine(filePath, fileLib.Stub);
                 if (!Directory.Exists(filePath))
                 {
-                    _logger.LogError($"The File Library '{fileLib.Stub}' does not exist for this section.");
+                    _logger.LogError("The File Library {FileLibraryName} does not exist for this section.",
+                        fileLib.Stub);
                     ShowAlertDanger($"Failed to delete File Library '{fileLib.Name}'");
                     return RedirectToAction(nameof(SectionController.Section),
                         new { sectionStub = section.Stub });
@@ -670,7 +671,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 filePath = Path.Combine(filePath, file.Name + type.Extension);
                 if (!System.IO.File.Exists(filePath))
                 {
-                    _logger.LogError($"'{file.Name}' file not found at: { filePath}");
+                    _logger.LogError("{Filename} file not found at: {Path}",
+                        file.Name,
+                        filePath);
                     ShowAlertDanger($"Failed to delete File Library '{file.Name}'");
                     return RedirectToAction(nameof(SectionController.FileLibrary),
                         new { sectionStub = section.Stub, fileLibStub = fileLib.Stub });
@@ -708,7 +711,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var fileType = libraryTypes.FirstOrDefault(_ => _.Extension.ToLower() == extension);
             if (fileType == null)
             {
-                _logger.LogError($"'{fileLib.Name}' does not allow '{extension}' files to be uploaded");
+                _logger.LogError("{Library} does not allow '{Extension}' files to be uploaded",
+                    fileLib.Name,
+                    extension);
                 ShowAlertDanger($"File extension '{extension}' is not allowed.");
                 return RedirectToAction(nameof(SectionController.FileLibrary),
                     new { sectionStub = section.Stub, fileLibStub = fileLib.Stub });

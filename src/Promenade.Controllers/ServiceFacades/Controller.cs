@@ -9,12 +9,12 @@ namespace Ocuda.Promenade.Controllers.ServiceFacades
 {
     public class Controller<T>
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<T> _logger;
         private readonly IConfiguration _config;
         private readonly IStringLocalizer<Shared> _sharedLocalizer;
         private readonly SiteSettingService _siteSettingService;
 
-        public ILogger Logger
+        public ILogger<T> Logger
         {
             get
             {
@@ -46,7 +46,8 @@ namespace Ocuda.Promenade.Controllers.ServiceFacades
             }
         }
 
-        public Controller(ILogger<T> logger, IConfiguration config,
+        public Controller(ILogger<T> logger,
+            IConfiguration config,
             IStringLocalizer<Shared> sharedLocalizer,
             SiteSettingService siteSettingService)
         {

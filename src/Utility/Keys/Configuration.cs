@@ -3,18 +3,23 @@
     public struct Configuration
     {
         public static readonly string OcudaErrorControllerName = "Ocuda.ErrorControllerName";
+        public static readonly string OcudaFileShared = "Ocuda.FileShared";
         public static readonly string OcudaInstance = "Ocuda.Instance";
         public static readonly string OcudaLoggingDatabase = "Ocuda.LoggingDatabase";
         public static readonly string OcudaLoggingRollingFile = "Ocuda.LoggingRollingFile";
         public static readonly string OcudaLoggingRollingHttpFile = "Ocuda.LoggingRollingHttpFile";
-
-        public static readonly string OcudaUrlSharedContent = "Ocuda.UrlSharedContent";
-        public static readonly string OcudaFileShared = "Ocuda.FileShared";
-
         public static readonly string OcudaSeqEndpoint = "Ocuda.SeqEndpoint";
+        public static readonly string OcudaUrlSharedContent = "Ocuda.UrlSharedContent";
 
-        public static readonly string ThrowQueryWarningsInDev = "ThrowQueryWarningsInDev";
+        public static readonly string OcudaRuntimeRedisCacheConfiguration
+            = "Ocuda.Runtime.RedisCacheConfiguration";
 
+        public static readonly string OcudaRuntimeRedisCacheInstance
+            = "Ocuda.Runtime.RedisCacheInstance";
+
+        public static readonly string OcudaRuntimeSessionTimeout = "Ocuda.Runtime.SessionTimeout";
+
+        public static readonly string OpsAPIGoogleMaps = "Ops.API.GoogleMaps";
         public static readonly string OpsAuthBlankRequestRedirect = "Ops.AuthBlankRequestRedirect";
         public static readonly string OpsAuthRedirect = "Ops.AuthRedirect";
         public static readonly string OpsAuthTimeoutMinutes = "Ops.AuthTimeoutMinutes";
@@ -36,13 +41,11 @@
         public static readonly string OpsLdapSearchBase = "Ops.LDAPSearchBase";
         public static readonly string OpsLdapServer = "Ops.LDAPServer";
         public static readonly string OpsNavColumn = "Ops.NavColumn";
+        public static readonly string OpsSessionTimeoutMinutes = "Ops.SessionTimeoutMinutes";
         public static readonly string OpsSiteManagerGroup = "Ops.SiteManagerGroup";
         public static readonly string OpsSiteSettingCacheMinutes = "Ops.SiteSettingCacheMinutes";
-        public static readonly string OpsSessionTimeoutMinutes = "Ops.SessionTimeoutMinutes";
 
+        public static readonly string PromenadeAPIGoogleMaps = "Promenade.API.GoogleMaps";
         public static readonly string PromenadeDatabaseProvider = "Promenade.DatabaseProvider";
-
-        public static readonly string PromAPIGoogleMaps = "Promenade.API.GoogleMaps";
-        public static readonly string OpsAPIGoogleMaps = "Ops.API.GoogleMaps";
     }
 }

@@ -61,7 +61,7 @@ namespace Ocuda.Promenade.Controllers
 
                 PageTitle = "Page not found";
 
-                return View("PageNotFound");
+                return NotFound();
             }
 
             _logger.LogCritical($"HTTP Error {id}: {originalPath}");
