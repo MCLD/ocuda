@@ -61,14 +61,17 @@ namespace Ocuda.Ops.Controllers.Authorization
                                     .Claims
                                     .FirstOrDefault(_ => _.Type == ClaimType.Username)?
                                     .Value ?? "Unknown";
-                                _logger.LogWarning($"Access denied for user {username} to manage section {sectionName}");
+                                _logger.LogWarning("Access denied for user {Username} to manage section {SectionName}",
+                                    username,
+                                    sectionName);
                                 context.Fail();
                             }
                         }
                     }
                     else
                     {
-                        _logger.LogError($"Error decoding section name for authorizaton, resource is wrong type: {context.Resource.GetType()}");
+                        _logger.LogError("Error decoding section name for authorizaton, resource is wrong type: {ResourceType}",
+                            context.Resource.GetType());
                         throw new OcudaException("Can't decode section name from context.");
                     }
                 }

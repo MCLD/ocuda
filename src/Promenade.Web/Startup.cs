@@ -38,9 +38,6 @@ namespace Ocuda.Promenade.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // build a temporary logger for this method call
-            using var logger = Utility.Logging.Configuration.Build(_config).CreateLogger();
-
             services.AddLocalization();
 
             services.Configure<RequestLocalizationOptions>(_ =>
@@ -63,14 +60,11 @@ namespace Ocuda.Promenade.Web
             var provider = _config[Configuration.PromenadeDatabaseProvider];
             if (provider == "SqlServer")
             {
-                logger.Information("Using {0} data provider", provider);
                 services.AddDbContextPool<PromenadeContext, DataProvider.SqlServer.Promenade.Context>(_ =>
                     _.UseSqlServer(promCs));
             }
             else
             {
-                logger.Fatal("No {0} configured in settings. Exiting.",
-                    Configuration.PromenadeDatabaseProvider);
                 throw new OcudaException($"No {Configuration.PromenadeDatabaseProvider} configured.");
             }
 

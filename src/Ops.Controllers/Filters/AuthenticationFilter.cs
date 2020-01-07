@@ -83,7 +83,8 @@ namespace Ocuda.Ops.Controllers.Filters
                     if (configuredAuthTimeout != null
                         && !int.TryParse(configuredAuthTimeout, out authTimeoutMinutes))
                     {
-                        _logger.LogWarning($"Configured {Configuration.OpsAuthTimeoutMinutes} could not be converted to a number. It should be a number of minutes (defaulting to 2).");
+                        _logger.LogWarning("Configured {OpsAuthTimeoutMinutes} could not be converted to a number. It should be a number of minutes (defaulting to 2).",
+                            Configuration.OpsAuthTimeoutMinutes);
                     }
 
                     // all authentication bits will expire after 2 minutes

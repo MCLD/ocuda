@@ -11,40 +11,44 @@ namespace Ocuda.Promenade.Web
 {
     public static class Program
     {
+        private const string Product = "Ocuda.Promenade";
+
         public static int Main(string[] args)
         {
-            var webHost = CreateHostBuilder(args).Build();
+            using var webHost = CreateHostBuilder(args).Build();
             var config = (IConfiguration)webHost.Services.GetService(typeof(IConfiguration));
 
-            Log.Logger = Utility.Logging.Configuration.Build(config).CreateLogger();
-
-            var instanceConfig = config[Utility.Keys.Configuration.OcudaInstance];
-            var instance = string.IsNullOrEmpty(instanceConfig) ? null : $" ({instanceConfig})";
+            var instance = string.IsNullOrEmpty(config[Utility.Keys.Configuration.OcudaInstance])
+                ? "n/a"
+                : config[Utility.Keys.Configuration.OcudaInstance];
 
             var version = Assembly.GetEntryAssembly()
                     .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                     .InformationalVersion;
 
+            Log.Logger = Utility.Logging.Configuration.Build(config).CreateLogger();
+            Log.Warning("{Product} v{Version} instance {Instance} starting up",
+                Product,
+                version,
+                instance);
+
             // perform initialization
             using (IServiceScope scope = webHost.Services.CreateScope())
             {
-                var web = new Web(scope);
-                Task.Run(() => web.InitalizeAsync()).Wait();
+                Task.Run(() => new Web(scope).InitalizeAsync()).Wait();
             }
-
-            string product = $"Ocuda.Promenade{instance}";
 
             try
             {
-                Log.Information("{Product} v{Version} starting up", product, version);
                 webHost.Run();
                 return 0;
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
-                Log.Fatal(ex, "{Product} v{Version} exited unexpectedly: {Message}",
-                    product,
+                Log.Fatal(ex, "{Product} instance {Instance} v{Version} exited unexpectedly: {Message}",
+                    Product,
+                    instance,
                     version,
                     ex.Message);
                 return 1;
@@ -52,6 +56,10 @@ namespace Ocuda.Promenade.Web
 #pragma warning restore CA1031 // Do not catch general exception types
             finally
             {
+                Log.Information("{Product} instance {Instance} v{Version} shutting down",
+                   Product,
+                   instance,
+                   version);
                 Log.CloseAndFlush();
             }
         }

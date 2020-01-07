@@ -55,7 +55,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error inserting roster data: {Message}", ex);
+                    _logger.LogError(ex, "Error inserting roster data: {Message}", ex.Message);
                     AlertDanger = "An error occured while uploading the roster.";
                 }
                 finally
