@@ -35,7 +35,7 @@ namespace Ocuda.Promenade.Controllers
         public async Task<IActionResult> Find(double? latitude = null, double? longitude = null,
             string zip = null)
         {
-            var apiKey = _config[Utility.Keys.Configuration.PromAPIGoogleMaps];
+            var apiKey = _config[Utility.Keys.Configuration.PromenadeAPIGoogleMaps];
 
             var viewModel = new LocationViewModel
             {
