@@ -22,9 +22,7 @@ namespace Ocuda.Promenade.Web
                 ? "n/a"
                 : config[Utility.Keys.Configuration.OcudaInstance];
 
-            var version = Assembly.GetEntryAssembly()
-                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                    .InformationalVersion;
+            var version = Utility.Helpers.VersionHelper.GetVersion();
 
             Log.Logger = Utility.Logging.Configuration.Build(config).CreateLogger();
             Log.Warning("{Product} v{Version} instance {Instance} starting up",
