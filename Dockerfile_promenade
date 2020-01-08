@@ -42,7 +42,7 @@ ENV org.opencontainers.image.created=$IMAGE_CREATED \
     org.opencontainers.image.version=$IMAGE_VERSION
 
 # Copy source
-COPY --from=build-stage "/app/publish/ops" .
+COPY --from=build-stage "/app/publish/promenade" .
 
 # Persist shared directory
 VOLUME ["/app/shared"]
