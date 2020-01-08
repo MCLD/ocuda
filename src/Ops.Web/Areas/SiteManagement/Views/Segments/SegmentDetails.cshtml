@@ -1,0 +1,186 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment.DetailsViewModel
+
+<div class="row">
+    <div class="modal fade"
+         id="deleteModal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="deleteModalLabel">
+        <div class="modal-dialog" role="document">
+            <form asp-action="@nameof(SegmentsController.DeleteSegmentText)"
+                  method="post"
+                  role="form"
+                  style="display:inline">
+                <input asp-for="SegmentText.Id" type="hidden" />
+                <input asp-for="SegmentText.SegmentId" type="hidden" />
+                <input asp-for="SegmentText.LanguageId" type="hidden" />
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="deleteModalLabel">Delete SegmentText</h4>
+                        <button type="button"
+                                class="close"
+                                data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+                        <span id="modal-text">Are you sure you want to delete the <b>@Model.SelectedLanguage.Description</b> SegmentText for <b>@Model.Segment.Name</b></span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-default"
+                                data-dismiss="modal"
+                                style="margin-right: 1em;">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="btn btn-danger btn-spinner pull-right"
+                                id="delButton"
+                                aria-label="Confirm">
+                            <span class="fas fa-spinner fa-times" aria-hidden="true"></span>
+                            Delete
+                            <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@if (Model.SegmentText != null)
+{
+    <div class="row" style="padding-top: 1rem;">
+        <div class="col-12">
+            <h3>Language to view:</h3>
+            <select asp-for="SelectedLanguage" asp-items="Model.LanguageList" formgroup></select>
+        </div>
+    </div>
+
+    <form method="post"
+          asp-action="@nameof(SegmentsController.EditSegmentText)"
+          role="form"
+          id="addform"
+          display="inline">
+        <input asp-for="SegmentText.Id"
+               value="@Model.SegmentText.Id"
+               type="hidden" />
+        <input asp-for="SegmentText.LanguageId"
+               value="@Model.SegmentText.LanguageId"
+               type="hidden" />
+        <input asp-for="SegmentText.SegmentId"
+               value="@Model.SegmentText.SegmentId"
+               type="hidden" />
+        <h3>Edit SegmentText</h3>
+        <input asp-for="SegmentText.Header"
+               value="@Model.SegmentText.Header"
+               formgroup
+               autocomplete="off" />
+        <div class="form-group row" id="content-div">
+            <label asp-for="SegmentText.Text"
+                   class="col-md-3 col-form-label text-md-right"></label>
+            <div class="col-md-9">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active"
+                           data-toggle="tab"
+                           href="#md-edit"
+                           role="tab">Edit</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           data-toggle="tab"
+                           href="#md-preview"
+                           role="tab">Preview</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="md-edit-preview">
+                    <div class="tab-pane show active"
+                         id="md-edit"
+                         role="tabpanel">
+                        <div id="wmd-button-bar"
+                             class="wmd-button-row"></div>
+                        <textarea asp-for="SegmentText.Text"
+                                  class="form-control wmd-input"
+                                  id="wmd-input">
+                            </textarea>
+                    </div>
+                    <div class="tab-pane" id="md-preview" role="tabpanel">
+                        <div id="preview" class="wmd-preview"></div>
+                    </div>
+                    <span asp-validation-for="SegmentText.Text"
+                          class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="float-lg-right">
+                <a class="btn btn-secondary"
+                   id="return-home"
+                   asp-action="@nameof(SegmentsController.Index)">Return to Segments</a>
+                <button type="submit"
+                        value="Submit"
+                        class="btn btn-primary">
+                    Update
+                </button>
+            </div>
+            <div>
+            </div>
+        </div>
+    </form>
+    <div class="row">
+        <button role="button"
+                class="btn btn-danger float-right"
+                data-toggle="modal"
+                data-target="#deleteModal">
+            Delete
+        </button>
+    </div>
+}
+else
+{
+    <div class="row" style="padding-top: 1rem;">
+        <div class="col-12">
+            <h1>Segment '@Model.Segment.Name' Doesn't have any SegmentTexts.</h1>
+        </div>
+        <div class="row">
+            <a class="btn btn-secondary"
+               id="return-home"
+               asp-action="@nameof(SegmentsController.Index)">Return to Segments</a>
+        </div>
+    </div>
+}
+
+@section scripts {
+    <script src="~/js/md.min.js" asp-append-version="true"></script>
+
+    <script>
+        @if (Model.SegmentText != null) {
+            <text>
+            $(document).ready(function () {
+                var editor = new Markdown.Editor($("#SegmentText_Text"), { allowUploads: true });
+                editor.run();
+            });
+            var pageUrl = "@Url.Action(nameof(SegmentsController.SegmentDetails), new { id = Model.SegmentText.SegmentId})";
+
+            $("#SelectedLanguage").on("change", function () {
+                window.location.href = pageUrl + "?language=" + $(this).val();
+            });
+            $("#SegmentText_Segment_IsActive").click(function () {
+                if ($(this).val().toLowerCase() == "false") {
+                    $(this).val("true");
+                }
+                else {
+                    $(this).val("false");
+                }
+            });
+        $("#delButton").click(function () {
+            var loader = $("#delButton").find(".fa-pulse");
+            loader.removeClass("d-none");
+        });
+            </text>
+        }
+
+    </script>
+}

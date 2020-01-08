@@ -214,6 +214,10 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.PageRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageHeaderRepository,
                 Data.Promenade.PageHeaderRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ISegmentRepository,
+                Data.Ops.SegmentRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ISegmentTextRepository,
+                Data.Ops.SegmentTextRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISocialCardRepository,
                 Data.Promenade.SocialCardRepository>();
 
@@ -242,6 +246,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IRosterService, RosterService>();
             services.AddScoped<ISectionService, SectionService>();
+            services.AddScoped<ISegmentService, SegmentService>();
             services.AddScoped<ISiteSettingService, SiteSettingService>();
             services.AddScoped<ISocialCardService, SocialCardService>();
             services.AddScoped<Service.Abstract.IUserContextProvider, UserContextProvider>();
