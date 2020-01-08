@@ -71,8 +71,11 @@ namespace Ocuda.Utility.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unable to create {0} file directory {1}: {2}",
-                    publicPrivateRoot, path, ex.Message);
+                _logger.LogError(ex,
+                    "Unable to create {PublicOrPrivate} file directory {FilePath}: {Message}",
+                    publicPrivateRoot,
+                    path,
+                    ex.Message);
                 throw;
             }
 
@@ -86,8 +89,11 @@ namespace Ocuda.Utility.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Unable to create {0} file directory {1}: {2}",
-                        publicPrivateRoot, path, ex.Message);
+                    _logger.LogError(ex,
+                        "Unable to create {PublicOrPrivate} file directory {FilePath}: {Message}",
+                        publicPrivateRoot,
+                        path,
+                        ex.Message);
                     throw;
                 }
             }

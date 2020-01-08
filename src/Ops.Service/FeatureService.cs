@@ -45,7 +45,10 @@ namespace Ocuda.Ops.Service
             }
             catch (OcudaException ex)
             {
-                _logger.LogError(ex, "Problem finding feature: {Message}", ex.Message);
+                _logger.LogError(ex,
+                    "Problem finding feature {FeatureName}: {Message}",
+                    featureName,
+                    ex.Message);
                 throw new OcudaException($"Could not find feature: {featureName}");
             }
         }
@@ -57,28 +60,20 @@ namespace Ocuda.Ops.Service
 
         public async Task<Feature> AddFeatureAsync(Feature feature)
         {
-            try
+            feature.Icon = "fa-inverse " + feature.Icon + " fa-stack-1x";
+            if (!feature.Icon.Contains("fab"))
             {
-                feature.Icon = "fa-inverse " + feature.Icon + " fa-stack-1x";
-                if (!feature.Icon.Contains("fab"))
-                {
-                    feature.Icon = "fa " + feature.Icon;
-                }
-                feature.Name = feature.Name?.Trim();
-                feature.BodyText = feature.BodyText?.Trim();
-                feature.Stub = feature.Stub?.Trim();
-                feature.CreatedAt = DateTime.Now;
-                feature.CreatedBy = GetCurrentUserId();
+                feature.Icon = "fa " + feature.Icon;
+            }
+            feature.Name = feature.Name?.Trim();
+            feature.BodyText = feature.BodyText?.Trim();
+            feature.Stub = feature.Stub?.Trim();
+            feature.CreatedAt = DateTime.Now;
+            feature.CreatedBy = GetCurrentUserId();
 
-                await ValidateAsync(feature);
-                await _featureRepository.AddAsync(feature);
-                await _featureRepository.SaveAsync();
-            }
-            catch (OcudaException ex)
-            {
-                _logger.LogError(ex.Message);
-                throw;
-            }
+            await ValidateAsync(feature);
+            await _featureRepository.AddAsync(feature);
+            await _featureRepository.SaveAsync();
 
             return feature;
         }
@@ -89,32 +84,24 @@ namespace Ocuda.Ops.Service
             await ValidateAsync(currentFeature);
             if (currentFeature != null)
             {
-                try
+                if (!feature.Icon.Contains("fa-inverse"))
                 {
-                    if (!feature.Icon.Contains("fa-inverse"))
+                    feature.Icon = "fa-inverse " + feature.Icon + " fa-stack-1x";
+                    if (!feature.Icon.Contains("fab"))
                     {
-                        feature.Icon = "fa-inverse " + feature.Icon + " fa-stack-1x";
-                        if (!feature.Icon.Contains("fab"))
-                        {
-                            feature.Icon = "fa " + feature.Icon;
-                        }
+                        feature.Icon = "fa " + feature.Icon;
                     }
-                    currentFeature.BodyText = feature.BodyText?.Trim();
-                    currentFeature.Icon = feature.Icon;
-                    currentFeature.Name = feature.Name?.Trim();
-                    currentFeature.Stub = feature.Stub?.Trim();
-                    currentFeature.UpdatedAt = DateTime.Now;
-                    currentFeature.UpdatedBy = GetCurrentUserId();
+                }
+                currentFeature.BodyText = feature.BodyText?.Trim();
+                currentFeature.Icon = feature.Icon;
+                currentFeature.Name = feature.Name?.Trim();
+                currentFeature.Stub = feature.Stub?.Trim();
+                currentFeature.UpdatedAt = DateTime.Now;
+                currentFeature.UpdatedBy = GetCurrentUserId();
 
-                    _featureRepository.Update(feature);
-                    await _featureRepository.SaveAsync();
-                    return await _featureRepository.FindAsync(currentFeature.Id);
-                }
-                catch (OcudaException ex)
-                {
-                    _logger.LogError(ex.Message);
-                    throw;
-                }
+                _featureRepository.Update(feature);
+                await _featureRepository.SaveAsync();
+                return await _featureRepository.FindAsync(currentFeature.Id);
             }
             else
             {

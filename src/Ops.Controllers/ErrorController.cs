@@ -29,14 +29,18 @@ namespace Ocuda.Ops.Controllers
 
             if (id == 404)
             {
-                _logger.LogError($"HTTP Error {id}: {originalPath}");
+                _logger.LogError("HTTP Error {HttpId}: {UrlPath}",
+                    id,
+                    originalPath);
                 return View("Error", new ErrorViewModel
                 {
                     RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
                 });
             }
 
-            _logger.LogCritical($"HTTP Error {id}: {originalPath}");
+            _logger.LogCritical("HTTP Error {HttpId}: {UrlPath}",
+                id,
+                originalPath);
             return View("Error", new ErrorViewModel
             {
                 RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier

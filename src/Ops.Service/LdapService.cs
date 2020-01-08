@@ -137,7 +137,10 @@ namespace Ocuda.Ops.Service
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Problem connecting to LDAP: {Message}", ex);
+                    _logger.LogError(ex, 
+                        "Problem connecting to LDAP server {LDAPServer}: {Message}",
+                        ldapServer,
+                        ex.Message);
                 }
             }
             return user;

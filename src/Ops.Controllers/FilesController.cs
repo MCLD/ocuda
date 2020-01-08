@@ -36,7 +36,9 @@ namespace Ocuda.Ops.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error viewing file {file.Id} : {ex}", ex);
+                _logger.LogError("Error viewing file id {FileId}: {Message}",
+                    file.Id,
+                    ex.Message);
                 return StatusCode(StatusCodes.Status404NotFound);
             }
         }
