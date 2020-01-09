@@ -40,7 +40,8 @@ namespace Ocuda.Ops.Controllers.Filters
                 {
                     var _logger = (ILogger<RestoreModelStateAttribute>)context.HttpContext
                         .RequestServices.GetService(typeof(ILogger<RestoreModelStateAttribute>));
-                    _logger.LogError($"ModelState timed out for key {key}.");
+                    _logger.LogError("ModelState timed out for key {ModelStateKey}",
+                        key);
                 }
             }
         }

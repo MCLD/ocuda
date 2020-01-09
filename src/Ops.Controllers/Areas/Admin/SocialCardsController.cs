@@ -145,7 +145,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting social card: {ex.Message}", ex.Message);
+                _logger.LogError(ex, "Error deleting social card: {Message}", ex.Message);
                 ShowAlertDanger("Unable to delete social card: ", ex.Message);
             }
 
