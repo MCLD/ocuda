@@ -1,11 +1,7 @@
-﻿using System.Threading.Tasks;
-
-namespace Ocuda.Promenade.Service.Interfaces
+﻿namespace Ocuda.Promenade.Service.Interfaces
 {
-    public interface IGenericRepository<TEntity, TKeyType>
+    public interface IGenericRepository<TEntity>
         where TEntity : class
-        where TKeyType : struct
     {
-        Task<TEntity> FindAsync(TKeyType id);
     }
 }

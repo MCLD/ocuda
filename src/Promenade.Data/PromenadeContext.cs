@@ -11,10 +11,19 @@ namespace Ocuda.Promenade.Data
         {
             // configure composite keys
             // https://docs.microsoft.com/en-us/ef/core/modeling/keys
-            modelBuilder.Entity<NavigationText>()
-                .HasKey(_ => new { _.Id, _.LanguageId });
             modelBuilder.Entity<EmediaCategory>()
                 .HasKey(_ => new { _.CategoryId, _.EmediaId });
+            modelBuilder.Entity<LocationFeature>()
+                .HasKey(_ => new { _.FeatureId, _.LocationId });
+            modelBuilder.Entity<LocationGroup>()
+                .HasKey(_ => new { _.GroupId, _.LocationId });
+            modelBuilder.Entity<LocationHours>()
+                .HasKey(_ => new { _.DayOfWeek, _.LocationId });
+            modelBuilder.Entity<NavigationText>()
+                .HasKey(_ => new { _.Id, _.LanguageId });
+            modelBuilder.Entity<Page>()
+                .HasKey(_ => new { _.LanguageId, _.PageHeaderId });
+
         }
 
         // Read-Only
@@ -32,7 +41,7 @@ namespace Ocuda.Promenade.Data
         public DbSet<Navigation> Navigations { get; }
         public DbSet<NavigationText> NavigationTexts { get; }
         public DbSet<Page> Pages { get; }
-        public DbSet<PageHeader> PageHeaders { get; }
+        public DbSet<PageHeader> PageHeaders { get; set; }
         public DbSet<SiteSetting> SiteSettings { get; }
         public DbSet<SocialCard> SocialCards { get; }
         public DbSet<UrlRedirect> UrlRedirects { get; }

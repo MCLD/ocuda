@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
-using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 
@@ -31,35 +31,31 @@ namespace Ocuda.Ops.Service
 
         public async Task<LocationGroup> AddLocationGroupAsync(LocationGroup locationGroup)
         {
-            locationGroup.CreatedAt = DateTime.Now;
-            locationGroup.CreatedBy = GetCurrentUserId();
-
             await _locationGroupRepository.AddAsync(locationGroup);
             await _locationGroupRepository.SaveAsync();
             return locationGroup;
         }
 
-        public async Task<LocationGroup> GetLocationGroupByIdAsync(int locationgroupId)
+        public async Task<LocationGroup> GetByIdsAsync(int groupId, int locationId)
         {
-            return await _locationGroupRepository.FindAsync(locationgroupId);
+            return await _locationGroupRepository.GetByIdsAsync(groupId, locationId);
         }
 
         public async Task<LocationGroup> EditAsync(LocationGroup locationGroup)
         {
-            var currentLocationGroup = await _locationGroupRepository.FindAsync(locationGroup.Id);
+            var currentLocationGroup = await _locationGroupRepository.GetByIdsAsync(
+                locationGroup.GroupId, locationGroup.LocationId);
             await ValidateAsync(currentLocationGroup);
-
-            currentLocationGroup.UpdatedAt = DateTime.Now;
-            currentLocationGroup.UpdatedBy = GetCurrentUserId();
 
             _locationGroupRepository.Update(currentLocationGroup);
             await _locationGroupRepository.SaveAsync();
             return currentLocationGroup;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int groupId, int locationId)
         {
-            _locationGroupRepository.Remove(id);
+            var locationGroup = await _locationGroupRepository.GetByIdsAsync(groupId, locationId);
+            _locationGroupRepository.Remove(locationGroup);
             await _locationGroupRepository.SaveAsync();
         }
 

@@ -12,7 +12,7 @@ using Ocuda.Ops.Service.Models;
 namespace Ocuda.Ops.Data.Ops
 {
     public class CoverIssueHeaderRepository
-        : GenericRepository<OpsContext, CoverIssueHeader, int>, ICoverIssueHeaderRepository
+        : OpsRepository<OpsContext, CoverIssueHeader, int>, ICoverIssueHeaderRepository
     {
         public CoverIssueHeaderRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
             ILogger<CoverIssueHeaderRepository> logger) : base(repositoryFacade, logger)

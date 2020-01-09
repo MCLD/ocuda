@@ -1,15 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Ocuda.Promenade.Models.Abstract;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class SiteSetting : BaseEntity
+    public class SiteSetting
     {
         [Key]
         [Required]
         [MaxLength(255)]
-        public new string Id { get; set; }
+        public string Id { get; set; }
 
         public SiteSettingType Type { get; set; }
 

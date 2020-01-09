@@ -12,7 +12,7 @@ using Ocuda.Ops.Service.Models;
 namespace Ocuda.Ops.Data.Ops
 {
     public class FileLibraryRepository
-        : GenericRepository<OpsContext, FileLibrary, int>, IFileLibraryRepository
+        : OpsRepository<OpsContext, FileLibrary, int>, IFileLibraryRepository
     {
         public FileLibraryRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
             ILogger<FileLibraryRepository> logger) : base(repositoryFacade, logger)

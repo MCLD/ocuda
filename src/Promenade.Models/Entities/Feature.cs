@@ -1,11 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Ocuda.Promenade.Models.Abstract;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class Feature : BaseEntity
+    public class Feature
     {
+        [Key]
+        [Required]
+        public int Id { get; set; }
+
         [MaxLength(255)]
         [Required]
         public string Name { get; set; }

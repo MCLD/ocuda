@@ -10,7 +10,7 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 namespace Ocuda.Promenade.Data.Promenade
 {
     public class LocationHoursRepository
-        : GenericRepository<PromenadeContext, LocationHours, int>, ILocationHoursRepository
+        : GenericRepository<PromenadeContext, LocationHours>, ILocationHoursRepository
     {
         public LocationHoursRepository(
             ServiceFacade.Repository<PromenadeContext> repositoryFacade,
@@ -33,6 +33,13 @@ namespace Ocuda.Promenade.Data.Promenade
                 .Where(_ => _.LocationId == locationId)
                 .OrderBy(_ => _.DayOfWeek)
                 .ToListAsync();
+        }
+
+        public void DeleteHoursByLocationAsync(int locationId)
+        {
+            var locationHours = DbSet.AsNoTracking().Where(_ => _.LocationId == locationId);
+
+            _context.RemoveRange(locationHours);
         }
     }
 }

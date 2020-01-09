@@ -3,7 +3,7 @@ using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
-    public interface IRosterHeaderRepository : IRepository<RosterHeader, int>
+    public interface IRosterHeaderRepository : IOpsRepository<RosterHeader, int>
     {
         Task<int?> GetLatestIdAsync();
     }

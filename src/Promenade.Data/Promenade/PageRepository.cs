@@ -8,7 +8,7 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 namespace Ocuda.Promenade.Data.Promenade
 {
     public class PageRepository
-        : GenericRepository<PromenadeContext, Page, int>, IPageRepository
+        : GenericRepository<PromenadeContext, Page>, IPageRepository
     {
         public PageRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<PageRepository> logger) : base(repositoryFacade, logger)

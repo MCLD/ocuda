@@ -6,7 +6,7 @@ using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
-    public interface IUserMetadataTypeRepository : IRepository<UserMetadataType, int>
+    public interface IUserMetadataTypeRepository : IOpsRepository<UserMetadataType, int>
     {
         Task<ICollection<UserMetadataType>> GetAllAsync();
         Task<DataWithCount<ICollection<UserMetadataType>>> GetPaginatedListAsync(BaseFilter filter);

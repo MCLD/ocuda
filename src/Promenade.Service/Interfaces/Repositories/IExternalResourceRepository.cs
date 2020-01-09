@@ -5,7 +5,7 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
-    public interface IExternalResourceRepository : IGenericRepository<ExternalResource, int>
+    public interface IExternalResourceRepository : IGenericRepository<ExternalResource>
     {
         Task<ICollection<ExternalResource>> GetAllAsync(ExternalResourceType? type);
     }

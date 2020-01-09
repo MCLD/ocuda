@@ -1,13 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Ocuda.Promenade.Models.Abstract;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class LocationFeature : BaseEntity
+    public class LocationFeature
     {
+        [Key]
         [Required]
         public int LocationId { get; set; }
 
+        [Key]
         [Required]
         public int FeatureId { get; set; }
 

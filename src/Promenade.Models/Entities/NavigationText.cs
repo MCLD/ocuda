@@ -2,12 +2,12 @@
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class NavigationText : Abstract.BaseEntity
+    public class NavigationText
     {
+        public int Id { get; set; }
         public int LanguageId { get; set; }
 
         [MaxLength(255)]
-
         public string AriaLabel { get; set; }
 
         [MaxLength(255)]

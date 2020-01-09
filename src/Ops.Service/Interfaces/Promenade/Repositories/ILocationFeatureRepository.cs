@@ -2,10 +2,11 @@
 using System.Threading.Tasks;
 using Ocuda.Promenade.Models.Entities;
 
-namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
+namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 {
-    public interface ILocationFeatureRepository : IRepository<LocationFeature, int>
+    public interface ILocationFeatureRepository : IGenericRepository<LocationFeature>
     {
+        Task<LocationFeature> GetByIdsAsync(int featureId, int locationId);
         Task<List<LocationFeature>> GetLocationFeaturesByLocationAsync(Location location);
         Task<bool> IsDuplicateAsync(LocationFeature locationfeature);
         Task<List<LocationFeature>> GeAllLocationFeaturesAsync();

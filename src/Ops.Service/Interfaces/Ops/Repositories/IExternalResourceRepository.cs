@@ -7,7 +7,7 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
-    public interface IExternalResourceRepository : IRepository<ExternalResource, int>
+    public interface IExternalResourceRepository : IOpsRepository<ExternalResource, int>
     {
         Task<ICollection<ExternalResource>> GetAllAsync(ExternalResourceType? type);
         Task<DataWithCount<ICollection<ExternalResource>>> GetPaginatedListAsync(

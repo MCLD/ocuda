@@ -3,8 +3,7 @@ using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
-    public interface IClaimGroupRepository : IRepository<ClaimGroup, int>
-
+    public interface IClaimGroupRepository : IOpsRepository<ClaimGroup, int>
     {
         Task<bool> IsClaimGroup(string claim, string group);
     }

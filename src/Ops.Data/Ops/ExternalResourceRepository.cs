@@ -13,7 +13,7 @@ using Ocuda.Utility.Models;
 namespace Ocuda.Ops.Data.Ops
 {
     public class ExternalResourceRepository
-        : GenericRepository<OpsContext, ExternalResource, int>, IExternalResourceRepository
+        : OpsRepository<OpsContext, ExternalResource, int>, IExternalResourceRepository
     {
         public ExternalResourceRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
             ILogger<ExternalResourceRepository> logger) : base(repositoryFacade, logger)

@@ -9,7 +9,7 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 namespace Ocuda.Promenade.Data.Promenade
 {
     public class LocationFeatureRepository
-        : GenericRepository<PromenadeContext, LocationFeature, int>, ILocationFeatureRepository
+        : GenericRepository<PromenadeContext, LocationFeature>, ILocationFeatureRepository
     {
         public LocationFeatureRepository(
             ServiceFacade.Repository<PromenadeContext> repositoryFacade,
@@ -17,12 +17,11 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<LocationFeature> GetLocationFeaturesByIds(int locationId, int featureId)
+        public async Task<LocationFeature> GetByIdsAsync(int featureId, int locationId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.LocationId == locationId &&
-                (_.FeatureId == featureId))
+                .Where(_ => _.FeatureId == featureId && _.LocationId == locationId)
                 .SingleOrDefaultAsync();
         }
 

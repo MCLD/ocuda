@@ -128,7 +128,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public IActionResult AddLocation()
         {
-            var location = new Location {
+            var location = new Location
+            {
                 IsNewLocation = true
             };
             return View("LocationDetails", new LocationViewModel
@@ -207,15 +208,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 var features = await _locationFeatureService.GetLocationFeaturesByLocationAsync(location);
                 var groups = await _locationGroupService.GetLocationGroupsByLocationAsync(location);
-                if(groups.Count > 0 || features.Count > 0)
+                if (groups.Count > 0 || features.Count > 0)
                 {
                     ShowAlertDanger($"You must delete all features and groups from {location.Name} before deleting it");
                     return RedirectToAction(nameof(Index));
                 }
-                foreach (var hour in await _locationHoursService.GetLocationHoursByIdAsync(location.Id))
-                {
-                    await _locationHoursService.DeleteAsync(hour.Id);
-                }
+
                 await _locationService.DeleteAsync(location.Id);
                 ShowAlertSuccess($"Deleted Location: {location.Name}");
             }
@@ -332,7 +330,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     var feature = await _featureService.GetFeatureByIdAsync(locationFeature.FeatureId);
                     ShowAlertDanger($"Failed to Update {location.Name}'s Feature: {feature.Name}");
-                    _logger.LogError(ex,$"Unable to edit {ex.Message}: {ex}", ex.Message);
+                    _logger.LogError(ex, $"Unable to edit {ex.Message}: {ex}", ex.Message);
                 }
             }
             return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
@@ -456,14 +454,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpPost]
         [Route("[action]")]
         [SaveModelState]
-        public async Task<IActionResult> DeleteLocationGroup(int locationgroupId)
+        public async Task<IActionResult> DeleteLocationGroup(int groupId, int locationId)
         {
-            var locationgroup = await _locationGroupService.GetLocationGroupByIdAsync(locationgroupId);
-            var location = await _locationService.GetLocationByIdAsync(locationgroup.LocationId);
-            var group = await _groupService.GetGroupByIdAsync(locationgroup.GroupId);
+            var group = await _groupService.GetGroupByIdAsync(groupId);
+            var location = await _locationService.GetLocationByIdAsync(locationId);
+
             try
             {
-                await _locationGroupService.DeleteAsync(locationgroupId);
+                await _locationGroupService.DeleteAsync(groupId, locationId);
                 ShowAlertSuccess($"Deleted Group '{group.GroupType}' from '{location.Name}'");
             }
             catch (OcudaException ex)
@@ -472,20 +470,19 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 _logger.LogError(ex, $"Problem deleting group '{group.GroupType}' from '{location.Name}':", ex.Message);
             }
 
-            return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub});
+            return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
         }
 
         [HttpPost]
         [Route("[action]")]
         [SaveModelState]
-        public async Task<IActionResult> DeleteLocationFeature(int locationfeatureId)
+        public async Task<IActionResult> DeleteLocationFeature(int featureId, int locationId)
         {
-            var locationfeature = await _locationFeatureService.GetLocationFeatureByIdAsync(locationfeatureId);
-            var location = await _locationService.GetLocationByIdAsync(locationfeature.LocationId);
-            var feature = await _featureService.GetFeatureByIdAsync(locationfeature.FeatureId);
+            var feature = await _featureService.GetFeatureByIdAsync(featureId);
+            var location = await _locationService.GetLocationByIdAsync(locationId);
             try
             {
-                await _locationFeatureService.DeleteAsync(locationfeatureId);
+                await _locationFeatureService.DeleteAsync(featureId, locationId);
                 ShowAlertSuccess($"Deleted Feature '{feature.Name}' from '{location.Name}'");
             }
             catch (OcudaException ex)
@@ -554,23 +551,27 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> GetItemInfo(int itemId, string objectType,string locationStub)
+        public async Task<IActionResult> GetItemInfo(int itemId, string objectType,
+            string locationStub)
         {
             var location = await _locationService.GetLocationByStubAsync(locationStub);
-            var viewModel = new LocationViewModel {
+            var viewModel = new LocationViewModel
+            {
                 Location = location
             };
 
             if (objectType == "Group")
             {
-                viewModel.LocationGroup = await _locationGroupService.GetLocationGroupByIdAsync(itemId);
+                viewModel.LocationGroup = await _locationGroupService
+                    .GetByIdsAsync(itemId, location.Id);
                 viewModel.Group = await _groupService.GetGroupByIdAsync(viewModel.LocationGroup.GroupId);
                 viewModel.IsLocationsGroup = location.DisplayGroupId == viewModel.Group.Id ? true : false;
                 return PartialView("_EditGroupsPartial", viewModel);
             }
             else if (objectType == "Feature")
             {
-                viewModel.LocationFeature = await _locationFeatureService.GetLocationFeatureByIdAsync(itemId);
+                viewModel.LocationFeature = await _locationFeatureService
+                    .GetByIdsAsync(itemId, location.Id);
                 viewModel.Features = await _featureService.GetAllFeaturesAsync();
                 return PartialView("_EditFeaturesPartial", viewModel);
             }
@@ -653,7 +654,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Problem looking up postal code for coordinates {location.Address}",ex.Message);
+                _logger.LogError(ex, $"Problem looking up postal code for coordinates {location.Address}", ex.Message);
                 return Json(new
                 {
                     success

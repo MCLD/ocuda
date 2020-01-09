@@ -12,11 +12,21 @@ using Ocuda.Promenade.Models.Entities;
 namespace Ocuda.Ops.Data.Promenade
 {
     public class SocialCardRepository
-        : GenericRepository<PromenadeContext, SocialCard, int>, ISocialCardRepository
+        : GenericRepository<PromenadeContext, SocialCard>, ISocialCardRepository
     {
         public SocialCardRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<SocialCardRepository> logger) : base(repositoryFacade, logger)
         {
+        }
+
+        public async Task<SocialCard> FindAsync(int id)
+        {
+            var entity = await DbSet.FindAsync(id);
+            if (entity != null)
+            {
+                _context.Entry(entity).State = EntityState.Detached;
+            }
+            return entity;
         }
 
         public async Task<DataWithCount<ICollection<SocialCard>>> GetPaginatedListAsync(

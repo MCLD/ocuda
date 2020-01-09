@@ -4,8 +4,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class Navigation : Abstract.BaseEntity
+    public class Navigation
     {
+        [Key]
+        [Required]
+        public int Id { get; set; }
+
         public bool ChangeToLinkWhenExtraSmall { get; set; }
         public bool HideTextWhenExtraSmall { get; set; }
         public bool TargetNewWindow { get; set; }

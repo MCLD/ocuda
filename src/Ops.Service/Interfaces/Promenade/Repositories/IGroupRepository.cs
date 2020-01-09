@@ -4,10 +4,11 @@ using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models.Entities;
 
-namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
+namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 {
-    public interface IGroupRepository : IRepository<Group, int>
+    public interface IGroupRepository : IGenericRepository<Group>
     {
+        Task<Group> FindAsync(int id);
         Task<List<Group>> GetAllGroupsAsync();
         Task<List<Group>> GetAllGroupRegions();
         Task<bool> IsDuplicateGroupTypeAsync(Group group);

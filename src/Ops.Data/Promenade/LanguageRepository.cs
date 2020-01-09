@@ -8,8 +8,8 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data.Promenade
 {
-    public class LanguageRepository 
-        : GenericRepository<PromenadeContext, Language, int>, ILanguageRepository
+    public class LanguageRepository
+        : GenericRepository<PromenadeContext, Language>, ILanguageRepository
     {
         public LanguageRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<LanguageRepository> logger) : base(repositoryFacade, logger)

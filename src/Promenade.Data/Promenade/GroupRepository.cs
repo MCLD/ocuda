@@ -8,11 +8,21 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 
 namespace Ocuda.Promenade.Data.Promenade
 {
-    public class GroupRepository : GenericRepository<PromenadeContext, Group, int>, IGroupRepository
+    public class GroupRepository : GenericRepository<PromenadeContext, Group>, IGroupRepository
     {
         public GroupRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<GroupRepository> logger) : base(repositoryFacade, logger)
         {
+        }
+
+        public async Task<Group> FindAsync(int id)
+        {
+            var entity = await DbSet.FindAsync(id);
+            if (entity != null)
+            {
+                _context.Entry(entity).State = EntityState.Detached;
+            }
+            return entity;
         }
 
         public async Task<List<Group>> GetAllGroups()

@@ -4,7 +4,7 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
-    public interface ISiteAlertRepository : IGenericRepository<SiteAlert, int>
+    public interface ISiteAlertRepository : IGenericRepository<SiteAlert>
     {
         Task<ICollection<SiteAlert>> GetCurrentSiteAlertsAsync();
     }
