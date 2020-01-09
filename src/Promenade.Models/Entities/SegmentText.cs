@@ -20,8 +20,10 @@ namespace Ocuda.Promenade.Models.Entities
 
         public Language Language { get; set; }
 
+        [MaxLength(255)]
         public string Header { get; set; }
 
+        [MaxLength(2000)]
         public string Text { get; set; }
     }
 }

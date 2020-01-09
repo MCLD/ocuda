@@ -40,11 +40,6 @@ namespace Ocuda.Ops.Service
             return await _segmentRepository.FindAsync(segmentId);
         }
 
-        public SegmentText GetSegmentTextBySegmentLanguageId(SegmentText segmentText)
-        {
-            return _segmentTextRepository.GetSegmentTextBySegmentId(segmentText.SegmentId, segmentText.LanguageId);
-        }
-
         public SegmentText GetBySegmentIdAndLanguage(int segmentId, int languageId)
         {
             return _segmentTextRepository.GetSegmentTextBySegmentId(segmentId, languageId);
@@ -52,7 +47,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<ICollection<string>> GetSegmentLanguagesByIdAsync(int id)
         {
-            return await _segmentTextRepository.GetLanguageById(id);
+            return await _segmentTextRepository.GetUsedLanguageNamesBySegmentId(id);
         }
 
         public Segment FindSegmentByName(string name)
@@ -96,9 +91,8 @@ namespace Ocuda.Ops.Service
 
         public async Task AddSegmentText(SegmentText segmentText)
         {
-            segmentText.Text = segmentText.Text.Trim();
-            segmentText.Header = segmentText.Header.Trim();
-
+            segmentText.Text = segmentText.Text?.Trim();
+            segmentText.Header = segmentText.Header?.Trim();
             await _segmentTextRepository.AddAsync(segmentText);
             await _segmentTextRepository.SaveAsync();
         }
@@ -106,8 +100,8 @@ namespace Ocuda.Ops.Service
         public async Task EditSegmentText(SegmentText segmentText)
         {
             var currentSegmentText = _segmentTextRepository.GetSegmentTextBySegmentId(segmentText.SegmentId,segmentText.LanguageId);
-            currentSegmentText.Header = segmentText.Header.Trim();
-            currentSegmentText.Text = segmentText.Text.Trim();
+            currentSegmentText.Text = segmentText.Text?.Trim();
+            currentSegmentText.Header = segmentText.Header?.Trim();
 
             _segmentTextRepository.Update(currentSegmentText);
             await _segmentTextRepository.SaveAsync();

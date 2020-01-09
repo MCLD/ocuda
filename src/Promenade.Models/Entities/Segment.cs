@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Ocuda.Promenade.Models.Abstract;
 
@@ -13,6 +14,7 @@ namespace Ocuda.Promenade.Models.Entities
 
         public bool IsActive { get; set; }
 
+        [MaxLength(255)]
         public string Name { get; set; }
 
         public SegmentText SegmentText { get; set; }

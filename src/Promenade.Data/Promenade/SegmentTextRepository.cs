@@ -14,15 +14,7 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public SegmentText GetSegmentTextBySegmentId(int segmentId)
-        {
-            return DbSet
-                .AsNoTracking()
-                .Where(_ => _.SegmentId == segmentId)
-                .FirstOrDefault();
-        }
-
-        public SegmentText GetSegmentTextBySgmentAndLanguageId(int segmentId, int languageId)
+        public SegmentText GetSegmentTextBySegmentAndLanguageId(int segmentId, int languageId)
         {
             return DbSet
                 .AsNoTracking()

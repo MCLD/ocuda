@@ -11,6 +11,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     {
         SegmentText GetSegmentTextBySegmentId(int segmentId, int languageId);
 
-        Task<List<string>> GetLanguageById(int segmentId);
+        Task<List<string>> GetUsedLanguageNamesBySegmentId(int segmentId);
     }
 }

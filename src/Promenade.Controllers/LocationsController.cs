@@ -18,18 +18,15 @@ namespace Ocuda.Promenade.Controllers
     public class LocationsController : BaseController<LocationsController>
     {
         private readonly LocationService _locationService;
-        private readonly LanguageService _languageService;
         private readonly SegmentService _segmentService;
 
         public static string Name { get { return "Locations"; } }
 
         public LocationsController(ServiceFacades.Controller<LocationsController> context,
-            LocationService locationService, SegmentService segmentService, LanguageService languageService ) : base(context)
+            LocationService locationService, SegmentService segmentService) : base(context)
         {
             _locationService = locationService
                 ?? throw new ArgumentNullException(nameof(locationService));
-            _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
             _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
         }
@@ -194,8 +191,7 @@ namespace Ocuda.Promenade.Controllers
                 };
                 if (viewModel.Location.PreFeatureSegmentId.HasValue)
                 {
-                    viewModel.PreFeatureSegment = await _segmentService.GetSegmentTextBySegmentAndLanguageId(
-                        viewModel.Location.PreFeatureSegmentId.Value, await _languageService.GetDefaultLanguageIdAsync());
+                    viewModel.PreFeatureSegment = await _segmentService.GetSegmentTextBySegmentAndLanguageId(viewModel.Location.PreFeatureSegmentId.Value,null);
                     if(viewModel.PreFeatureSegment!=null)
                     {
                         viewModel.PreFeatureSegment.Text = CommonMark.CommonMarkConverter.Convert(viewModel.PreFeatureSegment.Text);
@@ -203,8 +199,7 @@ namespace Ocuda.Promenade.Controllers
                 }
                 if (viewModel.Location.PostFeatureSegmentId.HasValue)
                 {
-                    viewModel.PostFeatureSegment = await _segmentService.GetSegmentTextBySegmentAndLanguageId(
-                        viewModel.Location.PostFeatureSegmentId.Value, await _languageService.GetDefaultLanguageIdAsync());
+                    viewModel.PostFeatureSegment = await _segmentService.GetSegmentTextBySegmentAndLanguageId(viewModel.Location.PostFeatureSegmentId.Value,null);
                     if (viewModel.PostFeatureSegment != null)
                     {
                         viewModel.PostFeatureSegment.Text = CommonMark.CommonMarkConverter.Convert(viewModel.PostFeatureSegment.Text);

@@ -170,7 +170,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             try
             {
                 await _segmentService.EditSegmentText(segmentText);
-                var updatedSegmentText = _segmentService.GetSegmentTextBySegmentLanguageId(segmentText);
+                var updatedSegmentText = _segmentService.GetBySegmentIdAndLanguage(segmentText.SegmentId,segmentText.LanguageId);
                 var language = await _languageService.GetActiveByIdAsync(updatedSegmentText.LanguageId);
 
                 ShowAlertSuccess($"Updated Segment: {updatedSegmentText.Header}");

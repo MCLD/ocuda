@@ -23,7 +23,7 @@ namespace Ocuda.Ops.Data.Ops
                 .FirstOrDefault();
         }
 
-        public async Task<List<string>> GetLanguageById(int segmentId)
+        public async Task<List<string>> GetUsedLanguageNamesBySegmentId(int segmentId)
         {
             return await _context.SegmentTexts
                 .AsNoTracking()
