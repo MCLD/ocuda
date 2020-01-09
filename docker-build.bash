@@ -3,15 +3,18 @@
 set -e
 
 BLD_PUSH=false
-BLD_BRANCH_FOUND=false
-BLD_RELEASE=false
 BLD_COMMIT=$(git rev-parse --short HEAD)
 BLD_VERSION=unknown
 BLD_VERSION_DATE=$(date -u +'%Y%m%d_%H%M%SZ')
 BLD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 
 if [[ -z $BLD_DOCKERFILE ]]; then
-  BLD_DOCKERFILE="Dockerfile"
+  BLD_DOCKERFILE_CHECK=Dockerfile_${BLD_DOCKER_IMAGE}
+  if [[ -n $BLD_DOCKER_IMAGE && -f $BLD_DOCKERFILE_CHECK ]]; then
+    BLD_DOCKERFILE=$BLD_DOCKERFILE_CHECK
+  else
+    BLD_DOCKERFILE="Dockerfile"
+  fi
   echo "=== No BLD_DOCKERFILE configured, using: $BLD_DOCKERFILE"
 fi
 
@@ -21,15 +24,20 @@ if [[ -z $BLD_DOCKER_IMAGE ]]; then
   echo "=== No BLD_DOCKER_IMAGE configured, using this directory name: $BLD_DOCKER_IMAGE"
 fi
 
+# Try getting branch from git
 if BLD_GITBRANCH=$(git symbolic-ref --short -q HEAD); then
   BLD_BRANCH=$BLD_GITBRANCH
-  BLD_BRANCH_FOUND=true
 else
-  # Azure DevOps works in detached HEAD state, get branch from variable
-  BLD_GITBRANCH=$BUILD_SOURCEBRANCHNAME
+  # Try getting branch from Travis environment
+  BLD_GITBRANCH=$TRAVIS_BRANCH
   if [[ -n $BLD_GITBRANCH ]]; then
     BLD_BRANCH=$BLD_GITBRANCH
-	BLD_BRANCH_FOUND=true
+  else
+    # Try getting branch from Azure DevOps
+    BLD_GITBRANCH=$BUILD_SOURCEBRANCHNAME
+    if [[ -n $BLD_GITBRANCH ]]; then
+      BLD_BRANCH=$BLD_GITBRANCH
+    fi
   fi
 fi
 
@@ -49,9 +57,8 @@ elif [[ $BLD_BRANCH =~ release/([0-9]+\.[0-9]+\.[0-9]+.*) ]]; then
   BLD_RELEASE_VERSION=${BASH_REMATCH[1]}
   BLD_DOCKER_TAG=v${BLD_RELEASE_VERSION}
   BLD_VERSION=v${BLD_RELEASE_VERSION}
-  BLD_RELEASE=true
   BLD_PUSH=true
-  echo "=== Building release artifacts for $BLD_RELEASE_VERSION"
+  echo "=== Including release artifacts for $BLD_RELEASE_VERSION"
 else
   BLD_DOCKER_TAG=$BLD_COMMIT
   BLD_VERSION=${BLD_COMMIT}-${BLD_VERSION_DATE}
@@ -62,15 +69,16 @@ if [ $# -gt 0 ]; then
 fi
 
 echo "=== Building branch $BLD_BRANCH commit $BLD_COMMIT as Docker image $BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG"
+echo "=== Image version: $BLD_VERSION"
 
 if [[ $BLD_PUSH = true ]]; then
-    docker build -f $BLD_DOCKERFILE -t $BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG \
+    docker build -f "$BLD_DOCKERFILE" -t "$BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG" \
         --build-arg BRANCH="$BLD_BRANCH" \
         --build-arg IMAGE_CREATED="$BLD_DATE" \
         --build-arg IMAGE_REVISION="$BLD_COMMIT" \
         --build-arg IMAGE_VERSION="$BLD_VERSION" .
 else
-    docker build -f $BLD_DOCKERFILE -t $BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG --target build-stage .
+    docker build -f "$BLD_DOCKERFILE" -t "$BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG" --target build-stage .
 fi
 
 if [[ -z $BLD_DOCKER_REPOSITORY ]]; then
@@ -83,18 +91,17 @@ else
       echo '=== Not pushing Docker image: username or password not specified'
     else
       if [[ -z $BLD_DOCKER_HOST ]]; then
-        echo "=== Pushing Docker image: $BLD_DOCKER_REPOSITORY/$BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG"
-      else
-        echo "=== Pushing Docker image: $BLD_DOCKER_REPOSITORY/$BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG to $BLD_DOCKER_HOST"
+        BLD_DOCKER_HOST="docker.io"
       fi
+      echo "=== Pushing Docker image: $BLD_DOCKER_REPOSITORY/$BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG to $BLD_DOCKER_HOST"
       echo "=== Authenticating..."
       echo "$BLD_DOCKER_PASSWORD" | docker login -u "$BLD_DOCKER_USERNAME" --password-stdin "$BLD_DOCKER_HOST" || exit $?
-      echo "=== Tagging image $BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG as $BLD_DOCKER_REPOSITORY/$BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG"
-      docker tag $BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG $BLD_DOCKER_REPOSITORY/$BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG
-      echo "=== Pushing image $BLD_DOCKER_REPOSITORY/$BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG"
-      docker push $BLD_DOCKER_REPOSITORY/$BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG
+      echo "=== Tagging image $BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG as $BLD_DOCKER_HOST/$BLD_DOCKER_REPOSITORY/$BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG"
+      docker tag "$BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG" "$BLD_DOCKER_HOST/$BLD_DOCKER_REPOSITORY/$BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG"
+      echo "=== Pushing image $BLD_DOCKER_HOST/$BLD_DOCKER_REPOSITORY/$BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG"
+      docker push "$BLD_DOCKER_HOST/$BLD_DOCKER_REPOSITORY/$BLD_DOCKER_IMAGE:$BLD_DOCKER_TAG"
       echo "=== Executing logout!"
-      docker logout $BLD_DOCKER_HOST
+      docker logout "$BLD_DOCKER_HOST"
     fi
   fi
 fi

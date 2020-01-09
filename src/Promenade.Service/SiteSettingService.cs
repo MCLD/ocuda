@@ -30,7 +30,9 @@ namespace Ocuda.Promenade.Service
             }
             else
             {
-                _logger.LogError($"Invalid value for promenade boolean setting {key}: {settingValue}");
+                _logger.LogError("Invalid value for Promenade boolean setting {SiteSettingKey}: {SiteSettingValue}",
+                    key,
+                    settingValue);
 
                 var defaultSetting = GetDefaultSetting(key);
                 if (bool.TryParse(defaultSetting.Value, out bool defaultResult))
@@ -39,7 +41,9 @@ namespace Ocuda.Promenade.Service
                 }
                 else
                 {
-                    _logger.LogCritical($"Invalid default value for promenade boolean setting {key}: {settingValue}");
+                    _logger.LogCritical("Invalid default value for Promenade boolean setting {SiteSettingKey}: {SiteSettingValue}",
+                        key,
+                        settingValue);
                     return default;
                 }
             }
@@ -55,7 +59,9 @@ namespace Ocuda.Promenade.Service
             }
             else
             {
-                _logger.LogError($"Invalid value for promenade integer setting {key}: {settingValue}");
+                _logger.LogError("Invalid value for Promenade integer setting {SiteSettingKey}: {SiteSettingValue}",
+                    key,
+                    settingValue);
 
                 var defaultSetting = GetDefaultSetting(key);
                 if (int.TryParse(defaultSetting.Value, out int defaultResult))
@@ -64,7 +70,9 @@ namespace Ocuda.Promenade.Service
                 }
                 else
                 {
-                    _logger.LogCritical($"Invalid default value for promenade integer setting {key}: {settingValue}");
+                    _logger.LogCritical("Invalid default value for Promenade integer setting {SiteSettingKey}: {SiteSettingValue}",
+                        key,
+                        settingValue);
                     return default;
                 }
             }

@@ -138,13 +138,17 @@ namespace Ocuda.Ops.Service
             {
                 if (!bool.TryParse(value, out _))
                 {
-                    _logger.LogError($"Invalid format for boolean key {key}: {value}");
+                    _logger.LogError("Invalid format for boolean site setting key {SiteSettingKey}: {SiteSettingValue}",
+                        key,
+                        value);
                     throw new OcudaException("Invald format.");
                 }
             }
             else if (currentSetting.Type == SiteSettingType.Int && !int.TryParse(value, out _))
             {
-                _logger.LogError($"Invalid format for integer key {key}: {value}");
+                _logger.LogError("Invalid format for integer site setting key {SiteSettingKey}: {SiteSettingValue}",
+                    key,
+                    value);
                 throw new OcudaException("Invald format.");
             }
 
@@ -176,26 +180,28 @@ namespace Ocuda.Ops.Service
 
             if (await _siteSettingRepository.IsDuplicateKey(siteSetting))
             {
-                var message = $"Site Setting with key '{siteSetting.Id}' already exists.";
-                _logger.LogWarning(message, siteSetting.Id);
-                throw new OcudaException(message);
+                _logger.LogWarning("Site setting with key {SiteSettingId} already exists.",
+                    siteSetting.Id);
+                throw new OcudaException($"Site Setting with key '{siteSetting.Id}' already exists.");
             }
 
             if (siteSetting.Type == SiteSettingType.Bool)
             {
                 if (!bool.TryParse(siteSetting.Value, out bool result))
                 {
-                    var message = $"{siteSetting.Name} requires a value of type {siteSetting.Type}.";
-                    _logger.LogWarning(message, siteSetting.Value, result);
-                    throw new OcudaException(message);
+                    _logger.LogWarning("{SiteSettingName} requires a value of type {SiteSettingType}",
+                        siteSetting.Name,
+                        siteSetting.Type);
+                    throw new OcudaException($"{siteSetting.Name} requires a value of type {siteSetting.Type}.");
                 }
             }
             else if (siteSetting.Type == SiteSettingType.Int
                 && !int.TryParse(siteSetting.Value, out int result))
             {
-                var message = $"{siteSetting.Name} requires a value of type {siteSetting.Type}.";
-                _logger.LogWarning(message, siteSetting.Value, result);
-                throw new OcudaException(message);
+                _logger.LogWarning("{SiteSettingName} requires a value of type {SiteSettingType}",
+                    siteSetting.Name,
+                    siteSetting.Type);
+                throw new OcudaException($"{siteSetting.Name} requires a value of type {siteSetting.Type}.");
             }
         }
     }

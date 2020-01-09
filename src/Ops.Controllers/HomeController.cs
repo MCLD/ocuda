@@ -17,7 +17,6 @@ namespace Ocuda.Ops.Controllers
         [HttpGet("")]
         public IActionResult Index()
         {
-            _logger.LogInformation("Hello, world.");
             return View();
         }
 

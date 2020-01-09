@@ -113,7 +113,10 @@ namespace Ocuda.Ops.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Unable to send email: {ex.Message}");
+                _logger.LogError(ex,
+                    "Unable to send email to {EmailTo} with subject {EmailSubject}: {Message}",
+                    emailAddress,
+                    subject);
                 throw new OcudaException("Unable to send email.", ex);
             }
             await client.DisconnectAsync(true);

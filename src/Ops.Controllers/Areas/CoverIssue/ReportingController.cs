@@ -32,8 +32,10 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error recording cover issue for BibId {bibId}: {ex}",
-                    bibId, ex.Message);
+                _logger.LogError(ex,
+                    "Error recording cover issue for BibId {BibId}: {Message}",
+                    bibId,
+                    ex.Message);
                 ShowAlertDanger("There was an error reporting this cover issue.");
             }
 

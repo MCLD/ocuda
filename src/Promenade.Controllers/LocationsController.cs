@@ -41,7 +41,7 @@ namespace Ocuda.Promenade.Controllers
         public async Task<IActionResult> Find(double? latitude = null, double? longitude = null,
             string zip = null)
         {
-            var apiKey = _config[Utility.Keys.Configuration.PromAPIGoogleMaps];
+            var apiKey = _config[Utility.Keys.Configuration.PromenadeAPIGoogleMaps];
 
             var viewModel = new LocationViewModel
             {
@@ -73,18 +73,23 @@ namespace Ocuda.Promenade.Controllers
                         }
                         else
                         {
-                            _logger.LogError("No geocoding results for {Zip}", zip);
+                            _logger.LogError("No geocoding results for {ZIPCode}", zip);
                             TempData["AlertDanger"] = $"Unable to locate ZIP Code: <strong>{zip}</strong>.";
                         }
                     }
                     catch (HttpRequestException ex)
                     {
-                        _logger.LogCritical(ex, "Google API error: {Message}", ex.Message);
+                        _logger.LogCritical(ex,
+                            "Google API error geocoding {ZIPCode}: {Message}",
+                            viewModel.Zip,
+                            ex.Message);
                         TempData["AlertDanger"] = "An error occured, please try again later.";
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogCritical(ex, ex.Message);
+                        _logger.LogCritical("Error geocoding {ZIPCode}: {Message}",
+                            viewModel.Zip,
+                            ex.Message);
                         TempData["AlertDanger"] = "An error occured, please try again later.";
                     }
                 }
@@ -131,7 +136,8 @@ namespace Ocuda.Promenade.Controllers
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Problem looking up postal code for coordinates {Coordinates}: {Message}",
+                        _logger.LogError(ex,
+                            "Problem looking up postal code for coordinates {Coordinates}: {Message}",
                             latlng,
                             ex.Message);
                     }
