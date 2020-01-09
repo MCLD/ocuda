@@ -193,20 +193,12 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteAsync(int id)
         {
-            try
-            {
-                var locationHours = await _locationHoursRepository.GetLocationHoursByLocationId(id);
-                _locationHoursRepository.RemoveRange(locationHours);
+            var locationHours = await _locationHoursRepository.GetLocationHoursByLocationId(id);
+            _locationHoursRepository.RemoveRange(locationHours);
 
-                var location = await _locationRepository.FindAsync(id);
-                _locationRepository.Remove(location);
-                await _locationRepository.SaveAsync();
-            }
-            catch (OcudaException ex)
-            {
-                _logger.LogError(ex, "Could not delete location", ex.Message);
-                throw;
-            }
+            var location = await _locationRepository.FindAsync(id);
+            _locationRepository.Remove(location);
+            await _locationRepository.SaveAsync();
         }
 
         private string GetFormattedDayGroupings(List<DayOfWeek> days)
