@@ -13,11 +13,11 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<ICollection<string>> GetSegmentLanguagesByIdAsync(int id);
         Task<Segment> GetSegmentById(int segmentId);
-        Task<SegmentText> GetSegmentTextById(int segmentTextId);
+        SegmentText GetSegmentTextBySegmentLanguageId(SegmentText segmentText);
         SegmentText GetBySegmentIdAndLanguage(int segmentId, int languageId);
         Task AddSegmentText(SegmentText segmentText);
         Task AddSegment(Segment segment);
-        Task<Segment> FindSegmentByName(string name);
+        Segment FindSegmentByName(string name);
         Task EditSegment(Segment segment);
         Task EditSegmentText(SegmentText segmentText);
         Task DeleteSegmentText(SegmentText segmentText);

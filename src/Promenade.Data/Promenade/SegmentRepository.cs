@@ -15,13 +15,5 @@ namespace Ocuda.Promenade.Data.Promenade
             ILogger<SegmentRepository> logger) : base(repositoryFacade, logger)
         {
         }
-
-        public async Task<List<Segment>> GetAllActiveSegments()
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.IsActive)
-                .ToListAsync();
-        }
     }
 }

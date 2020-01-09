@@ -11,7 +11,6 @@
                   method="post"
                   role="form"
                   style="display:inline">
-                <input asp-for="SegmentText.Id" type="hidden" />
                 <input asp-for="SegmentText.SegmentId" type="hidden" />
                 <input asp-for="SegmentText.LanguageId" type="hidden" />
                 <div class="modal-content">
@@ -63,9 +62,6 @@
           role="form"
           id="addform"
           display="inline">
-        <input asp-for="SegmentText.Id"
-               value="@Model.SegmentText.Id"
-               type="hidden" />
         <input asp-for="SegmentText.LanguageId"
                value="@Model.SegmentText.LanguageId"
                type="hidden" />

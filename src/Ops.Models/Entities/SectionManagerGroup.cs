@@ -15,6 +15,5 @@ namespace Ocuda.Ops.Models.Entities
         [Required]
         [MaxLength(255)]
         public string GroupName { get; set; }
-
     }
 }

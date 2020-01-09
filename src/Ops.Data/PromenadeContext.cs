@@ -25,6 +25,8 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.Id, _.LanguageId });
             modelBuilder.Entity<EmediaCategory>()
                 .HasKey(_ => new { _.CategoryId, _.EmediaId });
+            modelBuilder.Entity<SegmentText>()
+                .HasKey(_ => new { _.SegmentId, _.LanguageId });
         }
 
         #region IMigratableContext

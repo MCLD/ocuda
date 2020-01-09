@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
@@ -15,11 +14,19 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public SegmentText GetSegmentTextBySgmentId(int segmentId)
+        public SegmentText GetSegmentTextBySegmentId(int segmentId)
         {
             return DbSet
                 .AsNoTracking()
                 .Where(_ => _.SegmentId == segmentId)
+                .FirstOrDefault();
+        }
+
+        public SegmentText GetSegmentTextBySgmentAndLanguageId(int segmentId, int languageId)
+        {
+            return DbSet
+                .AsNoTracking()
+                .Where(_ => _.SegmentId == segmentId && _.LanguageId == languageId)
                 .FirstOrDefault();
         }
     }

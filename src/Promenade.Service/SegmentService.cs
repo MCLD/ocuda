@@ -28,8 +28,29 @@ namespace Ocuda.Promenade.Service
         public async Task<Segment> GetSegmentById(int segmentId)
         {
             var segment = await _segmentRepository.FindAsync(segmentId);
-            segment.SegmentText = _segmentTextRepository.GetSegmentTextBySgmentId(segment.Id);
+            segment.SegmentText = _segmentTextRepository.GetSegmentTextBySegmentId(segment.Id);
             return segment;
+        }
+
+        public async Task<SegmentText> GetSegmentTextBySegmentAndLanguageId(int segmentId, int languageId)
+        {
+            var segment = await _segmentRepository.FindAsync(segmentId);
+            if (segment != null && segment.IsActive)
+            {
+                if (segment.StartDate != null && segment.EndDate != null)
+                {
+                    var today = DateTime.Now;
+                    if (today > segment.StartDate && today < segment.EndDate)
+                    {
+                        return _segmentTextRepository.GetSegmentTextBySgmentAndLanguageId(segment.Id, languageId);
+                    }
+                }
+                else
+                {
+                    return _segmentTextRepository.GetSegmentTextBySgmentAndLanguageId(segment.Id, languageId);
+                }
+            }
+            return null;
         }
     }
 }

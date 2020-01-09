@@ -18,16 +18,18 @@ namespace Ocuda.Promenade.Controllers
     public class LocationsController : BaseController<LocationsController>
     {
         private readonly LocationService _locationService;
+        private readonly LanguageService _languageService;
         private readonly SegmentService _segmentService;
 
         public static string Name { get { return "Locations"; } }
 
         public LocationsController(ServiceFacades.Controller<LocationsController> context,
-            LocationService locationService, SegmentService segmentService ) : base(context)
+            LocationService locationService, SegmentService segmentService, LanguageService languageService ) : base(context)
         {
             _locationService = locationService
                 ?? throw new ArgumentNullException(nameof(locationService));
-
+            _languageService = languageService
+                ?? throw new ArgumentNullException(nameof(languageService));
             _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
         }
@@ -184,48 +186,25 @@ namespace Ocuda.Promenade.Controllers
                     LocationFeatures = new List<LocationsFeaturesViewModel>(),
                     Location = await _locationService.GetLocationByStubAsync(locationStub)
                 };
-                if (viewModel.Location.PreFeatureSegmentId != null)
+                if (viewModel.Location.PreFeatureSegmentId.HasValue)
                 {
-                    var segment = await _segmentService.GetSegmentById(viewModel.Location.PreFeatureSegmentId.Value);
-                    if (segment.IsActive)
+                    viewModel.PreFeatureSegment = await _segmentService.GetSegmentTextBySegmentAndLanguageId(
+                        viewModel.Location.PreFeatureSegmentId.Value, await _languageService.GetDefaultLanguageIdAsync());
+                    if(viewModel.PreFeatureSegment!=null)
                     {
-                        if (segment.StartDate != null && segment.EndDate != null)
-                        {
-                            var today = DateTime.Now;
-                            if (today > segment.StartDate && today < segment.EndDate)
-                            {
-                                viewModel.PreFeatureSegment = segment.SegmentText;
-                                viewModel.PreFeatureSegment.Text = CommonMark.CommonMarkConverter.Convert(viewModel.PreFeatureSegment.Text);
-                            }
-                        }
-                        else
-                        {
-                            viewModel.PreFeatureSegment = segment.SegmentText;
-                            viewModel.PreFeatureSegment.Text = CommonMark.CommonMarkConverter.Convert(viewModel.PreFeatureSegment.Text);
-                        }
+                        viewModel.PreFeatureSegment.Text = CommonMark.CommonMarkConverter.Convert(viewModel.PreFeatureSegment.Text);
                     }
                 }
-                if (viewModel.Location.PostFeatureSegmentId != null)
+                if (viewModel.Location.PostFeatureSegmentId.HasValue)
                 {
-                    var segment = await _segmentService.GetSegmentById(viewModel.Location.PostFeatureSegmentId.Value);
-                    if (segment.IsActive)
+                    viewModel.PostFeatureSegment = await _segmentService.GetSegmentTextBySegmentAndLanguageId(
+                        viewModel.Location.PostFeatureSegmentId.Value, await _languageService.GetDefaultLanguageIdAsync());
+                    if (viewModel.PostFeatureSegment != null)
                     {
-                        if (segment.StartDate != null && segment.EndDate != null)
-                        {
-                            var today = DateTime.Now;
-                            if (today > segment.StartDate && today < segment.EndDate)
-                            {
-                                viewModel.PostFeatureSegment = segment.SegmentText;
-                                viewModel.PostFeatureSegment.Text = CommonMark.CommonMarkConverter.Convert(viewModel.PostFeatureSegment.Text);
-                            }
-                        }
-                        else
-                        {
-                            viewModel.PostFeatureSegment = segment.SegmentText;
-                            viewModel.PostFeatureSegment.Text = CommonMark.CommonMarkConverter.Convert(viewModel.PostFeatureSegment.Text);
-                        }
+                        viewModel.PostFeatureSegment.Text = CommonMark.CommonMarkConverter.Convert(viewModel.PostFeatureSegment.Text);
                     }
                 }
+
                 viewModel.Location.Description = CommonMark.CommonMarkConverter.Convert(viewModel.Location.Description);
                 viewModel.Location.LocationHours = await _locationService.GetFormattedWeeklyHoursAsync(viewModel.Location.Id);
                 if (viewModel.Location.LocationHours != null)

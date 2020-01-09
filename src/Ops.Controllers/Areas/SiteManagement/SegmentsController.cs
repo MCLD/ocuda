@@ -170,11 +170,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             try
             {
                 await _segmentService.EditSegmentText(segmentText);
-                var updatedSegmentText = await _segmentService.GetSegmentTextById(segmentText.Id);
+                var updatedSegmentText = _segmentService.GetSegmentTextBySegmentLanguageId(segmentText);
                 var language = await _languageService.GetActiveByIdAsync(updatedSegmentText.LanguageId);
 
                 ShowAlertSuccess($"Updated Segment: {updatedSegmentText.Header}");
-                return RedirectToAction(nameof(SegmentsController.SegmentDetails), new { id = updatedSegmentText.Id, language = language.Name});
+                return RedirectToAction(nameof(SegmentsController.SegmentDetails), new { id = updatedSegmentText.SegmentId, language = language.Name});
             }
             catch (OcudaException ex)
             {

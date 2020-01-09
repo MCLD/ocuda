@@ -6,6 +6,5 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
     public interface ISegmentRepository : IGenericRepository<Segment, int>
     {
-        Task<List<Segment>> GetAllActiveSegments();
     }
 }

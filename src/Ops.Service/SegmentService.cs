@@ -40,9 +40,9 @@ namespace Ocuda.Ops.Service
             return await _segmentRepository.FindAsync(segmentId);
         }
 
-        public async Task<SegmentText> GetSegmentTextById(int segmentTextId)
+        public SegmentText GetSegmentTextBySegmentLanguageId(SegmentText segmentText)
         {
-            return await _segmentTextRepository.FindAsync(segmentTextId);
+            return _segmentTextRepository.GetSegmentTextBySegmentId(segmentText.SegmentId, segmentText.LanguageId);
         }
 
         public SegmentText GetBySegmentIdAndLanguage(int segmentId, int languageId)
@@ -55,7 +55,7 @@ namespace Ocuda.Ops.Service
             return await _segmentTextRepository.GetLanguageById(id);
         }
 
-        public async Task<Segment> FindSegmentByName(string name)
+        public Segment FindSegmentByName(string name)
         {
             return _segmentRepository.FindSegmentByName(name);
         }
@@ -96,8 +96,8 @@ namespace Ocuda.Ops.Service
 
         public async Task AddSegmentText(SegmentText segmentText)
         {
-            segmentText.CreatedAt = DateTime.Now;
-            segmentText.CreatedBy = GetCurrentUserId();
+            segmentText.Text = segmentText.Text.Trim();
+            segmentText.Header = segmentText.Header.Trim();
 
             await _segmentTextRepository.AddAsync(segmentText);
             await _segmentTextRepository.SaveAsync();
@@ -105,9 +105,7 @@ namespace Ocuda.Ops.Service
 
         public async Task EditSegmentText(SegmentText segmentText)
         {
-            var currentSegmentText = await _segmentTextRepository.FindAsync(segmentText.Id);
-            currentSegmentText.UpdatedAt = DateTime.Now;
-            currentSegmentText.UpdatedBy = GetCurrentUserId();
+            var currentSegmentText = _segmentTextRepository.GetSegmentTextBySegmentId(segmentText.SegmentId,segmentText.LanguageId);
             currentSegmentText.Header = segmentText.Header.Trim();
             currentSegmentText.Text = segmentText.Text.Trim();
 
