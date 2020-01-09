@@ -108,7 +108,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> CreateFeature(Feature feature)
         {
-            if(feature.NeedsPopup && string.IsNullOrEmpty(feature.Stub))
+            if (feature.NeedsPopup && string.IsNullOrEmpty(feature.Stub))
             {
                 ModelState.AddModelError("Feature.Stub", "A 'Stub' is required for a popup.");
                 ShowAlertDanger("A 'Stub' is required for a popup.");

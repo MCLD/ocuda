@@ -64,7 +64,8 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
             var header = await _coverIssueService.GetHeaderByIdAsync(id);
             if (header == null)
             {
-                _logger.LogWarning("Cover issue report {id} could not be found.", id);
+                _logger.LogWarning("Cover issue report {CoverIssueReportId} could not be found.",
+                    id);
                 ShowAlertDanger($"The requested report could not be found.");
                 return RedirectToAction(nameof(Index));
             }
@@ -100,8 +101,10 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error resolving cover issue for header {headerId}: {ex}",
-                    model.HeaderId, ex.Message);
+                _logger.LogError(ex,
+                    "Error resolving cover issue for header {HeaderId}: {Message}",
+                    model.HeaderId,
+                    ex.Message);
                 ShowAlertDanger($"An error occured while trying to make the issue as resolved");
             }
             return RedirectToAction(nameof(Index));

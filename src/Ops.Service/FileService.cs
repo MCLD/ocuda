@@ -58,7 +58,7 @@ namespace Ocuda.Ops.Service
 
             if (fileType == null)
             {
-                _logger.LogError($"{extension} is an unknown file type.", file);
+                _logger.LogError("{Extension} is an unknown file type.", extension);
                 throw new OcudaException("Unknown file type.");
             }
 
@@ -91,7 +91,7 @@ namespace Ocuda.Ops.Service
 
                 if (fileType == null)
                 {
-                    _logger.LogError($"{extension} is an unknown file type.", file);
+                    _logger.LogError("{Extension} is an unknown file type.", extension);
                     throw new OcudaException("Unknown file type.");
                 }
 
@@ -132,19 +132,9 @@ namespace Ocuda.Ops.Service
             string filePath = GetPrivateFilePath(file);
             byte[] fileBytes = IFormFileHelper.GetFileBytes(fileData);
 
-            if (string.IsNullOrWhiteSpace(oldFilePath))
+            if (!string.IsNullOrWhiteSpace(oldFilePath) && System.IO.File.Exists(oldFilePath))
             {
-                _logger.LogInformation($"Writing file: {filePath}");
-            }
-            else
-            {
-                if (System.IO.File.Exists(oldFilePath))
-                {
-                    _logger.LogInformation($"Editing File (Delete): {oldFilePath}");
-                    System.IO.File.Delete(oldFilePath);
-                }
-
-                _logger.LogInformation($"Editing File (Create): {filePath}");
+                System.IO.File.Delete(oldFilePath);
             }
 
             await System.IO.File.WriteAllBytesAsync(filePath, fileBytes);
@@ -158,7 +148,6 @@ namespace Ocuda.Ops.Service
 
             if (System.IO.File.Exists(filePath))
             {
-                _logger.LogInformation($"Deleting file: {filePath}");
                 System.IO.File.Delete(filePath);
             }
 
@@ -183,7 +172,7 @@ namespace Ocuda.Ops.Service
 
             if (fileType == null)
             {
-                _logger.LogError($"{extension} is an unknown file type.", file);
+                _logger.LogError("{Extension} is an unknown file type.", extension);
                 throw new OcudaException("Unknown file type.");
             }
 
@@ -209,19 +198,9 @@ namespace Ocuda.Ops.Service
             string filePath = GetPublicFilePath(file);
             byte[] fileBytes = IFormFileHelper.GetFileBytes(fileData);
 
-            if (string.IsNullOrWhiteSpace(oldFilePath))
+            if (!string.IsNullOrWhiteSpace(oldFilePath) && System.IO.File.Exists(oldFilePath))
             {
-                _logger.LogInformation($"Writing file: {filePath}");
-            }
-            else
-            {
-                if (System.IO.File.Exists(oldFilePath))
-                {
-                    _logger.LogInformation($"Editing File (Delete): {oldFilePath}");
-                    System.IO.File.Delete(oldFilePath);
-                }
-
-                _logger.LogInformation($"Editing File (Create): {filePath}");
+                System.IO.File.Delete(oldFilePath);
             }
 
             await System.IO.File.WriteAllBytesAsync(filePath, fileBytes);
@@ -235,7 +214,6 @@ namespace Ocuda.Ops.Service
 
             if (System.IO.File.Exists(filePath))
             {
-                _logger.LogInformation($"Deleting file: {filePath}");
                 System.IO.File.Delete(filePath);
             }
 

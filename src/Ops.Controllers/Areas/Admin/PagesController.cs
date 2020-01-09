@@ -181,7 +181,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting page header: {ex}", ex);
+                _logger.LogError(ex, "Error deleting page header: {Message}", ex.Message);
                 ShowAlertDanger("Unable to delete page: ", ex.Message);
             }
 
@@ -325,8 +325,10 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             catch (Exception ex)
             {
                 _logger.LogError(ex,
-                    "Error previewing header {header} in language {language}: {ex}",
-                    headerId, languageId, ex);
+                    "Error previewing header {Header} in language {Language}: {Message}",
+                    headerId,
+                    languageId,
+                    ex.Message);
                 ShowAlertWarning("Unable to preview page");
                 return RedirectToAction("Index");
             }

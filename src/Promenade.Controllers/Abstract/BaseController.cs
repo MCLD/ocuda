@@ -17,7 +17,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
     [MiddlewareFilter(typeof(i18n.Middleware.LocalizationMiddleware))]
     public abstract class BaseController<T> : Controller
     {
-        protected readonly ILogger _logger;
+        protected readonly ILogger<T> _logger;
         protected readonly IConfiguration _config;
         protected readonly IStringLocalizer<i18n.Resources.Shared> _sharedLocalizer;
         protected readonly SiteSettingService _siteSettingService;
@@ -26,6 +26,10 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
         protected BaseController(ServiceFacades.Controller<T> context)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
             _logger = context.Logger;
             _config = context.Config;
             _sharedLocalizer = context.SharedLocalizer;

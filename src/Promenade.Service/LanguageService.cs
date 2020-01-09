@@ -42,7 +42,7 @@ namespace Ocuda.Promenade.Service
                 if (siteCulture == null && dbCulture.IsActive)
                 {
                     // no longer active
-                    _logger.LogInformation("Marking language {Name} inactive in the database.",
+                    _logger.LogInformation("Marking language {LanguageName} inactive in the database.",
                         dbCulture.Name);
                     dbCulture.IsActive = false;
                     dbCulture.IsDefault = dbCulture.Name == Culture.DefaultName;
@@ -52,7 +52,7 @@ namespace Ocuda.Promenade.Service
                 else if (siteCulture != null && !dbCulture.IsActive)
                 {
                     // valid but marked invalid in the database
-                    _logger.LogInformation("Marking language {Name} as active in the database.",
+                    _logger.LogInformation("Marking language {LanguageName} as active in the database.",
                         dbCulture.Name);
                     dbCulture.IsActive = true;
                     dbCulture.IsDefault = dbCulture.Name == Culture.DefaultName;

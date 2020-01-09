@@ -41,6 +41,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             if (ModelState.IsValid)
             {
+                _logger.LogInformation("Inserting roster {FileName}", model.FileName);
+                var timer = new System.Diagnostics.Stopwatch();
+                timer.Start();
                 var tempFile = Path.GetTempFileName();
                 using (var fileStream = new FileStream(tempFile, FileMode.Create))
                 {
@@ -51,11 +54,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     int insertedRecordCount
                         = await _rosterService.ImportRosterAsync(CurrentUserId, tempFile);
-                    AlertInfo = $"Successfully inserted {insertedRecordCount} roster records.";
+                    timer.Stop();
+                    _logger.LogInformation("Roster {FileName} inserted {Count} records in {ElapsedMs} ms",
+                        model.FileName,
+                        insertedRecordCount,
+                        timer.ElapsedMilliseconds);
+                    AlertInfo = $"Successfully inserted {insertedRecordCount} roster records in {timer.Elapsed}";
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error inserting roster data: {Message}", ex);
+                    _logger.LogError(ex, "Error inserting roster data: {Message}", ex.Message);
                     AlertDanger = "An error occured while uploading the roster.";
                 }
                 finally

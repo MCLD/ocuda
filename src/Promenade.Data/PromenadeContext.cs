@@ -41,7 +41,6 @@ namespace Ocuda.Promenade.Data
         public DbSet<Navigation> Navigations { get; }
         public DbSet<NavigationText> NavigationTexts { get; }
         public DbSet<Page> Pages { get; }
-        public DbSet<PageHeader> PageHeaders { get; set; }
         public DbSet<SiteSetting> SiteSettings { get; }
         public DbSet<SocialCard> SocialCards { get; }
         public DbSet<UrlRedirect> UrlRedirects { get; }
@@ -49,5 +48,6 @@ namespace Ocuda.Promenade.Data
         // Read/Write 
         public DbSet<Language> Languages { get; set; }
         public DbSet<UrlRedirectAccess> UrlRedirectAccesses { get; set; }
+        public DbSet<PageHeader> PageHeaders { get; set; }
     }
 }

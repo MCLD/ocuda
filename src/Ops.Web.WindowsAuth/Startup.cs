@@ -119,7 +119,7 @@ namespace Ops.Web.WindowsAuth
 
                     if (whoami)
                     {
-                        _logger.LogInformation("Displaying whoami for {0}", identity.Name);
+                        _logger.LogInformation("Displaying whoami for {Username}", identity.Name);
                         context.Response.ContentType = "text/html";
                         context.Response.Headers.Add("X-Robots-Tag", "noindex");
                         await context.Response.WriteAsync(HtmlDocumentHeader);
@@ -156,7 +156,7 @@ namespace Ops.Web.WindowsAuth
 
                         if (string.IsNullOrEmpty(CacheDiscriminator))
                         {
-                            _logger.LogInformation("Id {0} user {1} has {2} roles from {3}",
+                            _logger.LogInformation("Id {UserId} user {Username} has {RolesCount} roles from {Referer}",
                                 id,
                                 identity.Name,
                                 roles.Count(),
@@ -164,7 +164,7 @@ namespace Ops.Web.WindowsAuth
                         }
                         else
                         {
-                            _logger.LogInformation("Id {0} user {1} has {2} roles from {3} cd {4}",
+                            _logger.LogInformation("Id {UserId} user {Username} has {RolesCount} roles from {Referer} cd {CacheDiscriminator}",
                                 id,
                                 identity.Name,
                                 roles.Count(),

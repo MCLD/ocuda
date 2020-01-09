@@ -49,12 +49,18 @@ namespace Ocuda.Ops.Web.StartupHelper
                 hasMigrations = pending != null && pending.Any();
                 if (hasMigrations)
                 {
-                    _logger.LogWarning($"Applying {pending.Count()} db migrations for {contextName}, last is: {pending.Last()}");
+                    _logger.LogWarning("Applying {MigrationsCount} db migrations for {ContextName}, last is: {LastMigration}",
+                        pending.Count(),
+                        contextName,
+                        pending.Last());
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogCritical($"Error looking up migrations for {contextName}: {ex.Message}");
+                _logger.LogCritical(ex,
+                    "Error looking up migrations for {ContextName}: {Message}",
+                    contextName,
+                    ex.Message);
                 throw;
             }
             try
@@ -66,7 +72,10 @@ namespace Ocuda.Ops.Web.StartupHelper
             }
             catch (Exception ex)
             {
-                _logger.LogCritical($"Error performing migrations for {contextName}: {ex.Message}");
+                _logger.LogCritical(ex,
+                    "Error performing migrations for {ContextName}: {Message}",
+                    contextName,
+                    ex.Message);
                 throw;
             }
         }

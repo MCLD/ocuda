@@ -39,12 +39,8 @@ namespace Ocuda.Ops.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // build a temporary logger for this method call
-            using var logger = Utility.Logging.Configuration.Build(_config).CreateLogger();
-
             // set a default culture of en-US if none is specified
             string culture = _config[Configuration.OpsCulture] ?? DefaultCulture;
-            logger.Information("Configuring for culture: {0}", culture);
             services.Configure<RequestLocalizationOptions>(_ =>
             {
                 _.DefaultRequestCulture
@@ -69,9 +65,9 @@ namespace Ocuda.Ops.Web
                     {
                         instanceName = $"{instanceName}{cacheDiscriminator}.";
                     }
-                    logger.Information("Using Redis distributed cache {0} instance {1}",
-                        redisConfiguration,
-                        instanceName);
+                    _config[Configuration.OcudaRuntimeRedisCacheConfiguration]
+                        = redisConfiguration;
+                    _config[Configuration.OcudaRuntimeRedisCacheInstance] = instanceName;
                     services.AddDistributedRedisCache(_ =>
                     {
                         _.Configuration = redisConfiguration;
@@ -79,7 +75,6 @@ namespace Ocuda.Ops.Web
                     });
                     break;
                 default:
-                    logger.Information("Using memory-based distributed cache");
                     services.AddDistributedMemoryCache();
                     break;
             }
@@ -93,15 +88,12 @@ namespace Ocuda.Ops.Web
             switch (provider)
             {
                 case "SqlServer":
-                    logger.Information("Using {0} data provider", provider);
                     services.AddDbContextPool<OpsContext,
                         DataProvider.SqlServer.Ops.Context>(_ => _.UseSqlServer(opsCs));
                     services.AddDbContextPool<PromenadeContext,
                         DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
                     break;
                 default:
-                    logger.Fatal("No {0} configured in settings. Exiting.",
-                        Configuration.OpsDatabaseProvider);
                     throw new OcudaException($"No {Configuration.OpsDatabaseProvider} configured.");
             }
 
@@ -112,8 +104,6 @@ namespace Ocuda.Ops.Web
             if (int.TryParse(_config[Configuration.OpsSessionTimeoutMinutes],
                 out int configuredTimeout))
             {
-                logger.Information("Session timeout configured for {0} minutes",
-                    configuredTimeout);
                 sessionTimeout = TimeSpan.FromMinutes(configuredTimeout);
             }
 
@@ -122,6 +112,8 @@ namespace Ocuda.Ops.Web
                 _.IdleTimeout = sessionTimeout;
                 _.Cookie.HttpOnly = true;
             });
+
+            _config[Configuration.OcudaRuntimeSessionTimeout] = sessionTimeout.ToString();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(_ =>
@@ -150,7 +142,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped(typeof(Data.ServiceFacade.Repository<>));
 
             // filters
-            services.AddScoped<Controllers.Filters.AuthenticationFilterAttribute>();
+            services.AddScoped<Controllers.Filters.AuthenticationFilter>();
             services.AddScoped<Controllers.Filters.ExternalResourceFilterAttribute>();
             services.AddScoped<Controllers.Filters.NavigationFilterAttribute>();
             services.AddScoped<Controllers.Filters.UserFilterAttribute>();
