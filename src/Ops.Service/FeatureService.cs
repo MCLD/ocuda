@@ -68,8 +68,6 @@ namespace Ocuda.Ops.Service
             feature.Name = feature.Name?.Trim();
             feature.BodyText = feature.BodyText?.Trim();
             feature.Stub = feature.Stub?.Trim();
-            feature.CreatedAt = DateTime.Now;
-            feature.CreatedBy = GetCurrentUserId();
 
             await ValidateAsync(feature);
             await _featureRepository.AddAsync(feature);
@@ -96,8 +94,6 @@ namespace Ocuda.Ops.Service
                 currentFeature.Icon = feature.Icon;
                 currentFeature.Name = feature.Name?.Trim();
                 currentFeature.Stub = feature.Stub?.Trim();
-                currentFeature.UpdatedAt = DateTime.Now;
-                currentFeature.UpdatedBy = GetCurrentUserId();
 
                 _featureRepository.Update(feature);
                 await _featureRepository.SaveAsync();
