@@ -8,7 +8,7 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 namespace Ocuda.Promenade.Data.Promenade
 {
     public class EmediaRepository
-        : GenericRepository<PromenadeContext, Emedia, int>, IEmediaRepository
+        : GenericRepository<PromenadeContext, Emedia>, IEmediaRepository
     {
         public EmediaRepository(
             ServiceFacade.Repository<PromenadeContext> repositoryFacade,

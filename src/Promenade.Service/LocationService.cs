@@ -140,7 +140,7 @@ namespace Ocuda.Promenade.Service
 
         public async Task<LocationFeature> GetLocationFeatureByIds(int locationId, int featureId)
         {
-            return await _locationFeatureRepository.GetLocationFeaturesByIds(locationId, featureId);
+            return await _locationFeatureRepository.GetByIdsAsync(featureId, locationId);
         }
 
         public async Task<List<Feature>> GetLocationsFeaturesAsync(string locationStub)

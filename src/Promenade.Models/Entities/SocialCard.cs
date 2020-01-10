@@ -1,12 +1,15 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Ocuda.Promenade.Models.Abstract;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class SocialCard : BaseEntity
+    public class SocialCard
     {
+        [Key]
+        [Required]
+        public int Id { get; set; }
+
         [Required]
         [MaxLength(70)]
         public string Title { get; set; }

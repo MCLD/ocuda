@@ -254,10 +254,8 @@
                             @foreach (var feature in Model.Features.Where(_ => _.Id == locationFeature.FeatureId))
                             {
                                 <tr>
-                                    <td class="td-class feature-item"
-                                        data-locationFeatureId="@locationFeature.Id">
-                                        @feature.Name
-                                    </td>
+                                    <td class="td-class feature-item" 
+                                        data-featureId="@locationFeature.FeatureId">@feature.Name</td>
                                     <td style="vertical-align:middle;">
                                         @if (!string.IsNullOrEmpty(locationFeature.Text))
                                         {
@@ -272,10 +270,9 @@
                                         }
                                     </td>
                                     <td style="vertical-align:middle;">@locationFeature.RedirectUrl</td>
-                                    <td>
-                                        <button type="button"
-                                                class="btn btn-link btn-xs deleteFeatureButton"
-                                                data-locationFeatureId="@locationFeature.Id"
+                                    <td><button type="button" 
+                                                class="btn btn-link btn-xs deleteFeatureButton" 
+                                                data-featureId="@locationFeature.FeatureId"
                                                 data-featureName="@feature.Name">
                                             <span class="fa fa-2x fas fa-minus-circle text-danger"
                                                   aria-hidden="true"></span>
@@ -320,11 +317,9 @@
                             @foreach (var group in Model.Groups.Where(_ => _.Id == locationGroup.GroupId))
                             {
                                 <tr>
-                                    <td style="vertical-align:middle;"
-                                        class="group-item"
-                                        data-locationgroupid="@locationGroup.Id">
-                                        @group.GroupType
-                                    </td>
+                                    <td style="vertical-align:middle;" 
+                                        class="group-item" 
+                                        data-groupid="@locationGroup.GroupId">@group.GroupType</td>
                                     @if (group.IsLocationRegion)
                                     {
                                         <td class="text-center"
@@ -346,9 +341,9 @@
                                         }
                                     </td>
                                     <td>
-                                        <button type="button"
-                                                class="btn btn-link btn-xs deletegroupButton"
-                                                data-locationgroupid="@locationGroup.Id"
+                                        <button type="button" 
+                                                class="btn btn-link btn-xs deletegroupButton" 
+                                                data-groupid="@locationGroup.GroupId" 
                                                 data-groupname="@group.GroupType">
                                             <span class="fa fa-2x fas fa-minus-circle text-danger"
                                                   aria-hidden="true"></span>
@@ -480,7 +475,8 @@
                 if (objType == "Group") {
                     $.post("@Url.Action(nameof(LocationsController.DeleteLocationGroup))",
                         {
-                            locationgroupId: itemId
+                            groupId: itemId,
+                            locationId: @Model.Location.Id
                         }, function () {
                             $("#deleteModal").modal('hide');
                             window.location.reload();
@@ -489,7 +485,8 @@
                 else {
                     $.post("@Url.Action(nameof(LocationsController.DeleteLocationFeature))",
                         {
-                            locationfeatureId: itemId
+                            featureId: itemId,
+                            locationId: @Model.Location.Id
                         }, function () {
                             $("#deleteModal").modal('hide');
                             window.location.reload();
@@ -517,10 +514,10 @@
                 GetItemList("Feature");
             });
             $(document).on('click', "#confirmDeleteGroup", function () {
-                DeleteLocationObject($(this).data('locationgroupid'), "Group")
+                DeleteLocationObject($(this).data('groupid'), "Group")
             });
             $(document).on('click', "#confirmDeleteFeature", function () {
-                DeleteLocationObject($(this).data('locationfeatureid'), "Feature")
+                DeleteLocationObject($(this).data('featureid'), "Feature")
             });
             $(document).on("click", ".addgroupButton", function () {
                 groupIds.push($(this).data("groupid"));
@@ -541,7 +538,7 @@
                 @foreach(var locationgroup in Model.LocationGroups)
                 {
                     <text>
-                if (@locationgroup.Id == parseInt($(this).data("locationgroupid"))) {
+                if (@locationgroup.GroupId == parseInt($(this).data("groupid"))) {
                             @foreach(var group in Model.Groups.Where(_ => _.Id == locationgroup.GroupId))
                             {
                                 @:$("#editModalTitle").text("Edit Group: @group.GroupType");
@@ -552,7 +549,7 @@
                 $("#itemEditModal").modal("show");
                 $("#updateItem").attr("action","@Url.Action(nameof(LocationsController.EditLocationGroup),LocationsController.Name)");
                 $('#updateItem').attr('name', 'groups');
-                GetEditInfo($(this).data("locationgroupid"), "Group");
+                GetEditInfo($(this).data("groupid"), "Group");
             });
             $("#updateItem").submit(function() {
                 if ($("#updateItem").attr("name") == "hours" && !$("#accordion-header").hasClass("bg-info")) {
@@ -564,7 +561,7 @@
                 @foreach(var locationfeature in Model.LocationFeatures)
                 {
                     <text>
-                if (@locationfeature.Id == parseInt($(this).data("locationfeatureid"))) {
+                if (@locationfeature.FeatureId == parseInt($(this).data("featureid"))) {
                             @foreach(var feature in Model.Features.Where(_ => _.Id == locationfeature.FeatureId))
                             {
                                 @:$("#editModalTitle").text("Edit Feature: @feature.Name");
@@ -575,7 +572,7 @@
                 $("#itemEditModal").modal("show");
                 $('#updateItem').attr('name', 'features');
                 $("#updateItem").attr("action","@Url.Action(nameof(LocationsController.EditLocationFeature),LocationsController.Name)");
-                GetEditInfo($(this).data("locationfeatureid"), "Feature");
+                GetEditInfo($(this).data("featureid"), "Feature");
             });
             $("#editHoursButton").on('click', function (e) {
                 $("#editModalTitle").text("Edit @Model.Location.Name's Hours");
@@ -606,7 +603,7 @@
             });
 
             $(document).on("click", "#removeGroupButton", function () {
-                groupIds.splice(groupIds.indexOf($(this).data("locationgroupid")), 1);
+                groupIds.splice(groupIds.indexOf($(this).data("groupid")), 1);
                 $("#GroupList").val(groupIds.join(','));
                 $(this).parent().parent().remove();
                 if (groupIds.length == 0)
@@ -615,7 +612,7 @@
                 }
             });
             $(document).on("click", "#removeFeatureButton", function () {
-                featureIds.splice(featureIds.indexOf($(this).data("locationfeatureid")), 1);
+                featureIds.splice(featureIds.indexOf($(this).data("featureid")), 1);
                 $("#FeatureList").val(featureIds.join(','));
                 $(this).parent().parent().remove();
                 if (featureIds.length == 0)
@@ -635,13 +632,13 @@
             });
 
             $('.deletegroupButton').on('click', function () {
-                $($("#deleteModal").find("button.btn-danger")).attr("data-locationgroupid",$(this).data("locationgroupid").toString());
+                $($("#deleteModal").find("button.btn-danger")).attr("data-groupid",$(this).data("groupid").toString());
                 $($("#deleteModal").find("button.btn-danger")).attr("id", "confirmDeleteGroup")
                 $("#deleteModal").find(".modal-body").html("Are you sure you want to remove the group '<strong>" + $(this).data("groupname") + "</strong>' from '<strong>@Model.Location.Name</strong>'")
                 $("#deleteModal").modal("show");
             });
             $('.deleteFeatureButton').on('click', function () {
-                $($("#deleteModal").find("button.btn-danger")).attr("data-locationfeatureId",$(this).data("locationfeatureid").toString());
+                $($("#deleteModal").find("button.btn-danger")).attr("data-featureId",$(this).data("featureid").toString());
                 $($("#deleteModal").find("button.btn-danger")).attr("id", "confirmDeleteFeature")
                 $("#deleteModal").find(".modal-body").html("Are you sure you want to remove the feature '<strong>" + $(this).data("featurename") + "</strong>' from '<strong>@Model.Location.Name</strong>'")
                 $("#deleteModal").modal("show");

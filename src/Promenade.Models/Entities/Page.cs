@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using Ocuda.Promenade.Models.Abstract;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class Page : BaseEntity
+    public class Page
     {
         [Required]
         [MaxLength(255)]
@@ -20,11 +19,13 @@ namespace Ocuda.Promenade.Models.Entities
 
         public SocialCard SocialCard { get; set; }
 
+        [Key]
         [Required]
         public int LanguageId { get; set; }
 
         public Language Language { get; set; }
 
+        [Key]
         [Required]
         public int PageHeaderId { get; set; }
 

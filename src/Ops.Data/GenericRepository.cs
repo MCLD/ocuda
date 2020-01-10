@@ -11,7 +11,7 @@ using Ocuda.Utility.Data;
 
 namespace Ocuda.Ops.Data
 {
-    public abstract class GenericRepository<TContext, TEntity, TKeyType>
+    public abstract class GenericRepository<TContext, TEntity>
         where TContext : DbContextBase
         where TEntity : class
     {
@@ -52,11 +52,6 @@ namespace Ocuda.Ops.Data
         public virtual void Remove(TEntity entity)
         {
             DbSet.Remove(entity);
-        }
-
-        public virtual void Remove(TKeyType id)
-        {
-            DbSet.Remove(DbSet.Find(id));
         }
 
         public virtual void RemoveRange(ICollection<TEntity> entities)
@@ -100,16 +95,6 @@ namespace Ocuda.Ops.Data
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync();
-        }
-
-        public virtual async Task<TEntity> FindAsync(TKeyType id)
-        {
-            var entity = await DbSet.FindAsync(id);
-            if (entity != null)
-            {
-                _context.Entry(entity).State = EntityState.Detached;
-            }
-            return entity;
         }
 
         public virtual async Task SaveAsync()

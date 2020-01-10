@@ -11,7 +11,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<Page> GetByHeaderAndLanguageAsync(int headerId, int languageId);
         Task<Page> CreateAsync(Page page);
         Task<Page> EditAsync(Page page);
-        Task DeleteAsync(int id);
+        Task DeleteAsync(Page page);
         Task<DataWithCount<ICollection<PageHeader>>> GetPaginatedHeaderListAsync(BaseFilter filter);
         Task<PageHeader> GetHeaderByIdAsync(int id);
         Task<ICollection<string>> GetHeaderLanguagesByIdAsync(int id);

@@ -1,10 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Ocuda.Promenade.Models.Abstract;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class Category : BaseEntity
+    public class Category
     {
+        [Key]
+        [Required]
+        public int Id { get; set; }
+
         [MaxLength(255)]
         [Required]
         public string Name { get; set; }

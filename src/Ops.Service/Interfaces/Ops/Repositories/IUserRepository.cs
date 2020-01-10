@@ -5,7 +5,7 @@ using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
-    public interface IUserRepository : IRepository<User, int>
+    public interface IUserRepository : IOpsRepository<User, int>
     {
         Task<User> GetSystemAdministratorAsync();
         Task<User> FindByUsernameAsync(string username);

@@ -12,7 +12,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 namespace Ocuda.Ops.Data.Ops
 {
     public class SectionManagerGroupRepository
-        : GenericRepository<OpsContext, SectionManagerGroup, int>, ISectionManagerGroupRepository
+        : OpsRepository<OpsContext, SectionManagerGroup, int>, ISectionManagerGroupRepository
     {
         public SectionManagerGroupRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
             ILogger<SectionManagerGroupRepository> logger) : base(repositoryFacade, logger)

@@ -48,8 +48,6 @@ namespace Ocuda.Ops.Service
             card.Image = card.Image?.Trim();
             card.ImageAlt = card.ImageAlt?.Trim();
             card.Title = card.Title?.Trim();
-            card.CreatedAt = DateTime.Now;
-            card.CreatedBy = GetCurrentUserId();
 
             await _socialCardRepository.AddAsync(card);
             await _socialCardRepository.SaveAsync();
@@ -63,8 +61,6 @@ namespace Ocuda.Ops.Service
             currentCard.Image = card.Image?.Trim();
             currentCard.ImageAlt = card.ImageAlt?.Trim();
             currentCard.Title = card.Title?.Trim();
-            currentCard.UpdatedAt = DateTime.Now;
-            currentCard.UpdatedBy = GetCurrentUserId();
 
             _socialCardRepository.Update(currentCard);
             await _socialCardRepository.SaveAsync();
@@ -73,7 +69,8 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteAsync(int id)
         {
-            _socialCardRepository.Remove(id);
+            var socialCard = await _socialCardRepository.FindAsync(id);
+            _socialCardRepository.Remove(socialCard);
             await _socialCardRepository.SaveAsync();
         }
     }

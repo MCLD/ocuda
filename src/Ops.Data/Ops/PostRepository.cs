@@ -11,7 +11,7 @@ using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class PostRepository : GenericRepository<OpsContext, Post, int>, IPostRepository
+    public class PostRepository : OpsRepository<OpsContext, Post, int>, IPostRepository
     {
         public PostRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
             ILogger<PostRepository> logger) : base(repositoryFacade, logger)

@@ -6,7 +6,7 @@ using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
-    public interface ISectionManagerGroupRepository : IRepository<SectionManagerGroup, int>
+    public interface ISectionManagerGroupRepository : IOpsRepository<SectionManagerGroup, int>
     {
         new Task<ICollection<SectionManagerGroup>>
             ToListAsync(params Expression<Func<SectionManagerGroup, IComparable>>[] orderBys);

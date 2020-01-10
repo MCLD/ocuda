@@ -54,11 +54,6 @@
 </div>
 
 <form asp-action="@nameof(PagesController.Detail)" method="post" role="form">
-    @if (!Model.NewPage)
-    {
-        <input asp-for="Page.Id" type="hidden" />
-    }
-
     <input asp-for="HeaderId" type="hidden" />
     <input asp-for="SelectedLanguageId" type="hidden" />
     <input asp-for="NewPage" type="hidden" />
@@ -94,7 +89,7 @@
                         class="btn btn-danger pull-right"
                         data-toggle="modal"
                         data-target="#deleteModal"
-                        data-headerId="@Model.Page.Id"
+                        data-headerId="@Model.Page.PageHeaderId"
                         data-languageId="@Model.SelectedLanguageId">
                     Delete
                 </button>

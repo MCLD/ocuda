@@ -6,7 +6,7 @@ using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
-    public interface ICoverIssueHeaderRepository : IRepository<CoverIssueHeader, int>
+    public interface ICoverIssueHeaderRepository : IOpsRepository<CoverIssueHeader, int>
     {
         Task<CoverIssueHeader> GetByBibIdAsync(int BibId);
 

@@ -1,18 +1,28 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Promenade.Models.Entities;
 
-namespace Ocuda.Ops.Data.Ops
+namespace Ocuda.Ops.Data.Promenade
 {
-    public class LocationHoursRepository : GenericRepository<PromenadeContext, LocationHours, int>, ILocationHoursRepository
+    public class LocationHoursRepository
+        : GenericRepository<PromenadeContext, LocationHours>, ILocationHoursRepository
     {
         public LocationHoursRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
-            ILogger<LinkRepository> logger) : base(repositoryFacade, logger)
+            ILogger<LocationHoursRepository> logger) : base(repositoryFacade, logger)
         {
+        }
+
+        public async Task<LocationHours> GetByIdsAsync(DayOfWeek dayOfWeek, int locationId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.DayOfWeek == dayOfWeek && _.LocationId == locationId)
+                .SingleOrDefaultAsync();
         }
 
         public async Task<List<LocationHours>> GetLocationHoursByLocationId(int locationId)
@@ -36,8 +46,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id != locationHour.Id
-                    && _.LocationId == locationHour.LocationId
+                .Where(_ => _.LocationId == locationHour.LocationId
                     && _.DayOfWeek == locationHour.DayOfWeek)
                 .AnyAsync();
         }

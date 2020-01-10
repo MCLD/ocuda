@@ -159,24 +159,12 @@ namespace Ocuda.Ops.Web
                 Data.Ops.CoverIssueHeaderRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IExternalResourceRepository,
                 Data.Ops.ExternalResourceRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IFeatureRepository,
-                Data.Ops.FeatureRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileLibraryRepository,
                 Data.Ops.FileLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileRepository,
                 Data.Ops.FileRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileTypeRepository,
                 Data.Ops.FileTypeRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IGroupRepository,
-                Data.Ops.GroupRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.ILocationRepository,
-                Data.Ops.LocationRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.ILocationFeatureRepository,
-                Data.Ops.LocationFeatureRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.ILocationGroupRepository,
-                Data.Ops.LocationGroupRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.ILocationHoursRepository,
-                Data.Ops.LocationHoursRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkLibraryRepository,
                 Data.Ops.LinkLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository,
@@ -200,8 +188,20 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserRepository,
                 Data.Ops.UserRepository>();
 
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IFeatureRepository,
+                Data.Promenade.FeatureRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IGroupRepository,
+                Data.Promenade.GroupRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILanguageRepository,
                 Data.Promenade.LanguageRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationRepository,
+               Data.Promenade.LocationRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationFeatureRepository,
+                Data.Promenade.LocationFeatureRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationGroupRepository,
+                Data.Promenade.LocationGroupRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationHoursRepository,
+                Data.Promenade.LocationHoursRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageRepository,
                 Data.Promenade.PageRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageHeaderRepository,

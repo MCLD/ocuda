@@ -11,7 +11,7 @@ using Ocuda.Utility.Models;
 namespace Ocuda.Promenade.Data.Promenade
 {
     public class ExternalResourceRepository
-        : GenericRepository<PromenadeContext, ExternalResource, int>, IExternalResourceRepository
+        : GenericRepository<PromenadeContext, ExternalResource>, IExternalResourceRepository
     {
         public ExternalResourceRepository(Repository<PromenadeContext> repositoryFacade,
             ILogger<ExternalResourceRepository> logger) : base(repositoryFacade, logger)

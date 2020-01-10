@@ -5,9 +5,9 @@ namespace Ocuda.Promenade.Models.Entities
 {
     public class Language
     {
+        [Key]
+        [Required]
         public int Id { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
 
         [MaxLength(255)]
         public string Description { get; set; }

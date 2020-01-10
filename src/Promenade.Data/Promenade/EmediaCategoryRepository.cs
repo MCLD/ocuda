@@ -9,7 +9,7 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 namespace Ocuda.Promenade.Data.Promenade
 {
     public class EmediaCategoryRepository
-        : GenericRepository<PromenadeContext, EmediaCategory, int>, IEmediaCategoryRepository
+        : GenericRepository<PromenadeContext, EmediaCategory>, IEmediaCategoryRepository
     {
         public EmediaCategoryRepository(
             ServiceFacade.Repository<PromenadeContext> repositoryFacade,
@@ -17,12 +17,11 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<EmediaCategory> GetEmediaCategoriesByIds(int emediaId, int categoryId)
+        public async Task<EmediaCategory> GetByIdsAsync(int emediaId, int categoryId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.EmediaId == emediaId &&
-                (_.CategoryId == categoryId))
+                .Where(_ => _.EmediaId == emediaId && _.CategoryId == categoryId)
                 .SingleOrDefaultAsync();
         }
 
