@@ -12,11 +12,21 @@ using Ocuda.Promenade.Models.Entities;
 namespace Ocuda.Ops.Data.Promenade
 {
     public class PageHeaderRepository
-        : GenericRepository<PromenadeContext, PageHeader, int>, IPageHeaderRepository
+        : GenericRepository<PromenadeContext, PageHeader>, IPageHeaderRepository
     {
         public PageHeaderRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<PageHeaderRepository> logger) : base(repositoryFacade, logger)
         {
+        }
+
+        public async Task<PageHeader> FindAsync(int id)
+        {
+            var entity = await DbSet.FindAsync(id);
+            if (entity != null)
+            {
+                _context.Entry(entity).State = EntityState.Detached;
+            }
+            return entity;
         }
 
         public async Task<DataWithCount<ICollection<PageHeader>>> GetPaginatedListAsync(

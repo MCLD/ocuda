@@ -6,7 +6,7 @@ using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
-    public interface IPostRepository : IRepository<Post, int>
+    public interface IPostRepository : IOpsRepository<Post, int>
     {
         Task<List<Post>> GetPostsBySectionCategoryIdAsync(int categoryId, int sectionId);
         Task<Post> GetSectionPostByStubAsync(string stub, int sectionId);

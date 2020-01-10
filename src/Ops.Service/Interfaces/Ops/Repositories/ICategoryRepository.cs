@@ -4,7 +4,7 @@ using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
-    public interface ICategoryRepository : IRepository<Category, int>
+    public interface ICategoryRepository : IOpsRepository<Category, int>
     {
         Task<List<Category>> GetCategoriesBySectionIdAsync(int sectionId);
         Task<Category> GetCategoryByStubAsync(string stub);

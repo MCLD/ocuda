@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
-using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
@@ -83,8 +83,6 @@ namespace Ocuda.Ops.Service
 
         public async Task<Group> AddGroupAsync(Group group)
         {
-            group.CreatedAt = DateTime.Now;
-            group.CreatedBy = GetCurrentUserId();
             group.GroupType = group.GroupType?.Trim();
             group.Stub = group.Stub.Trim();
             group.SubscriptionUrl = group.SubscriptionUrl?.Trim();
@@ -102,8 +100,7 @@ namespace Ocuda.Ops.Service
             currentGroup.Stub = group.Stub.Trim();
             currentGroup.IsLocationRegion = group.IsLocationRegion;
             currentGroup.SubscriptionUrl = group.SubscriptionUrl?.Trim();
-            currentGroup.UpdatedAt = DateTime.Now;
-            currentGroup.UpdatedBy = GetCurrentUserId();
+
             _groupRepository.Update(currentGroup);
             await _groupRepository.SaveAsync();
             return currentGroup;
@@ -111,7 +108,8 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteAsync(int id)
         {
-            _groupRepository.Remove(id);
+            var group = await _groupRepository.FindAsync(id);
+            _groupRepository.Remove(group);
             await _groupRepository.SaveAsync();
         }
 

@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
-using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
@@ -68,8 +68,6 @@ namespace Ocuda.Ops.Service
             feature.Name = feature.Name?.Trim();
             feature.BodyText = feature.BodyText?.Trim();
             feature.Stub = feature.Stub?.Trim();
-            feature.CreatedAt = DateTime.Now;
-            feature.CreatedBy = GetCurrentUserId();
 
             await ValidateAsync(feature);
             await _featureRepository.AddAsync(feature);
@@ -96,8 +94,6 @@ namespace Ocuda.Ops.Service
                 currentFeature.Icon = feature.Icon;
                 currentFeature.Name = feature.Name?.Trim();
                 currentFeature.Stub = feature.Stub?.Trim();
-                currentFeature.UpdatedAt = DateTime.Now;
-                currentFeature.UpdatedBy = GetCurrentUserId();
 
                 _featureRepository.Update(feature);
                 await _featureRepository.SaveAsync();
@@ -111,7 +107,8 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteAsync(int id)
         {
-            _featureRepository.Remove(id);
+            var feature = await _featureRepository.FindAsync(id);
+            _featureRepository.Remove(feature);
             await _featureRepository.SaveAsync();
         }
 

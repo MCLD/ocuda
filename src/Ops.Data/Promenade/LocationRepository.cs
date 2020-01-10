@@ -1,23 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Data.Extensions;
 using Ocuda.Ops.Service.Filters;
-using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models.Entities;
 
-namespace Ocuda.Ops.Data.Ops
+namespace Ocuda.Ops.Data.Promenade
 {
-    public class LocationRepository : GenericRepository<PromenadeContext,Location, int>, ILocationRepository
+    public class LocationRepository
+        : GenericRepository<PromenadeContext, Location>, ILocationRepository
     {
         public LocationRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
-            ILogger<LinkRepository> logger) : base(repositoryFacade, logger)
+            ILogger<LocationRepository> logger) : base(repositoryFacade, logger)
         {
+        }
+
+        public async Task<Location> FindAsync(int id)
+        {
+            var entity = await DbSet.FindAsync(id);
+            if (entity != null)
+            {
+                _context.Entry(entity).State = EntityState.Detached;
+            }
+            return entity;
         }
 
         public async Task<List<Location>> GeAllLocationsAsync()

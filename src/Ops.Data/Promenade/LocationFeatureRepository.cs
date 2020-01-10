@@ -3,16 +3,25 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Promenade.Models.Entities;
 
-namespace Ocuda.Ops.Data.Ops
+namespace Ocuda.Ops.Data.Promenade
 {
-    public class LocationFeatureRepository : GenericRepository<PromenadeContext, LocationFeature, int>, ILocationFeatureRepository
+    public class LocationFeatureRepository 
+        : GenericRepository<PromenadeContext, LocationFeature>, ILocationFeatureRepository
     {
         public LocationFeatureRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<LocationFeatureRepository> logger) : base(repositoryFacade, logger)
         {
+        }
+
+        public async Task<LocationFeature> GetByIdsAsync(int featureId, int locationId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.FeatureId == featureId && _.LocationId == locationId)
+                .SingleOrDefaultAsync();
         }
 
         public async Task<List<LocationFeature>> GetLocationFeaturesByLocationAsync(Location location)
@@ -42,8 +51,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id != locationfeature.Id
-                    && _.LocationId == locationfeature.LocationId
+                .Where(_ => _.LocationId == locationfeature.LocationId
                     && _.FeatureId == locationfeature.FeatureId)
                 .AnyAsync();
         }

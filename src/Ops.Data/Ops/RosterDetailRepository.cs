@@ -9,7 +9,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 namespace Ocuda.Ops.Data.Ops
 {
     public class RosterDetailRepository
-        : GenericRepository<OpsContext, RosterDetail, int>, IRosterDetailRepository
+        : OpsRepository<OpsContext, RosterDetail, int>, IRosterDetailRepository
     {
         public RosterDetailRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
             ILogger<RosterDetailRepository> logger) : base(repositoryFacade, logger)

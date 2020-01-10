@@ -2,12 +2,15 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Ocuda.Promenade.Models.Abstract;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class PageHeader : BaseEntity
+    public class PageHeader
     {
+        [Key]
+        [Required]
+        public int Id { get; set; }
+
         [Required]
         [MaxLength(255)]
         [DisplayName("Page Name")]

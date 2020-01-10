@@ -8,7 +8,7 @@ using Ocuda.Utility.Data;
 
 namespace Ocuda.Promenade.Data
 {
-    public class GenericRepository<TContext, TEntity, TKeyType>
+    public class GenericRepository<TContext, TEntity>
         where TContext : DbContextBase
         where TEntity : class
     {
@@ -37,16 +37,6 @@ namespace Ocuda.Promenade.Data
             {
                 return _dbSet ?? (_dbSet = _context.Set<TEntity>());
             }
-        }
-
-        public async Task<TEntity> FindAsync(TKeyType id)
-        {
-            var entity = await DbSet.FindAsync(id);
-            if (entity != null)
-            {
-                _context.Entry(entity).State = EntityState.Detached;
-            }
-            return entity;
         }
     }
 }

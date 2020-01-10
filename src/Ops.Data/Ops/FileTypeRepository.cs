@@ -9,7 +9,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 namespace Ocuda.Ops.Data.Ops
 {
     public class FileTypeRepository
-        : GenericRepository<OpsContext, FileType, int>, IFileTypeRepository
+        : OpsRepository<OpsContext, FileType, int>, IFileTypeRepository
     {
         public FileTypeRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
             ILogger<FileTypeRepository> logger) : base(repositoryFacade, logger)

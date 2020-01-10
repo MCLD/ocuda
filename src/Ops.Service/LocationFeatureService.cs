@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
-using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 
@@ -34,17 +34,14 @@ namespace Ocuda.Ops.Service
             return await _locationFeatureRepository.GetLocationFeaturesByLocationId(location.Id);
         }
 
-        public async Task<LocationFeature> GetLocationFeatureByIdAsync(int locationFeatureId)
+        public async Task<LocationFeature> GetByIdsAsync(int featureId, int locationId)
         {
-            return await _locationFeatureRepository.FindAsync(locationFeatureId);
+            return await _locationFeatureRepository.GetByIdsAsync(featureId, locationId);
         }
 
         public async Task<LocationFeature> AddLocationFeatureAsync(LocationFeature locationFeature)
         {
             await ValidateAsync(locationFeature);
-
-            locationFeature.CreatedAt = DateTime.Now;
-            locationFeature.CreatedBy = GetCurrentUserId();
 
             await _locationFeatureRepository.AddAsync(locationFeature);
             await _locationFeatureRepository.SaveAsync();
@@ -53,20 +50,21 @@ namespace Ocuda.Ops.Service
 
         public async Task<LocationFeature> EditAsync(LocationFeature locationFeature)
         {
-            var currentLocationFeature = await _locationFeatureRepository.FindAsync(locationFeature.Id);
+            var currentLocationFeature = await _locationFeatureRepository
+                .GetByIdsAsync(locationFeature.FeatureId, locationFeature.LocationId);
             currentLocationFeature.Text = locationFeature.Text;
             currentLocationFeature.RedirectUrl = locationFeature.RedirectUrl;
-            currentLocationFeature.UpdatedAt = DateTime.Now;
-            currentLocationFeature.UpdatedBy = GetCurrentUserId();
-            await ValidateAsync(currentLocationFeature);
+
             _locationFeatureRepository.Update(currentLocationFeature);
             await _locationFeatureRepository.SaveAsync();
             return currentLocationFeature;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int featureId, int locationId)
         {
-            _locationFeatureRepository.Remove(id);
+            var locationFeature = await _locationFeatureRepository
+                .GetByIdsAsync(featureId, locationId);
+            _locationFeatureRepository.Remove(locationFeature);
             await _locationFeatureRepository.SaveAsync();
         }
 

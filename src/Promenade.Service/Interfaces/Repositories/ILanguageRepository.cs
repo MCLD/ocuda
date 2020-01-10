@@ -4,7 +4,7 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
-    public interface ILanguageRepository : IGenericRepository<Language, int>
+    public interface ILanguageRepository : IGenericRepository<Language>
     {
         Task Add(Language language);
         void Update(Language language);

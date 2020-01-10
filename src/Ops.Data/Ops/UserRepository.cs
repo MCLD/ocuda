@@ -10,7 +10,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 namespace Ocuda.Ops.Data.Ops
 {
     public class UserRepository
-        : GenericRepository<OpsContext, User, int>, IUserRepository
+        : OpsRepository<OpsContext, User, int>, IUserRepository
     {
         public UserRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
             ILogger<UserRepository> logger) : base(repositoryFacade, logger)

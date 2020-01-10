@@ -5,17 +5,27 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Data.Extensions;
 using Ocuda.Ops.Service.Filters;
-using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models.Entities;
 
-namespace Ocuda.Ops.Data.Ops
+namespace Ocuda.Ops.Data.Promenade
 {
-    public class GroupRepository : GenericRepository<PromenadeContext, Group, int>, IGroupRepository
+    public class GroupRepository : GenericRepository<PromenadeContext, Group>, IGroupRepository
     {
         public GroupRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
-            ILogger<LinkRepository> logger) : base(repositoryFacade, logger)
+            ILogger<GroupRepository> logger) : base(repositoryFacade, logger)
         {
+        }
+
+        public async Task<Group> FindAsync(int id)
+        {
+            var entity = await DbSet.FindAsync(id);
+            if (entity != null)
+            {
+                _context.Entry(entity).State = EntityState.Detached;
+            }
+            return entity;
         }
 
         public async Task<List<Group>> GetAllGroupsAsync()

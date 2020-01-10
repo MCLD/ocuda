@@ -8,7 +8,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 namespace Ocuda.Ops.Data.Ops
 {
     public class ClaimGroupRepository
-        : GenericRepository<OpsContext, ClaimGroup, int>, IClaimGroupRepository
+        : OpsRepository<OpsContext, ClaimGroup, int>, IClaimGroupRepository
     {
         public ClaimGroupRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
             ILogger<ClaimGroupRepository> logger) : base(repositoryFacade, logger)

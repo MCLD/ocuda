@@ -4,9 +4,9 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
-    public interface IEmediaCategoryRepository : IGenericRepository<EmediaCategory, int>
+    public interface IEmediaCategoryRepository : IGenericRepository<EmediaCategory>
     {
-        Task<EmediaCategory> GetEmediaCategoriesByIds(int emediaId,int categoryId);
+        Task<EmediaCategory> GetByIdsAsync(int emediaId,int categoryId);
         Task<List<EmediaCategory>> GetEmediaCategoriesByEmediaId(int emediaId);
     }
 }

@@ -10,7 +10,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<List<LocationFeature>> GetLocationFeaturesByLocationAsync(Location location);
         Task<LocationFeature> AddLocationFeatureAsync(LocationFeature locationFeature);
         Task<LocationFeature> EditAsync(LocationFeature locationFeature);
-        Task DeleteAsync(int id);
-        Task<LocationFeature> GetLocationFeatureByIdAsync(int locationFeatureId);
+        Task DeleteAsync(int featureId, int locationId);
+        Task<LocationFeature> GetByIdsAsync(int featureId, int locationId);
     }
 }

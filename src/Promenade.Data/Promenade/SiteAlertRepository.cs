@@ -9,7 +9,7 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 namespace Ocuda.Promenade.Data.Promenade
 {
     public class SiteAlertRepository
-        : GenericRepository<PromenadeContext, SiteAlert, int>, ISiteAlertRepository
+        : GenericRepository<PromenadeContext, SiteAlert>, ISiteAlertRepository
     {
         public SiteAlertRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<SiteAlertRepository> logger) : base(repositoryFacade, logger)
