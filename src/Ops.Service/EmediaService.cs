@@ -127,8 +127,6 @@ namespace Ocuda.Ops.Service
             emedia.Name = emedia.Name.Trim();
             emedia.Details = emedia.Details.Trim();
             emedia.Description = emedia.Description.Trim();
-            emedia.UpdatedAt = DateTime.Now;
-            emedia.UpdatedBy = GetCurrentUserId();
             await _emediaRepository.AddAsync(emedia);
             await _emediaRepository.SaveAsync();
         }
@@ -140,8 +138,6 @@ namespace Ocuda.Ops.Service
             currentEmedia.Name = emedia.Name.Trim();
             currentEmedia.Details = emedia.Details.Trim();
             currentEmedia.Description = emedia.Description.Trim();
-            currentEmedia.UpdatedAt = DateTime.Now;
-            currentEmedia.UpdatedBy = GetCurrentUserId();
             _emediaRepository.Update(currentEmedia);
             await _emediaRepository.SaveAsync();
         }
@@ -150,7 +146,8 @@ namespace Ocuda.Ops.Service
         {
             try
             {
-                _emediaRepository.Remove(id);
+                var emedia = await _emediaRepository.FindAsync(id);
+                _emediaRepository.Remove(emedia);
                 await _emediaRepository.SaveAsync();
             }
             catch (OcudaException ex)

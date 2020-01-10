@@ -37,7 +37,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(categoryService));
         }
 
-
         [Route("")]
         [Route("[action]")]
         public async Task<IActionResult> Index(int page = 1)
@@ -147,7 +146,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             try
             {
                 var categories = await _emediaService.GetEmediaCategoriesById(emedia.Id);
-                if (categories.Count() > 0)
+                if (categories.Count > 0)
                 {
                     ShowAlertDanger($"Remove {emedia.Name}'s categories before deleting.");
                     return RedirectToAction(nameof(Index));

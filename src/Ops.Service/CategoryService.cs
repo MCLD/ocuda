@@ -40,8 +40,6 @@ namespace Ocuda.Ops.Service
         {
             category.Name = category.Name.Trim();
             category.Class = category.Class.ToLower().Trim();
-            category.CreatedAt = DateTime.Now;
-            category.CreatedBy = GetCurrentUserId();
             await _categoryRepository.AddAsync(category);
             await _categoryRepository.SaveAsync();
         }
@@ -57,8 +55,6 @@ namespace Ocuda.Ops.Service
             var currentCategory = await _categoryRepository.FindAsync(category.Id);
             currentCategory.Name = category.Name.Trim();
             currentCategory.Class = category.Class.ToLower().Trim();
-            currentCategory.UpdatedAt = DateTime.Now;
-            currentCategory.UpdatedBy = GetCurrentUserId();
             _categoryRepository.Update(currentCategory);
             await _categoryRepository.SaveAsync();
         }
@@ -67,7 +63,8 @@ namespace Ocuda.Ops.Service
         {
             try
             {
-                _categoryRepository.Remove(id);
+                var category = await _categoryRepository.FindAsync(id);
+                _categoryRepository.Remove(category);
                 await _categoryRepository.SaveAsync();
             }
             catch (OcudaException ex)

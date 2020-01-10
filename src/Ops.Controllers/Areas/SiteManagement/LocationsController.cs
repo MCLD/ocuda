@@ -522,7 +522,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             catch (OcudaException ex)
             {
                 ShowAlertDanger($"Unable to delete feature '{feature.Name}' from '{location.Name}': {ex.Message}");
-                _logger.LogError(ex, 
+                _logger.LogError(ex,
                     "Problem deleting feature {FeatureName} from {LocationName}: {Message}",
                     feature.Name,
                     location.Name,
@@ -683,7 +683,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error parsing Geocode API JSON: {Message} - {Result}", 
+                    _logger.LogError(ex, "Error parsing Geocode API JSON: {Message} - {Result}",
                         ex.Message,
                         stringResult);
                     return Json(new
@@ -694,7 +694,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, 
+                _logger.LogError(ex,
                     "Problem looking up postal code for {LocationAddress}: {Message}",
                     location.Address,
                     ex.Message);
@@ -725,7 +725,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error parsing Geocode API JSON: {Message} - {Result}", 
+                    _logger.LogError(ex, "Error parsing Geocode API JSON: {Message} - {Result}",
                         ex.Message,
                         stringResult);
                 }
@@ -758,7 +758,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, 
+                _logger.LogError(ex,
                     "Problem looking up postal code for {LocationAddress}: {Message}",
                     location.Address,
                     ex.Message);

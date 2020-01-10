@@ -50,7 +50,6 @@ namespace Ocuda.Ops.Data.Promenade
             };
         }
 
-
         public async Task<Location> GetLocationByStub(string locationStub)
         {
             return await DbSet
@@ -58,6 +57,7 @@ namespace Ocuda.Ops.Data.Promenade
                 .Where(_ => _.Stub == locationStub)
                 .FirstOrDefaultAsync();
         }
+
         public async Task<bool> IsDuplicateStubAsync(Location location)
         {
             return await DbSet
@@ -65,6 +65,7 @@ namespace Ocuda.Ops.Data.Promenade
                 .Where(_ => _.Id != location.Id && _.Stub == location.Stub)
                 .AnyAsync();
         }
+
         public async Task<bool> IsDuplicateNameAsync(Location location)
         {
             return await DbSet
