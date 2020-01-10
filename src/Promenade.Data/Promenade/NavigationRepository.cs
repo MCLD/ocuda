@@ -9,12 +9,22 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 namespace Ocuda.Promenade.Data.Promenade
 {
     public class NavigationRepository
-        : GenericRepository<PromenadeContext, Navigation, int>, INavigationRepository
+        : GenericRepository<PromenadeContext, Navigation>, INavigationRepository
     {
         public NavigationRepository(
             ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<NavigationRepository> logger) : base(repositoryFacade, logger)
         {
+        }
+
+        public async Task<Navigation> FindAsync(int id)
+        {
+            var entity = await DbSet.FindAsync(id);
+            if (entity != null)
+            {
+                _context.Entry(entity).State = EntityState.Detached;
+            }
+            return entity;
         }
 
         public async Task<ICollection<Navigation>> GetChildren(int parentNavigationId)

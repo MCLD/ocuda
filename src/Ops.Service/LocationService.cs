@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
-using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models;
 using Ocuda.Promenade.Models.Entities;
@@ -67,8 +67,6 @@ namespace Ocuda.Ops.Service
 
         public async Task<Location> AddLocationAsync(Location location)
         {
-            location.CreatedAt = DateTime.Now;
-            location.CreatedBy = GetCurrentUserId();
             location.Name = location.Name?.Trim();
             await ValidateAsync(location);
 
@@ -96,8 +94,6 @@ namespace Ocuda.Ops.Service
             currentLocation.EventLink = location.EventLink;
             currentLocation.SubscriptionLink = location.SubscriptionLink;
             currentLocation.DisplayGroupId = location.DisplayGroupId;
-            currentLocation.UpdatedAt = DateTime.Now;
-            currentLocation.UpdatedBy = GetCurrentUserId();
 
             await ValidateAsync(currentLocation);
 
@@ -110,8 +106,6 @@ namespace Ocuda.Ops.Service
         {
             var currentLocation = await _locationRepository.FindAsync(location.Id);
             currentLocation.IsAlwaysOpen = location.IsAlwaysOpen;
-            currentLocation.UpdatedAt = DateTime.Now;
-            currentLocation.UpdatedBy = GetCurrentUserId();
 
             await ValidateAsync(currentLocation);
 
@@ -199,7 +193,11 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteAsync(int id)
         {
-            _locationRepository.Remove(id);
+            var locationHours = await _locationHoursRepository.GetLocationHoursByLocationId(id);
+            _locationHoursRepository.RemoveRange(locationHours);
+
+            var location = await _locationRepository.FindAsync(id);
+            _locationRepository.Remove(location);
             await _locationRepository.SaveAsync();
         }
 

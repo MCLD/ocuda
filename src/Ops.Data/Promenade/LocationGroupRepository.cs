@@ -3,16 +3,25 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Promenade.Models.Entities;
 
-namespace Ocuda.Ops.Data.Ops
+namespace Ocuda.Ops.Data.Promenade
 {
-    public class LocationGroupRepository : GenericRepository<PromenadeContext, LocationGroup, int>, ILocationGroupRepository
+    public class LocationGroupRepository
+        : GenericRepository<PromenadeContext, LocationGroup>, ILocationGroupRepository
     {
         public LocationGroupRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<LocationGroupRepository> logger) : base(repositoryFacade, logger)
         {
+        }
+
+        public async Task<LocationGroup> GetByIdsAsync(int groupId, int locationId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.GroupId == groupId && _.LocationId == locationId)
+                .SingleOrDefaultAsync();
         }
 
         public async Task<List<LocationGroup>> GetLocationGroupsByLocationAsync(Location location)
@@ -27,8 +36,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id != locationGroup.Id
-                    && _.LocationId != locationGroup.LocationId
+                .Where(_ => _.LocationId != locationGroup.LocationId
                     && _.GroupId != locationGroup.GroupId)
                 .AnyAsync();
         }

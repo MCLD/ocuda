@@ -4,7 +4,7 @@ using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
-    public interface IFileTypeRepository : IRepository<FileType, int>
+    public interface IFileTypeRepository : IOpsRepository<FileType, int>
     {
         Task<ICollection<FileType>> GetAllExtensionsAsync();
         Task<FileType> GetByExtensionAsync(string extension);

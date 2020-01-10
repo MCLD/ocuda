@@ -4,10 +4,11 @@ using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models.Entities;
 
-namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
+namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 {
-    public interface IFeatureRepository : IRepository<Feature, int>
+    public interface IFeatureRepository : IGenericRepository<Feature>
     {
+        Task<Feature> FindAsync(int id);
         Task<List<Feature>> GetAllFeaturesAsync();
         Task<Feature> GetFeatureByName(string featureName);
         Task<bool> IsDuplicateNameAsync(Feature feature);

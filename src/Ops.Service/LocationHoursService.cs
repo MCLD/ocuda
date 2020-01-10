@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
-using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 
@@ -31,9 +31,6 @@ namespace Ocuda.Ops.Service
 
         public async Task<LocationHours> AddLocationHoursAsync(LocationHours locationHours)
         {
-            locationHours.CreatedAt = DateTime.Now;
-            locationHours.CreatedBy = GetCurrentUserId();
-
             await ValidateAsync(locationHours);
 
             await _locationHoursRepository.AddAsync(locationHours);
@@ -45,24 +42,17 @@ namespace Ocuda.Ops.Service
         {
             foreach (var hour in locationHours)
             {
-                var currentLocationHour = await _locationHoursRepository.FindAsync(hour.Id);
+                var currentLocationHour = await _locationHoursRepository
+                    .GetByIdsAsync(hour.DayOfWeek, hour.LocationId);
+
                 currentLocationHour.Open = hour.Open;
                 currentLocationHour.OpenTime = hour.OpenTime;
                 currentLocationHour.CloseTime = hour.CloseTime;
-                currentLocationHour.UpdatedAt = DateTime.Now;
-                currentLocationHour.UpdatedBy = GetCurrentUserId();
 
-                await ValidateAsync(currentLocationHour);
                 _locationHoursRepository.Update(currentLocationHour);
                 await _locationHoursRepository.SaveAsync();
             }
             return locationHours;
-        }
-
-        public async Task DeleteAsync(int id)
-        {
-            _locationHoursRepository.Remove(id);
-            await _locationHoursRepository.SaveAsync();
         }
 
         private async Task ValidateAsync(LocationHours locationHour)

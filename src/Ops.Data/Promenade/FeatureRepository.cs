@@ -5,17 +5,28 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Data.Extensions;
 using Ocuda.Ops.Service.Filters;
-using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models.Entities;
 
-namespace Ocuda.Ops.Data.Ops
+namespace Ocuda.Ops.Data.Promenade
 {
-    public class FeatureRepository : GenericRepository<PromenadeContext, Feature, int>, IFeatureRepository
+    public class FeatureRepository
+        : GenericRepository<PromenadeContext, Feature>, IFeatureRepository
     {
         public FeatureRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
-            ILogger<LinkRepository> logger) : base(repositoryFacade, logger)
+            ILogger<FeatureRepository> logger) : base(repositoryFacade, logger)
         {
+        }
+
+        public async Task<Feature> FindAsync(int id)
+        {
+            var entity = await DbSet.FindAsync(id);
+            if (entity != null)
+            {
+                _context.Entry(entity).State = EntityState.Detached;
+            }
+            return entity;
         }
 
         public async Task<List<Feature>> GetAllFeaturesAsync()

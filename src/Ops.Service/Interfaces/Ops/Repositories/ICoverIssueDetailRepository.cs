@@ -4,7 +4,7 @@ using Ocuda.Ops.Models.Entities;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
-    public interface ICoverIssueDetailRepository : IRepository<CoverIssueDetail, int>
+    public interface ICoverIssueDetailRepository : IOpsRepository<CoverIssueDetail, int>
     {
         Task<ICollection<CoverIssueDetail>> GetByHeaderIdAsync(int headerId, bool? resolved = null);
     }

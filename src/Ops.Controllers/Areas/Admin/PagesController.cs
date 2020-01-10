@@ -291,7 +291,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
             var page = await _pageService.GetByHeaderAndLanguageAsync(model.HeaderId,
                 model.SelectedLanguageId);
 
-            await _pageService.DeleteAsync(page.Id);
+            await _pageService.DeleteAsync(page);
 
             var language = await _languageService.GetActiveByIdAsync(model.SelectedLanguageId);
 

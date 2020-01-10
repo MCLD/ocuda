@@ -8,7 +8,7 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 namespace Ocuda.Promenade.Data.Promenade
 {
     public class UrlRedirectRepository
-        : GenericRepository<PromenadeContext, UrlRedirect, int>, IUrlRedirectRepository
+        : GenericRepository<PromenadeContext, UrlRedirect>, IUrlRedirectRepository
     {
         public UrlRedirectRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<UrlRedirectRepository> logger) : base(repositoryFacade, logger)

@@ -6,7 +6,7 @@ using Ocuda.Ops.Service.Models;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
-    public interface IFileRepository : IRepository<File, int>
+    public interface IFileRepository : IOpsRepository<File, int>
     {
         Task<File> GetLatestByLibraryIdAsync(int id);
         Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter);

@@ -46,7 +46,6 @@ namespace Ocuda.Promenade.Service
                         dbCulture.Name);
                     dbCulture.IsActive = false;
                     dbCulture.IsDefault = dbCulture.Name == Culture.DefaultName;
-                    dbCulture.UpdatedAt = _dateTimeProvider.Now;
 
                     _languageRepository.Update(dbCulture);
                 }
@@ -57,7 +56,6 @@ namespace Ocuda.Promenade.Service
                         dbCulture.Name);
                     dbCulture.IsActive = true;
                     dbCulture.IsDefault = dbCulture.Name == Culture.DefaultName;
-                    dbCulture.UpdatedAt = _dateTimeProvider.Now;
 
                     _languageRepository.Update(dbCulture);
                 }
@@ -93,7 +91,6 @@ namespace Ocuda.Promenade.Service
                 var culture = siteCultures.Single(_ => _.Name == missingCultureName);
                 await _languageRepository.Add(new Language
                 {
-                    CreatedAt = _dateTimeProvider.Now,
                     Description = culture.DisplayName,
                     IsActive = true,
                     IsDefault = culture.Name == Culture.DefaultName,

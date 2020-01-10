@@ -2,12 +2,15 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Ocuda.Promenade.Models.Abstract;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class Location : BaseEntity
+    public class Location
     {
+        [Key]
+        [Required]
+        public int Id { get; set; }
+
         [MaxLength(255)]
         [Required]
         public string Name { get; set; }

@@ -39,8 +39,6 @@ namespace Ocuda.Ops.Service
         {
             page.Title = page.Title?.Trim();
             page.Content = page.Content?.Trim();
-            page.CreatedAt = DateTime.Now;
-            page.CreatedBy = GetCurrentUserId();
 
             await _pageRepository.AddAsync(page);
             await _pageRepository.SaveAsync();
@@ -49,22 +47,21 @@ namespace Ocuda.Ops.Service
 
         public async Task<Page> EditAsync(Page page)
         {
-            var currentPage = await _pageRepository.FindAsync(page.Id);
+            var currentPage = await _pageRepository.GetByHeaderAndLanguageAsync(
+                page.PageHeaderId, page.LanguageId);
             currentPage.Title = page.Title?.Trim();
             currentPage.Content = page.Content?.Trim();
             currentPage.IsPublished = page.IsPublished;
             currentPage.SocialCardId = page.SocialCardId;
-            currentPage.UpdatedAt = DateTime.Now;
-            currentPage.UpdatedBy = GetCurrentUserId();
 
             _pageRepository.Update(currentPage);
             await _pageRepository.SaveAsync();
             return currentPage;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(Page page)
         {
-            _pageRepository.Remove(id);
+            _pageRepository.Remove(page);
             await _pageRepository.SaveAsync();
         }
 
@@ -94,8 +91,6 @@ namespace Ocuda.Ops.Service
             }
 
             header.PageName = header.PageName?.Trim();
-            header.CreatedAt = DateTime.Now;
-            header.CreatedBy = GetCurrentUserId();
 
             await _pageHeaderRepository.AddAsync(header);
             await _pageHeaderRepository.SaveAsync();
@@ -108,8 +103,6 @@ namespace Ocuda.Ops.Service
             var currentHeader = await _pageHeaderRepository.FindAsync(header.Id);
 
             currentHeader.PageName = header.PageName?.Trim();
-            currentHeader.UpdatedAt = DateTime.Now;
-            currentHeader.UpdatedBy = GetCurrentUserId();
 
             _pageHeaderRepository.Update(currentHeader);
             await _pageHeaderRepository.SaveAsync();

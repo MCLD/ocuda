@@ -4,8 +4,9 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
-    public interface INavigationRepository : IGenericRepository<Navigation, int>
+    public interface INavigationRepository : IGenericRepository<Navigation>
     {
+        Task<Navigation> FindAsync(int id);
         Task<ICollection<Navigation>> GetChildren(int parentNavigationId);
     }
 }

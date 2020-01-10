@@ -3,8 +3,12 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class ExternalResource : Abstract.BaseEntity
+    public class ExternalResource
     {
+        [Key]
+        [Required]
+        public int Id { get; set; }
+
         [Required]
         [MaxLength(255)]
         public string Name { get; set; }
