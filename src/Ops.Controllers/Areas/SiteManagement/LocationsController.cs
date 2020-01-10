@@ -16,6 +16,7 @@ using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
-using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models.Entities;
@@ -65,9 +65,6 @@ namespace Ocuda.Ops.Service
             segment.Name = segment.Name.Trim();
             if (! await _segmentRepository.IsDuplicateNameAsync(segment))
             {
-                segment.CreatedAt = DateTime.Now;
-                segment.CreatedBy = GetCurrentUserId();
-
                 await _segmentRepository.AddAsync(segment);
                 await _segmentRepository.SaveAsync();
             }
@@ -78,8 +75,6 @@ namespace Ocuda.Ops.Service
             if (!await _segmentRepository.IsDuplicateNameAsync(segment))
             {
                 var currentSegment = await _segmentRepository.FindAsync(segment.Id);
-                currentSegment.UpdatedAt = DateTime.Now;
-                currentSegment.UpdatedBy = GetCurrentUserId();
                 currentSegment.Name = segment.Name.Trim();
                 currentSegment.IsActive = segment.IsActive;
                 currentSegment.StartDate = segment.StartDate;

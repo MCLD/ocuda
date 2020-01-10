@@ -207,9 +207,9 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageHeaderRepository,
                 Data.Promenade.PageHeaderRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISegmentRepository,
-                Data.Ops.SegmentRepository>();
+                Data.Promenade.SegmentRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISegmentTextRepository,
-                Data.Ops.SegmentTextRepository>();
+                Data.Promenade.SegmentTextRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISocialCardRepository,
                 Data.Promenade.SocialCardRepository>();
 

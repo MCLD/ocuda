@@ -9,13 +9,23 @@ using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models.Entities;
 
-namespace Ocuda.Ops.Data.Ops
+namespace Ocuda.Ops.Data.Promenade
 {
-    public class SegmentRepository : GenericRepository<PromenadeContext, Segment, int>, ISegmentRepository
+    public class SegmentRepository : GenericRepository<PromenadeContext, Segment>, ISegmentRepository
     {
         public SegmentRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<SegmentRepository> logger) : base(repositoryFacade, logger)
         {
+        }
+
+        public async Task<Segment> FindAsync(int id)
+        {
+            var entity = await DbSet.FindAsync(id);
+            if (entity != null)
+            {
+                _context.Entry(entity).State = EntityState.Detached;
+            }
+            return entity;
         }
 
         public async Task<ICollection<Segment>> GetAllActiveSegmentsAsync()

@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Ocuda.Promenade.Models.Abstract;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class Segment : BaseEntity
+    public class Segment
     {
+        [Key]
+        [Required]
+        public int Id { get; set; }
+
         public DateTime? StartDate { get; set; }
 
         public DateTime? EndDate { get; set; }

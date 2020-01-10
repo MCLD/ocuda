@@ -4,7 +4,7 @@ using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models.Entities;
 
-namespace Ocuda.Ops.Service.Interfaces.Ops.Services
+namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 {
     public interface ISegmentService
     {

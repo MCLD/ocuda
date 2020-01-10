@@ -6,9 +6,9 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Promenade.Models.Entities;
 
-namespace Ocuda.Ops.Data.Ops
+namespace Ocuda.Ops.Data.Promenade
 {
-    public class SegmentTextRepository : GenericRepository<PromenadeContext, SegmentText, int>, ISegmentTextRepository
+    public class SegmentTextRepository : GenericRepository<PromenadeContext, SegmentText>, ISegmentTextRepository
     {
         public SegmentTextRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<SegmentTextRepository> logger) : base(repositoryFacade, logger)

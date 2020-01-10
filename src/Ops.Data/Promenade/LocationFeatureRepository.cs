@@ -8,7 +8,7 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data.Promenade
 {
-    public class LocationFeatureRepository 
+    public class LocationFeatureRepository
         : GenericRepository<PromenadeContext, LocationFeature>, ILocationFeatureRepository
     {
         public LocationFeatureRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
