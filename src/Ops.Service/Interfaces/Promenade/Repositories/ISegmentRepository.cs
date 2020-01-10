@@ -13,7 +13,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
             BaseFilter filter);
 
         Segment FindSegmentByName(string name);
-
+        Task<ICollection<Segment>> GetAllActiveSegmentsAsync();
         Task<bool> IsDuplicateNameAsync(Segment segment);
     }
 }

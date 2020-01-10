@@ -29,6 +29,11 @@ namespace Ocuda.Ops.Service
                             ?? throw new ArgumentNullException(nameof(segmentTextRepository));
         }
 
+        public async Task<ICollection<Segment>> GetActiveSegmentsAsync()
+        {
+            return await _segmentRepository.GetAllActiveSegmentsAsync();
+        }
+
         public async Task<DataWithCount<ICollection<Segment>>> GetPaginatedListAsync(
             BaseFilter filter)
         {

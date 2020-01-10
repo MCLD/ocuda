@@ -144,7 +144,16 @@
               rows="5"
               formgroup
               autocomplete="off"></textarea>
-
+    <select asp-for="Location.PreFeatureSegmentId"
+            asp-items="@Model.PreFeatSegments"
+            formgroup>
+        <option value="">None</option>
+    </select>
+    <select asp-for="Location.PostFeatureSegmentId"
+            asp-items="@Model.PostFeatSegments"
+            formgroup>
+        <option value="">None</option>
+    </select>
     <input value="@Model.Location.Facebook"
            asp-for="Location.Facebook"
            formgroup

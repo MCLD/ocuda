@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location
@@ -22,5 +23,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location
         public string Action { get; set; }
         public PaginateModel PaginateModel { get; set; }
         public bool IsLocationsGroup { get; set; }
+        public SelectList PreFeatSegments { get; set; }
+        public SelectList PostFeatSegments { get; set; }
     }
 }

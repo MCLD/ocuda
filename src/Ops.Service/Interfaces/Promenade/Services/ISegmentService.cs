@@ -11,6 +11,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<DataWithCount<ICollection<Segment>>> GetPaginatedListAsync(
             BaseFilter filter);
 
+        Task<ICollection<Segment>> GetActiveSegmentsAsync();
         Task<ICollection<string>> GetSegmentLanguagesByIdAsync(int id);
         Task<Segment> GetSegmentById(int segmentId);
         SegmentText GetBySegmentIdAndLanguage(int segmentId, int languageId);

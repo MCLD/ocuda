@@ -18,6 +18,14 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
+        public async Task<ICollection<Segment>> GetAllActiveSegmentsAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.IsActive)
+                .ToListAsync();
+        }
+
         public async Task<DataWithCount<ICollection<Segment>>> GetPaginatedListAsync(
             BaseFilter filter)
         {
