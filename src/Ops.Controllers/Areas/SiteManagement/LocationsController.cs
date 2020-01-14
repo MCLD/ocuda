@@ -7,6 +7,7 @@ using BranchLocator.Models;
 using BranchLocator.Models.PlaceDetails;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -15,6 +16,7 @@ using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
@@ -34,6 +36,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly IFeatureService _featureService;
         private readonly IGroupService _groupService;
         private readonly IConfiguration _config;
+        private readonly ISegmentService _segmentService;
 
         public static string Name { get { return "Locations"; } }
 
@@ -44,7 +47,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             IFeatureService featureService,
             ILocationFeatureService locationFeatureService,
             ILocationHoursService locationHoursService,
-            ILocationGroupService locationGroupService) : base(context)
+            ILocationGroupService locationGroupService,
+            ISegmentService segmentService) : base(context)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _locationService = locationService
@@ -59,6 +63,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(locationFeatureService));
             _locationHoursService = locationHoursService
                 ?? throw new ArgumentNullException(nameof(locationHoursService));
+            _segmentService = segmentService
+                ?? throw new ArgumentNullException(nameof(segmentService));
         }
 
         [HttpGet("")]
@@ -112,6 +118,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     Action = nameof(LocationsController.EditLocation),
                     AllLocationHours = await _locationHoursService.GetLocationHoursByIdAsync(location.Id)
                 };
+                var segments = await _segmentService.GetActiveSegmentsAsync();
+                viewModel.PostFeatSegments = new SelectList(segments, nameof(Segment.Id),
+                    nameof(Segment.Name),viewModel.Location?.PostFeatureSegmentId);
+                viewModel.PreFeatSegments = new SelectList(segments, nameof(Segment.Id),
+                    nameof(Segment.Name), viewModel.Location?.PreFeatureSegmentId);
                 viewModel.Location.LocationHours = await _locationService.GetFormattedWeeklyHoursAsync(viewModel.Location.Id);
                 viewModel.FeatureList = string.Join(",", viewModel.LocationFeatures.Select(_ => _.FeatureId));
                 viewModel.GroupList = string.Join(",", viewModel.LocationGroups.Select(_ => _.GroupId));
@@ -239,8 +250,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     var oldLocation = await _locationService.GetLocationByIdAsync(location.Id);
                     if (!(oldLocation.Address.Equals(location.Address) && oldLocation.City.Equals(location.City)
-                        && oldLocation.State.Equals(location.State) && oldLocation.Zip.Equals(location.Zip)
-                        && oldLocation.Country.Equals(location.Country)))
+                        && oldLocation.State.Equals(location.State) && oldLocation.Zip.Equals(location.Zip))
+                        && oldLocation.Country.Equals(location.Country))
                     {
                         try
                         {

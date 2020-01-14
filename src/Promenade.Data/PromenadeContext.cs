@@ -23,7 +23,8 @@ namespace Ocuda.Promenade.Data
                 .HasKey(_ => new { _.Id, _.LanguageId });
             modelBuilder.Entity<Page>()
                 .HasKey(_ => new { _.LanguageId, _.PageHeaderId });
-
+            modelBuilder.Entity<SegmentText>()
+                .HasKey(_ => new { _.LanguageId, _.SegmentId });
         }
 
         // Read-Only
@@ -41,6 +42,8 @@ namespace Ocuda.Promenade.Data
         public DbSet<Navigation> Navigations { get; }
         public DbSet<NavigationText> NavigationTexts { get; }
         public DbSet<Page> Pages { get; }
+        public DbSet<Segment> Segments { get; }
+        public DbSet<SegmentText> SegmentTexts { get; }
         public DbSet<SiteSetting> SiteSettings { get; }
         public DbSet<SocialCard> SocialCards { get; }
         public DbSet<UrlRedirect> UrlRedirects { get; }

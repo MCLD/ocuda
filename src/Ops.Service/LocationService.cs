@@ -94,6 +94,8 @@ namespace Ocuda.Ops.Service
             currentLocation.EventLink = location.EventLink;
             currentLocation.SubscriptionLink = location.SubscriptionLink;
             currentLocation.DisplayGroupId = location.DisplayGroupId;
+            currentLocation.PostFeatureSegmentId = location.PostFeatureSegmentId;
+            currentLocation.PreFeatureSegmentId = location.PreFeatureSegmentId;
 
             await ValidateAsync(currentLocation);
 

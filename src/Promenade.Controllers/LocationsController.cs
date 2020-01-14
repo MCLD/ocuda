@@ -18,14 +18,17 @@ namespace Ocuda.Promenade.Controllers
     public class LocationsController : BaseController<LocationsController>
     {
         private readonly LocationService _locationService;
+        private readonly SegmentService _segmentService;
 
         public static string Name { get { return "Locations"; } }
 
         public LocationsController(ServiceFacades.Controller<LocationsController> context,
-            LocationService locationService) : base(context)
+            LocationService locationService, SegmentService segmentService) : base(context)
         {
             _locationService = locationService
                 ?? throw new ArgumentNullException(nameof(locationService));
+            _segmentService = segmentService
+                ?? throw new ArgumentNullException(nameof(segmentService));
         }
 
         [HttpGet("")]
@@ -186,8 +189,26 @@ namespace Ocuda.Promenade.Controllers
                     LocationFeatures = new List<LocationsFeaturesViewModel>(),
                     Location = await _locationService.GetLocationByStubAsync(locationStub)
                 };
+                if (viewModel.Location.PreFeatureSegmentId.HasValue)
+                {
+                    viewModel.PreFeatureSegment = await _segmentService.GetSegmentTextBySegmentIdAsync(
+                        viewModel.Location.PreFeatureSegmentId.Value);
+                    if(viewModel.PreFeatureSegment!=null)
+                    {
+                        viewModel.PreFeatureSegment.Text = CommonMark.CommonMarkConverter.Convert(viewModel.PreFeatureSegment.Text);
+                    }
+                }
+                if (viewModel.Location.PostFeatureSegmentId.HasValue)
+                {
+                    viewModel.PostFeatureSegment = await _segmentService.GetSegmentTextBySegmentIdAsync(
+                        viewModel.Location.PostFeatureSegmentId.Value);
+                    if (viewModel.PostFeatureSegment != null)
+                    {
+                        viewModel.PostFeatureSegment.Text = CommonMark.CommonMarkConverter.Convert(viewModel.PostFeatureSegment.Text);
+                    }
+                }
+
                 viewModel.Location.Description = CommonMark.CommonMarkConverter.Convert(viewModel.Location.Description);
-                viewModel.Location.PostFeatureDescription = CommonMark.CommonMarkConverter.Convert(viewModel.Location.PostFeatureDescription);
                 viewModel.Location.LocationHours = await _locationService.GetFormattedWeeklyHoursAsync(viewModel.Location.Id);
                 if (viewModel.Location.LocationHours != null)
                 {
