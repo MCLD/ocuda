@@ -20,7 +20,7 @@
                         <input type="checkbox"
                                class="custom-control-input"
                                asp-for="IsLocationsGroup"
-                               value="@Model.IsLocationsGroup"
+                               value="@Model.IsLocationsGroup.ToString().ToLower()"
                                id="locationMapGroup" />
                         <label class="col-form-label text-md-right col-md-3 custom-control-label text-hide" for="locationMapGroup"></label>
                     </div>
