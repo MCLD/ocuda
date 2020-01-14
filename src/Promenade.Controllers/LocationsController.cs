@@ -205,8 +205,8 @@ namespace Ocuda.Promenade.Controllers
                         viewModel.PostFeatureSegment.Text = CommonMark.CommonMarkConverter.Convert(viewModel.PostFeatureSegment.Text);
                     }
                 }
-
-                viewModel.Location.Description = CommonMark.CommonMarkConverter.Convert(viewModel.Location.Description);
+                viewModel.Location.DescriptionSegment = await _segmentService.GetSegmentTextBySegmentAndLanguageId(viewModel.Location.DescriptionSegmentId, null);
+                viewModel.Location.DescriptionSegment.Text = CommonMark.CommonMarkConverter.Convert(viewModel.Location.DescriptionSegment.Text);
                 viewModel.Location.LocationHours = await _locationService.GetFormattedWeeklyHoursAsync(viewModel.Location.Id);
                 if (viewModel.Location.LocationHours != null)
                 {

@@ -26,6 +26,9 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public string Stub { get; set; }
 
+        [NotMapped]
+        public SegmentText DescriptionSegment { get; set; }
+
         [MaxLength(255)]
         public string MapLink { get; set; }
 
@@ -48,8 +51,7 @@ namespace Ocuda.Promenade.Models.Entities
 
         public Group DisplayGroup { get; set; }
 
-        [MaxLength(2000)]
-        public string Description { get; set; }
+        public int DescriptionSegmentId { get; set; }
 
         [DisplayName("Post-Feature Segment")]
         public int? PostFeatureSegmentId { get; set; }
@@ -78,28 +80,48 @@ namespace Ocuda.Promenade.Models.Entities
         public string State { get; set; }
 
         [MaxLength(255)]
-        public string SDType { get; set; }
+        public string Type { get; set; }
 
         [MaxLength(255)]
-        public string SDEmail { get; set; }
+        public string Email { get; set; }
 
         [MaxLength(255)]
-        public string SDAreaServedName { get; set; }
+        public string Context { get; set; }
 
         [MaxLength(255)]
-        public string SDAreaServedType { get; set; }
+        public string AreaServedName { get; set; }
 
         [MaxLength(255)]
-        public string SDLocationId { get; set; }
+        public string AreaServedType { get; set; }
 
         [MaxLength(255)]
-        public string SDParentOrganization { get; set; }
+        public string AddressId { get; set; }
+
+        [MaxLength(255)]
+        public string AddressType { get; set; }
+
+        [MaxLength(255)]
+        public string AddressCountry { get; set; }
+
+        public string ContactType { get; set; }
+
+        [MaxLength(255)]
+        public string LocationId { get; set; }
+
+        [MaxLength(255)]
+        public string ParentOrganization { get; set; }
+
+        [MaxLength(255)]
+        public bool IsAccessibleForFree { get; set; }
 
         [MaxLength(255)]
         public string GeoLocation { get; set; }
 
         [MaxLength(255)]
         public string PAbbreviation { get; set; }
+
+        [MaxLength(255)]
+        public string PriceRange { get; set; }
 
         public bool IsAlwaysOpen { get; set; }
 
