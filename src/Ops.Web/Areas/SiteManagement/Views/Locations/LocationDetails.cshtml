@@ -96,13 +96,13 @@
       display="inline">
     <input asp-for="GroupList" type="hidden" />
     <input asp-for="FeatureList" type="hidden" />
-    <input value="@Model.Location.Id" 
-           asp-for="Location.Id" 
-           id="location-id" 
+    <input value="@Model.Location.Id"
+           asp-for="Location.Id"
+           id="location-id"
            type="hidden" />
-    <input value="@Model.Location.Name" 
-           asp-for="Location.Name" 
-           formgroup 
+    <input value="@Model.Location.Name"
+           asp-for="Location.Name"
+           formgroup
            autocomplete="off" />
     <input value="@Model.Location.Stub"
            asp-for="Location.Stub"
@@ -118,17 +118,17 @@
            asp-for="Location.Address"
            formgroup
            autocomplete="off" />
-    <input value="@Model.Location.City" 
-           asp-for="Location.City" 
-           formgroup 
+    <input value="@Model.Location.City"
+           asp-for="Location.City"
+           formgroup
            autocomplete="off" />
-    <input value="@Model.Location.State" 
-           asp-for="Location.State" 
-           formgroup 
+    <input value="@Model.Location.State"
+           asp-for="Location.State"
+           formgroup
            autocomplete="off" />
-    <input value="@Model.Location.Zip" 
-           asp-for="Location.Zip" 
-           formgroup 
+    <input value="@Model.Location.Zip"
+           asp-for="Location.Zip"
+           formgroup
            autocomplete="off" />
     <input value="@Model.Location.MapLink"
            asp-for="Location.MapLink"
@@ -144,6 +144,16 @@
               rows="5"
               formgroup
               autocomplete="off"></textarea>
+    <select asp-for="Location.PreFeatureSegmentId"
+            asp-items="@Model.PreFeatSegments"
+            formgroup>
+        <option value="">None</option>
+    </select>
+    <select asp-for="Location.PostFeatureSegmentId"
+            asp-items="@Model.PostFeatSegments"
+            formgroup>
+        <option value="">None</option>
+    </select>
     <input value="@Model.Location.Facebook"
            asp-for="Location.Facebook"
            formgroup
@@ -158,15 +168,15 @@
            autocomplete="off" />
     <div class="row">
         <div class="col-md-9 offset-md-3">
-            <a class="btn btn-secondary" 
-               id="return-home" 
+            <a class="btn btn-secondary"
+               id="return-home"
                asp-action="@nameof(LocationsController.Index)">Return to Locations</a>
             @if (Model.Location.IsNewLocation)
             {
                 <text>
-                    <button type="submit" 
-                            id="submit" 
-                            value="Submit" 
+                    <button type="submit"
+                            id="submit"
+                            value="Submit"
                             class="btn btn-success btn-spinner">
                         <span class="buttonText">Add Location</span>
                         <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
@@ -176,9 +186,9 @@
             else
             {
                 <text>
-                    <button type="submit" 
-                            id="submit" 
-                            value="Submit" 
+                    <button type="submit"
+                            id="submit"
+                            value="Submit"
                             class="btn btn-success btn-spinner">
                         <span class="buttonText">Update Location</span>
                         <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
@@ -192,10 +202,12 @@
         <div class="col-3 card">
             <div class="card-header">
                 <h4 style="margin: 0; display: initial;">Hours</h4>
-                <button type="button" 
-                        id="editHoursButton" 
-                        class="btn btn-warning" 
-                        style="float:right;">Edit Hours</button>
+                <button type="button"
+                        id="editHoursButton"
+                        class="btn btn-warning"
+                        style="float:right;">
+                    Edit Hours
+                </button>
             </div>
             @if (Model.Location.IsAlwaysOpen)
             {
@@ -218,10 +230,12 @@
         <div class="col-6 card">
             <div class="card-header">
                 <h4 style="margin: 0; display: initial;">Features</h4>
-                <button type="button" 
-                        id="addFeatureButton" 
-                        class="btn btn-warning" 
-                        style="float:right;">Add Feature</button>
+                <button type="button"
+                        id="addFeatureButton"
+                        class="btn btn-warning"
+                        style="float:right;">
+                    Add Feature
+                </button>
             </div>
             @if (Model.LocationFeatures.Any())
             {
@@ -260,7 +274,7 @@
                                                 class="btn btn-link btn-xs deleteFeatureButton" 
                                                 data-featureId="@locationFeature.FeatureId"
                                                 data-featureName="@feature.Name">
-                                            <span class="fa fa-2x fas fa-minus-circle text-danger" 
+                                            <span class="fa fa-2x fas fa-minus-circle text-danger"
                                                   aria-hidden="true"></span>
                                         </button>
                                     </td>
@@ -278,11 +292,13 @@
         <div class="col-6 card">
             <div class="card-header">
                 <h4 style="margin: 0; display: initial;">Groups</h4>
-                <button type="button" 
-                        id="addGroupButton" 
-                        class="btn btn-warning" 
-                        data-toggle="modal" 
-                        style="float:right;">Add Group</button>
+                <button type="button"
+                        id="addGroupButton"
+                        class="btn btn-warning"
+                        data-toggle="modal"
+                        style="float:right;">
+                    Add Group
+                </button>
             </div>
             @if (Model.LocationGroups.Any())
             {
@@ -306,7 +322,7 @@
                                         data-groupid="@locationGroup.GroupId">@group.GroupType</td>
                                     @if (group.IsLocationRegion)
                                     {
-                                        <td class="text-center" 
+                                        <td class="text-center"
                                             style="vertical-align:middle;">
                                             <span class="fas fa-check"></span>
                                         </td>
@@ -329,9 +345,10 @@
                                                 class="btn btn-link btn-xs deletegroupButton" 
                                                 data-groupid="@locationGroup.GroupId" 
                                                 data-groupname="@group.GroupType">
-                                            <span class="fa fa-2x fas fa-minus-circle text-danger" 
+                                            <span class="fa fa-2x fas fa-minus-circle text-danger"
                                                   aria-hidden="true"></span>
-                                        </button></td>
+                                        </button>
+                                    </td>
                                 </tr>
                             }
                         }

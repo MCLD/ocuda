@@ -40,6 +40,7 @@ namespace Ocuda.Ops.Service
         {
             return await _locationRepository.GeAllLocationsAsync();
         }
+
         public async Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(
             BaseFilter filter)
         {
@@ -57,7 +58,6 @@ namespace Ocuda.Ops.Service
             {
                 return location;
             }
-
         }
 
         public async Task<Location> GetLocationByIdAsync(int locationId)
@@ -94,6 +94,8 @@ namespace Ocuda.Ops.Service
             currentLocation.EventLink = location.EventLink;
             currentLocation.SubscriptionLink = location.SubscriptionLink;
             currentLocation.DisplayGroupId = location.DisplayGroupId;
+            currentLocation.PostFeatureSegmentId = location.PostFeatureSegmentId;
+            currentLocation.PreFeatureSegmentId = location.PreFeatureSegmentId;
 
             await ValidateAsync(currentLocation);
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -50,8 +51,11 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(2000)]
         public string Description { get; set; }
 
-        [MaxLength(2000)]
-        public string PostFeatureDescription { get; set; }
+        [DisplayName("Post-Feature Segment")]
+        public int? PostFeatureSegmentId { get; set; }
+
+        [DisplayName("Pre-Feature Segment")]
+        public int? PreFeatureSegmentId { get; set; }
 
         [MaxLength(255)]
         public string Facebook { get; set; }

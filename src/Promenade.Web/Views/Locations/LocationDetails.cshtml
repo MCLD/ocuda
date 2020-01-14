@@ -114,6 +114,21 @@
     </div>
 </div>
 
+@if (Model.PreFeatureSegment != null)
+{
+    <div class="row">
+        <div class="col-12">
+            @if (!string.IsNullOrEmpty(Model.PreFeatureSegment?.Header))
+            {
+            <h2 class="location-subheading">
+                @Model.PreFeatureSegment.Header
+            </h2>
+            }
+            @Html.Raw(Model.PreFeatureSegment.Text)
+        </div>
+    </div>
+}
+
 <h2 class="location-subheading">Library Information</h2>
 
 <div class="row">
@@ -190,11 +205,17 @@
     }
 </div>
 
-@if (!string.IsNullOrEmpty(Model.Location.PostFeatureDescription))
+@if (Model.PostFeatureSegment != null)
 {
     <div class="row">
         <div class="col-12">
-            @Html.Raw(Model.Location.PostFeatureDescription)
+            @if (!string.IsNullOrEmpty(Model.PostFeatureSegment?.Header))
+            {
+                <h2 class="location-subheading">
+                    @Model.PostFeatureSegment.Header
+                </h2>
+            }
+            @Html.Raw(Model.PostFeatureSegment.Text)
         </div>
     </div>
 }

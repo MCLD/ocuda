@@ -11,5 +11,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Locations
         public int NearbyCount { get; set; }
         public Group LocationNeighborGroup { get; set; }
         public List<string> StructuredLocationHours { get; set; }
+        public SegmentText PreFeatureSegment { get; set; }
+        public SegmentText PostFeatureSegment { get; set; }
     }
 }

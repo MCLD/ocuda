@@ -9,6 +9,5 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         Task<List<Category>> GetCategoriesBySectionIdAsync(int sectionId);
         Task<Category> GetCategoryByStubAsync(string stub);
         Task<bool> SectionHasCategoryAsync(int categoryId, int sectionId);
-
     }
 }
