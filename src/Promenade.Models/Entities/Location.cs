@@ -103,7 +103,7 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string AddressCountry { get; set; }
 
-        public string ContactType { get; set; }
+
 
         [MaxLength(255)]
         public string LocationId { get; set; }
