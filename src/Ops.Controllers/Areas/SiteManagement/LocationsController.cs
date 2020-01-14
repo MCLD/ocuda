@@ -431,15 +431,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpPost]
         [Route("[action]")]
         [SaveModelState]
-        public async Task<IActionResult> CreateLocationGroup(int locationId, int groupId)
+        public async Task<IActionResult> CreateLocationGroup(int locationId, int itemId)
         {
             var location = await _locationService.GetLocationByIdAsync(locationId);
-            var group = await _groupService.GetGroupByIdAsync(groupId);
+            var group = await _groupService.GetGroupByIdAsync(itemId);
             try
             {
                 var locationGroup = new LocationGroup
                 {
-                    GroupId = groupId,
+                    GroupId = itemId,
                     LocationId = locationId
                 };
                 if (!string.IsNullOrEmpty(group.SubscriptionUrl))
@@ -465,15 +465,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpPost]
         [Route("[action]")]
         [SaveModelState]
-        public async Task<IActionResult> CreateLocationFeature(int locationId, int featureId)
+        public async Task<IActionResult> CreateLocationFeature(int locationId, int itemId)
         {
             var location = await _locationService.GetLocationByIdAsync(locationId);
-            var feature = await _featureService.GetFeatureByIdAsync(featureId);
+            var feature = await _featureService.GetFeatureByIdAsync(itemId);
             try
             {
                 var locationFeature = new LocationFeature
                 {
-                    FeatureId = featureId,
+                    FeatureId = itemId,
                     LocationId = locationId
                 };
                 await _locationFeatureService.AddLocationFeatureAsync(locationFeature);
@@ -495,14 +495,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpPost]
         [Route("[action]")]
         [SaveModelState]
-        public async Task<IActionResult> DeleteLocationGroup(int groupId, int locationId)
+        public async Task<IActionResult> DeleteLocationGroup(int itemId, int locationId)
         {
-            var group = await _groupService.GetGroupByIdAsync(groupId);
+            var group = await _groupService.GetGroupByIdAsync(itemId);
             var location = await _locationService.GetLocationByIdAsync(locationId);
 
             try
             {
-                await _locationGroupService.DeleteAsync(groupId, locationId);
+                await _locationGroupService.DeleteAsync(itemId, locationId);
                 ShowAlertSuccess($"Deleted Group '{group.GroupType}' from '{location.Name}'");
             }
             catch (OcudaException ex)
@@ -521,13 +521,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpPost]
         [Route("[action]")]
         [SaveModelState]
-        public async Task<IActionResult> DeleteLocationFeature(int featureId, int locationId)
+        public async Task<IActionResult> DeleteLocationFeature(int itemId, int locationId)
         {
-            var feature = await _featureService.GetFeatureByIdAsync(featureId);
+            var feature = await _featureService.GetFeatureByIdAsync(itemId);
             var location = await _locationService.GetLocationByIdAsync(locationId);
             try
             {
-                await _locationFeatureService.DeleteAsync(featureId, locationId);
+                await _locationFeatureService.DeleteAsync(itemId, locationId);
                 ShowAlertSuccess($"Deleted Feature '{feature.Name}' from '{location.Name}'");
             }
             catch (OcudaException ex)
