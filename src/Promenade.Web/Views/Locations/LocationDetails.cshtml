@@ -133,7 +133,7 @@
 
 <div class="row">
     <div class="col-12">
-        @Html.Raw(Model.Location.Description)
+        @Html.Raw(Model.Location.DescriptionSegment.Text)
     </div>
 </div>
 
@@ -320,31 +320,31 @@
     </script>
     <script type="application/ld+json">
         {
-        "@@context": "http://schema.org",
-        "@@type": "@Model.Location.SDType",
+        "@@context": "@Model.Location.Context",
+        "@@type": "@Model.Location.Type",
         "name": "@Model.Location.Name",
         "areaServed": {
-        "@@type": "@Model.Location.SDAreaServedType",
-        "name": "@Model.Location.SDAreaServedName"
+        "@@type": "@Model.Location.AreaServedType",
+        "name": "@Model.Location.AreaServedName"
         },
-        "email": "@Model.Location.SDEmail",
+        "email": "@Model.Location.Email",
         "address": {
-        "@@id": "_:@Model.Location.SDLocationId",
-        "@@type": "PostalAddress",
-        "addressCountry": "US",
+        "@@id": "_:@Model.Location.AddressId",
+        "@@type": "@Model.Location.AddressType",
+        "addressCountry": "@Model.Location.AddressCountry",
         "addressRegion": "@Model.Location.State",
         "addressLocality": "@Model.Location.City",
-        "contactType": "Location address",
+        "contactType": "@Model.Location.ContactType",
         "postalCode": "@Model.Location.Zip",
         "streetAddress": "@Model.Location.Address"
         },
-        "location": { "@@id": "_:@Model.Location.SDLocationId" },
-        "parentOrganization": "@Model.Location.SDParentOrganization",
+        "location": { "@@id": "_:@Model.Location.AddressId" },
+        "parentOrganization": "@Model.Location.ParentOrganization",
         "telephone": "@Html.Raw(@Model.Location.Phone)",
         "openingHours": @Html.Raw(Json.Serialize(@Model.StructuredLocationHours)),
         "image": "@Model.Location.ImagePath",
-        "isAccessibleForFree": true,
-        "priceRange" : "$000 - $000",
+        "isAccessibleForFree": @Model.Location.IsAccessibleForFree.ToString().ToLower(),
+        "priceRange" : "@Model.Location.PriceRange",
         "sameAs": ["@Model.Location.MapLink"
         @if (!string.IsNullOrEmpty(Model.Location.Facebook))
         {

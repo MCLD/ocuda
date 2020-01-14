@@ -89,7 +89,7 @@ namespace Ocuda.Ops.Service
             currentLocation.Stub = location.Stub;
             currentLocation.Code = location.Code;
             currentLocation.Phone = location.Phone;
-            currentLocation.Description = location.Description;
+            currentLocation.DescriptionSegmentId = location.DescriptionSegmentId;
             currentLocation.Facebook = location.Facebook;
             currentLocation.EventLink = location.EventLink;
             currentLocation.SubscriptionLink = location.SubscriptionLink;
