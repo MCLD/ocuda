@@ -8,12 +8,12 @@ namespace Ocuda.Promenade.Models.Entities
         [Key]
         [Required]
         public int LocationId { get; set; }
+
         public Location Location { get; set; }
 
         [Key]
         [Required]
         public DayOfWeek DayOfWeek { get; set; }
-
 
         public bool Open { get; set; }
         public DateTime? OpenTime { get; set; }
