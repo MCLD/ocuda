@@ -35,9 +35,15 @@ namespace Ocuda.Promenade.Service
                 ?? throw new ArgumentNullException(nameof(languageService));
         }
 
-        public async Task<SegmentText> GetSegmentTextBySegmentAndLanguageId(int segmentId, int? languageId)
+        public async Task<SegmentText> GetSegmentTextBySegmentIdAsync(int segmentId)
         {
-            if (languageId==null) {
+            SegmentText segmentText = null;
+
+            var segment = await _segmentRepository.GetActiveAsync(segmentId);
+
+            if (segment != null)
+            {
+
                 var currentCultureName = _httpContextAccessor
                     .HttpContext
                     .Features
@@ -45,20 +51,24 @@ namespace Ocuda.Promenade.Service
                     .RequestCulture
                     .UICulture?
                     .Name;
+
                 if (!string.IsNullOrWhiteSpace(currentCultureName))
                 {
-                    languageId = await _languageService
+                    var currentLangaugeId = await _languageService
                         .GetLanguageIdAsync(currentCultureName);
+                    segmentText = await _segmentTextRepository
+                        .GetByIdsAsync(currentLangaugeId, segmentId);
+                }
+
+                if (segmentText == null)
+                {
+                    var defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync();
+                    segmentText = await _segmentTextRepository
+                        .GetByIdsAsync(defaultLanguageId, segmentId);
                 }
             }
-            var segment = await _segmentRepository.FindAsync(segmentId);
-            if (segment?.IsActive == true &&
-                (segment?.StartDate == null || _dateTimeProvider.Now > segment?.StartDate) &&
-                (segment?.EndDate == null || _dateTimeProvider.Now < segment?.EndDate))
-            {
-                return _segmentTextRepository.GetSegmentTextBySegmentAndLanguageId(segment.Id, languageId.Value);
-            }
-            return null;
+
+            return segmentText;
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Ocuda.Promenade.Data
             modelBuilder.Entity<Page>()
                 .HasKey(_ => new { _.LanguageId, _.PageHeaderId });
             modelBuilder.Entity<SegmentText>()
-                .HasKey(_ => new { _.SegmentId, _.LanguageId });
+                .HasKey(_ => new { _.LanguageId, _.SegmentId });
         }
 
         // Read-Only

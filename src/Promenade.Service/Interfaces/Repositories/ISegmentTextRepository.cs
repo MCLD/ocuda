@@ -6,7 +6,6 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
     public interface ISegmentTextRepository : IGenericRepository<SegmentText>
     {
-        Task<SegmentText> FindAsync(int id);
-        SegmentText GetSegmentTextBySegmentAndLanguageId(int segmentId, int languageId);
+        Task<SegmentText> GetByIdsAsync(int languageId, int segmentId);
     }
 }

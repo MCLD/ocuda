@@ -15,22 +15,12 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<SegmentText> FindAsync(int id)
+        public async Task<SegmentText> GetByIdsAsync(int languageId, int segmentId)
         {
-            var entity = await DbSet.FindAsync(id);
-            if (entity != null)
-            {
-                _context.Entry(entity).State = EntityState.Detached;
-            }
-            return entity;
-        }
-
-        public SegmentText GetSegmentTextBySegmentAndLanguageId(int segmentId, int languageId)
-        {
-            return DbSet
+            return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.SegmentId == segmentId && _.LanguageId == languageId)
-                .FirstOrDefault();
+                .Where(_ => _.LanguageId == languageId && _.SegmentId == segmentId)
+                .SingleOrDefaultAsync();
         }
     }
 }

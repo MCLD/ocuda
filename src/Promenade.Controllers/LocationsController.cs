@@ -191,7 +191,8 @@ namespace Ocuda.Promenade.Controllers
                 };
                 if (viewModel.Location.PreFeatureSegmentId.HasValue)
                 {
-                    viewModel.PreFeatureSegment = await _segmentService.GetSegmentTextBySegmentAndLanguageId(viewModel.Location.PreFeatureSegmentId.Value,null);
+                    viewModel.PreFeatureSegment = await _segmentService.GetSegmentTextBySegmentIdAsync(
+                        viewModel.Location.PreFeatureSegmentId.Value);
                     if(viewModel.PreFeatureSegment!=null)
                     {
                         viewModel.PreFeatureSegment.Text = CommonMark.CommonMarkConverter.Convert(viewModel.PreFeatureSegment.Text);
@@ -199,7 +200,8 @@ namespace Ocuda.Promenade.Controllers
                 }
                 if (viewModel.Location.PostFeatureSegmentId.HasValue)
                 {
-                    viewModel.PostFeatureSegment = await _segmentService.GetSegmentTextBySegmentAndLanguageId(viewModel.Location.PostFeatureSegmentId.Value,null);
+                    viewModel.PostFeatureSegment = await _segmentService.GetSegmentTextBySegmentIdAsync(
+                        viewModel.Location.PostFeatureSegmentId.Value);
                     if (viewModel.PostFeatureSegment != null)
                     {
                         viewModel.PostFeatureSegment.Text = CommonMark.CommonMarkConverter.Convert(viewModel.PostFeatureSegment.Text);
