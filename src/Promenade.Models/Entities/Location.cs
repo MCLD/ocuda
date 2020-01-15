@@ -51,6 +51,7 @@ namespace Ocuda.Promenade.Models.Entities
 
         public Group DisplayGroup { get; set; }
 
+        [DisplayName("Description Segment")]
         public int DescriptionSegmentId { get; set; }
 
         [DisplayName("Post-Feature Segment")]
