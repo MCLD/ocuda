@@ -142,11 +142,11 @@
            asp-for="Location.Phone"
            formgroup
            autocomplete="off" />
-    <textarea id="comment location-description"
-              asp-for="Location.DescriptionSegmentId"
-              rows="5"
-              formgroup
-              autocomplete="off"></textarea>
+    <select asp-for="Location.DescriptionSegmentId"
+        asp-items="@Model.PostFeatSegments"
+        formgroup>
+        <option value="">None</option>
+    </select>
     <select asp-for="Location.PreFeatureSegmentId"
             asp-items="@Model.PreFeatSegments"
             formgroup>
