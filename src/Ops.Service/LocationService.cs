@@ -68,6 +68,19 @@ namespace Ocuda.Ops.Service
         public async Task<Location> AddLocationAsync(Location location)
         {
             location.Name = location.Name?.Trim();
+            location.AdministrativeArea = location.AdministrativeArea.Trim();
+            location.Context = location.Context.Trim();
+            location.Type = location.Type.Trim();
+            location.AreaServedName = location.AreaServedName.Trim();
+            location.AreaServedType = location.AreaServedType.Trim();
+            location.Email = location.Email.Trim();
+            location.AddressId = location.AddressId.Trim();
+            location.AddressType = location.AddressType.Trim();
+            location.ContactType = location.ContactType.Trim();
+            location.AddressId = location.AddressId.Trim();
+            location.AddressType = location.AddressType.Trim();
+            location.ParentOrganization = location.ParentOrganization.Trim();
+            location.PriceRange = location.PriceRange.Trim();
             await ValidateAsync(location);
 
             await _locationRepository.AddAsync(location);
@@ -96,6 +109,20 @@ namespace Ocuda.Ops.Service
             currentLocation.DisplayGroupId = location.DisplayGroupId;
             currentLocation.PostFeatureSegmentId = location.PostFeatureSegmentId;
             currentLocation.PreFeatureSegmentId = location.PreFeatureSegmentId;
+            currentLocation.AdministrativeArea = location.AdministrativeArea.Trim();
+            currentLocation.Context = location.Context.Trim();
+            currentLocation.Type = location.Type.Trim();
+            currentLocation.AreaServedName = location.AreaServedName.Trim();
+            currentLocation.AreaServedType = location.AreaServedType.Trim();
+            currentLocation.Email = location.Email.Trim();
+            currentLocation.AddressId = location.AddressId.Trim();
+            currentLocation.AddressType = location.AddressType.Trim();
+            currentLocation.ContactType = location.ContactType.Trim();
+            currentLocation.AddressId = location.AddressId.Trim();
+            currentLocation.AddressType = location.AddressType.Trim();
+            currentLocation.ParentOrganization = location.ParentOrganization.Trim();
+            currentLocation.PriceRange = location.PriceRange.Trim();
+            currentLocation.IsAccessibleForFree = location.IsAccessibleForFree;
 
             await ValidateAsync(currentLocation);
 

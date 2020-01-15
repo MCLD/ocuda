@@ -137,17 +137,23 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpGet("[action]")]
         [SaveModelState]
-        public IActionResult AddLocation()
+        public async Task<IActionResult> AddLocation()
         {
             var location = new Location
             {
                 IsNewLocation = true
             };
-            return View("LocationDetails", new LocationViewModel
+            var viewModel = new LocationViewModel
             {
                 Location = location,
                 Action = nameof(LocationsController.CreateLocation)
-            });
+            };
+            var segments = await _segmentService.GetActiveSegmentsAsync();
+            viewModel.PostFeatSegments = new SelectList(segments, nameof(Segment.Id),
+                nameof(Segment.Name), viewModel.Location?.PostFeatureSegmentId);
+            viewModel.PreFeatSegments = new SelectList(segments, nameof(Segment.Id),
+                nameof(Segment.Name), viewModel.Location?.PreFeatureSegmentId);
+            return View("LocationDetails", viewModel);
         }
 
         [HttpPost]

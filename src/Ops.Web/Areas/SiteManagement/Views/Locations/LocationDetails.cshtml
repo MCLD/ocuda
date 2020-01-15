@@ -169,6 +169,66 @@
            asp-for="Location.SubscriptionLink"
            formgroup
            autocomplete="off" />
+    <h3>Stuctured Data</h3>
+    <input value="@Model.Location.AdministrativeArea"
+           asp-for="Location.AdministrativeArea"
+           formgroup
+           autocomplete="off" />
+    <input value="@Model.Location.Context"
+           asp-for="Location.Context"
+           formgroup
+           autocomplete="off" />
+    <input value="@Model.Location.Type"
+           asp-for="Location.Type"
+           formgroup
+           autocomplete="off" />
+    <input value="@Model.Location.AreaServedName"
+           asp-for="Location.AreaServedName"
+           formgroup
+           autocomplete="off" />
+    <input value="@Model.Location.AreaServedType"
+           asp-for="Location.AreaServedType"
+           formgroup
+           autocomplete="off" />
+    <input value="@Model.Location.Email"
+           asp-for="Location.Email"
+           formgroup
+           autocomplete="off" />
+    <input value="@Model.Location.AddressId"
+           asp-for="Location.AddressId"
+           formgroup
+           autocomplete="off" />
+    <input value="@Model.Location.AddressType"
+           asp-for="Location.AddressType"
+           formgroup
+           autocomplete="off" />
+    <input value="@Model.Location.ContactType"
+           asp-for="Location.ContactType"
+           formgroup
+           autocomplete="off" />
+    <input value="@Model.Location.ParentOrganization"
+           asp-for="Location.ParentOrganization"
+           formgroup
+           autocomplete="off" />
+    <div class="row form-group">
+        <label class="col-form-label text-md-right col-md-3">
+            Is Accessible For Free?
+        </label>
+        <div class="flex-md-grow-0">
+            <div class="custom-control custom-switch">
+                <input type="checkbox"
+                       class="custom-control-input switch"
+                       asp-for="Location.IsAccessibleForFree"
+                       value="@Model.Location.IsAccessibleForFree.ToString().ToLower()"
+                       id="isAccessibleForFree" />
+                <label class="col-form-label text-md-right col-md-3 custom-control-label text-hide" for="isAccessibleForFree"></label>
+            </div>
+        </div>
+    </div>
+    <input value="@Model.Location.PriceRange"
+           asp-for="Location.PriceRange"
+           formgroup
+           autocomplete="off" />
     <div class="row">
         <div class="col-md-9 offset-md-3">
             <a class="btn btn-secondary"
@@ -392,6 +452,16 @@
             ulMapList.setAttribute("id", "maplink-suggestions");
             $($("#Location_Address").parent()).append(ulMapList);
         });
+
+        $(document).on("click", ".switch", function(e){
+            if ($(this).val().toLowerCase() == "true") {
+                $(this).val("false");
+            }
+            else {
+                $(this).val("true");
+            }
+        });
+
         @if (!Model.Location.IsNewLocation)
         {
             <text>
@@ -462,15 +532,6 @@
                     }
                     });
             }
-
-            $(document).on("click", "#locationMapGroup", function(e){
-                if ($("#locationMapGroup").val().toLowerCase() == "true") {
-                    $("#locationMapGroup").val("false");
-                }
-                else {
-                    $("#locationMapGroup").val("true");
-                }
-            });
 
             $("#updateItem").on("hidden.bs.modal", function () {
                 $("#updateItem").find(".modal-body").html("");

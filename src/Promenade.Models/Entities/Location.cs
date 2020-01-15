@@ -100,9 +100,6 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string AddressType { get; set; }
 
-        [MaxLength(255)]
-        public string AddressCountry { get; set; }
-
         public string ContactType { get; set; }
 
         [MaxLength(255)]
@@ -111,7 +108,6 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string ParentOrganization { get; set; }
 
-        [MaxLength(255)]
         public bool IsAccessibleForFree { get; set; }
 
         [MaxLength(255)]
