@@ -105,9 +105,6 @@ namespace Ocuda.Promenade.Models.Entities
         public string ContactType { get; set; }
 
         [MaxLength(255)]
-        public string LocationId { get; set; }
-
-        [MaxLength(255)]
         public string ParentOrganization { get; set; }
 
         public bool IsAccessibleForFree { get; set; }
