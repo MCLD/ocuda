@@ -452,7 +452,7 @@
             ulMapList.setAttribute("id", "maplink-suggestions");
             $($("#Location_Address").parent()).append(ulMapList);
         });
-
+        
         $(document).on("click", ".switch", function(e){
             if ($(this).val().toLowerCase() == "true") {
                 $(this).val("false");
@@ -553,10 +553,10 @@
                 else if ($(this).data("itemtype") == "Group") {
                     url = "@Url.Action(nameof(LocationsController.EditLocationGroup),LocationsController.Name)"
                     $("#editModalTitle").text("Edit Group: " + $(this).data("itemname"));
-  
+
                 }
                 else {
-                    
+
                     url = "@Url.Action(nameof(LocationsController.EditLocationHours),LocationsController.Name)";
                     $("#editModalTitle").text("Edit Hours: @Model.Location.Name");
                 }

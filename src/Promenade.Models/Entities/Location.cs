@@ -100,6 +100,7 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string AddressType { get; set; }
 
+        [MaxLength(255)]
         public string ContactType { get; set; }
 
         [MaxLength(255)]
