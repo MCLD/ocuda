@@ -11,9 +11,9 @@ namespace Ocuda.Promenade.Models.Defaults
             #region Social
             new SiteSetting
             {
-                Id = Keys.SiteSetting.Social.TwitterSite,
-                Name = "Twitter Site",
-                Description = "@username for the website used in the Twitter card footer.",
+                Id = Keys.SiteSetting.Social.TwitterUsername,
+                Name = "Twitter Username",
+                Description = "The Twitter @username a Twitter Card should be attributed to",
                 Category = "Social",
                 Value = string.Empty,
                 Type = SiteSettingType.StringNullable
