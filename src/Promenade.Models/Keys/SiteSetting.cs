@@ -4,7 +4,7 @@
     {
         public struct Social
         {
-            public const string TwitterSite = "Social.TwitterSite";
+            public const string TwitterUsername = "Social.TwitterUsername";
         }
 
         public struct Site

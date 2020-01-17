@@ -15,15 +15,20 @@ namespace Ocuda.Promenade.Controllers.TagHelpers
         private const string ogType = "og:Type";
         private const string ogTypeValue = "website";
         private const string ogUrl = "og:Url";
-        private const string twCard = "tw:card";
-        private const string twCardValue = "summary_large_image";
-        private const string twSite = "tw:site";
+        private const string twitterCard = "twitter:card";
+        private const string twitterCardValue = "summary_large_image";
+        private const string twitterSite = "twitter:site";
 
         [HtmlAttributeName(attributeName)]
         public SocialCard Card { get; set; }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
+            if (output == null)
+            {
+                throw new System.ArgumentNullException(nameof(output));
+            }
+
             output.TagName = string.Empty;
 
             if (Card != null)
@@ -39,19 +44,21 @@ namespace Ocuda.Promenade.Controllers.TagHelpers
                     output.Content.AppendHtml(MetaProperty(ogImageAlt, Card.ImageAlt));
                 }
 
-                output.Content.AppendHtml(MetaName(twCard, twCardValue));
+                output.Content.AppendHtml(MetaName(twitterCard, twitterCardValue));
 
                 if (!string.IsNullOrWhiteSpace(Card.TwitterSite))
                 {
-                    output.Content.AppendHtml(MetaName(twSite, Card.TwitterSite));
+                    output.Content.AppendHtml(MetaName(twitterSite, Card.TwitterSite));
                 }
             }
         }
 
         private TagBuilder MetaName(string name, string content)
         {
-            var metaTag = new TagBuilder("meta");
-            metaTag.TagRenderMode = TagRenderMode.SelfClosing;
+            var metaTag = new TagBuilder("meta")
+            {
+                TagRenderMode = TagRenderMode.SelfClosing
+            };
             metaTag.Attributes.Add("name", name);
             metaTag.Attributes.Add("content", content);
             return metaTag;
@@ -59,8 +66,10 @@ namespace Ocuda.Promenade.Controllers.TagHelpers
 
         private TagBuilder MetaProperty(string property, string content)
         {
-            var metaTag = new TagBuilder("meta");
-            metaTag.TagRenderMode = TagRenderMode.SelfClosing;
+            var metaTag = new TagBuilder("meta")
+            {
+                TagRenderMode = TagRenderMode.SelfClosing
+            };
             metaTag.Attributes.Add("property", property);
             metaTag.Attributes.Add("content", content);
             return metaTag;
