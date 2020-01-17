@@ -30,7 +30,7 @@ namespace Ocuda.Promenade.Service
             var card = await _socialCardRepository.FindAsync(id);
 
             card.TwitterSite = await _siteSettingService.GetSettingStringAsync(
-                    Models.Keys.SiteSetting.Social.TwitterSite);
+                    Models.Keys.SiteSetting.Social.TwitterUsername);
 
             return card;
         }
