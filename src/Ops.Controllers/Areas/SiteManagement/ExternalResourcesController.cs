@@ -19,6 +19,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     {
         private readonly IExternalResourceService _externalResourceService;
 
+        public static string Name { get { return "ExternalResources"; } }
+        public static string Area { get { return "SiteManagement"; } }
+
         public ExternalResourcesController(
             ServiceFacades.Controller<ExternalResourcesController> context,
             IExternalResourceService externalResourceService) : base(context)

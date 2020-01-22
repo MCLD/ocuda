@@ -20,6 +20,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     {
         private readonly IRosterService _rosterService;
 
+        public static string Name { get { return "Roster"; } }
+        public static string Area { get { return "SiteManagement"; } }
+
         public RosterController(ServiceFacades.Controller<RosterController> context,
             IRosterService rosterService) : base(context)
         {
