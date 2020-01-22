@@ -9,5 +9,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
         Task<LocationGroup> GetByIdsAsync(int groupId, int locationId);
         Task<List<LocationGroup>> GetLocationGroupsByLocationAsync(Location location);
         Task<bool> IsDuplicateAsync(LocationGroup locationGroup);
+        Task<List<LocationGroup>> GetLocationGroupsByGroupAsync(int groupId);
     }
 }

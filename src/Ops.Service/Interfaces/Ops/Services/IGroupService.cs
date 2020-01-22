@@ -18,5 +18,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<DataWithCount<ICollection<Group>>> PageItemsAsync(GroupFilter filter);
         Task<Group> GetGroupByIdAsync(int groupId);
         Task<Group> GetGroupByStubAsync(string groupType);
+        Task<List<LocationGroup>> GetLocationGroupsByGroupId(int groupId);
     }
 }

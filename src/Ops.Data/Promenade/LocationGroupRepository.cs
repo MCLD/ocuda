@@ -32,6 +32,14 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
+        public async Task<List<LocationGroup>> GetLocationGroupsByGroupAsync(int groupId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.GroupId == groupId)
+                .ToListAsync();
+        }
+
         public async Task<bool> IsDuplicateAsync(LocationGroup locationGroup)
         {
             return await DbSet
