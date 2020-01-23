@@ -20,6 +20,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     {
         private readonly IUserMetadataTypeService _userMetadataTypeService;
 
+        public static string Name { get { return "Users"; } }
+        public static string Area { get { return "SiteManagement"; } }
+
         public UsersController(ServiceFacades.Controller<UsersController> context,
             IUserMetadataTypeService userMetadataTypeService) : base(context)
         {

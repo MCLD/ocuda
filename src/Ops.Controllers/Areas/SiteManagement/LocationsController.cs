@@ -39,6 +39,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ISegmentService _segmentService;
 
         public static string Name { get { return "Locations"; } }
+        public static string Area { get { return "SiteManagement"; } }
 
         public LocationsController(IConfiguration config,
             ServiceFacades.Controller<LocationsController> context,
