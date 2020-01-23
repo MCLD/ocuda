@@ -23,6 +23,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly IFeatureService _featureService;
 
         public static string Name { get { return "Features"; } }
+        public static string Area { get { return "SiteManagement"; } }
 
         public FeaturesController(ServiceFacades.Controller<FeaturesController> context,
             IFeatureService featureService) : base(context)

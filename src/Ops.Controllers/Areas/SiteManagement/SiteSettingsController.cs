@@ -16,6 +16,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class SiteSettingsController : BaseController<SiteSettingsController>
     {
+        public static string Name { get { return "SiteSettings"; } }
+        public static string Area { get { return "SiteManagement"; } }
+
         public SiteSettingsController(ServiceFacades.Controller<SiteSettingsController> context)
             : base(context)
         {
