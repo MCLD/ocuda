@@ -26,6 +26,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ICategoryService _categoryService;
 
         public static string Name { get { return "Emedia"; } }
+        public static string Area { get { return "SiteManagement"; } }
 
         public EmediaController(ServiceFacades.Controller<EmediaController> context,
             IEmediaService emediaService,

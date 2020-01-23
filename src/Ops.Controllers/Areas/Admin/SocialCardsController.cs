@@ -22,6 +22,7 @@ namespace Ocuda.Ops.Controllers.Areas.Admin
         private readonly ISocialCardService _socialCardService;
 
         public static string Name { get { return "SocialCards"; } }
+        public static string Area { get { return "Admin"; } }
 
         public SocialCardsController(ServiceFacades.Controller<SocialCardsController> context,
             ISocialCardService socialCardService) : base(context)

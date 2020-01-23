@@ -1,0 +1,30 @@
+﻿@using Ocuda.Ops.Controllers.Areas.Admin
+
+    <div class="justify-content-center d-flex align-items-center flex-wrap">
+        <div class="col-xs-12 col-sm-4 space-above">
+            <div class="card">
+                <div class="card-header">
+                    <h3>@PagesController.Name</h3>
+                </div>
+                <div class="card-body mx-auto">
+                    <a asp-area="@PagesController.Area"
+                       asp-controller="@PagesController.Name"
+                       asp-action="@nameof(PagesController.Index)"
+                       class="btn btn-info">View @PagesController.Name</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-4 space-above">
+            <div class="card">
+                <div class="card-header">
+                    <h3>@SocialCardsController.Name</h3>
+                </div>
+                <div class="card-body mx-auto">
+                    <a asp-area="@SocialCardsController.Area"
+                       asp-controller="@SocialCardsController.Name"
+                       asp-action="@nameof(SocialCardsController.Index)"
+                       class="btn btn-info">View @SocialCardsController.Name</a>
+                </div>
+            </div>
+        </div>
+    </div>

@@ -25,6 +25,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ILocationGroupService _locationGroupService;
 
         public static string Name { get { return "Groups"; } }
+        public static string Area { get { return "SiteManagement"; } }
 
         public GroupsController(ServiceFacades.Controller<GroupsController> context,
             ILocationGroupService locationGroupService,
