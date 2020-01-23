@@ -235,30 +235,27 @@
         <div class="col-7">
             <table class="nearby-locations-table">
                 <tbody>
-                    @{ int counter = 1;}
-                    @foreach (var location in Model.NearbyLocations)
+                    @foreach (var locationGroup in Model.NearbyLocations)
                     {
-                        @if (location.HasEvents)
+                        @if (locationGroup.Location.HasEvents)
                         {
                             <tr>
-                                <td>@counter</td>
+                                <td>@locationGroup.DisplayOrder</td>
                                 <td>
-                                    <a asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub="@location.Stub">@location.Name</a>
+                                    <a asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub="@locationGroup.Location.Stub">@locationGroup.Location.Name</a>
                                 </td>
                                 <td>
-                                    <a href="@location.EventLink" class="btn btn-sm btn-outline-secondary text-dark"><span class="fas fa-calendar-alt"></span> Events</a>
-                                    <a href="@location.SubscriptionLink" class="btn btn-sm btn-outline-secondary text-dark"><span class="far fa-envelope"></span> Mailing List</a>
+                                    <a href="@locationGroup.Location.EventLink" class="btn btn-sm btn-outline-secondary text-dark"><span class="fas fa-calendar-alt"></span> Events</a>
+                                    <a href="@locationGroup.Location.SubscriptionLink" class="btn btn-sm btn-outline-secondary text-dark"><span class="far fa-envelope"></span> Mailing List</a>
                                 </td>
                             </tr>
-                            counter++;
                         }
                     }
-                    @{ counter -= 1; }
                     <tr>
                         <td colspan="2">&nbsp;</td>
                         <td>
                             <a href="@Model.LocationNeighborGroup.SubscriptionUrl" class="btn btn-sm btn-outline-secondary text-dark" target="_blank">
-                                <text><span class="far fa-envelope"></span> Updates from all @counter locations</text>
+                                <text><span class="far fa-envelope"></span> Updates from all @Model.NearbyCount locations</text>
 
                             </a>
                         </td>

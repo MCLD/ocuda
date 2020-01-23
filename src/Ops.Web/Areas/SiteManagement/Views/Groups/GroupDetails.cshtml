@@ -55,6 +55,8 @@
                         <input asp-for="Group.SubscriptionUrl"
                                formgroup
                                autocomplete="off" />
+                        <input asp-for="OrderedLocationIds"
+                               hidden />
                         @if (!Model.Group.IsNewGroup && Model.LocationGroups.Count > 0)
                         {
                             <h4>Map Display Order</h4>
@@ -63,8 +65,9 @@
                                 <div class="row form-group">
                                     <label class="col-form-label text-md-right col-md-3" for="@locationGroup.Location.Stub">@locationGroup.Location.Name</label>
                                     <div class="col-sm-1">
-                                        <input class="locationGroup form-control"
+                                        <input class="location-ordering form-control"
                                                id="@locationGroup.Location.Stub"
+                                               data-locationId="@locationGroup.Location.Id"
                                                autocomplete="off"
                                                type="text"
                                                aria-invalid="false"
@@ -134,15 +137,34 @@
                 $("#group-isLocationRegion").val("True");
             }
         });
-        $("#groupform").submit(function (event) {
+        $("#groupform").submit(function () {
             if (!$("#accordion-header").hasClass("bg-info")) {
                 $("#Group_SubscriptionUrl").val("");
                 $("#group-isLocationRegion").val("False");
             }
             else {
+                var ids = $(".location-ordering");
+                var orderedIds = SortLocationsOrder(ids);
+                var ordered = orderedIds.map(function (i, v) {
+                    return $(v).data("locationid");
+                });
+                var locationIds = $.makeArray(ordered);
+                $("#OrderedLocationIds").val(locationIds.join(","));
 
             }
         });
+        function SortLocationsOrder(arr) {
+            for (var outer = 0; outer < arr.length; outer++) {
+                for (var inner = 0; inner <= arr.length - 2; inner++) {
+                    if (parseInt(arr[inner].value) > parseInt(arr[inner+1].value)) {
+                        var temp = arr[inner];
+                        arr[inner] = arr[inner + 1];
+                        arr[inner + 1] = temp;
+                    }
+                }
+            }
+            return arr;
+        }
         function FormatStub(object) {
             updateStub($(object), $(object).val());
         }

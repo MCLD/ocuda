@@ -31,6 +31,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<LocationGroup> AddLocationGroupAsync(LocationGroup locationGroup)
         {
+            await ValidateAsync(locationGroup);
             await _locationGroupRepository.AddAsync(locationGroup);
             await _locationGroupRepository.SaveAsync();
             return locationGroup;
@@ -45,7 +46,8 @@ namespace Ocuda.Ops.Service
         {
             var currentLocationGroup = await _locationGroupRepository.GetByIdsAsync(
                 locationGroup.GroupId, locationGroup.LocationId);
-            await ValidateAsync(currentLocationGroup);
+
+            currentLocationGroup.DisplayOrder = locationGroup.DisplayOrder;
 
             _locationGroupRepository.Update(currentLocationGroup);
             await _locationGroupRepository.SaveAsync();

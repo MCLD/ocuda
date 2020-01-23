@@ -155,18 +155,17 @@ namespace Ocuda.Promenade.Service
             return features;
         }
 
-        public async Task<List<Location>> GetLocationsNeighborsAsync(int groupId)
+        public async Task<List<LocationGroup>> GetLocationsNeighborsAsync(int groupId)
         {
-            var locationIds = await _locationGroupRepository.GetLocationsByGroupIdAsync(groupId);
-            var locations = new List<Location>();
-            foreach (var location in locationIds)
+            var locationGroups = await _locationGroupRepository.GetLocationsByGroupIdAsync(groupId);
+            foreach (var locationGroup in locationGroups)
             {
-                if (location.HasSubscription)
+                if (locationGroup.HasSubscription)
                 {
-                    locations.Add(await _locationRepository.FindAsync(location.LocationId));
+                    locationGroup.Location = await _locationRepository.FindAsync(locationGroup.LocationId);
                 }
             }
-            return locations;
+            return locationGroups;
         }
 
         public async Task<Group> GetLocationsNeighborGroup(int groupId)
