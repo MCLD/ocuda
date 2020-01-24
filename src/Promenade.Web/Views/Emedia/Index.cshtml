@@ -1,22 +1,6 @@
 ﻿@model Ocuda.Promenade.Controllers.ViewModels.Emedias.EmediaViewModel
 
-<div class="modal fade" tabindex="-1" role="dialog" id="helpModal">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalTitle"></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" id="emedia-content">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+<div modal id="infoModal"></div>
 
 <h2>eMedia</h2>
 <p>Electronic downloads and streaming available 24/7 for tablets, smartphones, eReaders, and computers! Need help? See our tutorials,  <a href="https://extranet.mcldaz.org/"><strong>contact us online</strong></a>, or call us: <a href="tel:6026523000">602-652-3000</a>.</p>
@@ -31,7 +15,13 @@
                     <a href="@emedia.RedirectUrl">@emedia.Name</a>
                     @if (!string.IsNullOrEmpty(emedia.EmediaText?.Details))
                     {
-                        <button type="button" class="btn btn-warning float-right help-btn" data-emedia="@emedia.Name" data-toggle="modal" data-target="#helpModal">Help</button>
+                        <span class="fas fa-question-circle fa-pull-right"
+                              style="cursor: pointer;"
+                              data-target="#infoModal"
+                              data-toggle="modal"
+                              data-name="@emedia.Name"
+                              data-details="@emedia.EmediaText.Details">
+                        </span>
                     }
                 </div>
                 <div class="card-body">
@@ -51,21 +41,13 @@
 
 @section scripts {
     <script>
-        $(document).ready(function () {
-            $('[data-toggle="tooltip"]').tooltip();
-        });
-
-        $(".help-btn").on('click', function () {
-            @foreach (var emedia in Model.AllEmedia)
-            {
-                <text>
-                if ("@emedia.Name" == $(this).data("emedia"))
-                {
-                    $("#modalTitle").text("@emedia.Name Help");
-                    $("#emedia-content").html($("#emedia-content").html("@Html.Raw(emedia.EmediaText?.Details).ToString()").text());
-                }
-                </text>
-            }
+        $("#infoModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var modal = $(this);
+            var name = button.data("name");
+            var details = button.data("details");
+            modal.find(".modal-title").text(name);
+            modal.find(".modal-body").html(details);
         });
     </script>
 }
