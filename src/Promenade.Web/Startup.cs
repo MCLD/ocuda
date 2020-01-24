@@ -71,14 +71,28 @@ namespace Ocuda.Promenade.Web
             services.Configure<RouteOptions>(_ =>
                 _.ConstraintMap.Add("cultureConstraint", typeof(CultureRouteConstraint)));
 
-            services.AddControllersWithViews()
+            if (_isDevelopment)
+            {
+                services.AddControllersWithViews()
+                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                .AddDataAnnotationsLocalization(_ =>
+                {
+                    _.DataAnnotationLocalizerProvider = (__, factory)
+                        => factory.Create(typeof(i18n.Resources.Shared));
+                })
+                .AddRazorRuntimeCompilation();
+            }
+            else
+            {
+                services.AddControllersWithViews()
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization(_ =>
                 {
                     _.DataAnnotationLocalizerProvider = (__, factory)
                         => factory.Create(typeof(i18n.Resources.Shared));
                 });
-
+            }
+            
             services.Configure<RouteOptions>(_ =>
             {
                 _.AppendTrailingSlash = true;
