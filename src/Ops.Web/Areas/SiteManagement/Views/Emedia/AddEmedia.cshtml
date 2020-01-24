@@ -30,20 +30,6 @@
     <select id="categoryIds" multiple="multiple" asp-for="CategoryIds" asp-items="Model.SelectionEmediaCategories" class="hidden" formgroup>
     </select>
     <div class="form-group row">
-        <label asp-for="Emedia.Description" class="col-md-3 col-form-label text-md-right"></label>
-        <div class="form-group-inner col-md-9">
-            <textarea asp-for="Emedia.Description" markdown-editor></textarea>
-            <span asp-validation-for="Emedia.Description" class="validation-message text-danger"></span>
-        </div>
-    </div>
-    <div class="form-group row">
-        <label asp-for="Emedia.Details" class="col-md-3 col-form-label text-md-right"></label>
-        <div class="form-group-inner col-md-9">
-            <textarea asp-for="Emedia.Details" markdown-editor></textarea>
-            <span asp-validation-for="Emedia.Details" class="validation-message text-danger"></span>
-        </div>
-    </div>
-    <div class="form-group row">
         <div class="col-md-9 offset-md-3">
             <a class="btn btn-secondary"
                asp-action="@nameof(EmediaController.Index)">Return to Emedia</a>
@@ -57,7 +43,7 @@
     <script src="~/js/md.min.js" asp-append-version="true"></script>
     <script>
         $("#emediaform").submit(function (event) {
-            $("#Emedia_Stub").val($("#Emedia_Name").val().toLowerCase().replace(/[^a-zA-Z0-9]/g, '').replace(/ /g,"-"));
+            $("#Emedia_Stub").val($("#Emedia_Name").val().toLowerCase().replace(/[^a-zA-Z0-9]/g, '').replace(/ /g, "-"));
         });
 
         $(document).ready(function () {

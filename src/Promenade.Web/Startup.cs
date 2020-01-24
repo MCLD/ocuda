@@ -100,10 +100,14 @@ namespace Ocuda.Promenade.Web
             // repositories
             services.AddScoped<Service.Interfaces.Repositories.ICategoryRepository,
                 Data.Promenade.CategoryRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ICategoryTextRepository,
+                Data.Promenade.CategoryTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IEmediaRepository,
                 Data.Promenade.EmediaRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IEmediaCategoryRepository,
                 Data.Promenade.EmediaCategoryRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IEmediaTextRepository,
+                Data.Promenade.EmediaTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IExternalResourceRepository,
                 Data.Promenade.ExternalResourceRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IFeatureRepository,

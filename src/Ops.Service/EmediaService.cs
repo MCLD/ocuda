@@ -125,8 +125,6 @@ namespace Ocuda.Ops.Service
         {
             emedia.RedirectUrl = emedia.RedirectUrl.Trim();
             emedia.Name = emedia.Name.Trim();
-            emedia.Details = emedia.Details.Trim();
-            emedia.Description = emedia.Description.Trim();
             await _emediaRepository.AddAsync(emedia);
             await _emediaRepository.SaveAsync();
         }
@@ -136,8 +134,6 @@ namespace Ocuda.Ops.Service
             var currentEmedia = await _emediaRepository.FindAsync(emedia.Id);
             currentEmedia.RedirectUrl = emedia.RedirectUrl.Trim();
             currentEmedia.Name = emedia.Name.Trim();
-            currentEmedia.Details = emedia.Details.Trim();
-            currentEmedia.Description = emedia.Description.Trim();
             _emediaRepository.Update(currentEmedia);
             await _emediaRepository.SaveAsync();
         }

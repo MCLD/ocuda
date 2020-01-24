@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -15,5 +16,8 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         [Required]
         public string Class { get; set; }
+
+        [NotMapped]
+        public CategoryText CategoryText { get; set; }
     }
 }

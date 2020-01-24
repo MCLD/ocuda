@@ -11,8 +11,12 @@ namespace Ocuda.Promenade.Data
         {
             // configure composite keys
             // https://docs.microsoft.com/en-us/ef/core/modeling/keys
+            modelBuilder.Entity<CategoryText>()
+                .HasKey(_ => new { _.CategoryId, _.LanguageId });
             modelBuilder.Entity<EmediaCategory>()
                 .HasKey(_ => new { _.CategoryId, _.EmediaId });
+            modelBuilder.Entity<EmediaText>()
+                .HasKey(_ => new { _.EmediaId, _.LanguageId });
             modelBuilder.Entity<LocationFeature>()
                 .HasKey(_ => new { _.FeatureId, _.LocationId });
             modelBuilder.Entity<LocationGroup>()
@@ -29,8 +33,10 @@ namespace Ocuda.Promenade.Data
 
         // Read-Only
         public DbSet<Category> Categories { get; }
+        public DbSet<CategoryText> CategoryTexts { get; }
         public DbSet<Emedia> Emedia { get; set; }
         public DbSet<EmediaCategory> EmediaCategories { get; set; }
+        public DbSet<EmediaText> EmediaTexts { get; }
         public DbSet<ExternalResource> ExternalResources { get; set; }
         public DbSet<Feature> Features { get; }
         public DbSet<Group> Groups { get; }
