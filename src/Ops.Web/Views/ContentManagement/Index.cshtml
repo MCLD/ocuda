@@ -1,0 +1,17 @@
+﻿@using Ocuda.Ops.Controllers.Areas.ContentManagement
+
+<div class="justify-content-center d-flex align-items-center flex-wrap">
+    <div class="col-xs-12 col-sm-4 space-above">
+        <div class="card">
+            <div class="card-header">
+                <h3>@SectionController.Name</h3>
+            </div>
+            <div class="card-body mx-auto">
+                <a asp-area="@SectionController.Area"
+                   asp-controller="@SectionController.Name"
+                   asp-action="@nameof(SectionController.Index)"
+                   class="btn btn-info">View @SectionController.Name</a>
+            </div>
+        </div>
+    </div>
+</div>

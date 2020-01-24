@@ -24,6 +24,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ILanguageService _languageService;
         private readonly ISegmentService _segmentService;
         public static string Name { get { return "Segments"; } }
+        public static string Area { get { return "SiteManagement"; } }
 
         public SegmentsController(ServiceFacades.Controller<SegmentsController> context,
             ILanguageService languageService,

@@ -20,6 +20,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
         private readonly ICoverIssueService _coverIssueService;
 
         public static string Name { get { return "Management"; } }
+        public static string Area { get { return "CoverIssue"; } }
 
         public ManagementController(ServiceFacades.Controller<ManagementController> context,
             ICoverIssueService coverIssueService) : base(context)
