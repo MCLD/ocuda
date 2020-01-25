@@ -106,7 +106,8 @@ namespace Ocuda.Promenade.Service
                 // Fill in non-override days
                 if (results.Count < DaysInWeek)
                 {
-                    var weeklyHours = await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
+                    var weeklyHours
+                        = await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
 
                     var remainingDays = weeklyHours
                         .Where(_ => !results.Select(r => r.DayOfWeek).Contains(_.DayOfWeek));
@@ -138,21 +139,16 @@ namespace Ocuda.Promenade.Service
             return results;
         }
 
-        public async Task<LocationFeature> GetLocationFeatureByIds(int locationId, int featureId)
+        public async Task<LocationFeature> GetLocationFullFeatureAsync(string locationStub,
+            string featureStub)
         {
-            return await _locationFeatureRepository.GetByIdsAsync(featureId, locationId);
+            return await _locationFeatureRepository.GetFullLocationFeatureAsync(locationStub,
+                featureStub);
         }
 
-        public async Task<List<Feature>> GetLocationsFeaturesAsync(string locationStub)
+        public async Task<List<LocationFeature>> GetFullLocationFeaturesAsync(string locationStub)
         {
-            var location = await GetLocationByStubAsync(locationStub);
-            var locationFeatures = await _locationFeatureRepository.GetLocationFeaturesByLocationId(location.Id);
-            var features = new List<Feature>();
-            foreach (var feature in locationFeatures)
-            {
-                features.Add(await _featureRepository.FindAsync(feature.FeatureId));
-            }
-            return features;
+            return await _locationFeatureRepository.GetFullLocationFeaturesAsync(locationStub);
         }
 
         public async Task<List<Location>> GetLocationsNeighborsAsync(int groupId)
@@ -174,7 +170,8 @@ namespace Ocuda.Promenade.Service
             return await _groupRepository.FindAsync(groupId);
         }
 
-        public async Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId, bool isStructuredData = false)
+        public async Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId,
+            bool isStructuredData = false)
         {
             var location = await _locationRepository.FindAsync(locationId);
             if (location.IsAlwaysOpen)
@@ -186,7 +183,8 @@ namespace Ocuda.Promenade.Service
             // Order weeklyHours to start on Monday
             weeklyHours = weeklyHours.OrderBy(_ => ((int)_.DayOfWeek + 6) % 7).ToList();
 
-            var dayGroupings = new List<(List<DayOfWeek> DaysOfWeek, DateTime OpenTime, DateTime CloseTime)>();
+            var dayGroupings
+                = new List<(List<DayOfWeek> DaysOfWeek, DateTime OpenTime, DateTime CloseTime)>();
             var closedDays = new List<DayOfWeek>();
             foreach (var day in weeklyHours)
             {
@@ -217,26 +215,37 @@ namespace Ocuda.Promenade.Service
             {
                 var days = isStructuredData ? GetFormattedDayGroupings(DaysOfWeek, true)
                     : GetFormattedDayGroupings(DaysOfWeek);
-                var openTime = isStructuredData ? new StringBuilder(OpenTime.ToString("%H"))
-                    : new StringBuilder(OpenTime.ToString("%h"));
+
+                var openTimeString = isStructuredData
+                    ? new StringBuilder(OpenTime.ToString("%H", CultureInfo.InvariantCulture))
+                    : new StringBuilder(OpenTime.ToString("%h", CultureInfo.InvariantCulture));
+
                 if (OpenTime.Minute != 0 || isStructuredData)
                 {
-                    openTime.Append(OpenTime.ToString(":mm"));
+                    openTimeString.Append(OpenTime.ToString(":mm", CultureInfo.InvariantCulture));
                 }
-                openTime.Append(isStructuredData ? "" : OpenTime.ToString(" tt").ToLower());
 
-                var closeTime = isStructuredData ? new StringBuilder(CloseTime.ToString("%H"))
-                    : new StringBuilder(CloseTime.ToString("%h"));
+                openTimeString.Append(isStructuredData
+                    ? ""
+                    : OpenTime.ToString(" tt", CultureInfo.InvariantCulture).ToLowerInvariant());
+
+                var closeTimeString = isStructuredData
+                    ? new StringBuilder(CloseTime.ToString("%H", CultureInfo.InvariantCulture))
+                    : new StringBuilder(CloseTime.ToString("%h", CultureInfo.InvariantCulture));
+
                 if (CloseTime.Minute != 0 || isStructuredData)
                 {
-                    closeTime.Append(CloseTime.ToString(":mm"));
+                    closeTimeString
+                        .Append(CloseTime.ToString(":mm", CultureInfo.InvariantCulture));
                 }
-                closeTime.Append(isStructuredData ? "" : CloseTime.ToString(" tt").ToLower());
+                closeTimeString.Append(isStructuredData
+                    ? ""
+                    : CloseTime.ToString(" tt", CultureInfo.InvariantCulture).ToLowerInvariant());
 
                 formattedDayGroupings.Add(new LocationDayGrouping
                 {
                     Days = days,
-                    Time = $"{openTime} {ndash} {closeTime}"
+                    Time = $"{openTimeString} {ndash} {closeTimeString}"
                 });
             }
 
@@ -253,12 +262,14 @@ namespace Ocuda.Promenade.Service
             return formattedDayGroupings;
         }
 
-        private string GetFormattedDayGroupings(List<DayOfWeek> days, bool isStructuredData = false)
+        private string GetFormattedDayGroupings(List<DayOfWeek> days,
+            bool isStructuredData = false)
         {
             var dayFormatter = new DateTimeFormatInfo();
             if (days.Count == 1)
             {
-                return isStructuredData ? dayFormatter.GetAbbreviatedDayName(days[0]).Substring(0, 2)
+                return isStructuredData
+                    ? dayFormatter.GetAbbreviatedDayName(days[0]).Substring(0, 2)
                     : dayFormatter.GetAbbreviatedDayName(days[0]);
             }
             else
@@ -294,7 +305,8 @@ namespace Ocuda.Promenade.Service
                 }
                 else
                 {
-                    return string.Join(", ", days.Select(_ => dayFormatter.GetAbbreviatedDayName(_)));
+                    return string.Join(", ",
+                        days.Select(_ => dayFormatter.GetAbbreviatedDayName(_)));
                 }
             }
         }
@@ -346,11 +358,11 @@ namespace Ocuda.Promenade.Service
                 }
                 else if (result.OpenTime.Value.TimeOfDay > now.TimeOfDay)
                 {
-                    result.StatusMessage = $"Opens at {result.OpenTime.Value.ToString("h:mm tt")}";
+                    result.StatusMessage = $"Opens at {result.OpenTime.Value.ToString("h:mm tt", CultureInfo.InvariantCulture)}";
                 }
                 else if (result.CloseTime.Value.TimeOfDay > now.TimeOfDay)
                 {
-                    result.StatusMessage = $"Open until {result.CloseTime.Value.ToString("h:mm tt")}";
+                    result.StatusMessage = $"Open until {result.CloseTime.Value.ToString("h:mm tt", CultureInfo.InvariantCulture)}";
                     result.IsCurrentlyOpen = true;
                 }
                 else
@@ -404,7 +416,7 @@ namespace Ocuda.Promenade.Service
                         nextDay = nextOpen.DayOfWeek.ToString();
                     }
 
-                    result.StatusMessage = $"Opens {nextDay} at {nextOpen.OpenTime.Value.ToString("h:mm tt")}";
+                    result.StatusMessage = $"Opens {nextDay} at {nextOpen.OpenTime.Value.ToString("h:mm tt", CultureInfo.InvariantCulture)}";
                 }
             }
 

@@ -1,64 +1,36 @@
 ﻿@model Ocuda.Promenade.Controllers.ViewModels.Locations.LocationViewModel
 
-@section styles {
-    <style>
-        .location-tile {
-            border: 1px solid #b8b9bb;
-            margin: 0 auto;
-            max-width: 322px;
-        }
-
-        .location-tile-background {
-            background-color: #fcf6e6;
-            padding: 0.75rem;
-        }
-
-        .location-tile-table {
-            margin: 0 auto;
-            padding: 0.75rem;
-            text-align: center;
-            width: 100%;
-        }
-
-        .traffic-red {
-            color: #cc3232;
-        }
-
-        .traffic-green {
-            color: #30B534;
-        }
-    </style>
-}
-
 <h1>Locations</h1>
 
 @if (Model.CanSearchAddress)
 {
     <div class="row">
-        <div class="col-12" style="padding-bottom: 1rem;">
-            <form asp-action="@nameof(LocationsController.Find)" method="get" role="form">
+        <div class="col-12 mb-2">
+            <form asp-action="@nameof(LocationsController.Find)"
+                  method="get"
+                  role="form">
                 <div class="input-group">
                     <input asp-for="Zip"
                            placeholder="Enter your ZIP Code to find your closest library"
                            class="form-control default-text" />
-                    <duv class="input-group-append">
+                    <div class="input-group-append">
                         <button class="btn btn-primary">
                             Go
                         </button>
-                    </duv>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
-    <div class="row @(Model.IsMobile ? "" : "hide")">
-        <div class="col-12" style="padding-bottom: 1rem;">
+    <div class="row d-block d-sm-none">
+        <div class="col-12 mb-2">
             <form asp-action="Location" method="get" role="form" id="GeoForm">
                 <input asp-for="Latitude" id="Latitude" hidden />
                 <input asp-for="Longitude" id="Longitude" hidden />
                 <button type="button"
-                        class="btn btn-default btn-block"
-                        id="GeoButton"
-                        style="display: none;">
+                        class="btn btn-outline-primary btn-block"
+                        id="GeoButton">
+                    <span class="fas fa-map-marker-alt"></span>
                     Use my location
                 </button>
             </form>
@@ -66,78 +38,72 @@
     </div>
 }
 
-<div class="row" style="font-size:14px;">
+<div class="row">
     @if (Model?.Locations?.Count > 0)
     {
         @foreach (var location in Model.Locations)
         {
-            <div class="col-12 col-md-6 col-lg-4 mt-2 mb-4">
-                <div class="location-tile">
-                    <div class="@(location.CurrentStatus.IsCurrentlyOpen ? "traffic-green" : "traffic-red")" style="border-bottom:5px solid; width: 100%;">
+            <div class="col-12 col-md-6 col-lg-4 mt-2 mb-3">
+                <div class="prom-location-tile">
+                    @if (!string.IsNullOrEmpty(location.MapLink)
+                  && !string.IsNullOrEmpty(location.MapImagePath))
+                    {
                         <a href="@location.MapLink">
                             <img src="@location.MapImagePath" class="img-fluid" />
                         </a>
-                    </div>
-                    <div class="location-tile-background">
-                        <table class="location-tile-table">
-                            <tbody>
-                                <tr>
-                                    <td style="padding-bottom:10px;">
-                                        <span class="h3">
-                                            @if (!string.IsNullOrWhiteSpace(location.LocatorName))
-                                            {
-                                                @Html.Raw(location.LocatorName)
-                                            }
-                                            else
-                                            {
-                                                @location.Name
-                                            }
-                                        </span>
-                                        <em>
-                                            @if (location.Distance != 0)
-                                            {
-                                                <text>(@location.Distance mi.)</text>
-                                            }
-                                        </em>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="padding-bottom:10px">
-                                        @location.Address<br>
-                                        @location.City  @location.State, @location.Zip
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="padding-bottom:10px;">
-                                        <strong class="@(location.CurrentStatus.IsCurrentlyOpen ? "traffic-green" : "traffic-red")">
-                                            @location.CurrentStatus.StatusMessage
-                                        </strong>
-                                    </td>
-                                </tr>
-                                <tr style="text-align: left;">
-                                    <td style="padding: 5px 0;">
-                                        <a asp-action="@nameof(LocationsController.Locations)"
-                                           asp-route-locationStub="@location.Stub"
-                                           class="btn btn-light btn-outline-secondary text-dark"
-                                           style="font-size: 14px;">
-                                            More Info
-                                        </a>
-                                        @if (location.HasEvents)
-                                        {
-                                            <a href="@location.EventLink"
-                                               class="btn btn-light btn-outline-secondary text-dark float-right">
-                                                Events
-                                            </a>
-                                        }
-                                        else
-                                        {
-                                            <em class="float-right" style="padding-top:10px;">@location.LocatorNotes</em>
-                                        }
-                                    </td>
+                    }
+                    <div class="@(location.CurrentStatus.IsCurrentlyOpen ? "bg-success" : "bg-danger")"
+                         style="height: 0.4rem;">&nbsp;</div>
+                    <div class="p-3">
+                        <span class="h3">
+                            @if (!string.IsNullOrWhiteSpace(location.LocatorName))
+                            {
+                                @Html.Raw(location.LocatorName)
+                            }
+                            else
+                            {
+                                @location.Name
+                            }
+                        </span>
+                        <em>
+                            @if (location.Distance != 0)
+                            {
+                                <text>(@location.Distance mi.)</text>
+                            }
+                        </em>
+                        <p>
+                            @location.Address<br />
+                            @location.City
+                            @location.State,
+                            @location.Zip
+                        </p>
+                        <p class="py-1 @(location.CurrentStatus.IsCurrentlyOpen ? "text-success" : "text-danger")">
+                            <strong>@location.CurrentStatus.StatusMessage</strong>
+                        </p>
+                        <div class="row">
+                            <div class="col-6">
+                                <a asp-action="@nameof(LocationsController.Locations)"
+                                   asp-route-locationStub="@location.Stub"
+                                   class="btn btn-outline-dark">
+                                    More Info
+                                </a>
 
-                                </tr>
-                            </tbody>
-                        </table>
+                            </div>
+                            <div class="col-6 text-right">
+                                @if (location.HasEvents)
+                                {
+                                    <a href="@location.EventLink"
+                                       class="btn btn-outline-dark">
+                                        Events
+                                    </a>
+                                }
+                                else
+                                {
+                                    <em class="text-dark align-middle">@location.LocatorNotes</em>
+                                }
+
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -159,10 +125,8 @@
             if (location.protocol != 'https:' && location.hostname != 'localhost') {
                 location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
             }
-            if (@Model.IsMobile == "True") {
-                $('#GeoButton').html(useMyLocation);
-                $('#GeoButton').show();
-            }
+            $('#GeoButton').html(useMyLocation);
+            $('#GeoButton').show();
         });
 
         var geoSuccess = function (position) {
