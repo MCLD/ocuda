@@ -2,6 +2,8 @@
 {
     public static class Enrichment
     {
+        public static readonly string APIQuery = "APIQuery";
+        public static readonly string APIResult = "APIResult";
         public static readonly string Application = "Application";
         public static readonly string Identifier = "Identifier";
         public static readonly string Instance = "Instance";

@@ -8,9 +8,13 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public int LocationId { get; set; }
 
+        public Location Location { get; set; }
+
         [Key]
         [Required]
         public int FeatureId { get; set; }
+
+        public Feature Feature { get; set; }
 
         public string Text { get; set; }
 

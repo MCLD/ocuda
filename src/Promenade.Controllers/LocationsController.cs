@@ -1,26 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BranchLocator.Helpers;
 using BranchLocator.Models;
+using CommonMark;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.ViewModels.Locations;
 using Ocuda.Promenade.Service;
+using Serilog.Context;
 
 namespace Ocuda.Promenade.Controllers
 {
     [Route("[Controller]")]
     public class LocationsController : BaseController<LocationsController>
     {
+        private const string MapQuery
+            = "https://maps.googleapis.com/maps/api/geocode/json?{0}={1}&key={2}";
+
         private readonly LocationService _locationService;
         private readonly SegmentService _segmentService;
 
+        private readonly string ApiKey;
+
         public static string Name { get { return "Locations"; } }
+
+        public IFormatProvider CurrentCulture { get; private set; }
 
         public LocationsController(ServiceFacades.Controller<LocationsController> context,
             LocationService locationService, SegmentService segmentService) : base(context)
@@ -29,138 +39,201 @@ namespace Ocuda.Promenade.Controllers
                 ?? throw new ArgumentNullException(nameof(locationService));
             _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
+
+            ApiKey = _config[Utility.Keys.Configuration.PromenadeAPIGoogleMaps];
         }
 
         [HttpGet("")]
         [HttpGet("[action]")]
         [HttpGet("[action]/{Zip}")]
         [HttpGet("[action]/{latitude}/{longitude}")]
-        public async Task<IActionResult> Find(double? latitude = null, double? longitude = null,
-            string zip = null)
+        public async Task<IActionResult> Find(string zip, double? latitude, double? longitude)
         {
-            var apiKey = _config[Utility.Keys.Configuration.PromenadeAPIGoogleMaps];
+            if (!string.IsNullOrEmpty(zip))
+            {
+                return await FindAsync(zip);
+            }
+            else if (latitude.HasValue && longitude.HasValue)
+            {
+                return await FindAsync(latitude, longitude);
+            }
+            else
+            {
+                var viewModel = await CreateLocationViewModelAsync();
+                return await ShowNearestAsync(viewModel);
+            }
+        }
 
+        private async Task<string> PeformMapQueryAsync(string query)
+        {
+            try
+            {
+                using var client = new HttpClient();
+                using var response = await client.GetAsync(new Uri(query));
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadAsStringAsync();
+            }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception ex)
+            {
+                using (LogContext.PushProperty(Utility.Logging.Enrichment.APIQuery, query))
+                {
+                    _logger.LogWarning(ex,
+                        "Error with map API query: {ErrorMessage}",
+                        ex.Message);
+                }
+                TempData["AlertDanger"] = "An error occured, please try again later.";
+            }
+#pragma warning restore CA1031 // Do not catch general exception types
+            return null;
+        }
+
+        private async Task<LocationViewModel> CreateLocationViewModelAsync()
+        {
             var viewModel = new LocationViewModel
             {
-                CanSearchAddress = !string.IsNullOrWhiteSpace(apiKey),
-                Zip = zip?.Trim()
+                Locations = await _locationService.GetAllLocationsAsync(),
+                CanSearchAddress = !string.IsNullOrWhiteSpace(ApiKey)
             };
-
-            var searchLatitude = latitude;
-            var searchLongitude = longitude;
-
-            if (!string.IsNullOrWhiteSpace(apiKey))
-            {
-                if (!string.IsNullOrWhiteSpace(zip))
-                {
-                    using var client = new HttpClient();
-                    try
-                    {
-                        var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?address={zip}&key={apiKey}");
-                        response.EnsureSuccessStatusCode();
-
-                        var stringResult = await response.Content.ReadAsStringAsync();
-                        dynamic jsonResult = JsonConvert.DeserializeObject(stringResult);
-
-                        if (jsonResult.results.Count > 0)
-                        {
-                            var result = jsonResult.results[0];
-                            searchLatitude = result.geometry.location.lat;
-                            searchLongitude = result.geometry.location.lng;
-                        }
-                        else
-                        {
-                            _logger.LogError("No geocoding results for {ZIPCode}", zip);
-                            TempData["AlertDanger"] = $"Unable to locate ZIP Code: <strong>{zip}</strong>.";
-                        }
-                    }
-                    catch (HttpRequestException ex)
-                    {
-                        _logger.LogCritical(ex,
-                            "Google API error geocoding {ZIPCode}: {Message}",
-                            viewModel.Zip,
-                            ex.Message);
-                        TempData["AlertDanger"] = "An error occured, please try again later.";
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogCritical("Error geocoding {ZIPCode}: {Message}",
-                            viewModel.Zip,
-                            ex.Message);
-                        TempData["AlertDanger"] = "An error occured, please try again later.";
-                    }
-                }
-                else if (latitude.HasValue && longitude.HasValue)
-                {
-                    // try to get the zip code to display to the user
-                    var latlng = $"{latitude},{longitude}";
-                    try
-                    {
-                        using var client = new HttpClient();
-                        GeocodeResult geoResult = null;
-                        string stringResult = null;
-
-                        try
-                        {
-                            var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?latlng={latlng}&key={apiKey}");
-                            response.EnsureSuccessStatusCode();
-
-                            stringResult = await response.Content.ReadAsStringAsync();
-
-                            geoResult = JsonConvert.DeserializeObject<GeocodeResult>(stringResult);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError("Error parsing Geocode API JSON: {Message} - {Result}",
-                                ex.Message,
-                                stringResult);
-                        }
-
-                        if (geoResult?.Results?.Count() > 0)
-                        {
-                            viewModel.Zip = geoResult?
-                                .Results?
-                                .FirstOrDefault(_ => _.Types.Any(__ => __ == "postal_code"))?
-                                .AddressComponents?
-                                .FirstOrDefault()?
-                                .ShortName;
-                            if (string.IsNullOrEmpty(viewModel.Zip))
-                            {
-                                _logger.LogWarning("Could not find postal code when reverse geocoding {Coordinates}",
-                                    latlng);
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex,
-                            "Problem looking up postal code for coordinates {Coordinates}: {Message}",
-                            latlng,
-                            ex.Message);
-                    }
-                    return View("Locations", viewModel);
-                }
-            }
-
-            viewModel.Locations = await _locationService.GetAllLocationsAsync();
 
             foreach (var location in viewModel.Locations)
             {
                 location.CurrentStatus = await _locationService.GetCurrentStatusAsync(location.Id);
             }
 
-            if (searchLatitude.HasValue && searchLongitude.HasValue)
+            return viewModel;
+        }
+
+        private async Task<IActionResult> FindAsync(string zip)
+        {
+            var viewModel = await CreateLocationViewModelAsync();
+
+            if (viewModel.CanSearchAddress && !string.IsNullOrEmpty(zip))
+            {
+                var mapQueryResult
+                    = await PeformMapQueryAsync(string.Format(CultureInfo.InvariantCulture,
+                    MapQuery,
+                    "address",
+                    zip.Trim(),
+                    ApiKey));
+
+                if (!string.IsNullOrEmpty(mapQueryResult))
+                {
+                    try
+                    {
+                        dynamic jsonResult = JsonConvert.DeserializeObject(mapQueryResult);
+
+                        if (jsonResult.results.Count > 0)
+                        {
+                            viewModel.Latitude = jsonResult.results[0].geometry.location.lat;
+                            viewModel.Longitude = jsonResult.results[0].geometry.location.lng;
+                            viewModel.Zip = zip.Trim();
+                        }
+                    }
+#pragma warning disable CA1031 // Do not catch general exception types
+                    catch (Exception ex)
+                    {
+                        using (LogContext.PushProperty(Utility.Logging.Enrichment.APIResult,
+                            mapQueryResult))
+                        {
+                            _logger.LogWarning(ex,
+                                "Could not parse address API result into JSON: {ErrorMessage}",
+                                ex.Message);
+                        }
+                    }
+#pragma warning restore CA1031 // Do not catch general exception types
+                }
+            }
+
+            return await ShowNearestAsync(viewModel);
+        }
+
+        private async Task<IActionResult> FindAsync(double? latitude, double? longitude)
+        {
+            var viewModel = await CreateLocationViewModelAsync();
+
+            if (viewModel.CanSearchAddress
+                && latitude.HasValue
+                && longitude.HasValue)
+            {
+                viewModel.Latitude = latitude;
+                viewModel.Longitude = longitude;
+
+                var mapQueryResult
+                    = await PeformMapQueryAsync(string.Format(CultureInfo.InvariantCulture,
+                        MapQuery,
+                        "latlng",
+                        $"{viewModel.Latitude},{viewModel.Longitude}",
+                        ApiKey));
+
+                if (!string.IsNullOrEmpty(mapQueryResult))
+                {
+                    try
+                    {
+                        var geoResult = JsonConvert.DeserializeObject<GeocodeResult>(mapQueryResult);
+
+                        if (geoResult?.Results?.Count() > 0)
+                        {
+                            var zipCode = geoResult?
+                                .Results?
+                                .FirstOrDefault(_ => _.Types.Any(__ => __ == "postal_code"))?
+                                .AddressComponents?
+                                .FirstOrDefault()?
+                                .ShortName;
+
+                            if (string.IsNullOrEmpty(zipCode))
+                            {
+                                _logger.LogWarning("Could not find postal code when reverse geocoding {Coordinates}",
+                                    $"{viewModel.Latitude},{viewModel.Longitude}");
+                            }
+                            else
+                            {
+                                viewModel.Zip = zipCode;
+                            }
+                        }
+                    }
+#pragma warning disable CA1031 // Do not catch general exception types
+                    catch (Exception ex)
+                    {
+                        using (LogContext.PushProperty(Utility.Logging.Enrichment.APIResult,
+                            mapQueryResult))
+                        {
+                            _logger.LogWarning(ex,
+                                "Could not parse latlng API result into JSON: {ErrorMessage}",
+                                ex.Message);
+                        }
+                    }
+#pragma warning restore CA1031 // Do not catch general exception types
+                }
+            }
+
+            return await ShowNearestAsync(viewModel);
+        }
+
+        private async Task<IActionResult> ShowNearestAsync(LocationViewModel viewModel)
+        {
+            if (viewModel == null)
+            {
+                viewModel = await CreateLocationViewModelAsync();
+            }
+
+            if (viewModel.Latitude.HasValue && viewModel.Longitude.HasValue)
             {
                 foreach (var location in viewModel.Locations)
                 {
                     var geolocation = location.GeoLocation
                         .Split(',')
-                        .Select(_ => Convert.ToDouble(_)).ToList();
-                    location.Distance = HaversineHelper.Calculate(geolocation[0], geolocation[1],
-                        searchLatitude.Value, searchLongitude.Value);
+                        .Select(Convert.ToDouble).ToList();
+                    location.Distance = HaversineHelper.Calculate(
+                        geolocation[0],
+                        geolocation[1],
+                        (double)viewModel.Latitude,
+                        (double)viewModel.Longitude);
                 }
 
-                viewModel.Locations = viewModel.Locations.OrderBy(_ => _.Distance)
+                viewModel.Locations = viewModel
+                    .Locations
+                    .OrderBy(_ => _.Distance)
                     .Select(_ =>
                     {
                         _.Distance = Math.Ceiling(_.Distance);
@@ -175,123 +248,116 @@ namespace Ocuda.Promenade.Controllers
         }
 
         [HttpGet("{locationStub}")]
+        public async Task<IActionResult> Locations(string locationStub)
+        {
+            if (string.IsNullOrEmpty(locationStub))
+            {
+                return RedirectToAction(nameof(Find));
+            }
+
+            var viewModel = new LocationDetailViewModel
+            {
+                CanonicalUrl = await GetCanonicalUrl(),
+                Location = await _locationService.GetLocationByStubAsync(locationStub)
+            };
+
+            if (viewModel.Location == null)
+            {
+                return NotFound();
+            }
+
+            if (viewModel.Location.PreFeatureSegmentId.HasValue)
+            {
+                viewModel.PreFeatureSegment = await _segmentService.GetSegmentTextBySegmentIdAsync(
+                    viewModel.Location.PreFeatureSegmentId.Value);
+                if (viewModel.PreFeatureSegment != null)
+                {
+                    viewModel.PreFeatureSegment.Text
+                        = CommonMarkConverter.Convert(viewModel.PreFeatureSegment.Text);
+                }
+            }
+
+            if (viewModel.Location.PostFeatureSegmentId.HasValue)
+            {
+                viewModel.PostFeatureSegment = await _segmentService.GetSegmentTextBySegmentIdAsync(
+                    viewModel.Location.PostFeatureSegmentId.Value);
+                if (viewModel.PostFeatureSegment != null)
+                {
+                    viewModel.PostFeatureSegment.Text
+                        = CommonMarkConverter.Convert(viewModel.PostFeatureSegment.Text);
+                }
+            }
+
+            viewModel.Location.DescriptionSegment = await _segmentService
+                .GetSegmentTextBySegmentIdAsync(viewModel.Location.DescriptionSegmentId);
+
+            viewModel.Location.DescriptionSegment.Text = CommonMarkConverter
+                .Convert(viewModel.Location.DescriptionSegment.Text);
+
+            viewModel.Location.LocationHours
+                = await _locationService.GetFormattedWeeklyHoursAsync(viewModel.Location.Id);
+
+            if (viewModel.Location.LocationHours != null)
+            {
+                viewModel.StructuredLocationHours
+                    = (await _locationService.GetFormattedWeeklyHoursAsync(viewModel.Location.Id, true))
+                    .Select(_ => $"{_.Days} {_.Time}").ToList();
+            }
+
+            var locationFeatures
+                = await _locationService.GetFullLocationFeaturesAsync(locationStub);
+
+            viewModel.LocationFeatures = locationFeatures
+                .Select(_ => new LocationsFeaturesViewModel(_));
+
+            if (viewModel.Location.DisplayGroupId.HasValue)
+            {
+                viewModel.LocationNeighborGroup = await _locationService
+                    .GetLocationsNeighborGroup(viewModel.Location.DisplayGroupId.Value);
+
+                var neighbors = await _locationService
+                    .GetLocationsNeighborsAsync(viewModel.Location.DisplayGroupId.Value);
+                if (neighbors.Count > 0)
+                {
+                    viewModel.NearbyLocations = neighbors;
+                    viewModel.NearbyCount = viewModel.NearbyLocations.Count;
+                }
+            }
+
+            PageTitle = viewModel.Location.Name;
+
+            return View("LocationDetails", viewModel);
+        }
+
         [HttpGet("{locationStub}/{featureStub}")]
         public async Task<IActionResult> Locations(string locationStub, string featureStub)
         {
             if (string.IsNullOrEmpty(locationStub))
             {
-                return await Find();
+                return RedirectToAction(nameof(Find));
             }
-            else if (string.IsNullOrEmpty(featureStub))
+
+            var locationFeature
+                = await _locationService.GetLocationFullFeatureAsync(locationStub, featureStub);
+
+            if (locationFeature?.Feature != null)
             {
-                var viewModel = new LocationDetailViewModel
-                {
-                    LocationFeatures = new List<LocationsFeaturesViewModel>(),
-                    Location = await _locationService.GetLocationByStubAsync(locationStub)
-                };
-                if (viewModel.Location.PreFeatureSegmentId.HasValue)
-                {
-                    viewModel.PreFeatureSegment = await _segmentService.GetSegmentTextBySegmentIdAsync(
-                        viewModel.Location.PreFeatureSegmentId.Value);
-                    if(viewModel.PreFeatureSegment!=null)
-                    {
-                        viewModel.PreFeatureSegment.Text = CommonMark.CommonMarkConverter.Convert(viewModel.PreFeatureSegment.Text);
-                    }
-                }
-                if (viewModel.Location.PostFeatureSegmentId.HasValue)
-                {
-                    viewModel.PostFeatureSegment = await _segmentService.GetSegmentTextBySegmentIdAsync(
-                        viewModel.Location.PostFeatureSegmentId.Value);
-                    if (viewModel.PostFeatureSegment != null)
-                    {
-                        viewModel.PostFeatureSegment.Text = CommonMark.CommonMarkConverter.Convert(viewModel.PostFeatureSegment.Text);
-                    }
-                }
+                var location = await _locationService.GetLocationByStubAsync(locationStub);
+                PageTitle = $"{locationFeature.Feature.Name} at {location.Name} Library";
 
-                viewModel.Location.Description = CommonMark.CommonMarkConverter.Convert(viewModel.Location.Description);
-                viewModel.Location.LocationHours = await _locationService.GetFormattedWeeklyHoursAsync(viewModel.Location.Id);
-                if (viewModel.Location.LocationHours != null)
+                return View("LocationFeatureDetails", new LocationDetailViewModel
                 {
-                    viewModel.StructuredLocationHours = (await _locationService.GetFormattedWeeklyHoursAsync(viewModel.Location.Id, true))
-                        .Select(_ => $"{_.Days} {_.Time}").ToList();
-                }
-                var features = await _locationService.GetLocationsFeaturesAsync(locationStub);
-
-                foreach (var feature in features.OrderBy(_ => _.Name).ToList())
-                {
-                    var locationFeature = await _locationService.GetLocationFeatureByIds(viewModel.Location.Id, feature.Id);
-                    var locationfeatureModel = new LocationsFeaturesViewModel
+                    CanonicalUrl = await GetCanonicalUrl(),
+                    LocationFeatures = new List<LocationsFeaturesViewModel>
                     {
-                        BodyText = CommonMark.CommonMarkConverter.Convert(feature.BodyText),
-                        Icon = feature.Icon,
-                        ImagePath = feature.ImagePath,
-                        Name = feature.Name,
-                        RedirectUrl = locationFeature.RedirectUrl,
-                        Stub = feature.Stub,
-                        Text = CommonMark.CommonMarkConverter.Convert(locationFeature.Text)
-                    };
-                    if (!feature.Icon.Contains("fa-inverse"))
-                    {
-                        locationfeatureModel.InnerSpan = "<strong>7</strong>";
-                    }
-                    viewModel.LocationFeatures.Add(locationfeatureModel);
-                }
-
-                if (viewModel.Location.DisplayGroupId.HasValue)
-                {
-                    viewModel.LocationNeighborGroup = await _locationService
-                        .GetLocationsNeighborGroup(viewModel.Location.DisplayGroupId.Value);
-
-                    var neighbors = await _locationService
-                        .GetLocationsNeighborsAsync(viewModel.Location.DisplayGroupId.Value);
-                    if (neighbors.Count > 0)
-                    {
-                        viewModel.NearbyLocations = neighbors;
-                        viewModel.NearbyCount = viewModel.NearbyLocations.Count;
-                    }
-                    else
-                    {
-                        viewModel.NearbyCount = 0;
-                    }
-                }
-
-                PageTitle = viewModel.Location.Name;
-
-                return View("LocationDetails", viewModel);
+                        new LocationsFeaturesViewModel(locationFeature)
+                    },
+                    Location = location
+                });
             }
             else
             {
-                var viewModel = new LocationDetailViewModel();
-                var locationFeatureViewModel = new List<LocationsFeaturesViewModel>();
-
-                viewModel.Location = await _locationService.GetLocationByStubAsync(locationStub);
-                var feature = (await _locationService.GetLocationsFeaturesAsync(locationStub)).SingleOrDefault(_ => _.Stub == featureStub);
-                if (feature != null)
-                {
-                    var locationFeature = await _locationService.GetLocationFeatureByIds(viewModel.Location.Id, feature.Id);
-
-                    var locationfeatureModel = new LocationsFeaturesViewModel
-                    {
-                        BodyText = CommonMark.CommonMarkConverter.Convert(feature.BodyText),
-                        Icon = feature.Icon,
-                        ImagePath = feature.ImagePath,
-                        Name = feature.Name,
-                        RedirectUrl = locationFeature.RedirectUrl,
-                        Stub = feature.Stub,
-                        Text = CommonMark.CommonMarkConverter.Convert(locationFeature.Text)
-                    };
-
-                    locationFeatureViewModel.Add(locationfeatureModel);
-                    viewModel.LocationFeatures = locationFeatureViewModel;
-
-                    PageTitle = feature.Name;
-
-                    return View("LocationFeatureDetails", viewModel);
-                }
-                else
-                {
-                    return await Locations(locationStub, "");
-                }
+                return NotFound();
             }
         }
     }

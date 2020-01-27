@@ -67,7 +67,21 @@ namespace Ocuda.Ops.Service
 
         public async Task<Location> AddLocationAsync(Location location)
         {
+            if (location == null)
+            {
+                throw new ArgumentNullException(nameof(location));
+            }
+
+            location.AddressType = location.AddressType.Trim();
+            location.AdministrativeArea = location.AdministrativeArea.Trim();
+            location.AreaServedName = location.AreaServedName.Trim();
+            location.AreaServedType = location.AreaServedType.Trim();
+            location.ContactType = location.ContactType.Trim();
+            location.Email = location.Email.Trim();
             location.Name = location.Name?.Trim();
+            location.ParentOrganization = location.ParentOrganization.Trim();
+            location.PriceRange = location.PriceRange.Trim();
+            location.Type = location.Type.Trim();
             await ValidateAsync(location);
 
             await _locationRepository.AddAsync(location);
@@ -78,24 +92,39 @@ namespace Ocuda.Ops.Service
 
         public async Task<Location> EditAsync(Location location)
         {
+            if (location == null)
+            {
+                throw new ArgumentNullException(nameof(location));
+            }
+
             var currentLocation = await _locationRepository.FindAsync(location.Id);
             currentLocation.Address = location.Address;
+            currentLocation.AddressType = location.AddressType.Trim();
+            currentLocation.AdministrativeArea = location.AdministrativeArea.Trim();
+            currentLocation.AreaServedName = location.AreaServedName.Trim();
+            currentLocation.AreaServedType = location.AreaServedType.Trim();
             currentLocation.City = location.City;
-            currentLocation.Zip = location.Zip;
-            currentLocation.State = location.State;
+            currentLocation.Code = location.Code;
+            currentLocation.ContactType = location.ContactType.Trim();
             currentLocation.Country = location.Country;
+            currentLocation.DescriptionSegmentId = location.DescriptionSegmentId;
+            currentLocation.DisplayGroupId = location.DisplayGroupId;
+            currentLocation.Email = location.Email.Trim();
+            currentLocation.EventLink = location.EventLink;
+            currentLocation.Facebook = location.Facebook;
+            currentLocation.IsAccessibleForFree = location.IsAccessibleForFree;
             currentLocation.MapLink = location.MapLink;
             currentLocation.Name = location.Name;
-            currentLocation.Stub = location.Stub;
-            currentLocation.Code = location.Code;
+            currentLocation.ParentOrganization = location.ParentOrganization.Trim();
             currentLocation.Phone = location.Phone;
-            currentLocation.Description = location.Description;
-            currentLocation.Facebook = location.Facebook;
-            currentLocation.EventLink = location.EventLink;
-            currentLocation.SubscriptionLink = location.SubscriptionLink;
-            currentLocation.DisplayGroupId = location.DisplayGroupId;
             currentLocation.PostFeatureSegmentId = location.PostFeatureSegmentId;
             currentLocation.PreFeatureSegmentId = location.PreFeatureSegmentId;
+            currentLocation.PriceRange = location.PriceRange.Trim();
+            currentLocation.State = location.State;
+            currentLocation.Stub = location.Stub;
+            currentLocation.SubscriptionLink = location.SubscriptionLink;
+            currentLocation.Type = location.Type.Trim();
+            currentLocation.Zip = location.Zip;
 
             await ValidateAsync(currentLocation);
 
@@ -106,6 +135,11 @@ namespace Ocuda.Ops.Service
 
         public async Task<Location> EditAlwaysOpenAsync(Location location)
         {
+            if (location == null)
+            {
+                throw new ArgumentNullException(nameof(location));
+            }
+
             var currentLocation = await _locationRepository.FindAsync(location.Id);
             currentLocation.IsAlwaysOpen = location.IsAlwaysOpen;
 
@@ -159,24 +193,34 @@ namespace Ocuda.Ops.Service
             {
                 var days = GetFormattedDayGroupings(DaysOfWeek);
 
-                var openTime = new StringBuilder(OpenTime.ToString("%h"));
+                var openTimeString = new StringBuilder(OpenTime.ToString("%h",
+                    CultureInfo.InvariantCulture));
+
                 if (OpenTime.Minute != 0)
                 {
-                    openTime.Append(OpenTime.ToString(":mm"));
+                    openTimeString.Append(OpenTime.ToString(":mm", CultureInfo.InvariantCulture));
                 }
-                openTime.Append(OpenTime.ToString(" tt").ToLower());
 
-                var closeTime = new StringBuilder(CloseTime.ToString("%h"));
+                openTimeString.Append(OpenTime
+                    .ToString(" tt", CultureInfo.InvariantCulture)
+                    .ToLowerInvariant());
+
+                var closeTimeString = new StringBuilder(CloseTime.ToString("%h",
+                    CultureInfo.InvariantCulture));
+
                 if (CloseTime.Minute != 0)
                 {
-                    closeTime.Append(CloseTime.ToString(":mm"));
+                    closeTimeString.Append(CloseTime.ToString(":mm",
+                        CultureInfo.InvariantCulture));
                 }
-                closeTime.Append(CloseTime.ToString(" tt").ToLower());
+                closeTimeString.Append(CloseTime
+                    .ToString(" tt", CultureInfo.InvariantCulture)
+                    .ToLowerInvariant());
 
                 formattedDayGroupings.Add(new LocationDayGrouping
                 {
                     Days = days,
-                    Time = $"{openTime} {ndash} {closeTime}"
+                    Time = $"{openTimeString} {ndash} {closeTimeString}"
                 });
             }
 

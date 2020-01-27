@@ -18,9 +18,9 @@
                 <div class="flex-md-grow-0">
                     <div class="custom-control custom-switch">
                         <input type="checkbox"
-                               class="custom-control-input"
+                               class="custom-control-input switch"
                                asp-for="IsLocationsGroup"
-                               value="@Model.IsLocationsGroup"
+                               value="@Model.IsLocationsGroup.ToString().ToLower()"
                                id="locationMapGroup" />
                         <label class="col-form-label text-md-right col-md-3 custom-control-label text-hide" for="locationMapGroup"></label>
                     </div>
