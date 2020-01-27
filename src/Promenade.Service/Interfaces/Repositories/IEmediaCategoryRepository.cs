@@ -7,7 +7,7 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
     public interface IEmediaCategoryRepository : IGenericRepository<EmediaCategory>
     {
         Task<EmediaCategory> GetByIdsAsync(int emediaId,int categoryId);
-        Task<List<EmediaCategory>> GetEmediaCategoriesByEmediaId(int emediaId);
+        Task<ICollection<Category>> GetCategoriesByEmediaIdAsync(int emediaId);
     }
 }
 

@@ -25,10 +25,19 @@ namespace Ocuda.Promenade.Controllers
             {
                 AllEmedia = await _emediaService.GetAllEmediaAsync()
             };
+
             foreach (var emedia in emediaViewModel.AllEmedia)
             {
-                emedia.Description = CommonMark.CommonMarkConverter.Convert(emedia.Description);
-                emedia.Details = CommonMark.CommonMarkConverter.Convert(emedia.Details);
+                if (!string.IsNullOrWhiteSpace(emedia.EmediaText?.Description))
+                {
+                    emedia.EmediaText.Description = CommonMark.CommonMarkConverter
+                    .Convert(emedia.EmediaText.Description);
+                }
+                if (!string.IsNullOrWhiteSpace(emedia.EmediaText?.Details))
+                {
+                    emedia.EmediaText.Details = CommonMark.CommonMarkConverter
+                    .Convert(emedia.EmediaText?.Details);
+                }
             }
 
             PageTitle = "eMedia";
