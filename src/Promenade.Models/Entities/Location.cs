@@ -26,13 +26,16 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public string Stub { get; set; }
 
+        [NotMapped]
+        public SegmentText DescriptionSegment { get; set; }
+
         [MaxLength(255)]
         public string MapLink { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(100)]
         public string MapImagePath { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(100)]
         public string Address { get; set; }
 
         [MaxLength(50)]
@@ -48,8 +51,8 @@ namespace Ocuda.Promenade.Models.Entities
 
         public Group DisplayGroup { get; set; }
 
-        [MaxLength(2000)]
-        public string Description { get; set; }
+        [DisplayName("Description Segment")]
+        public int DescriptionSegmentId { get; set; }
 
         [DisplayName("Post-Feature Segment")]
         public int? PostFeatureSegmentId { get; set; }
@@ -57,10 +60,10 @@ namespace Ocuda.Promenade.Models.Entities
         [DisplayName("Pre-Feature Segment")]
         public int? PreFeatureSegmentId { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(50)]
         public string Facebook { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(100)]
         public string SubscriptionLink { get; set; }
 
         [MaxLength(255)]
@@ -68,42 +71,50 @@ namespace Ocuda.Promenade.Models.Entities
 
         public bool HasEvents { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(50)]
         public string AdministrativeArea { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(50)]
         public string Country { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(50)]
         public string State { get; set; }
 
-        [MaxLength(255)]
-        public string SDType { get; set; }
+        [MaxLength(50)]
+        public string Type { get; set; }
 
-        [MaxLength(255)]
-        public string SDEmail { get; set; }
+        [MaxLength(50)]
+        public string Email { get; set; }
 
-        [MaxLength(255)]
-        public string SDAreaServedName { get; set; }
+        [MaxLength(50)]
+        public string AreaServedName { get; set; }
 
-        [MaxLength(255)]
-        public string SDAreaServedType { get; set; }
+        [MaxLength(50)]
+        public string AreaServedType { get; set; }
 
-        [MaxLength(255)]
-        public string SDLocationId { get; set; }
+        [MaxLength(50)]
+        public string AddressType { get; set; }
 
-        [MaxLength(255)]
-        public string SDParentOrganization { get; set; }
+        [MaxLength(50)]
+        public string ContactType { get; set; }
+
+        [MaxLength(50)]
+        public string ParentOrganization { get; set; }
+
+        public bool IsAccessibleForFree { get; set; }
 
         [MaxLength(255)]
         public string GeoLocation { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(50)]
         public string PAbbreviation { get; set; }
+
+        [MaxLength(50)]
+        public string PriceRange { get; set; }
 
         public bool IsAlwaysOpen { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(50)]
         public string LocatorName { get; set; }
 
         [MaxLength(50)]

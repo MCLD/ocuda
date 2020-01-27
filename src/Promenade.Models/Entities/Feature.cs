@@ -23,7 +23,11 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(80)]
         public string Stub { get; set; }
 
+        [MaxLength(2000)]
         public string BodyText { get; set; }
+
+        [MaxLength(5)]
+        public string IconText { get; set; }
 
         [NotMapped]
         public bool IsNewFeature { get; set; }

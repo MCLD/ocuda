@@ -1,6 +1,7 @@
 ﻿@model Ocuda.Promenade.Controllers.ViewModels.Locations.LocationDetailViewModel
 
 @section styles {
+    <link rel="canonical" href="@Model.CanonicalUrl" />
     <style>
         .location-image {
             float: right;
@@ -42,6 +43,11 @@
             line-height: 1.5rem;
         }
 
+        .location-features .location-icon-text {
+            color: white;
+            font-weight: bold;
+        }
+
         .region-map {
             border: 1px solid #307fe2;
         }
@@ -76,7 +82,9 @@
         <img src="@Model.Location.ImagePath" class="location-image mb-2" />
         <h1 class="location-header">
             @Model.Location.Name
-            <a href="@Model.Location.MapLink" class="btn btn-outline-secondary text-dark map-button" target="_blank">
+            <a href="@Model.Location.MapLink"
+               class="btn btn-outline-secondary text-dark map-button"
+               target="_blank">
                 <span class="fas fa-map-marker-alt"></span> Map
             </a>
         </h1>
@@ -84,13 +92,15 @@
             <tbody>
                 <tr>
                     <td class="address">
-                        <p>
+                        <address>
                             @Model.Location.Address
                             <br />
-                            @Model.Location.City, @Model.Location.State @Model.Location.Zip
+                            @Model.Location.City,
+                            @Model.Location.State
+                            @Model.Location.Zip
                             <br />
                             <a href="tel:@Model.Location.Phone">@Model.Location.Phone</a>
-                        </p>
+                        </address>
                     </td>
                     <td>
                         @if (Model.Location.IsAlwaysOpen)
@@ -102,7 +112,8 @@
                             <p>
                                 @foreach (var dayGrouping in Model.Location.LocationHours)
                                 {
-                                    <strong>@dayGrouping.Days</strong> <span>@dayGrouping.Time</span>
+                                    <strong>@dayGrouping.Days</strong>
+                                    <span>@dayGrouping.Time</span>
                                     <br />
                                 }
                             </p>
@@ -120,9 +131,9 @@
         <div class="col-12">
             @if (!string.IsNullOrEmpty(Model.PreFeatureSegment?.Header))
             {
-            <h2 class="location-subheading">
-                @Model.PreFeatureSegment.Header
-            </h2>
+                <h2 class="location-subheading">
+                    @Model.PreFeatureSegment.Header
+                </h2>
             }
             @Html.Raw(Model.PreFeatureSegment.Text)
         </div>
@@ -133,7 +144,7 @@
 
 <div class="row">
     <div class="col-12">
-        @Html.Raw(Model.Location.Description)
+        @Html.Raw(Model.Location.DescriptionSegment.Text)
     </div>
 </div>
 
@@ -171,19 +182,29 @@
         @if (string.IsNullOrEmpty(feature.RedirectUrl))
         {
             <div class="col-2 mb-3">
-                <a asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub="@Model.Location.Stub" asp-route-featureStub="@feature.Stub" class="bring-modal" data-toggle="modal" data-target="#featureModal" target="_blank" data-feature="@feature.Stub">
-                    <span class="fa-stack fa-2x" style="color:#007bff">
+                <a asp-action="@nameof(LocationsController.Locations)"
+                   asp-route-locationStub="@Model.Location.Stub"
+                   asp-route-featureStub="@feature.Stub"
+                   class="feature-popup"
+                   data-toggle="modal"
+                   data-target="#featureModal"
+                   target="_blank"
+                   data-feature="@feature.Stub">
+                    <span class="fa-stack fa-2x" style="color: #007bff">
                         <span class="fa fa-square fa-stack-2x"></span>
-                        <span class="@feature.Icon" style="@(!string.IsNullOrEmpty(feature.InnerSpan) ? "color:white" : "")">
-                            @if (!string.IsNullOrEmpty(feature.InnerSpan))
-                            {
-                                @Html.Raw(feature.InnerSpan.ToString());
-                            }
-                        </span>
+                        <span class="@feature.Icon">@Html.Raw(feature.IconText)</span>
                     </span>
                 </a>
                 <div>
-                    <a class="bring-modal" data-toggle="modal" data-target="#featureModal" asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub="@Model.Location.Stub" asp-route-featureStub="@feature.Stub" data-feature="@feature.Stub"> @feature.Name</a>
+                    <a class="feature-popup"
+                       data-toggle="modal"
+                       data-target="#featureModal"
+                       asp-action="@nameof(LocationsController.Locations)"
+                       asp-route-locationStub="@Model.Location.Stub"
+                       asp-route-featureStub="@feature.Stub"
+                       data-feature="@feature.Stub">
+                        @feature.Name
+                    </a>
                 </div>
             </div>
         }
@@ -193,12 +214,13 @@
                 <a href="@feature.RedirectUrl" target="_blank">
                     <span class="fa-stack fa-2x" style="color:#007bff">
                         <span class="fa fa-square fa-stack-2x"></span>
-                        <span class="@feature.Icon">
-                        </span>
+                        <span class="@feature.Icon"></span>
                     </span>
                 </a>
                 <div>
-                    <a href="@feature.RedirectUrl" data-feature="@feature.Stub" target="_blank">@feature.Name</a>
+                    <a href="@feature.RedirectUrl"
+                       data-feature="@feature.Stub"
+                       target="_blank">@feature.Name</a>
                 </div>
             </div>
         }
@@ -226,11 +248,17 @@
 
     <p>The @Model.Location.Name has other libraries nearby.</p>
 
-    <p>Interested in updates from every library in this area? <a href="@Model.LocationNeighborGroup.SubscriptionUrl" target="_blank">Get updates from these libraries.</a></p>
+    <p>
+        Interested in updates from every library in this area?
+        <a href="@Model.LocationNeighborGroup.SubscriptionUrl"
+           target="_blank">Get updates from these libraries.</a>
+    </p>
 
     <div class="row">
         <div class="col-4">
-            <img src="@Model.LocationNeighborGroup.MapImage" class="region-map img-fluid" alt="@Model.LocationNeighborGroup.Description">
+            <img src="@Model.LocationNeighborGroup.MapImage"
+                 class="region-map img-fluid"
+                 alt="@Model.LocationNeighborGroup.Description">
         </div>
         <div class="col-7">
             <table class="nearby-locations-table">
@@ -243,11 +271,20 @@
                             <tr>
                                 <td>@counter</td>
                                 <td>
-                                    <a asp-action="@nameof(LocationsController.Locations)" asp-route-locationStub="@location.Stub">@location.Name</a>
+                                    <a asp-action="@nameof(LocationsController.Locations)"
+                                       asp-route-locationStub="@location.Stub">@location.Name</a>
                                 </td>
                                 <td>
-                                    <a href="@location.EventLink" class="btn btn-sm btn-outline-secondary text-dark"><span class="fas fa-calendar-alt"></span> Events</a>
-                                    <a href="@location.SubscriptionLink" class="btn btn-sm btn-outline-secondary text-dark"><span class="far fa-envelope"></span> Mailing List</a>
+                                    <a href="@location.EventLink"
+                                       class="btn btn-sm btn-outline-secondary text-dark">
+                                        <span class="fas fa-calendar-alt"></span>
+                                        Events
+                                    </a>
+                                    <a href="@location.SubscriptionLink"
+                                       class="btn btn-sm btn-outline-secondary text-dark">
+                                        <span class="far fa-envelope"></span>
+                                        Mailing List
+                                    </a>
                                 </td>
                             </tr>
                             counter++;
@@ -257,9 +294,13 @@
                     <tr>
                         <td colspan="2">&nbsp;</td>
                         <td>
-                            <a href="@Model.LocationNeighborGroup.SubscriptionUrl" class="btn btn-sm btn-outline-secondary text-dark" target="_blank">
-                                <text><span class="far fa-envelope"></span> Updates from all @counter locations</text>
-
+                            <a href="@Model.LocationNeighborGroup.SubscriptionUrl"
+                               class="btn btn-sm btn-outline-secondary text-dark"
+                               target="_blank">
+                                <text>
+                                    <span class="far fa-envelope"></span>
+                                    Updates from all @counter locations
+                                </text>
                             </a>
                         </td>
                     </tr>
@@ -267,7 +308,6 @@
             </table>
         </div>
     </div>
-
 }
 
 <div class="modal fade" id="featureModal" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
@@ -298,59 +338,72 @@
 </div>
 
 @section Scripts{
-    <script>
-                $('.bring-modal').on('click', function () {
-                    @foreach (var feature in Model.LocationFeatures)
-                    {
-                        <text>
-                        if ("@feature.Stub" == $(this).data("feature"))
-                        {
-                            $("#modalTitle").text("@Html.Raw(feature.Name)");
+    @if (Model.LocationFeatures.Any())
+    {
+        <script>
+        $('.feature-popup').on('click', function () {
+            @foreach (var feature in Model.LocationFeatures)
+            {
+                <text>
+                if ("@feature.Stub" == $(this).data("feature"))
+                {
+                    $("#modalTitle").text("@Html.Raw(feature.Name)");
 
-
-                            $("#modal-body").html($("#modal-body").html("@feature.BodyText").text());
-                            $("#modal-text").html($("#modal-text").html("@feature.Text").text());
-                    }
-                        </text>
-                    }
-                    $('#featureModal').on('shown.bs.modal', function () {
-                        $('#myInput').trigger('focus')
-                    });
-                });
-    </script>
+                    $("#modal-body").html($("#modal-body").html("@feature.BodyText").text());
+                    $("#modal-text").html($("#modal-text").html("@feature.Text").text());
+                }
+                </text>
+            }
+            $('#featureModal').on('shown.bs.modal', function () {
+                $('#myInput').trigger('focus')
+            });
+        });
+        </script>
+    }
     <script type="application/ld+json">
         {
         "@@context": "http://schema.org",
-        "@@type": "@Model.Location.SDType",
+        "@@type": "@Model.Location.Type",
         "name": "@Model.Location.Name",
         "areaServed": {
-        "@@type": "@Model.Location.SDAreaServedType",
-        "name": "@Model.Location.SDAreaServedName"
+        "@@type": "@Model.Location.AreaServedType",
+        "name": "@Model.Location.AreaServedName"
         },
-        "email": "@Model.Location.SDEmail",
+        "email": "@Model.Location.Email",
         "address": {
-        "@@id": "_:@Model.Location.SDLocationId",
-        "@@type": "PostalAddress",
-        "addressCountry": "US",
+        "@@id": "@Model.CanonicalUrl",
+        "@@type": "@Model.Location.AddressType",
+        "addressCountry": "@Model.Location.Country",
         "addressRegion": "@Model.Location.State",
         "addressLocality": "@Model.Location.City",
-        "contactType": "Location address",
+        "contactType": "@Model.Location.ContactType",
         "postalCode": "@Model.Location.Zip",
         "streetAddress": "@Model.Location.Address"
         },
-        "location": { "@@id": "_:@Model.Location.SDLocationId" },
-        "parentOrganization": "@Model.Location.SDParentOrganization",
+        "location": { "@@id": "@Model.CanonicalUrl" },
+        "parentOrganization": "@Model.Location.ParentOrganization",
         "telephone": "@Html.Raw(@Model.Location.Phone)",
         "openingHours": @Html.Raw(Json.Serialize(@Model.StructuredLocationHours)),
-        "image": "@Model.Location.ImagePath",
-        "isAccessibleForFree": true,
-        "priceRange" : "$000 - $000",
-        "sameAs": ["@Model.Location.MapLink"
+        @if (!string.IsNullOrEmpty(Model.Location.ImagePath))
+        {
+            @:"image": "@Model.Location.ImagePath",
+        }
+        "isAccessibleForFree": @Model.Location.IsAccessibleForFree.ToString().ToLowerInvariant(),
+        @if (Model.Location.IsAccessibleForFree)
+        {
+            @:"priceRange" : "$000 - $000",
+        }
+        else
+        {
+            @:"priceRange" : "@Model.Location.PriceRange",
+        }
+        "sameAs": [
+        "@Model.Location.MapLink"
         @if (!string.IsNullOrEmpty(Model.Location.Facebook))
         {
             @:, "@Model.Location.Facebook"
-        }]
         }
-
+        ]
+        }
     </script>
 }

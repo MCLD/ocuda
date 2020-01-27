@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using CommonMark;
+using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Controllers.ViewModels.Locations
 {
@@ -27,7 +28,21 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Locations
         [MaxLength(255)]
         public string RedirectUrl { get; set; }
 
-        [NotMapped]
-        public string InnerSpan { get; set; }
+        [MaxLength(5)]
+        public string IconText { get; set; }
+
+        public LocationsFeaturesViewModel(LocationFeature locationsFeatures)
+        {
+            BodyText = CommonMarkConverter.Convert(locationsFeatures?.Feature?.BodyText);
+            Icon = string.IsNullOrEmpty(locationsFeatures?.Feature?.IconText)
+                ? locationsFeatures?.Feature?.Icon
+                : $"{locationsFeatures?.Feature?.Icon} location-icon-text";
+            ImagePath = locationsFeatures?.Feature?.ImagePath;
+            Name = locationsFeatures?.Feature?.Name;
+            RedirectUrl = locationsFeatures?.RedirectUrl;
+            Stub = locationsFeatures?.Feature?.Stub;
+            Text = CommonMarkConverter.Convert(locationsFeatures?.Text);
+            IconText = locationsFeatures?.Feature?.IconText;
+        }
     }
 }
