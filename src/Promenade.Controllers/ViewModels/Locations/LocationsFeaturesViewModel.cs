@@ -36,7 +36,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Locations
             BodyText = CommonMarkConverter.Convert(locationsFeatures?.Feature?.BodyText);
             Icon = string.IsNullOrEmpty(locationsFeatures?.Feature?.IconText)
                 ? locationsFeatures?.Feature?.Icon
-                : $"{locationsFeatures?.Feature?.Icon} location-icon-text";
+                : $"{locationsFeatures?.Feature?.Icon} prom-location-icon-text";
             ImagePath = locationsFeatures?.Feature?.ImagePath;
             Name = locationsFeatures?.Feature?.Name;
             RedirectUrl = locationsFeatures?.RedirectUrl;
