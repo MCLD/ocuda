@@ -176,3 +176,38 @@ footer {
     border: 1px solid #ccc;
     background-color: #f0f0f0;
 }
+
+    .prom-location-tile .status-bar {
+        height: 0.4rem;
+    }
+
+.prom-location-icon-text {
+    color: white;
+    font-weight: bold;
+}
+
+.prom-location h1 {
+    font-size: 2rem;
+    display: inline-block;
+}
+
+.prom-location h2 {
+    font-size: 1.8rem;
+}
+
+.prom-location .prom-features {
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+    .prom-location .prom-features a:hover {
+        text-decoration: none;
+    }
+
+.prom-location .prom-feature-segment {
+    margin-bottom: 0.5rem;
+}
+
+.prom-location .prom-location-nearby td {
+    vertical-align: middle;
+}
