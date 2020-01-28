@@ -263,9 +263,11 @@
         <div class="col-7">
             <table class="nearby-locations-table">
                 <tbody>
-                    @foreach (var locationGroup in Model.NearbyLocations)
+                    @foreach (var locationGroup in Model.NearbyLocationGroups)
                     {
-                        @if (locationGroup.Location.HasEvents)
+                        var location = locationGroup.Location;
+
+                        @if (location.HasEvents)
                         {
                             <tr>
                                 <td>@locationGroup.DisplayOrder</td>

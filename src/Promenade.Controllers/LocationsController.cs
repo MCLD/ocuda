@@ -319,8 +319,8 @@ namespace Ocuda.Promenade.Controllers
                     .GetLocationsNeighborsAsync(viewModel.Location.DisplayGroupId.Value);
                 if (neighbors.Count > 0)
                 {
-                    viewModel.NearbyLocations = neighbors;
-                    viewModel.NearbyCount = viewModel.NearbyLocations.Count;
+                    viewModel.NearbyLocationGroups = neighbors;
+                    viewModel.NearbyCount = viewModel.NearbyLocationGroups.Count;
                 }
             }
 
