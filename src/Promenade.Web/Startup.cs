@@ -71,14 +71,28 @@ namespace Ocuda.Promenade.Web
             services.Configure<RouteOptions>(_ =>
                 _.ConstraintMap.Add("cultureConstraint", typeof(CultureRouteConstraint)));
 
-            services.AddControllersWithViews()
+            if (_isDevelopment)
+            {
+                services.AddControllersWithViews()
+                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                .AddDataAnnotationsLocalization(_ =>
+                {
+                    _.DataAnnotationLocalizerProvider = (__, factory)
+                        => factory.Create(typeof(i18n.Resources.Shared));
+                })
+                .AddRazorRuntimeCompilation();
+            }
+            else
+            {
+                services.AddControllersWithViews()
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization(_ =>
                 {
                     _.DataAnnotationLocalizerProvider = (__, factory)
                         => factory.Create(typeof(i18n.Resources.Shared));
                 });
-
+            }
+            
             services.Configure<RouteOptions>(_ =>
             {
                 _.AppendTrailingSlash = true;
@@ -100,10 +114,14 @@ namespace Ocuda.Promenade.Web
             // repositories
             services.AddScoped<Service.Interfaces.Repositories.ICategoryRepository,
                 Data.Promenade.CategoryRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ICategoryTextRepository,
+                Data.Promenade.CategoryTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IEmediaRepository,
                 Data.Promenade.EmediaRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IEmediaCategoryRepository,
                 Data.Promenade.EmediaCategoryRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IEmediaTextRepository,
+                Data.Promenade.EmediaTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IExternalResourceRepository,
                 Data.Promenade.ExternalResourceRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IFeatureRepository,

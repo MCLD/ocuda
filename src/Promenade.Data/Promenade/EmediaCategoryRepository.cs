@@ -25,11 +25,12 @@ namespace Ocuda.Promenade.Data.Promenade
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<List<EmediaCategory>> GetEmediaCategoriesByEmediaId(int emediaId)
+        public async Task<ICollection<Category>> GetCategoriesByEmediaIdAsync(int emediaId)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.EmediaId == emediaId)
+                .Select(_ => _.Category)
                 .ToListAsync();
         }
     }

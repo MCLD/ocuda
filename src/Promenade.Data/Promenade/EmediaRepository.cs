@@ -16,7 +16,7 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<List<Emedia>> GetAllEmedia()
+        public async Task<List<Emedia>> GetAllAsync()
         {
             return await DbSet
                 .AsNoTracking()

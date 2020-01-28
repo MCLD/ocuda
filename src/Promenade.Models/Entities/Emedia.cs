@@ -20,15 +20,12 @@ namespace Ocuda.Promenade.Models.Entities
 
         [MaxLength(255)]
         [Required]
-        public string Description { get; set; }
-
-        public string Details { get; set; }
-
-        [MaxLength(255)]
-        [Required]
         public string RedirectUrl { get; set; }
 
         [NotMapped]
-        public List<Category> Categories { get; set; }
+        public ICollection<Category> Categories { get; set; }
+
+        [NotMapped]
+        public EmediaText EmediaText { get; set; }
     }
 }

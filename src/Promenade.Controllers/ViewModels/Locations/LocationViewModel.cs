@@ -11,8 +11,6 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Locations
 
         public bool CanSearchAddress { get; set; }
 
-        public bool IsMobile { get; set; }
-
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
     }
