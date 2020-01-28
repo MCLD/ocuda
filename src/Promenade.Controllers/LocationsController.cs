@@ -321,6 +321,8 @@ namespace Ocuda.Promenade.Controllers
                 {
                     viewModel.NearbyLocationGroups = neighbors;
                     viewModel.NearbyCount = viewModel.NearbyLocationGroups.Count;
+                    viewModel.NearbyEventsCount = viewModel.NearbyLocationGroups
+                        .Count(_ => _.Location.HasEvents);
                 }
             }
 
