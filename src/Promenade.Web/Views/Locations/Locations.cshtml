@@ -43,18 +43,19 @@
     {
         @foreach (var location in Model.Locations)
         {
-            <div class="col-12 col-md-6 col-lg-4 mt-2 mb-3">
-                <div class="prom-location-tile">
+            <div class="col-12 col-md-6 col-lg-4 mt-2 mb-3 d-flex">
+                <div class="prom-location-tile flex-fill w-100">
                     @if (!string.IsNullOrEmpty(location.MapLink)
-                  && !string.IsNullOrEmpty(location.MapImagePath))
+                 && !string.IsNullOrEmpty(location.MapImagePath))
                     {
                         <a href="@location.MapLink">
-                            <img src="@location.MapImagePath" class="img-fluid" />
+                            <img src="@location.MapImagePath"
+                                 class="img-fluid"
+                                 style="width: 100%;" />
                         </a>
                     }
-                    <div class="@(location.CurrentStatus.IsCurrentlyOpen ? "bg-success" : "bg-danger")"
-                         style="height: 0.4rem;">&nbsp;</div>
-                    <div class="p-3">
+                    <div class="status-bar @(location.CurrentStatus.IsCurrentlyOpen ? "bg-success" : "bg-danger")">&nbsp;</div>
+                    <div class="px-3 pt-2 pb-3">
                         <span class="h3">
                             @if (!string.IsNullOrWhiteSpace(location.LocatorName))
                             {
@@ -71,13 +72,13 @@
                                 <text>(@location.Distance mi.)</text>
                             }
                         </em>
-                        <p>
+                        <p class="mb-1">
                             @location.Address<br />
                             @location.City
                             @location.State,
                             @location.Zip
                         </p>
-                        <p class="py-1 @(location.CurrentStatus.IsCurrentlyOpen ? "text-success" : "text-danger")">
+                        <p class="@(location.CurrentStatus.IsCurrentlyOpen ? "text-success" : "text-danger")">
                             <strong>@location.CurrentStatus.StatusMessage</strong>
                         </p>
                         <div class="row">
@@ -85,7 +86,7 @@
                                 <a asp-action="@nameof(LocationsController.Locations)"
                                    asp-route-locationStub="@location.Stub"
                                    class="btn btn-outline-dark">
-                                    More Info
+                                    Details
                                 </a>
 
                             </div>
