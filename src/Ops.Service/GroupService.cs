@@ -16,14 +16,22 @@ namespace Ocuda.Ops.Service
     public class GroupService : BaseService<GroupService>, IGroupService
     {
         private readonly IGroupRepository _groupRepository;
+        private readonly ILocationGroupRepository _locationGroupRepository;
+        private readonly ILocationService _locationService;
 
         public GroupService(ILogger<GroupService> logger,
             IHttpContextAccessor httpContextAccessor,
-            IGroupRepository groupRepository)
+            IGroupRepository groupRepository
+            ,ILocationGroupRepository locationGroupRepository,
+            ILocationService locationService)
             : base (logger, httpContextAccessor)
         {
             _groupRepository = groupRepository
                 ?? throw new ArgumentNullException(nameof(groupRepository));
+            _locationGroupRepository = locationGroupRepository
+                ?? throw new ArgumentNullException(nameof(locationGroupRepository));
+            _locationService = locationService
+                ?? throw new ArgumentNullException(nameof(locationService));
         }
 
         public async Task<List<Group>> GetMissingGroups(List<int> locationGroupIds)
@@ -66,6 +74,16 @@ namespace Ocuda.Ops.Service
         public async Task<Group> GetGroupByIdAsync(int groupId)
         {
             return await _groupRepository.FindAsync(groupId);
+        }
+
+        public async Task<List<LocationGroup>> GetLocationGroupsByGroupId(int groupId)
+        {
+            var locationGroups = await _locationGroupRepository.GetLocationGroupsByGroupAsync(groupId);
+            foreach (var locationgroup in locationGroups)
+            {
+                locationgroup.Location = await _locationService.GetLocationByIdAsync(locationgroup.LocationId);
+            }
+            return locationGroups;
         }
 
         public async Task<Group> GetGroupByStubAsync(string groupType)

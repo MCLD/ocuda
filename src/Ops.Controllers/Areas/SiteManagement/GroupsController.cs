@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,17 +22,17 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     public class GroupsController : BaseController<GroupsController>
     {
         private readonly IGroupService _groupService;
-        private readonly ILocationService _locationService;
+        private readonly ILocationGroupService _locationGroupService;
 
         public static string Name { get { return "Groups"; } }
         public static string Area { get { return "SiteManagement"; } }
 
         public GroupsController(ServiceFacades.Controller<GroupsController> context,
-            ILocationService locationService,
+            ILocationGroupService locationGroupService,
             IGroupService groupService) : base(context)
         {
-            _locationService = locationService
-            ?? throw new ArgumentNullException(nameof(locationService));
+            _locationGroupService = locationGroupService
+            ?? throw new ArgumentNullException(nameof(locationGroupService));
             _groupService = groupService
                 ?? throw new ArgumentNullException(nameof(groupService));
         }
@@ -78,11 +79,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 var group = await _groupService.GetGroupByStubAsync(groupStub);
                 group.IsNewGroup = false;
                 group.IsLocationRegion = !string.IsNullOrEmpty(group.SubscriptionUrl);
-                return View("GroupDetails", new GroupViewModel
+                var viewModel = new GroupViewModel
                 {
                     Group = group,
                     Action = nameof(GroupsController.EditGroup)
-                });
+                };
+                if (group.IsLocationRegion)
+                {
+                    viewModel.LocationGroups = await _groupService.GetLocationGroupsByGroupId(group.Id);
+                }
+                return View("GroupDetails", viewModel);
             }
             catch (OcudaException ex)
             {
@@ -176,44 +182,61 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpPost]
         [Route("[action]")]
         [SaveModelState]
-        public async Task<IActionResult> EditGroup(Group group)
+        public async Task<IActionResult> EditGroup(GroupViewModel viewModel)
         {
-            if (group.IsLocationRegion && string.IsNullOrEmpty(group.SubscriptionUrl))
+            if (viewModel.Group.IsLocationRegion && string.IsNullOrEmpty(viewModel.Group.SubscriptionUrl))
             {
                 ModelState.AddModelError("Group.SubscriptionUrl", "A 'Subscription URL' is required for a location region.");
                 ShowAlertDanger($"A 'Subscription URL' is required for a location region.");
-                group.IsNewGroup = false;
-                return View("GroupDetails", new GroupViewModel
-                {
-                    Group = group,
-                    Action = nameof(GroupsController.EditGroup)
-                });
+                viewModel.Group.IsNewGroup = false;
+                viewModel.Action = nameof(GroupsController.EditGroup);
+                return View("GroupDetails", viewModel);
             }
             if (ModelState.IsValid)
             {
                 try
                 {
-                    await _groupService.EditAsync(group);
-                    ShowAlertSuccess($"Updated group: {group.GroupType}");
-                    group.IsNewGroup = false;
-                    return RedirectToAction(nameof(GroupsController.Groups), new { groupStub = group.Stub });
+                    await _groupService.EditAsync(viewModel.Group);
+                    if (!string.IsNullOrWhiteSpace(viewModel.OrderedLocationIds) && viewModel.Group.IsLocationRegion)
+                    {
+                        var locationIds = viewModel.OrderedLocationIds
+                            .Split(",")
+                            .Select(int.Parse)
+                            .ToList();
+                        var order = 1;
+                        foreach (var id in locationIds)
+                        {
+                            var locationGroup = await _locationGroupService.GetByIdsAsync(viewModel.Group.Id, id);
+                            locationGroup.DisplayOrder = order;
+                            await _locationGroupService.EditAsync(locationGroup);
+                            order++;
+                        }
+                    }
+                    ShowAlertSuccess($"Updated group: {viewModel.Group.GroupType}");
+                    viewModel.Group.IsNewGroup = false;
+                    viewModel.LocationGroups = await _groupService.GetLocationGroupsByGroupId(viewModel.Group.Id);
+                    return RedirectToAction(nameof(GroupsController.Groups), new { groupStub = viewModel.Group.Stub });
                 }
                 catch (OcudaException ex)
                 {
-                    ShowAlertDanger($"Unable to update Group {group.GroupType} : {ex.Message}");
+                    ShowAlertDanger($"Unable to update Group {viewModel.Group.GroupType} : {ex.Message}");
                     _logger.LogError(ex,
                         "Problem updating {GroupType}: {Message}",
-                        group.GroupType,
+                        viewModel.Group.GroupType,
                         ex.Message);
-                    group.IsNewGroup = false;
+                    viewModel.Group.IsNewGroup = false;
+                    if (viewModel.Group.IsLocationRegion)
+                    {
+                        viewModel.LocationGroups = await _groupService.GetLocationGroupsByGroupId(viewModel.Group.Id);
+                    }
                     return View("GroupDetails", new GroupViewModel
                     {
-                        Group = group,
+                        Group = viewModel.Group,
                         Action = nameof(GroupsController.EditGroup)
                     });
                 }
             }
-            return RedirectToAction(nameof(GroupsController.Groups), new { groupStub = group.Stub });
+            return RedirectToAction(nameof(GroupsController.Groups), new { groupStub = viewModel.Group.Stub });
         }
     }
 }

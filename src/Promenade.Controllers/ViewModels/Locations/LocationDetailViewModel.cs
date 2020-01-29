@@ -7,8 +7,9 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Locations
     {
         public Location Location { get; set; }
         public IEnumerable<LocationsFeaturesViewModel> LocationFeatures { get; set; }
-        public List<Location> NearbyLocations { get; set; }
+        public List<LocationGroup> NearbyLocationGroups { get; set; }
         public int NearbyCount { get; set; }
+        public int NearbyEventsCount { get; set; }
         public Group LocationNeighborGroup { get; set; }
         public List<string> StructuredLocationHours { get; set; }
         public SegmentText PreFeatureSegment { get; set; }

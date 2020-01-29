@@ -27,9 +27,9 @@
            autocomplete="off" />
     <input asp-for="Group.Stub"
            formgroup
-           autocomplete="off" 
+           autocomplete="off"
            info-tooltip="The stub is the nickname/URL for the group."
-           on-blur-js="FormatStub"/>
+           on-blur-js="FormatStub" />
     <div class="row">
         <div class="accordion offset-md-3 col-md-9" id="locationregion-accordion">
             <div class="card">
@@ -53,7 +53,28 @@
                     <div class="card-body">
                         <input asp-for="Group.SubscriptionUrl"
                                formgroup
-                               autocomplete="off"/>
+                               autocomplete="off" />
+                        <input asp-for="OrderedLocationIds"
+                               hidden />
+                        @if (!Model.Group.IsNewGroup && Model.LocationGroups.Count > 0)
+                        {
+                            <h4>Map Display Order</h4>
+                            @foreach (var locationGroup in Model.LocationGroups)
+                            {
+                                <div class="row form-group">
+                                    <label class="col-form-label text-md-right col-md-3" for="@locationGroup.Location.Stub">@locationGroup.Location.Name</label>
+                                    <div class="col-sm-1">
+                                        <input class="location-ordering form-control"
+                                               id="@locationGroup.Location.Stub"
+                                               data-locationId="@locationGroup.Location.Id"
+                                               autocomplete="off"
+                                               type="text"
+                                               aria-invalid="false"
+                                               value="@locationGroup.DisplayOrder" />
+                                    </div>
+                                </div>
+                            }
+                        }
                     </div>
                 </div>
             </div>
@@ -67,27 +88,27 @@
                    asp-action="@nameof(GroupsController.Index)">Return to Groups</a>
                 @if (Model.Group.IsNewGroup)
                 {
-                <text>
-                    <button type="submit"
-                            id="submit"
-                            value="Submit"
-                            class="btn btn-primary btn-spinner">
-                        <span class="buttonText">Add Group</span>
-                        <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
-                    </button>
-                </text>
+                    <text>
+                        <button type="submit"
+                                id="submit"
+                                value="Submit"
+                                class="btn btn-primary btn-spinner">
+                            <span class="buttonText">Add Group</span>
+                            <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
+                        </button>
+                    </text>
                 }
                 else
                 {
-                <text>
-                    <button type="submit"
-                            id="submit"
-                            value="Submit"
-                            class="btn btn-primary btn-spinner">
-                        <span class="buttonText">Update Group</span>
-                        <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
-                    </button>
-                </text>
+                    <text>
+                        <button type="submit"
+                                id="submit"
+                                value="Submit"
+                                class="btn btn-primary btn-spinner">
+                            <span class="buttonText">Update Group</span>
+                            <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
+                        </button>
+                    </text>
                 }
             </div>
         </div>
@@ -115,12 +136,34 @@
                 $("#group-isLocationRegion").val("True");
             }
         });
-        $( "#groupform" ).submit(function( event ) {
+        $("#groupform").submit(function () {
             if (!$("#accordion-header").hasClass("bg-info")) {
                 $("#Group_SubscriptionUrl").val("");
                 $("#group-isLocationRegion").val("False");
             }
+            else {
+                var ids = $(".location-ordering");
+                var orderedIds = SortLocationsOrder(ids);
+                var ordered = orderedIds.map(function (i, v) {
+                    return $(v).data("locationid");
+                });
+                var locationIds = $.makeArray(ordered);
+                $("#OrderedLocationIds").val(locationIds.join(","));
+
+            }
         });
+        function SortLocationsOrder(arr) {
+            for (var outer = 0; outer < arr.length; outer++) {
+                for (var inner = 0; inner <= arr.length - 2; inner++) {
+                    if (parseInt(arr[inner].value) > parseInt(arr[inner+1].value)) {
+                        var temp = arr[inner];
+                        arr[inner] = arr[inner + 1];
+                        arr[inner + 1] = temp;
+                    }
+                }
+            }
+            return arr;
+        }
         function FormatStub(object) {
             updateStub($(object), $(object).val());
         }
