@@ -132,8 +132,17 @@ namespace Ocuda.Ops.Web
                     policy => policy.RequireClaim(nameof(ClaimType.SiteManager)));
             });
 
-            services.AddControllersWithViews()
-                .AddSessionStateTempDataProvider();
+            if (_isDevelopment)
+            {
+                services.AddControllersWithViews()
+                    .AddSessionStateTempDataProvider()
+                    .AddRazorRuntimeCompilation();
+            }
+            else
+            {
+                services.AddControllersWithViews()
+                    .AddSessionStateTempDataProvider();
+            }
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 

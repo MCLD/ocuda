@@ -54,6 +54,7 @@ namespace Ocuda.Ops.Service
                 .GetByIdsAsync(locationFeature.FeatureId, locationFeature.LocationId);
             currentLocationFeature.Text = locationFeature.Text;
             currentLocationFeature.RedirectUrl = locationFeature.RedirectUrl;
+            currentLocationFeature.NewTab = locationFeature.NewTab;
 
             _locationFeatureRepository.Update(currentLocationFeature);
             await _locationFeatureRepository.SaveAsync();
