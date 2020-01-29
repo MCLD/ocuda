@@ -108,7 +108,7 @@
                 }
                 else
                 {
-                    <a href="@feature.RedirectUrl" target="_blank">
+                    <a href="@feature.RedirectUrl" target="@(feature.NewTab == true ? "_blank" : null)">
                         <span class="fa-stack fa-2x d-block mx-auto">
                             <span class="fa fa-square fa-stack-2x"></span>
                             <span class="@feature.Icon"></span>

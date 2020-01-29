@@ -300,6 +300,7 @@
                             <th>Name</th>
                             <th>Custom Text</th>
                             <th>Redirect URL</th>
+                            <th>Open in new tab</th>
                             <th width="44px">&nbsp;</th>
                         </tr>
                     </thead>
@@ -329,6 +330,7 @@
                                         }
                                     </td>
                                     <td style="vertical-align:middle;">@locationFeature.RedirectUrl</td>
+                                    <td style="vertical-align:middle">@(locationFeature.NewTab ? "Yes" : "No")</td>
                                     <td>
                                         <button type="button"
                                                 class="btn btn-link btn-xs deleteItemButton"

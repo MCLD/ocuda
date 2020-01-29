@@ -28,6 +28,8 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Locations
         [MaxLength(255)]
         public string RedirectUrl { get; set; }
 
+        public bool? NewTab { get; set; }
+
         [MaxLength(5)]
         public string IconText { get; set; }
 
@@ -40,6 +42,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Locations
             ImagePath = locationsFeatures?.Feature?.ImagePath;
             Name = locationsFeatures?.Feature?.Name;
             RedirectUrl = locationsFeatures?.RedirectUrl;
+            NewTab = locationsFeatures?.NewTab;
             Stub = locationsFeatures?.Feature?.Stub;
             Text = CommonMarkConverter.Convert(locationsFeatures?.Text);
             IconText = locationsFeatures?.Feature?.IconText;
