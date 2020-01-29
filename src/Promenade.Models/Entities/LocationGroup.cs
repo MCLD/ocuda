@@ -9,14 +9,12 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public int LocationId { get; set; }
 
-        [NotMapped]
         public Location Location { get; set; }
 
         [Key]
         [Required]
         public int GroupId { get; set; }
 
-        [NotMapped]
         public Group Group { get; set; }
 
         public bool HasSubscription { get; set; }
