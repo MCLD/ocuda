@@ -146,9 +146,15 @@
 
             <div class="row">
                 <div class="col-md-6 col-lg-5">
-                    <img src="@Model.LocationNeighborGroup.MapImage"
-                         class="d-block img-fluid mx-auto"
-                         alt="@Model.LocationNeighborGroup.Description">
+                    <a href="@Model.LocationNeighborGroup.MapImage"
+                       class="map-popup"
+                       data-toggle="modal"
+                       data-target="#mapModal"
+                       target="_blank">
+                        <img src="@Model.LocationNeighborGroup.MapImage"
+                             class="d-block img-fluid mx-auto"
+                             alt="@Model.LocationNeighborGroup.Description">
+                    </a>
                 </div>
                 <div class="col-md-6 col-lg-7">
                     <table class="table table-sm">
@@ -188,15 +194,15 @@
                                 <a href="@Model.LocationNeighborGroup.SubscriptionUrl"
                                    class="btn btn-sm btn-outline-secondary text-dark m-1 float-right"
                                    target="_blank">
-                                        <span class="far fa-envelope"></span>
-                                        @if (Model.NearbyCount == Model.NearbyEventsCount)
-                                        {
-                                            <text>Updates from all @Model.NearbyEventsCount locations</text>
-                                        }
-                                        else
-                                        {
-                                            <text>Updates from @Model.NearbyEventsCount locations</text>
-                                        }
+                                    <span class="far fa-envelope"></span>
+                                    @if (Model.NearbyCount == Model.NearbyEventsCount)
+                                    {
+                                        <text>Updates from all @Model.NearbyEventsCount locations</text>
+                                    }
+                                    else
+                                    {
+                                        <text>Updates from @Model.NearbyEventsCount locations</text>
+                                    }
                                 </a>
                             </td>
                         </tr>
@@ -206,7 +212,12 @@
         </div>
     }
 
-    <div class="modal fade" id="featureModal" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+    <div class="modal fade"
+         id="featureModal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="modalTitle"
+         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -216,22 +227,55 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div>
-                        <div id="modal-body">
-                        </div>
-                    </div>
-                    <div>
-                        <div id="modal-text">
-
-                        </div>
-                    </div>
+                    <div id="modal-body"></div>
+                    <div id="modal-text"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    <button type="button"
+                            class="btn btn-primary"
+                            data-dismiss="modal">
+                        Close
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+
+    @if (!string.IsNullOrEmpty(Model?.LocationNeighborGroup?.MapImage))
+    {
+        <div class="modal fade"
+             id="mapModal"
+             tabindex="-1"
+             role="dialog"
+             aria-labelledby="mapModalTitle"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="mapModalTitle">Nearby Locations Map</h5>
+                        <button type="button"
+                                class="close"
+                                data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <img src="@Model.LocationNeighborGroup.MapImage"
+                             class="d-block img-fluid mx-auto"
+                             alt="@Model?.LocationNeighborGroup?.Description">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-outline-primary"
+                                data-dismiss="modal">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
 @section Scripts{
@@ -242,7 +286,7 @@
             @foreach (var feature in Model.LocationFeatures)
             {
                 <text>
-                if ("@feature.Stub" == $(this).data("feature"))
+                if ('@feature.Stub' == $(this).data("feature"))
                 {
                     $("#modalTitle").text("@Html.Raw(feature.Name)");
 
@@ -251,9 +295,6 @@
                 }
                 </text>
             }
-            $('#featureModal').on('shown.bs.modal', function () {
-                $('#myInput').trigger('focus')
-            });
         });
         </script>
     }
