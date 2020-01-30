@@ -59,9 +59,12 @@ namespace Ocuda.Promenade.Service
             }
             else
             {
-                _logger.LogError("Invalid value for Promenade integer setting {SiteSettingKey}: {SiteSettingValue}",
-                    key,
-                    settingValue);
+                if (!string.IsNullOrEmpty(settingValue))
+                {
+                    _logger.LogError("Invalid value for Promenade integer setting {SiteSettingKey}: {SiteSettingValue}",
+                        key,
+                        settingValue);
+                }
 
                 var defaultSetting = GetDefaultSetting(key);
                 if (int.TryParse(defaultSetting.Value, out int defaultResult))
@@ -70,9 +73,12 @@ namespace Ocuda.Promenade.Service
                 }
                 else
                 {
-                    _logger.LogCritical("Invalid default value for Promenade integer setting {SiteSettingKey}: {SiteSettingValue}",
-                        key,
-                        settingValue);
+                    if (!string.IsNullOrEmpty(defaultSetting.Value))
+                    {
+                        _logger.LogCritical("Invalid default value for Promenade integer setting {SiteSettingKey}: {SiteSettingValue}",
+                            key,
+                            settingValue);
+                    }
                     return default;
                 }
             }
@@ -85,11 +91,8 @@ namespace Ocuda.Promenade.Service
 
         private async Task<string> GetSettingValueAsync(string key)
         {
-            var siteSetting = await _siteSettingRepository.FindAsync(key);
-            if (siteSetting == null)
-            {
-                siteSetting = GetDefaultSetting(key);
-            }
+            var siteSetting = await _siteSettingRepository.FindAsync(key)
+                ?? GetDefaultSetting(key);
 
             return siteSetting?.Value;
         }
