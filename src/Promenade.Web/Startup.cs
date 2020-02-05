@@ -69,44 +69,43 @@ namespace Ocuda.Promenade.Web
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // configure distributed cache
-            switch (_config[Configuration.PromenadeDistributedCache])
+            if (_config[Configuration.PromenadeDistributedCache]?.ToUpperInvariant() == "REDIS")
             {
-                case "Redis":
-                    string redisConfiguration
-                        = _config[Configuration.PromenadeDistributedCacheRedisConfiguration]
-                        ?? throw new OcudaException("Configuration.PromenadeDistributedCache has Redis selected but Configuration.PromenadeDistributedCacheRedisConfiguration is not set.");
-                    string instanceName = CacheInstance.OcudaPromenade;
-                    if (!instanceName.EndsWith(".", StringComparison.OrdinalIgnoreCase))
-                    {
-                        instanceName += ".";
-                    }
-                    string cacheDiscriminator
-                        = _config[Configuration.PromenadeDistributedCacheInstanceDiscriminator]
-                        ?? string.Empty;
-                    if (!string.IsNullOrEmpty(cacheDiscriminator))
-                    {
-                        instanceName = $"{instanceName}{cacheDiscriminator}.";
-                    }
-                    _config[Configuration.OcudaRuntimeRedisCacheConfiguration]
-                        = redisConfiguration;
-                    _config[Configuration.OcudaRuntimeRedisCacheInstance] = instanceName;
-                    services.AddDistributedRedisCache(_ =>
-                    {
-                        _.Configuration = redisConfiguration;
-                        _.InstanceName = instanceName;
-                    });
-                    break;
-                default:
-                    services.AddDistributedMemoryCache();
-                    break;
+                string redisConfiguration
+                    = _config[Configuration.PromenadeDistributedCacheRedisConfiguration]
+                    ?? throw new OcudaException("Configuration.PromenadeDistributedCache has Redis selected but Configuration.PromenadeDistributedCacheRedisConfiguration is not set.");
+                string instanceName = CacheInstance.OcudaPromenade;
+                if (!instanceName.EndsWith(".", StringComparison.OrdinalIgnoreCase))
+                {
+                    instanceName += ".";
+                }
+                string cacheDiscriminator
+                    = _config[Configuration.PromenadeDistributedCacheInstanceDiscriminator]
+                    ?? string.Empty;
+                if (!string.IsNullOrEmpty(cacheDiscriminator))
+                {
+                    instanceName = $"{instanceName}{cacheDiscriminator}.";
+                }
+                _config[Configuration.OcudaRuntimeRedisCacheConfiguration]
+                    = redisConfiguration;
+                _config[Configuration.OcudaRuntimeRedisCacheInstance] = instanceName;
+                services.AddDistributedRedisCache(_ =>
+                {
+                    _.Configuration = redisConfiguration;
+                    _.InstanceName = instanceName;
+                });
+            }
+            else
+            {
+                services.AddDistributedMemoryCache();
             }
 
             // database configuration
             string promCs = _config.GetConnectionString("Promenade")
                 ?? throw new OcudaException("ConnectionString:Promenade not configured.");
 
-            var provider = _config[Configuration.PromenadeDatabaseProvider];
-            if (provider == "SqlServer")
+            if (_config[Configuration.PromenadeDatabaseProvider]?.ToUpperInvariant()
+                    == "SQLSERVER")
             {
                 services.AddDbContextPool<PromenadeContext,
                     DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
