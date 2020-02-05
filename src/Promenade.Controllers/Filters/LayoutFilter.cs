@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ocuda.i18n;
 using Ocuda.Promenade.Models.Keys;
@@ -15,19 +14,16 @@ namespace Ocuda.Promenade.Controllers.Filters
 {
     public class LayoutFilter : IAsyncResourceFilter
     {
-        private readonly ILogger<LayoutFilter> _logger;
         private readonly IOptions<RequestLocalizationOptions> _l10nOptions;
         private readonly ExternalResourceService _externalResourceService;
         private readonly NavigationService _navigationService;
         private readonly SiteSettingService _siteSettingService;
 
-        public LayoutFilter(ILogger<LayoutFilter> logger,
-            IOptions<RequestLocalizationOptions> l10nOptions,
+        public LayoutFilter(IOptions<RequestLocalizationOptions> l10nOptions,
             ExternalResourceService externalResourceService,
             NavigationService navigationService,
             SiteSettingService siteSettingService)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _l10nOptions = l10nOptions ?? throw new ArgumentNullException(nameof(l10nOptions));
             _externalResourceService = externalResourceService
                 ?? throw new ArgumentNullException(nameof(externalResourceService));
@@ -37,8 +33,8 @@ namespace Ocuda.Promenade.Controllers.Filters
                 ?? throw new ArgumentNullException(nameof(siteSettingService));
         }
 
-        public async Task OnResourceExecutionAsync(ResourceExecutingContext context,
-            ResourceExecutionDelegate next)
+        public Task OnResourceExecutionAsync(ResourceExecutingContext context,
+                        ResourceExecutionDelegate next)
         {
             if (context == null)
             {
@@ -50,15 +46,13 @@ namespace Ocuda.Promenade.Controllers.Filters
                 throw new ArgumentNullException(nameof(next));
             }
 
-            var externalResources = await _externalResourceService.GetAllAsync();
+            return OnResourceExecutionInternalAsync(context, next);
+        }
 
-            context.HttpContext.Items[ItemKey.ExternalCSS] = externalResources
-                .Where(_ => _.Type == ExternalResourceType.CSS)
-                .Select(_ => _.Url).ToList();
-
-            context.HttpContext.Items[ItemKey.ExternalJS] = externalResources
-                .Where(_ => _.Type == ExternalResourceType.JS)
-                .Select(_ => _.Url).ToList();
+        private async Task OnResourceExecutionInternalAsync(ResourceExecutingContext context,
+            ResourceExecutionDelegate next)
+        {
+            bool forceReload = context.HttpContext.Request.Query["clearcache"] == "1";
 
             // generate list for drop-down
             var cultureList = new Dictionary<string, string>();
@@ -85,45 +79,60 @@ namespace Ocuda.Promenade.Controllers.Filters
             context.HttpContext.Items[ItemKey.HrefLang] = cultureHrefLang;
             context.HttpContext.Items[ItemKey.L10n] = cultureList;
 
-            var topNavigationId
-                = await _siteSettingService.GetSettingIntAsync(Models.Keys.SiteSetting.Site.NavigationIdTop);
+            var externalResources = await _externalResourceService.GetAllAsync(forceReload);
+
+            context.HttpContext.Items[ItemKey.ExternalCSS] = externalResources
+                .Where(_ => _.Type == ExternalResourceType.CSS)
+                .Select(_ => _.Url).ToList();
+
+            context.HttpContext.Items[ItemKey.ExternalJS] = externalResources
+                .Where(_ => _.Type == ExternalResourceType.JS)
+                .Select(_ => _.Url).ToList();
+
+            var topNavigationId = await _siteSettingService
+                .GetSettingIntAsync(SiteSetting.Site.NavigationIdTop, forceReload);
+
             if (topNavigationId > 0)
             {
                 context.HttpContext.Items[ItemKey.TopNavigation]
-                    = await _navigationService.GetNavigation(topNavigationId);
+                    = await _navigationService.GetNavigation(topNavigationId, forceReload);
             }
 
-            var middleNavigationId
-                = await _siteSettingService.GetSettingIntAsync(SiteSetting.Site.NavigationIdMiddle);
+            var middleNavigationId = await _siteSettingService
+                .GetSettingIntAsync(SiteSetting.Site.NavigationIdMiddle, forceReload);
+
             if (middleNavigationId > 0)
             {
                 context.HttpContext.Items[ItemKey.MiddleNavigation]
-                    = await _navigationService.GetNavigation(middleNavigationId);
+                    = await _navigationService.GetNavigation(middleNavigationId, forceReload);
             }
 
-            var leftNavigationId
-                = await _siteSettingService.GetSettingIntAsync(SiteSetting.Site.NavigationIdLeft);
+            var leftNavigationId = await _siteSettingService
+                .GetSettingIntAsync(SiteSetting.Site.NavigationIdLeft, forceReload);
+
             if (leftNavigationId > 0)
             {
                 context.HttpContext.Items[ItemKey.LeftNavigation]
-                    = await _navigationService.GetNavigation(leftNavigationId);
+                    = await _navigationService.GetNavigation(leftNavigationId, forceReload);
             }
 
-            var footerNavigationId
-                = await _siteSettingService.GetSettingIntAsync(SiteSetting.Site.NavigationIdFooter);
+            var footerNavigationId = await _siteSettingService
+                .GetSettingIntAsync(SiteSetting.Site.NavigationIdFooter, forceReload);
             if (leftNavigationId > 0)
             {
                 context.HttpContext.Items[ItemKey.FooterNavigation]
-                    = await _navigationService.GetNavigation(footerNavigationId);
+                    = await _navigationService.GetNavigation(footerNavigationId, forceReload);
             }
 
-            context.HttpContext.Items[ItemKey.BannerImage]
-                = await _siteSettingService.GetSettingStringAsync(SiteSetting.Site.BannerImage);
-            context.HttpContext.Items[ItemKey.BannerImageAlt]
-                = await _siteSettingService.GetSettingStringAsync(SiteSetting.Site.BannerImageAlt);
+            context.HttpContext.Items[ItemKey.BannerImage] = await _siteSettingService
+                .GetSettingStringAsync(SiteSetting.Site.BannerImage, forceReload);
+
+            context.HttpContext.Items[ItemKey.BannerImageAlt] = await _siteSettingService
+                .GetSettingStringAsync(SiteSetting.Site.BannerImageAlt, forceReload);
 
             context.HttpContext.Items[ItemKey.GoogleAnalyticsTrackingCode]
-                = await _siteSettingService.GetSettingStringAsync(SiteSetting.Site.GoogleTrackingCode);
+                = await _siteSettingService
+                    .GetSettingStringAsync(SiteSetting.Site.GoogleTrackingCode, forceReload);
 
             await next();
         }

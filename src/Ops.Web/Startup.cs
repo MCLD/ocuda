@@ -37,6 +37,9 @@ namespace Ocuda.Ops.Web
             _isDevelopment = env.IsDevelopment();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability",
+            "CA1506:Avoid excessive class coupling",
+            Justification = "Dependency injection")]
         public void ConfigureServices(IServiceCollection services)
         {
             // set a default culture of en-US if none is specified
@@ -52,7 +55,7 @@ namespace Ocuda.Ops.Web
                 case "Redis":
                     string redisConfiguration
                         = _config[Configuration.OpsDistributedCacheRedisConfiguration]
-                        ?? throw new OcudaException($"{Configuration.OpsDistributedCache} has Redis selected but {Configuration.OpsDistributedCacheRedisConfiguration} is not set.");
+                        ?? throw new OcudaException("Configuration.OpsDistributedCache has Redis selected but Configuration.OpsDistributedCacheRedisConfiguration is not set.");
                     string instanceName = CacheInstance.OcudaOps;
                     if (!instanceName.EndsWith(".", StringComparison.OrdinalIgnoreCase))
                     {
@@ -94,7 +97,7 @@ namespace Ocuda.Ops.Web
                         DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
                     break;
                 default:
-                    throw new OcudaException($"No {Configuration.OpsDatabaseProvider} configured.");
+                    throw new OcudaException("No Configuration.OpsDatabaseProvider configured.");
             }
 
             // stoer the data protection key in the context

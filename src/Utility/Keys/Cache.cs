@@ -24,5 +24,20 @@
         /// Cached site settings, {0} is the site setting key
         /// </summary>
         public static readonly string OpsSiteSetting = "sitesetting.{0}";
+
+        /// <summary>
+        /// Cached navigation element, {0} is the id of the element, {1} is the language id
+        /// </summary>
+        public static readonly string PromNavLang = "nav.{0}.{1}";
+
+        /// <summary>
+        /// Cached site settings, {0} is the site setting key
+        /// </summary>
+        public static readonly string PromSiteSetting = "sitesetting.{0}";
+
+        /// <summary>
+        /// Cached external resource list
+        /// </summary>
+        public static readonly string PromExternalResources = "externalresources";
     }
 }

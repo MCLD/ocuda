@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Ocuda.Utility.Keys;
 using Serilog;
 
 namespace Ocuda.Promenade.Web
@@ -18,14 +18,14 @@ namespace Ocuda.Promenade.Web
             using var webHost = CreateHostBuilder(args).Build();
             var config = (IConfiguration)webHost.Services.GetService(typeof(IConfiguration));
 
-            var instance = string.IsNullOrEmpty(config[Utility.Keys.Configuration.OcudaInstance])
+            var instance = string.IsNullOrEmpty(config[Configuration.OcudaInstance])
                 ? "n/a"
-                : config[Utility.Keys.Configuration.OcudaInstance];
+                : config[Configuration.OcudaInstance];
 
             var version = Utility.Helpers.VersionHelper.GetVersion();
 
             Log.Logger = Utility.Logging.Configuration.Build(config).CreateLogger();
-            Log.Warning("{Product} v{Version} instance {Instance} starting up",
+            Log.Information("{Product} v{Version} instance {Instance} starting up",
                 Product,
                 version,
                 instance);
@@ -38,6 +38,26 @@ namespace Ocuda.Promenade.Web
 
             try
             {
+                if (string.IsNullOrEmpty(config[Configuration.OcudaRuntimeRedisCacheConfiguration]))
+                {
+                    Log.Information("{Product} distributed cache: in memory",
+                        Product);
+                }
+                else
+                {
+                    Log.Information("{Product} distributed cache: Redis configuration {RedisConfiguration} instance {RedisInstance}",
+                        Product,
+                        config[Configuration.OcudaRuntimeRedisCacheConfiguration],
+                        config[Configuration.OcudaRuntimeRedisCacheInstance]);
+                }
+
+                if (!string.IsNullOrEmpty(config[Configuration.OcudaRuntimeSessionTimeout]))
+                {
+                    Log.Information("{Product} session timeout configured for {SessionTimeout}",
+                        Product,
+                        config[Configuration.OcudaRuntimeSessionTimeout]);
+                }
+
                 webHost.Run();
                 return 0;
             }
