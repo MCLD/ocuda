@@ -104,9 +104,22 @@ footer {
 
 .prom-leftnav .prom-leftnav-section {
     background-color: white;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     padding: 0.25rem;
     position: relative;
+}
+
+.prom-leftnav a.prom-leftnav-featurette-button {
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+    .prom-leftnav a.prom-leftnav-featurette-button:hover {
+        color: white;
+    }
+
+.prom-leftnav a.prom-leftnav-featurette-button-1 {
+    margin-top: 1rem;
 }
 
 .prom-leftnav .prom-leftnav-header {
