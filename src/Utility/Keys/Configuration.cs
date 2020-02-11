@@ -47,5 +47,14 @@
 
         public static readonly string PromenadeAPIGoogleMaps = "Promenade.API.GoogleMaps";
         public static readonly string PromenadeDatabaseProvider = "Promenade.DatabaseProvider";
+        public static readonly string PromenadeDistributedCache = "Promenade.DistributedCache";
+
+        public static readonly string PromenadeDistributedCacheInstanceDiscriminator
+            = "Promenade.DistributedCacheInstanceDiscriminator";
+
+        public static readonly string PromenadeDistributedCacheRedisConfiguration
+            = "Promenade.DistributedCache.RedisConfiguration";
+
+        public static readonly string PromenadeRequestLogging = "Promenade.RequestLogging";
     }
 }

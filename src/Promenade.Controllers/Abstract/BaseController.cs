@@ -36,7 +36,8 @@ namespace Ocuda.Promenade.Controllers.Abstract
             _siteSettingService = context.SiteSettingService;
         }
 
-        public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        public override async Task OnActionExecutionAsync(ActionExecutingContext context,
+            ActionExecutionDelegate next)
         {
             await base.OnActionExecutionAsync(context, next);
 
@@ -63,8 +64,6 @@ namespace Ocuda.Promenade.Controllers.Abstract
             }
 
             ViewData[Utility.Keys.ViewData.Title] = pageTitle;
-
-            await next();
         }
 
         protected async Task<string> GetCanonicalUrl()

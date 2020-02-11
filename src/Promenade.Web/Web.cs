@@ -19,35 +19,23 @@ namespace Ocuda.Promenade.Web
 
         public async Task InitalizeAsync()
         {
-            int stage = 10;
             try
             {
                 var languageService = _scope.ServiceProvider.GetRequiredService<LanguageService>();
                 await languageService.SyncLanguagesAsync();
             }
+            catch (InvalidOperationException ioex)
+            {
+                _log.LogCritical(ioex,
+                    "Error acquiring LanguageService to sync languages in database: {ErrorMessage}",
+                    ioex.Message);
+            }
             catch (Exception ex)
             {
-                bool critical = false;
-                string errorText;
-                switch (stage)
-                {
-                    case 10:
-                        errorText = "Error syncing available languages with database: {Message}";
-                        break;
-                    default:
-                        errorText = "Unknown error during application startup: {Message}";
-                        break;
-                }
-
-                if (critical)
-                {
-                    _log.LogCritical(ex, errorText, ex.Message);
-                    throw;
-                }
-                else
-                {
-                    _log.LogCritical(ex, errorText, ex.Message);
-                }
+                _log.LogCritical(ex,
+                    "Error syncing available languages with database: {ErrorMessage}",
+                    ex.Message);
+                throw;
             }
         }
     }

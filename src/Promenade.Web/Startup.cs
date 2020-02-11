@@ -20,6 +20,7 @@ using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Providers;
+using Serilog;
 using Serilog.Context;
 
 namespace Ocuda.Promenade.Web
@@ -32,12 +33,25 @@ namespace Ocuda.Promenade.Web
         public Startup(IConfiguration configuration,
             IWebHostEnvironment env)
         {
+            if (env == null)
+            {
+                throw new ArgumentNullException(nameof(env));
+            }
+
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _isDevelopment = env.IsDevelopment();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability",
+            "CA1506:Avoid excessive class coupling",
+            Justification = "Dependency injection")]
         public void ConfigureServices(IServiceCollection services)
         {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
             services.AddLocalization();
 
             services.Configure<RequestLocalizationOptions>(_ =>
@@ -54,18 +68,51 @@ namespace Ocuda.Promenade.Web
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            string promCs = _config.GetConnectionString("Promenade")
-                ?? throw new OcudaException("ConnectionString:Promenade not configured.");
-
-            var provider = _config[Configuration.PromenadeDatabaseProvider];
-            if (provider == "SqlServer")
+            // configure distributed cache
+            if (_config[Configuration.PromenadeDistributedCache]?.ToUpperInvariant() == "REDIS")
             {
-                services.AddDbContextPool<PromenadeContext, DataProvider.SqlServer.Promenade.Context>(_ =>
-                    _.UseSqlServer(promCs));
+                string redisConfiguration
+                    = _config[Configuration.PromenadeDistributedCacheRedisConfiguration]
+                    ?? throw new OcudaException("Configuration.PromenadeDistributedCache has Redis selected but Configuration.PromenadeDistributedCacheRedisConfiguration is not set.");
+                string instanceName = CacheInstance.OcudaPromenade;
+                if (!instanceName.EndsWith(".", StringComparison.OrdinalIgnoreCase))
+                {
+                    instanceName += ".";
+                }
+                string cacheDiscriminator
+                    = _config[Configuration.PromenadeDistributedCacheInstanceDiscriminator]
+                    ?? string.Empty;
+                if (!string.IsNullOrEmpty(cacheDiscriminator))
+                {
+                    instanceName = $"{instanceName}{cacheDiscriminator}.";
+                }
+                _config[Configuration.OcudaRuntimeRedisCacheConfiguration]
+                    = redisConfiguration;
+                _config[Configuration.OcudaRuntimeRedisCacheInstance] = instanceName;
+                services.AddDistributedRedisCache(_ =>
+                {
+                    _.Configuration = redisConfiguration;
+                    _.InstanceName = instanceName;
+                });
             }
             else
             {
-                throw new OcudaException($"No {Configuration.PromenadeDatabaseProvider} configured.");
+                services.AddDistributedMemoryCache();
+            }
+
+            // database configuration
+            string promCs = _config.GetConnectionString("Promenade")
+                ?? throw new OcudaException("ConnectionString:Promenade not configured.");
+
+            if (_config[Configuration.PromenadeDatabaseProvider]?.ToUpperInvariant()
+                    == "SQLSERVER")
+            {
+                services.AddDbContextPool<PromenadeContext,
+                    DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
+            }
+            else
+            {
+                throw new OcudaException("No Configuration.PromenadeDatabaseProvider configured.");
             }
 
             services.Configure<RouteOptions>(_ =>
@@ -92,7 +139,7 @@ namespace Ocuda.Promenade.Web
                         => factory.Create(typeof(i18n.Resources.Shared));
                 });
             }
-            
+
             services.Configure<RouteOptions>(_ =>
             {
                 _.AppendTrailingSlash = true;
@@ -183,6 +230,16 @@ namespace Ocuda.Promenade.Web
         public void Configure(IApplicationBuilder app,
             Utility.Services.Interfaces.IPathResolverService pathResolver)
         {
+            if (app == null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
+
+            if (pathResolver == null)
+            {
+                throw new ArgumentNullException(nameof(pathResolver));
+            }
+
             // configure error page handling and development IDE linking
             if (_isDevelopment)
             {
@@ -213,7 +270,8 @@ namespace Ocuda.Promenade.Web
             // insert remote address into the log context for each request
             app.Use(async (context, next) =>
             {
-                using (LogContext.PushProperty("RemoteAddress", context.Connection.RemoteIpAddress))
+                using (LogContext.PushProperty("RemoteAddress",
+                    context.Connection.RemoteIpAddress))
                 {
                     await next.Invoke();
                 }
@@ -235,6 +293,11 @@ namespace Ocuda.Promenade.Web
                     = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(contentFilePath),
                 RequestPath = new PathString(contentUrl)
             });
+
+            if (!string.IsNullOrEmpty(_config[Configuration.PromenadeRequestLogging]))
+            {
+                app.UseSerilogRequestLogging();
+            }
 
             app.UseRouting();
 
