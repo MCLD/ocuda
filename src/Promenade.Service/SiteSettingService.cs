@@ -12,6 +12,8 @@ namespace Ocuda.Promenade.Service
 {
     public class SiteSettingService
     {
+        private const string NoValue = "null";
+
         private readonly ILogger _logger;
         private readonly IDistributedCache _cache;
         private readonly ISiteSettingRepository _siteSettingRepository;
@@ -122,26 +124,27 @@ namespace Ocuda.Promenade.Service
             if (!forceReload)
             {
                 setting = await _cache.GetStringAsync(cacheKey);
+                if(setting?.Equals(NoValue, StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    return null;
+                }
             }
 
             if (string.IsNullOrEmpty(setting))
             {
                 var siteSetting = await _siteSettingRepository.FindAsync(key)
                     ?? GetDefaultSetting(key);
-                setting = siteSetting?.Value;
-                if (!string.IsNullOrEmpty(setting))
-                {
-                    _logger.LogDebug("Cache miss for {CacheKey}, caching {Length} characters in {Elapsed} ms",
-                        cacheKey,
-                        setting?.Length,
-                        (Stopwatch.GetTimestamp() - start) * 1000 / (double)Stopwatch.Frequency);
-                    await _cache.SetStringAsync(cacheKey,
-                        setting,
-                        new DistributedCacheEntryOptions
-                        {
-                            SlidingExpiration = new TimeSpan(1, 0, 0)
-                        });
-                }
+                setting = siteSetting?.Value ?? NoValue;
+                _logger.LogDebug("Cache miss for {CacheKey}, caching {Length} characters in {Elapsed} ms",
+                    cacheKey,
+                    setting?.Length,
+                    (Stopwatch.GetTimestamp() - start) * 1000 / (double)Stopwatch.Frequency);
+                await _cache.SetStringAsync(cacheKey,
+                    setting,
+                    new DistributedCacheEntryOptions
+                    {
+                        SlidingExpiration = new TimeSpan(1, 0, 0)
+                    });
             }
             return setting;
         }

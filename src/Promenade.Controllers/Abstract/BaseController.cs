@@ -36,31 +36,24 @@ namespace Ocuda.Promenade.Controllers.Abstract
             _siteSettingService = context.SiteSettingService;
         }
 
-        public override async Task OnActionExecutionAsync(ActionExecutingContext context,
-            ActionExecutionDelegate next)
+        public override void OnActionExecuted(ActionExecutedContext context)
         {
-            await base.OnActionExecutionAsync(context, next);
+            base.OnActionExecuted(context);
 
-            string pageTitle;
-            var titleSuffix = await _siteSettingService.GetSettingStringAsync(
-                SiteSetting.Site.PageTitleSuffix);
+            var titleSuffix = context?.HttpContext.Items[ItemKey.PageTitleSuffix] as string;
 
-            if (context.Controller is BaseController<T> controller
+            string pageTitle = !string.IsNullOrWhiteSpace(titleSuffix)
+                ? titleSuffix
+                : string.Empty;
+
+            if (context?.Controller is BaseController<T> controller
                 && !string.IsNullOrWhiteSpace(controller.PageTitle))
             {
-                if (!string.IsNullOrEmpty(titleSuffix)
-                    && !titleSuffix.Equals(controller.PageTitle, StringComparison.OrdinalIgnoreCase))
-                {
-                    pageTitle = $"{controller.PageTitle} - {titleSuffix}";
-                }
-                else
-                {
-                    pageTitle = controller.PageTitle;
-                }
-            }
-            else
-            {
-                pageTitle = !string.IsNullOrWhiteSpace(titleSuffix) ? titleSuffix : string.Empty;
+                pageTitle = !string.IsNullOrEmpty(titleSuffix)
+                    && !titleSuffix.Equals(controller.PageTitle,
+                        StringComparison.OrdinalIgnoreCase)
+                    ? $"{controller.PageTitle} - {titleSuffix}"
+                    : controller.PageTitle;
             }
 
             ViewData[Utility.Keys.ViewData.Title] = pageTitle;
@@ -68,8 +61,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
         protected async Task<string> GetCanonicalUrl()
         {
-            var isTLS = await _siteSettingService.GetSettingBoolAsync(
-                Models.Keys.SiteSetting.Site.IsTLS);
+            var isTLS = await _siteSettingService.GetSettingBoolAsync(SiteSetting.Site.IsTLS);
 
             var scheme = isTLS ? Uri.UriSchemeHttps : Uri.UriSchemeHttp;
 

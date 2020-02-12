@@ -4,7 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData[Ocuda.Utility.Keys.ViewData.Title]</title>
-    <link rel="shortcut icon" href="#" />
     @RenderSection("metadata", required: false)
     @{
         var googleAnalyticsTrackingCode = Context.Items[Ocuda.Promenade.Controllers.ItemKey.GoogleAnalyticsTrackingCode] as string;
@@ -231,7 +230,7 @@
     {
         foreach (var jsUrl in (List<string>)Context.Items[ItemKey.ExternalJS])
         {
-            <script src="@jsUrl" asp-append-version="true"></script>
+            <script src="@jsUrl"></script>
         }
     }
     @RenderSection("Scripts", required: false)

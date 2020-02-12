@@ -59,11 +59,14 @@
 
     <h2>Library Information</h2>
 
-    <div class="row prom-feature-segment">
-        <div class="col-12">
-            @Html.Raw(Model.Location.DescriptionSegment.Text)
+    @if (Model.Location.DescriptionSegment?.Text?.Length > 0)
+    {
+        <div class="row prom-feature-segment">
+            <div class="col-12">
+                @Html.Raw(Model.Location.DescriptionSegment.Text)
+            </div>
         </div>
-    </div>
+    }
 
     <div class="row prom-features">
         <div class="col-4 col-md-3 col-lg-2 mb-2">

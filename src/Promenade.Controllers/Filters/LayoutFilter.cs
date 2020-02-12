@@ -89,6 +89,9 @@ namespace Ocuda.Promenade.Controllers.Filters
                 .Where(_ => _.Type == ExternalResourceType.JS)
                 .Select(_ => _.Url).ToList();
 
+            context.HttpContext.Items[ItemKey.PageTitleSuffix] = await _siteSettingService
+                .GetSettingStringAsync(SiteSetting.Site.PageTitleSuffix, forceReload);
+
             var topNavigationId = await _siteSettingService
                 .GetSettingIntAsync(SiteSetting.Site.NavigationIdTop, forceReload);
 
