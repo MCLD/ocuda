@@ -49,14 +49,9 @@ namespace Ocuda.Promenade.Controllers.Abstract
                         redirectUrl += Request.QueryString;
                     }
 
-                    if (redirect.IsPermanent)
-                    {
-                        return RedirectPermanent(redirectUrl);
-                    }
-                    else
-                    {
-                        return Redirect(redirectUrl);
-                    }
+                    return redirect.IsPermanent
+                        ? RedirectPermanent(redirectUrl)
+                        : Redirect(redirectUrl);
                 }
 
                 _logger.LogWarning("No {PageType} page or redirect found for stub {stub}: {RequestPath}",

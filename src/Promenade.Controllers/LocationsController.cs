@@ -291,8 +291,11 @@ namespace Ocuda.Promenade.Controllers
             viewModel.Location.DescriptionSegment = await _segmentService
                 .GetSegmentTextBySegmentIdAsync(viewModel.Location.DescriptionSegmentId);
 
-            viewModel.Location.DescriptionSegment.Text = CommonMarkConverter
-                .Convert(viewModel.Location.DescriptionSegment.Text);
+            if (viewModel.Location.DescriptionSegment?.Text.Length > 0)
+            {
+                viewModel.Location.DescriptionSegment.Text = CommonMarkConverter
+                    .Convert(viewModel.Location.DescriptionSegment.Text);
+            }
 
             viewModel.Location.LocationHours
                 = await _locationService.GetFormattedWeeklyHoursAsync(viewModel.Location.Id);
