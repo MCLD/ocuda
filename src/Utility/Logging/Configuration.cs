@@ -37,10 +37,11 @@ namespace Ocuda.Utility.Logging
             string errorControllerName = config[Keys.Configuration.OcudaErrorControllerName]
                 ?? DefaultErrorControllerName;
 
-            string rollingLogLocation
-                = Path.Combine("shared", config[Keys.Configuration.OcudaLoggingRollingFile]);
-            if (!string.IsNullOrEmpty(rollingLogLocation))
+            if (!string.IsNullOrEmpty(config[Keys.Configuration.OcudaLoggingRollingFile]))
             {
+                string rollingLogLocation
+                    = Path.Combine("shared", config[Keys.Configuration.OcudaLoggingRollingFile]);
+
                 string rollingLogFile = !string.IsNullOrEmpty(instance)
                     ? Path.Combine(rollingLogLocation, $"log-{instance}-{{Date}}.txt")
                     : Path.Combine(rollingLogLocation, "log-{Date}.txt");
@@ -97,7 +98,8 @@ namespace Ocuda.Utility.Logging
                 loggerConfig
                     .WriteTo.Logger(_ => _
                         .Filter.ByExcluding(Matching.FromSource(errorControllerName))
-                        .WriteTo.Seq(seqEndpoint));
+                        .WriteTo.Seq(seqEndpoint,
+                            apiKey: config[Keys.Configuration.OcudaSeqAPI]));
             }
 
             return loggerConfig;

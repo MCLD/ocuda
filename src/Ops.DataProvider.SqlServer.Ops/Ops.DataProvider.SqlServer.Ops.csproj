@@ -10,7 +10,7 @@
     <Product>Ocuda</Product>
     <RepositoryType>Git</RepositoryType>
     <RepositoryUrl>https://github.com/MCLD/ocuda/</RepositoryUrl>
-    <RootNamespace>Ocuda.Ops.DataProvider.SqlServer</RootNamespace>
+    <RootNamespace>Ocuda.Ops.DataProvider.SqlServer.Ops</RootNamespace>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
