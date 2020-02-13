@@ -29,6 +29,8 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(5)]
         public string IconText { get; set; }
 
+        public int? SortOrder { get; set; }
+
         [NotMapped]
         public bool IsNewFeature { get; set; }
 

@@ -35,7 +35,9 @@ namespace Ocuda.Promenade.Data.Promenade
                 .AsNoTracking()
                 .Include(_ => _.Feature)
                 .Where(_ => _.Location.Stub == locationStub)
-                .OrderBy(_ => _.Feature.Name)
+                .OrderByDescending(_ => _.Feature.SortOrder.HasValue)
+                .ThenBy(_ => _.Feature.SortOrder)
+                .ThenBy(_ => _.Feature.Name)
                 .ToListAsync();
         }
     }
