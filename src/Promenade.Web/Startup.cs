@@ -244,6 +244,7 @@ namespace Ocuda.Promenade.Web
             if (_isDevelopment)
             {
                 app.UseDeveloperExceptionPage();
+                app.UseBrowserLink();
             }
             else
             {

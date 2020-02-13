@@ -185,6 +185,34 @@ footer {
     transform: rotate(0deg);
 }
 
+.prom-body-content h1 {
+    font-size: 2rem;
+    display: inline-block;
+}
+
+.prom-body-content hr {
+    border-top: 2px solid;
+}
+
+.prom-body-content h2 {
+    font-size: 1.8rem;
+    line-height: 1.5;
+}
+
+    .prom-body-content h2 + hr {
+        margin-top: -0.5rem;
+        padding-top: 0;
+    }
+
+.prom-body-content h3 {
+    font-size: 1.6rem;
+}
+
+.prom-body-content dd {
+    margin-left: 3rem;
+    margin-top: 0.5rem;
+}
+
 .prom-location-tile {
     border: 1px solid #ccc;
     background-color: #f0f0f0;
@@ -197,15 +225,6 @@ footer {
 .prom-location-icon-text {
     color: white;
     font-weight: bold;
-}
-
-.prom-location h1 {
-    font-size: 2rem;
-    display: inline-block;
-}
-
-.prom-location h2 {
-    font-size: 1.8rem;
 }
 
 .prom-location .prom-features {
