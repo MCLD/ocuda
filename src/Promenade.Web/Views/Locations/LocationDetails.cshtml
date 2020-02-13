@@ -69,26 +69,6 @@
     }
 
     <div class="row prom-features">
-        <div class="col-4 col-md-3 col-lg-2 mb-2">
-            <a href="@Model.Location.EventLink" target="_blank">
-                <span class="fa-stack fa-2x d-block mx-auto">
-                    <span class="fas fa-square fa-stack-2x"></span>
-                    <span class="fas fa-inverse fa-calendar-alt fa-stack-1x"></span>
-                </span>
-                Browse
-                Events
-            </a>
-        </div>
-        <div class="col-4 col-md-3 col-lg-2 mb-2">
-            <a href="@Model.Location.SubscriptionLink" target="_blank">
-                <span class="fa-stack fa-2x d-block mx-auto">
-                    <span class="fas fa-square fa-stack-2x"></span>
-                    <span class="far fa-inverse fa-envelope fa-stack-1x"></span>
-                </span>
-                Send&nbsp;me
-                Events
-            </a>
-        </div>
         @foreach (var feature in Model.LocationFeatures)
         {
             <div class="col-4 col-md-3 col-lg-2 mb-2">
