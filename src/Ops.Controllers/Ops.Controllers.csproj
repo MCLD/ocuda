@@ -14,7 +14,6 @@
     <RepositoryUrl>https://github.com/MCLD/ocuda/</RepositoryUrl>
     <RootNamespace>Ocuda.Ops.Controllers</RootNamespace>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

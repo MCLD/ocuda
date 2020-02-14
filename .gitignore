@@ -248,11 +248,6 @@ src/Ops.Web.WindowsAuth/logs/*
 src/Promenade.Web/logs/*
 src/Promenade.Web/shared/*
 
-!dev/bin
-
-# Exclude migrations during development
-src/Ops.DataProvider.*/Migrations/
-
 # Exclude publish results
 src/Ops.Web.WindowsAuth/Properties/PublishProfiles/
 
