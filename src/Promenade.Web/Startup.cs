@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -291,11 +292,16 @@ namespace Ocuda.Promenade.Web
                 contentUrl = $"/{contentUrl}";
             }
 
+            // https://github.com/aspnet/AspNetCore/issues/2442
+            var extensionContentTypeProvider = new FileExtensionContentTypeProvider();
+            extensionContentTypeProvider.Mappings[".webmanifest"] = "application/manifest+json";
+
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider
                     = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(contentFilePath),
-                RequestPath = new PathString(contentUrl)
+                RequestPath = new PathString(contentUrl),
+                ContentTypeProvider = extensionContentTypeProvider
             });
 
             if (!string.IsNullOrEmpty(_config[Configuration.PromenadeRequestLogging]))
