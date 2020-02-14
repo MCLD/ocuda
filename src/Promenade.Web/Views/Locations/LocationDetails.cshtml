@@ -4,6 +4,8 @@
     <link rel="canonical" href="@Model.CanonicalUrl" />
 }
 
+<div modal id="featureModal"></div>
+
 <div class="prom-location">
     <div class="row">
         <div class="col-12 col-md-5 order-md-2">
@@ -77,11 +79,12 @@
                     <a asp-action="@nameof(LocationsController.Locations)"
                        asp-route-locationStub="@Model.Location.Stub"
                        asp-route-featureStub="@feature.Stub"
-                       class="feature-popup"
                        data-toggle="modal"
                        data-target="#featureModal"
                        target="_blank"
-                       data-feature="@feature.Stub">
+                       data-feature="@feature.Stub"
+                       data-location="@Model.Location.Stub"
+                       data-name="@feature.Name">
                         <span class="fa-stack fa-2x d-block mx-auto">
                             <span class="fa fa-square fa-stack-2x"></span>
                             <span class="@feature.Icon">@Html.Raw(feature.IconText)</span>
@@ -194,93 +197,33 @@
             </div>
         </div>
     }
-
-    <div class="modal fade"
-         id="featureModal"
-         tabindex="-1"
-         role="dialog"
-         aria-labelledby="modalTitle"
-         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">Details</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div id="modal-body"></div>
-                    <div id="modal-text"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button"
-                            class="btn btn-primary"
-                            data-dismiss="modal">
-                        Close
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    @if (!string.IsNullOrEmpty(Model?.LocationNeighborGroup?.MapImage))
-    {
-        <div class="modal fade"
-             id="mapModal"
-             tabindex="-1"
-             role="dialog"
-             aria-labelledby="mapModalTitle"
-             aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="mapModalTitle">Nearby Locations Map</h5>
-                        <button type="button"
-                                class="close"
-                                data-dismiss="modal"
-                                aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <img src="@Model.LocationNeighborGroup.MapImage"
-                             class="d-block img-fluid mx-auto"
-                             alt="@Model?.LocationNeighborGroup?.Description">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button"
-                                class="btn btn-outline-primary"
-                                data-dismiss="modal">
-                            Close
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
 </div>
 
-@section Scripts{
-    @if (Model.LocationFeatures.Any())
-    {
-        <script>
-        $('.feature-popup').on('click', function () {
-            @foreach (var feature in Model.LocationFeatures)
-            {
-                <text>
-                if ('@feature.Stub' == $(this).data("feature"))
-                {
-                    $("#modalTitle").text("@Html.Raw(feature.Name)");
+@section Scripts {
+    <script>
+        $("#featureModal").on("show.bs.modal", function (event) {
+            var button = $(event.relatedTarget);
+            var feature = button.data("feature");
+            var location = button.data("location");
+            var name = button.data("name");
 
-                    $("#modal-body").html($("#modal-body").html("@feature.BodyText").text());
-                    $("#modal-text").html($("#modal-text").html("@feature.Text").text());
-                }
-                </text>
-            }
+            var modal = $(this);
+            modal.find(".modal-title").html(name);
+
+            var modalBody = modal.find(".modal-body");
+            modalBody.html("<span class=\"fas fa-spinner fa-2x fa-pulse\"></span>")
+
+            $.getJSON("@Url.Action(nameof(LocationsController.GetFeatureInfo), LocationsController.Name)",
+                { locationStub: location, featureStub: feature },
+                function (response) {
+                    modalBody.html(response.bodyText).append(response.text);
+                })
+                .fail(function () {
+                    window.location.href = button.attr("href");
+                });
         });
-        </script>
-    }
+    </script>
+
     <script type="application/ld+json">
         {
         "@@context": "http://schema.org",

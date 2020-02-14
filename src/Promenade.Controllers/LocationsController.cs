@@ -365,5 +365,30 @@ namespace Ocuda.Promenade.Controllers
                 return NotFound();
             }
         }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetFeatureInfo(string locationStub, string featureStub)
+        {
+            var locationFeature
+                 = await _locationService.GetLocationFullFeatureAsync(locationStub, featureStub);
+
+            if (locationFeature != null)
+            {
+                var viewModel = new FeatureInfoViewModel
+                {
+                    BodyText = CommonMarkConverter.Convert(locationFeature.Feature.BodyText),
+                    Text = CommonMarkConverter.Convert(locationFeature.Text)
+                };
+
+                return Json(viewModel);
+            }
+            else
+            {
+                _logger.LogWarning("Location Feature not found for location {locationStub} and feature {featureStub}",
+                        locationStub,
+                        featureStub);
+                return NotFound();
+            }
+        }
     }
 }
