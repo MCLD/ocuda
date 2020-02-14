@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data
 {
-    public abstract class PromenadeContext : Utility.Data.DbContextBase, IMigratableContext
+    public abstract class PromenadeContext
+        : Utility.Data.DbContextBase, IMigratableContext, IDataProtectionKeyContext
     {
         protected PromenadeContext(DbContextOptions options) : base(options) { }
 
@@ -49,6 +51,7 @@ namespace Ocuda.Ops.Data
 
         public DbSet<Category> Categories { get; set; }
         public DbSet<CategoryText> CategoryTexts { get; set; }
+        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
         public DbSet<Emedia> Emedia { get; set; }
         public DbSet<EmediaCategory> EmediaCategories { get; set; }
         public DbSet<EmediaText> EmediaTexts { get; set; }
