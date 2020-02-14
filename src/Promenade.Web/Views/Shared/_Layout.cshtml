@@ -29,6 +29,27 @@
         }
     }
     @RenderSection("Styles", required: false)
+    <link rel="apple-touch-icon"
+          sizes="180x180"
+          href="@Context.Items[ItemKey.PublicContentPath]/apple-touch-icon.png">
+    <link rel="icon" type="image/png"
+          sizes="32x32"
+          href="@Context.Items[ItemKey.PublicContentPath]/favicon-32x32.png">
+    <link rel="icon" type="image/png"
+          sizes="16x16"
+          href="@Context.Items[ItemKey.PublicContentPath]/favicon-16x16.png">
+    <link rel="manifest"
+          href="@Context.Items[ItemKey.PublicContentPath]/site.webmanifest">
+    <link rel="mask-icon"
+          href="@Context.Items[ItemKey.PublicContentPath]/safari-pinned-tab.svg" color="#567ebf">
+    <link rel="shortcut icon"
+          href="@Context.Items[ItemKey.PublicContentPath]/favicon.ico">
+    <meta name="apple-mobile-web-app-title" content="MCLD">
+    <meta name="application-name" content="MCLD">
+    <meta name="msapplication-TileColor" content="#567ebf">
+    <meta name="msapplication-config"
+          content="@Context.Items[ItemKey.PublicContentPath]/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
 </head>
 <body>
     <div class="container-fluid prom-content">
@@ -192,8 +213,8 @@
                             {
                                 leftNavigationFeaturetteNumber++;
                                 <a href="@item.Link"
-                                    aria-label="@item.NavigationText.AriaLabel"
-                                    class="btn btn-secondary btn-block prom-leftnav-featurette-button prom-leftnav-featurette-button-@leftNavigationFeaturetteNumber">@item.NavigationText.Label</a>
+                                   aria-label="@item.NavigationText.AriaLabel"
+                                   class="btn btn-secondary btn-block prom-leftnav-featurette-button prom-leftnav-featurette-button-@leftNavigationFeaturetteNumber">@item.NavigationText.Label</a>
                             }
                         }
                     </div>

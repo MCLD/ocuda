@@ -9,6 +9,7 @@
         public static readonly string OcudaLoggingRollingFile = "Ocuda.LoggingRollingFile";
         public static readonly string OcudaLoggingRollingHttpFile = "Ocuda.LoggingRollingHttpFile";
         public static readonly string OcudaSeqEndpoint = "Ocuda.SeqEndpoint";
+        public static readonly string OcudaSeqAPI = "Ocuda.API.Seq";
         public static readonly string OcudaUrlSharedContent = "Ocuda.UrlSharedContent";
 
         public static readonly string OcudaRuntimeRedisCacheConfiguration
