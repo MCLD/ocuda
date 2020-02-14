@@ -14,6 +14,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Default to only logging Warnings for Microsoft and System namespaces
 - Display location feature details pop-ups using Ajax
 
+### Fixed
+- Remove hardcoded "Library" from location pages
+
 ## 1.0.0
 ### Added
 - Everything (initial release)

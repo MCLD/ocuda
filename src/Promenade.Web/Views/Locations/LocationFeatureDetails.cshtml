@@ -8,7 +8,7 @@
                     <div id="content">
                         @foreach (var feature in Model.LocationFeatures)
                         {
-                            <h1>@Model.Location.Name Library @feature.Name</h1>
+                            <h1>@Model.Location.Name @feature.Name</h1>
                             <div id="feature-body">@Html.Raw(feature.BodyText)</div>
                             <div id="feature-text">@Html.Raw(feature.Text)</div>
                         }
@@ -16,7 +16,7 @@
                     <p style="margin-left: 1rem;">
                         <a asp-action="@nameof(LocationsController.Locations)"
                            asp-route-locationStub="@Model.Location.Stub"
-                           asp-route-featureStub="" class="btn btn-default">
+                           asp-route-featureStub="" class="btn btn-outline-dark">
                             <span class="fa fa-arrow-circle-left" aria-hidden="true"></span>
                             Back to @Model.Location.Name
                         </a>
