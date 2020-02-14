@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Data
 {
-    public abstract class PromenadeContext : Utility.Data.DbContextBase
+    public abstract class PromenadeContext : Utility.Data.DbContextBase, IDataProtectionKeyContext
     {
         protected PromenadeContext(DbContextOptions options) : base(options) { }
 
@@ -34,6 +35,7 @@ namespace Ocuda.Promenade.Data
         // Read-Only
         public DbSet<Category> Categories { get; }
         public DbSet<CategoryText> CategoryTexts { get; }
+        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
         public DbSet<Emedia> Emedia { get; set; }
         public DbSet<EmediaCategory> EmediaCategories { get; set; }
         public DbSet<EmediaText> EmediaTexts { get; }

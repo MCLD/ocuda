@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
@@ -114,6 +115,8 @@ namespace Ocuda.Promenade.Web
             {
                 throw new OcudaException("No Configuration.PromenadeDatabaseProvider configured.");
             }
+
+            services.AddDataProtection().PersistKeysToDbContext<PromenadeContext>();
 
             services.Configure<RouteOptions>(_ =>
                 _.ConstraintMap.Add("cultureConstraint", typeof(CultureRouteConstraint)));
