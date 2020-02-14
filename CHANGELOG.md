@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Pull favicon and similar resources out of the public content path
 - Move Promenade Data Protection Key from file system storage to database storage
 - Ability to serve out .webmanifest files
+- Made logo at top of Promenade clickable to go back to the top of the site
 
 ### Changed
 - Default to only logging Warnings for Microsoft and System namespaces

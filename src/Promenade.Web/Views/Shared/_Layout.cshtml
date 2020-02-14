@@ -111,9 +111,9 @@
                 if (!string.IsNullOrEmpty(bannerImage))
                 {
                     <div class="row prom-nav-logo">
-                        <img src="@bannerImage"
+                        <a asp-action="Index" asp-controller="Home" asp-area=""><img src="@bannerImage"
                              alt="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.BannerImageAlt]"
-                             style="max-width: 100%;" />
+                             style="max-width: 100%;" /></a>
                     </div>
                 }
                 var middleNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.MiddleNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
