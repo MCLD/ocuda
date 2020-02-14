@@ -9,6 +9,7 @@ using Ocuda.i18n;
 using Ocuda.Promenade.Models.Keys;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility.Models;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Controllers.Filters
 {
@@ -17,11 +18,13 @@ namespace Ocuda.Promenade.Controllers.Filters
         private readonly IOptions<RequestLocalizationOptions> _l10nOptions;
         private readonly ExternalResourceService _externalResourceService;
         private readonly NavigationService _navigationService;
+        private readonly IPathResolverService _pathResolverService;
         private readonly SiteSettingService _siteSettingService;
 
         public LayoutFilter(IOptions<RequestLocalizationOptions> l10nOptions,
             ExternalResourceService externalResourceService,
             NavigationService navigationService,
+            IPathResolverService pathResolverService,
             SiteSettingService siteSettingService)
         {
             _l10nOptions = l10nOptions ?? throw new ArgumentNullException(nameof(l10nOptions));
@@ -29,6 +32,8 @@ namespace Ocuda.Promenade.Controllers.Filters
                 ?? throw new ArgumentNullException(nameof(externalResourceService));
             _navigationService = navigationService
                 ?? throw new ArgumentNullException(nameof(navigationService));
+            _pathResolverService = pathResolverService
+                ?? throw new ArgumentNullException(nameof(pathResolverService));
             _siteSettingService = siteSettingService
                 ?? throw new ArgumentNullException(nameof(siteSettingService));
         }
@@ -78,6 +83,9 @@ namespace Ocuda.Promenade.Controllers.Filters
             }
             context.HttpContext.Items[ItemKey.HrefLang] = cultureHrefLang;
             context.HttpContext.Items[ItemKey.L10n] = cultureList;
+
+            context.HttpContext.Items[ItemKey.PublicContentPath]
+                = _pathResolverService.GetPublicContentUrl();
 
             var externalResources = await _externalResourceService.GetAllAsync(forceReload);
 

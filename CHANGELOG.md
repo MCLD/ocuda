@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ## Unreleased
 ### Added
+- Pull favicon and similar resources out of the public content path
 - Move Promenade Data Protection Key from file system storage to database storage
 
 ### Changed
