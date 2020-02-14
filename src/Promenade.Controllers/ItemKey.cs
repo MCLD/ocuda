@@ -13,6 +13,7 @@
         public const string LeftNavigation = "LeftNavigation";
         public const string MiddleNavigation = "MiddleNavigation";
         public const string PageTitleSuffix = "PageTitle";
+        public const string PublicContentPath = "PublicContentPath";
         public const string TopNavigation = "TopNavigation";
     }
 }
