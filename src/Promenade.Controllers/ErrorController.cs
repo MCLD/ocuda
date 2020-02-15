@@ -57,14 +57,18 @@ namespace Ocuda.Promenade.Controllers
                     }
                 }
 
-                _logger.LogWarning($"HTTP Error {id}: {originalPath}");
+                _logger.LogWarning("HTTP Error {StatusCode}: {RequestPath}",
+                    id,
+                    originalPath);
 
                 PageTitle = "Page not found";
 
                 return NotFound();
             }
 
-            _logger.LogCritical($"HTTP Error {id}: {originalPath}");
+            _logger.LogCritical("HTTP Error {StatusCode}: {RequestPath}",
+                id,
+                originalPath);
 
             PageTitle = "Error";
 
