@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ### Fixed
 - Remove hardcoded "Library" from location pages
+- Redirects properly bring along query strings
 
 ## 1.0.0
 ### Added

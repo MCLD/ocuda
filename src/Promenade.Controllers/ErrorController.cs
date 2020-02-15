@@ -42,9 +42,9 @@ namespace Ocuda.Promenade.Controllers
                 {
                     var redirectUrl = redirect.Url;
 
-                    if (Request.QueryString.HasValue)
+                    if (!string.IsNullOrWhiteSpace(statusFeature?.OriginalQueryString))
                     {
-                        redirectUrl += Request.QueryString;
+                        redirectUrl += statusFeature.OriginalQueryString;
                     }
 
                     if (redirect.IsPermanent)
