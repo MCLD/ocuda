@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Net.Http.Headers;
 using Ocuda.i18n;
 using Ocuda.i18n.RouteConstraint;
 using Ocuda.Promenade.Data;
@@ -292,8 +293,12 @@ namespace Ocuda.Promenade.Web
             // insert remote address into the log context for each request
             app.Use(async (context, next) =>
             {
-                using (LogContext.PushProperty("RemoteAddress",
+                using (LogContext.PushProperty(Utility.Logging.Enrichment.RemoteAddress,
                     context.Connection.RemoteIpAddress))
+                using (LogContext.PushProperty(HeaderNames.UserAgent,
+                    context.Request.Headers[HeaderNames.UserAgent].ToString()))
+                using (LogContext.PushProperty(HeaderNames.Referer,
+                    context.Request.Headers[HeaderNames.Referer].ToString()))
                 {
                     await next.Invoke();
                 }
