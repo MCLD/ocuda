@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Move Promenade Data Protection Key from file system storage to database storage
 - Ability to serve out .webmanifest files
 - Made logo at top of Promenade clickable to go back to the top of the site
+- Response compression
+- Configuration and handling of reverse proxy address
 
 ### Changed
 - Default to only logging Warnings for Microsoft and System namespaces

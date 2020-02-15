@@ -8,6 +8,7 @@
         public static readonly string OcudaLoggingDatabase = "Ocuda.LoggingDatabase";
         public static readonly string OcudaLoggingRollingFile = "Ocuda.LoggingRollingFile";
         public static readonly string OcudaLoggingRollingHttpFile = "Ocuda.LoggingRollingHttpFile";
+        public static readonly string OcudaProxyAddress = "Ocuda.ProxyAddress";
         public static readonly string OcudaSeqEndpoint = "Ocuda.SeqEndpoint";
         public static readonly string OcudaSeqAPI = "Ocuda.API.Seq";
         public static readonly string OcudaUrlSharedContent = "Ocuda.UrlSharedContent";

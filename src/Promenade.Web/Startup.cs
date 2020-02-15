@@ -244,6 +244,21 @@ namespace Ocuda.Promenade.Web
                 throw new ArgumentNullException(nameof(pathResolver));
             }
 
+            app.UseResponseCompression();
+
+            if (!string.IsNullOrEmpty(_config[Configuration.OcudaProxyAddress]))
+            {
+                app.UseForwardedHeaders(new ForwardedHeadersOptions
+                {
+                    ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.All,
+                    RequireHeaderSymmetry = false,
+                    ForwardLimit = null,
+                    KnownProxies = {
+                        System.Net.IPAddress.Parse(_config[Configuration.OcudaProxyAddress])
+                    }
+                });
+            }
+
             // configure error page handling and development IDE linking
             if (_isDevelopment)
             {
