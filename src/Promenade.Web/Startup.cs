@@ -54,6 +54,8 @@ namespace Ocuda.Promenade.Web
                 throw new ArgumentNullException(nameof(services));
             }
 
+            services.AddResponseCompression();
+
             services.AddLocalization();
 
             services.Configure<RequestLocalizationOptions>(_ =>
