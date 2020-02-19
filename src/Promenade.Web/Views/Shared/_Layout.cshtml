@@ -85,21 +85,58 @@
                             <div class="@(l10n?.Count() > 1 ? "col-9" : "col-12") prom-right-nav">
                                 @foreach (var item in topNavigation.Navigations)
                                 {
-                                    <div>
-                                        <a href="@(string.IsNullOrEmpty(item.Link) ? "#" : item.Link)"
-                                           title="@item.NavigationText.Title"
-                                           aria-label="@item.NavigationText.AriaLabel"
-                                           class="@(item.NavigationText.Label == null ? "" : "d-flex align-items-center")">
-                                            @if (!string.IsNullOrEmpty(item.Icon))
-                                            {
-                                                <span class="@item.Icon @(item.NavigationText.Label == null ? "" : "prom-fa-space")"></span>
-                                            }
-                                            @if (!string.IsNullOrEmpty(item.NavigationText.Label))
-                                            {
-                                                <span class="@(item.HideTextWhenExtraSmall ? "hidden-xxs" : "")">@item.NavigationText.Label</span>
-                                            }
-                                        </a>
-                                    </div>
+                                    if (item.ChangeToLinkWhenExtraSmall || item.Navigations.Count() == 0)
+                                    {
+                                        <div class="@(item.Navigations.Count() == 0 ? "" : "prom-nav-link")">
+                                            <a href="@(string.IsNullOrEmpty(item.Link) ? "#" : item.Link)"
+                                               title="@item.NavigationText.Title"
+                                               aria-label="@item.NavigationText.AriaLabel"
+                                               class="@(item.NavigationText.Label == null ? "" : "d-flex align-items-center")">
+                                                @if (!string.IsNullOrEmpty(item.Icon))
+                                                {
+                                                    <span class="@item.Icon @(item.NavigationText.Label == null ? "" : "prom-fa-space")"></span>
+                                                }
+                                                @if (!string.IsNullOrEmpty(item.NavigationText.Label))
+                                                {
+                                                    <span class="@(item.HideTextWhenExtraSmall ? "hidden-xxs" : "")">@item.NavigationText.Label</span>
+                                                }
+                                            </a>
+                                        </div>
+                                    }
+                                    if (item.Navigations.Count() > 0)
+                                    {
+                                        <div role="presentation" class="dropdown @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : "")">
+                                            <a class="dropdown-toggle @(item.NavigationText.Label == null ? "" : "d-flex align-items-center")"
+                                               data-toggle="dropdown"
+                                               href="#"
+                                               role="button"
+                                               aria-haspopup="true"
+                                               aria-expanded="false">
+                                                @if (!string.IsNullOrEmpty(item.Icon))
+                                                {
+                                                    <span class="@item.Icon @(item.NavigationText.Label == null ? "" : "prom-fa-space")"></span>
+                                                }
+                                                @if (!string.IsNullOrEmpty(item.NavigationText.Label))
+                                                {
+                                                    <span class="@(item.HideTextWhenExtraSmall ? "hidden-xxs" : "")">@item.NavigationText.Label</span>
+                                                }
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-right prom-nav-dropdown">
+                                                @foreach (var subItem in item.Navigations)
+                                                {
+                                                    <a href="@subItem.Link"
+                                                       class="dropdown-item"
+                                                       aria-label="@subItem.NavigationText.AriaLabel">
+                                                        @if (!string.IsNullOrEmpty(subItem.Icon))
+                                                        {
+                                                            <span class="@subItem.Icon"></span>
+                                                        }
+                                                        @subItem.NavigationText.Label
+                                                    </a>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
                                 }
                             </div>
                         }
@@ -111,9 +148,11 @@
                 if (!string.IsNullOrEmpty(bannerImage))
                 {
                     <div class="row prom-nav-logo">
-                        <a asp-action="Index" asp-controller="Home" asp-area=""><img src="@bannerImage"
-                             alt="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.BannerImageAlt]"
-                             style="max-width: 100%;" /></a>
+                        <a asp-action="Index" asp-controller="Home" asp-area="">
+                            <img src="@bannerImage"
+                                 alt="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.BannerImageAlt]"
+                                 style="max-width: 100%;" />
+                        </a>
                     </div>
                 }
                 var middleNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.MiddleNavigation] as Ocuda.Promenade.Models.Entities.Navigation;

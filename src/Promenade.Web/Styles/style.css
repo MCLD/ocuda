@@ -37,6 +37,16 @@ span.prom-fa-space {
             color: white;
         }
 
+    .prom-nav-top > .prom-right-nav .prom-dropdown-swap-link {
+        display: none; 
+    }
+
+    .prom-nav-top > .prom-right-nav .prom-nav-link {
+        display: block;
+    }
+
+/* right nav bar */
+
 /* logo nav bar */
 .prom-nav-logo {
     background-color: #333;
@@ -68,6 +78,14 @@ span.prom-fa-space {
 
 
 @media (min-width: 374px) {
+    .prom-nav-top > .prom-right-nav .prom-dropdown-swap-link {
+        display: block;
+    }
+
+    .prom-nav-top > .prom-right-nav .prom-nav-link {
+        display: none;
+    }
+
     .prom-nav-middle .prom-dropdown-swap-link {
         display: block;
     }
