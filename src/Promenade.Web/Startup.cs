@@ -174,6 +174,8 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.EmediaRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IEmediaCategoryRepository,
                 Data.Promenade.EmediaCategoryRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IEmediaGroupRepository,
+                Data.Promenade.EmediaGroupRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IEmediaTextRepository,
                 Data.Promenade.EmediaTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IExternalResourceRepository,

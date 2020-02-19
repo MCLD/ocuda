@@ -38,6 +38,7 @@ namespace Ocuda.Promenade.Data
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
         public DbSet<Emedia> Emedia { get; set; }
         public DbSet<EmediaCategory> EmediaCategories { get; set; }
+        public DbSet<EmediaGroup> EmediaGroups { get; }
         public DbSet<EmediaText> EmediaTexts { get; }
         public DbSet<ExternalResource> ExternalResources { get; set; }
         public DbSet<Feature> Features { get; }
