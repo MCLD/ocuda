@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Response compression for Promenade
 - Configuration and handling of reverse proxy address in Promenade
 - Promenade log enrichment with referer and user agent
+- Drop-down capability to Promenade top navigation
 
 ### Changed
 - Default to only logging Warnings for Microsoft and System namespaces
