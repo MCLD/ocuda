@@ -74,8 +74,7 @@ span.prom-fa-space {
         display: block;
     }
 
-
-@media (min-width: 374px) {
+@media (min-width: 385px) {
     .prom-nav-top > .prom-right-nav .prom-dropdown-swap-link {
         display: block;
     }
