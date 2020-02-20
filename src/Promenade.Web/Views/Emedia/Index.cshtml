@@ -2,42 +2,51 @@
 
 <div modal id="infoModal"></div>
 
-<h2>eMedia</h2>
-<p>Electronic downloads and streaming available 24/7 for tablets, smartphones, eReaders, and computers! Need help? See our tutorials,  <a href="https://extranet.mcldaz.org/"><strong>contact us online</strong></a>, or call us: <a href="tel:6026523000">602-652-3000</a>.</p>
-<p><strong>New  <a href="/About/ebooks">publisher policies</a>  may impact your eBook reading.</strong></p>
-
-<div class="row">
-    @foreach (var emedia in Model.AllEmedia)
+@foreach (var group in Model.GroupedEmedia)
+{
+    if (!string.IsNullOrWhiteSpace(group.Segment?.SegmentText?.Text))
     {
-        <div class="col-12 col-md-4 d-flex mb-4">
-            <div class="card flex-fill w-100">
-                <div class="card-header">
-                    <a href="@emedia.RedirectUrl">@emedia.Name</a>
-                    @if (!string.IsNullOrEmpty(emedia.EmediaText?.Details))
-                    {
-                        <span class="fas fa-question-circle fa-pull-right"
-                              style="cursor: pointer;"
-                              data-target="#infoModal"
-                              data-toggle="modal"
-                              data-name="@emedia.Name"
-                              data-details="@emedia.EmediaText.Details">
-                        </span>
-                    }
-                </div>
-                <div class="card-body">
-                    @Html.Raw(emedia.EmediaText?.Description)
-                </div>
-                <div class="card-footer">
-                    @foreach (var category in emedia.Categories)
-                    {
-                        <span class="badge @category.Class">@category.CategoryText?.Text</span>
-                    }
-                </div>
+        <div class="row">
+            <div class="col-12">
+                @Html.Raw(group.Segment.SegmentText.Text)
             </div>
         </div>
     }
-</div>
-
+    if (group.Emedias.Any())
+    {
+        <div class="row">
+            @foreach (var emedia in group.Emedias)
+            {
+                <div class="col-12 col-md-4 d-flex mb-4">
+                    <div class="card flex-fill w-100">
+                        <div class="card-header">
+                            <a href="@emedia.RedirectUrl" target="_blank">@emedia.Name</a>
+                            @if (!string.IsNullOrEmpty(emedia.EmediaText?.Details))
+                            {
+                                <span class="fas fa-question-circle fa-pull-right"
+                                      style="cursor: pointer;"
+                                      data-target="#infoModal"
+                                      data-toggle="modal"
+                                      data-name="@emedia.Name"
+                                      data-details="@emedia.EmediaText.Details">
+                                </span>
+                            }
+                        </div>
+                        <div class="card-body">
+                            @Html.Raw(emedia.EmediaText?.Description)
+                        </div>
+                        <div class="card-footer">
+                            @foreach (var category in emedia.Categories)
+                            {
+                                <span class="badge @category.Class">@category.CategoryText?.Text</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+}
 
 @section scripts {
     <script>

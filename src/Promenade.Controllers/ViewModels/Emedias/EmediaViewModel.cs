@@ -5,6 +5,6 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Emedias
 {
     public class EmediaViewModel
     {
-        public List<Emedia> AllEmedia { get; set; }
+        public ICollection<EmediaGroup> GroupedEmedia { get; set; }
     }
 }

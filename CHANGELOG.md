@@ -13,10 +13,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Configuration and handling of reverse proxy address in Promenade
 - Promenade log enrichment with referer and user agent
 - Drop-down capability to Promenade top navigation
+- Groups for Promenade emedia content
 
 ### Changed
 - Default to only logging Warnings for Microsoft and System namespaces
 - Display location feature details pop-ups using Ajax in Promenade
+- Text on Promenade emedia page is now segments
 
 ### Fixed
 - Remove hardcoded "Library" from location pages in Promenade

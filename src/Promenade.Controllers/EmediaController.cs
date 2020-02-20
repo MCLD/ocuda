@@ -21,24 +21,35 @@ namespace Ocuda.Promenade.Controllers
         [Route("")]
         public async Task<IActionResult> Index()
         {
-            var emediaViewModel = new EmediaViewModel
-            {
-                AllEmedia = await _emediaService.GetAllEmediaAsync()
-            };
+            var groupedEmedia = await _emediaService.GetGroupedEmediaAsync();
 
-            foreach (var emedia in emediaViewModel.AllEmedia)
+            foreach (var group in groupedEmedia)
             {
-                if (!string.IsNullOrWhiteSpace(emedia.EmediaText?.Description))
+                if (!string.IsNullOrWhiteSpace(group.Segment?.SegmentText?.Text))
                 {
-                    emedia.EmediaText.Description = CommonMark.CommonMarkConverter
-                    .Convert(emedia.EmediaText.Description);
+                    group.Segment.SegmentText.Text = CommonMark.CommonMarkConverter
+                        .Convert(group.Segment.SegmentText.Text);
                 }
-                if (!string.IsNullOrWhiteSpace(emedia.EmediaText?.Details))
+
+                foreach (var emedia in group.Emedias)
                 {
-                    emedia.EmediaText.Details = CommonMark.CommonMarkConverter
-                    .Convert(emedia.EmediaText?.Details);
+                    if (!string.IsNullOrWhiteSpace(emedia.EmediaText?.Description))
+                    {
+                        emedia.EmediaText.Description = CommonMark.CommonMarkConverter
+                            .Convert(emedia.EmediaText.Description);
+                    }
+                    if (!string.IsNullOrWhiteSpace(emedia.EmediaText?.Details))
+                    {
+                        emedia.EmediaText.Details = CommonMark.CommonMarkConverter
+                            .Convert(emedia.EmediaText?.Details);
+                    }
                 }
             }
+
+            var emediaViewModel = new EmediaViewModel
+            {
+                GroupedEmedia = groupedEmedia
+            };
 
             PageTitle = "eMedia";
 
