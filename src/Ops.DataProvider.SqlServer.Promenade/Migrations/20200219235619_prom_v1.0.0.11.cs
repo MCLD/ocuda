@@ -2,11 +2,10 @@
 
 namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 {
-    public partial class prom_v1002cs : Migration
+    public partial class prom_v10011 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            
             migrationBuilder.CreateTable(
                 name: "EmediaGroups",
                 columns: table => new
@@ -35,8 +34,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
             migrationBuilder.InsertData(
                 table: "EmediaGroups",
-                columns: new[] {"Id", "Name", "SortOrder" },
-                values: new object[] { 1, "Default", 1});
+                columns: new[] { "Id", "Name", "SortOrder" },
+                values: new object[] { 1, "Default", 1 });
 
             migrationBuilder.AddColumn<int>(
                 name: "GroupId",
