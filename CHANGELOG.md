@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Promenade log enrichment with referer and user agent
 - Drop-down capability to Promenade top navigation
 - Groups for Promenade emedia content
+- Empty robots.txt to avoid 404s when its requested
 
 ### Changed
 - Default to only logging Warnings for Microsoft and System namespaces
