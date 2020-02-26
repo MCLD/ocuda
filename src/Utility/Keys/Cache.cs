@@ -26,6 +26,16 @@
         public static readonly string OpsSiteSetting = "sitesetting.{0}";
 
         /// <summary>
+        /// Default language ID
+        /// </summary>
+        public static readonly string PromDefaultLanguageId = "langid-default";
+
+        /// <summary>
+        /// Language id, {0} is the culture
+        /// </summary>
+        public static readonly string PromLanguageId = "langid.{0}";
+
+        /// <summary>
         /// Cached navigation element, {0} is the id of the element, {1} is the language id
         /// </summary>
         public static readonly string PromNavLang = "nav.{0}.{1}";

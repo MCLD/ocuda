@@ -44,7 +44,7 @@ namespace Ocuda.Promenade.Service
         public async Task<Navigation> GetNavigation(int navigationId, bool forceReload)
         {
             long start = Stopwatch.GetTimestamp();
-            var defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync();
+            var defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync(forceReload);
 
             Navigation nav = null;
 
@@ -89,7 +89,7 @@ namespace Ocuda.Promenade.Service
                     navToCache,
                     new DistributedCacheEntryOptions
                     {
-                        SlidingExpiration = new TimeSpan(1, 0, 0)
+                        SlidingExpiration = CacheSlidingExpiration
                     });
                 _logger.LogDebug("Cache miss for {CacheKey}, caching {Length} characters in {Elapsed} ms",
                     cacheKey,
