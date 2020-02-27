@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Remove hardcoded "Library" from location pages in Promenade
 - Promenade redirects properly bring along query strings
 - Ops roster import for vacant roles with no supervisor
+- Segment date constraints not working properly
 
 ## 1.0.0
 ### Added

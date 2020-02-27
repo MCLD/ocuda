@@ -29,8 +29,8 @@ namespace Ocuda.Promenade.Data.Promenade
         {
             return await DbSet.AsNoTracking()
                 .Where(_ => _.Id == id && _.IsActive
-                    && (!_.StartDate.HasValue || _.StartDate >= _dateTimeProvider.Now)
-                    && (!_.EndDate.HasValue || _.StartDate <= _dateTimeProvider.Now))
+                    && (!_.StartDate.HasValue || _.StartDate <= _dateTimeProvider.Now)
+                    && (!_.EndDate.HasValue || _.EndDate >= _dateTimeProvider.Now))
                 .SingleOrDefaultAsync();
         }
     }
