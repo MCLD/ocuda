@@ -57,6 +57,8 @@ namespace Ocuda.Promenade.Web
 
             services.AddResponseCompression();
 
+            services.AddResponseCaching();
+
             services.AddLocalization();
 
             services.Configure<RequestLocalizationOptions>(_ =>
@@ -334,6 +336,19 @@ namespace Ocuda.Promenade.Web
             }
 
             app.UseRouting();
+
+            app.UseResponseCaching();
+
+            app.Use(async (context, next) =>
+            {
+                context.Response.GetTypedHeaders().CacheControl = new CacheControlHeaderValue
+                {
+                    Public = true,
+                    MaxAge = TimeSpan.FromMinutes(2)
+                };
+
+                await next();
+            });
 
             app.UseEndpoints(endpoints => endpoints.MapControllers());
         }

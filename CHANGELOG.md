@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Groups for Promenade emedia content
 - Empty robots.txt to avoid 404s when its requested
 - Caching of language id lookups in Promenade
+- Cache control headers for Promenade
 
 ### Changed
 - Default to only logging Warnings for Microsoft and System namespaces
