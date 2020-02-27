@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Ocuda.Utility.Abstract;
 
@@ -6,6 +7,8 @@ namespace Ocuda.Promenade.Service.Abstract
 {
     public abstract class BaseService<TService>
     {
+        protected TimeSpan CacheSlidingExpiration { get; set; }
+
         protected readonly ILogger<TService> _logger;
         protected readonly IDateTimeProvider _dateTimeProvider;
 
@@ -15,6 +18,8 @@ namespace Ocuda.Promenade.Service.Abstract
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _dateTimeProvider = dateTimeProvider
                 ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+
+            CacheSlidingExpiration = new TimeSpan(1, 0, 0);
         }
     }
 }

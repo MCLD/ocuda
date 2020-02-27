@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ocuda.i18n;
@@ -14,15 +16,18 @@ namespace Ocuda.Promenade.Service
 {
     public class LanguageService : BaseService<LanguageService>
     {
+        private readonly IDistributedCache _cache;
         private readonly IOptions<RequestLocalizationOptions> _l10nOptions;
         private readonly ILanguageRepository _languageRepository;
 
         public LanguageService(ILogger<LanguageService> logger,
             IDateTimeProvider dateTimeProvider,
+            IDistributedCache cache,
             IOptions<RequestLocalizationOptions> l10nOptions,
             ILanguageRepository languageRepository)
             : base(logger, dateTimeProvider)
         {
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _l10nOptions = l10nOptions ?? throw new ArgumentNullException(nameof(l10nOptions));
             _languageRepository = languageRepository
                 ?? throw new ArgumentNullException(nameof(languageRepository));
@@ -100,15 +105,78 @@ namespace Ocuda.Promenade.Service
 
             await _languageRepository.SaveAsync();
         }
-
         public async Task<int> GetDefaultLanguageIdAsync()
         {
-            return await _languageRepository.GetDefaultLanguageId();
+            return await GetDefaultLanguageIdAsync(false);
+        }
+
+        public async Task<int> GetDefaultLanguageIdAsync(bool forceReload)
+        {
+            var cacheKey = Utility.Keys.Cache.PromDefaultLanguageId;
+
+            if (!forceReload)
+            {
+                string cachedLanguageIdText = await _cache.GetStringAsync(cacheKey);
+
+                if (!string.IsNullOrEmpty(cachedLanguageIdText)
+                    && int.TryParse(cachedLanguageIdText, out int cachedLanguageId))
+                {
+                    return cachedLanguageId;
+                }
+            }
+
+            int languageId = await _languageRepository.GetDefaultLanguageId();
+
+            await _cache.SetStringAsync(cacheKey,
+                languageId.ToString(CultureInfo.InvariantCulture),
+                new DistributedCacheEntryOptions
+                {
+                    SlidingExpiration = CacheSlidingExpiration
+                });
+
+            _logger.LogDebug("Cache miss for {CacheKey}, caching {Length} characters",
+                cacheKey,
+                languageId.ToString(CultureInfo.InvariantCulture));
+
+            return languageId;
         }
 
         public async Task<int> GetLanguageIdAsync(string culture)
         {
-            return await _languageRepository.GetLanguageId(culture);
+            return await GetLanguageIdAsync(culture, false);
+        }
+
+        public async Task<int> GetLanguageIdAsync(string culture, bool forceReload)
+        {
+            var cacheKey = string.Format(CultureInfo.InvariantCulture,
+                Utility.Keys.Cache.PromLanguageId,
+                culture);
+
+            if (!forceReload)
+            {
+                string cachedLanguageIdText = await _cache.GetStringAsync(cacheKey);
+
+                if (!string.IsNullOrEmpty(cachedLanguageIdText)
+                    && int.TryParse(cachedLanguageIdText, out int cachedLanguageId))
+                {
+                    return cachedLanguageId;
+                }
+            }
+
+            int languageId = await _languageRepository.GetLanguageId(culture);
+
+            await _cache.SetStringAsync(cacheKey,
+                languageId.ToString(CultureInfo.InvariantCulture),
+                new DistributedCacheEntryOptions
+                {
+                    SlidingExpiration = CacheSlidingExpiration
+                });
+
+            _logger.LogDebug("Cache miss for {CacheKey}, caching {Length} characters",
+                cacheKey,
+                languageId.ToString(CultureInfo.InvariantCulture));
+
+            return languageId;
         }
     }
 }

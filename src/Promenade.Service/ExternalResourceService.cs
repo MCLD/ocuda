@@ -69,7 +69,7 @@ namespace Ocuda.Promenade.Service
                     resToCache,
                     new DistributedCacheEntryOptions
                     {
-                        SlidingExpiration = new TimeSpan(1, 0, 0)
+                        SlidingExpiration = CacheSlidingExpiration
                     });
                 _logger.LogDebug("Cache miss for {CacheKey}, caching {Length} characters in {Elapsed} ms",
                     cacheKey,
