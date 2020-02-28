@@ -5,6 +5,6 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
     public interface IUrlRedirectRepository
     {
-        Task<UrlRedirect> GetRedirectsByPathAsync(string path);
+        Task<UrlRedirect> GetRedirectIdPathAsync(string path);
     }
 }

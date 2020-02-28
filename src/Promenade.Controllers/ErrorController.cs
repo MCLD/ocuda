@@ -36,25 +36,14 @@ namespace Ocuda.Promenade.Controllers
 
             if (id == 404)
             {
-                var redirect = await _redirectService.GetUrlRedirectByPathAsync(originalPath);
+                var redirect
+                    = await _redirectService.GetUrlRedirectByPathAsync(originalPath);
 
                 if (redirect != null)
                 {
-                    var redirectUrl = redirect.Url;
-
-                    if (!string.IsNullOrWhiteSpace(statusFeature?.OriginalQueryString))
-                    {
-                        redirectUrl += statusFeature.OriginalQueryString;
-                    }
-
-                    if (redirect.IsPermanent)
-                    {
-                        return RedirectPermanent(redirectUrl);
-                    }
-                    else
-                    {
-                        return Redirect(redirectUrl);
-                    }
+                    return redirect.IsPermanent
+                        ? RedirectPermanent(redirect.Url + statusFeature?.OriginalQueryString)
+                        : Redirect(redirect.Url + statusFeature?.OriginalQueryString);
                 }
 
                 _logger.LogWarning("HTTP Error {StatusCode}: {RequestPath}",

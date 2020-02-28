@@ -59,6 +59,11 @@ namespace Ocuda.Promenade.Controllers.Filters
         {
             bool forceReload = context.HttpContext.Request.Query["clearcache"] == "1";
 
+            if (forceReload)
+            {
+                context.HttpContext.Items[ItemKey.ForceReload] = true;
+            }
+
             // generate list for drop-down
             var cultureList = new Dictionary<string, string>();
             var cultureHrefLang = new SortedDictionary<string, string>

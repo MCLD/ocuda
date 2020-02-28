@@ -41,6 +41,16 @@
         public static readonly string PromNavLang = "nav.{0}.{1}";
 
         /// <summary>
+        /// Cached page, {0} is the language id, {1} is the type, {2} is the stub
+        /// </summary>
+        public static readonly string PromPage = "page.{0}.{1}.{2}";
+
+        /// <summary>
+        /// Cached redirect path, {0} is the requested path
+        /// </summary>
+        public static readonly string PromRedirectPath = "redir.{0}";
+
+        /// <summary>
         /// Cached site settings, {0} is the site setting key
         /// </summary>
         public static readonly string PromSiteSetting = "sitesetting.{0}";
