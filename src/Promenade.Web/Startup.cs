@@ -114,8 +114,19 @@ namespace Ocuda.Promenade.Web
             if (_config[Configuration.PromenadeDatabaseProvider]?.ToUpperInvariant()
                     == "SQLSERVER")
             {
-                services.AddDbContextPool<PromenadeContext,
-                    DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
+                var poolSizeConfig = _config[Configuration.PromenadeDatabasePoolSize];
+                if (!string.IsNullOrEmpty(poolSizeConfig)
+                    && int.TryParse(poolSizeConfig, out int poolSize))
+                {
+                    services.AddDbContextPool<PromenadeContext,
+                        DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs),
+                            poolSize);
+                }
+                else
+                {
+                    services.AddDbContextPool<PromenadeContext,
+                        DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
+                }
             }
             else
             {
