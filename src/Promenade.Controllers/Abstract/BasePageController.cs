@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Controllers.ViewModels.Shared;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service;
@@ -34,42 +33,25 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
         protected async Task<IActionResult> ReturnPageAsync(string stub)
         {
-            var page = await _pageService.GetByStubAndType(stub, PageType);
+            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
+            var page = await _pageService.GetByStubAndType(stub, PageType, forceReload);
 
             if (page == null)
             {
-                var redirect = await _redirectService.GetUrlRedirectByPathAsync(Request.Path);
-
-                if (redirect != null)
-                {
-                    var redirectUrl = redirect.Url;
-
-                    if (Request.QueryString.HasValue)
-                    {
-                        redirectUrl += Request.QueryString;
-                    }
-
-                    return redirect.IsPermanent
-                        ? RedirectPermanent(redirectUrl)
-                        : Redirect(redirectUrl);
-                }
-
-                _logger.LogWarning("No {PageType} page or redirect found for stub {stub}: {RequestPath}",
-                    PageType,
-                    stub,
-                    Request.Path);
                 return NotFound();
             }
 
             var viewModel = new PageViewModel
             {
-                Content = CommonMark.CommonMarkConverter.Convert(page.Content)
+                Content = CommonMark.CommonMarkConverter.Convert(page.Content),
+                CanonicalUrl = await GetCanonicalUrl()
             };
 
             if (page.SocialCardId.HasValue)
             {
                 var card = await _socialCardService.GetByIdAsync(page.SocialCardId.Value);
-                card.Url = await GetCanonicalUrl();
+                card.Url = viewModel.CanonicalUrl;
                 viewModel.SocialCard = card;
             }
 

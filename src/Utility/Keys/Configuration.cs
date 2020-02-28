@@ -48,6 +48,8 @@
         public static readonly string OpsSiteSettingCacheMinutes = "Ops.SiteSettingCacheMinutes";
 
         public static readonly string PromenadeAPIGoogleMaps = "Promenade.API.GoogleMaps";
+        public static readonly string PromenadeCachePagesHours = "Promenade.CachePagesHours";
+        public static readonly string PromenadeCacheRedirectsHours = "Promenade.CacheRedirectsHours";
         public static readonly string PromenadeDatabasePoolSize = "Promenade.DatabasePoolSize";
         public static readonly string PromenadeDatabaseProvider = "Promenade.DatabaseProvider";
         public static readonly string PromenadeDistributedCache = "Promenade.DistributedCache";

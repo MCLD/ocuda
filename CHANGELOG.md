@@ -18,6 +18,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Caching of language id lookups in Promenade
 - Cache control headers for Promenade
 - Promenade.DatabasePoolSize setting for configuring more or less than the default (128)
+- Promenade.CachePagesHours setting for how many hours to cache pages in distributed cache
+- Promenade.CacheRedirectsHours setting for how many hours to cache redirects in distributed cache
+- Add canonical URLs to metadata on pages
 
 ### Changed
 - Default to only logging Warnings for Microsoft and System namespaces

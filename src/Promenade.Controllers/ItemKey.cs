@@ -7,6 +7,7 @@
         public const string ExternalCSS = "ExternalCSS";
         public const string ExternalJS = "ExternalJS";
         public const string FooterNavigation = "FooterNavigation";
+        public const string ForceReload = "ForceReload";
         public const string GoogleAnalyticsTrackingCode = "GoogleAnalyticsTrackingCode";
         public const string HrefLang = "HrefLang";
         public const string L10n = "L10n";

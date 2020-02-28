@@ -6,5 +6,6 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Shared
     {
         public string Content { get; set; }
         public SocialCard SocialCard { get; set; }
+        public string CanonicalUrl { get; set; }
     }
 }

@@ -15,12 +15,28 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<UrlRedirect> GetRedirectsByPathAsync(string path)
+        public async Task<UrlRedirect> GetRedirectIdPathAsync(string path)
         {
-            return await DbSet
+            var redirect = await DbSet
                 .AsNoTracking()
                 .Where(_ => _.IsActive && _.RequestPath == path)
+                .Select(_ => new
+                {
+                    _.Id,
+                    _.Url,
+                })
                 .SingleOrDefaultAsync();
+
+            if (redirect == null)
+            {
+                return null;
+            }
+
+            return new UrlRedirect
+            {
+                Id = redirect.Id,
+                Url = redirect.Url
+            };
         }
     }
 }
