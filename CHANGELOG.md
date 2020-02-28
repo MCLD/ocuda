@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Empty robots.txt to avoid 404s when its requested
 - Caching of language id lookups in Promenade
 - Cache control headers for Promenade
+- Promenade.DatabasePoolSize setting for configuring more or less than the default (128)
 
 ### Changed
 - Default to only logging Warnings for Microsoft and System namespaces
