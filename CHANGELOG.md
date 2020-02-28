@@ -32,6 +32,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Promenade redirects properly bring along query strings
 - Ops roster import for vacant roles with no supervisor
 - Segment date constraints not working properly
+- Cache force refresh of IsTLS site setting
 
 ## 1.0.0
 ### Added

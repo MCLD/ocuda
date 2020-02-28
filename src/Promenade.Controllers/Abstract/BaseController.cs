@@ -61,7 +61,9 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
         protected async Task<string> GetCanonicalUrl()
         {
-            var isTLS = await _siteSettingService.GetSettingBoolAsync(SiteSetting.Site.IsTLS);
+            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+            var isTLS = await _siteSettingService
+                .GetSettingBoolAsync(SiteSetting.Site.IsTLS, forceReload);
 
             var scheme = isTLS ? Uri.UriSchemeHttps : Uri.UriSchemeHttp;
 
