@@ -366,8 +366,8 @@ namespace Ocuda.Promenade.Controllers
             }
         }
 
-        [HttpGet("[action]")]
-        public async Task<IActionResult> GetFeatureInfo(string locationStub, string featureStub)
+        [HttpGet("{locationStub}/[action]/{featureStub}")]
+        public async Task<IActionResult> FeatureInfo(string locationStub, string featureStub)
         {
             var locationFeature
                  = await _locationService.GetLocationFullFeatureAsync(locationStub, featureStub);
