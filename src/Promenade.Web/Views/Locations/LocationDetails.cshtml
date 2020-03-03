@@ -211,7 +211,7 @@
             var modalBody = modal.find(".modal-body");
             modalBody.html("<span class=\"fas fa-spinner fa-2x fa-pulse\"></span>")
 
-            $.get(featureUrl,
+            $.getJSON(featureUrl,
                 function (response) {
                     modalBody.html(response.bodyText).append(response.text);
                 })
