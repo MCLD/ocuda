@@ -82,8 +82,7 @@
                        data-toggle="modal"
                        data-target="#featureModal"
                        target="_blank"
-                       data-feature="@feature.Stub"
-                       data-location="@Model.Location.Stub"
+                       data-featureUrl="@Url.Action(nameof(LocationsController.FeatureInfo), LocationsController.Name, new { locationStub = Model.Location.Stub, featureStub = feature.Stub })"
                        data-name="@feature.Name">
                         <span class="fa-stack fa-2x d-block mx-auto">
                             <span class="fa fa-square fa-stack-2x"></span>
@@ -203,8 +202,7 @@
     <script>
         $("#featureModal").on("show.bs.modal", function (event) {
             var button = $(event.relatedTarget);
-            var feature = button.data("feature");
-            var location = button.data("location");
+            var featureUrl = button.data("featureurl");
             var name = button.data("name");
 
             var modal = $(this);
@@ -213,8 +211,7 @@
             var modalBody = modal.find(".modal-body");
             modalBody.html("<span class=\"fas fa-spinner fa-2x fa-pulse\"></span>")
 
-            $.getJSON("@Url.Action(nameof(LocationsController.GetFeatureInfo), LocationsController.Name)",
-                { locationStub: location, featureStub: feature },
+            $.getJSON(featureUrl,
                 function (response) {
                     modalBody.html(response.bodyText).append(response.text);
                 })
