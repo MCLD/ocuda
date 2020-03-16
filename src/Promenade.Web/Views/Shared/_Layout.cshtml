@@ -266,7 +266,7 @@
                         }
                         @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl].ToString()))
                         {
-                            <a href="https://twitter.com/@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]"
+                            <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]"
                                class="prom-leftnav-social-link"
                                target="_blank"><span class="fab fa-twitter"></span></a>
                         }
