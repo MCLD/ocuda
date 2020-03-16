@@ -20,6 +20,15 @@ namespace Ocuda.Promenade.Models.Defaults
             },
             new SiteSetting
             {
+                Id = Keys.SiteSetting.Social.InstagramUrl,
+                Name = "Instagram URL",
+                Description = "The URL to an Instagram profile",
+                Category = "Social",
+                Value = string.Empty,
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
                 Id = Keys.SiteSetting.Social.TwitterUsername,
                 Name = "Twitter Username",
                 Description = "The Twitter @username a Twitter Card should be attributed to",
