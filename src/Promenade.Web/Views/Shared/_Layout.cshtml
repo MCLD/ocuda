@@ -264,6 +264,12 @@
                                class="prom-leftnav-social-link"
                                target="_blank"><span class="fab fa-facebook"></span></a>
                         }
+                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl].ToString()))
+                        {
+                            <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl]"
+                               class="prom-leftnav-social-link"
+                               target="_blank"><span class="fab fa-instagram"></span></a>
+                        }
                         @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl].ToString()))
                         {
                             <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]"

@@ -153,6 +153,9 @@ namespace Ocuda.Promenade.Controllers.Filters
             context.HttpContext.Items[ItemKey.SocialFacebookUrl] = await _siteSettingService
                 .GetSettingStringAsync(SiteSetting.Social.FacebookUrl, forceReload);
 
+            context.HttpContext.Items[ItemKey.SocialInstagramUrl] = await _siteSettingService
+                .GetSettingStringAsync(SiteSetting.Social.InstagramUrl, forceReload);
+
             context.HttpContext.Items[ItemKey.SocialTwitterUrl] = await _siteSettingService
                 .GetSettingStringAsync(SiteSetting.Social.TwitterUrl, forceReload);
 
