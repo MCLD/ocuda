@@ -4,7 +4,10 @@
     {
         public struct Social
         {
+            public const string FacebookUrl = "Social.FacebookUrl";
+            public const string TwitterUrl = "Social.TwitterUrl";
             public const string TwitterUsername = "Social.TwitterUsername";
+            public const string YoutubeUrl = "Social.YoutubeUrl";
         }
 
         public struct Site

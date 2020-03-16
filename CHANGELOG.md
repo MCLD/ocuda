@@ -21,6 +21,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Promenade.CachePagesHours setting for how many hours to cache pages in distributed cache
 - Promenade.CacheRedirectsHours setting for how many hours to cache redirects in distributed cache
 - Add canonical URLs to metadata on pages
+- Promenade ability to mark locations as closed and hide their opening hours
+- Social link site settings and display in Promenade left nav
 
 ### Changed
 - Default to only logging Warnings for Microsoft and System namespaces

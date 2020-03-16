@@ -153,5 +153,7 @@ namespace Ocuda.Promenade.Models.Entities
         public int? SocialCardId { get; set; }
 
         public SocialCard SocialCard { get; set; }
+
+        public bool IsClosed { get; set; }
     }
 }

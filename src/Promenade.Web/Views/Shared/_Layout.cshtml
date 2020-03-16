@@ -257,6 +257,26 @@
                             }
                         }
                     </div>
+                    <div class="text-center prom-leftnav-social">
+                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl].ToString()))
+                        {
+                            <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]"
+                               class="prom-leftnav-social-link"
+                               target="_blank"><span class="fab fa-facebook"></span></a>
+                        }
+                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl].ToString()))
+                        {
+                            <a href="https://twitter.com/@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]"
+                               class="prom-leftnav-social-link"
+                               target="_blank"><span class="fab fa-twitter"></span></a>
+                        }
+                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl].ToString()))
+                        {
+                            <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl]"
+                               class="prom-leftnav-social-link"
+                               target="_blank"><span class="fab fa-youtube"></span></a>
+                        }
+                    </div>
                 </div>
             }
         </div>

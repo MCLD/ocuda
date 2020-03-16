@@ -11,9 +11,36 @@ namespace Ocuda.Promenade.Models.Defaults
             #region Social
             new SiteSetting
             {
+                Id = Keys.SiteSetting.Social.FacebookUrl,
+                Name = "Facebook URL",
+                Description = "The URL to a Facebook profile",
+                Category = "Social",
+                Value = string.Empty,
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
                 Id = Keys.SiteSetting.Social.TwitterUsername,
                 Name = "Twitter Username",
                 Description = "The Twitter @username a Twitter Card should be attributed to",
+                Category = "Social",
+                Value = string.Empty,
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.Social.TwitterUrl,
+                Name = "Twitter URL",
+                Description = "The URL to a Twitter profile",
+                Category = "Social",
+                Value = string.Empty,
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.Social.YoutubeUrl,
+                Name = "Youtube URL",
+                Description = "The URL to a Youtube page",
                 Category = "Social",
                 Value = string.Empty,
                 Type = SiteSettingType.StringNullable
