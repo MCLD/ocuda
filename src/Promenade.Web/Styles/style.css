@@ -38,7 +38,7 @@ span.prom-fa-space {
         }
 
     .prom-nav-top > .prom-right-nav .prom-dropdown-swap-link {
-        display: none; 
+        display: none;
     }
 
     .prom-nav-top > .prom-right-nav .prom-nav-link {
@@ -155,6 +155,16 @@ footer {
 
     .prom-leftnav .prom-leftnav-content ul {
         margin-bottom: 0.25rem;
+    }
+
+.prom-leftnav-social {
+    font-size: 2rem;
+    margin-top: 1rem;
+}
+
+    .prom-leftnav-social a.prom-leftnav-social-link {
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
     }
 
 /* body content */

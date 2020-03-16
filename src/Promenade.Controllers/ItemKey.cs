@@ -15,6 +15,9 @@
         public const string MiddleNavigation = "MiddleNavigation";
         public const string PageTitleSuffix = "PageTitle";
         public const string PublicContentPath = "PublicContentPath";
+        public const string SocialFacebookUrl = "SocialFacebookUrl";
+        public const string SocialTwitterUrl = "SocialTwitterUrl";
+        public const string SocialYoutubeUrl = "SocialYoutubeUrl";
         public const string TopNavigation = "TopNavigation";
     }
 }

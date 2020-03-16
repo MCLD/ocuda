@@ -150,6 +150,15 @@ namespace Ocuda.Promenade.Controllers.Filters
                 = await _siteSettingService
                     .GetSettingStringAsync(SiteSetting.Site.GoogleTrackingCode, forceReload);
 
+            context.HttpContext.Items[ItemKey.SocialFacebookUrl] = await _siteSettingService
+                .GetSettingStringAsync(SiteSetting.Social.FacebookUrl, forceReload);
+
+            context.HttpContext.Items[ItemKey.SocialTwitterUrl] = await _siteSettingService
+                .GetSettingStringAsync(SiteSetting.Social.TwitterUrl, forceReload);
+
+            context.HttpContext.Items[ItemKey.SocialYoutubeUrl] = await _siteSettingService
+                .GetSettingStringAsync(SiteSetting.Social.YoutubeUrl, forceReload);
+
             await next();
         }
     }
