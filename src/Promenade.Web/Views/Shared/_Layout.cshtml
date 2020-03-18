@@ -54,7 +54,7 @@
 <body>
     <div class="container-fluid prom-content">
         <header>
-            <div class="row prom-nav-top">
+            <div class="row prom-nav-top"aria-label="Top" role="navigation">
                 @{
                     var topNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.TopNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
                     var l10n = Context.Items[Ocuda.Promenade.Controllers.ItemKey.L10n] as IDictionary<string, string>;
@@ -88,9 +88,9 @@
                                     if (item.ChangeToLinkWhenExtraSmall || item.Navigations.Count() == 0)
                                     {
                                         <div class="@(item.Navigations.Count() == 0 ? "" : "prom-nav-link")">
-                                            <a href="@(string.IsNullOrEmpty(item.Link) ? "#" : item.Link)"
-                                               title="@item.NavigationText.Title"
+                                            <a title="@item.NavigationText.Title"
                                                aria-label="@item.NavigationText.AriaLabel"
+                                               href="@(string.IsNullOrEmpty(item.Link) ? "#" : item.Link)"
                                                class="@(item.NavigationText.Label == null ? "" : "d-flex align-items-center")">
                                                 @if (!string.IsNullOrEmpty(item.Icon))
                                                 {
@@ -147,7 +147,7 @@
                 var bannerImage = Context.Items[Ocuda.Promenade.Controllers.ItemKey.BannerImage] as string;
                 if (!string.IsNullOrEmpty(bannerImage))
                 {
-                    <div class="row prom-nav-logo">
+                    <div class="row prom-nav-logo" role="banner" aria-label="Visit home page">
                         <a asp-action="Index" asp-controller="Home" asp-area="">
                             <img src="@bannerImage"
                                  alt="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.BannerImageAlt]"
@@ -158,17 +158,17 @@
                 var middleNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.MiddleNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
                 if (middleNavigation?.Navigations.Count() > 0)
                 {
-                    <div class="row prom-nav-middle">
+                    <div class="row prom-nav-middle" aria-label="middle" role="navigation">
                         <ul class="nav nav-pills">
                             @foreach (var item in middleNavigation.Navigations)
                             {
                                 if (item.ChangeToLinkWhenExtraSmall || item.Navigations.Count() == 0)
                                 {
                                     <li role="presentation" class="nav-item prom-nav-link">
-                                        <a href="@item.Link"
+                                        <a aria-label="@item.NavigationText.AriaLabel"
+                                           href="@item.Link"
                                            class="nav-link prom-nav-link"
-                                           title="@item.NavigationText.Title"
-                                           aria-label="@item.NavigationText.AriaLabel">@item.NavigationText.Label</a>
+                                           title="@item.NavigationText.Title">@item.NavigationText.Label</a>
                                     </li>
                                 }
                                 if (item.Navigations.Count() > 0)
@@ -209,7 +209,8 @@
                 int leftNavigationSectionNumber = 0;
                 int leftNavigationFeaturetteNumber = 0;
             }
-            <div class="col-12 @(leftNavigation?.Navigations.Count() > 0 ? "col-sm-9 order-sm-last" : "") prom-body-content-container">
+            <div class="col-12 @(leftNavigation?.Navigations.Count() > 0 ? "col-sm-9 order-sm-last" : "") prom-body-content-container"
+                 role="main">
                 <div class="prom-body-content">
                     @RenderBody()
                 </div>
@@ -217,8 +218,8 @@
 
             @if (leftNavigation?.Navigations.Count() > 0)
             {
-                <div class="col-12 col-sm-3 order-sm-first prom-leftnav-container">
-                    <div class="prom-leftnav">
+                <div role="complementary" class="col-12 col-sm-3 order-sm-first prom-leftnav-container">
+                    <div class="prom-leftnav" aria-label="res">
                         @foreach (var item in leftNavigation.Navigations)
                         {
                             if (item?.Navigations?.Count() > 0)
@@ -294,7 +295,7 @@
             var footerNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.FooterNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
             if (footerNavigation?.Navigations.Count() > 0)
             {
-                <footer class="row">
+                <footer class="row" role="contentinfo">
                     <div class="col-12">
                         @foreach (var item in footerNavigation.Navigations)
                         {
