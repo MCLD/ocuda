@@ -20,7 +20,7 @@
                target="_blank">
                 <span class="fas fa-map-marker-alt"></span> Map
             </a>
-            <div class="screenreader-only">Our address is:</div>
+            <div class="sr-only">Our address is:</div>
             <address>
                 @Model.Location.Address
                 <br />
@@ -30,7 +30,7 @@
                 <br />
                 <a aria-label="Call us at: @Model.Location.Phone" href="tel:@Model.Location.Phone">@Model.Location.Phone</a>
             </address>
-            <div class="screenreader-only">Our current operating hours are:</div>
+            <div class="sr-only">Our current operating hours are:</div>
             @if (Model.Location.IsAlwaysOpen)
             {
                 <p>Open</p>
