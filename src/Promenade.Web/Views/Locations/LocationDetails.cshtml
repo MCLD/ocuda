@@ -14,11 +14,13 @@
         </div>
         <div class="col-12 col-md-7 order-md-1">
             <h1>@Model.Location.Name</h1>
-            <a href="@Model.Location.MapLink"
+            <a aria-label="Go to our map link"
+               href="@Model.Location.MapLink"
                class="btn btn-outline-secondary text-dark float-right ml-2"
                target="_blank">
                 <span class="fas fa-map-marker-alt"></span> Map
             </a>
+            <div class="screenreader-only">Our address is:</div>
             <address>
                 @Model.Location.Address
                 <br />
@@ -26,8 +28,9 @@
                 @Model.Location.State
                 @Model.Location.Zip
                 <br />
-                <a href="tel:@Model.Location.Phone">@Model.Location.Phone</a>
+                <a aria-label="Call us at: @Model.Location.Phone" href="tel:@Model.Location.Phone">@Model.Location.Phone</a>
             </address>
+            <div class="screenreader-only">Our current operating hours are:</div>
             @if (Model.Location.IsAlwaysOpen)
             {
                 <p>Open</p>
@@ -37,7 +40,7 @@
                 <p>
                     @if (Model.Location.IsClosed)
                     {
-                        <strong style="font-size: 1.2rem;" 
+                        <strong style="font-size: 1.2rem;"
                                 class="text-danger prom-locaton-isclosed">Closed</strong>
                     }
                     else
@@ -167,7 +170,8 @@
                                     <td>
                                         @if (!string.IsNullOrWhiteSpace(locationGroup.Location.EventLink))
                                         {
-                                            <a href="@locationGroup.Location.SubscriptionLink"
+                                            <a aria-label="Subscribe to emails from the @locationGroup.Location.Name"
+                                               href="@locationGroup.Location.SubscriptionLink"
                                                class="btn btn-sm btn-outline-secondary text-dark m-1 float-right">
                                                 <span class="far fa-envelope"></span>
                                                 Subscribe
@@ -175,7 +179,8 @@
                                         }
                                         @if (!string.IsNullOrWhiteSpace(locationGroup.Location.SubscriptionLink))
                                         {
-                                            <a href="@locationGroup.Location.EventLink"
+                                            <a aria-label="View events for the @locationGroup.Location.Name"
+                                               href="@locationGroup.Location.EventLink"
                                                class="btn btn-sm btn-outline-secondary text-dark m-1 float-right">
                                                 <span class="fas fa-calendar-alt"></span>
                                                 Events
