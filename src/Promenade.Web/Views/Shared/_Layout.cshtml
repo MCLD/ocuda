@@ -246,7 +246,8 @@
                                                 <li>
                                                     <a href="@subItem.Link"
                                                        @(subItem.TargetNewWindow ? "target=\"_blank\"" : "")
-                                                       aria-label="@subItem.NavigationText.AriaLabel">@subItem.NavigationText.Label</a>
+                                                       aria-label="@subItem.NavigationText.AriaLabel @(subItem.TargetNewWindow ? " (opens new window)" : "")">
+                                                        @subItem.NavigationText.Label</a>
                                                 </li>
                                             }
                                         </ul>
@@ -268,28 +269,28 @@
                             <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]"
                                class="prom-leftnav-social-link"
                                target="_blank"
-                               aria-label="Visit our Facebook"><span class="fab fa-facebook"></span></a>
+                               aria-label="Visit our Facebook (opens new window)"><span class="fab fa-facebook"></span></a>
                         }
                         @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl].ToString()))
                         {
                             <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl]"
                                class="prom-leftnav-social-link"
                                target="_blank"
-                               aria-label="Visit our Instagram"><span class="fab fa-instagram"></span></a>
+                               aria-label="Visit our Instagram (opens new window)"><span class="fab fa-instagram"></span></a>
                         }
                         @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl].ToString()))
                         {
                             <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]"
                                class="prom-leftnav-social-link"
                                target="_blank"
-                               aria-label="Visit our Twitter"><span class="fab fa-twitter"></span></a>
+                               aria-label="Visit our Twitter (opens new window)"><span class="fab fa-twitter"></span></a>
                         }
                         @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl].ToString()))
                         {
                             <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl]"
                                class="prom-leftnav-social-link"
                                target="_blank"
-                               aria-label="Visit our Youtube"><span class="fab fa-youtube"></span></a>
+                               aria-label="Visit our Youtube (opens new window)"><span class="fab fa-youtube"></span></a>
                         }
                     </div>
                 </div>

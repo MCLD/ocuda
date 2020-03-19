@@ -14,7 +14,7 @@
         </div>
         <div class="col-12 col-md-7 order-md-1">
             <h1>@Model.Location.Name</h1>
-            <a aria-label="Go to our map link"
+            <a aria-label="Go to our map link (opens new window)"
                href="@Model.Location.MapLink"
                class="btn btn-outline-secondary text-dark float-right ml-2"
                target="_blank">
@@ -87,23 +87,27 @@
             <div class="col-4 col-md-3 col-lg-2 mb-2">
                 @if (string.IsNullOrEmpty(feature.RedirectUrl))
                 {
-                    <a asp-action="@nameof(LocationsController.Locations)"
-                       asp-route-locationStub="@Model.Location.Stub"
-                       asp-route-featureStub="@feature.Stub"
-                       data-toggle="modal"
-                       data-target="#featureModal"
-                       target="_blank"
-                       data-featureUrl="@Url.Action(nameof(LocationsController.FeatureInfo), LocationsController.Name, new { locationStub = Model.Location.Stub, featureStub = feature.Stub })"
-                       data-name="@feature.Name">
-                        <span class="fa-stack fa-2x d-block mx-auto">
-                            <span class="fa fa-square fa-stack-2x"></span>
-                            <span class="@feature.Icon"
-                                  @(string.IsNullOrEmpty(feature.IconText) ? "" : "aria-hidden='true'")>
-                                @Html.Raw(feature.IconText)
-                            </span>
+                <a asp-action="@nameof(LocationsController.Locations)"
+                   asp-route-locationStub="@Model.Location.Stub"
+                   asp-route-featureStub="@feature.Stub"
+                   data-toggle="modal"
+                   data-target="#featureModal"
+                   target="@(feature.NewTab == true ? "_blank" : null)"
+                   data-featureUrl="@Url.Action(nameof(LocationsController.FeatureInfo), LocationsController.Name, new { locationStub = Model.Location.Stub, featureStub = feature.Stub })"
+                   data-name="@feature.Name">
+                    <span class="fa-stack fa-2x d-block mx-auto">
+                        <span class="fa fa-square fa-stack-2x"></span>
+                        <span class="@feature.Icon"
+                              @(string.IsNullOrEmpty(feature.IconText) ? "" : "aria-hidden='true'")>
+                            @Html.Raw(feature.IconText)
                         </span>
-                        @feature.Name
-                    </a>
+                    </span>
+                    @feature.Name
+                    @if (feature.NewTab == true)
+                    {
+                        <span class="sr-only">(opens new window)</span>
+                    }
+                </a>
                 }
                 else
                 {
@@ -113,6 +117,10 @@
                             <span class="@feature.Icon"></span>
                         </span>
                         @feature.Name
+                        @if (feature.NewTab.HasValue && feature.NewTab.Value == true)
+                        {
+                            <span class="sr-only">(opens new window)</span>
+                        }
                     </a>
                 }
             </div>
@@ -139,7 +147,8 @@
 
             <p>
                 Interested in updates from every library in this area?
-                <a href="@Model.LocationNeighborGroup.SubscriptionUrl"
+                <a aria-label="Subscribe to updates from all of these libraries (opens new window)"
+                   href="@Model.LocationNeighborGroup.SubscriptionUrl"
                    target="_blank">Subscribe to updates from all of these libraries.</a>
             </p>
 
@@ -204,6 +213,7 @@
                                     {
                                         <text>Updates from @Model.NearbyEventsCount locations</text>
                                     }
+                                    <span class="sr-only">(opens new window)</span>
                                 </a>
                             </td>
                         </tr>
@@ -260,7 +270,8 @@
         "location": { "@@id": "@Model.CanonicalUrl" },
         "parentOrganization": "@Model.Location.ParentOrganization",
         "telephone": "@Html.Raw(@Model.Location.Phone)",
-        @if (!Model.Location.IsClosed) {
+        @if (!Model.Location.IsClosed)
+        {
             @:"openingHours": @Html.Raw(Json.Serialize(@Model.StructuredLocationHours)),
         }
         @if (!string.IsNullOrEmpty(Model.Location.ImagePath))
