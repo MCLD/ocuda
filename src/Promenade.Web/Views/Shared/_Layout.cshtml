@@ -71,12 +71,12 @@
                                             aria-haspopup="true" aria-expanded="true">
                                         English <span class="caret"></span>
                                     </button>
-                                    <div class="dropdown-menu">
+                                    <ul class="dropdown-menu" role="list">
                                         @foreach (var l10nItem in l10n)
                                         {
-                                            <a href="/@l10nItem.Value" class="dropdown-item">@l10nItem.Key</a>
+                                            <li><a href="/@l10nItem.Value" class="dropdown-item">@l10nItem.Key</a></li>
                                         }
-                                    </div>
+                                    </ul>
                                 </div>
                             </div>
                         }
@@ -121,20 +121,22 @@
                                                     <span class="@(item.HideTextWhenExtraSmall ? "hidden-xxs" : "")">@item.NavigationText.Label</span>
                                                 }
                                             </a>
-                                            <div class="dropdown-menu dropdown-menu-right prom-nav-dropdown">
+                                            <ul role="list" class="dropdown-menu dropdown-menu-right prom-nav-dropdown">
                                                 @foreach (var subItem in item.Navigations)
                                                 {
-                                                    <a href="@subItem.Link"
-                                                       class="dropdown-item"
-                                                       aria-label="@subItem.NavigationText.AriaLabel">
-                                                        @if (!string.IsNullOrEmpty(subItem.Icon))
-                                                        {
-                                                            <span class="@subItem.Icon"></span>
-                                                        }
-                                                        @subItem.NavigationText.Label
-                                                    </a>
+                                                    <li>
+                                                        <a href="@subItem.Link"
+                                                           class="dropdown-item"
+                                                           aria-label="@subItem.NavigationText.AriaLabel">
+                                                            @if (!string.IsNullOrEmpty(subItem.Icon))
+                                                            {
+                                                                <span class="@subItem.Icon"></span>
+                                                            }
+                                                            @subItem.NavigationText.Label
+                                                        </a>
+                                                    </li>
                                                 }
-                                            </div>
+                                            </ul>
                                         </div>
                                     }
                                 }
@@ -181,20 +183,22 @@
                                            role="button"
                                            aria-haspopup="true"
                                            aria-expanded="false"><span class="nav-link-icon @(item.Icon != null ? item.Icon : "")"></span><span class="nav-link-text">@item.NavigationText.Label</span><span class="caret"></span></a>
-                                        <div class="dropdown-menu prom-nav-dropdown">
+                                        <ul role="list" class="dropdown-menu prom-nav-dropdown">
                                             @foreach (var subItem in item.Navigations)
                                             {
-                                                <a href="@subItem.Link"
-                                                   class="dropdown-item"
-                                                   aria-label="@subItem.NavigationText.AriaLabel">
-                                                    @if (!string.IsNullOrEmpty(subItem.Icon))
-                                                    {
-                                                        <span class="@subItem.Icon"></span>
-                                                    }
-                                                    @subItem.NavigationText.Label
-                                                </a>
+                                                <li>
+                                                    <a href="@subItem.Link"
+                                                       class="dropdown-item"
+                                                       aria-label="@subItem.NavigationText.AriaLabel">
+                                                        @if (!string.IsNullOrEmpty(subItem.Icon))
+                                                        {
+                                                            <span class="@subItem.Icon"></span>
+                                                        }
+                                                        @subItem.NavigationText.Label
+                                                    </a>
+                                                </li>
                                             }
-                                        </div>
+                                        </ul>
                                     </li>
                                 }
                             }
