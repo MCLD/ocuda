@@ -271,3 +271,7 @@ a.prom-leftnav-header:hover {
 .prom-location .prom-location-nearby td {
     vertical-align: middle;
 }
+.prom-faq-icons {
+    border: 1px solid #b1800e;
+    color: #7f7141;
+}
