@@ -275,3 +275,9 @@ a.prom-leftnav-header:hover {
     border: 1px solid #b1800e;
     color: #7f7141;
 }
+.prom-locations-maplink{
+    color: black;
+}
+.prom-locations-maplink:hover{
+    color: white;
+}
