@@ -160,7 +160,7 @@
                 var middleNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.MiddleNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
                 if (middleNavigation?.Navigations.Count() > 0)
                 {
-                    <div class="row prom-nav-middle" aria-label="middle" role="navigation">
+                    <div class="row prom-nav-middle" aria-label="bottom" role="navigation">
                         <ul class="nav nav-pills">
                             @foreach (var item in middleNavigation.Navigations)
                             {
@@ -258,34 +258,44 @@
                         }
                     </div>
                     <div class="text-center prom-leftnav-social">
-                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl].ToString()))
-                        {
-                            <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]"
-                               class="prom-leftnav-social-link"
-                               target="_blank"
-                               aria-label="Visit our Facebook (opens new window)"><span class="fab fa-facebook"></span></a>
-                        }
-                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl].ToString()))
-                        {
-                            <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl]"
-                               class="prom-leftnav-social-link"
-                               target="_blank"
-                               aria-label="Visit our Instagram (opens new window)"><span class="fab fa-instagram"></span></a>
-                        }
-                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl].ToString()))
-                        {
-                            <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]"
-                               class="prom-leftnav-social-link"
-                               target="_blank"
-                               aria-label="Visit our Twitter (opens new window)"><span class="fab fa-twitter"></span></a>
-                        }
-                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl].ToString()))
-                        {
-                            <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl]"
-                               class="prom-leftnav-social-link"
-                               target="_blank"
-                               aria-label="Visit our Youtube (opens new window)"><span class="fab fa-youtube"></span></a>
-                        }
+                        <ul aria-label="Connect with us on social media!" class="nav d-inline-flex justify-content-center">
+                            @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl].ToString()))
+                            {
+                                <li>
+                                    <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]"
+                                       class="prom-leftnav-social-link"
+                                       target="_blank"
+                                       aria-label="Visit our Facebook (opens new window)"><span class="fab fa-facebook"></span></a>
+                                </li>
+                            }
+                            @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl].ToString()))
+                            {
+                                <li>
+                                    <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl]"
+                                       class="prom-leftnav-social-link"
+                                       target="_blank"
+                                       aria-label="Visit our Instagram (opens new window)"><span class="fab fa-instagram"></span></a>
+                                </li>
+                            }
+                            @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl].ToString()))
+                            {
+                                <li>
+                                    <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]"
+                                       class="prom-leftnav-social-link"
+                                       target="_blank"
+                                       aria-label="Visit our Twitter (opens new window)"><span class="fab fa-twitter"></span></a>
+                                </li>
+                            }
+                            @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl].ToString()))
+                            {
+                                <li>
+                                    <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl]"
+                                       class="prom-leftnav-social-link"
+                                       target="_blank"
+                                       aria-label="Visit our Youtube (opens new window)"><span class="fab fa-youtube"></span></a>
+                                </li>
+                            }
+                        </ul>
                     </div>
                 </div>
             }
