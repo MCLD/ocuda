@@ -213,12 +213,6 @@
                 int leftNavigationSectionNumber = 0;
                 int leftNavigationFeaturetteNumber = 0;
             }
-            <div class="col-12 @(leftNavigation?.Navigations.Count() > 0 ? "col-sm-9 order-sm-last" : "") prom-body-content-container"
-                 role="main">
-                <div class="prom-body-content">
-                    @RenderBody()
-                </div>
-            </div>
 
             @if (leftNavigation?.Navigations.Count() > 0)
             {
@@ -295,6 +289,12 @@
                     </div>
                 </div>
             }
+            <div class="col-12 @(leftNavigation?.Navigations.Count() > 0 ? "col-sm-9 order-sm-last" : "") prom-body-content-container"
+                 role="main">
+                <div class="prom-body-content">
+                    @RenderBody()
+                </div>
+            </div>
         </div>
         @{
             var footerNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.FooterNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
