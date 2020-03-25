@@ -81,6 +81,18 @@ namespace Ocuda.Promenade.Service
                     });
                 }
             }
+            else if (location.IsClosed)
+            {
+                for (int day = 0; day < DaysInWeek; day++)
+                {
+                    results.Add(new LocationHoursResult
+                    {
+                        Open = false,
+                        DayOfWeek = (DayOfWeek)day,
+                        IsCurrentlyOpen = false
+                    });
+                }
+            }
             else
             {
                 // Add override days
@@ -173,7 +185,7 @@ namespace Ocuda.Promenade.Service
             bool isStructuredData = false)
         {
             var location = await _locationRepository.FindAsync(locationId);
-            if (location.IsAlwaysOpen)
+            if (location.IsAlwaysOpen || location.IsClosed)
             {
                 return null;
             }
@@ -321,6 +333,16 @@ namespace Ocuda.Promenade.Service
                     Open = true,
                     IsCurrentlyOpen = true,
                     StatusMessage = "Open"
+                };
+            }
+
+            if (location.IsClosed)
+            {
+                return new LocationHoursResult
+                {
+                    Open = false,
+                    IsCurrentlyOpen = false,
+                    StatusMessage = "Closed"
                 };
             }
 
