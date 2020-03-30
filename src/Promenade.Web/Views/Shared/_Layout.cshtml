@@ -52,9 +52,10 @@
     <meta name="theme-color" content="#ffffff">
 </head>
 <body>
+    <a aria-label="Skip to main content" href="#mainContent" class="sr-only"></a>
     <div class="container-fluid prom-content">
         <header>
-            <div class="row prom-nav-top"aria-label="Top" role="navigation">
+            <div class="row prom-nav-top" aria-label="Top" role="navigation">
                 @{
                     var topNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.TopNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
                     var l10n = Context.Items[Ocuda.Promenade.Controllers.ItemKey.L10n] as IDictionary<string, string>;
@@ -225,11 +226,11 @@
                                 leftNavigationSectionNumber++;
                                 <div class="prom-leftnav-section">
                                     <a class="prom-leftnav-header collapsed"
-                                         data-toggle="collapse"
-                                         href="#left-navigation-@leftNavigationSectionNumber"
-                                         role="button"
-                                         aria-expanded="false"
-                                         aria-controls="left-navigation-@leftNavigationSectionNumber">
+                                       data-toggle="collapse"
+                                       href="#left-navigation-@leftNavigationSectionNumber"
+                                       role="button"
+                                       aria-expanded="false"
+                                       aria-controls="left-navigation-@leftNavigationSectionNumber">
                                         @item.NavigationText.Label
                                     </a>
                                     <div class="row prom-leftnav-content collapse"
@@ -241,7 +242,8 @@
                                                     <a href="@subItem.Link"
                                                        @(subItem.TargetNewWindow ? "target=\"_blank\"" : "")
                                                        aria-label="@subItem.NavigationText.AriaLabel @(subItem.TargetNewWindow ? " (opens new window)" : "")">
-                                                        @subItem.NavigationText.Label</a>
+                                                        @subItem.NavigationText.Label
+                                                    </a>
                                                 </li>
                                             }
                                         </ul>
@@ -300,7 +302,7 @@
                 </div>
             }
             <div class="col-12 @(leftNavigation?.Navigations.Count() > 0 ? "col-sm-9 order-sm-last" : "") prom-body-content-container"
-                 role="main">
+                 role="main" id="mainContent">
                 <div class="prom-body-content">
                     @RenderBody()
                 </div>
