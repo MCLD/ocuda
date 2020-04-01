@@ -226,6 +226,14 @@ a.rowlink {
     text-decoration: none;
 }
 
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.cursor-default {
+    cursor: default;
+}
+
 @media screen and (max-height: 500px) {
     .navcolumn {
         padding-top: 15px;

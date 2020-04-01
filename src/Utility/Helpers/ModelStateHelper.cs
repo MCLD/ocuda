@@ -52,5 +52,10 @@ namespace Ocuda.Utility.Helpers
             var routeString = string.Join("-", routeValues.Values).ToLower();
             return $"ModelState_{routeString}";
         }
+
+        public static string GetModelStateKey(string key)
+        {
+            return $"ModelState_{key}";
+        }
     }
 }

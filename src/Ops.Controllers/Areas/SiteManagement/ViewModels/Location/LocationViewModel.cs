@@ -4,14 +4,13 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location
 {
-    public class LocationViewModel
+    public class LocationViewModel : LocationPartialViewModel
     {
         public ICollection<Promenade.Models.Entities.Location> AllLocations { get; set; }
 
         public Promenade.Models.Entities.Location Location { get; set; }
         public Promenade.Models.Entities.LocationFeature LocationFeature { get; set; }
         public Promenade.Models.Entities.LocationGroup LocationGroup { get; set; }
-        public List<Promenade.Models.Entities.LocationHours> AllLocationHours { get; set; }
         public List<Promenade.Models.Entities.LocationFeature> LocationFeatures { get; set; }
         public List<Promenade.Models.Entities.Feature> Features { get; set; }
         public string FeatureList { get; set; }

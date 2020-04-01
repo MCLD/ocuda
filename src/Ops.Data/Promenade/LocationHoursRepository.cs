@@ -30,14 +30,6 @@ namespace Ocuda.Ops.Data.Promenade
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.LocationId == locationId)
-                .ToListAsync();
-        }
-
-        public async Task<ICollection<LocationHours>> GetWeeklyHoursAsync(int locationId)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.LocationId == locationId)
                 .OrderBy(_ => _.DayOfWeek)
                 .ToListAsync();
         }

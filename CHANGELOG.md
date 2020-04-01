@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Add canonical URLs to metadata on pages
 - Promenade ability to mark locations as closed and hide their opening hours
 - Social link site settings and display in Promenade left nav
+- Ops page for setting location hours and managing overrides
 
 ### Changed
 - Default to only logging Warnings for Microsoft and System namespaces
