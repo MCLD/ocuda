@@ -1,0 +1,53 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Data.ServiceFacade;
+using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
+using Ocuda.Promenade.Models.Entities;
+
+namespace Ocuda.Ops.Data.Promenade
+{
+    public class ScheduleRequestRepository : GenericRepository<PromenadeContext, ScheduleRequest>,
+        IScheduleRequestRepository
+
+    {
+        public ScheduleRequestRepository(Repository<PromenadeContext> repositoryFacade,
+            ILogger<ScheduleRequestRepository> logger)
+            : base(repositoryFacade, logger)
+        {
+        }
+
+        public async Task<ScheduleRequest> GetRequestAsync(int requestId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Include(_ => _.ScheduleRequestSubject)
+                .Include(_ => _.ScheduleRequestTelephone)
+                .Where(_ => _.Id == requestId)
+                .SingleOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<ScheduleRequest>> GetRequestsAsync(DateTime requestedDate)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Include(_ => _.ScheduleRequestSubject)
+                .Where(_ => _.RequestedTime.Date == requestedDate.Date)
+                .OrderBy(_ => _.RequestedTime)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<ScheduleRequest>> GetUnclaimedRequestsAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Include(_ => _.ScheduleRequestSubject)
+                .Where(_ => !_.IsClaimed)
+                .OrderBy(_ => _.RequestedTime)
+                .ToListAsync();
+        }
+    }
+}

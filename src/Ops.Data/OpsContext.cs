@@ -44,7 +44,7 @@ namespace Ocuda.Ops.Data
         public DbSet<CoverIssueDetail> CoverIssueDetails { get; set; }
         public DbSet<CoverIssueHeader> CoverIssueHeaders { get; set; }
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
-        public DbSet<Models.Entities.ExternalResource> ExternalResources { get; set; }
+        public DbSet<ExternalResource> ExternalResources { get; set; }
         public DbSet<File> Files { get; set; }
         public DbSet<FileLibrary> FileLibraries { get; set; }
         public DbSet<FileLibraryFileType> FileLibraryFileTypes { get; set; }
@@ -56,10 +56,13 @@ namespace Ocuda.Ops.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<RosterHeader> RosterHeaders { get; set; }
         public DbSet<RosterDetail> RosterDetails { get; set; }
+        public DbSet<ScheduleClaim> ScheduleClaims { get; set; }
+        public DbSet<ScheduleLog> ScheduleLogs { get; set; }
+        public DbSet<ScheduleLogCallDisposition> ScheduleLogCallDispositions { get; set; }
         public DbSet<SectionCategory> SectionCategories { get; set; }
         public DbSet<Section> Sections { get; set; }
         public DbSet<SectionManagerGroup> SectionManagerGroups { get; set; }
-        public DbSet<Models.Entities.SiteSetting> SiteSettings { get; set; }
+        public DbSet<SiteSetting> SiteSettings { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<UserMetadata> UserMetadata { get; set; }
         public DbSet<UserMetadataType> UserMetadataTypes { get; set; }

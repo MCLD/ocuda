@@ -1,0 +1,14 @@
+﻿@model Ocuda.Promenade.Controllers.ViewModels.Help.ScheduleViewModel
+
+@if (Model?.SegmentText != null)
+{
+    if (!string.IsNullOrEmpty(Model.SegmentText.Header))
+    {
+        <h1>@Model.SegmentText.Header</h1>
+    }
+    @Html.Raw(Model.SegmentText.Text)
+}
+else
+{
+    <h1>Scheduling is currently not available</h1>
+}

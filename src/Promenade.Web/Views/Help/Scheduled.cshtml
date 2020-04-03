@@ -1,0 +1,61 @@
+﻿@model Ocuda.Promenade.Controllers.ViewModels.Help.ScheduleViewModel
+
+@if (Model?.SegmentText != null)
+{
+    if (!string.IsNullOrEmpty(Model.SegmentText.Header))
+    {
+        <h1>@Model.SegmentText.Header</h1>
+    }
+    @Html.Raw(Model.SegmentText.Text)
+}
+else
+{
+    <h1>Your time is scheduled</h1>
+}
+
+<p class="lead">Here are the details:</p>
+
+<div class="row">
+    <div class="col-md-3 text-md-right"><strong>Requested time</strong></div>
+    <div class="col-md-9">@Model.ScheduleRequest.RequestedTime</div>
+</div>
+<div class="row mt-2">
+    <div class="col-md-3 text-md-right"><strong>Name</strong></div>
+    <div class="col-md-9">@Model.ScheduleRequest.Name</div>
+</div>
+<div class="row mt-2">
+    <div class="col-md-3 text-md-right"><strong>Phone</strong></div>
+    <div class="col-md-9">@Model.FormattedPhone</div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.ScheduleRequest.Email))
+{
+    <div class="row mt-2">
+        <div class="col-md-3 text-md-right"><strong>Email</strong></div>
+        <div class="col-md-9">@Model.ScheduleRequest.Email</div>
+    </div>
+}
+
+<div class="row mt-2">
+    <div class="col-md-3 text-md-right"><strong>Subject</strong></div>
+    <div class="col-md-9">@Model.ScheduleRequestSubject</div>
+</div>
+<div class="row mt-2">
+    <div class="col-md-3 text-md-right"><strong>Language</strong></div>
+    <div class="col-md-9">@Model.ScheduleRequest.Language</div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.ScheduleRequest.Notes))
+{
+    <div class="row mt-2">
+        <div class="col-md-3 text-md-right"><strong>Notes</strong></div>
+        <div class="col-md-9">@Model.ScheduleRequest.Notes</div>
+    </div>
+}
+
+<div class="row">
+    <div class="offset-md-3 mt-2">
+        <a href="/"
+           class="btn btn-outline-dark m-2">Back to the site</a>
+    </div>
+</div>

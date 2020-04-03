@@ -128,6 +128,64 @@ namespace Ocuda.Promenade.Models.Defaults
                 Description = "Name to append to the end of page titles",
                 Category = "Site",
                 Type = SiteSettingType.StringNullable
+            },
+            #endregion
+            #region Scheduling
+            new SiteSetting
+            {
+                Category = "Scheduling",
+                Description = "Set to enable scheduling",
+                Id = Keys.SiteSetting.Scheduling.Enable,
+                Name = "Scheduling enabled",
+                Type = SiteSettingType.Bool,
+                Value = "False"
+            },
+            new SiteSetting
+            {
+                Category = "Scheduling",
+                Description = "Segment to show if scheduling is enabled",
+                Id = Keys.SiteSetting.Scheduling.EnabledSegment,
+                Name = "Enabled scheduling segment",
+                Type = SiteSettingType.Int,
+                Value = "-1"
+            },
+            new SiteSetting
+            {
+                Category = "Scheduling",
+                Description = "Segment to show if scheduling is disabled",
+                Id = Keys.SiteSetting.Scheduling.DisabledSegment,
+                Name = "Disabled scheduling segment",
+                Type = SiteSettingType.Int,
+                Value = "-1"
+            },
+            new SiteSetting
+            {
+                Category = "Scheduling",
+                Description = "Segment to show if scheduling is successful",
+                Id = Keys.SiteSetting.Scheduling.ScheduledSegment,
+                Name = "Scheduled explanation segment",
+                Type = SiteSettingType.Int,
+                Value = "-1"
+            },
+            #endregion
+            #region Email
+            new SiteSetting
+            {
+                Category = "Email",
+                Description = "Segment to use as email header",
+                Id = Keys.SiteSetting.Email.HeaderSegment,
+                Name = "Header segment",
+                Type = SiteSettingType.Int,
+                Value = "-1"
+            },
+            new SiteSetting
+            {
+                Category = "Email",
+                Description = "Segment to use as email footer",
+                Id = Keys.SiteSetting.Email.FooterSegment,
+                Name = "Footer segment",
+                Type = SiteSettingType.Int,
+                Value = "-1"
             }
             #endregion
         };
