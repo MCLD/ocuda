@@ -1,7 +1,6 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location.LocationViewModel
 @section styles{
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/dt-picker.min.css" asp-append-version="true" />
 }
 <div class="modal fade" id="listAddModal" tabindex="-1" role="dialog" aria-labelledby="listModalLabel">
     <div class="modal-dialog modal-lg" role="document">
@@ -85,11 +84,18 @@
     <div class="location-save-message"></div>
 </div>
 
-<div class="row page-title">
-    <div class="col-12">
-        <h1>@(Model.Location.IsNewLocation ? "Add Location" : "Edit " + Model.Location.Name)</h1>
+@if (Model.Location.IsNewLocation)
+{
+    <div class="row page-title">
+        <div class="col-12">
+            <h1>@(Model.Location.IsNewLocation ? "Add Location" : "Edit " + Model.Location.Name)</h1>
+        </div>
     </div>
-</div>
+}
+else
+{
+    @await Html.PartialAsync("_LocationPartial")
+}
 
 
 <form method="post"
@@ -143,8 +149,8 @@
            formgroup
            autocomplete="off" />
     <select asp-for="Location.DescriptionSegmentId"
-        asp-items="@Model.PostFeatSegments"
-        formgroup>
+            asp-items="@Model.PostFeatSegments"
+            formgroup>
         <option value="">None</option>
     </select>
     <select asp-for="Location.PreFeatureSegmentId"
@@ -254,34 +260,6 @@
     </div>
     @if (!Model.Location.IsNewLocation)
     {
-        <div class="col-3 card">
-            <div class="card-header">
-                <h4 style="margin: 0; display: initial;">Hours</h4>
-                <button type="button"
-                        data-itemtype="Hour"
-                        class="btn btn-warning edit-item"
-                        style="float:right;">
-                    Edit Hours
-                </button>
-            </div>
-            @if (Model.Location.IsAlwaysOpen)
-            {
-                <p>Always Open</p>
-            }
-            else
-            {
-                <table class="table table-sm table-bordered">
-                    <tr>
-                        <td>
-                            @foreach (var dayGrouping in Model.Location.LocationHours)
-                            {
-                                <strong>@dayGrouping.Days</strong> <span>@dayGrouping.Time</span>
-                            }
-                        </td>
-                    </tr>
-                </table>
-            }
-        </div>
         <div class="col-6 card">
             <div class="card-header">
                 <h4 style="margin: 0; display: initial;">Features</h4>
@@ -433,7 +411,6 @@
 
 @section scripts{
     <script src="~/js/md.min.js" asp-append-version="true"></script>
-    <script src="~/js/dt-picker.min.js" asp-append-version="true"></script>
     <script>
 
         function FormatStub(object) {
@@ -446,7 +423,7 @@
             ulMapList.setAttribute("id", "maplink-suggestions");
             $($("#Location_Address").parent()).append(ulMapList);
         });
-        
+
         $(document).on("click", ".switch", function(e){
             if ($(this).val().toLowerCase() == "true") {
                 $(this).val("false");
@@ -544,15 +521,10 @@
                     $("#editModalTitle").text("Edit Feature: " + $(this).data("itemname"));
 
                 }
-                else if ($(this).data("itemtype") == "Group") {
+                else {
                     url = "@Url.Action(nameof(LocationsController.EditLocationGroup),LocationsController.Name)"
                     $("#editModalTitle").text("Edit Group: " + $(this).data("itemname"));
 
-                }
-                else {
-
-                    url = "@Url.Action(nameof(LocationsController.EditLocationHours),LocationsController.Name)";
-                    $("#editModalTitle").text("Edit Hours: @Model.Location.Name");
                 }
 
                 $("#itemEditModal").modal("show");
@@ -561,26 +533,6 @@
                 GetEditInfo($(this).data("itemid"), $(this).data("itemtype"));
             });
 
-            $(document).on("click", "div.hours-item", function (e) {
-                var button = $("#hour-selector-" + $(this).data("hourid"));
-                button.data("isopen", $(this).data("hourval"));
-                button.text($(this).text());
-                var index = $(this).data("indexval");
-                if ($(this).data("hourval") == "1") {
-                    button.removeClass("btn-danger");
-                    button.addClass("btn-success");
-                    $("#hour-inputs-" + $(this).data("hourid")).removeClass("d-none");
-                    $("#AllLocationHours_" + index + "__Open").prop('checked', true);
-                    $("#AllLocationHours_"+index+"__Open").val( true);
-                }
-                else {
-                    button.removeClass("btn-success");
-                    button.addClass("btn-danger");
-                    $("#hour-inputs-" + $(this).data("hourid")).addClass("d-none");
-                    $("#AllLocationHours_" + index + "__Open").prop('checked', false);
-                    $("#AllLocationHours_"+index+"__Open").val(false);
-                }
-            });
             //Updating Delete Modal
             $('.deleteItemButton').on('click', function () {
                 $($("#deleteModal").find("button.btn-danger")).attr("data-itemid",$(this).data("itemid").toString());

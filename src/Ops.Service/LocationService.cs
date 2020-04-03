@@ -158,7 +158,8 @@ namespace Ocuda.Ops.Service
                 return null;
             }
 
-            var weeklyHours = await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
+            var weeklyHours = await _locationHoursRepository
+                .GetLocationHoursByLocationId(locationId);
             // Order weeklyHours to start on Monday
             weeklyHours = weeklyHours.OrderBy(_ => ((int)_.DayOfWeek + 1) % 8).ToList();
 

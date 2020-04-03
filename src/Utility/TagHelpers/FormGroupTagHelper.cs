@@ -17,6 +17,7 @@ namespace Ocuda.Utility.TagHelpers
     {
         private const string attributeName = "formgroup";
         private const string forAttributeName = "asp-for";
+        private const string hideLabelAttributeName = "hide-label";
         private const string ignoreValidationAttributeName = "ignore-validation";
         private const string infoTooltipAttributeName = "info-tooltip";
         private const string onBlurJs = "on-blur-js";
@@ -28,10 +29,14 @@ namespace Ocuda.Utility.TagHelpers
         private const string defaultLabelClass = "col-form-label text-md-right";
         private const string defaultInputClass = "form-control";
         private const string defaultInnerDivClass = "form-group-inner col-md-9";
+        private const string hideLabelInnerDivClass = "form-group-inner col-12";
         private const string defaultValidationMessageClass = "validation-message text-danger";
         private const string validationIgnoreClass = "validation-ignore";
 
-        private const string dateTimeGroupClass = "input-group date datetimepicker";
+        private const string dateTimeGroupClass = "input-group date";
+        private const string dateTimePickerClass = "datetimepicker";
+        private const string dateTimeDatePickerClass = "datepicker";
+        private const string dateTimeTimePickerClass = "timepicker";
         private const string dateTimeGroupAppendClass = "input-group-append";
         private const string dateTimeGroupTextClass = "input-group-text";
         private const string dateTimeIconCalendarClass = "far fa-calendar-alt";
@@ -51,6 +56,9 @@ namespace Ocuda.Utility.TagHelpers
 
         [HtmlAttributeName(forAttributeName)]
         public ModelExpression For { get; set; }
+
+        [HtmlAttributeName(hideLabelAttributeName)]
+        public bool HideLabel { get; set; }
 
         [HtmlAttributeName(ignoreValidationAttributeName)]
         public bool IgnoreValidation { get; set; }
@@ -74,7 +82,11 @@ namespace Ocuda.Utility.TagHelpers
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
             // Manually create each child asp form tag helper element
-            TagHelperOutput labelElement = await CreateLabelElement(context);
+            TagHelperOutput labelElement = null;
+            if (!HideLabel)
+            {
+                labelElement = await CreateLabelElement(context);
+            }
             TagHelperOutput inputElement = await CreateInputElement(output);
             TagHelperOutput validationMessageElement
                 = await CreateValidationMessageElement(context);
@@ -86,7 +98,7 @@ namespace Ocuda.Utility.TagHelpers
                         inputElement,
                         validationMessageElement
                     },
-                    defaultInnerDivClass
+                    HideLabel ? hideLabelInnerDivClass : defaultInnerDivClass
                 );
 
             // Wrap all elements with a form group div
@@ -169,13 +181,13 @@ namespace Ocuda.Utility.TagHelpers
                 var pickerId = $"{inputId}_datetimepicker";
 
                 var icon = new TagBuilder("span");
-                if (DateTimePicker.Value == DateTimePickerType.DateTime)
+                if (DateTimePicker.Value == DateTimePickerType.TimeOnly)
                 {
-                    icon.AddCssClass(dateTimeIconCalendarClass);
+                    icon.AddCssClass(dateTimeIconClockClass);
                 }
                 else
                 {
-                    icon.AddCssClass(dateTimeIconClockClass);
+                    icon.AddCssClass(dateTimeIconCalendarClass);
                 }
 
                 var inputGroupText = new TagBuilder("div");
@@ -192,12 +204,24 @@ namespace Ocuda.Utility.TagHelpers
                 inputOutput.Attributes.Add("type", dateTimeInputType);
                 inputOutput.Attributes.AddCssClass(dateTimeInputClass);
                 inputOutput.Attributes.Add("data-target", $"#{pickerId}");
-                inputOutput.Attributes.Add("data-toggle", dateTimeToggle);
                 inputOutput.PostElement.SetHtmlContent(inputGroupAppend);
 
                 var pickerGroup = new TagBuilder("div");
                 pickerGroup.Attributes.Add("id", pickerId);
                 pickerGroup.AddCssClass(dateTimeGroupClass);
+                if (DateTimePicker == DateTimePickerType.DateOnly)
+                {
+                    pickerGroup.AddCssClass(dateTimeDatePickerClass);
+                }
+                else if (DateTimePicker == DateTimePickerType.TimeOnly)
+                {
+                    pickerGroup.AddCssClass(dateTimeTimePickerClass);
+                }
+                else
+                {
+                    pickerGroup.AddCssClass(dateTimePickerClass);
+                }
+
                 pickerGroup.Attributes.Add("data-target-input", dateTimeTargetInput);
                 inputOutput.PreElement.AppendHtml(pickerGroup.RenderStartTag());
                 inputOutput.PostElement.AppendHtml(pickerGroup.RenderEndTag());
@@ -262,6 +286,7 @@ namespace Ocuda.Utility.TagHelpers
     public enum DateTimePickerType
     {
         DateTime,
+        DateOnly,
         TimeOnly
     }
 }

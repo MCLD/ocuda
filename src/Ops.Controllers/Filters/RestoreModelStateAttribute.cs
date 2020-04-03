@@ -10,15 +10,26 @@ namespace Ocuda.Ops.Controllers.Filters
 {
     public class RestoreModelStateAttribute : ActionFilterAttribute
     {
+        public string Key { get; set; }
+
         public override async Task OnActionExecutionAsync(ActionExecutingContext context,
                                          ActionExecutionDelegate next)
         {
             var resultContext = await next();
 
             var controller = context.Controller as Controller;
-            var key = ModelStateHelper.GetModelStateKey(context.RouteData.Values);
 
-            if (controller?.TempData[key] is string modelStateStorage)
+            string modelStateKey;
+            if (!string.IsNullOrWhiteSpace(Key))
+            {
+                modelStateKey = ModelStateHelper.GetModelStateKey(Key);
+            }
+            else
+            {
+                modelStateKey = ModelStateHelper.GetModelStateKey(context.RouteData.Values);
+            }
+
+            if (controller?.TempData[modelStateKey] is string modelStateStorage)
             {
                 var (modelState, time) = ModelStateHelper.DeserializeModelState(modelStateStorage);
                 var timeDifference = DateTimeOffset.Now.ToUnixTimeSeconds() - time;
@@ -41,7 +52,7 @@ namespace Ocuda.Ops.Controllers.Filters
                     var _logger = (ILogger<RestoreModelStateAttribute>)context.HttpContext
                         .RequestServices.GetService(typeof(ILogger<RestoreModelStateAttribute>));
                     _logger.LogError("ModelState timed out for key {ModelStateKey}",
-                        key);
+                        modelStateKey);
                 }
             }
         }
