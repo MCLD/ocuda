@@ -218,6 +218,9 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.LocationFeatureRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationGroupRepository,
                 Data.Promenade.LocationGroupRepository>();
+            services.AddScoped<
+                Service.Interfaces.Promenade.Repositories.ILocationHoursOverrideRepository,
+                Data.Promenade.LocationHoursOverrideRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationHoursRepository,
                 Data.Promenade.LocationHoursRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageRepository,
