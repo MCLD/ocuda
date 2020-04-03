@@ -189,6 +189,12 @@ namespace Ocuda.Ops.Web
                 Data.Ops.RosterDetailRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterHeaderRepository,
                 Data.Ops.RosterHeaderRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IScheduleClaimRepository,
+                Data.Ops.ScheduleClaimRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IScheduleLogCallDispositionRepository,
+                Data.Ops.ScheduleLogCallDispositionRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IScheduleLogRepository,
+                Data.Ops.ScheduleLogRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ISectionRepository,
                 Data.Ops.SectionRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ISectionManagerGroupRepository,
@@ -227,6 +233,8 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.PageRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageHeaderRepository,
                 Data.Promenade.PageHeaderRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IScheduleRequestRepository,
+                Data.Promenade.ScheduleRequestRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISegmentRepository,
                 Data.Promenade.SegmentRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISegmentTextRepository,
@@ -260,6 +268,8 @@ namespace Ocuda.Ops.Web
                 Utility.Services.PathResolverService>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IRosterService, RosterService>();
+            services.AddScoped<IScheduleService, ScheduleService>();
+            services.AddScoped<IScheduleRequestService, ScheduleRequestService>();
             services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<ISegmentService, SegmentService>();
             services.AddScoped<ISiteSettingService, SiteSettingService>();

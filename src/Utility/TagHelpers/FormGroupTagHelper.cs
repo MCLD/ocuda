@@ -140,11 +140,16 @@ namespace Ocuda.Utility.TagHelpers
 
             if (!string.IsNullOrEmpty(InfoTooltip))
             {
+                string popupTooltip = InfoTooltip.Replace("'",
+                    "\\'",
+                    StringComparison.InvariantCultureIgnoreCase);
+
                 var tooltip = new TagBuilder("span");
                 tooltip.AddCssClass("fas fa-info-circle");
                 tooltip.Attributes.Add("data-toggle", "tooltip");
                 tooltip.Attributes.Add("href", "#");
                 tooltip.Attributes.Add("title", InfoTooltip);
+                tooltip.Attributes.Add("onclick", $"alert('{popupTooltip}');");
                 labelOutput.Content.AppendHtml("&nbsp;");
                 labelOutput.Content.AppendHtml(tooltip.RenderSelfClosingTag());
             }

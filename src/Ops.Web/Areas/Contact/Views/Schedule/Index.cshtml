@@ -1,0 +1,88 @@
+﻿@model Ocuda.Ops.Controllers.ViewModels.Contact.ScheduleIndexViewModel
+
+<div class="row">
+    <div class="col-sm-6">
+        <h1>
+            Requests
+            <small class="text-muted">@Model.ViewDescription</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a asp-controller="Schedule"
+           asp-action="Index"
+           asp-area="Contact"
+           asp-route-requestedDate="@Model.RequestedDate.AddDays(1).ToString("yyyy-MM-dd")"
+           class="btn btn-outline-primary mt-2 mb-1 mr-1 float-right"><span class="fas fa-chevron-circle-right"></span></a>
+        <a asp-controller="Schedule"
+           asp-action="Index"
+           asp-area="Contact"
+           asp-route-requestedDate="@DateTime.Now.ToString("yyyy-MM-dd")"
+           class="btn btn-outline-primary mt-2 mb-1 mr-1 float-right @Model.ActiveToday">Today</a>
+        <a asp-controller="Schedule"
+           asp-action="Index"
+           asp-area="Contact"
+           asp-route-requestedDate="@Model.RequestedDate.AddDays(-1).ToString("yyyy-MM-dd")"
+           class="btn btn-outline-primary mt-2 mb-1 mr-1 float-right"><span class="fas fa-chevron-circle-left"></span></a>
+        <a asp-controller="Schedule"
+           asp-action="Index"
+           asp-area="Contact"
+           asp-route-requestedDate=""
+           class="btn btn-outline-warning mt-2 mb-1 mr-2 float-right @Model.ActiveUnclaimed">Unclaimed</a>
+    </div>
+</div>
+
+<table class="table table-striped table-bordered table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Requested time</th>
+            <th scope="col">Name</th>
+            <th scope="col">Subject</th>
+            <th scope="col">Claimed</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if (Model.Requests?.Count() > 0)
+        {
+            @foreach (var request in Model.Requests)
+            {
+                <tr class="@(Model.Claims.SingleOrDefault(_ => _.ScheduleRequestId == request.Id)?.IsComplete == true
+                        ? "table-success"
+                        : request.IsClaimed ? "table-info" : "")">
+                    <td>
+                        <a asp-action="details"
+                           asp-controller="Schedule"
+                           asp-area="contact"
+                           asp-route-requestId="@request.Id">@request.RequestedTime</a>
+                    </td>
+                    <td>@request.Name</td>
+                    <td>@request.ScheduleRequestSubject?.Subject</td>
+                    <td>
+                        @if (Model.Claims.Any(_ => _.ScheduleRequestId == request.Id))
+                        {
+                            <a asp-controller="Profile"
+                               asp-area=""
+                               asp-action="Index"
+                               asp-route-id="@Model.Claims.SingleOrDefault(_ => _.ScheduleRequestId == request.Id)?.User.Username">
+                                @Model.Claims.SingleOrDefault(_ => _.ScheduleRequestId == request.Id)?.User.Name
+                            </a>
+                        }
+                        else
+                        {
+                            @:No
+                        }
+                    </td>
+                </tr>
+
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4">
+                    No requests found.
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

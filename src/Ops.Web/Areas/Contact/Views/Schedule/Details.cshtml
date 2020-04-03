@@ -1,0 +1,167 @@
+﻿@model Ocuda.Ops.Controllers.ViewModels.Contact.ScheduleDetailViewModel
+
+@if (Model.ScheduleRequest != null)
+{
+    <div class="row mb-3">
+        <div class="col-6">
+            <h1>
+                Request
+                <small class="text-muted">id @Model.ScheduleRequest.Id</small>
+            </h1>
+        </div>
+        <div class="col-6">
+            @if (Model.ScheduleClaim == null)
+            {
+                <form asp-controller="Schedule"
+                      asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Claim))"
+                      method="post"
+                      role="form"
+                      style="display: inline;">
+                    <input type="hidden"
+                           name="RequestId"
+                           value="@Model.ScheduleRequest.Id" />
+                    <input type="submit"
+                           class="btn btn-outline-info mt-2 mb-1 mr-1 float-right"
+                           value="Claim" />
+                </form>
+            }
+            <a asp-controller="Schedule"
+               asp-action="Index"
+               asp-route-requestedDate="@Model.ScheduleRequest.RequestedTime.ToString("yyyy-MM-dd")"
+               class="btn btn-outline-dark mt-2 mb-1 mr-2 float-right">Back</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-3 text-sm-right"><strong>Requested time</strong></div>
+        <div class="col-sm-9">@Model.ScheduleRequest.RequestedTime</div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-sm-3 text-sm-right"><strong>Name</strong></div>
+        <div class="col-sm-9">@Model.ScheduleRequest.Name</div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-sm-3 text-sm-right"><strong>Phone</strong></div>
+        <div class="col-sm-9">@Model.FormattedPhone</div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ScheduleRequest.Email))
+    {
+        <div class="row mt-2">
+            <div class="col-sm-3 text-sm-right"><strong>Email</strong></div>
+            <div class="col-sm-9">@Model.ScheduleRequest.Email</div>
+        </div>
+    }
+
+    <div class="row mt-2">
+        <div class="col-sm-3 text-sm-right"><strong>Subject</strong></div>
+        <div class="col-sm-9">@Model.ScheduleRequest.ScheduleRequestSubject.Subject</div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-sm-3 text-sm-right"><strong>Language</strong></div>
+        <div class="col-sm-9">@Model.ScheduleRequest.Language</div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ScheduleRequest.Notes))
+    {
+        <div class="row mt-2">
+            <div class="col-sm-3 text-sm-right"><strong>Notes</strong></div>
+            <div class="col-sm-9">@Model.ScheduleRequest.Notes</div>
+        </div>
+    }
+
+    @if (Model.ScheduleClaim != null)
+    {
+        <div class="row mt-4">
+            <div class="col-sm-3 text-sm-right"><strong>Claimed by</strong></div>
+            <div class="col-sm-9">
+                <a asp-controller="Profile"
+                   asp-area=""
+                   asp-action="Index"
+                   asp-route-id="@Model.ScheduleClaim.User.Username">@Model.ScheduleClaim.User.Name</a>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-sm-3 text-sm-right"><strong>Claimed at</strong></div>
+            <div class="col-sm-9">@Model.ScheduleClaim.CreatedAt</div>
+        </div>
+        @if (Model.IsClaimedByCurrentUser)
+        {
+            <div class="row mt-4 mb-4">
+                <div class="col-sm-9 offset-md-3 h4">Add log entry</div>
+            </div>
+            <form asp-controller="Schedule"
+                  asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.AddLog))"
+                  method="post"
+                  role="form">
+                <input type="hidden"
+                       asp-for="AddLog.ScheduleRequestId"
+                       value="@Model.ScheduleRequest.Id" />
+                <select asp-for="AddLog.ScheduleLogCallDispositionId"
+                        asp-items="Model.CallDispositions" formgroup></select>
+                <input type="number"
+                       asp-for="AddLog.DurationMinutes" formgroup />
+                <textarea asp-for="AddLog.Notes"
+                          maxlength="1000" formgroup></textarea>
+                <select asp-for="AddLog.IsComplete"
+                        formgroup>
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+                <div class="offset-md-3 col-md-9">
+                    <input type="submit"
+                           class="btn btn-outline-primary"
+                           value="Save log entry" />
+                </div>
+            </form>
+        }
+    }
+
+    @if (Model.ScheduleLogs?.Count() > 0)
+    {
+        <div class="offset-md-3 col-md-9 mt-4">
+            <table class="table table-sm table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Log Entry</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var log in Model.ScheduleLogs)
+                    {
+                        <tr class="@(log.IsComplete ? "table-success" : "")">
+                            <td>
+                                @log.CreatedAt
+                            </td>
+                            <td>
+                                @if (log.IsComplete == true)
+                                {
+                                    <strong>This call has been completed.</strong>
+                                    <br />
+                                }
+                                @if (!string.IsNullOrEmpty(log.ScheduleLogCallDisposition?.Disposition))
+                                {
+                                    <strong>Disposition:</strong>
+                                    @log.ScheduleLogCallDisposition?.Disposition
+                                    <br />
+                                }
+                                @if (log.DurationMinutes != null)
+                                {
+                                    <strong>Duration:</strong>
+                                    @log.DurationMinutes
+                                    @:minutes<br />
+                                }
+                                @if (!string.IsNullOrEmpty(log.Notes))
+                                {
+                                    <strong>Notes:</strong><br />
+                                    @log.Notes
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+}
