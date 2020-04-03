@@ -7,12 +7,14 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Ocuda.Ops.Models;
+using Ocuda.Utility.Keys;
 using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Ops.Controllers.Filters
 {
     public class NavigationFilterAttribute : Attribute, IAsyncActionFilter
     {
+        //todo move this to configuration
         private const string NavMenuFileName = "NavMenu.json";
 
         private readonly ILogger<NavigationFilterAttribute> _logger;
@@ -32,14 +34,31 @@ namespace Ocuda.Ops.Controllers.Filters
         public async Task OnActionExecutionAsync(ActionExecutingContext context,
             ActionExecutionDelegate next)
         {
-            var navMenuJsonFile = _pathResolverService.GetPrivateContentFilePath(NavMenuFileName);
-            using (StreamReader file = File.OpenText(navMenuJsonFile))
+            if (!string.IsNullOrEmpty(NavMenuFileName))
             {
-                var serializer = new JsonSerializer();
-                context.HttpContext.Items[ItemKey.NavColumn] = (List<NavigationRow>)serializer
-                    .Deserialize(file, typeof(List<NavigationRow>));
-            }
+                string navJson = _cache.GetString(Cache.OpsLeftNav);
+                if (string.IsNullOrEmpty(navJson))
+                {
+                    var navMenuJsonFile = _pathResolverService.GetPrivateContentFilePath(NavMenuFileName);
+                    if (File.Exists(navMenuJsonFile))
+                    {
+                        using StreamReader file = File.OpenText(navMenuJsonFile);
+                        navJson = file.ReadToEnd();
+                        _cache.SetString(Cache.OpsLeftNav,
+                            navJson,
+                            new DistributedCacheEntryOptions
+                            {
+                                AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
+                            });
+                    }
+                }
 
+                if (!string.IsNullOrEmpty(navJson))
+                {
+                    context.HttpContext.Items[ItemKey.NavColumn] =
+                        JsonConvert.DeserializeObject<List<NavigationRow>>(navJson);
+                }
+            }
             await next();
         }
     }
