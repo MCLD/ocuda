@@ -26,6 +26,11 @@
         public static readonly string OpsSiteSetting = "sitesetting.{0}";
 
         /// <summary>
+        /// Left navigation JSON
+        /// </summary>
+        public static readonly string OpsLeftNav = "leftnav";
+
+        /// <summary>
         /// Default language ID
         /// </summary>
         public static readonly string PromDefaultLanguageId = "langid-default";
