@@ -40,7 +40,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Segment date constraints not working properly
 - Cache force refresh of IsTLS site setting
 - Location features modal caching the same description for all
-- Updating ops site settings
+- Site settings not being able to be updated
 
 ## 1.0.0
 ### Added
