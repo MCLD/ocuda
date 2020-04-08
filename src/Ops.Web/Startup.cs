@@ -212,6 +212,9 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.EmediaCategoryRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaRepository,
                 Data.Promenade.EmediaRepository>();
+            services.AddScoped<
+                Service.Interfaces.Promenade.Repositories.IExternalResourcePromRepository,
+                Data.Promenade.ExternalResourcePromRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IFeatureRepository,
                 Data.Promenade.FeatureRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IGroupRepository,
@@ -249,6 +252,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IEmediaService, EmediaService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IExternalResourcePromService, ExternalResourcePromService>();
             services.AddScoped<IExternalResourceService, ExternalResourceService>();
             services.AddScoped<IFeatureService, FeatureService>();
             services.AddScoped<IFileService, FileService>();
