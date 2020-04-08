@@ -30,13 +30,13 @@
     <div class="col-xs-12 col-sm-4 space-above">
         <div class="card">
             <div class="card-header">
-                <h3>@ExternalResourcesController.Name</h3>
+                <h3>External Resources</h3>
             </div>
             <div class="card-body mx-auto">
                 <a asp-area="@ExternalResourcesController.Area"
                    asp-controller="@ExternalResourcesController.Name"
                    asp-action="@nameof(ExternalResourcesController.Index)"
-                   class="btn btn-info">View @ExternalResourcesController.Name</a>
+                   class="btn btn-info">View External Resources</a>
             </div>
         </div>
     </div>
@@ -102,6 +102,19 @@
                    asp-controller="@SegmentsController.Name"
                    asp-action="@nameof(SegmentsController.Index)"
                    class="btn btn-info">View @SegmentsController.Name</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-4 space-above">
+        <div class="card">
+            <div class="card-header">
+                <h3>Site Settings</h3>
+            </div>
+            <div class="card-body mx-auto">
+                <a asp-area="@SiteSettingsController.Area"
+                   asp-controller="@SiteSettingsController.Name"
+                   asp-action="@nameof(SiteSettingsController.Index)"
+                   class="btn btn-info">View Site Settings</a>
             </div>
         </div>
     </div>
