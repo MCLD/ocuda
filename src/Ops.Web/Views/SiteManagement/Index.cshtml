@@ -1,133 +1,108 @@
 ﻿@using Ocuda.Ops.Controllers.Areas.SiteManagement
-    <div class="justify-content-center d-flex align-items-center flex-wrap">
-        <div class="col-xs-12 col-sm-4 space-above">
-            <div class="card">
-                <div class="card-header">
-                    <h3>@CategoriesController.Name</h3>
-                </div>
-                <div class="card-body mx-auto">
-                    <a asp-area="@CategoriesController.Area"
-                       asp-controller="@CategoriesController.Name"
-                       asp-action="@nameof(CategoriesController.Index)"
-                       class="btn btn-info">View @CategoriesController.Name</a>
-                </div>
+
+<div class="justify-content-center d-flex align-items-center flex-wrap">
+    <div class="col-xs-12 col-sm-4 space-above">
+        <div class="card">
+            <div class="card-header">
+                <h3>@CategoriesController.Name</h3>
             </div>
-        </div>
-        <div class="col-xs-12 col-sm-4 space-above">
-            <div class="card">
-                <div class="card-header">
-                    <h3>@EmediaController.Name</h3>
-                </div>
-                <div class="card-body mx-auto">
-                    <a asp-area="@EmediaController.Area"
-                       asp-controller="@EmediaController.Name"
-                       asp-action="@nameof(EmediaController.Index)"
-                       class="btn btn-info">View @EmediaController.Name</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-xs-12 col-sm-4 space-above">
-            <div class="card">
-                <div class="card-header">
-                    <h3>@ExternalResourcesController.Name</h3>
-                </div>
-                <div class="card-body mx-auto">
-                    <a asp-area="@ExternalResourcesController.Area"
-                       asp-controller="@ExternalResourcesController.Name"
-                       asp-action="@nameof(ExternalResourcesController.Index)"
-                       class="btn btn-info">View @ExternalResourcesController.Name</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-xs-12 col-sm-4 space-above">
-            <div class="card">
-                <div class="card-header">
-                    <h3>@FeaturesController.Name</h3>
-                </div>
-                <div class="card-body mx-auto">
-                    <a asp-area="@FeaturesController.Area"
-                       asp-controller="@FeaturesController.Name"
-                       asp-action="@nameof(FeaturesController.Index)"
-                       class="btn btn-info">View @FeaturesController.Name</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-xs-12 col-sm-4 space-above">
-            <div class="card">
-                <div class="card-header">
-                    <h3>@GroupsController.Name</h3>
-                </div>
-                <div class="card-body mx-auto">
-                    <a asp-area="@GroupsController.Area"
-                       asp-controller="@GroupsController.Name"
-                       asp-action="@nameof(GroupsController.Index)"
-                       class="btn btn-info mx-auto">View @GroupsController.Name</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-xs-12 col-sm-4 space-above">
-            <div class="card">
-                <div class="card-header">
-                    <h3>@LocationsController.Name</h3>
-                </div>
-                <div class="card-body mx-auto">
-                    <a asp-area="@LocationsController.Area"
-                       asp-controller="@LocationsController.Name"
-                       asp-action="@nameof(LocationsController.Index)"
-                       class="btn btn-info">View @LocationsController.Name</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-xs-12 col-sm-4 space-above">
-            <div class="card">
-                <div class="card-header">
-                    <h3>@RosterController.Name</h3>
-                </div>
-                <div class="card-body mx-auto">
-                    <a asp-area="@RosterController.Area"
-                       asp-controller="@RosterController.Name"
-                       asp-action="@nameof(RosterController.Upload)"
-                       class="btn btn-info">View @RosterController.Name</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-xs-12 col-sm-4 space-above">
-            <div class="card">
-                <div class="card-header">
-                    <h3>@SegmentsController.Name</h3>
-                </div>
-                <div class="card-body mx-auto">
-                    <a asp-area="@SegmentsController.Area"
-                       asp-controller="@SegmentsController.Name"
-                       asp-action="@nameof(SegmentsController.Index)"
-                       class="btn btn-info">View @SegmentsController.Name</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-xs-12 col-sm-4 space-above">
-            <div class="card">
-                <div class="card-header">
-                    <h3>@SiteSettingsController.Name</h3>
-                </div>
-                <div class="card-body mx-auto">
-                    <a asp-area="@SiteSettingsController.Area"
-                       asp-controller="@SiteSettingsController.Name"
-                       asp-action="@nameof(SiteSettingsController.Index)"
-                       class="btn btn-info">View @SiteSettingsController.Name</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-xs-12 col-sm-4 space-above">
-            <div class="card">
-                <div class="card-header">
-                    <h3>@UsersController.Name</h3>
-                </div>
-                <div class="card-body mx-auto">
-                    <a asp-area="@UsersController.Area"
-                       asp-controller="@UsersController.Name"
-                       asp-action="@nameof(UsersController.Metadata)"
-                       class="btn btn-info">View @UsersController.Name</a>
-                </div>
+            <div class="card-body mx-auto">
+                <a asp-area="@CategoriesController.Area"
+                   asp-controller="@CategoriesController.Name"
+                   asp-action="@nameof(CategoriesController.Index)"
+                   class="btn btn-info">View @CategoriesController.Name</a>
             </div>
         </div>
     </div>
+    <div class="col-xs-12 col-sm-4 space-above">
+        <div class="card">
+            <div class="card-header">
+                <h3>@EmediaController.Name</h3>
+            </div>
+            <div class="card-body mx-auto">
+                <a asp-area="@EmediaController.Area"
+                   asp-controller="@EmediaController.Name"
+                   asp-action="@nameof(EmediaController.Index)"
+                   class="btn btn-info">View @EmediaController.Name</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-4 space-above">
+        <div class="card">
+            <div class="card-header">
+                <h3>@FeaturesController.Name</h3>
+            </div>
+            <div class="card-body mx-auto">
+                <a asp-area="@FeaturesController.Area"
+                   asp-controller="@FeaturesController.Name"
+                   asp-action="@nameof(FeaturesController.Index)"
+                   class="btn btn-info">View @FeaturesController.Name</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-4 space-above">
+        <div class="card">
+            <div class="card-header">
+                <h3>@GroupsController.Name</h3>
+            </div>
+            <div class="card-body mx-auto">
+                <a asp-area="@GroupsController.Area"
+                   asp-controller="@GroupsController.Name"
+                   asp-action="@nameof(GroupsController.Index)"
+                   class="btn btn-info mx-auto">View @GroupsController.Name</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-4 space-above">
+        <div class="card">
+            <div class="card-header">
+                <h3>@LocationsController.Name</h3>
+            </div>
+            <div class="card-body mx-auto">
+                <a asp-area="@LocationsController.Area"
+                   asp-controller="@LocationsController.Name"
+                   asp-action="@nameof(LocationsController.Index)"
+                   class="btn btn-info">View @LocationsController.Name</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-4 space-above">
+        <div class="card">
+            <div class="card-header">
+                <h3>@PagesController.Name</h3>
+            </div>
+            <div class="card-body mx-auto">
+                <a asp-area="@PagesController.Area"
+                   asp-controller="@PagesController.Name"
+                   asp-action="@nameof(PagesController.Index)"
+                   class="btn btn-info">View @PagesController.Name</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-4 space-above">
+        <div class="card">
+            <div class="card-header">
+                <h3>@SegmentsController.Name</h3>
+            </div>
+            <div class="card-body mx-auto">
+                <a asp-area="@SegmentsController.Area"
+                   asp-controller="@SegmentsController.Name"
+                   asp-action="@nameof(SegmentsController.Index)"
+                   class="btn btn-info">View @SegmentsController.Name</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-4 space-above">
+        <div class="card">
+            <div class="card-header">
+                <h3>Social Cards</h3>
+            </div>
+            <div class="card-body mx-auto">
+                <a asp-area="@SocialCardsController.Area"
+                   asp-controller="@SocialCardsController.Name"
+                   asp-action="@nameof(SocialCardsController.Index)"
+                   class="btn btn-info">View Social Cards</a>
+            </div>
+        </div>
+    </div>
+</div>
