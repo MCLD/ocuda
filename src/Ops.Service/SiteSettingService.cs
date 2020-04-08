@@ -156,7 +156,7 @@ namespace Ocuda.Ops.Service
             currentSetting.UpdatedAt = DateTime.Now;
             currentSetting.UpdatedBy = GetCurrentUserId();
 
-            await ValidateSiteSettingAsync(currentSetting);
+            ValidateSiteSettingAsync(currentSetting);
 
             _siteSettingRepository.Update(currentSetting);
             await _siteSettingRepository.SaveAsync();
@@ -171,18 +171,11 @@ namespace Ocuda.Ops.Service
             return currentSetting;
         }
 
-        public async Task ValidateSiteSettingAsync(SiteSetting siteSetting)
+        public void ValidateSiteSettingAsync(SiteSetting siteSetting)
         {
             if (siteSetting == null)
             {
                 throw new ArgumentNullException(nameof(siteSetting));
-            }
-
-            if (await _siteSettingRepository.IsDuplicateKey(siteSetting))
-            {
-                _logger.LogWarning("Site setting with key {SiteSettingId} already exists.",
-                    siteSetting.Id);
-                throw new OcudaException($"Site Setting with key '{siteSetting.Id}' already exists.");
             }
 
             if (siteSetting.Type == SiteSettingType.Bool)
