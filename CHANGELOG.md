@@ -41,6 +41,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Cache force refresh of IsTLS site setting
 - Location features modal caching the same description for all
 - Site settings not being able to be updated
+- Empty site settings being set to a null value
 
 ## 1.0.0
 ### Added

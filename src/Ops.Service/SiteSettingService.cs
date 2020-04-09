@@ -134,29 +134,17 @@ namespace Ocuda.Ops.Service
         {
             var currentSetting = await _siteSettingRepository.FindAsync(key);
 
-            if (currentSetting.Type == SiteSettingType.Bool)
+            if (currentSetting.Type == SiteSettingType.StringNullable
+                && string.IsNullOrWhiteSpace(value))
             {
-                if (!bool.TryParse(value, out _))
-                {
-                    _logger.LogError("Invalid format for boolean site setting key {SiteSettingKey}: {SiteSettingValue}",
-                        key,
-                        value);
-                    throw new OcudaException("Invald format.");
-                }
-            }
-            else if (currentSetting.Type == SiteSettingType.Int && !int.TryParse(value, out _))
-            {
-                _logger.LogError("Invalid format for integer site setting key {SiteSettingKey}: {SiteSettingValue}",
-                    key,
-                    value);
-                throw new OcudaException("Invald format.");
+                value = string.Empty;
             }
 
             currentSetting.Value = value;
             currentSetting.UpdatedAt = DateTime.Now;
             currentSetting.UpdatedBy = GetCurrentUserId();
 
-            ValidateSiteSettingAsync(currentSetting);
+            ValidateSiteSetting(currentSetting);
 
             _siteSettingRepository.Update(currentSetting);
             await _siteSettingRepository.SaveAsync();
@@ -171,7 +159,7 @@ namespace Ocuda.Ops.Service
             return currentSetting;
         }
 
-        public void ValidateSiteSettingAsync(SiteSetting siteSetting)
+        public void ValidateSiteSetting(SiteSetting siteSetting)
         {
             if (siteSetting == null)
             {
@@ -180,20 +168,28 @@ namespace Ocuda.Ops.Service
 
             if (siteSetting.Type == SiteSettingType.Bool)
             {
-                if (!bool.TryParse(siteSetting.Value, out bool result))
+                if (!bool.TryParse(siteSetting.Value, out _))
                 {
-                    _logger.LogWarning("{SiteSettingName} requires a value of type {SiteSettingType}",
-                        siteSetting.Name,
-                        siteSetting.Type);
+                    _logger.LogWarning("Invalid format for boolean site setting key {SiteSettingKey}: {SiteSettingValue}",
+                        siteSetting.Id,
+                        siteSetting.Value);
                     throw new OcudaException($"{siteSetting.Name} requires a value of type {siteSetting.Type}.");
                 }
             }
             else if (siteSetting.Type == SiteSettingType.Int
-                && !int.TryParse(siteSetting.Value, out int result))
+                && !int.TryParse(siteSetting.Value, out _))
             {
-                _logger.LogWarning("{SiteSettingName} requires a value of type {SiteSettingType}",
-                    siteSetting.Name,
-                    siteSetting.Type);
+                _logger.LogWarning("Invalid format for integer site setting key {SiteSettingKey}: {SiteSettingValue}",
+                    siteSetting.Id,
+                    siteSetting.Value);
+                throw new OcudaException($"{siteSetting.Name} requires a value of type {siteSetting.Type}.");
+            }
+            else if (siteSetting.Type == SiteSettingType.String
+                && string.IsNullOrWhiteSpace(siteSetting.Value))
+            {
+                _logger.LogError("Invalid format for string site setting key {SiteSettingKey}: {SiteSettingValue}",
+                    siteSetting.Id,
+                    siteSetting.Value);
                 throw new OcudaException($"{siteSetting.Name} requires a value of type {siteSetting.Type}.");
             }
         }
