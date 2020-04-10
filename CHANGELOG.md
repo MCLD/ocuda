@@ -24,6 +24,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Promenade ability to mark locations as closed and hide their opening hours
 - Social link site settings and display in Promenade left nav
 - Ops page for setting location hours and managing overrides
+- Promenade external resource management
+- Promenade site setting management
 
 ### Changed
 - Default to only logging Warnings for Microsoft and System namespaces
@@ -40,6 +42,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Location features modal caching the same description for all
 - User claims not being applied right on sign in
 - Marking cover sheet issues as resolved when they had been reported two or more times
+- Site settings not being able to be updated
+- Empty site settings being set to a null value
 
 ## 1.0.0
 ### Added

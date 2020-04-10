@@ -1,0 +1,198 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages.IndexViewModel
+
+<form id="addForm" role="form">
+    <div modal id="addModal" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+        <input id="addName" asp-for="PageHeader.PageName" formgroup />
+        <input id="addStub" asp-for="PageHeader.Stub" formgroup />
+        <select id="addType" asp-for="PageHeader.Type" formgroup>
+            <option></option>
+            @foreach (var type in (PageType[])Enum.GetValues(typeof(PageType)))
+            {
+                <option value="@Convert.ToInt32(type)">@type</option>
+            }
+        </select>
+    </div>
+</form>
+
+<form id="editForm" role="form">
+    <input id="editId" asp-for="PageHeader.Id" type="hidden" />
+    <div modal id="editModal" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <input id="editName" asp-for="PageHeader.PageName" formgroup />
+        <input id="editStub" asp-for="PageHeader.Stub" formgroup readonly />
+        <select id="editType" asp-for="PageHeader.Type" formgroup disabled>
+            @foreach (var type in (PageType[])Enum.GetValues(typeof(PageType)))
+            {
+                <option value="@Convert.ToInt32(type)">@type</option>
+            }
+        </select>
+    </div>
+</form>
+
+
+<form asp-controller="Pages" asp-action="@(nameof(PagesController.Delete))" method="post" role="form">
+    <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
+    <input id="deleteId" asp-for="PageHeader.Id" type="hidden" />
+    <input id="deleteName" asp-for="PageHeader.PageName" type="hidden" />
+    <div modal id="deleteModal" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+</form>
+
+<div class="mb-2">
+    <button class="btn btn-outline-secondary text-dark"
+            data-toggle="modal"
+            data-target="#addModal">
+        Create Page
+    </button>
+</div>
+
+@if (Model.PageHeaders.Count() == 0)
+{
+    <div class="alert alert-warning">No Pages Found</div>
+}
+else
+{
+    <div class="row">
+        <div class="col-12">
+            <div>
+                <table class="table table-sm table-bordered link-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Stub</th>
+                            <th>Type</th>
+                            <th>Languages</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var header in Model.PageHeaders)
+                        {
+                            <tr>
+                                <td class="td-class">
+                                    <a asp-action="@(nameof(PagesController.Detail))" asp-route-id="@header.Id" class="rowlink">
+                                        @header.PageName
+                                    </a>
+                                </td>
+                                <td>@header.Stub</td>
+                                <td>@header.Type.ToString()</td>
+                                <td> @string.Join(", ", header.PageLanguages)</td>
+                                <td align="center" class="on-top">
+                                    <button type="button"
+                                            class="btn btn-primary btn-xs"
+                                            data-toggle="modal"
+                                            data-target="#editModal"
+                                            data-id="@header.Id"
+                                            data-name="@header.PageName"
+                                            data-stub="@header.Stub"
+                                            data-type="@((int)header.Type)">
+                                        <span class="fas fa-edit" aria-hidden="true"></span>
+                                    </button>
+                                    <button type="button"
+                                            class="btn btn-danger btn-xs"
+                                            data-toggle="modal"
+                                            data-target="#deleteModal"
+                                            data-id="@header.Id"
+                                            data-name="@header.PageName">
+                                        <span class="fas fa-times" aria-hidden="true"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.PaginateModel.MaxPage > 1)
+    {
+        <paginate paginateModel="@Model.PaginateModel"></paginate>
+    }
+}
+
+@section scripts {
+    <script>
+        $(window).on("load", function() {
+            $('.td-class').each(function() {
+                $(this).children('a.rowlink').height($(this).height() + 11);
+            });
+        });
+        $(window).resize(function() {
+            $('.td-class').each(function() {
+                $(this).children('a.rowlink').height($(this).height() + 11);
+            });
+        });
+
+        var addStub = $("#addStub");
+
+        addStub.on("blur", function () {
+            if (addStub.valid()) {
+                updateStub(addStub, addStub.val());
+                var addType = $("#addType");
+                if (addType.val() != "") {
+                    setTimeout(function () {
+                        ValidateField(addStub,
+                            "@Url.Action(nameof(PagesController.StubInUse), PagesController.Name)",
+                            [addStub.serialize(), addType.serialize()].join("&"));
+                    }, 200);
+                }
+            }
+        })
+
+        $("#addForm").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            if (addStub.valid()) {
+                updateStub(addStub, addStub.val());
+            }
+            $.post("@(Url.Action(nameof(PagesController.Create), PagesController.Name))",
+                form.serialize(),
+                function (response) {
+                    if (response.success == true) {
+                        location.href = response.url;
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
+        });
+
+        $("#editModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+            var stub = button.data("stub");
+            var type = button.data("type");
+            $("#editId").val(id);
+            $("#editName").val(name);
+            $("#editStub").val(stub);
+            $("#editType").val(type);
+        });
+
+        $("#editForm").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.post("@(Url.Action(nameof(PagesController.Edit), PagesController.Name))",
+                form.serialize(),
+                function (response) {
+                    if (response.success == true) {
+                        location.reload();
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
+        });
+
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+            var modal = $(this);
+            $("#deleteId").val(id);
+            $("#deleteName").val(name);
+            modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
+        });
+    </script>
+}

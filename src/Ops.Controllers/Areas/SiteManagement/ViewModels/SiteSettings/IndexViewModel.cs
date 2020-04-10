@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Ocuda.Ops.Models.Entities;
+using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.SiteSettings
 {
