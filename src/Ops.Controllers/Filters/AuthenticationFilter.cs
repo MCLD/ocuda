@@ -305,6 +305,9 @@ namespace Ocuda.Ops.Controllers.Filters
 
                         // TODO set a reasonable initial nickname
                         context.HttpContext.Items[ItemKey.Nickname] = user.Nickname ?? username;
+
+                        // Set the users claims for this request
+                        ((ClaimsIdentity)context.HttpContext.User.Identity).AddClaims(claims);
                     }
                 }
             }
