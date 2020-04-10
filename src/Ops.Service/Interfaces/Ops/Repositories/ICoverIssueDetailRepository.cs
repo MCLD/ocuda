@@ -6,6 +6,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
     public interface ICoverIssueDetailRepository : IOpsRepository<CoverIssueDetail, int>
     {
-        Task<ICollection<CoverIssueDetail>> GetByHeaderIdAsync(int headerId, bool? resolved = null);
+        Task<ICollection<CoverIssueDetail>> GetByHeaderIdAsync(int headerId,
+            bool includeCreatedByUser = false,
+            bool? resolved = null);
     }
 }
