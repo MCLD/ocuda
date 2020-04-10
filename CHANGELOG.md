@@ -38,6 +38,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Segment date constraints not working properly
 - Cache force refresh of IsTLS site setting
 - Location features modal caching the same description for all
+- User claims not being applied right on sign in
+- Marking cover sheet issues as resolved when they had been reported two or more times
 
 ## 1.0.0
 ### Added
