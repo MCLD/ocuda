@@ -1,0 +1,32 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Roster.UploadViewModel
+
+<form asp-action="@nameof(RosterController.Upload)" method="post" role="form" enctype="multipart/form-data">
+    <div class="form-group row">
+        <label asp-for="Roster" class="col-md-3 col-form-label text-md-right">Upload the roster</label>
+        <div class="col-md-9">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <label class="btn btn-outline-secondary btn-file form-control">
+                        <span class="far fa-file"></span> Select a File
+                        <input type="file" asp-for="Roster" accept=".xls,.xlsx" hidden />
+                    </label>
+                </div>
+                <div class="custom-file">
+                    <input type="text" class="form-control" readonly id="selectedFile" />
+                </div>
+            </div>
+            <div>
+                <span asp-validation-for="Roster" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="offset-md-3 col-md-9">
+            <button type="submit" class="btn btn-primary btn-spinner" aria-label="Confirm">
+                Submit
+                <span class="fa fa-spinner fa-pulse fa-fw d-none"></span>
+            </button>
+        </div>
+    </div>   
+</form>

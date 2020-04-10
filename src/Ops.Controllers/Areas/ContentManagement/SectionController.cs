@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
-using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels;
+using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;

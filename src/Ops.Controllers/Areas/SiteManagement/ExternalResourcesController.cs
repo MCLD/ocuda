@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.ExternalResources;
-using Ocuda.Ops.Models.Entities;
-using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Ops.Service.Interfaces.Promenade.Services;
+using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
@@ -17,24 +17,24 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class ExternalResourcesController : BaseController<ExternalResourcesController>
     {
-        private readonly IExternalResourceService _externalResourceService;
+        private readonly IExternalResourcePromService _externalResourcePromService;
 
         public static string Name { get { return "ExternalResources"; } }
         public static string Area { get { return "SiteManagement"; } }
 
         public ExternalResourcesController(
             ServiceFacades.Controller<ExternalResourcesController> context,
-            IExternalResourceService externalResourceService) : base(context)
+            IExternalResourcePromService externalResourcepromService) : base(context)
         {
-            _externalResourceService = externalResourceService
-                ?? throw new ArgumentNullException(nameof(externalResourceService));
+            _externalResourcePromService = externalResourcepromService
+                ?? throw new ArgumentNullException(nameof(externalResourcepromService));
         }
 
         [Route("")]
         [Route("[action]")]
         public async Task<IActionResult> Index(ExternalResourceType type = ExternalResourceType.CSS)
         {
-            var resourceList = await _externalResourceService.GetAllAsync(type);
+            var resourceList = await _externalResourcePromService.GetAllAsync(type);
 
             var viewModel = new IndexViewModel
             {
@@ -54,7 +54,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             try
             {
-                await _externalResourceService.AddAsync(resource);
+                await _externalResourcePromService.AddAsync(resource);
                 ShowAlertSuccess($"Added external resource: {resource.Name}");
                 success = true;
             }
@@ -75,7 +75,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             try
             {
-                await _externalResourceService.EditAsync(resource);
+                await _externalResourcePromService.EditAsync(resource);
                 ShowAlertSuccess($"Edited external resource: {resource.Name}");
                 success = true;
             }
@@ -96,7 +96,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             try
             {
-                await _externalResourceService.DeleteAsync(resource.Id);
+                await _externalResourcePromService.DeleteAsync(resource.Id);
                 ShowAlertSuccess($"Deleted external resource: {resource.Name}");
                 success = true;
             }
@@ -119,11 +119,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 if (increase)
                 {
-                    await _externalResourceService.IncreaseSortOrder(resource.Id);
+                    await _externalResourcePromService.IncreaseSortOrder(resource.Id);
                 }
                 else
                 {
-                    await _externalResourceService.DecreaseSortOrder(resource.Id);
+                    await _externalResourcePromService.DecreaseSortOrder(resource.Id);
                 }
                 success = true;
             }
