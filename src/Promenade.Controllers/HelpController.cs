@@ -13,7 +13,6 @@ using Ocuda.Promenade.Service;
 namespace Ocuda.Promenade.Controllers
 {
     [Route("[Controller]")]
-    [Route("{culture:cultureConstraint}/[Controller]")]
     public class HelpController : BaseController<HelpController>
     {
         private readonly ScheduleService _scheduleService;
