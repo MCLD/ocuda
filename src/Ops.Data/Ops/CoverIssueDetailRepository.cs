@@ -17,16 +17,21 @@ namespace Ocuda.Ops.Data.Ops
         }
 
         public async Task<ICollection<CoverIssueDetail>> GetByHeaderIdAsync(int headerId,
+            bool includeCreatedByUser = false,
             bool? resolved = null)
         {
             var query = DbSet
                 .AsNoTracking()
-                .Include(_ => _.CreatedByUser)
                 .Where(_ => _.CoverIssueHeaderId == headerId);
 
             if (resolved.HasValue)
             {
                 query = query.Where(_ => _.IsResolved == resolved);
+            }
+
+            if (includeCreatedByUser)
+            {
+                query = query.Include(_ => _.CreatedByUser);
             }
 
             return await query

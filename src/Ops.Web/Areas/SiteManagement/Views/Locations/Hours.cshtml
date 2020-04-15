@@ -1,0 +1,238 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location.LocationHoursViewModel
+
+@section styles {
+    <link rel="stylesheet" href="~/css/dt-picker.min.css" asp-append-version="true" />
+}
+
+@await Html.PartialAsync("_LocationPartial")
+
+<form id="addForm" asp-action="@nameof(LocationsController.AddOverride)" method="post" role="form">
+    <input id="addLocationStub" asp-for="LocationStub" type="hidden" />
+    <div modal id="addModal" name="override" type="Ocuda.Utility.TagHelpers.ModalTypes.Add" isLarge="true">
+        <select asp-for="AddOverride.LocationId" formgroup>
+            <option value="@Model.LocationId">@Model.LocationName</option>
+            <option value="">All Locations</option>
+        </select>
+        <input asp-for="AddOverride.Reason" formgroup />
+        <input asp-for="AddOverride.Date" formgroup datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateOnly" />
+        <select asp-for="AddOverride.Open" formgroup>
+            <option value="True">Open</option>
+            <option value="False">Closed</option>
+        </select>
+        <input asp-for="AddOverride.OpenTime" formgroup datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.TimeOnly" />
+        <input asp-for="AddOverride.CloseTime" formgroup datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.TimeOnly" />
+    </div>
+</form>
+
+<form id="editForm" asp-action="@nameof(LocationsController.EditOverride)" method="post" role="form">
+    <input id="editLocationStub" asp-for="LocationStub" type="hidden" />
+    <input asp-for="EditOverride.Id" type="hidden" />
+    <div modal id="editModal" name="override" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit" isLarge="true">
+        <select asp-for="EditOverride.LocationId" formgroup disabled="disabled">
+            <option value="@Model.LocationId">@Model.LocationName</option>
+            <option value="">All Locations</option>
+        </select>
+        <input asp-for="EditOverride.Reason" formgroup />
+        <input asp-for="EditOverride.Date" formgroup datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateOnly" />
+        <select asp-for="EditOverride.Open" formgroup>
+            <option value="True">Open</option>
+            <option value="False">Closed</option>
+        </select>
+        <input asp-for="EditOverride.OpenTime" formgroup datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.TimeOnly" />
+        <input asp-for="EditOverride.CloseTime" formgroup datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.TimeOnly" />
+    </div>
+</form>
+
+<form id="deleteForm" asp-action="@nameof(LocationsController.DeleteOverride)" method="post" role="form">
+    <input id="deleteLocationStub" asp-for="LocationStub" type="hidden" />
+    <input asp-for="DeleteOverride.Id" type="hidden" />
+    <input asp-for="DeleteOverride.Reason" type="hidden" />
+    <div modal id="deleteModal" name="override" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+</form>
+
+<div class="row">
+    <div class="col-12col-lg-10 col-xl-8 offset-lg-1 offset-xl-2">
+        <form asp-action="@nameof(LocationsController.Hours)" method=post role="form">
+            <input id="hoursLocationStub" asp-for="LocationStub" type="hidden" />
+            <table class="table table-sm table-borderless">
+                @for (int i = 0; i < Enum.GetNames(typeof(DayOfWeek)).Length; i++)
+                {
+                    <tr>
+                        <td class="text-right">
+                            <input asp-for="LocationHours[i].DayOfWeek" type="hidden" />
+                            <input asp-for="LocationHours[i].LocationId" type="hidden" />
+                            <strong>@Model.LocationHours[i].DayOfWeek.ToString()</strong>
+                        </td>
+                        <td>
+                            <select asp-for="LocationHours[i].Open" class="openSelector" formgroup hide-label="true">
+                                <option value="True">Open</option>
+                                <option value="False">Closed</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input asp-for="LocationHours[i].OpenTime" type="time" formgroup hide-label="true" datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.TimeOnly" />
+                        </td>
+                        <td class="text-center">
+                            &ndash;
+                        </td>
+                        <td>
+                            <input asp-for="LocationHours[i].CloseTime" type="time" formgroup hide-label="true" datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.TimeOnly" />
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td>&nbsp;</td>
+                    <td colspan="4">
+                        <a asp-action="@nameof(LocationsController.Index)" class="btn btn-secondary">Return to Locations</a>
+                        <button type="submit" class="btn btn-success" button-spinner>Update Hours</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h2>
+            Overrides
+            <button type="button"
+                    class="btn btn-outline-secondary"
+                    data-toggle="modal"
+                    data-target="#addModal">
+                Add override
+            </button>
+        </h2>
+        <hr />
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-12">
+        <table class="table table-sm table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Reason</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Hours</th>
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var hoursOverride in Model.LocationHoursOverrides)
+                {
+                    <tr class="cursor-pointer overrideRow"
+                        data-id="@hoursOverride.Id"
+                        data-locationid="@hoursOverride.LocationId"
+                        data-reason="@hoursOverride.Reason"
+                        data-date="@hoursOverride.Date"
+                        data-open="@hoursOverride.Open"
+                        data-opentime="@hoursOverride.OpenTime"
+                        data-closetime="@hoursOverride.CloseTime">
+                        <td>@hoursOverride.Reason</td>
+                        <td>@hoursOverride.Date.ToShortDateString() &ndash; @hoursOverride.Date.DayOfWeek.ToString()</td>
+                        <td>@(hoursOverride.LocationId.HasValue ? Model.LocationName : "All Locations")</td>
+                        <td>@(hoursOverride.Open ? $"{hoursOverride.OpenTime.Value.ToShortTimeString()} {System.Net.WebUtility.HtmlDecode("&ndash;")} {hoursOverride.CloseTime.Value.ToShortTimeString()}" : "Closed")</td>
+                        <td class="on-top cursor-default">
+                            <button type="button"
+                                    class="btn btn-sm btn-danger"
+                                    data-toggle="modal"
+                                    data-target="#deleteModal">
+                                <span class="fas fa-times"></span>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/dt-picker.min.js" asp-append-version="true"></script>
+
+    <script>
+        $(".datepicker").datetimepicker({
+            format: "L",
+            allowInputToggle: true
+
+        });
+        $(".timepicker").datetimepicker({
+            format: "LT",
+            allowInputToggle: true
+        });
+
+        $(".openSelector").on("change", function () {
+            if ($(this).val() == "True") {
+                $(this).closest("td").siblings().find(".timepicker").children(".datetimepicker-input").removeAttr("disabled");
+            }
+            else {
+                $(this).closest("td").siblings().find(".timepicker").children(".datetimepicker-input")
+                    .attr("disabled", "disabled")
+                    .val("");
+            }
+        })
+        .change();
+
+        $("#AddOverride_Open").on("change", function () {
+            if ($(this).val() == "True") {
+                $("#addModal").find(".timepicker").children(".datetimepicker-input").removeAttr("disabled");
+            }
+            else {
+                $("#addModal").find(".timepicker").children(".datetimepicker-input")
+                    .attr("disabled", "disabled")
+                    .val("");
+            }
+        });
+
+        $("#EditOverride_Open").on("change", function () {
+            if ($(this).val() == "True") {
+                $("#editModal").find(".timepicker").children(".datetimepicker-input").removeAttr("disabled");
+            }
+            else {
+                $("#editModal").find(".timepicker").children(".datetimepicker-input")
+                    .attr("disabled", "disabled")
+                    .val("");
+            }
+        });
+
+        $(".overrideRow").on("click", "td:not(:last-child)", function () {
+            var row = $(this).parent("tr");
+            $("#EditOverride_Id").val(row.data("id"));
+            $("#EditOverride_LocationId").val(row.data("locationid"));
+            $("#EditOverride_Reason").val(row.data("reason"));
+            $("#EditOverride_Date").val(row.data("date"));
+            $("#EditOverride_Open").val(row.data("open")).change();
+            $("#EditOverride_OpenTime").val(row.data("opentime"));
+            $("#EditOverride_CloseTime").val(row.data("closetime"));
+            $("#editModal").modal();
+        });
+
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            var row = $(e.relatedTarget).closest("tr");
+            var reason = row.data("reason");
+            $("#DeleteOverride_Id").val(row.data("id"));
+            $("#DeleteOverride_Reason").val(reason);
+            $(this).find(".modal-text").text("Are you sure you want to delete \"" + reason + "\"?");
+        });
+
+        @if (ViewData.ModelState.ContainsKey("AddOverride.Open"))
+        {
+            <text>
+                $("#AddOverride_Open").change();
+                $("#addModal").modal();
+            </text>
+        }
+
+        @if (ViewData.ModelState.ContainsKey("EditOverride.Open"))
+        {
+            <text>
+                $("#EditOverride_Open").change();
+                $("#editModal").modal();
+            </text>
+        }
+
+    </script>
+}

@@ -189,6 +189,12 @@ namespace Ocuda.Ops.Web
                 Data.Ops.RosterDetailRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterHeaderRepository,
                 Data.Ops.RosterHeaderRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IScheduleClaimRepository,
+                Data.Ops.ScheduleClaimRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IScheduleLogCallDispositionRepository,
+                Data.Ops.ScheduleLogCallDispositionRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IScheduleLogRepository,
+                Data.Ops.ScheduleLogRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ISectionRepository,
                 Data.Ops.SectionRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ISectionManagerGroupRepository,
@@ -206,6 +212,9 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.EmediaCategoryRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaRepository,
                 Data.Promenade.EmediaRepository>();
+            services.AddScoped<
+                Service.Interfaces.Promenade.Repositories.IExternalResourcePromRepository,
+                Data.Promenade.ExternalResourcePromRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IFeatureRepository,
                 Data.Promenade.FeatureRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IGroupRepository,
@@ -218,16 +227,23 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.LocationFeatureRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationGroupRepository,
                 Data.Promenade.LocationGroupRepository>();
+            services.AddScoped<
+                Service.Interfaces.Promenade.Repositories.ILocationHoursOverrideRepository,
+                Data.Promenade.LocationHoursOverrideRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationHoursRepository,
                 Data.Promenade.LocationHoursRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageRepository,
                 Data.Promenade.PageRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageHeaderRepository,
                 Data.Promenade.PageHeaderRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IScheduleRequestRepository,
+                Data.Promenade.ScheduleRequestRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISegmentRepository,
                 Data.Promenade.SegmentRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISegmentTextRepository,
                 Data.Promenade.SegmentTextRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ISiteSettingPromRepository,
+                Data.Promenade.SiteSettingPromRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISocialCardRepository,
                 Data.Promenade.SocialCardRepository>();
 
@@ -238,6 +254,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IEmediaService, EmediaService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IExternalResourcePromService, ExternalResourcePromService>();
             services.AddScoped<IExternalResourceService, ExternalResourceService>();
             services.AddScoped<IFeatureService, FeatureService>();
             services.AddScoped<IFileService, FileService>();
@@ -257,8 +274,11 @@ namespace Ocuda.Ops.Web
                 Utility.Services.PathResolverService>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IRosterService, RosterService>();
+            services.AddScoped<IScheduleService, ScheduleService>();
+            services.AddScoped<IScheduleRequestService, ScheduleRequestService>();
             services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<ISegmentService, SegmentService>();
+            services.AddScoped<ISiteSettingPromService, SiteSettingPromService>();
             services.AddScoped<ISiteSettingService, SiteSettingService>();
             services.AddScoped<ISocialCardService, SocialCardService>();
             services.AddScoped<Service.Abstract.IUserContextProvider, UserContextProvider>();

@@ -1,0 +1,27 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.SocialCards.DetailViewModel
+
+<form asp-action="@Model.Action" method="post" role="form">
+    <div class="row">
+        <div class="col-12">
+            @if (Model.Action == nameof(SocialCardsController.Edit))
+            {
+                <input asp-for="SocialCard.Id" type="hidden" />
+            }
+
+            <input asp-for="SocialCard.Title" formgroup />
+            <textarea asp-for="SocialCard.Description" formgroup></textarea>
+            <input asp-for="SocialCard.Image" formgroup />
+            <textarea asp-for="SocialCard.ImageAlt" formgroup></textarea>
+
+            <div class="row">
+                <div class="offset-md-3 col-md-9">
+                    <a class="btn btn-outline-secondary text-dark" asp-action="@(nameof(PagesController.Index))">Cancel</a>
+                    <button type="submit" class="btn btn-success" aria-label="Confirm" buttonspinner>
+                        <span class="fa fa-save" aria-hidden="true"></span>
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

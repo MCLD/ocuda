@@ -14,7 +14,7 @@ namespace Ocuda.Ops.Models.Defaults
                 Id = Keys.SiteSetting.CoverIssueReporting.LeapBibUrl,
                 Name = "Leap bib records url",
                 Description = "Leap bib records url with scheme, host and path",
-                Category = "CoverIssueReporting",
+                Category = "Cover Issue Reporting",
                 Value = "",
                 Type = SiteSettingType.StringNullable
             },

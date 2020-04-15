@@ -7,6 +7,7 @@ using BranchLocator.Models;
 using BranchLocator.Models.PlaceDetails;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -112,19 +113,19 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 var viewModel = new LocationViewModel
                 {
                     Location = location,
+                    LocationName = location.Name,
+                    LocationStub = location.Stub,
                     LocationFeatures = await _locationFeatureService.GetLocationFeaturesByLocationAsync(location),
                     LocationGroups = await _locationGroupService.GetLocationGroupsByLocationAsync(location),
                     Groups = await _groupService.GetAllGroupsAsync(),
                     Features = await _featureService.GetAllFeaturesAsync(),
-                    Action = nameof(LocationsController.EditLocation),
-                    AllLocationHours = await _locationHoursService.GetLocationHoursByIdAsync(location.Id)
+                    Action = nameof(LocationsController.EditLocation)
                 };
                 var segments = await _segmentService.GetActiveSegmentsAsync();
                 viewModel.PostFeatSegments = new SelectList(segments, nameof(Segment.Id),
-                    nameof(Segment.Name),viewModel.Location?.PostFeatureSegmentId);
+                    nameof(Segment.Name), viewModel.Location?.PostFeatureSegmentId);
                 viewModel.PreFeatSegments = new SelectList(segments, nameof(Segment.Id),
                     nameof(Segment.Name), viewModel.Location?.PreFeatureSegmentId);
-                viewModel.Location.LocationHours = await _locationService.GetFormattedWeeklyHoursAsync(viewModel.Location.Id);
                 viewModel.FeatureList = string.Join(",", viewModel.LocationFeatures.Select(_ => _.FeatureId));
                 viewModel.GroupList = string.Join(",", viewModel.LocationGroups.Select(_ => _.GroupId));
                 return View("LocationDetails", viewModel);
@@ -373,71 +374,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpPost]
         [Route("[action]")]
         [SaveModelState]
-        public async Task<IActionResult> EditLocationHours(LocationViewModel viewModel)
-        {
-            var location = await _locationService.GetLocationByIdAsync(viewModel.AllLocationHours[0].LocationId);
-            var updateAlwaysOpen = true;
-            foreach (var hour in viewModel.AllLocationHours)
-            {
-                if (hour.Open && (hour.OpenTime == null || hour.CloseTime == null))
-                {
-                    ShowAlertDanger($"Location hours must be provided if open");
-                    return RedirectToAction(nameof(Location), new { locationStub = location.Stub });
-                }
-                if (hour.CloseTime.HasValue && hour.OpenTime.HasValue)
-                {
-                    if (DateTime.Compare(hour.CloseTime.Value, hour.OpenTime.Value) < 0)
-                    {
-                        ShowAlertDanger($"Location can't close before it's opening time");
-                        return RedirectToAction(nameof(Location), new { locationStub = location.Stub });
-                    }
-                    if (DateTime.Compare(hour.CloseTime.Value, hour.OpenTime.Value) == 0)
-                    {
-                        ShowAlertDanger($"Location opening and closing times can't be equal.");
-                        return RedirectToAction(nameof(Location), new { locationStub = location.Stub });
-                    }
-                }
-                if (hour.Open)
-                {
-                    updateAlwaysOpen = false;
-                }
-            }
-            try
-            {
-                location.IsAlwaysOpen = updateAlwaysOpen;
-                await _locationService.EditAlwaysOpenAsync(location);
-                ShowAlertSuccess($"Updated {location.Name}'s Hours");
-            }
-            catch (OcudaException ex)
-            {
-                ShowAlertDanger($"Failed to Update {location.Name}'s Hours");
-                _logger.LogError(ex,
-                    "Unable to edit hours for {LocationName}: {Message}",
-                    location.Name,
-                    ex.Message);
-            }
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    await _locationHoursService.EditAsync(viewModel.AllLocationHours);
-                    ShowAlertSuccess($"Updated {location.Name}'s Hours");
-                }
-                catch (OcudaException ex)
-                {
-                    ShowAlertDanger($"Failed to Update {location.Name}'s Hours");
-                    _logger.LogError(ex,
-                        "Unable to edit hours for {LocationName}: {Message}",
-                        location.Name,
-                        ex.Message);
-                }
-            }
-            return RedirectToAction(nameof(LocationsController.Location), new { locationStub = location.Stub });
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        [SaveModelState]
         public async Task<IActionResult> CreateLocationGroup(int locationId, int itemId)
         {
             var location = await _locationService.GetLocationByIdAsync(locationId);
@@ -624,17 +560,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 viewModel.IsLocationsGroup = location.DisplayGroupId == viewModel.Group.Id ? true : false;
                 return PartialView("_EditGroupsPartial", viewModel);
             }
-            else if (objectType == "Feature")
+            else
             {
                 viewModel.LocationFeature = await _locationFeatureService
                     .GetByIdsAsync(itemId, location.Id);
                 viewModel.Features = await _featureService.GetAllFeaturesAsync();
                 return PartialView("_EditFeaturesPartial", viewModel);
-            }
-            else
-            {
-                viewModel.AllLocationHours = await _locationHoursService.GetLocationHoursByIdAsync(location.Id);
-                return PartialView("_EditHoursPartial", viewModel);
             }
         }
 
@@ -782,6 +713,183 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     ex.Message);
             }
             return location;
+        }
+
+        [HttpGet]
+        [Route("{locationStub}/[action]")]
+        [RestoreModelState(Key = nameof(Hours))]
+        public async Task<IActionResult> Hours(string locationStub)
+        {
+            var viewModel = new LocationHoursViewModel();
+            try
+            {
+                var location = await _locationService.GetLocationByStubAsync(locationStub);
+                viewModel.LocationId = location.Id;
+                viewModel.LocationName = location.Name;
+                viewModel.LocationStub = location.Stub;
+            }
+            catch (OcudaException ex)
+            {
+                ShowAlertDanger($"Unable to find Location {locationStub}: {ex.Message}");
+                return RedirectToAction(nameof(LocationsController.Index));
+            }
+
+            viewModel.LocationHours = (await _locationHoursService
+                .GetLocationHoursByIdAsync(viewModel.LocationId)).ToList();
+            viewModel.LocationHoursOverrides = await _locationHoursService
+                .GetLocationHoursOverrideByIdAsync(viewModel.LocationId);
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [Route("{locationStub}/[action]")]
+        [SaveModelState(Key = nameof(Hours))]
+        public async Task<IActionResult> Hours(LocationHoursViewModel model)
+        {
+            for (int i = 0; i < Enum.GetNames(typeof(DayOfWeek)).Length; i++)
+            {
+                var day = model.LocationHours[i];
+                if (day.Open)
+                {
+                    if (!day.OpenTime.HasValue || !day.CloseTime.HasValue)
+                    {
+                        if (!day.OpenTime.HasValue)
+                        {
+                            ModelState.AddModelError($"LocationHours[{i}].OpenTime",
+                                "Please select an Open Time.");
+                        }
+                        if (!day.CloseTime.HasValue)
+                        {
+                            ModelState.AddModelError($"LocationHours[{i}].CloseTime",
+                                "Please select an Open Time.");
+                        }
+                    }
+                    else if (day.OpenTime.Value.TimeOfDay > day.CloseTime.Value.TimeOfDay)
+                    {
+                        ModelState.AddModelError($"LocationHours[{i}].OpenTime",
+                        "Open Time must be before the Close Time.");
+                    }
+                }
+            }
+
+            if (ModelState.IsValid)
+            {
+                await _locationHoursService.EditAsync(model.LocationHours);
+                ShowAlertSuccess("Hours updated!");
+            }
+
+            return RedirectToAction(nameof(Hours), new { locationStub = model.LocationStub });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        [SaveModelState(Key = nameof(Hours))]
+        public async Task<IActionResult> AddOverride(LocationHoursViewModel model)
+        {
+            if (model.AddOverride.Open)
+            {
+                if (!model.AddOverride.OpenTime.HasValue || !model.AddOverride.CloseTime.HasValue)
+                {
+                    if (!model.AddOverride.OpenTime.HasValue)
+                    {
+                        ModelState.AddModelError("AddOverride.OpenTime",
+                            "Please select an Open Time.");
+                    }
+                    if (!model.AddOverride.CloseTime.HasValue)
+                    {
+                        ModelState.AddModelError("AddOverride.CloseTime",
+                            "Please select an Close Time.");
+                    }
+                }
+                else if (model.AddOverride.OpenTime > model.AddOverride.CloseTime)
+                {
+                    ModelState.AddModelError("AddOverride.OpenTime",
+                        "Open Time must be before the Close Time.");
+                }
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var hoursOverride = await _locationHoursService
+                        .AddLocationHoursOverrideAsync(model.AddOverride);
+                    ShowAlertSuccess($"Override '{hoursOverride.Reason}' added!");
+                }
+                catch (OcudaException gex)
+                {
+                    ModelState.AddModelError("AddOverride.Date", gex.Message);
+                }
+            }
+
+            return RedirectToAction(nameof(Hours), new { locationStub = model.LocationStub });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        [SaveModelState(Key = nameof(Hours))]
+        public async Task<IActionResult> EditOverride(LocationHoursViewModel model)
+        {
+            if (model.EditOverride.Open)
+            {
+                if (!model.EditOverride.OpenTime.HasValue || !model.EditOverride.CloseTime.HasValue)
+                {
+                    if (!model.EditOverride.OpenTime.HasValue)
+                    {
+                        ModelState.AddModelError("EditOverride.OpenTime",
+                            "Please select an Open Time.");
+                    }
+                    if (!model.EditOverride.CloseTime.HasValue)
+                    {
+                        ModelState.AddModelError("EditOverride.CloseTime",
+                            "Please select an Close Time.");
+                    }
+                }
+                else if (model.EditOverride.OpenTime > model.EditOverride.CloseTime)
+                {
+                    ModelState.AddModelError("EditOverride.OpenTime",
+                        "Open Time must be before the Close Time.");
+                }
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var hoursOverride = await _locationHoursService
+                        .EditLocationHoursOverrideAsync(model.EditOverride);
+                    ShowAlertSuccess($"Override '{hoursOverride.Reason}' updated!");
+                }
+                catch (OcudaException gex)
+                {
+                    ModelState.AddModelError("EditOverride.Date", gex.Message);
+                }
+            }
+
+            return RedirectToAction(nameof(Hours), new { locationStub = model.LocationStub });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeleteOverride(LocationHoursViewModel model)
+        {
+            try
+            {
+                await _locationHoursService.DeleteLocationsHoursOverrideAsync(
+                    model.DeleteOverride.Id);
+                ShowAlertSuccess($"Deleted override: {model.DeleteOverride.Reason}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "Error deleting override id {Id}: {Message}",
+                    model.DeleteOverride.Id,
+                    ex.Message);
+                ShowAlertDanger("Unable to delete override: ", ex.Message);
+            }
+
+            return RedirectToAction(nameof(Hours), new { locationStub = model.LocationStub });
         }
     }
 }

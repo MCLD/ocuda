@@ -14,13 +14,5 @@ namespace Ocuda.Ops.Data.Ops
             ILogger<SiteSettingRepository> logger) : base(repositoryFacade, logger)
         {
         }
-
-        public async Task<bool> IsDuplicateKey(SiteSetting setting)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.Id != setting.Id)
-                .AnyAsync();
-        }
     }
 }

@@ -692,6 +692,90 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.ToTable("PageHeaders");
                 });
 
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.ScheduleRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<bool>("IsClaimed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<DateTime>("RequestedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ScheduleRequestSubjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ScheduleRequestTelephoneId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScheduleRequestSubjectId");
+
+                    b.HasIndex("ScheduleRequestTelephoneId");
+
+                    b.ToTable("ScheduleRequest");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.ScheduleRequestSubject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ScheduleRequestSubject");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.ScheduleRequestTelephone", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ScheduleRequestTelephone");
+                });
+
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Segment", b =>
                 {
                     b.Property<int>("Id")
@@ -1004,6 +1088,21 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .WithMany()
                         .HasForeignKey("SocialCardId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.ScheduleRequest", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.ScheduleRequestSubject", "ScheduleRequestSubject")
+                        .WithMany()
+                        .HasForeignKey("ScheduleRequestSubjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.ScheduleRequestTelephone", "ScheduleRequestTelephone")
+                        .WithMany()
+                        .HasForeignKey("ScheduleRequestTelephoneId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.SegmentText", b =>

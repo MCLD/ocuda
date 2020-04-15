@@ -621,6 +621,80 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.ToTable("RosterHeaders");
                 });
 
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.ScheduleClaim", b =>
+                {
+                    b.Property<int>("ScheduleRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsComplete")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ScheduleRequestId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ScheduleClaims");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.ScheduleLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DurationMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsComplete")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(1000)")
+                        .HasMaxLength(1000);
+
+                    b.Property<int?>("ScheduleLogCallDispositionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ScheduleRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScheduleLogCallDispositionId");
+
+                    b.ToTable("ScheduleLogs");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.ScheduleLogCallDisposition", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Disposition")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ScheduleLogCallDispositions");
+                });
+
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.Section", b =>
                 {
                     b.Property<int>("Id")
@@ -1143,6 +1217,23 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.HasOne("Ocuda.Ops.Models.Entities.User", "UpdatedByUser")
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.ScheduleClaim", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.ScheduleLog", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.ScheduleLogCallDisposition", "ScheduleLogCallDisposition")
+                        .WithMany()
+                        .HasForeignKey("ScheduleLogCallDispositionId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 

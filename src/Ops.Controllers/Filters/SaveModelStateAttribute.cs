@@ -6,6 +6,8 @@ namespace Ocuda.Ops.Controllers.Filters
 {
     public class SaveModelStateAttribute : ActionFilterAttribute
     {
+        public string Key { get; set; }
+
         public override void OnActionExecuted(ActionExecutedContext context)
         {
             //Only export when ModelState is not valid
@@ -17,8 +19,17 @@ namespace Ocuda.Ops.Controllers.Filters
                 using var controller = context.Controller as Controller;
                 if (controller != null && context.ModelState != null)
                 {
-                    var key = ModelStateHelper.GetModelStateKey(context.RouteData.Values);
-                    controller.TempData[key] = ModelStateHelper
+                    string modelStateKey;
+                    if (!string.IsNullOrWhiteSpace(Key))
+                    {
+                        modelStateKey = ModelStateHelper.GetModelStateKey(Key);
+                    }
+                    else
+                    {
+                        modelStateKey = ModelStateHelper.GetModelStateKey(context.RouteData.Values);
+                    }
+
+                    controller.TempData[modelStateKey] = ModelStateHelper
                         .SerializeModelState(context.ModelState);
                 }
             }

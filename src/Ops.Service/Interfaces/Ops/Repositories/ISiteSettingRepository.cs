@@ -5,6 +5,5 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
     public interface ISiteSettingRepository : IOpsRepository<SiteSetting, string>
     {
-        Task<bool> IsDuplicateKey(SiteSetting setting);
     }
 }
