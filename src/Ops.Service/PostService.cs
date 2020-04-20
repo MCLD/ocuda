@@ -131,17 +131,10 @@ namespace Ocuda.Ops.Service
             return await _postRepository.GetTopSectionPostsAsync(sectionId, take);
         }
 
-        public async Task<DataWithCount<ICollection<Post>>> GetSectionPaginatedPostsAsync(
-            BaseFilter filter, int sectionId)
+        public async Task<DataWithCount<ICollection<Post>>> GetPaginatedPostsAsync(
+            BlogFilter filter)
         {
-            return await _postRepository.GetPaginatedListBySectionAsync(filter, sectionId);
-        }
-
-        public async Task<DataWithCount<ICollection<Post>>> GetSectionCategoryPaginatedPostListAsync(
-            BaseFilter filter, int sectionId, int categoryId)
-        {
-            return await _postRepository.GetPaginatedListBySectionAsync(filter, sectionId,
-                categoryId);
+            return await _postRepository.GetPaginatedListAsync(filter);
         }
 
         public async Task<List<PostCategory>> GetPostCategoriesByIdsAsync(List<int> postIds)

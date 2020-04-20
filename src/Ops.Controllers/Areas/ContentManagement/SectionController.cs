@@ -90,9 +90,12 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 return RedirectToAction(nameof(SectionController.Index));
             }
 
-            var filter = new BaseFilter(page, 5);
+            var filter = new BlogFilter(page, 5)
+            {
+                SectionId = section.Id
+            };
 
-            var posts = await _postService.GetSectionPaginatedPostsAsync(filter, section.Id);
+            var posts = await _postService.GetPaginatedPostsAsync(filter);
 
             var paginateModel = new PaginateModel
             {
@@ -145,12 +148,15 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 return RedirectToAction(nameof(SectionController.Index));
             }
 
-            var filter = new BaseFilter(page, 5);
+            var filter = new BlogFilter(page, 5)
+            {
+                SectionId = section.Id
+            };
 
             var paginateModel = new PaginateModel
             {
                 CurrentPage = page,
-                ItemsPerPage = filter.Take.Value
+                ItemsPerPage = filter.Take.Value,
             };
 
             if (paginateModel.PastMaxPage)
@@ -175,7 +181,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             };
             if (string.IsNullOrEmpty(categoryStub))
             {
-                var posts = await _postService.GetSectionPaginatedPostsAsync(filter, section.Id);
+                var posts = await _postService.GetPaginatedPostsAsync(filter);
                 foreach (var post in posts.Data.ToList())
                 {
                     post.Content = CommonMark.CommonMarkConverter.Convert(post.Content);
@@ -192,8 +198,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 try
                 {
                     var category = await _postService.GetSectionCategoryByStubAsync(categoryStub, section.Id);
-                    var posts = await _postService
-                        .GetSectionCategoryPaginatedPostListAsync(filter, section.Id, category.Id);
+                    filter.CategoryId = category.Id;
+                    var posts = await _postService.GetPaginatedPostsAsync(filter);
                     foreach (var post in posts.Data.ToList())
                     {
                         post.Content = CommonMark.CommonMarkConverter.Convert(post.Content);
