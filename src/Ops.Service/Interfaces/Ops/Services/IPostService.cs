@@ -18,11 +18,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<Category> GetSectionCategoryByStubAsync(string stub, int sectionId);
 
-        Task<DataWithCount<ICollection<Post>>> GetSectionCategoryPaginatedPostListAsync(
-            BaseFilter filter, int sectionId, int categoryId);
-
-        Task<DataWithCount<ICollection<Post>>> GetSectionPaginatedPostsAsync(
-            BaseFilter filter, int sectionId);
+        Task<DataWithCount<ICollection<Post>>> GetPaginatedPostsAsync(BlogFilter filter);
 
         Task<List<Post>> GetTopSectionPostsAsync(int take, int sectionId);
 
