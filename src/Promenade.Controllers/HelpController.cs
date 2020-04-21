@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.ViewModels.Help;
 using Ocuda.Promenade.Service;
+using Ocuda.Utility.Extensions;
 
 namespace Ocuda.Promenade.Controllers
 {
@@ -24,24 +26,37 @@ namespace Ocuda.Promenade.Controllers
             : base(context)
         {
             _scheduleService = scheduleService
-                ?? throw new System.ArgumentNullException(nameof(scheduleService));
+                ?? throw new ArgumentNullException(nameof(scheduleService));
             _segmentService = segmentService
-                ?? throw new System.ArgumentNullException(nameof(segmentService));
+                ?? throw new ArgumentNullException(nameof(segmentService));
         }
 
-        private System.DateTime FirstAvailable()
+        private const double StartHour = 8.5;
+        private const double AvailableHours = 8;
+        private const double BufferHours = 4;
+        private static readonly TimeSpan QuantizeSpan = TimeSpan.FromMinutes(30);
+
+        private DateTime FirstAvailable(DateTime date)
         {
-            var firstAvailable = System.DateTime.Today.AddHours(8.5);
+            var firstAvailable = date.Date.AddHours(StartHour);
             switch (firstAvailable.DayOfWeek)
             {
-                case System.DayOfWeek.Friday:
-                    firstAvailable = firstAvailable.AddDays(3);
-                    break;
-                case System.DayOfWeek.Saturday:
+                case DayOfWeek.Saturday:
                     firstAvailable = firstAvailable.AddDays(2);
                     break;
-                default:
+                case DayOfWeek.Sunday:
                     firstAvailable = firstAvailable.AddDays(1);
+                    break;
+                default:
+                    if (date > firstAvailable
+                        && date.AddHours(BufferHours) < firstAvailable.AddHours(AvailableHours))
+                    {
+                        firstAvailable = date.AddHours(BufferHours).RoundUp(QuantizeSpan);
+                    }
+                    else
+                    {
+                        firstAvailable = firstAvailable.AddDays(1);
+                    }
                     break;
             }
             return firstAvailable;
@@ -61,7 +76,7 @@ namespace Ocuda.Promenade.Controllers
                 return RedirectToAction(nameof(Schedule));
             }
 
-            var firstAvailable = FirstAvailable();
+            var firstAvailable = FirstAvailable(DateTime.Now);
 
             if (viewModel.RequestedDate.Date < firstAvailable.Date)
             {
@@ -70,7 +85,7 @@ namespace Ocuda.Promenade.Controllers
                     ModelState.Remove(nameof(viewModel.RequestedDate));
                 }
                 ModelState.AddModelError(nameof(viewModel.RequestedDate),
-                    $"You must request a date on or after {firstAvailable.Date.ToShortDateString()}");
+                    $"You must request a date on or after {firstAvailable.ToShortDateString()}");
                 viewModel.RequestedDate = firstAvailable.Date;
             }
             else if (viewModel.RequestedDate.Date > firstAvailable.Date.AddDays(7))
@@ -80,21 +95,22 @@ namespace Ocuda.Promenade.Controllers
                     ModelState.Remove(nameof(viewModel.RequestedDate));
                 }
                 ModelState.AddModelError(nameof(viewModel.RequestedDate),
-                    $"The furthest date you can schedule a call is {firstAvailable.Date.AddDays(7).ToShortDateString()}");
+                    $"The furthest date you can schedule a call is {firstAvailable.AddDays(7).ToShortDateString()}");
                 viewModel.RequestedDate = firstAvailable.Date.AddDays(7);
             }
 
             if (viewModel.RequestedTime.TimeOfDay < firstAvailable.TimeOfDay)
             {
                 ModelState.AddModelError(nameof(viewModel.RequestedTime),
-                    $"You must request a time after {firstAvailable.ToShortTimeString()}");
+                    $"The earliest time you can select is {firstAvailable.ToShortTimeString()}");
                 viewModel.RequestedTime = firstAvailable.ToLocalTime();
             }
-            else if (viewModel.RequestedTime.TimeOfDay > firstAvailable.AddHours(8).TimeOfDay)
+            else if (viewModel.RequestedTime.TimeOfDay
+                > firstAvailable.AddHours(AvailableHours).TimeOfDay)
             {
                 ModelState.AddModelError(nameof(viewModel.RequestedTime),
-                    $"You must request a time before {firstAvailable.AddHours(8).ToShortTimeString()}");
-                viewModel.RequestedTime = firstAvailable.AddHours(8).ToLocalTime();
+                    $"You must request a time before {firstAvailable.AddHours(AvailableHours).ToShortTimeString()}");
+                viewModel.RequestedTime = firstAvailable.AddHours(AvailableHours).ToLocalTime();
             }
 
             var subjects = await _scheduleService.GetSubjectsAsync();
@@ -117,7 +133,7 @@ namespace Ocuda.Promenade.Controllers
 
             if (ModelState.IsValid)
             {
-                viewModel.ScheduleRequest.RequestedTime = new System.DateTime(
+                viewModel.ScheduleRequest.RequestedTime = new DateTime(
                     viewModel.RequestedDate.Year,
                     viewModel.RequestedDate.Month,
                     viewModel.RequestedDate.Day,
@@ -206,14 +222,14 @@ namespace Ocuda.Promenade.Controllers
                 Value = _.Id.ToString(CultureInfo.InvariantCulture)
             });
 
-            var firstAvailable = FirstAvailable();
+            var firstAvailable = FirstAvailable(DateTime.Now);
 
-            if (scheduleViewModel.RequestedDate == System.DateTime.MinValue)
+            if (scheduleViewModel.RequestedDate == DateTime.MinValue)
             {
                 scheduleViewModel.RequestedDate = firstAvailable.Date;
             }
 
-            if (scheduleViewModel.RequestedTime == System.DateTime.MinValue)
+            if (scheduleViewModel.RequestedTime == DateTime.MinValue)
             {
                 scheduleViewModel.RequestedTime = firstAvailable.ToLocalTime();
             }

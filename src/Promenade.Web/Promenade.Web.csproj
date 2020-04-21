@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <AssemblyName>Ocuda.Promenade.Web</AssemblyName>
-    <AssemblyVersion>1.0.0.26</AssemblyVersion>
+    <AssemblyVersion>1.0.0.27</AssemblyVersion>
     <Authors>Maricopa County Library District Web developers</Authors>
     <CodeAnalysisRuleSet>../../OcudaRuleSet.ruleset</CodeAnalysisRuleSet>
     <Company>Maricopa County Library District</Company>
     <Copyright>Copyright 2018 Maricopa County Library District</Copyright>
-    <FileVersion>1.0.0.26</FileVersion>
+    <FileVersion>1.0.0.27</FileVersion>
     <LangVersion>Latest</LangVersion>
     <PackageLicenseUrl>https://github.com/MCLD/ocuda/blob/develop/LICENSE</PackageLicenseUrl>
     <Product>Ocuda</Product>
