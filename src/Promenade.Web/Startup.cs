@@ -55,6 +55,11 @@ namespace Ocuda.Promenade.Web
                 throw new ArgumentNullException(nameof(services));
             }
 
+            if (_isDevelopment)
+            {
+                services.AddApplicationInsightsTelemetry();
+            }
+
             services.AddResponseCompression();
 
             services.AddResponseCaching();
