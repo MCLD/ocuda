@@ -64,5 +64,50 @@
         /// Cached external resource list
         /// </summary>
         public static readonly string PromExternalResources = "externalresources";
+
+        /// <summary>
+        /// Cached social card, {0} is the card id
+        /// </summary>
+        public static readonly string PromSocialCard = "socialcard.{0}";
+
+        /// <summary>
+        /// Cached segment, {0} is the segment id
+        /// </summary>
+        public static readonly string PromSegment = "segment.{0}";
+
+        /// <summary>
+        /// Cached segment text, {0} is the language id, {1} is the id
+        /// </summary>
+        public static readonly string PromSegmentText = "segmenttext.{0}.{1}";
+
+        /// <summary>
+        /// Cached emedia groups
+        /// </summary>
+        public static readonly string PromEmediaGroups = "emediagroups";
+
+        /// <summary>
+        /// Cached emedia groups
+        /// </summary>
+        public static readonly string PromEmedias = "emedias";
+
+        /// <summary>
+        /// Cached emedia text, {0} is the language id, {1} is the id
+        /// </summary>
+        public static readonly string PromEmediaText = "emediatext.{0}.{1}";
+
+        /// <summary>
+        /// Cached emedia categories
+        /// </summary>
+        public static readonly string PromCategories = "categories";
+
+        /// <summary>
+        /// Cached emedia text, {0} is the language id, {1} is the id
+        /// </summary>
+        public static readonly string PromCategoryText = "categorytext.{0}.{1}";
+
+        /// <summary>
+        /// Cached emedia categories
+        /// </summary>
+        public static readonly string PromEmediaCategories = "emediacategories";
     }
 }

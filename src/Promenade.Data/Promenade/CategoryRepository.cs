@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -16,20 +17,11 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<Category> FindAsync(int id)
-        {
-            var entity = await DbSet.FindAsync(id);
-            if (entity != null)
-            {
-                _context.Entry(entity).State = EntityState.Detached;
-            }
-            return entity;
-        }
-
         public async Task<List<Category>> GetAllCategories()
         {
             return await DbSet
                 .AsNoTracking()
+                .OrderBy(_ => _.Id)
                 .ToListAsync();
         }
     }
