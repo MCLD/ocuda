@@ -25,7 +25,7 @@ namespace Ocuda.Promenade.Service.Abstract
             CacheSlidingExpiration = new TimeSpan(1, 0, 0);
         }
 
-        protected int? GetPageCacheDuration(IConfiguration config)
+        protected static int? GetPageCacheDuration(IConfiguration config)
         {
             if (config == null)
             {
@@ -80,7 +80,7 @@ namespace Ocuda.Promenade.Service.Abstract
         protected async Task SaveToCacheAsync<T>(IDistributedCache cache,
             string cacheKey,
             T item,
-            int? cacheDuration)
+            int? cacheDuration) where T : class
         {
             if (cacheDuration == null || string.IsNullOrEmpty(cacheKey) || item == null)
             {

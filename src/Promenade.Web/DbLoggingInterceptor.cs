@@ -8,7 +8,7 @@ namespace Ocuda.Promenade.Web
 {
     public class DbLoggingInterceptor : DbCommandInterceptor
     {
-        private ILogger _logger;
+        private readonly ILogger _logger;
 
         public DbLoggingInterceptor()
         {
@@ -27,13 +27,5 @@ namespace Ocuda.Promenade.Web
             }
             return base.ReaderExecutingAsync(command, eventData, result, cancellationToken);
         }
-
-        //public override Task<DbDataReader> ReaderExecutedAsync(DbCommand command,
-        //    CommandExecutedEventData eventData,
-        //    DbDataReader result,
-        //    CancellationToken cancellationToken = default)
-        //{
-        //    return base.ReaderExecutedAsync(command, eventData, result, cancellationToken);
-        //}
     }
 }
