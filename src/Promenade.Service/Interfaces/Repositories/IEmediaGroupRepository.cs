@@ -6,6 +6,6 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
     public interface IEmediaGroupRepository : IGenericRepository<EmediaGroup>
     {
-        Task<ICollection<EmediaGroup>> GetAllWithEmediaAsync();
+        Task<ICollection<EmediaGroup>> GetAllAsync();
     }
 }

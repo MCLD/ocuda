@@ -157,8 +157,10 @@ namespace Ocuda.Promenade.Controllers
 
                 if (segmentId >= 0)
                 {
-                    viewModel.SegmentText
-                        = await _segmentService.GetSegmentTextBySegmentIdAsync(segmentId);
+                    var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
+                    viewModel.SegmentText = await _segmentService
+                        .GetSegmentTextBySegmentIdAsync(segmentId, forceReload);
 
                     if (!string.IsNullOrEmpty(viewModel.SegmentText?.Text))
                     {
@@ -193,8 +195,10 @@ namespace Ocuda.Promenade.Controllers
 
             if (segmentId >= 0)
             {
-                scheduleViewModel.SegmentText
-                    = await _segmentService.GetSegmentTextBySegmentIdAsync(segmentId);
+                var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
+                scheduleViewModel.SegmentText = await _segmentService
+                    .GetSegmentTextBySegmentIdAsync(segmentId, forceReload);
 
                 if (!string.IsNullOrEmpty(scheduleViewModel.SegmentText?.Text))
                 {

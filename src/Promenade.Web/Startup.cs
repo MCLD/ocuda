@@ -123,14 +123,35 @@ namespace Ocuda.Promenade.Web
                 if (!string.IsNullOrEmpty(poolSizeConfig)
                     && int.TryParse(poolSizeConfig, out int poolSize))
                 {
-                    services.AddDbContextPool<PromenadeContext,
-                        DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs),
-                            poolSize);
+                    if (_isDevelopment)
+                    {
+                        services.AddDbContextPool<PromenadeContext,
+                            DataProvider.SqlServer.Promenade.Context>(_ => _
+                                .UseSqlServer(promCs)
+                                .AddInterceptors(new DbLoggingInterceptor()),
+                                poolSize);
+                    }
+                    else
+                    {
+                        services.AddDbContextPool<PromenadeContext,
+                            DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs),
+                                poolSize);
+                    }
                 }
                 else
                 {
-                    services.AddDbContextPool<PromenadeContext,
-                        DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
+                    if (_isDevelopment)
+                    {
+                        services.AddDbContextPool<PromenadeContext,
+                            DataProvider.SqlServer.Promenade.Context>(_ => _
+                                .UseSqlServer(promCs)
+                                .AddInterceptors(new DbLoggingInterceptor()));
+                    }
+                    else
+                    {
+                        services.AddDbContextPool<PromenadeContext,
+                            DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
+                    }
                 }
             }
             else

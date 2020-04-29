@@ -50,7 +50,8 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
             if (page.SocialCardId.HasValue)
             {
-                var card = await _socialCardService.GetByIdAsync(page.SocialCardId.Value);
+                var card = await _socialCardService.GetByIdAsync(page.SocialCardId.Value,
+                    forceReload);
                 card.Url = viewModel.CanonicalUrl;
                 viewModel.SocialCard = card;
             }

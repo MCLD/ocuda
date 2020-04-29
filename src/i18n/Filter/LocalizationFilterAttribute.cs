@@ -29,15 +29,13 @@ namespace Ocuda.i18n.Filter
         public async Task OnResourceExecutionAsync(ResourceExecutingContext context,
             ResourceExecutionDelegate next)
         {
-            var httpContext = context.HttpContext;
-
             var currentCulture = _cultureContextProvider.GetCurrentCulture();
-            httpContext.Items[LocalizationItemKey.ISOLanguageName]
+            context.HttpContext.Items[LocalizationItemKey.ISOLanguageName]
                 = currentCulture.TwoLetterISOLanguageName;
 
             if (_l10nOptions.Value?.SupportedCultures.Count > 1)
             {
-                var cookieCulture = httpContext
+                var cookieCulture = context.HttpContext
                     .Request
                     .Cookies[CookieRequestCultureProvider.DefaultCookieName];
 
@@ -45,7 +43,7 @@ namespace Ocuda.i18n.Filter
                 {
                     if (cookieCulture != null)
                     {
-                        httpContext
+                        context.HttpContext
                             .Response
                             .Cookies
                             .Delete(CookieRequestCultureProvider.DefaultCookieName);
@@ -54,7 +52,7 @@ namespace Ocuda.i18n.Filter
                 else
                 {
                     // no cookie or new culture selected, reset cookie
-                    httpContext.Response.Cookies.Append(
+                    context.HttpContext.Response.Cookies.Append(
                         CookieRequestCultureProvider.DefaultCookieName,
                         CookieRequestCultureProvider
                             .MakeCookieValue(new RequestCulture(currentCulture.Name)),
@@ -84,8 +82,9 @@ namespace Ocuda.i18n.Filter
                         }
                     }
                 }
-                httpContext.Items[LocalizationItemKey.HrefLang] = cultureHrefLang;
-                httpContext.Items[LocalizationItemKey.L10n] = cultureList.OrderBy(_ => _.Text);
+                context.HttpContext.Items[LocalizationItemKey.HrefLang] = cultureHrefLang;
+                context.HttpContext.Items[LocalizationItemKey.L10n] 
+                    = cultureList.OrderBy(_ => _.Text);
             }
 
             await next();

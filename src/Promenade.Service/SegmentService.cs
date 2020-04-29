@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Abstract;
@@ -12,6 +15,8 @@ namespace Ocuda.Promenade.Service
 {
     public class SegmentService : BaseService<SegmentService>
     {
+        private readonly IDistributedCache _cache;
+        private readonly IConfiguration _config;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ISegmentRepository _segmentRepository;
         private readonly ISegmentTextRepository _segmentTextRepository;
@@ -19,12 +24,16 @@ namespace Ocuda.Promenade.Service
 
         public SegmentService(ILogger<SegmentService> logger,
             IDateTimeProvider dateTimeProvider,
+            IDistributedCache cache,
+            IConfiguration config,
             IHttpContextAccessor httpContextAccessor,
             ISegmentRepository segmentRepository,
             ISegmentTextRepository segmentTextRepository,
             LanguageService languageService)
             : base(logger, dateTimeProvider)
         {
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
             _httpContextAccessor = httpContextAccessor
                 ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _segmentRepository = segmentRepository
@@ -35,15 +44,30 @@ namespace Ocuda.Promenade.Service
                 ?? throw new ArgumentNullException(nameof(languageService));
         }
 
-        public async Task<SegmentText> GetSegmentTextBySegmentIdAsync(int segmentId)
+        public async Task<SegmentText> GetSegmentTextBySegmentIdAsync(int segmentId,
+            bool forceReload)
         {
             SegmentText segmentText = null;
+            Segment segment = null;
 
-            var segment = await _segmentRepository.GetActiveAsync(segmentId);
+            var cachePagesInHours = GetPageCacheDuration(_config);
+            string segmentCacheKey = string.Format(CultureInfo.InvariantCulture,
+                Utility.Keys.Cache.PromSegment,
+                segmentId);
+
+            if (cachePagesInHours != null && !forceReload)
+            {
+                segment = await GetFromCacheAsync<Segment>(_cache, segmentCacheKey);
+            }
+
+            if (segment == null)
+            {
+                segment = await _segmentRepository.GetActiveAsync(segmentId);
+                await SaveToCacheAsync(_cache, segmentCacheKey, segment, cachePagesInHours);
+            }
 
             if (segment != null)
             {
-
                 var currentCultureName = _httpContextAccessor
                     .HttpContext
                     .Features
@@ -52,19 +76,63 @@ namespace Ocuda.Promenade.Service
                     .UICulture?
                     .Name;
 
+                string segmentTextCacheKey = null;
+
                 if (!string.IsNullOrWhiteSpace(currentCultureName))
                 {
                     var currentLangaugeId = await _languageService
                         .GetLanguageIdAsync(currentCultureName);
-                    segmentText = await _segmentTextRepository
-                        .GetByIdsAsync(currentLangaugeId, segmentId);
+
+                    segmentTextCacheKey = string.Format(CultureInfo.InvariantCulture,
+                        Utility.Keys.Cache.PromSegmentText,
+                        currentLangaugeId,
+                        segmentId);
+
+                    if (cachePagesInHours != null && !forceReload)
+                    {
+                        segmentText = await GetFromCacheAsync<SegmentText>(
+                            _cache,
+                            segmentTextCacheKey);
+                    }
+
+                    if (segmentText == null)
+                    {
+                        segmentText = await _segmentTextRepository
+                            .GetByIdsAsync(currentLangaugeId, segmentId);
+
+                        await SaveToCacheAsync(_cache,
+                            segmentTextCacheKey,
+                            segmentText,
+                            cachePagesInHours);
+                    }
                 }
 
                 if (segmentText == null)
                 {
                     var defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync();
-                    segmentText = await _segmentTextRepository
-                        .GetByIdsAsync(defaultLanguageId, segmentId);
+
+                    segmentTextCacheKey = string.Format(CultureInfo.InvariantCulture,
+                        Utility.Keys.Cache.PromSegmentText,
+                        defaultLanguageId,
+                        segmentId);
+
+                    if (cachePagesInHours != null && !forceReload)
+                    {
+                        segmentText = await GetFromCacheAsync<SegmentText>(
+                            _cache,
+                            segmentTextCacheKey);
+                    }
+
+                    if (segmentText == null)
+                    {
+                        segmentText = await _segmentTextRepository
+                            .GetByIdsAsync(defaultLanguageId, segmentId);
+
+                        await SaveToCacheAsync(_cache,
+                            segmentTextCacheKey,
+                            segmentText,
+                            cachePagesInHours);
+                    }
                 }
             }
 

@@ -17,11 +17,10 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<ICollection<EmediaGroup>> GetAllWithEmediaAsync()
+        public async Task<ICollection<EmediaGroup>> GetAllAsync()
         {
             return await DbSet
                 .AsNoTracking()
-                .Include(_ => _.Emedias)
                 .OrderBy(_ => _.SortOrder)
                 .ToListAsync();
         }

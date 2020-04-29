@@ -21,7 +21,9 @@ namespace Ocuda.Promenade.Controllers
         [Route("")]
         public async Task<IActionResult> Index()
         {
-            var groupedEmedia = await _emediaService.GetGroupedEmediaAsync();
+            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
+            var groupedEmedia = await _emediaService.GetGroupedEmediaAsync(forceReload);
 
             foreach (var group in groupedEmedia)
             {
