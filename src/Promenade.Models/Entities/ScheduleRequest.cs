@@ -33,7 +33,6 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string Language { get; set; }
 
-        [Required]
         [MaxLength(255)]
         [Display(Name = "How can we help?")]
         public string Notes { get; set; }

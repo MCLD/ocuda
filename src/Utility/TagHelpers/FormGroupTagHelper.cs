@@ -33,6 +33,8 @@ namespace Ocuda.Utility.TagHelpers
         private const string defaultValidationMessageClass = "validation-message text-danger";
         private const string validationIgnoreClass = "validation-ignore";
 
+        private const string requiredFieldClass = "fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker";
+
         private const string dateTimeGroupClass = "input-group date";
         private const string dateTimePickerClass = "datetimepicker";
         private const string dateTimeDatePickerClass = "datepicker";
@@ -85,7 +87,7 @@ namespace Ocuda.Utility.TagHelpers
             TagHelperOutput labelElement = null;
             if (!HideLabel)
             {
-                labelElement = await CreateLabelElement(context);
+                labelElement = await CreateLabelElement(context, output);
             }
             TagHelperOutput inputElement = await CreateInputElement(output);
             TagHelperOutput validationMessageElement
@@ -118,7 +120,8 @@ namespace Ocuda.Utility.TagHelpers
             output.Content.SetHtmlContent(formGroupDiv);
         }
 
-        private async Task<TagHelperOutput> CreateLabelElement(TagHelperContext context)
+        private async Task<TagHelperOutput> CreateLabelElement(TagHelperContext context,
+            TagHelperOutput output)
         {
             var labelTagHelper =
                 new LabelTagHelper(_htmlGenerator)
@@ -154,6 +157,14 @@ namespace Ocuda.Utility.TagHelpers
                 labelOutput.Content.AppendHtml(tooltip.RenderSelfClosingTag());
             }
 
+            if (output.Attributes.ContainsName("data-val-required")
+                || output.Attributes.ContainsName("formgroup-val-required"))
+            {
+                var icon = new TagBuilder("span");
+                icon.AddCssClass(requiredFieldClass);
+
+                labelOutput.Content.AppendHtml(icon.RenderSelfClosingTag());
+            }
             return labelOutput;
         }
 
@@ -230,6 +241,13 @@ namespace Ocuda.Utility.TagHelpers
                 pickerGroup.Attributes.Add("data-target-input", dateTimeTargetInput);
                 inputOutput.PreElement.AppendHtml(pickerGroup.RenderStartTag());
                 inputOutput.PostElement.AppendHtml(pickerGroup.RenderEndTag());
+            }
+
+            if (inputOutput.Attributes.ContainsName("formgroup-val-required"))
+            {
+                var tagValue = inputOutput.Attributes["formgroup-val-required"];
+                inputOutput.Attributes.Add("data-val-required", tagValue.Value);
+                inputOutput.Attributes.Remove(tagValue);
             }
 
             return inputOutput;

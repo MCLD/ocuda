@@ -1,0 +1,51 @@
+﻿@model Ocuda.Promenade.Controllers.ViewModels.Help.ScheduleDetailsViewModel
+
+@if (Model?.SegmentText != null)
+{
+    if (!string.IsNullOrEmpty(Model.SegmentText.Header))
+    {
+        <h1>@Model.SegmentText.Header</h1>
+    }
+    @Html.Raw(Model.SegmentText.Text)
+}
+else
+{
+    <h1>Schedule your time</h1>
+}
+<div class="row">
+    <div class="col-12">
+        <form method="post" action="@Url.Action("ScheduleDetails", "Help")"
+              type="date"
+              formgroup>
+            <input asp-for="DisplayTime" formgroup readonly />
+            <input asp-for="DisplaySubject" formgroup readonly />
+            <input asp-for="ScheduleRequest.Name" formgroup />
+            <input asp-for="ScheduleRequestPhone"
+                   type="tel"
+                   placeholder="###-###-####"
+                   formgroup />
+            <input asp-for="ScheduleRequest.Email"
+                   formgroup
+                   formgroup-val-required="@Model.EmailRequiredMessage"
+                   type="email" />
+            <select asp-for="ScheduleRequest.Language"
+                    asp-items="Model.Languages" formgroup></select>
+            <textarea asp-for="ScheduleRequest.Notes"
+                      maxlength="255"
+                      formgroup-val-required="@Model.NotesRequiredMessage"
+                      formgroup />
+            <div>
+                <a href="@Url.Action("Schedule", "Help")"
+                   class="btn btn-outline-dark m-2 btn-lg float-left">
+                    <span class="fas fa-chevron-left"></span>
+                    Back
+                </a>
+                <button type="submit"
+                        class="btn btn-outline-success m-2 btn-lg float-right">
+                    <span class="far fa-check-circle"></span>
+                    Submit
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

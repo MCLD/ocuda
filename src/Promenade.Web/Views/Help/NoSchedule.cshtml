@@ -1,12 +1,12 @@
-﻿@model Ocuda.Promenade.Controllers.ViewModels.Help.ScheduleViewModel
+﻿@model Ocuda.Promenade.Models.Entities.SegmentText
 
-@if (Model?.SegmentText != null)
+@if (Model != null)
 {
-    if (!string.IsNullOrEmpty(Model.SegmentText.Header))
+    if (!string.IsNullOrEmpty(Model.Header))
     {
-        <h1>@Model.SegmentText.Header</h1>
+        <h1>@Model.Header</h1>
     }
-    @Html.Raw(Model.SegmentText.Text)
+    @Html.Raw(Model.Text)
 }
 else
 {
