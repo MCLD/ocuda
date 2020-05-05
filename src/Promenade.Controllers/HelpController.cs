@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,6 +12,7 @@ using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.ViewModels.Help;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility.Extensions;
+using Ocuda.Utility.Helpers;
 
 namespace Ocuda.Promenade.Controllers
 {
@@ -34,6 +36,12 @@ namespace Ocuda.Promenade.Controllers
         private const double StartHour = 8.5;
         private const double AvailableHours = 8;
         private const double BufferHours = 4;
+        private readonly IList<DayOfWeek> BlockedDays = new List<DayOfWeek>
+        {
+            DayOfWeek.Sunday,
+            DayOfWeek.Saturday
+        };
+
         private static readonly TimeSpan QuantizeSpan = TimeSpan.FromMinutes(30);
 
         private DateTime FirstAvailable(DateTime date)
@@ -77,6 +85,14 @@ namespace Ocuda.Promenade.Controllers
             }
 
             var firstAvailable = FirstAvailable(DateTime.Now);
+
+
+            if (BlockedDays.Contains(viewModel.RequestedDate.DayOfWeek))
+            {
+                ModelState.AddModelError(nameof(viewModel.RequestedDate),
+                   "This service is only available on the following days: "
+                   + new DayOfWeekHelper().ListDays(BlockedDays));
+            }
 
             if (viewModel.RequestedDate.Date < firstAvailable.Date)
             {
