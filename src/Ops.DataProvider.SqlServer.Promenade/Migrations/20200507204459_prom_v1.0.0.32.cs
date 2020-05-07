@@ -31,6 +31,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(255)",
                 oldMaxLength: 255);
+
+            migrationBuilder.Sql(@"UPDATE [ScheduleRequestSubject] SET [RequireComments] = 1;");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

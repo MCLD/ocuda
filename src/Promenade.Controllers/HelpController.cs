@@ -259,9 +259,6 @@ namespace Ocuda.Promenade.Controllers
             }
             else
             {
-                TempData[TempDataDateTime] = viewModel.ScheduleRequest.RequestedTime;
-                TempData[TempDataSubjectId] = viewModel.ScheduleRequest.ScheduleRequestSubjectId;
-
                 return await DisplayScheduleDetailsFormAsync(viewModel);
             }
         }
