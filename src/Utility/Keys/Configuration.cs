@@ -2,6 +2,7 @@
 {
     public struct Configuration
     {
+        public static readonly string OcudaCookieName = "Ocuda.CookieName";
         public static readonly string OcudaErrorControllerName = "Ocuda.ErrorControllerName";
         public static readonly string OcudaFileShared = "Ocuda.FileShared";
         public static readonly string OcudaInstance = "Ocuda.Instance";
@@ -61,5 +62,8 @@
             = "Promenade.DistributedCache.RedisConfiguration";
 
         public static readonly string PromenadeRequestLogging = "Promenade.RequestLogging";
+
+        public static readonly string PromenadeSessionTimeoutMinutes
+            = "Promenade.SessionTimeoutMinutes";
     }
 }
