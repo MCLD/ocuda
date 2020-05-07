@@ -109,5 +109,10 @@
         /// Cached emedia categories
         /// </summary>
         public static readonly string PromEmediaCategories = "emediacategories";
+
+        /// <summary>
+        /// Cached schedule subjects
+        /// </summary>
+        public static readonly string PromScheduleSubjects = "schedulesubjects";
     }
 }

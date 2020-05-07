@@ -22,23 +22,14 @@ else
                    type="time"
                    step="1800"
                    formgroup />
-            <input asp-for="ScheduleRequest.Name" formgroup />
-            <input asp-for="ScheduleRequestPhone"
-                   type="tel"
-                   placeholder="###-###-####"
-                   formgroup />
-            <input asp-for="ScheduleRequest.Email"
-                   formgroup
-                   type="email" />
-            <select asp-for="ScheduleRequest.ScheduleRequestSubjectId"
+            <select asp-for="SubjectId"
                     asp-items="Model.Subjects" formgroup></select>
-            <select asp-for="ScheduleRequest.Language"
-                    asp-items="Model.Languages" formgroup></select>
-            <textarea asp-for="ScheduleRequest.Notes"
-                      maxlength="255"
-                      formgroup />
-            <div class="offset-md-3">
-                <input type="submit" class="btn btn-outline-success m-2" />
+            <div>
+                <button type="submit"
+                        class="btn btn-outline-dark m-2 btn-lg float-right">
+                    Next
+                    <span class="fas fa-chevron-right"></span>
+                </button>
             </div>
         </form>
     </div>

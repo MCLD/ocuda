@@ -1,4 +1,4 @@
-﻿@model Ocuda.Promenade.Controllers.ViewModels.Help.ScheduleViewModel
+﻿@model Ocuda.Promenade.Controllers.ViewModels.Help.ScheduleDetailsViewModel
 
 @if (Model?.SegmentText != null)
 {
@@ -16,8 +16,8 @@ else
 <p class="lead">Here are the details:</p>
 
 <div class="row">
-    <div class="col-md-3 text-md-right"><strong>Requested time</strong></div>
-    <div class="col-md-9">@Model.ScheduleRequest.RequestedTime</div>
+    <div class="col-md-3 text-md-right"><strong>Requested date and time</strong></div>
+    <div class="col-md-9">@Model.DisplayTime</div>
 </div>
 <div class="row mt-2">
     <div class="col-md-3 text-md-right"><strong>Name</strong></div>
@@ -38,7 +38,7 @@ else
 
 <div class="row mt-2">
     <div class="col-md-3 text-md-right"><strong>Subject</strong></div>
-    <div class="col-md-9">@Model.ScheduleRequestSubject</div>
+    <div class="col-md-9">@Model.DisplaySubject</div>
 </div>
 <div class="row mt-2">
     <div class="col-md-3 text-md-right"><strong>Language</strong></div>
