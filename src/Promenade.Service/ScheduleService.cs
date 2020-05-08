@@ -63,7 +63,7 @@ namespace Ocuda.Promenade.Service
             return subjects;
         }
 
-        public async Task<ScheduleRequest> AddAsync(ScheduleRequest scheduleRequest,
+        public Task<ScheduleRequest> AddAsync(ScheduleRequest scheduleRequest,
             string phone)
         {
             if (scheduleRequest == null)
@@ -76,6 +76,12 @@ namespace Ocuda.Promenade.Service
                 throw new ArgumentNullException(phone);
             }
 
+            return AddAsyncInternal(scheduleRequest, phone);
+        }
+
+        private async Task<ScheduleRequest> AddAsyncInternal(ScheduleRequest scheduleRequest,
+            string phone)
+        {
             var fixedPhone = Regex.Replace(phone, "[^0-9.]", "").Trim();
 
             var requestTelephone = await _scheduleRequestTelephoneRepository.GetAsync(fixedPhone)

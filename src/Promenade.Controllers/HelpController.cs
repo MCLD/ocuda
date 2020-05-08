@@ -88,6 +88,10 @@ namespace Ocuda.Promenade.Controllers
                     else
                     {
                         firstAvailable = firstAvailable.AddDays(1);
+                        if (firstAvailable.DayOfWeek == DayOfWeek.Saturday)
+                        {
+                            firstAvailable = firstAvailable.AddDays(2);
+                        }
                     }
                     break;
             }
@@ -375,9 +379,7 @@ namespace Ocuda.Promenade.Controllers
                 scheduleViewModel.NotesRequiredMessage = RequiredNotes;
             }
 
-            int segmentId = subject.SegmentId.HasValue
-                ? subject.SegmentId.Value
-                : await _siteSettingService
+            int segmentId = subject.SegmentId ?? await _siteSettingService
                     .GetSettingIntAsync(Models.Keys.SiteSetting.Scheduling.EnabledSegment);
 
             if (segmentId >= 0)
