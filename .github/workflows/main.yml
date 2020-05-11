@@ -10,7 +10,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Set Docker image name
-      run: echo ::set-env name=BLD_DOCKER_IMAGE::$(echo $GITHUB_REPOSITORY/${PWD##*/}
+      run: echo ::set-env name=BLD_DOCKER_IMAGE::$(echo $GITHUB_REPOSITORY/ops
         | tr '[:upper:]' '[:lower:]')
 
     - name: Extract Docker username
@@ -22,7 +22,7 @@ jobs:
       env:
         BLD_DOCKER_HOST: docker.pkg.github.com
         BLD_DOCKER_PASSWORD: ${{secrets.GITHUB_TOKEN}}
-        BLD_DOCKER_IMAGE: ops
+        BLD_DOCKERFILE: Dockerfile_ops
       run: ./docker-build.bash
 
   promenade:
@@ -32,7 +32,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Set Docker image name
-      run: echo ::set-env name=BLD_DOCKER_IMAGE::$(echo $GITHUB_REPOSITORY/${PWD##*/}
+      run: echo ::set-env name=BLD_DOCKER_IMAGE::$(echo $GITHUB_REPOSITORY/promenade
         | tr '[:upper:]' '[:lower:]')
 
     - name: Extract Docker username
@@ -44,5 +44,5 @@ jobs:
       env:
         BLD_DOCKER_HOST: docker.pkg.github.com
         BLD_DOCKER_PASSWORD: ${{secrets.GITHUB_TOKEN}}
-        BLD_DOCKER_IMAGE: promenade
+        BLD_DOCKERFILE: Dockerfile_promenade
       run: ./docker-build.bash
