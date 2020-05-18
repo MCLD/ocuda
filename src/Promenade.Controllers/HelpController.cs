@@ -70,32 +70,29 @@ namespace Ocuda.Promenade.Controllers
 
         private DateTime FirstAvailable(DateTime date)
         {
-            var firstAvailable = date.Date.AddHours(StartHour);
-            switch (firstAvailable.DayOfWeek)
+            var firstAvailable = date.RoundUp(QuantizeSpan);
+
+            if (firstAvailable.TimeOfDay < firstAvailable.Date.AddHours(StartHour).TimeOfDay)
             {
-                case DayOfWeek.Saturday:
-                    firstAvailable = firstAvailable.AddDays(2);
-                    break;
-                case DayOfWeek.Sunday:
-                    firstAvailable = firstAvailable.AddDays(1);
-                    break;
-                default:
-                    if (date > firstAvailable
-                        && date.AddHours(BufferHours) < firstAvailable.AddHours(AvailableHours))
-                    {
-                        firstAvailable = date.AddHours(BufferHours).RoundUp(QuantizeSpan);
-                    }
-                    else
-                    {
-                        firstAvailable = firstAvailable.AddDays(1);
-                        if (firstAvailable.DayOfWeek == DayOfWeek.Saturday)
-                        {
-                            firstAvailable = firstAvailable.AddDays(2);
-                        }
-                    }
-                    break;
+                firstAvailable = firstAvailable.Date.AddHours(StartHour);
             }
-            return firstAvailable;
+            else
+            {
+                firstAvailable = firstAvailable.AddHours(BufferHours);
+            }
+
+            if (firstAvailable.TimeOfDay
+                > firstAvailable.Date.AddHours(StartHour + AvailableHours).TimeOfDay)
+            {
+                firstAvailable = firstAvailable.Date.AddDays(1).AddHours(StartHour);
+            }
+
+            return firstAvailable.DayOfWeek switch
+            {
+                DayOfWeek.Saturday => firstAvailable.Date.AddDays(2).AddHours(StartHour),
+                DayOfWeek.Sunday => firstAvailable.Date.AddDays(1).AddHours(StartHour),
+                _ => firstAvailable
+            };
         }
 
         [HttpGet("[action]")]
