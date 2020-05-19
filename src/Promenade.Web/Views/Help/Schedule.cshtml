@@ -12,6 +12,18 @@ else
 {
     <h1>Schedule your time</h1>
 }
+
+@if (!string.IsNullOrEmpty(Model?.WarningText))
+{
+    <div class="row">
+        <div class="col-12 col-sm-10 offset-sm-1">
+            <div class="alert alert-warning">
+                @Html.Raw(Model.WarningText)
+            </div>
+        </div>
+    </div>
+}
+
 <div class="row">
     <div class="col-12">
         <form method="post" action="@Url.Action("Schedule", "Help")">

@@ -32,6 +32,9 @@ namespace Ocuda.Promenade.Controllers
         private const string ErrorEarliestTime = "The earliest time you can select is: {0}";
         private const string ErrorTimeBefore = "You must request a time before: {0}";
         private const string ErrorTelephoneFormat = "Please enter a telephone number in the format: ###-###-####";
+        private const string ErrorDateClosed = "That date is not available for scheduling: {0}";
+
+        private const string SessionTimeout = "Unfortunately your session has timed out. Please reselect your time and subject.";
 
         private const string ViewModelTelephoneId = nameof(ScheduleRequest)
             + "."
@@ -54,14 +57,18 @@ namespace Ocuda.Promenade.Controllers
 
         private static readonly TimeSpan QuantizeSpan = TimeSpan.FromMinutes(30);
 
+        private readonly LocationService _locationService;
         private readonly ScheduleService _scheduleService;
         private readonly SegmentService _segmentService;
 
         public HelpController(ServiceFacades.Controller<HelpController> context,
+            LocationService locationService,
             ScheduleService scheduleService,
             SegmentService segmentService)
             : base(context)
         {
+            _locationService = locationService
+                ?? throw new ArgumentNullException(nameof(locationService));
             _scheduleService = scheduleService
                 ?? throw new ArgumentNullException(nameof(scheduleService));
             _segmentService = segmentService
@@ -99,14 +106,25 @@ namespace Ocuda.Promenade.Controllers
         [ResponseCache(NoStore = true)]
         public async Task<IActionResult> Schedule()
         {
-            return await DisplayScheduleFormAsync(null);
+            return await DisplayScheduleFormAsync(null, null);
         }
 
         [HttpGet("[action]")]
         [ResponseCache(NoStore = true)]
         public async Task<IActionResult> ScheduleDetails()
         {
-            return await DisplayScheduleDetailsFormAsync(null);
+            var scheduleRequestSubjectId = TempData.Peek(TempDataSubjectId) as int?;
+            var requestedTime = TempData.Peek(TempDataDateTime) as DateTime?;
+
+            if (scheduleRequestSubjectId == null || requestedTime == null)
+            {
+                _logger.LogError("TempData items missing in ScheduleDetails");
+                return await DisplayScheduleFormAsync(null, SessionTimeout);
+            }
+
+            return await DisplayScheduleDetailsFormAsync(null,
+                (int)scheduleRequestSubjectId,
+                (DateTime)requestedTime);
         }
 
         [HttpPost("Schedule")]
@@ -125,6 +143,18 @@ namespace Ocuda.Promenade.Controllers
                     string.Format(CultureInfo.InvariantCulture,
                         ErrorAvailableDays,
                         new DayOfWeekHelper().ListDays(BlockedDays)));
+            }
+
+            // check for all-location closure on that day
+            var closureReason = await _locationService
+                .GetClosureInformationAsync(viewModel.RequestedDate);
+
+            if (!string.IsNullOrEmpty(closureReason))
+            {
+                ModelState.AddModelError(nameof(viewModel.RequestedDate),
+                    string.Format(CultureInfo.InvariantCulture,
+                        ErrorDateClosed,
+                        closureReason));
             }
 
             if (viewModel.RequestedDate.Date < firstAvailable.Date)
@@ -161,7 +191,7 @@ namespace Ocuda.Promenade.Controllers
                 viewModel.RequestedTime = firstAvailable.ToLocalTime();
             }
             else if (viewModel.RequestedTime.TimeOfDay
-                > firstAvailable.AddHours(AvailableHours).TimeOfDay)
+                > firstAvailable.Date.AddHours(StartHour + AvailableHours).TimeOfDay)
             {
                 ModelState.AddModelError(nameof(viewModel.RequestedTime),
                     string.Format(CultureInfo.InvariantCulture,
@@ -182,7 +212,7 @@ namespace Ocuda.Promenade.Controllers
             }
             else
             {
-                return await DisplayScheduleFormAsync(viewModel);
+                return await DisplayScheduleFormAsync(viewModel, null);
             }
         }
 
@@ -201,10 +231,19 @@ namespace Ocuda.Promenade.Controllers
                 ModelState.Remove(ViewModelTelephoneId);
             }
 
-            viewModel.ScheduleRequest.ScheduleRequestSubjectId
-                = (int)TempData.Peek(TempDataSubjectId);
-            viewModel.ScheduleRequest.RequestedTime
-                = (DateTime)TempData.Peek(TempDataDateTime);
+            var scheduleRequestSubjectId = TempData.Peek(TempDataSubjectId) as int?;
+            var requestedTime = TempData.Peek(TempDataDateTime) as DateTime?;
+
+            if (scheduleRequestSubjectId != null && requestedTime != null)
+            {
+                viewModel.ScheduleRequest.ScheduleRequestSubjectId = (int)scheduleRequestSubjectId;
+                viewModel.ScheduleRequest.RequestedTime = (DateTime)requestedTime;
+            }
+            else
+            {
+                _logger.LogError("TempData items missing in SubmitScheduleDetails");
+                return await DisplayScheduleFormAsync(null, SessionTimeout);
+            }
 
             string phoneNumbers;
             if (!string.IsNullOrEmpty(viewModel.ScheduleRequestPhone))
@@ -260,11 +299,14 @@ namespace Ocuda.Promenade.Controllers
             }
             else
             {
-                return await DisplayScheduleDetailsFormAsync(viewModel);
+                return await DisplayScheduleDetailsFormAsync(viewModel,
+                    (int)scheduleRequestSubjectId,
+                    (DateTime)requestedTime);
             }
         }
 
-        private async Task<IActionResult> DisplayScheduleFormAsync(ScheduleViewModel viewModel)
+        private async Task<IActionResult> DisplayScheduleFormAsync(ScheduleViewModel viewModel,
+            string warningMessage)
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
@@ -305,6 +347,8 @@ namespace Ocuda.Promenade.Controllers
                 }
             }
 
+            scheduleViewModel.WarningText = warningMessage;
+
             int segmentId = await _siteSettingService
                 .GetSettingIntAsync(Models.Keys.SiteSetting.Scheduling.EnabledSegment,
                     forceReload);
@@ -343,7 +387,9 @@ namespace Ocuda.Promenade.Controllers
         }
 
         private async Task<IActionResult>
-            DisplayScheduleDetailsFormAsync(ScheduleDetailsViewModel viewModel)
+            DisplayScheduleDetailsFormAsync(ScheduleDetailsViewModel viewModel,
+            int selectedSubjectId,
+            DateTime requestedTime)
         {
             var enabled = await _siteSettingService
                 .GetSettingBoolAsync(Models.Keys.SiteSetting.Scheduling.Enable);
@@ -361,8 +407,6 @@ namespace Ocuda.Promenade.Controllers
             }
 
             var scheduleViewModel = viewModel ?? new ScheduleDetailsViewModel();
-
-            int selectedSubjectId = (int)TempData.Peek(TempDataSubjectId);
 
             var subject = subjects.SingleOrDefault(_ => _.Id == selectedSubjectId);
 
@@ -395,7 +439,7 @@ namespace Ocuda.Promenade.Controllers
 
             scheduleViewModel.ScheduleRequest = new ScheduleRequest
             {
-                RequestedTime = (DateTime)TempData.Peek(TempDataDateTime)
+                RequestedTime = requestedTime
             };
 
             return View("ScheduleDetails", scheduleViewModel);
