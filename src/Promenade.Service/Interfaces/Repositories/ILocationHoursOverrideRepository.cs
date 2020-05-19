@@ -12,5 +12,7 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
         Task<ICollection<LocationHoursOverride>> GetBetweenDatesAsync(int locationId,
             DateTime startDate,
             DateTime endDate);
+
+        public Task<string> GetClosureInformationAsync(DateTime date);
     }
 }

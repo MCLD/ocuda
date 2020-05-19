@@ -21,5 +21,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Help
         [Required]
         [Display(Name = "Subject")]
         public int SubjectId { get; set; }
+
+        public string WarningText { get; set; }
     }
 }
