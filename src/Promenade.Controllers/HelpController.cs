@@ -157,6 +157,7 @@ namespace Ocuda.Promenade.Controllers
                         closureReason));
             }
 
+            // verify the requested date is not before the first available or 7 days after
             if (viewModel.RequestedDate.Date < firstAvailable.Date)
             {
                 if (ModelState.ContainsKey(nameof(viewModel.RequestedDate)))
@@ -182,7 +183,9 @@ namespace Ocuda.Promenade.Controllers
                 viewModel.RequestedDate = firstAvailable.Date.AddDays(7);
             }
 
-            if (viewModel.RequestedTime.TimeOfDay < firstAvailable.TimeOfDay)
+            // if the selected date is today then ensure it's before the first available time
+            if (viewModel.RequestedDate.Date == DateTime.Now.Date
+                && viewModel.RequestedTime.TimeOfDay < firstAvailable.TimeOfDay)
             {
                 ModelState.AddModelError(nameof(viewModel.RequestedTime),
                     string.Format(CultureInfo.CurrentCulture,
@@ -190,14 +193,27 @@ namespace Ocuda.Promenade.Controllers
                         firstAvailable.ToShortTimeString()));
                 viewModel.RequestedTime = firstAvailable.ToLocalTime();
             }
-            else if (viewModel.RequestedTime.TimeOfDay
-                > firstAvailable.Date.AddHours(StartHour + AvailableHours).TimeOfDay)
+            else
             {
-                ModelState.AddModelError(nameof(viewModel.RequestedTime),
-                    string.Format(CultureInfo.InvariantCulture,
-                        ErrorTimeBefore,
-                        firstAvailable.AddHours(AvailableHours).ToShortTimeString()));
-                viewModel.RequestedTime = firstAvailable.AddHours(AvailableHours).ToLocalTime();
+                // if the selected date is not today, ensure times are within the allowed range
+                if (viewModel.RequestedTime.TimeOfDay
+                    < firstAvailable.Date.AddHours(StartHour).TimeOfDay)
+                {
+                    ModelState.AddModelError(nameof(viewModel.RequestedTime),
+                        string.Format(CultureInfo.CurrentCulture,
+                            ErrorEarliestTime,
+                            firstAvailable.ToShortTimeString()));
+                    viewModel.RequestedTime = firstAvailable.ToLocalTime();
+                }
+                else if (viewModel.RequestedTime.TimeOfDay
+                    > firstAvailable.Date.AddHours(StartHour + AvailableHours).TimeOfDay)
+                {
+                    ModelState.AddModelError(nameof(viewModel.RequestedTime),
+                        string.Format(CultureInfo.InvariantCulture,
+                            ErrorTimeBefore,
+                            firstAvailable.AddHours(AvailableHours).ToShortTimeString()));
+                    viewModel.RequestedTime = firstAvailable.AddHours(AvailableHours).ToLocalTime();
+                }
             }
 
             if (ModelState.IsValid)
