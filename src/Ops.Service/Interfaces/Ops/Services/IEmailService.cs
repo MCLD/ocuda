@@ -1,11 +1,13 @@
 ﻿using System.Threading.Tasks;
+using Ocuda.Ops.Models.Entities;
+using Ocuda.Utility.Email;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IEmailService
     {
-        Task SendToUserAsync(int userId, string subject, string body, string htmlBody = null);
-        Task SendToAddressAsync(string emailAddress, string subject, string body,
-            string htmlBody = null);
+        Task<EmailSetupText> GetEmailSetupAsync(int emailSetupId, string languageName);
+        Task<EmailTemplateText> GetEmailTemplateAsync(int emailTemplateId, string languageName);
+        Task<Record> SendAsync(Details emailDetails, string toAddress, string toName);
     }
 }

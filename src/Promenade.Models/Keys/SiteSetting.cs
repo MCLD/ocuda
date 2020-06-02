@@ -31,11 +31,5 @@
             public const string EnabledSegment = "Scheduling.EnabledSegment";
             public const string ScheduledSegment = "Scheduling.ScheduledSegment";
         }
-
-        public struct Email
-        {
-            public const string HeaderSegment = "Email.HeaderSegment";
-            public const string FooterSegment = "Email.FooterSegment";
-        }
     }
 }

@@ -41,5 +41,7 @@ namespace Ocuda.Promenade.Models.Entities
         public DateTime CreatedAt { get; set; }
 
         public bool IsClaimed { get; set; }
+
+        public DateTime? NotificationSentAt { get; set; }
     }
 }

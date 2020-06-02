@@ -168,26 +168,6 @@ namespace Ocuda.Promenade.Models.Defaults
                 Value = "-1"
             },
             #endregion
-            #region Email
-            new SiteSetting
-            {
-                Category = "Email",
-                Description = "Segment to use as email header",
-                Id = Keys.SiteSetting.Email.HeaderSegment,
-                Name = "Header segment",
-                Type = SiteSettingType.Int,
-                Value = "-1"
-            },
-            new SiteSetting
-            {
-                Category = "Email",
-                Description = "Segment to use as email footer",
-                Id = Keys.SiteSetting.Email.FooterSegment,
-                Name = "Footer segment",
-                Type = SiteSettingType.Int,
-                Value = "-1"
-            }
-            #endregion
         };
     }
 }

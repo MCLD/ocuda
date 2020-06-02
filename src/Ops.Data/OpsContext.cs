@@ -24,6 +24,10 @@ namespace Ocuda.Ops.Data
 
             // configure composite keys
             // https://docs.microsoft.com/en-us/ef/core/modeling/keys
+            modelBuilder.Entity<EmailSetupText>()
+                .HasKey(_ => new { _.EmailSetupId, _.PromenadeLanguageName });
+            modelBuilder.Entity<EmailTemplateText>()
+                .HasKey(_ => new { _.EmailTemplateId, _.PromenadeLanguageName });
             modelBuilder.Entity<FileLibraryFileType>()
                 .HasKey(_ => new { _.FileLibraryId, _.FileTypeId });
             modelBuilder.Entity<UserMetadata>()
@@ -44,6 +48,11 @@ namespace Ocuda.Ops.Data
         public DbSet<CoverIssueDetail> CoverIssueDetails { get; set; }
         public DbSet<CoverIssueHeader> CoverIssueHeaders { get; set; }
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
+        public DbSet<EmailRecord> EmailRecords { get; set; }
+        public DbSet<EmailSetup> EmailSetups { get; set; }
+        public DbSet<EmailSetupText> EmailSetupTexts { get; set; }
+        public DbSet<EmailTemplate> EmailTemplates { get; set; }
+        public DbSet<EmailTemplateText> EmailTemplateTexts { get; set; }
         public DbSet<ExternalResource> ExternalResources { get; set; }
         public DbSet<File> Files { get; set; }
         public DbSet<FileLibrary> FileLibraries { get; set; }

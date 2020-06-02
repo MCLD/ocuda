@@ -10,7 +10,7 @@
         /// <summary>
         /// The return URL once the user is authenticated, replace {0} with the user's identifier.
         /// </summary>
-        /// 
+        ///
         public static readonly string OpsReturn = "auth.{0}.return";
 
         /// <summary>
@@ -29,6 +29,16 @@
         /// Left navigation JSON
         /// </summary>
         public static readonly string OpsLeftNav = "leftnav";
+
+        /// <summary>
+        /// Instance that runs jobs and how often it runs them
+        /// </summary>
+        public static readonly string OpsJobRunner = "jobrunner";
+
+        /// <summary>
+        /// Send message to stop the job runner, replace {0} with the instance name
+        /// </summary>
+        public static readonly string OpsJobStop = "jobstop.{0}";
 
         /// <summary>
         /// Default language ID

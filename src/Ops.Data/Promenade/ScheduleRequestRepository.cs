@@ -49,5 +49,17 @@ namespace Ocuda.Ops.Data.Promenade
                 .OrderBy(_ => _.RequestedTime)
                 .ToListAsync();
         }
+
+        public async Task<ICollection<ScheduleRequest>> GetPendingNotificationsAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Include(_ => _.ScheduleRequestSubject)
+                .Where(_ => _.NotificationSentAt == null
+                    && _.Email != null
+                    && _.ScheduleRequestSubject.RelatedEmailSetupId != null)
+                .OrderBy(_ => _.RequestedTime)
+                .ToListAsync();
+        }
     }
 }
