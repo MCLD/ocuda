@@ -36,6 +36,7 @@
         <tr>
             <th scope="col">Requested time</th>
             <th scope="col">Name</th>
+            <th scope="col">Language</th>
             <th scope="col">Subject</th>
             <th scope="col">Claimed</th>
         </tr>
@@ -46,33 +47,34 @@
         {
             @foreach (var request in Model.Requests)
             {
-                <tr class="@(Model.Claims.SingleOrDefault(_ => _.ScheduleRequestId == request.Id)?.IsComplete == true
+        <tr class="@(Model.Claims.SingleOrDefault(_ => _.ScheduleRequestId == request.Id)?.IsComplete == true
                         ? "table-success"
                         : request.IsClaimed ? "table-info" : "")">
-                    <td>
-                        <a asp-action="details"
-                           asp-controller="Schedule"
-                           asp-area="contact"
-                           asp-route-requestId="@request.Id">@request.RequestedTime</a>
-                    </td>
-                    <td>@request.Name</td>
-                    <td>@request.ScheduleRequestSubject?.Subject</td>
-                    <td>
-                        @if (Model.Claims.Any(_ => _.ScheduleRequestId == request.Id))
-                        {
-                            <a asp-controller="Profile"
-                               asp-area=""
-                               asp-action="Index"
-                               asp-route-id="@Model.Claims.SingleOrDefault(_ => _.ScheduleRequestId == request.Id)?.User.Username">
-                                @Model.Claims.SingleOrDefault(_ => _.ScheduleRequestId == request.Id)?.User.Name
-                            </a>
-                        }
-                        else
-                        {
-                            @:No
-                        }
-                    </td>
-                </tr>
+            <td>
+                <a asp-action="details"
+                   asp-controller="Schedule"
+                   asp-area="contact"
+                   asp-route-requestId="@request.Id">@request.RequestedTime</a>
+            </td>
+            <td>@request.Name</td>
+            <td>@request.Language</td>
+            <td>@request.ScheduleRequestSubject?.Subject</td>
+            <td>
+                @if (Model.Claims.Any(_ => _.ScheduleRequestId == request.Id))
+                {
+                    <a asp-controller="Profile"
+                       asp-area=""
+                       asp-action="Index"
+                       asp-route-id="@Model.Claims.SingleOrDefault(_ => _.ScheduleRequestId == request.Id)?.User.Username">
+                        @Model.Claims.SingleOrDefault(_ => _.ScheduleRequestId == request.Id)?.User.Name
+                    </a>
+                }
+                else
+                {
+                    @:No
+                }
+            </td>
+        </tr>
 
             }
         }
