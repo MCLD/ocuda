@@ -5,18 +5,18 @@
   "license": "MIT",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.13.0",
-    "bootstrap": "^4.4.1",
+    "bootstrap": "^4.5.0",
     "bootstrap-multiselect": "^0.9.15",
     "commonmark": "^0.29.1",
     "fontawesome-iconpicker": "^3.2.0",
     "jquery": "^3.5.1",
-    "jquery-validation": "^1.19.1",
+    "jquery-validation": "^1.19.2",
     "jquery-validation-unobtrusive": "^3.2.11",
-    "moment": "^2.25.3",
-    "moment-timezone": "^0.5.28",
+    "moment": "^2.26.0",
+    "moment-timezone": "^0.5.31",
     "popper.js": "^1.16.1",
+    "slick-carousel": "^1.8.1",
     "tempusdominus-bootstrap-4": "^5.1.2",
     "tempusdominus-core": "^5.0.3"
   }
 }
-
