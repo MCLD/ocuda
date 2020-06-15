@@ -46,8 +46,8 @@ namespace Ocuda.Promenade.Controllers
             + "."
             + nameof(ScheduleRequest.Notes);
 
-        private const double StartHour = 10;
-        private const double AvailableHours = 6.5;
+        private const double StartHour = 9;
+        private const double AvailableHours = 7.5;
         private const double BufferHours = 4;
         private readonly IList<DayOfWeek> BlockedDays = new List<DayOfWeek>
         {
