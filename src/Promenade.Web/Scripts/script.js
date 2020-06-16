@@ -63,7 +63,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (buttons.length > 0) {
             $(".modal-content-footer").text("");
-            buttons.sort((a, b) => (a.Sort > b.Sort ? 1 : b.Sort > a.Sort ? -1 : 0));
+            buttons.sort(function (a, b) {
+                return a.Sort - b.Sort;
+            });
             buttons.forEach(function (b) {
                 let buttonText =
                     '<a href="' +
