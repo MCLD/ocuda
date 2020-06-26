@@ -10,5 +10,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
         public Task<ScheduleRequest> GetRequestAsync(int requestId);
         public Task<IEnumerable<ScheduleRequest>> GetRequestsAsync(DateTime requestedDate);
         public Task<IEnumerable<ScheduleRequest>> GetUnclaimedRequestsAsync();
+        public Task<ICollection<ScheduleRequest>> GetPendingNotificationsAsync();
     }
 }
