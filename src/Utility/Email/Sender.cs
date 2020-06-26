@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Logging;
@@ -135,7 +136,13 @@ namespace Ocuda.Utility.Email
             using var client = new SmtpClient
             {
                 // accept any STARTTLS certificate
-                ServerCertificateValidationCallback = (_, __, ___, ____) => true
+                ServerCertificateValidationCallback = (_, __, ___, ____) => true,
+                SslProtocols = SslProtocols.Ssl2
+                    | SslProtocols.Ssl3
+                    | SslProtocols.Tls
+                    | SslProtocols.Tls11
+                    | SslProtocols.Tls12
+                    | SslProtocols.Tls13
             };
 
             client.MessageSent += (sender, e) =>
