@@ -137,12 +137,6 @@ namespace Ocuda.Utility.Email
             {
                 // accept any STARTTLS certificate
                 ServerCertificateValidationCallback = (_, __, ___, ____) => true,
-                SslProtocols = SslProtocols.Ssl2
-                    | SslProtocols.Ssl3
-                    | SslProtocols.Tls
-                    | SslProtocols.Tls11
-                    | SslProtocols.Tls12
-                    | SslProtocols.Tls13
             };
 
             client.MessageSent += (sender, e) =>
@@ -154,7 +148,9 @@ namespace Ocuda.Utility.Email
 
             client.AuthenticationMechanisms.Remove("XOAUTH2");
 
-            await client.ConnectAsync(details.Server, details.Port ?? 25);
+            await client.ConnectAsync(details.Server,
+                details.Port ?? 25,
+                MailKit.Security.SecureSocketOptions.None);
 
             if (!string.IsNullOrWhiteSpace(details.Username)
                 && !string.IsNullOrWhiteSpace(details.Password))
