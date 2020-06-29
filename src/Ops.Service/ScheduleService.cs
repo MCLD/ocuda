@@ -52,8 +52,32 @@ namespace Ocuda.Ops.Service
             _scheduleRequestRepository.Update(request);
             await _scheduleRequestRepository.SaveAsync();
 
+            await AddLogAsync(new ScheduleLog
+            {
+                Notes = "Request claimed.",
+                ScheduleRequestId = request.Id
+            });
+
             return updatedClaim;
         }
+
+        public async Task UnclaimAsync(int scheduleRequestId)
+        {
+            _scheduleClaimRepository.Remove(scheduleRequestId);
+            await _scheduleClaimRepository.SaveAsync();
+
+            var request = await _scheduleRequestRepository.GetRequestAsync(scheduleRequestId);
+            request.IsClaimed = false;
+            _scheduleRequestRepository.Update(request);
+            await _scheduleRequestRepository.SaveAsync();
+
+            await AddLogAsync(new ScheduleLog
+            {
+                Notes = "Request unclaimed.",
+                ScheduleRequestId = request.Id
+            });
+        }
+
         public async Task<IEnumerable<ScheduleClaim>> GetClaimsAsync(int[] scheduleRequestIds)
         {
             return await _scheduleClaimRepository.GetClaimsAsync(scheduleRequestIds);
@@ -64,7 +88,7 @@ namespace Ocuda.Ops.Service
             return await _scheduleClaimRepository.GetClaimsForUserAsync(GetCurrentUserId());
         }
 
-        public async Task AddLog(ScheduleLog log)
+        public async Task AddLogAsync(ScheduleLog log)
         {
             ScheduleClaim claim = null;
 

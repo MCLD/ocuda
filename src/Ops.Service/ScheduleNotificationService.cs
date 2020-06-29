@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Email;
 using Ocuda.Utility.Exceptions;
@@ -14,16 +16,20 @@ namespace Ocuda.Ops.Service
         : BaseService<ScheduleNotificationService>, IScheduleNotificationService
     {
         private readonly IEmailService _emailService;
+        private readonly IScheduleLogRepository _scheduleLogRepository;
         private readonly IScheduleRequestService _scheduleRequestService;
         private readonly ISiteSettingService _siteSettingService;
 
         public ScheduleNotificationService(ILogger<ScheduleNotificationService> logger,
             IHttpContextAccessor httpContextAccessor,
             IEmailService emailService,
+            IScheduleLogRepository scheduleLogRepsitory,
             IScheduleRequestService scheduleRequestService,
             ISiteSettingService siteSettingService) : base(logger, httpContextAccessor)
         {
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
+            _scheduleLogRepository = scheduleLogRepsitory
+                ?? throw new ArgumentNullException(nameof(scheduleLogRepsitory));
             _scheduleRequestService = scheduleRequestService
                 ?? throw new ArgumentNullException(nameof(scheduleRequestService));
             _siteSettingService = siteSettingService
@@ -134,7 +140,15 @@ namespace Ocuda.Ops.Service
                             await _emailService.SendAsync(emailDetails,
                                 pending.Email.Trim(),
                                 pending.Name?.Trim());
-                            await _scheduleRequestService.SetNotificationSentAsync(pending.Id);
+                            await _scheduleRequestService.SetNotificationSentAsync(pending);
+
+                            await _scheduleLogRepository.AddAsync(new ScheduleLog
+                            {
+                                CreatedAt = DateTime.Now,
+                                Notes = $"Email sent to {pending.Email.Trim()} confirming request.",
+                                ScheduleRequestId = pending.Id
+                            });
+                            await _scheduleLogRepository.SaveAsync();
                         }
                         catch (Exception ex)
                         {
