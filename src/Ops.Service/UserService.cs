@@ -7,7 +7,6 @@ using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
@@ -75,6 +74,7 @@ namespace Ocuda.Ops.Service
                 sysadminUser = new User
                 {
                     Username = "sysadmin",
+                    Name = "System",
                     CreatedAt = DateTime.Now,
                     IsSysadmin = true
                 };

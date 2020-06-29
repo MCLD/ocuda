@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Ops.Models.Entities
 {
@@ -25,5 +26,23 @@ namespace Ocuda.Ops.Models.Entities
 
         [Display(Name = "Call is complete")]
         public bool IsComplete { get; set; }
+
+        [NotMapped]
+        public bool ShowNotesHeader
+        {
+            get
+            {
+                return IsComplete
+                    || !string.IsNullOrEmpty(ScheduleLogCallDisposition?.Disposition)
+                    || DurationMinutes != null;
+            }
+        }
+
+        [NotMapped]
+        public string Name { get; set; }
+
+        [NotMapped]
+        public string Username { get; set; }
+
     }
 }

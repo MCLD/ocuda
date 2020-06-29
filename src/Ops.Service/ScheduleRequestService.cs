@@ -44,9 +44,12 @@ namespace Ocuda.Ops.Service
             return await _scheduleRequestRepository.GetPendingNotificationsAsync();
         }
 
-        public async Task SetNotificationSentAsync(int requestId)
+        public async Task SetNotificationSentAsync(ScheduleRequest request)
         {
-            var request = await _scheduleRequestRepository.GetRequestAsync(requestId);
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
             request.NotificationSentAt = DateTime.Now;
             _scheduleRequestRepository.Update(request);
             await _scheduleRequestRepository.SaveAsync();

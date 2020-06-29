@@ -93,11 +93,6 @@ namespace Ocuda.Promenade.Service
 
             addedRequest.ScheduleRequestTelephone = requestTelephone;
 
-            if (!string.IsNullOrEmpty(addedRequest.Email))
-            {
-                //send email
-            }
-
             return addedRequest;
         }
     }

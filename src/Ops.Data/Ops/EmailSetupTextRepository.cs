@@ -19,10 +19,10 @@ namespace Ocuda.Ops.Data.Ops
             string languageName)
         {
             return await DbSet
-                .AsNoTracking()
                 .Include(_ => _.EmailSetup)
                 .Where(_ => _.EmailSetupId == emailSetupId
                     && _.PromenadeLanguageName == languageName)
+                .AsNoTracking()
                 .SingleOrDefaultAsync();
         }
     }

@@ -21,10 +21,10 @@ namespace Ocuda.Ops.Data.Ops
         public async Task<IEnumerable<ScheduleLog>> GetByScheduleRequestIdAsync(int scheduleRequestId)
         {
             return await DbSet
-                .AsNoTracking()
                 .Include(_ => _.ScheduleLogCallDisposition)
                 .Where(_ => _.ScheduleRequestId == scheduleRequestId)
                 .OrderByDescending(_ => _.CreatedAt)
+                .AsNoTracking()
                 .ToListAsync();
         }
     }

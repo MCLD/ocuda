@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,16 +17,19 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
     {
         private readonly IScheduleService _scheduleService;
         private readonly IScheduleRequestService _scheduleRequestService;
+        private readonly IUserService _userService;
 
         public ScheduleController(ServiceFacades.Controller<ScheduleController> context,
             IScheduleService scheduleService,
-            IScheduleRequestService scheduleRequestService)
+            IScheduleRequestService scheduleRequestService,
+            IUserService userService)
             : base(context)
         {
             _scheduleService = scheduleService
                 ?? throw new ArgumentNullException(nameof(scheduleService));
             _scheduleRequestService = scheduleRequestService
                 ?? throw new ArgumentNullException(nameof(scheduleRequestService));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
         [Route("")]
@@ -77,6 +81,28 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
                 viewModel.ScheduleClaim = claims.FirstOrDefault();
                 viewModel.ScheduleLogs
                     = await _scheduleService.GetLogAsync(viewModel.ScheduleRequest.Id);
+
+                var users = new Dictionary<int, Tuple<string, string>>();
+                foreach (int userId in viewModel.ScheduleLogs.Select(_ => _.UserId).Distinct())
+                {
+                    if (userId != 0)
+                    {
+                        users.Add(userId, await _userService.GetUserInfoById(userId));
+                    }
+                }
+
+                foreach (var scheduleLog in viewModel.ScheduleLogs)
+                {
+                    if (scheduleLog.UserId == 0)
+                    {
+                        scheduleLog.Name = "System";
+                    }
+                    else
+                    {
+                        scheduleLog.Name = users[scheduleLog.UserId].Item1;
+                        scheduleLog.Username = users[scheduleLog.UserId].Item2;
+                    }
+                }
             }
 
             if (viewModel.ScheduleClaim?.UserId == CurrentUserId)
@@ -104,6 +130,15 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
 
         [HttpPost]
         [Route("[action]")]
+        public async Task<IActionResult> Unclaim(int requestId)
+        {
+            await _scheduleService.UnclaimAsync(requestId);
+
+            return RedirectToAction(nameof(Details), new { requestId });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
         public async Task<IActionResult> AddLog(ScheduleDetailViewModel viewModel)
         {
             var addLog = viewModel?.AddLog;
@@ -113,7 +148,7 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
                 || addLog.Notes != null
                 || addLog.IsComplete)
             {
-                await _scheduleService.AddLog(addLog);
+                await _scheduleService.AddLogAsync(addLog);
             }
 
             return RedirectToAction(nameof(Details),
