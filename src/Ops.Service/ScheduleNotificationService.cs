@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -105,6 +106,8 @@ namespace Ocuda.Ops.Service
                                 ? "en-US"
                                 : pending.Language;
 
+                        var culture = CultureInfo.GetCultureInfo(lang);
+
                         var emailSetupText = await _emailService.GetEmailSetupAsync(setupId, lang);
 
                         var emailTemplateText = await _emailService
@@ -122,7 +125,7 @@ namespace Ocuda.Ops.Service
                             BodyHtml = emailSetupText.BodyHtml,
                             Tags = new Dictionary<string, string>
                             {
-                                { "Scheduled", pending.RequestedTime.ToString() },
+                                { "Scheduled", pending.RequestedTime.ToString(culture) },
                                 { "Subject", pending.ScheduleRequestSubject.Subject }
                             },
                             BccEmailAddress = settings.BccAddress,
