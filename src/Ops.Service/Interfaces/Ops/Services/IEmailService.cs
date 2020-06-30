@@ -8,6 +8,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
     {
         Task<EmailSetupText> GetEmailSetupAsync(int emailSetupId, string languageName);
         Task<EmailTemplateText> GetEmailTemplateAsync(int emailTemplateId, string languageName);
-        Task<Record> SendAsync(Details emailDetails, string toAddress, string toName);
+        Task<Record> SendAsync(Details emailDetails);
     }
 }

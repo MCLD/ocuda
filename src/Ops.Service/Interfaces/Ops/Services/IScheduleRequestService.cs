@@ -12,5 +12,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<IEnumerable<ScheduleRequest>> GetRequestsAsync(DateTime requestedDate);
         Task<IEnumerable<ScheduleRequest>> GetUnclaimedRequestsAsync();
         Task SetNotificationSentAsync(ScheduleRequest request);
+        Task SetFollowupSentAsync(ScheduleRequest request);
     }
 }

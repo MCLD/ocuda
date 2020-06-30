@@ -54,5 +54,16 @@ namespace Ocuda.Ops.Service
             _scheduleRequestRepository.Update(request);
             await _scheduleRequestRepository.SaveAsync();
         }
+
+        public async Task SetFollowupSentAsync(ScheduleRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+            request.FollowupSentAt = DateTime.Now;
+            _scheduleRequestRepository.Update(request);
+            await _scheduleRequestRepository.SaveAsync();
+        }
     }
 }

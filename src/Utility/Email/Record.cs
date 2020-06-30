@@ -19,6 +19,8 @@ namespace Ocuda.Utility.Email
                 RestrictToDomain = incoming.RestrictToDomain;
                 SentResponse = incoming.SentResponse;
                 Subject = incoming.Subject;
+                ToEmailAddress = incoming.ToEmailAddress;
+                ToName = incoming.ToName;
             }
         }
 
@@ -33,6 +35,10 @@ namespace Ocuda.Utility.Email
 
         [Required]
         public string FromName { get; set; }
+        [Required]
+        public string ToEmailAddress { get; set; }
+        [Required]
+        public string ToName { get; set; }
 
         [Required]
         public string BodyText { get; set; }

@@ -46,11 +46,9 @@ namespace Ocuda.Ops.Service
                 .GetByIdLanguageAsync(emailTemplateId, languageName);
         }
 
-        public async Task<Utility.Email.Record> SendAsync(Utility.Email.Details emailDetails,
-            string toAddress,
-            string toName)
+        public async Task<Utility.Email.Record> SendAsync(Utility.Email.Details emailDetails)
         {
-            var record = await _sender.SendEmailAsync(emailDetails, toAddress, toName);
+            var record = await _sender.SendEmailAsync(emailDetails);
 
             try
             {
@@ -63,7 +61,7 @@ namespace Ocuda.Ops.Service
             catch (Exception ex)
             {
                 _logger.LogError("Unable to save email record for email sent to {ToAddress}: {ErrorMessage}",
-                    toAddress,
+                    emailDetails.ToEmailAddress,
                     ex.Message);
             }
 

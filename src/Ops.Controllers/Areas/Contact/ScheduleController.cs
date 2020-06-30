@@ -70,6 +70,11 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
                 ScheduleRequest = await _scheduleRequestService.GetRequestAsync(requestId)
             };
 
+            if (viewModel.ScheduleRequest.ScheduleRequestSubject.FollowupEmailSetupId != null)
+            {
+                viewModel.FinishMessage = "Yes, send follow-up email";
+            }
+
             if (viewModel.ScheduleRequest == null)
             {
                 AlertDanger = $"Could not find request {requestId}.";
@@ -148,7 +153,7 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
                 || addLog.Notes != null
                 || addLog.IsComplete)
             {
-                await _scheduleService.AddLogAsync(addLog);
+                await _scheduleService.AddLogAsync(addLog, true);
             }
 
             return RedirectToAction(nameof(Details),

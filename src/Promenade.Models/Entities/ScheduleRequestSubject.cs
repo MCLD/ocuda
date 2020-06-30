@@ -17,5 +17,6 @@ namespace Ocuda.Promenade.Models.Entities
         public bool RequireEmail { get; set; }
         public bool RequireComments { get; set; }
         public int? RelatedEmailSetupId { get; set; }
+        public int? FollowupEmailSetupId { get; set; }
     }
 }
