@@ -41,6 +41,7 @@ namespace Ocuda.Ops.Controllers.ViewModels.Contact
             }
 
             var claim = Claims.SingleOrDefault(_ => _.ScheduleRequestId == request.Id);
+
             if (claim?.IsComplete == true)
             {
                 return "table-success";
@@ -53,16 +54,16 @@ namespace Ocuda.Ops.Controllers.ViewModels.Contact
                 return "table-warning";
             }
 
-            if (request.RequestedTime.AddHours(1) < DateTime.Now
+            if (request?.IsClaimed == true)
+            {
+                return "table-info";
+            }
+
+            if (request.RequestedTime.AddHours(-1) < DateTime.Now
                 && request?.IsClaimed != true
                 && !request.IsUnderway)
             {
                 return "table-danger";
-            }
-
-            if (request?.IsClaimed == true)
-            {
-                return "table-info";
             }
 
             return null;
@@ -76,6 +77,7 @@ namespace Ocuda.Ops.Controllers.ViewModels.Contact
             }
 
             var claim = Claims.SingleOrDefault(_ => _.ScheduleRequestId == request.Id);
+
             if (claim?.IsComplete == true)
             {
                 return "<span class=\"far fa-check-square mr-1\" title=\"Complete\"></span>";
@@ -90,8 +92,11 @@ namespace Ocuda.Ops.Controllers.ViewModels.Contact
 
             if (request?.IsClaimed == true)
             {
-                return "<span class=\"fas fa-user-check mr-1\" title=\"Claimed\"></span>";
+                return request.IsUnderway
+                    ? "<span class=\"fas fa-user mr-1\" title=\"Claimed, underway\"></span>"
+                    : "<span class=\"far fa-user mr-1\" title=\"Claimed, not started\"></span>";
             }
+
 
             if (request.RequestedTime.AddHours(1) < DateTime.Now
                 && request?.IsClaimed != true
@@ -101,6 +106,7 @@ namespace Ocuda.Ops.Controllers.ViewModels.Contact
             }
 
             if (request.RequestedTime.AddHours(-1) < DateTime.Now
+                && request?.IsClaimed != true
                 && !request.IsUnderway)
             {
                 return "<span class=\"fas fa-clock mr-1\" title=\"Unclaimed, scheduled soon\"></span>";
