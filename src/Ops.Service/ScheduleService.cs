@@ -17,6 +17,7 @@ namespace Ocuda.Ops.Service
         private readonly IScheduleClaimRepository _scheduleClaimRepository;
         private readonly IScheduleLogCallDispositionRepository _scheduleLogCallDispositionRepository;
         private readonly IScheduleLogRepository _scheduleLogRepository;
+        private readonly IScheduleNotificationService _scheduleNotificationService;
         private readonly IScheduleRequestRepository _scheduleRequestRepository;
 
         public ScheduleService(ILogger<ScheduleService> logger,
@@ -24,6 +25,7 @@ namespace Ocuda.Ops.Service
             IScheduleClaimRepository scheduleClaimRepository,
             IScheduleLogCallDispositionRepository scheduleLogCallDispositionRepository,
             IScheduleLogRepository scheduleLogRepository,
+            IScheduleNotificationService scheduleNotificationService,
             IScheduleRequestRepository scheduleRequestRepository)
             : base(logger, httpContextAccessor)
         {
@@ -33,6 +35,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(scheduleLogCallDispositionRepository));
             _scheduleLogRepository = scheduleLogRepository
                 ?? throw new ArgumentNullException(nameof(scheduleLogRepository));
+            _scheduleNotificationService = scheduleNotificationService
+                ?? throw new ArgumentNullException(nameof(scheduleNotificationService));
             _scheduleRequestRepository = scheduleRequestRepository
                 ?? throw new ArgumentNullException(nameof(scheduleRequestRepository));
         }
@@ -56,7 +60,7 @@ namespace Ocuda.Ops.Service
             {
                 Notes = "Request claimed.",
                 ScheduleRequestId = request.Id
-            });
+            }, false);
 
             return updatedClaim;
         }
@@ -75,7 +79,7 @@ namespace Ocuda.Ops.Service
             {
                 Notes = "Request unclaimed.",
                 ScheduleRequestId = request.Id
-            });
+            }, false);
         }
 
         public async Task<IEnumerable<ScheduleClaim>> GetClaimsAsync(int[] scheduleRequestIds)
@@ -88,8 +92,13 @@ namespace Ocuda.Ops.Service
             return await _scheduleClaimRepository.GetClaimsForUserAsync(GetCurrentUserId());
         }
 
-        public async Task AddLogAsync(ScheduleLog log)
+        public async Task AddLogAsync(ScheduleLog log, bool markAsUnderway)
         {
+            if (log == null)
+            {
+                throw new ArgumentNullException(nameof(log));
+            }
+
             ScheduleClaim claim = null;
 
             log.CreatedAt = DateTime.Now;
@@ -100,7 +109,9 @@ namespace Ocuda.Ops.Service
                 {
                     log.ScheduleRequestId
                 });
+
                 claim = claims.SingleOrDefault();
+
                 if (claim?.IsComplete == false)
                 {
                     claim.IsComplete = true;
@@ -113,6 +124,21 @@ namespace Ocuda.Ops.Service
 
             await _scheduleLogRepository.AddAsync(log);
             await _scheduleLogRepository.SaveAsync();
+
+            var request = await _scheduleRequestRepository
+                .GetRequestAsync(log.ScheduleRequestId);
+
+            if (markAsUnderway && !request.IsUnderway)
+            {
+                request.IsUnderway = true;
+                _scheduleRequestRepository.Update(request);
+                await _scheduleRequestRepository.SaveAsync();
+            }
+
+            if (log.IsComplete && request?.ScheduleRequestSubject?.FollowupEmailSetupId != null)
+            {
+                await _scheduleNotificationService.SendFollowupAsync(request);
+            }
 
             if (claim != null)
             {

@@ -62,7 +62,7 @@
                            value="Claim" />
                 </form>
             }
-            else
+            else if (!Model.ScheduleLogs.Where(_ => _.IsComplete == true).Any())
             {
                 <button type="button"
                         class="btn btn-outline-danger mt-2 mb-1 mr-1 float-right"
@@ -105,7 +105,7 @@
     </div>
     <div class="row mt-2">
         <div class="col-sm-3 text-sm-right"><strong>Language</strong></div>
-        <div class="col-sm-9">@Model.ScheduleRequest.Language</div>
+        <div class="col-sm-9">@(new System.Globalization.CultureInfo(Model.ScheduleRequest.Language).EnglishName)</div>
     </div>
 
     @if (!string.IsNullOrEmpty(Model.ScheduleRequest.Notes))
@@ -149,11 +149,13 @@
                        asp-for="AddLog.DurationMinutes" formgroup />
                 <textarea asp-for="AddLog.Notes"
                           maxlength="1000" formgroup></textarea>
-                <select asp-for="AddLog.IsComplete"
-                        formgroup>
-                    <option value="false">No</option>
-                    <option value="true">Yes</option>
-                </select>
+                @if (!Model.ScheduleLogs.Where(_ => _.IsComplete == true).Any())
+                {
+                    <select asp-for="AddLog.IsComplete" formgroup>
+                        <option value="false">No</option>
+                        <option value="true">@Model.FinishMessage</option>
+                    </select>
+                }
                 <div class="offset-md-3 col-md-9">
                     <input type="submit"
                            class="btn btn-outline-primary"

@@ -43,6 +43,5 @@ namespace Ocuda.Ops.Models.Entities
 
         [NotMapped]
         public string Username { get; set; }
-
     }
 }

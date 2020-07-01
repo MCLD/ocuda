@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Authentication;
 using System.Threading.Tasks;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Logging;
@@ -18,16 +17,16 @@ namespace Ocuda.Utility.Email
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Task<Record> SendEmailAsync(Details details, string toAddress, string toName)
+        public Task<Record> SendEmailAsync(Details details)
         {
-            if (string.IsNullOrWhiteSpace(toAddress))
-            {
-                throw new ArgumentNullException(nameof(toAddress));
-            }
-
             if (details == null)
             {
                 throw new ArgumentNullException(nameof(details));
+            }
+
+            if (string.IsNullOrWhiteSpace(details.ToEmailAddress))
+            {
+                throw new ArgumentNullException("No to email address provided.");
             }
 
             if (string.IsNullOrWhiteSpace(details.Server))
@@ -57,21 +56,19 @@ namespace Ocuda.Utility.Email
 
             if (string.IsNullOrEmpty(details.OverrideEmailToAddress)
                 && !string.IsNullOrEmpty(details.RestrictToDomain)
-                && !toAddress.EndsWith(details.RestrictToDomain,
+                && !details.ToEmailAddress.EndsWith(details.RestrictToDomain,
                     StringComparison.OrdinalIgnoreCase))
             {
                 _logger.LogWarning("Requested to send email to {ToEmailAddress} which doesn't align with the restricted to domain {RestrictToDomain}",
-                    toAddress,
+                    details.ToEmailAddress,
                     details.RestrictToDomain);
                 throw new OcudaEmailException($"Restricted to sending emails to the following domain: {details.RestrictToDomain}");
             }
 
-            return SendEmailInternalAsync(details, toAddress, toName);
+            return SendEmailInternalAsync(details);
         }
 
-        private async Task<Record> SendEmailInternalAsync(Details details,
-            string toEmailAddress,
-            string toName)
+        private async Task<Record> SendEmailInternalAsync(Details details)
         {
             // apply the details replacements
             if (details.Tags?.Count > 0)
@@ -123,9 +120,9 @@ namespace Ocuda.Utility.Email
             }
             else
             {
-                message.To.Add(string.IsNullOrWhiteSpace(toName)
-                    ? new MailboxAddress(toEmailAddress)
-                    : new MailboxAddress(toName, toEmailAddress));
+                message.To.Add(string.IsNullOrWhiteSpace(details.ToName)
+                    ? new MailboxAddress(details.ToEmailAddress)
+                    : new MailboxAddress(details.ToName, details.ToEmailAddress));
             }
 
             if (!string.IsNullOrWhiteSpace(details.BccEmailAddress))

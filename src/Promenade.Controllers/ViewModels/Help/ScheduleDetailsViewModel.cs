@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Helpers;
@@ -30,17 +31,18 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Help
 
         public ScheduleRequest ScheduleRequest { get; set; }
 
+        //TODO use available site langauges for this
         public SelectListItem[] Languages = new SelectListItem[]
         {
             new SelectListItem
             {
-                 Text = "English",
-                 Value = "English"
+                 Text = new CultureInfo("en-US").NativeName,
+                 Value = "en-US"
             },
             new SelectListItem
             {
-                Text = "español",
-                Value = "español"
+                Text = new CultureInfo("es-US").NativeName,
+                Value = "es-US"
             }
         };
 
@@ -55,6 +57,14 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Help
             {
                 return TextFormattingHelper
                     .FormatPhone(ScheduleRequest?.ScheduleRequestTelephone?.Phone);
+            }
+        }
+
+        public string FormattedLanguage
+        {
+            get
+            {
+                return new CultureInfo(ScheduleRequest?.Language).NativeName;
             }
         }
     }
