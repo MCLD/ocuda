@@ -46,7 +46,7 @@ namespace Ocuda.Ops.Service
                 .GetByIdLanguageAsync(emailTemplateId, languageName);
         }
 
-        public async Task<Utility.Email.Record> SendAsync(Utility.Email.Details emailDetails)
+        public async Task<EmailRecord> SendAsync(Utility.Email.Details emailDetails)
         {
             var record = await _sender.SendEmailAsync(emailDetails);
 
@@ -56,7 +56,7 @@ namespace Ocuda.Ops.Service
                 {
                     CreatedAt = DateTime.Now
                 };
-                await _emailRecordRepository.AddSaveAsync(emailRecord);
+                return await _emailRecordRepository.AddSaveAsync(emailRecord);
             }
             catch (Exception ex)
             {
@@ -64,8 +64,7 @@ namespace Ocuda.Ops.Service
                     emailDetails.ToEmailAddress,
                     ex.Message);
             }
-
-            return record;
+            return null;
         }
     }
 }
