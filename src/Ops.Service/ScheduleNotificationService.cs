@@ -128,7 +128,9 @@ namespace Ocuda.Ops.Service
                             BodyHtml = emailSetupText.BodyHtml,
                             Tags = new Dictionary<string, string>
                             {
-                                { "Scheduled", pending.RequestedTime.ToString(culture) },
+                                { "ScheduledDate", pending.RequestedTime.ToString("d", culture) },
+                                { "ScheduledTime", pending.RequestedTime.ToString("t", culture) },
+                                { "Scheduled", pending.RequestedTime.ToString("g", culture) },
                                 { "Subject", pending.ScheduleRequestSubject.Subject }
                             },
                             BccEmailAddress = settings.BccAddress,
@@ -143,14 +145,15 @@ namespace Ocuda.Ops.Service
 
                         try
                         {
-                            await _emailService.SendAsync(emailDetails);
+                            var sentEmail = await _emailService.SendAsync(emailDetails);
                             await _scheduleRequestService.SetNotificationSentAsync(pending);
 
                             await _scheduleLogRepository.AddAsync(new ScheduleLog
                             {
                                 CreatedAt = DateTime.Now,
-                                Notes = $"Email sent to {pending.Email.Trim()} confirming request.",
-                                ScheduleRequestId = pending.Id
+                                Notes = $"Request confirmation email sent to {pending.Email.Trim()}.",
+                                ScheduleRequestId = pending.Id,
+                                RelatedEmailId = sentEmail?.Id
                             });
                             await _scheduleLogRepository.SaveAsync();
                         }
@@ -224,14 +227,15 @@ namespace Ocuda.Ops.Service
 
                 try
                 {
-                    await _emailService.SendAsync(emailDetails);
+                    var sentEmail = await _emailService.SendAsync(emailDetails);
                     await _scheduleRequestService.SetFollowupSentAsync(request);
 
                     await _scheduleLogRepository.AddAsync(new ScheduleLog
                     {
                         CreatedAt = DateTime.Now,
                         Notes = $"Follow-up email sent to {request.Email.Trim()}.",
-                        ScheduleRequestId = request.Id
+                        ScheduleRequestId = request.Id,
+                        RelatedEmailId = sentEmail?.Id
                     });
                     await _scheduleLogRepository.SaveAsync();
                 }

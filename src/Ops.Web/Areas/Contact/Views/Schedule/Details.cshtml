@@ -220,7 +220,14 @@
                                     {
                                         <strong>Notes:</strong><br />
                                     }
-                                    @log.Notes
+                                    @if (log.UserId == 0)
+                                    {
+                                        @Html.Raw(log.Notes)
+                                    }
+                                    else
+                                    {
+                                        @log.Notes
+                                    }
                                 }
                             </td>
                         </tr>
