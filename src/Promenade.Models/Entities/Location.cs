@@ -155,5 +155,7 @@ namespace Ocuda.Promenade.Models.Entities
         public SocialCard SocialCard { get; set; }
 
         public bool IsClosed { get; set; }
+
+        public int? HourOverrideSegmentId { get; set; }
     }
 }
