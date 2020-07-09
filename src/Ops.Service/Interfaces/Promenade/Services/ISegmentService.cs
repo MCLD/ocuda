@@ -13,13 +13,13 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         Task<ICollection<Segment>> GetActiveSegmentsAsync();
         Task<ICollection<string>> GetSegmentLanguagesByIdAsync(int id);
-        Task<Segment> GetSegmentById(int segmentId);
-        SegmentText GetBySegmentIdAndLanguage(int segmentId, int languageId);
-        Task AddSegmentText(SegmentText segmentText);
-        Task AddSegment(Segment segment);
-        Segment FindSegmentByName(string name);
-        Task EditSegment(Segment segment);
-        Task EditSegmentText(SegmentText segmentText);
-        Task DeleteSegmentText(SegmentText segmentText);
+        Task<Segment> GetByIdAsync(int segmentId);
+        Task<SegmentText> GetBySegmentAndLanguageAsync(int segmentId, int languageId);
+        Task<Segment> CreateAsync(Segment segment);
+        Task<Segment> EditAsync(Segment segment);
+        Task DeleteAsync(int id);
+        Task CreateSegmentTextAsync(SegmentText segmentText);
+        Task EditSegmentTextAsync(SegmentText segmentText);
+        Task DeleteSegmentTextAsync(SegmentText segmentText);
     }
 }

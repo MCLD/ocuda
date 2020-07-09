@@ -8,19 +8,28 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data.Promenade
 {
-    public class SegmentTextRepository : GenericRepository<PromenadeContext, SegmentText>, ISegmentTextRepository
+    public class SegmentTextRepository 
+        : GenericRepository<PromenadeContext, SegmentText>, ISegmentTextRepository
     {
         public SegmentTextRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<SegmentTextRepository> logger) : base(repositoryFacade, logger)
         {
         }
 
-        public SegmentText GetSegmentTextBySegmentId(int segmentId, int languageId)
+        public async Task<ICollection<SegmentText>> GetBySegmentIdAsync(int segmentId)
         {
-            return DbSet
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.SegmentId == segmentId)
+                .ToListAsync();
+        }
+
+        public async Task<SegmentText> GetBySegmentAndLanguageAsync(int segmentId, int languageId)
+        {
+            return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.SegmentId == segmentId && _.LanguageId == languageId)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
         }
 
         public async Task<List<string>> GetUsedLanguageNamesBySegmentId(int segmentId)

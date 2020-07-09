@@ -73,5 +73,15 @@ namespace Ocuda.Ops.Data.Promenade
                 .Where(_ => _.Id != location.Id && _.Name == location.Name)
                 .AnyAsync();
         }
+
+        public async Task<ICollection<Location>> GetUsingSegmentAsync(int segmentId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.DescriptionSegmentId == segmentId
+                    || _.PostFeatureSegmentId == segmentId
+                    || _.PreFeatureSegmentId == segmentId)
+                .ToListAsync();
+        }
     }
 }
