@@ -112,7 +112,7 @@ namespace Ocuda.Ops.Service
 
                 claim = claims.SingleOrDefault();
 
-                if (claim?.IsComplete == false)
+                if (claim != null && !claim.IsComplete)
                 {
                     claim.IsComplete = true;
                 }
