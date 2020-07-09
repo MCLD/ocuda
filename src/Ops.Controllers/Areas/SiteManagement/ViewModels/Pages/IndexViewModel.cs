@@ -8,6 +8,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
     {
         public ICollection<PageHeader> PageHeaders { get; set; }
         public PaginateModel PaginateModel { get; set; }
+        public PageType PageType { get; set; }
         public PageHeader PageHeader { get; set; }
     }
 }

@@ -15,11 +15,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
         [DisplayName("Stub")]
         public string HeaderStub { get; set; }
 
+        [DisplayName("Type")]
+        public PageType HeaderType { get; set; }
+
         public bool NewPage { get; set; }
         public string PageUrl { get; set; }
         public SelectList SocialCardList { get; set; }
 
-        public int SelectedLanguageId { get; set; }
+        public int LanguageId { get; set; }
+        public string LanguageDescription { get; set; }
 
         public SelectList LanguageList { get; set; }
 
