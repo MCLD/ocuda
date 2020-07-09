@@ -374,7 +374,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Property<bool>("HasEvents")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("HourOverrideSegmentId")
+                    b.Property<int?>("HoursSegmentId")
                         .HasColumnType("int");
 
                     b.Property<string>("ImagePath")

@@ -268,17 +268,17 @@ namespace Ocuda.Promenade.Controllers
 
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
-            if (viewModel.Location.HourOverrideSegmentId.HasValue)
+            if (viewModel.Location.HoursSegmentId.HasValue)
             {
-                viewModel.HourOverrideSegment
+                viewModel.HoursSegment
                     = await _segmentService.GetSegmentTextBySegmentIdAsync(
-                        viewModel.Location.HourOverrideSegmentId.Value,
+                        viewModel.Location.HoursSegmentId.Value,
                         forceReload);
 
-                if (viewModel.HourOverrideSegment != null)
+                if (viewModel.HoursSegment != null)
                 {
-                    viewModel.HourOverrideSegment.Text
-                        = CommonMarkConverter.Convert(viewModel.HourOverrideSegment.Text);
+                    viewModel.HoursSegment.Text
+                        = CommonMarkConverter.Convert(viewModel.HoursSegment.Text);
                 }
             }
 

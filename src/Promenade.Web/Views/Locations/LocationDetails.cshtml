@@ -35,9 +35,9 @@
             else
             {
                 <p>
-                    @if (Model.HourOverrideSegment != null)
+                    @if (Model.HoursSegment != null)
                     {
-                        @Html.Raw(Model.HourOverrideSegment.Text)
+                        @Html.Raw(Model.HoursSegment.Text)
                     }
                     else
                     {
@@ -259,7 +259,7 @@
         "location": { "@@id": "@Model.CanonicalUrl" },
         "parentOrganization": "@Model.Location.ParentOrganization",
         "telephone": "@Html.Raw(@Model.Location.Phone)",
-        @if (!Model.Location.IsClosed && Model.HourOverrideSegment == null)
+        @if (!Model.Location.IsClosed && Model.HoursSegment == null)
         {
             @:"openingHours": @Html.Raw(Json.Serialize(@Model.StructuredLocationHours)),
         }

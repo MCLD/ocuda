@@ -7,7 +7,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
-                name: "HourOverrideSegmentId",
+                name: "HoursSegmentId",
                 table: "Locations",
                 nullable: true);
         }
@@ -15,7 +15,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "HourOverrideSegmentId",
+                name: "HoursSegmentId",
                 table: "Locations");
         }
     }

@@ -156,6 +156,6 @@ namespace Ocuda.Promenade.Models.Entities
 
         public bool IsClosed { get; set; }
 
-        public int? HourOverrideSegmentId { get; set; }
+        public int? HoursSegmentId { get; set; }
     }
 }
