@@ -35,19 +35,26 @@
             else
             {
                 <p>
-                    @if (Model.Location.IsClosed)
+                    @if (Model.HoursSegment != null)
                     {
-                        <strong style="font-size: 1.2rem;" 
-                                class="text-danger prom-locaton-isclosed">Closed</strong>
+                        @Html.Raw(Model.HoursSegment.Text)
                     }
                     else
                     {
-                    @foreach (var dayGrouping in Model.Location.LocationHours)
-                    {
-                        <strong>@dayGrouping.Days</strong>
-                        <span>@dayGrouping.Time</span>
-                        <br />
-                    }
+                        @if (Model.Location.IsClosed)
+                        {
+                            <strong style="font-size: 1.2rem;"
+                                    class="text-danger prom-locaton-isclosed">Closed</strong>
+                        }
+                        else
+                        {
+                            @foreach (var dayGrouping in Model.Location.LocationHours)
+                            {
+                                <strong>@dayGrouping.Days</strong>
+                                <span>@dayGrouping.Time</span>
+                                <br />
+                            }
+                        }
                     }
                 </p>
             }
@@ -252,7 +259,8 @@
         "location": { "@@id": "@Model.CanonicalUrl" },
         "parentOrganization": "@Model.Location.ParentOrganization",
         "telephone": "@Html.Raw(@Model.Location.Phone)",
-        @if (!Model.Location.IsClosed) {
+        @if (!Model.Location.IsClosed && Model.HoursSegment == null)
+        {
             @:"openingHours": @Html.Raw(Json.Serialize(@Model.StructuredLocationHours)),
         }
         @if (!string.IsNullOrEmpty(Model.Location.ImagePath))
