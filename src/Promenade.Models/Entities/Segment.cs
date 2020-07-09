@@ -24,6 +24,7 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string Name { get; set; }
 
+        [NotMapped]
         public SegmentText SegmentText { get; set; }
 
         [NotMapped]
