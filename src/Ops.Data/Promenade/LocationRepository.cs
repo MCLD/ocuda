@@ -80,7 +80,8 @@ namespace Ocuda.Ops.Data.Promenade
                 .AsNoTracking()
                 .Where(_ => _.DescriptionSegmentId == segmentId
                     || _.PostFeatureSegmentId == segmentId
-                    || _.PreFeatureSegmentId == segmentId)
+                    || _.PreFeatureSegmentId == segmentId
+                    || _.HoursSegmentId == segmentId)
                 .ToListAsync();
         }
     }
