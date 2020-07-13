@@ -45,9 +45,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [Route("")]
         [Route("[action]/{page}")]
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, PageType? Type = null)
         {
-            var filter = new BaseFilter(page);
+            var filter = new PageFilter(page)
+            {
+                PageType = Type ?? PageType.Home
+            };
 
             var headerList = await _pageService.GetPaginatedHeaderListAsync(filter);
 
@@ -62,7 +65,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToRoute(
                     new
                     {
-                        page = paginateModel.LastPage ?? 1
+                        page = paginateModel.LastPage ?? 1,
+                        Type
                     });
             }
 
@@ -74,7 +78,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var viewModel = new IndexViewModel
             {
                 PageHeaders = headerList.Data,
-                PaginateModel = paginateModel
+                PaginateModel = paginateModel,
+                PageType = filter.PageType.Value
             };
 
             return View(viewModel);
@@ -186,7 +191,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ShowAlertDanger("Unable to delete page: ", ex.Message);
             }
 
-            return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
+            return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage, Type = model.PageType });
         }
 
         [HttpPost]
@@ -226,8 +231,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 HeaderId = header.Id,
                 HeaderName = header.PageName,
                 HeaderStub = header.Stub,
+                HeaderType = header.Type,
                 NewPage = page == null,
-                SelectedLanguageId = selectedLanguage.Id,
+                LanguageId = selectedLanguage.Id,
+                LanguageDescription = selectedLanguage.Description,
                 LanguageList = new SelectList(languages, nameof(Language.Name),
                     nameof(Language.Description), selectedLanguage.Name),
                 SocialCardList = new SelectList(await _socialCardService.GetListAsync(),
@@ -253,16 +260,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> Detail(DetailViewModel model)
         {
-            var language = await _languageService.GetActiveByIdAsync(model.SelectedLanguageId);
-
-            var currentPage = await _pageService.GetByHeaderAndLanguageAsync(
-                    model.HeaderId, language.Id);
+            var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
 
             if (ModelState.IsValid)
             {
                 var page = model.Page;
                 page.LanguageId = language.Id;
                 page.PageHeaderId = model.HeaderId;
+
+                var currentPage = await _pageService.GetByHeaderAndLanguageAsync(
+                    model.HeaderId, language.Id);
 
                 if (currentPage == null)
                 {
@@ -290,13 +297,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         public async Task<IActionResult> DeletePage(DetailViewModel model)
         {
             var page = await _pageService.GetByHeaderAndLanguageAsync(model.HeaderId,
-                model.SelectedLanguageId);
+                model.LanguageId);
 
             await _pageService.DeleteAsync(page);
 
-            var language = await _languageService.GetActiveByIdAsync(model.SelectedLanguageId);
+            var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
 
-            ShowAlertSuccess($"Deleted page content!");
+            ShowAlertSuccess($"Deleted page {language.Description} content!");
 
             return RedirectToAction(nameof(Detail),
                 new

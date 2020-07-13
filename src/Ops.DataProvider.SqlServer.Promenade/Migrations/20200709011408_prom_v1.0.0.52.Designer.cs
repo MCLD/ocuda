@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Ocuda.Ops.DataProvider.SqlServer.Promenade;
 
 namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20200709011408_prom_v1.0.0.51")]
+    partial class prom_v10051
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -374,9 +376,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Property<bool>("HasEvents")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("HoursSegmentId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ImagePath")
                         .HasColumnType("nvarchar(255)")
                         .HasMaxLength(255);
@@ -709,13 +708,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasMaxLength(255);
 
-                    b.Property<DateTime?>("FollowupSentAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool>("IsClaimed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsUnderway")
                         .HasColumnType("bit");
 
                     b.Property<string>("Language")
@@ -731,9 +724,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(255)")
                         .HasMaxLength(255);
-
-                    b.Property<DateTime?>("NotificationSentAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("RequestedTime")
                         .HasColumnType("datetime2");
@@ -759,12 +749,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("FollowupEmailSetupId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("RelatedEmailSetupId")
-                        .HasColumnType("int");
 
                     b.Property<bool>("RequireComments")
                         .HasColumnType("bit");

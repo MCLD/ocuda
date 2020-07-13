@@ -30,9 +30,14 @@ namespace Ocuda.Ops.Data.Promenade
         }
 
         public async Task<DataWithCount<ICollection<PageHeader>>> GetPaginatedListAsync(
-            BaseFilter filter)
+            PageFilter filter)
         {
             var query = DbSet.AsNoTracking();
+
+            if (filter.PageType.HasValue)
+            {
+                query = query.Where(_ => _.Type == filter.PageType.Value);
+            }
 
             return new DataWithCount<ICollection<PageHeader>>
             {

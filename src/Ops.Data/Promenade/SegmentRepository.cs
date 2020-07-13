@@ -43,24 +43,10 @@ namespace Ocuda.Ops.Data.Promenade
             {
                 Count = await DbSet.AsNoTracking().CountAsync(),
                 Data = await DbSet.AsNoTracking()
+                    .OrderBy(_ => _.Name)
                     .ApplyPagination(filter)
                     .ToListAsync()
             };
-        }
-
-        public Segment FindSegmentByName(string name)
-        {
-            return DbSet.AsNoTracking()
-                .Where(_ => _.Name == name)
-                .FirstOrDefault();
-        }
-
-        public async Task<bool> IsDuplicateNameAsync(Segment segment)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.Id != segment.Id && _.Name == segment.Name)
-                .AnyAsync();
         }
     }
 }

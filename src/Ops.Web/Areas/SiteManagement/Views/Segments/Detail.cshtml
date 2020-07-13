@@ -1,0 +1,87 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment.DetailViewModel
+
+@section styles {
+    <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
+}
+
+<form asp-controller="@SegmentsController.Name" asp-action="@(nameof(SegmentsController.DeleteText))" method="post" role="form">
+    <input id="deleteSegmemtId" asp-for="SegmentId" type="hidden" />
+    <input id="deleteLanguageId" asp-for="LanguageId" type="hidden" />
+    <div modal id="deleteModal" name="Segment" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+</form>
+
+<div class="row" style="padding-top: 1rem;">
+    <div class="col-12">
+        <input asp-for="SegmentName" formgroup readonly />
+        <input asp-for="SegmentStartDate" formgroup value="@Model.SegmentStartDate?.ToString()" datetime-picker="DateTimePickerType.DateTime" readonly />
+        <input asp-for="SegmentEndDate" formgroup value="@Model.SegmentStartDate?.ToString()" datetime-picker="DateTimePickerType.DateTime" readonly />
+        <select asp-for="SelectedLanguage" asp-items="Model.LanguageList" formgroup></select>
+    </div>
+</div>
+
+@if (!Model.NewSegmentText)
+{
+    <div class="row">
+        <div class="col-12">
+            <button type="button"
+                    class="btn btn-danger float-right"
+                    data-toggle="modal"
+                    data-target="#deleteModal"
+                    data-segmentId="@Model.SegmentId"
+                    data-languageId="@Model.LanguageId"
+                    data-languageDescription="@Model.LanguageDescription">
+                Delete
+            </button>
+        </div>
+    </div>
+}
+
+<div class="row" style="padding-bottom: 1rem;">
+    <div class="col-12 col-md-9 offset-md-3">
+        <hr />
+    </div>
+</div>
+
+<form asp-action="@nameof(SegmentsController.Detail)" method="post" role="form">
+    <input asp-for="SegmentId" type="hidden" />
+    <input asp-for="LanguageId" type="hidden" />
+
+    <input asp-for="SegmentText.Header" formgroup />
+
+    <div class="form-group row">
+        <label asp-for="SegmentText.Text" class="col-md-3 col-form-label text-md-right"></label>
+        <div class="form-group-inner col-md-9">
+            <textarea asp-for="SegmentText.Text" markdown-editor></textarea>
+            <span asp-validation-for="SegmentText.Text" class="validation-message text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="offset-md-3 col-md-9">
+            <a asp-action="Index" class="btn btn-outline-secondary text-dark">Cancel</a>
+            <button type="submit" class="btn btn-success" buttonspinner>
+                Save
+            </button>
+        </div>
+    </div>
+</form>
+
+@section scripts {
+    <script src="~/js/md.min.js" asp-append-version="true"></script>
+
+    <script>
+        var editor = new Markdown.Editor($("#SegmentText_Text"), { allowUploads: true });
+        editor.run();
+
+        var segmentDetailsUrl = "@Url.Action(nameof(SegmentsController.Detail), new { id = Model.SegmentId})";
+
+        $("#SelectedLanguage").on("change", function () {
+            window.location.href = segmentDetailsUrl + "?language=" + $(this).val();
+        });
+
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            var languageDescription = $(e.relatedTarget).data("languagedescription");
+            $(this).find(".modal-text").text("Are you sure you want to delete the " + languageDescription + " text for this segment?");
+        });
+    </script>
+}

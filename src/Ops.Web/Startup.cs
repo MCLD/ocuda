@@ -218,6 +218,8 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaCategoryRepository,
                 Data.Promenade.EmediaCategoryRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaGroupRepository,
+                Data.Promenade.EmediaGroupRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaRepository,
                 Data.Promenade.EmediaRepository>();
             services.AddScoped<
@@ -246,6 +248,8 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.PageHeaderRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IScheduleRequestRepository,
                 Data.Promenade.ScheduleRequestRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IScheduleRequestSubjectRepository,
+                Data.Promenade.ScheduleRequestSubjectRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISegmentRepository,
                 Data.Promenade.SegmentRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISegmentTextRepository,
