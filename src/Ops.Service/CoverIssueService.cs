@@ -30,7 +30,7 @@ namespace Ocuda.Ops.Service
         }
 
         public async Task<DataWithCount<ICollection<CoverIssueHeader>>> GetPaginatedHeaderListAsync(
-            BaseFilter filter)
+            CoverIssueFilter filter)
         {
             return await _coverIssueHeaderRepository.GetPaginiatedListAsync(filter);
         }

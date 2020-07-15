@@ -8,5 +8,6 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue.ViewModels.Management
     {
         public ICollection<CoverIssueHeader> CoverIssueHeaders { get; set; }
         public PaginateModel PaginateModel { get; set; }
+        public CoverIssueType CoverIssueType {get; set;}
     }
 }

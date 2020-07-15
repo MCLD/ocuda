@@ -2,6 +2,30 @@
 
 <h3>Cover Issues</h3>
 
+<div class="row mb-2">
+    <div class="col-12">
+        <ul class="nav nav-pills">
+            <li class="nav-item">
+                <a asp-action="@nameof(ManagementController.Index)"
+                   asp-route-Type=""
+                   class="nav-link"
+                   ActiveBy routeKey="type" value=",@Ocuda.Utility.Models.CoverIssueType.Pending">
+                    @Ocuda.Utility.Models.CoverIssueType.Pending.ToString()
+                </a>
+            </li>
+            <li class="nav-item">
+                <a asp-action="@nameof(ManagementController.Index)"
+                   asp-route-Type="@Ocuda.Utility.Models.CoverIssueType.Closed"
+                   class="nav-link"
+                   ActiveBy routeKey="type"
+                   value="@Ocuda.Utility.Models.CoverIssueType.Closed">
+                    @Ocuda.Utility.Models.CoverIssueType.Closed.ToString()
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
 @if (Model.CoverIssueHeaders.Count == 0)
 {
     <div class="alert alert-warning">No Issues Found</div>

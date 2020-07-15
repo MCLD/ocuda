@@ -11,6 +11,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         Task<CoverIssueHeader> GetByBibIdAsync(int BibId);
 
         Task<DataWithCount<ICollection<CoverIssueHeader>>> GetPaginiatedListAsync(
-            BaseFilter filter);
+            CoverIssueFilter filter);
     }
 }

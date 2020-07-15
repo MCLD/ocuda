@@ -31,9 +31,12 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
 
         [Route("")]
         [Route("[action]")]
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, CoverIssueType? type = null)
         {
-            var filter = new BaseFilter(page);
+            var filter = new CoverIssueFilter(page)
+            {
+                CoverIssueType = type ?? CoverIssueType.Pending
+            };
             var headers = await _coverIssueService.GetPaginatedHeaderListAsync(filter);
 
             var paginateModel = new PaginateModel
