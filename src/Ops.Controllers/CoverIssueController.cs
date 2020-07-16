@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Utility.Keys;
@@ -16,7 +14,6 @@ namespace Ocuda.Ops.Controllers
         public CoverIssueController(ServiceFacades.Controller<CoverIssueController> context)
             : base(context)
         {
-
         }
 
         [Route("")]
@@ -24,6 +21,5 @@ namespace Ocuda.Ops.Controllers
         {
             return View();
         }
-
     }
 }
