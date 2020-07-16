@@ -2,6 +2,11 @@
 
 <h3>Cover Issues</h3>
 
+@if (Model.CoverIssueHeaders.Count == 0)
+{
+    <div class="alert alert-warning">No Issues Found</div>
+}
+
 <div class="row mb-2">
     <div class="col-12">
         <ul class="nav nav-pills">
@@ -9,8 +14,8 @@
                 <a asp-action="@nameof(ManagementController.Index)"
                    asp-route-Type=""
                    class="nav-link"
-                   ActiveBy routeKey="type" value=",@Ocuda.Utility.Models.CoverIssueType.Pending">
-                    @Ocuda.Utility.Models.CoverIssueType.Pending.ToString()
+                   ActiveBy routeKey="type" value=",@Ocuda.Utility.Models.CoverIssueType.New">
+                    @Ocuda.Utility.Models.CoverIssueType.New.ToString()
                 </a>
             </li>
             <li class="nav-item">
@@ -23,20 +28,14 @@
                 </a>
             </li>
         </ul>
+        <hr />
     </div>
 </div>
-
-@if (Model.CoverIssueHeaders.Count == 0)
-{
-    <div class="alert alert-warning">No Issues Found</div>
-}
-
 <table class="table table-sm table-bordered link-table">
     <thead>
         <tr>
             <th>Bib ID</th>
             <th>Last Resolved</th>
-            <th>Pending Issues</th>
         </tr>
     </thead>
     <tbody>
@@ -49,7 +48,6 @@
                     </a>
                 </td>
                 <td>@header.LastResolved?.ToShortDateString()</td>
-                <td><span class="@(header.HasPendingIssue ? "fas fa-exclamation-triangle" : "")"></span></td>
             </tr>
         }
     </tbody>
