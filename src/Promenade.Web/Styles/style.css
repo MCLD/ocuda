@@ -140,6 +140,7 @@ footer {
 .prom-leftnav .prom-leftnav-header {
     cursor: pointer;
 }
+
 a.prom-leftnav-header:hover {
     text-decoration: none;
 }
@@ -167,6 +168,8 @@ a.prom-leftnav-header:hover {
 
     .prom-leftnav-social a.prom-leftnav-social-link {
         margin-left: 0.5rem;
+    }
+    .prom-leftnav-social a.prom-leftnav-social-link:last-child {
         margin-right: 0.5rem;
     }
 
@@ -271,13 +274,16 @@ a.prom-leftnav-header:hover {
 .prom-location .prom-location-nearby td {
     vertical-align: middle;
 }
+
 .prom-faq-icons {
     border: 1px solid #b1800e;
     color: #7f7141;
 }
-.prom-locations-maplink{
+
+.prom-locations-maplink {
     color: black;
 }
-.prom-locations-maplink:hover{
-    color: white;
-}
+
+    .prom-locations-maplink:hover {
+        color: white;
+    }
