@@ -443,5 +443,10 @@ namespace Ocuda.Promenade.Service
 
             return result;
         }
+
+        public async Task<string> GetClosureInformationAsync(DateTime date)
+        {
+            return await _locationHoursOverrideRepository.GetClosureInformationAsync(date);
+        }
     }
 }

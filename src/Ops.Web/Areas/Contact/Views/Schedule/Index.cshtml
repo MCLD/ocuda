@@ -36,8 +36,9 @@
         <tr>
             <th scope="col">Requested time</th>
             <th scope="col">Name</th>
+            <th scope="col">Language</th>
             <th scope="col">Subject</th>
-            <th scope="col">Claimed</th>
+            <th scope="col">Status</th>
         </tr>
     </thead>
 
@@ -46,9 +47,7 @@
         {
             @foreach (var request in Model.Requests)
             {
-                <tr class="@(Model.Claims.SingleOrDefault(_ => _.ScheduleRequestId == request.Id)?.IsComplete == true
-                        ? "table-success"
-                        : request.IsClaimed ? "table-info" : "")">
+                <tr class="@Model.GetRowClass(request)">
                     <td>
                         <a asp-action="details"
                            asp-controller="Schedule"
@@ -56,8 +55,10 @@
                            asp-route-requestId="@request.Id">@request.RequestedTime</a>
                     </td>
                     <td>@request.Name</td>
+                    <td>@(new System.Globalization.CultureInfo(request.Language).EnglishName)</td>
                     <td>@request.ScheduleRequestSubject?.Subject</td>
                     <td>
+                        @Html.Raw(Model.GetStatusTag(request))
                         @if (Model.Claims.Any(_ => _.ScheduleRequestId == request.Id))
                         {
                             <a asp-controller="Profile"
@@ -69,17 +70,16 @@
                         }
                         else
                         {
-                            @:No
+                            @:Not claimed
                         }
                     </td>
                 </tr>
-
             }
         }
         else
         {
             <tr>
-                <td colspan="4">
+                <td colspan="5">
                     No requests found.
                 </td>
             </tr>

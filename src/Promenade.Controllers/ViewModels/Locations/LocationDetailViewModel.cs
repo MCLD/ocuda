@@ -15,5 +15,6 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Locations
         public SegmentText PreFeatureSegment { get; set; }
         public SegmentText PostFeatureSegment { get; set; }
         public string CanonicalUrl { get; set; }
+        public SegmentText HoursSegment { get; set; }
     }
 }

@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
-using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Service
@@ -37,6 +37,33 @@ namespace Ocuda.Ops.Service
         public async Task<IEnumerable<ScheduleRequest>> GetUnclaimedRequestsAsync()
         {
             return await _scheduleRequestRepository.GetUnclaimedRequestsAsync();
+        }
+
+        public async Task<ICollection<ScheduleRequest>> GetPendingNotificationsAsync()
+        {
+            return await _scheduleRequestRepository.GetPendingNotificationsAsync();
+        }
+
+        public async Task SetNotificationSentAsync(ScheduleRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+            request.NotificationSentAt = DateTime.Now;
+            _scheduleRequestRepository.Update(request);
+            await _scheduleRequestRepository.SaveAsync();
+        }
+
+        public async Task SetFollowupSentAsync(ScheduleRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+            request.FollowupSentAt = DateTime.Now;
+            _scheduleRequestRepository.Update(request);
+            await _scheduleRequestRepository.SaveAsync();
         }
     }
 }

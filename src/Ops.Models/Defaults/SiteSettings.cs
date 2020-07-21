@@ -26,8 +26,8 @@ namespace Ocuda.Ops.Models.Defaults
                 Name = "Email from address",
                 Description = "Email address that outgoing system mails are from",
                 Category = "Email",
-                Value = "ocuda",
-                Type = SiteSettingType.String
+                Value = "",
+                Type = SiteSettingType.StringNullable
             },
             new SiteSetting
             {
@@ -35,8 +35,8 @@ namespace Ocuda.Ops.Models.Defaults
                 Name = "Email from name",
                 Description = "Name that outgoing system mails are from",
                 Category = "Email",
-                Value = "ocuda",
-                Type = SiteSettingType.String
+                Value = "",
+                Type = SiteSettingType.StringNullable
             },
             new SiteSetting
             {
@@ -44,8 +44,8 @@ namespace Ocuda.Ops.Models.Defaults
                 Name = "Email outgoing host",
                 Description = "Outgoing host name for emails",
                 Category = "Email",
-                Value = "ocuda",
-                Type = SiteSettingType.String
+                Value = "",
+                Type = SiteSettingType.StringNullable
             },
             new SiteSetting
             {
@@ -73,6 +73,33 @@ namespace Ocuda.Ops.Models.Defaults
                 Category = "Email",
                 Value = "25",
                 Type = SiteSettingType.Int
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.Email.OverrideToAddress,
+                Name = "Override to email",
+                Description = "Override all outgoing emails and send to this address",
+                Category = "Email",
+                Value = "",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.Email.BccAddress,
+                Name = "BCC address",
+                Description = "BCC all outgoing emails to this address",
+                Category = "Email",
+                Value = "",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.Email.RestrictToDomain,
+                Name = "Restrict to domain",
+                Description = "Restrict all outgoing emails to only addresses @ this domain",
+                Category = "Email",
+                Value = "",
+                Type = SiteSettingType.StringNullable
             },
             #endregion
             #region FileManagement

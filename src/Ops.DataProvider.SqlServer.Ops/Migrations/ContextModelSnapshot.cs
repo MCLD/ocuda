@@ -15,7 +15,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.1")
+                .HasAnnotation("ProductVersion", "3.1.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -182,6 +182,168 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.HasIndex("UpdatedBy");
 
                     b.ToTable("CoverIssueHeaders");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmailRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("BccEmailAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BodyHtml")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BodyText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FromEmailAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FromName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OverrideEmailToAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RestrictToDomain")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SentResponse")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ToEmailAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ToName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EmailRecords");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmailSetup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<int>("EmailTemplateId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FromEmailAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("FromName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmailTemplateId");
+
+                    b.ToTable("EmailSetups");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmailSetupText", b =>
+                {
+                    b.Property<int>("EmailSetupId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PromenadeLanguageName")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("BodyHtml")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BodyText")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Preview")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Subject")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("UrlParameters")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.HasKey("EmailSetupId", "PromenadeLanguageName");
+
+                    b.ToTable("EmailSetupTexts");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmailTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EmailTemplates");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmailTemplateText", b =>
+                {
+                    b.Property<int>("EmailTemplateId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PromenadeLanguageName")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("TemplateHtml")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TemplateMjml")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TemplateText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("EmailTemplateId", "PromenadeLanguageName");
+
+                    b.ToTable("EmailTemplateTexts");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ExternalResource", b =>
@@ -662,6 +824,9 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasColumnType("nvarchar(1000)")
                         .HasMaxLength(1000);
 
+                    b.Property<int?>("RelatedEmailId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("ScheduleLogCallDispositionId")
                         .HasColumnType("int");
 
@@ -1038,6 +1203,33 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmailSetup", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.EmailTemplate", "EmailTemplate")
+                        .WithMany()
+                        .HasForeignKey("EmailTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmailSetupText", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.EmailSetup", "EmailSetup")
+                        .WithMany()
+                        .HasForeignKey("EmailSetupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmailTemplateText", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.EmailTemplate", "EmailTemplate")
+                        .WithMany()
+                        .HasForeignKey("EmailTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ExternalResource", b =>

@@ -23,29 +23,40 @@ namespace Ocuda.Ops.Data.Promenade
         public async Task<ScheduleRequest> GetRequestAsync(int requestId)
         {
             return await DbSet
-                .AsNoTracking()
                 .Include(_ => _.ScheduleRequestSubject)
                 .Include(_ => _.ScheduleRequestTelephone)
                 .Where(_ => _.Id == requestId)
+                .AsNoTracking()
                 .SingleOrDefaultAsync();
         }
 
         public async Task<IEnumerable<ScheduleRequest>> GetRequestsAsync(DateTime requestedDate)
         {
             return await DbSet
-                .AsNoTracking()
                 .Include(_ => _.ScheduleRequestSubject)
                 .Where(_ => _.RequestedTime.Date == requestedDate.Date)
                 .OrderBy(_ => _.RequestedTime)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
         public async Task<IEnumerable<ScheduleRequest>> GetUnclaimedRequestsAsync()
         {
             return await DbSet
-                .AsNoTracking()
                 .Include(_ => _.ScheduleRequestSubject)
                 .Where(_ => !_.IsClaimed)
+                .OrderBy(_ => _.RequestedTime)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<ICollection<ScheduleRequest>> GetPendingNotificationsAsync()
+        {
+            return await DbSet
+                .Include(_ => _.ScheduleRequestSubject)
+                .Where(_ => _.NotificationSentAt == null
+                    && _.Email != null
+                    && _.ScheduleRequestSubject.RelatedEmailSetupId != null)
                 .OrderBy(_ => _.RequestedTime)
                 .ToListAsync();
         }

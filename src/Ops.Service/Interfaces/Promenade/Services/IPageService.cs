@@ -12,7 +12,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<Page> CreateAsync(Page page);
         Task<Page> EditAsync(Page page);
         Task DeleteAsync(Page page);
-        Task<DataWithCount<ICollection<PageHeader>>> GetPaginatedHeaderListAsync(BaseFilter filter);
+        Task<DataWithCount<ICollection<PageHeader>>> GetPaginatedHeaderListAsync(PageFilter filter);
         Task<PageHeader> GetHeaderByIdAsync(int id);
         Task<ICollection<string>> GetHeaderLanguagesByIdAsync(int id);
         Task<PageHeader> CreateHeaderAsync(PageHeader header);

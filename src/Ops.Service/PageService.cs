@@ -66,7 +66,7 @@ namespace Ocuda.Ops.Service
         }
 
         public async Task<DataWithCount<ICollection<PageHeader>>> GetPaginatedHeaderListAsync(
-            BaseFilter filter)
+            PageFilter filter)
         {
             return await _pageHeaderRepository.GetPaginatedListAsync(filter);
         }

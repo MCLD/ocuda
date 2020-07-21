@@ -17,6 +17,7 @@ using Ocuda.Ops.Data;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
+using Ocuda.Ops.Web.JobScheduling;
 using Ocuda.Ops.Web.StartupHelper;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
@@ -161,6 +162,7 @@ namespace Ocuda.Ops.Web
 
             // helpers
             services.AddScoped<Utility.Helpers.WebHelper>();
+            services.AddScoped<Utility.Email.Sender>();
 
             // repositories
             services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,
@@ -169,6 +171,12 @@ namespace Ocuda.Ops.Web
                 Data.Ops.CoverIssueDetailRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICoverIssueHeaderRepository,
                 Data.Ops.CoverIssueHeaderRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IEmailRecordRepository,
+                Data.Ops.EmailRecordRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IEmailSetupTextRepository,
+                Data.Ops.EmailSetupTextRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IEmailTemplateTextRepository,
+                Data.Ops.EmailTemplateTextRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IExternalResourceRepository,
                 Data.Ops.ExternalResourceRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileLibraryRepository,
@@ -210,6 +218,8 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaCategoryRepository,
                 Data.Promenade.EmediaCategoryRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaGroupRepository,
+                Data.Promenade.EmediaGroupRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaRepository,
                 Data.Promenade.EmediaRepository>();
             services.AddScoped<
@@ -238,6 +248,8 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.PageHeaderRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IScheduleRequestRepository,
                 Data.Promenade.ScheduleRequestRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IScheduleRequestSubjectRepository,
+                Data.Promenade.ScheduleRequestSubjectRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISegmentRepository,
                 Data.Promenade.SegmentRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISegmentTextRepository,
@@ -274,8 +286,10 @@ namespace Ocuda.Ops.Web
                 Utility.Services.PathResolverService>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IRosterService, RosterService>();
+            services.AddScoped<IScheduleNotificationService, ScheduleNotificationService>();
             services.AddScoped<IScheduleService, ScheduleService>();
-            services.AddScoped<IScheduleRequestService, ScheduleRequestService>();
+            services.AddScoped<Service.Interfaces.Ops.Services.IScheduleRequestService,
+                ScheduleRequestService>();
             services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<ISegmentService, SegmentService>();
             services.AddScoped<ISiteSettingPromService, SiteSettingPromService>();
@@ -284,6 +298,10 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Abstract.IUserContextProvider, UserContextProvider>();
             services.AddScoped<IUserMetadataTypeService, UserMetadataTypeService>();
             services.AddScoped<IUserService, UserService>();
+
+            // background process
+            services.AddScoped<JobScopedProcessingService>();
+            services.AddHostedService<JobBackgroundService>();
         }
 
         public void Configure(IApplicationBuilder app,

@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Ops page for setting location hours and managing overrides
 - Promenade external resource management
 - Promenade site setting management
+- Posts to Ops homepage
 
 ### Changed
 - Default to only logging Warnings for Microsoft and System namespaces

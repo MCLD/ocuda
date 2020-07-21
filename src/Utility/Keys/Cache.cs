@@ -10,7 +10,7 @@
         /// <summary>
         /// The return URL once the user is authenticated, replace {0} with the user's identifier.
         /// </summary>
-        /// 
+        ///
         public static readonly string OpsReturn = "auth.{0}.return";
 
         /// <summary>
@@ -29,6 +29,16 @@
         /// Left navigation JSON
         /// </summary>
         public static readonly string OpsLeftNav = "leftnav";
+
+        /// <summary>
+        /// Instance that runs jobs and how often it runs them
+        /// </summary>
+        public static readonly string OpsJobRunner = "jobrunner";
+
+        /// <summary>
+        /// Send message to stop the job runner, replace {0} with the instance name
+        /// </summary>
+        public static readonly string OpsJobStop = "jobstop.{0}";
 
         /// <summary>
         /// Default language ID
@@ -64,5 +74,55 @@
         /// Cached external resource list
         /// </summary>
         public static readonly string PromExternalResources = "externalresources";
+
+        /// <summary>
+        /// Cached social card, {0} is the card id
+        /// </summary>
+        public static readonly string PromSocialCard = "socialcard.{0}";
+
+        /// <summary>
+        /// Cached segment, {0} is the segment id
+        /// </summary>
+        public static readonly string PromSegment = "segment.{0}";
+
+        /// <summary>
+        /// Cached segment text, {0} is the language id, {1} is the id
+        /// </summary>
+        public static readonly string PromSegmentText = "segmenttext.{0}.{1}";
+
+        /// <summary>
+        /// Cached emedia groups
+        /// </summary>
+        public static readonly string PromEmediaGroups = "emediagroups";
+
+        /// <summary>
+        /// Cached emedia groups
+        /// </summary>
+        public static readonly string PromEmedias = "emedias";
+
+        /// <summary>
+        /// Cached emedia text, {0} is the language id, {1} is the id
+        /// </summary>
+        public static readonly string PromEmediaText = "emediatext.{0}.{1}";
+
+        /// <summary>
+        /// Cached emedia categories
+        /// </summary>
+        public static readonly string PromCategories = "categories";
+
+        /// <summary>
+        /// Cached emedia text, {0} is the language id, {1} is the id
+        /// </summary>
+        public static readonly string PromCategoryText = "categorytext.{0}.{1}";
+
+        /// <summary>
+        /// Cached emedia categories
+        /// </summary>
+        public static readonly string PromEmediaCategories = "emediacategories";
+
+        /// <summary>
+        /// Cached schedule subjects
+        /// </summary>
+        public static readonly string PromScheduleSubjects = "schedulesubjects";
     }
 }

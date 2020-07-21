@@ -8,6 +8,7 @@
       "node_modules/bootstrap-multiselect/dist/js/bootstrap-multiselect.js",
       "node_modules/jquery-validation/dist/jquery.validate.js",
       "node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js",
+      "node_modules/slick-carousel/slick/slick.js",
       "Scripts/Layout.js",
       "Scripts/ops.js"
     ],
@@ -54,6 +55,8 @@
       "node_modules/bootstrap/dist/css/bootstrap.css",
       "node_modules/bootstrap-multiselect/dist/css/bootstrap-multiselect.css",
       "node_modules/@fortawesome/fontawesome-free/css/all.css",
+      "node_modules/slick-carousel/slick/slick.css",
+      "node_modules/slick-carousel/slick/slick-theme.css",
       "Styles/ops.css"
     ],
     "minify": {

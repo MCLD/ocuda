@@ -266,10 +266,26 @@ namespace Ocuda.Promenade.Controllers
                 return NotFound();
             }
 
+            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
+            if (viewModel.Location.HoursSegmentId.HasValue)
+            {
+                viewModel.HoursSegment
+                    = await _segmentService.GetSegmentTextBySegmentIdAsync(
+                        viewModel.Location.HoursSegmentId.Value,
+                        forceReload);
+
+                if (viewModel.HoursSegment != null)
+                {
+                    viewModel.HoursSegment.Text
+                        = CommonMarkConverter.Convert(viewModel.HoursSegment.Text);
+                }
+            }
+
             if (viewModel.Location.PreFeatureSegmentId.HasValue)
             {
                 viewModel.PreFeatureSegment = await _segmentService.GetSegmentTextBySegmentIdAsync(
-                    viewModel.Location.PreFeatureSegmentId.Value);
+                    viewModel.Location.PreFeatureSegmentId.Value, forceReload);
                 if (viewModel.PreFeatureSegment != null)
                 {
                     viewModel.PreFeatureSegment.Text
@@ -280,7 +296,7 @@ namespace Ocuda.Promenade.Controllers
             if (viewModel.Location.PostFeatureSegmentId.HasValue)
             {
                 viewModel.PostFeatureSegment = await _segmentService.GetSegmentTextBySegmentIdAsync(
-                    viewModel.Location.PostFeatureSegmentId.Value);
+                    viewModel.Location.PostFeatureSegmentId.Value, forceReload);
                 if (viewModel.PostFeatureSegment != null)
                 {
                     viewModel.PostFeatureSegment.Text
@@ -289,7 +305,8 @@ namespace Ocuda.Promenade.Controllers
             }
 
             viewModel.Location.DescriptionSegment = await _segmentService
-                .GetSegmentTextBySegmentIdAsync(viewModel.Location.DescriptionSegmentId);
+                .GetSegmentTextBySegmentIdAsync(viewModel.Location.DescriptionSegmentId,
+                    forceReload);
 
             if (viewModel.Location.DescriptionSegment?.Text.Length > 0)
             {

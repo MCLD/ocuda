@@ -35,21 +35,28 @@ namespace Ocuda.Ops.Data.Ops
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<DataWithCount<ICollection<Post>>> GetPaginatedListBySectionAsync(
-            BaseFilter filter, int sectionId, int? categoryId = null)
+        public async Task<DataWithCount<ICollection<Post>>> GetPaginatedListAsync(BlogFilter filter)
         {
-            var query = DbSet
-                .AsNoTracking()
-                .Where(_ => _.SectionId == sectionId);
+            var query = DbSet.AsNoTracking();
 
-            if (categoryId.HasValue)
+            if (filter.SectionId.HasValue)
+            {
+                query = query.Where(_ => _.SectionId == filter.SectionId.Value);
+            }
+
+            if (filter.IsShownOnHomePage.HasValue)
+            {
+                query = query.Where(_ => _.ShowOnHomePage == filter.IsShownOnHomePage.Value);
+            }
+                
+            if (filter.CategoryId.HasValue)
             {
                 query = query
                     .Join(_context.PostCategories,
                         post => post.Id,
                         postCategory => postCategory.PostId,
                         (post, postCategory) => new { post, postCategory })
-                    .Where(_ => _.postCategory.CategoryId == categoryId.Value)
+                    .Where(_ => _.postCategory.CategoryId == filter.CategoryId.Value)
                     .Select(_ => _.post);
             }
 

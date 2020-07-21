@@ -9,7 +9,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     public interface IPageHeaderRepository : IGenericRepository<PageHeader>
     {
         Task<PageHeader> FindAsync(int id);
-        Task<DataWithCount<ICollection<PageHeader>>> GetPaginatedListAsync(BaseFilter filter);
+        Task<DataWithCount<ICollection<PageHeader>>> GetPaginatedListAsync(PageFilter filter);
         Task<ICollection<string>> GetLanguagesByIdAsync(int id);
         Task<bool> StubInUseAsync(PageHeader header);
     }

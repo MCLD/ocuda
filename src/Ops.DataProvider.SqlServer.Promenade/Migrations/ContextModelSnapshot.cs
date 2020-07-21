@@ -15,7 +15,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.1")
+                .HasAnnotation("ProductVersion", "3.1.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -374,6 +374,9 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Property<bool>("HasEvents")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("HoursSegmentId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ImagePath")
                         .HasColumnType("nvarchar(255)")
                         .HasMaxLength(255);
@@ -706,7 +709,13 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasMaxLength(255);
 
+                    b.Property<DateTime?>("FollowupSentAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("IsClaimed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUnderway")
                         .HasColumnType("bit");
 
                     b.Property<string>("Language")
@@ -720,9 +729,11 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasMaxLength(255);
 
                     b.Property<string>("Notes")
-                        .IsRequired()
                         .HasColumnType("nvarchar(255)")
                         .HasMaxLength(255);
+
+                    b.Property<DateTime?>("NotificationSentAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("RequestedTime")
                         .HasColumnType("datetime2");
@@ -748,6 +759,21 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("FollowupEmailSetupId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RelatedEmailSetupId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("RequireComments")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("RequireEmail")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("SegmentId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Subject")
                         .IsRequired()
@@ -803,10 +829,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.SegmentText", b =>
                 {
-                    b.Property<int>("SegmentId")
+                    b.Property<int>("LanguageId")
                         .HasColumnType("int");
 
-                    b.Property<int>("LanguageId")
+                    b.Property<int>("SegmentId")
                         .HasColumnType("int");
 
                     b.Property<string>("Header")
@@ -817,12 +843,9 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("nvarchar(2000)")
                         .HasMaxLength(2000);
 
-                    b.HasKey("SegmentId", "LanguageId");
+                    b.HasKey("LanguageId", "SegmentId");
 
-                    b.HasIndex("LanguageId");
-
-                    b.HasIndex("SegmentId")
-                        .IsUnique();
+                    b.HasIndex("SegmentId");
 
                     b.ToTable("SegmentTexts");
                 });
@@ -1113,9 +1136,9 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Ocuda.Promenade.Models.Entities.Segment", null)
-                        .WithOne("SegmentText")
-                        .HasForeignKey("Ocuda.Promenade.Models.Entities.SegmentText", "SegmentId")
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Segment", "Segment")
+                        .WithMany()
+                        .HasForeignKey("SegmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

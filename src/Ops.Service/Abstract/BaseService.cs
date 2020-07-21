@@ -23,8 +23,10 @@ namespace Ocuda.Ops.Service.Abstract
 
         protected int GetCurrentUserId()
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-            var userIdClaim = httpContext.User.Claims.First(_ => _.Type == ClaimType.UserId);
+            var userIdClaim = _httpContextAccessor.HttpContext
+                .User
+                .Claims
+                .First(_ => _.Type == ClaimType.UserId);
 
             if (int.TryParse(userIdClaim.Value, out int id))
             {

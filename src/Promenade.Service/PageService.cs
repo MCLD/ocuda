@@ -184,6 +184,7 @@ namespace Ocuda.Promenade.Service
                 {
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(cachePagesInHours)
                 });
+
             if (forceReload)
             {
                 _logger.LogDebug("Forced cache reload for {CacheKey}, caching {Length} characters",

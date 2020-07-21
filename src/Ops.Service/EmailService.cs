@@ -1,125 +1,70 @@
 ﻿using System;
 using System.Threading.Tasks;
-using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using MimeKit;
+using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Service.Abstract;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
-    public class EmailService : IEmailService
+    public class EmailService : BaseService<EmailService>, IEmailService
     {
-        private readonly ILogger<EmailService> _logger;
-        private readonly ISiteSettingService _siteSettingService;
-        private readonly IUserService _userService;
+        private readonly Utility.Email.Sender _sender;
+        private readonly IEmailRecordRepository _emailRecordRepository;
+        private readonly IEmailSetupTextRepository _emailSetupTextRepository;
+        private readonly IEmailTemplateTextRepository _emailTemplateTextRepository;
+
         public EmailService(ILogger<EmailService> logger,
-            ISiteSettingService siteSettingService,
-            IUserService userService)
+            Utility.Email.Sender sender,
+            IHttpContextAccessor httpContextAccessor,
+            IEmailRecordRepository emailRecordRepository,
+            IEmailSetupTextRepository emailSetupTextRepository,
+            IEmailTemplateTextRepository emailTemplateTextRepository)
+            : base(logger, httpContextAccessor)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _siteSettingService = siteSettingService
-                ?? throw new ArgumentNullException(nameof(siteSettingService));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _sender = sender ?? throw new ArgumentNullException(nameof(sender));
+            _emailRecordRepository = emailRecordRepository
+                ?? throw new ArgumentNullException(nameof(emailRecordRepository));
+            _emailSetupTextRepository = emailSetupTextRepository
+                ?? throw new ArgumentNullException(nameof(emailSetupTextRepository));
+            _emailTemplateTextRepository = emailTemplateTextRepository
+                ?? throw new ArgumentNullException(nameof(emailTemplateTextRepository));
         }
 
-        public async Task SendToUserAsync(int userId, string subject, string body,
-            string htmlBody = null)
+        public async Task<EmailSetupText> GetEmailSetupAsync(int emailSetupId, string languageName)
         {
-            var user = await _userService.GetByIdAsync(userId);
-
-            if (string.IsNullOrWhiteSpace(user.Email))
-            {
-                throw new OcudaException("User does not have an email address configured.");
-            }
-
-            await SendEmailAsync(user.Email,
-                subject,
-                body,
-                htmlBody,
-                user.Nickname);
+            return await _emailSetupTextRepository
+                .GetByIdLanguageAsync(emailSetupId, languageName);
         }
 
-        public async Task SendToAddressAsync(string emailAddress, string subject,
-            string body, string htmlBody = null)
+        public async Task<EmailTemplateText> GetEmailTemplateAsync(int emailTemplateId,
+            string languageName)
         {
-            await SendEmailAsync(emailAddress,
-                subject,
-                body,
-                htmlBody);
+            return await _emailTemplateTextRepository
+                .GetByIdLanguageAsync(emailTemplateId, languageName);
         }
 
-        private async Task SendEmailAsync(string emailAddress,
-            string subject,
-            string body,
-            string htmlBody = null,
-            string emailName = null)
+        public async Task<EmailRecord> SendAsync(Utility.Email.Details emailDetails)
         {
-            var message = new MimeMessage();
-
-            var fromName = await _siteSettingService.GetSettingStringAsync(
-                Ops.Models.Keys.SiteSetting.Email.FromName);
-            var fromAddress = await _siteSettingService.GetSettingStringAsync(
-                Ops.Models.Keys.SiteSetting.Email.FromAddress);
-            message.From.Add(new MailboxAddress(fromName, fromAddress));
-
-            if (!string.IsNullOrWhiteSpace(emailName))
-            {
-                message.To.Add(new MailboxAddress(emailName, emailAddress));
-            }
-            else
-            {
-                message.To.Add(new MailboxAddress(emailAddress));
-            }
-
-            message.Subject = subject;
-
-            var builder = new BodyBuilder
-            {
-                TextBody = body
-            };
-            if (!string.IsNullOrWhiteSpace(htmlBody))
-            {
-                builder.HtmlBody = htmlBody;
-            }
-            message.Body = builder.ToMessageBody();
-
-            using var client = new SmtpClient();
-            // accept any STARTTLS certificate
-            client.ServerCertificateValidationCallback = (s, c, h, e) => true;
-
-            var outgoingHost = await _siteSettingService.GetSettingStringAsync(
-                Ops.Models.Keys.SiteSetting.Email.OutgoingHost);
-            var outgoingPort = await _siteSettingService.GetSettingIntAsync(
-                Ops.Models.Keys.SiteSetting.Email.OutgoingPort);
-
-            await client.ConnectAsync(outgoingHost, outgoingPort, false);
-
-            client.AuthenticationMechanisms.Remove("XOAUTH2");
-
-            var outgoingLogin = await _siteSettingService.GetSettingStringAsync(
-                Ops.Models.Keys.SiteSetting.Email.OutgoingLogin);
-            var outgoingPassword = await _siteSettingService.GetSettingStringAsync(
-                Ops.Models.Keys.SiteSetting.Email.OutgoingPassword);
-            if (!string.IsNullOrEmpty(outgoingLogin)
-                && !string.IsNullOrEmpty(outgoingPassword))
-            {
-                client.Authenticate(outgoingLogin, outgoingPassword);
-            }
+            var record = await _sender.SendEmailAsync(emailDetails);
 
             try
             {
-                await client.SendAsync(message);
+                var emailRecord = new EmailRecord(record)
+                {
+                    CreatedAt = DateTime.Now
+                };
+                return await _emailRecordRepository.AddSaveAsync(emailRecord);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,
-                    "Unable to send email to {EmailTo} with subject {EmailSubject}: {Message}",
-                    emailAddress,
-                    subject);
-                throw new OcudaException("Unable to send email.", ex);
+                _logger.LogError("Unable to save email record for email sent to {ToAddress}: {ErrorMessage}",
+                    emailDetails.ToEmailAddress,
+                    ex.Message);
             }
-            await client.DisconnectAsync(true);
+            return null;
         }
     }
 }

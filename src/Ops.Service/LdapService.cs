@@ -82,19 +82,19 @@ namespace Ocuda.Ops.Service
                     cn.Bind(ldapDn, ldapPassword);
 
                     LdapSearchQueue queue = cn.Search(ldapSearchBase,
-                        LdapConnection.SCOPE_SUB,
+                        LdapConnection.ScopeSub,
                         filter,
                         AttributesToReturn,
                         false,
                         null,
                         constraints);
 
-                    LdapMessage message = queue.getResponse();
+                    LdapMessage message = queue.GetResponse();
                     var now = DateTime.Now;
                     while (message.Type == LDAPSearchResponse)
                     {
                         var entry = ((LdapSearchResult)message).Entry;
-                        var attributes = entry.getAttributeSet().GetEnumerator();
+                        var attributes = entry.GetAttributeSet().GetEnumerator();
                         while (attributes.MoveNext())
                         {
                             var attribute = (LdapAttribute)attributes.Current;
@@ -130,7 +130,7 @@ namespace Ocuda.Ops.Service
                             }
                         }
                         user.LastLdapUpdate = now;
-                        message = queue.getResponse();
+                        message = queue.GetResponse();
                     }
                     user.LastLdapCheck = now;
                     cn.Disconnect();

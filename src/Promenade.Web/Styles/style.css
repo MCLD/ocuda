@@ -287,3 +287,36 @@ a.prom-leftnav-header:hover {
     .prom-locations-maplink:hover {
         color: white;
     }
+
+/* carousels */
+
+.prom-carousel div {
+    text-align: center;
+}
+
+    .prom-carousel div a {
+        text-decoration: none;
+    }
+
+        .prom-carousel div a img {
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 150px;
+            padding-bottom: 1rem;
+        }
+
+.prom-carousel .prom-carousel-nav {
+    color: #47484a;
+    cursor: pointer;
+    position: absolute;
+    top: 40%;
+    z-index: 100;
+}
+
+.prom-carousel .prom-carousel-prev {
+    left: 0;
+}
+
+.prom-carousel .prom-carousel-next {
+    right: 0;
+}

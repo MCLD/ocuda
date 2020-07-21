@@ -17,20 +17,12 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<EmediaCategory> GetByIdsAsync(int emediaId, int categoryId)
+        public async Task<ICollection<EmediaCategory>> GetAllAsync()
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.EmediaId == emediaId && _.CategoryId == categoryId)
-                .SingleOrDefaultAsync();
-        }
-
-        public async Task<ICollection<Category>> GetCategoriesByEmediaIdAsync(int emediaId)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.EmediaId == emediaId)
-                .Select(_ => _.Category)
+                .OrderBy(_ => _.EmediaId)
+                .ThenBy(_ => _.CategoryId)
                 .ToListAsync();
         }
     }

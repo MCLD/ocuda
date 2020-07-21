@@ -55,6 +55,11 @@ namespace Ocuda.Promenade.Web
                 throw new ArgumentNullException(nameof(services));
             }
 
+            if (_isDevelopment)
+            {
+                services.AddApplicationInsightsTelemetry();
+            }
+
             services.AddResponseCompression();
 
             services.AddResponseCaching();
@@ -107,6 +112,25 @@ namespace Ocuda.Promenade.Web
                 services.AddDistributedMemoryCache();
             }
 
+            var sessionTimeout = TimeSpan.FromMinutes(20);
+            if (int.TryParse(_config[Configuration.PromenadeSessionTimeoutMinutes],
+                out int configuredTimeout))
+            {
+                sessionTimeout = TimeSpan.FromMinutes(configuredTimeout);
+            }
+
+            string cookieName = string.IsNullOrEmpty(_config[Configuration.OcudaCookieName])
+                ? ".oc"
+                : _config[Configuration.OcudaCookieName];
+
+            services.AddSession(_ =>
+            {
+                _.IdleTimeout = sessionTimeout;
+                _.Cookie.HttpOnly = true;
+                _.Cookie.IsEssential = true;
+                _.Cookie.Name = cookieName;
+            });
+
             // database configuration
             string promCs = _config.GetConnectionString("Promenade")
                 ?? throw new OcudaException("ConnectionString:Promenade not configured.");
@@ -118,14 +142,35 @@ namespace Ocuda.Promenade.Web
                 if (!string.IsNullOrEmpty(poolSizeConfig)
                     && int.TryParse(poolSizeConfig, out int poolSize))
                 {
-                    services.AddDbContextPool<PromenadeContext,
-                        DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs),
-                            poolSize);
+                    if (_isDevelopment)
+                    {
+                        services.AddDbContextPool<PromenadeContext,
+                            DataProvider.SqlServer.Promenade.Context>(_ => _
+                                .UseSqlServer(promCs)
+                                .AddInterceptors(new DbLoggingInterceptor()),
+                                poolSize);
+                    }
+                    else
+                    {
+                        services.AddDbContextPool<PromenadeContext,
+                            DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs),
+                                poolSize);
+                    }
                 }
                 else
                 {
-                    services.AddDbContextPool<PromenadeContext,
-                        DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
+                    if (_isDevelopment)
+                    {
+                        services.AddDbContextPool<PromenadeContext,
+                            DataProvider.SqlServer.Promenade.Context>(_ => _
+                                .UseSqlServer(promCs)
+                                .AddInterceptors(new DbLoggingInterceptor()));
+                    }
+                    else
+                    {
+                        services.AddDbContextPool<PromenadeContext,
+                            DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
+                    }
                 }
             }
             else
@@ -141,23 +186,25 @@ namespace Ocuda.Promenade.Web
             if (_isDevelopment)
             {
                 services.AddControllersWithViews()
-                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
-                .AddDataAnnotationsLocalization(_ =>
-                {
-                    _.DataAnnotationLocalizerProvider = (__, factory)
-                        => factory.Create(typeof(i18n.Resources.Shared));
-                })
-                .AddRazorRuntimeCompilation();
+                    .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                    .AddDataAnnotationsLocalization(_ =>
+                    {
+                        _.DataAnnotationLocalizerProvider = (__, factory)
+                            => factory.Create(typeof(i18n.Resources.Shared));
+                    })
+                    .AddRazorRuntimeCompilation()
+                    .AddSessionStateTempDataProvider();
             }
             else
             {
                 services.AddControllersWithViews()
-                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
-                .AddDataAnnotationsLocalization(_ =>
-                {
-                    _.DataAnnotationLocalizerProvider = (__, factory)
-                        => factory.Create(typeof(i18n.Resources.Shared));
-                });
+                    .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                    .AddDataAnnotationsLocalization(_ =>
+                    {
+                        _.DataAnnotationLocalizerProvider = (__, factory)
+                            => factory.Create(typeof(i18n.Resources.Shared));
+                    })
+                    .AddSessionStateTempDataProvider();
             }
 
             services.Configure<RouteOptions>(_ =>
@@ -367,6 +414,8 @@ namespace Ocuda.Promenade.Web
 
                 await next();
             });
+
+            app.UseSession();
 
             app.UseEndpoints(endpoints => endpoints.MapControllers());
         }

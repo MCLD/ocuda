@@ -11,5 +11,12 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         [Required]
         public string Subject { get; set; }
+
+        public int? SegmentId { get; set; }
+
+        public bool RequireEmail { get; set; }
+        public bool RequireComments { get; set; }
+        public int? RelatedEmailSetupId { get; set; }
+        public int? FollowupEmailSetupId { get; set; }
     }
 }
