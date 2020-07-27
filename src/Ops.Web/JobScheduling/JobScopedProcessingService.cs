@@ -23,12 +23,19 @@ namespace Ocuda.Ops.Web.JobScheduling
         {
             StartProcessing();
 
-            await _scheduleNotificationService.SendPendingNotificationsAsync();
+            var sent = await _scheduleNotificationService.SendPendingNotificationsAsync();
 
-            _logger.LogDebug("Scheduled tasks complete in {Elapsed} ms",
-                StopProcessing().ElapsedMilliseconds);
-
-            await Task.CompletedTask;
+            if (sent > 0)
+            {
+                _logger.LogDebug("Scheduled tasks sent {SentNotifications} email(s) in {Elapsed} ms",
+                    sent,
+                    StopProcessing().ElapsedMilliseconds);
+            }
+            else
+            {
+                _logger.LogDebug("Scheduled tasks complete in {Elapsed} ms",
+                    StopProcessing().ElapsedMilliseconds);
+            }
         }
     }
 }

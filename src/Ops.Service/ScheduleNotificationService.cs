@@ -80,14 +80,15 @@ namespace Ocuda.Ops.Service
             return config;
         }
 
-        public async Task SendPendingNotificationsAsync()
+        public async Task<int> SendPendingNotificationsAsync()
         {
+            int sentNotifications = 0;
             var pendingNotifications
                 = await _scheduleRequestService.GetPendingNotificationsAsync();
 
             if (pendingNotifications?.Count > 0)
             {
-                _logger.LogDebug("Found {PendingNotificationCount} pending notifications",
+                _logger.LogDebug("Found {PendingNotificationCount} pending notification(s)",
                     pendingNotifications.Count);
 
                 Configuration settings = null;
@@ -146,7 +147,13 @@ namespace Ocuda.Ops.Service
                         try
                         {
                             var sentEmail = await _emailService.SendAsync(emailDetails);
-                            await _scheduleRequestService.SetNotificationSentAsync(pending);
+
+                            if (sentEmail != null)
+                            {
+                                sentNotifications++;
+
+                                await _scheduleRequestService.SetNotificationSentAsync(pending);
+                            }
 
                             await _scheduleLogRepository.AddAsync(new ScheduleLog
                             {
@@ -159,14 +166,17 @@ namespace Ocuda.Ops.Service
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError("Error sending email setup {EmailSetupId} to {EmailTo}: {ErrorMessage}",
-                                emailSetupText.EmailSetup.Id,
-                                pending.Email.Trim(),
+                            _logger.LogError("Sending pending notification id {RequestId} failed: {ErrorMessage}",
+                                pending.Id,
                                 ex.Message);
                         }
+
+                        await Task.Delay(TimeSpan.FromSeconds(2));
                     }
                 }
             }
+
+            return sentNotifications;
         }
 
         public async Task SendFollowupAsync(ScheduleRequest request)
