@@ -145,6 +145,8 @@ namespace Ocuda.Utility.Email
 
             client.AuthenticationMechanisms.Remove("XOAUTH2");
 
+            client.Timeout = 30 * 1000;  // 30 seconds
+
             await client.ConnectAsync(details.Server,
                 details.Port ?? 25,
                 MailKit.Security.SecureSocketOptions.None);
