@@ -73,6 +73,9 @@ namespace Ocuda.Utility.Email
         private async Task<Record> SendEmailInternalAsync(Details details)
         {
             // apply the details replacements
+            _logger.LogTrace("Applying details replacements for {TagCount} tags",
+                details.Tags?.Count ?? 0);
+
             if (details.Tags?.Count > 0)
             {
                 var stubble = new StubbleBuilder().Build();
@@ -84,6 +87,7 @@ namespace Ocuda.Utility.Email
             // apply the sections to the HTML template
             if (!string.IsNullOrEmpty(details?.TemplateHtml))
             {
+                _logger.LogTrace("Performing HTML template replacement");
                 details.BodyHtml = details.TemplateHtml
                     .Replace("{{Body}}", details.BodyHtml, StringComparison.OrdinalIgnoreCase)
                     .Replace("{{Preview}}", details.Preview, StringComparison.OrdinalIgnoreCase)
@@ -96,6 +100,7 @@ namespace Ocuda.Utility.Email
                     .TemplateText?
                     .Contains("{{Body}}", StringComparison.OrdinalIgnoreCase) == true)
             {
+                _logger.LogTrace("Performing text template replacement");
                 details.BodyText = details.TemplateText.Replace("{{Body}}",
                     details.BodyText,
                     StringComparison.OrdinalIgnoreCase);
@@ -147,6 +152,10 @@ namespace Ocuda.Utility.Email
             client.Timeout = 30 * 1000;  // 30 seconds
 
             var sendTimer = Stopwatch.StartNew();
+            _logger.LogTrace("Connecting to server {MailServer} on port {MailServerPort}",
+                details.Server,
+                details.Port ?? 25);
+
             await client.ConnectAsync(details.Server,
                 details.Port ?? 25,
                 MailKit.Security.SecureSocketOptions.None);
@@ -159,7 +168,13 @@ namespace Ocuda.Utility.Email
 
             try
             {
+                _logger.LogTrace("Calling SMTP client send at {TimeStamp} ms",
+                    sendTimer.ElapsedMilliseconds);
+
                 await client.SendAsync(message);
+
+                _logger.LogTrace("SMTP send complete at {TimeStamp} ms",
+                    sendTimer.ElapsedMilliseconds);
 
                 sendTimer.Stop();
 
