@@ -91,7 +91,9 @@ namespace Ocuda.Ops.Service
             {
                 await AddLogAsync(new ScheduleLog
                 {
-
+                    Notes = "Cancelled, no email sent.",
+                    ScheduleRequestId = scheduleRequestId,
+                    IsCancelled = true
                 });
             }
 
@@ -150,9 +152,19 @@ namespace Ocuda.Ops.Service
             if (log.IsComplete)
             {
                 var request = await _scheduleRequestService.GetRequestAsync(log.ScheduleRequestId);
+                bool handled = false;
                 if (request?.ScheduleRequestSubject.FollowupEmailSetupId != null)
                 {
-                    await _scheduleNotificationService.SendFollowupAsync(request);
+                    handled = await _scheduleNotificationService.SendFollowupAsync(request);
+                }
+                if (!handled)
+                {
+                    await AddLogAsync(new ScheduleLog
+                    {
+                        Notes = "Completed, no email sent.",
+                        ScheduleRequestId = log.ScheduleRequestId,
+                        IsCancelled = true
+                    });
                 }
             }
             else if (setUnderway)

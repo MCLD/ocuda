@@ -163,7 +163,7 @@ namespace Ocuda.Ops.Service
             return sentNotifications;
         }
 
-        public async Task SendFollowupAsync(ScheduleRequest request)
+        public async Task<bool> SendFollowupAsync(ScheduleRequest request)
         {
             if (request == null)
             {
@@ -200,6 +200,7 @@ namespace Ocuda.Ops.Service
                     if (sentEmail != null)
                     {
                         await _scheduleRequestService.SetFollowupSentAsync(request);
+                        return true;
                     }
                 }
                 catch (Exception ex)
@@ -209,6 +210,7 @@ namespace Ocuda.Ops.Service
                         ex.Message);
                 }
             }
+            return false;
         }
 
         public async Task<EmailRecord> SendCancellationAsync(ScheduleRequest request)
@@ -326,23 +328,26 @@ namespace Ocuda.Ops.Service
 
                 var sentEmail = await _emailService.SendAsync(emailDetails);
 
-                _logger.LogInformation("{EmailDescription} (setup {EmailSetupId}) sent to {EmailTo}",
-                    emailDescription,
-                    emailSetupText.EmailSetup.Id,
-                    request.Email.Trim());
-
-                await _scheduleRequestService.SetFollowupSentAsync(request);
-
-                await _scheduleLogRepository.AddAsync(new ScheduleLog
+                if (sentEmail != null)
                 {
-                    CreatedAt = DateTime.Now,
-                    Notes = $"{emailDescription} sent to {request.Email.Trim()}.",
-                    ScheduleRequestId = request.Id,
-                    RelatedEmailId = sentEmail?.Id
-                });
-                await _scheduleLogRepository.SaveAsync();
+                    _logger.LogInformation("{EmailDescription} (setup {EmailSetupId}) sent to {EmailTo}",
+                        emailDescription,
+                        emailSetupText.EmailSetup.Id,
+                        request.Email.Trim());
 
-                return sentEmail;
+                    await _scheduleRequestService.SetFollowupSentAsync(request);
+
+                    await _scheduleLogRepository.AddAsync(new ScheduleLog
+                    {
+                        CreatedAt = DateTime.Now,
+                        Notes = $"{emailDescription} sent to {request.Email.Trim()}.",
+                        ScheduleRequestId = request.Id,
+                        RelatedEmailId = sentEmail?.Id
+                    });
+                    await _scheduleLogRepository.SaveAsync();
+
+                    return sentEmail;
+                }
             }
             catch (Exception ex)
             {
