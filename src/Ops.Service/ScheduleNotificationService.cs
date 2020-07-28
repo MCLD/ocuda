@@ -102,50 +102,50 @@ namespace Ocuda.Ops.Service
                 {
                     foreach (var pending in pendingNotifications)
                     {
-                        var setupId = (int)pending.ScheduleRequestSubject.RelatedEmailSetupId;
-                        var lang = pending.Language
-                            .Equals("English", StringComparison.OrdinalIgnoreCase)
-                                ? "en-US"
-                                : pending.Language;
-
-                        var culture = CultureInfo.GetCultureInfo(lang);
-
-                        var emailSetupText = await _emailService.GetEmailSetupAsync(setupId, lang);
-
-                        var emailTemplateText = await _emailService
-                            .GetEmailTemplateAsync(emailSetupText.EmailSetup.EmailTemplateId, lang);
-
-                        var emailDetails = new Details
+                        try
                         {
-                            FromEmailAddress = emailSetupText.EmailSetup.FromEmailAddress,
-                            FromName = emailSetupText.EmailSetup.FromName,
-                            ToEmailAddress = pending.Email.Trim(),
-                            ToName = pending.Name?.Trim(),
-                            UrlParameters = emailSetupText.UrlParameters,
-                            Preview = emailSetupText.Preview,
-                            TemplateHtml = emailTemplateText.TemplateHtml,
-                            TemplateText = emailTemplateText.TemplateText,
-                            BodyText = emailSetupText.BodyText,
-                            BodyHtml = emailSetupText.BodyHtml,
-                            Tags = new Dictionary<string, string>
+                            var setupId = (int)pending.ScheduleRequestSubject.RelatedEmailSetupId;
+                            var lang = pending.Language
+                                .Equals("English", StringComparison.OrdinalIgnoreCase)
+                                    ? "en-US"
+                                    : pending.Language;
+
+                            var culture = CultureInfo.GetCultureInfo(lang);
+
+                            var emailSetupText = await _emailService.GetEmailSetupAsync(setupId, lang);
+
+                            var emailTemplateText = await _emailService
+                                .GetEmailTemplateAsync(emailSetupText.EmailSetup.EmailTemplateId, lang);
+
+                            var emailDetails = new Details
+                            {
+                                FromEmailAddress = emailSetupText.EmailSetup.FromEmailAddress,
+                                FromName = emailSetupText.EmailSetup.FromName,
+                                ToEmailAddress = pending.Email.Trim(),
+                                ToName = pending.Name?.Trim(),
+                                UrlParameters = emailSetupText.UrlParameters,
+                                Preview = emailSetupText.Preview,
+                                TemplateHtml = emailTemplateText.TemplateHtml,
+                                TemplateText = emailTemplateText.TemplateText,
+                                BodyText = emailSetupText.BodyText,
+                                BodyHtml = emailSetupText.BodyHtml,
+                                Tags = new Dictionary<string, string>
                             {
                                 { "ScheduledDate", pending.RequestedTime.ToString("d", culture) },
                                 { "ScheduledTime", pending.RequestedTime.ToString("t", culture) },
                                 { "Scheduled", pending.RequestedTime.ToString("g", culture) },
                                 { "Subject", pending.ScheduleRequestSubject.Subject }
                             },
-                            BccEmailAddress = settings.BccAddress,
-                            OverrideEmailToAddress = settings.OverrideToAddress,
-                            Password = settings.OutgoingPassword,
-                            Port = settings.OutgoingPort,
-                            RestrictToDomain = settings.RestrictToDomain,
-                            Server = settings.OutgoingHost,
-                            Subject = emailSetupText.Subject,
-                            Username = settings.OutgoingLogin
-                        };
+                                BccEmailAddress = settings.BccAddress,
+                                OverrideEmailToAddress = settings.OverrideToAddress,
+                                Password = settings.OutgoingPassword,
+                                Port = settings.OutgoingPort,
+                                RestrictToDomain = settings.RestrictToDomain,
+                                Server = settings.OutgoingHost,
+                                Subject = emailSetupText.Subject,
+                                Username = settings.OutgoingLogin
+                            };
 
-                        try
-                        {
                             var sentEmail = await _emailService.SendAsync(emailDetails);
 
                             if (sentEmail != null)
