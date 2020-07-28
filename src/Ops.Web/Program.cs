@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -24,7 +23,7 @@ namespace Ocuda.Ops.Web
             var version = Utility.Helpers.VersionHelper.GetVersion();
 
             Log.Logger = Utility.Logging.Configuration.Build(config).CreateLogger();
-            Log.Warning("{Product} v{Version} instance {Instance} starting up",
+            Log.Information("{Product} v{Version} instance {Instance} starting up",
                 Product,
                 version,
                 instance);
@@ -44,7 +43,8 @@ namespace Ocuda.Ops.Web
 
                 if (!string.IsNullOrEmpty(config[Configuration.OcudaRuntimeSessionTimeout]))
                 {
-                    Log.Information("Session timeout configured for {SessionTimeout}",
+                    Log.Information("{Product} session timeout configured for {SessionTimeout}",
+                        Product,
                         config[Configuration.OcudaRuntimeSessionTimeout]);
                 }
 

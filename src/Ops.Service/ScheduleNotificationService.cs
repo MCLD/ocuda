@@ -109,15 +109,15 @@ namespace Ocuda.Ops.Service
                 {
                     foreach (var pending in pendingNotifications)
                     {
-                        var lang = pending.Language
+                        try
+                        {
+                            var lang = pending.Language
                             .Equals("English", StringComparison.OrdinalIgnoreCase)
                                 ? "en-US"
                                 : pending.Language;
 
-                        var culture = CultureInfo.GetCultureInfo(lang);
+                            var culture = CultureInfo.GetCultureInfo(lang);
 
-                        try
-                        {
                             var sentEmail = await SendAsync(pending,
                                 settings,
                                 lang,
@@ -137,6 +137,15 @@ namespace Ocuda.Ops.Service
                                 sentNotifications++;
 
                                 await _scheduleRequestService.SetNotificationSentAsync(pending);
+
+                                await _scheduleLogRepository.AddAsync(new ScheduleLog
+                                {
+                                    CreatedAt = DateTime.Now,
+                                    Notes = $"Request confirmation email sent to {pending.Email.Trim()}.",
+                                    ScheduleRequestId = pending.Id,
+                                    RelatedEmailId = sentEmail?.Id
+                                });
+                                await _scheduleLogRepository.SaveAsync();
                             }
                         }
                         catch (Exception ex)
@@ -231,8 +240,8 @@ namespace Ocuda.Ops.Service
                         lang,
                         new Dictionary<string, string>
                         {
-                        { "Scheduled", request.RequestedTime.ToString(culture) },
-                        { "Subject", request.ScheduleRequestSubject.Subject }
+                            { "Scheduled", request.RequestedTime.ToString(culture) },
+                            { "Subject", request.ScheduleRequestSubject.Subject }
                         },
                         EmailType.Cancellation);
                 }

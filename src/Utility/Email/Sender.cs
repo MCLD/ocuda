@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Logging;
 using MimeKit;
 using Ocuda.Utility.Exceptions;
+using Serilog.Context;
 using Stubble.Core.Builders;
 
 namespace Ocuda.Utility.Email
@@ -113,9 +115,6 @@ namespace Ocuda.Utility.Email
 
             if (!string.IsNullOrWhiteSpace(details.OverrideEmailToAddress))
             {
-                _logger.LogWarning("Email override: sending to {EmailAddress} for {EmailSubject}",
-                    details.OverrideEmailToAddress,
-                    details.Subject);
                 message.To.Add(new MailboxAddress(details.OverrideEmailToAddress));
             }
             else
@@ -130,7 +129,7 @@ namespace Ocuda.Utility.Email
                 message.Bcc.Add(new MailboxAddress(details.BccEmailAddress));
             }
 
-            using var client = new SmtpClient
+            using var client = new SmtpClient()
             {
                 // accept any STARTTLS certificate
                 ServerCertificateValidationCallback = (_, __, ___, ____) => true,
@@ -147,6 +146,8 @@ namespace Ocuda.Utility.Email
 
             client.Timeout = 30 * 1000;  // 30 seconds
 
+            var sendTimer = Stopwatch.StartNew();
+
             await client.ConnectAsync(details.Server,
                 details.Port ?? 25,
                 MailKit.Security.SecureSocketOptions.None);
@@ -157,11 +158,49 @@ namespace Ocuda.Utility.Email
                 await client.AuthenticateAsync(details.Username, details.Password);
             }
 
-            await client.SendAsync(message);
+            try
+            {
+                await client.SendAsync(message);
 
-            await client.DisconnectAsync(true);
+                sendTimer.Stop();
 
-            return details;
+                using (LogContext.PushProperty("EmailServer", details.Server))
+                using (LogContext.PushProperty("EmailPort", details.Port))
+                using (LogContext.PushProperty("EmailRestrictToDomain", details.RestrictToDomain))
+                using (LogContext.PushProperty("EmailUsername", details.Username))
+                using (LogContext.PushProperty("EmailBccToAddress", details.BccEmailAddress))
+                using (LogContext.PushProperty("EmailSubject", details.Subject))
+                using (LogContext.PushProperty("EmailFromName", details.FromName))
+                using (LogContext.PushProperty("EmailFromAddress", details.FromEmailAddress))
+                using (LogContext.PushProperty("EmailToAddressOverride", details.OverrideEmailToAddress))
+                using (LogContext.PushProperty("EmailServerResponse", details.SentResponse))
+                {
+                    _logger.LogInformation("Email sent to: {EmailAddress} in {Elapsed} ms",
+                        string.IsNullOrWhiteSpace(details.OverrideEmailToAddress)
+                            ? details.ToEmailAddress
+                            : details.OverrideEmailToAddress,
+                        sendTimer.ElapsedMilliseconds);
+                }
+
+                return details;
+            }
+            catch (System.Net.Mail.SmtpException ex)
+            {
+                _logger.LogError("Error sending email to: {EmailAddress} - status {StatusCode}, {ErrorMessage}",
+                    string.IsNullOrWhiteSpace(details.OverrideEmailToAddress)
+                            ? details.ToEmailAddress
+                            : details.OverrideEmailToAddress,
+                    ex.StatusCode,
+                    ex.Message);
+                return null;
+            }
+            finally
+            {
+                if (client.IsConnected)
+                {
+                    await client.DisconnectAsync(true);
+                }
+            }
         }
     }
 }
