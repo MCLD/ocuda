@@ -157,31 +157,49 @@ namespace Ocuda.Utility.Email
                 await client.AuthenticateAsync(details.Username, details.Password);
             }
 
-            await client.SendAsync(message);
-
-            sendTimer.Stop();
-
-            using (LogContext.PushProperty("EmailServer", details.Server))
-            using (LogContext.PushProperty("EmailPort", details.Port))
-            using (LogContext.PushProperty("EmailRestrictToDomain", details.RestrictToDomain))
-            using (LogContext.PushProperty("EmailUsername", details.Username))
-            using (LogContext.PushProperty("EmailBccToAddress", details.BccEmailAddress))
-            using (LogContext.PushProperty("EmailSubject", details.Subject))
-            using (LogContext.PushProperty("EmailFromName", details.FromName))
-            using (LogContext.PushProperty("EmailFromAddress", details.FromEmailAddress))
-            using (LogContext.PushProperty("EmailToAddressOverride", details.OverrideEmailToAddress))
-            using (LogContext.PushProperty("EmailServerResponse", details.SentResponse))
+            try
             {
-                _logger.LogInformation("Email sent to: {EmailAddress} in {Elapsed} ms",
-                    string.IsNullOrWhiteSpace(details.OverrideEmailToAddress)
-                        ? details.ToEmailAddress
-                        : details.OverrideEmailToAddress,
-                    sendTimer.ElapsedMilliseconds);
+                await client.SendAsync(message);
+
+                sendTimer.Stop();
+
+                using (LogContext.PushProperty("EmailServer", details.Server))
+                using (LogContext.PushProperty("EmailPort", details.Port))
+                using (LogContext.PushProperty("EmailRestrictToDomain", details.RestrictToDomain))
+                using (LogContext.PushProperty("EmailUsername", details.Username))
+                using (LogContext.PushProperty("EmailBccToAddress", details.BccEmailAddress))
+                using (LogContext.PushProperty("EmailSubject", details.Subject))
+                using (LogContext.PushProperty("EmailFromName", details.FromName))
+                using (LogContext.PushProperty("EmailFromAddress", details.FromEmailAddress))
+                using (LogContext.PushProperty("EmailToAddressOverride", details.OverrideEmailToAddress))
+                using (LogContext.PushProperty("EmailServerResponse", details.SentResponse))
+                {
+                    _logger.LogInformation("Email sent to: {EmailAddress} in {Elapsed} ms",
+                        string.IsNullOrWhiteSpace(details.OverrideEmailToAddress)
+                            ? details.ToEmailAddress
+                            : details.OverrideEmailToAddress,
+                        sendTimer.ElapsedMilliseconds);
+                }
+
+                return details;
             }
-
-            await client.DisconnectAsync(true);
-
-            return details;
+            catch (System.Net.Mail.SmtpException ex)
+            {
+                _logger.LogError("Error sending email to: {EmailAddress} - status {StatusCode}, {ErrorMessage}",
+                    string.IsNullOrWhiteSpace(details.OverrideEmailToAddress)
+                            ? details.ToEmailAddress
+                            : details.OverrideEmailToAddress,
+                    ex.StatusCode,
+                    ex.Message);
+                return null;
+            }
+            finally
+            {
+                if (client.IsConnected)
+                {
+                    await client.DisconnectAsync(true);
+                }
+            }
         }
     }
 }
