@@ -91,7 +91,6 @@ namespace Ocuda.Ops.Web.JobScheduling
                 while (!stoppingToken.IsCancellationRequested
                     && !await GetCancellationOrder(JobSleepSeconds))
                 {
-                    _logger.LogTrace("Job service awake in {InstanceName}", InstanceName);
                     using (var scope = _services.CreateScope())
                     {
                         await scope.ServiceProvider
@@ -105,9 +104,6 @@ namespace Ocuda.Ops.Web.JobScheduling
                     }
                     else
                     {
-                        _logger.LogTrace("Job service sleeping in {InstanceName} for {JobSleep} ms",
-                            InstanceName,
-                            JobSleepSeconds);
                         await Task.Delay(JobSleepSeconds * 1000, stoppingToken);
                     }
                 }

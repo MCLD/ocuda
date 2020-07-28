@@ -96,7 +96,10 @@ namespace Ocuda.Ops.Service
                 {
                     settings = await GetEmailSettingsAsync();
                 }
-                catch (OcudaEmailException) { }
+                catch (OcudaEmailException oex)
+                {
+                    _logger.LogError("Error finding email settings: {ErrorMessage}", oex.Message);
+                }
 
                 if (settings != null)
                 {
@@ -105,17 +108,27 @@ namespace Ocuda.Ops.Service
                         try
                         {
                             var setupId = (int)pending.ScheduleRequestSubject.RelatedEmailSetupId;
+                            _logger.LogTrace("Email setup id: {EmailSetupId}", setupId);
+
                             var lang = pending.Language
                                 .Equals("English", StringComparison.OrdinalIgnoreCase)
                                     ? "en-US"
                                     : pending.Language;
+                            _logger.LogTrace("Using language: {Language}", pending.Language);
 
                             var culture = CultureInfo.GetCultureInfo(lang);
+                            _logger.LogTrace("Found culture: {Culture}", culture.DisplayName);
 
                             var emailSetupText = await _emailService.GetEmailSetupAsync(setupId, lang);
+                            _logger.LogTrace("Email setup fetched, subject: {Subject}", emailSetupText.Subject);
+
 
                             var emailTemplateText = await _emailService
                                 .GetEmailTemplateAsync(emailSetupText.EmailSetup.EmailTemplateId, lang);
+                            _logger.LogTrace("Email template for {Language}: HTML {HtmlLength} chars, text {TextLength} chars",
+                                emailTemplateText.PromenadeLanguageName,
+                                emailTemplateText.TemplateHtml.Length,
+                                emailTemplateText.TemplateText.Length);
 
                             var emailDetails = new Details
                             {
@@ -130,12 +143,12 @@ namespace Ocuda.Ops.Service
                                 BodyText = emailSetupText.BodyText,
                                 BodyHtml = emailSetupText.BodyHtml,
                                 Tags = new Dictionary<string, string>
-                            {
-                                { "ScheduledDate", pending.RequestedTime.ToString("d", culture) },
-                                { "ScheduledTime", pending.RequestedTime.ToString("t", culture) },
-                                { "Scheduled", pending.RequestedTime.ToString("g", culture) },
-                                { "Subject", pending.ScheduleRequestSubject.Subject }
-                            },
+                                {
+                                    { "ScheduledDate", pending.RequestedTime.ToString("d", culture) },
+                                    { "ScheduledTime", pending.RequestedTime.ToString("t", culture) },
+                                    { "Scheduled", pending.RequestedTime.ToString("g", culture) },
+                                    { "Subject", pending.ScheduleRequestSubject.Subject }
+                                },
                                 BccEmailAddress = settings.BccAddress,
                                 OverrideEmailToAddress = settings.OverrideToAddress,
                                 Password = settings.OutgoingPassword,
@@ -146,7 +159,11 @@ namespace Ocuda.Ops.Service
                                 Username = settings.OutgoingLogin
                             };
 
+                            _logger.LogTrace("Calling email service send async");
+
                             var sentEmail = await _emailService.SendAsync(emailDetails);
+
+                            _logger.LogTrace("Back from email service send async");
 
                             if (sentEmail != null)
                             {
