@@ -10,8 +10,8 @@ using Ocuda.Ops.DataProvider.SqlServer.Ops;
 namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20200721232749_ops_v1.0.0.53")]
-    partial class ops_v10053
+    [Migration("20200729205008_ops_v1.0.0.56")]
+    partial class ops_v10056
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
