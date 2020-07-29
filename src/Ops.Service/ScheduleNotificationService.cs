@@ -304,8 +304,7 @@ namespace Ocuda.Ops.Service
 
             var emailTemplateText = await _emailService
                 .GetEmailTemplateAsync(emailSetupText.EmailSetup.EmailTemplateId, lang);
-            _logger.LogTrace("Email template for {Language}: HTML {HtmlLength} chars, text {TextLength} chars",
-                emailTemplateText.PromenadeLanguageName,
+            _logger.LogTrace("Email template: HTML {HtmlLength} chars, text {TextLength} chars",
                 emailTemplateText.TemplateHtml.Length,
                 emailTemplateText.TemplateText.Length);
 
