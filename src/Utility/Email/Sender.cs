@@ -28,7 +28,7 @@ namespace Ocuda.Utility.Email
 
             if (string.IsNullOrWhiteSpace(details.ToEmailAddress))
             {
-                throw new ArgumentNullException("No to email address provided.");
+                throw new OcudaEmailException("No to email address provided.");
             }
 
             if (string.IsNullOrWhiteSpace(details.Server))
@@ -152,6 +152,7 @@ namespace Ocuda.Utility.Email
             client.Timeout = 30 * 1000;  // 30 seconds
 
             var sendTimer = Stopwatch.StartNew();
+
             _logger.LogTrace("Connecting to server {MailServer} on port {MailServerPort}",
                 details.Server,
                 details.Port ?? 25);
