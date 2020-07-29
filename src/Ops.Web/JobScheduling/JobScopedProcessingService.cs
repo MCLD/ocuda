@@ -23,7 +23,17 @@ namespace Ocuda.Ops.Web.JobScheduling
         {
             StartProcessing();
 
-            var sent = await _scheduleNotificationService.SendPendingNotificationsAsync();
+            int sent = 0;
+
+            try
+            {
+                sent = await _scheduleNotificationService.SendPendingNotificationsAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical("Error sending pending notifications: {ErrorMessage}"
+                    ex.Message);
+            }
 
             if (sent > 0)
             {
