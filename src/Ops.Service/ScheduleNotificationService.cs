@@ -103,7 +103,10 @@ namespace Ocuda.Ops.Service
                 {
                     settings = await GetEmailSettingsAsync();
                 }
-                catch (OcudaEmailException) { }
+                catch (OcudaEmailException oex)
+                {
+                    _logger.LogError("Error finding email settings: {ErrorMessage}", oex.Message);
+                }
 
                 if (settings != null)
                 {
@@ -115,8 +118,10 @@ namespace Ocuda.Ops.Service
                             .Equals("English", StringComparison.OrdinalIgnoreCase)
                                 ? "en-US"
                                 : pending.Language;
+                            _logger.LogTrace("Using language: {Language}", pending.Language);
 
                             var culture = CultureInfo.GetCultureInfo(lang);
+                            _logger.LogTrace("Found culture: {Culture}", culture.DisplayName);
 
                             var sentEmail = await SendAsync(pending,
                                 settings,
@@ -292,9 +297,17 @@ namespace Ocuda.Ops.Service
             int setupId = (int)setupIdLookup;
 
             var emailSetupText = await _emailService.GetEmailSetupAsync(setupId, lang);
+            _logger.LogTrace("Email setup for language {Language}: HTML {HtmlLength} chars, text {TextLength} chars",
+                emailSetupText.PromenadeLanguageName,
+                emailSetupText.BodyHtml.Length,
+                emailSetupText.BodyText.Length);
 
             var emailTemplateText = await _emailService
                 .GetEmailTemplateAsync(emailSetupText.EmailSetup.EmailTemplateId, lang);
+            _logger.LogTrace("Email template for {Language}: HTML {HtmlLength} chars, text {TextLength} chars",
+                emailTemplateText.PromenadeLanguageName,
+                emailTemplateText.TemplateHtml.Length,
+                emailTemplateText.TemplateText.Length);
 
             var emailDetails = new Details
             {
@@ -321,7 +334,7 @@ namespace Ocuda.Ops.Service
 
             try
             {
-                _logger.LogDebug("{EmailDescription} (setup {EmailSetupId}) sending to {EmailTo}",
+                _logger.LogTrace("{EmailDescription} (setup {EmailSetupId}) sending to {EmailTo}...",
                     emailDescription,
                     emailSetupText.EmailSetup.Id,
                     request.Email.Trim());
@@ -347,6 +360,13 @@ namespace Ocuda.Ops.Service
                     await _scheduleLogRepository.SaveAsync();
 
                     return sentEmail;
+                }
+                else
+                {
+                    _logger.LogWarning("{EmailDescription} (setup {EmailSetupId}) failed sending to {EmailTo}",
+                        emailDescription,
+                        emailSetupText.EmailSetup.Id,
+                        request.Email.Trim());
                 }
             }
             catch (Exception ex)
