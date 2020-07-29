@@ -31,7 +31,7 @@ namespace Ocuda.Ops.Web.JobScheduling
             }
             catch (Exception ex)
             {
-                _logger.LogCritical("Error sending pending notifications: {ErrorMessage}"
+                _logger.LogCritical("Error sending pending notifications: {ErrorMessage}",
                     ex.Message);
             }
 

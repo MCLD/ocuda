@@ -120,12 +120,12 @@ namespace Ocuda.Utility.Email
 
             if (!string.IsNullOrWhiteSpace(details.OverrideEmailToAddress))
             {
-                message.To.Add(new MailboxAddress(details.OverrideEmailToAddress));
+                message.To.Add(MailboxAddress.Parse(details.OverrideEmailToAddress));
             }
             else
             {
                 message.To.Add(string.IsNullOrWhiteSpace(details.ToName)
-                    ? new MailboxAddress(details.ToEmailAddress)
+                    ? MailboxAddress.Parse(details.ToEmailAddress)
                     : new MailboxAddress(details.ToName, details.ToEmailAddress));
             }
 
