@@ -142,15 +142,6 @@ namespace Ocuda.Ops.Service
                                 sentNotifications++;
 
                                 await _scheduleRequestService.SetNotificationSentAsync(pending);
-
-                                await _scheduleLogRepository.AddAsync(new ScheduleLog
-                                {
-                                    CreatedAt = DateTime.Now,
-                                    Notes = $"Request confirmation email sent to {pending.Email.Trim()}.",
-                                    ScheduleRequestId = pending.Id,
-                                    RelatedEmailId = sentEmail?.Id
-                                });
-                                await _scheduleLogRepository.SaveAsync();
                             }
                         }
                         catch (Exception ex)
