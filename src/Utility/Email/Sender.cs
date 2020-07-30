@@ -131,7 +131,7 @@ namespace Ocuda.Utility.Email
 
             if (!string.IsNullOrWhiteSpace(details.BccEmailAddress))
             {
-                message.Bcc.Add(new MailboxAddress(details.BccEmailAddress));
+                message.Bcc.Add(MailboxAddress.Parse(details.BccEmailAddress));
             }
 
             using var client = new SmtpClient()
