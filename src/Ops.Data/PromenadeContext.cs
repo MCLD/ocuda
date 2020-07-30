@@ -69,6 +69,8 @@ namespace Ocuda.Ops.Data
         public DbSet<NavigationText> NavigationTexts { get; set; }
         public DbSet<Page> Pages { get; set; }
         public DbSet<PageHeader> PageHeaders { get; set; }
+        public DbSet<PodcastItem> PodcastItems { get; set; }
+        public DbSet<Podcast> Podcasts { get; set; }
         public DbSet<ScheduleRequest> ScheduleRequest { get; set; }
         public DbSet<ScheduleRequestSubject> ScheduleRequestSubject { get; set; }
         public DbSet<Segment> Segments { get; set; }
