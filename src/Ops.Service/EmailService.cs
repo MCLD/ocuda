@@ -50,20 +50,24 @@ namespace Ocuda.Ops.Service
         {
             var record = await _sender.SendEmailAsync(emailDetails);
 
-            try
+            if (record != null)
             {
-                var emailRecord = new EmailRecord(record)
+                try
                 {
-                    CreatedAt = DateTime.Now
-                };
-                return await _emailRecordRepository.AddSaveAsync(emailRecord);
+                    var emailRecord = new EmailRecord(record)
+                    {
+                        CreatedAt = DateTime.Now
+                    };
+                    return await _emailRecordRepository.AddSaveAsync(emailRecord);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Unable to save email record for email sent to {ToAddress}: {ErrorMessage}",
+                        emailDetails.ToEmailAddress,
+                        ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError("Unable to save email record for email sent to {ToAddress}: {ErrorMessage}",
-                    emailDetails.ToEmailAddress,
-                    ex.Message);
-            }
+
             return null;
         }
     }

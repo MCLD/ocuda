@@ -45,5 +45,7 @@ namespace Ocuda.Promenade.Models.Entities
         public DateTime? NotificationSentAt { get; set; }
         public DateTime? FollowupSentAt { get; set; }
         public bool IsUnderway { get; set; }
+        public bool IsCancelled { get; set; }
+        public DateTime? CancellationSentAt { get; set; }
     }
 }

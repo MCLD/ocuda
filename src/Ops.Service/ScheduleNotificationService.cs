@@ -22,6 +22,13 @@ namespace Ocuda.Ops.Service
         private readonly IScheduleRequestService _scheduleRequestService;
         private readonly ISiteSettingService _siteSettingService;
 
+        private enum EmailType
+        {
+            ScheduleNotification,
+            Followup,
+            Cancellation
+        }
+
         public ScheduleNotificationService(ILogger<ScheduleNotificationService> logger,
             IHttpContextAccessor httpContextAccessor,
             IEmailService emailService,
@@ -80,14 +87,15 @@ namespace Ocuda.Ops.Service
             return config;
         }
 
-        public async Task SendPendingNotificationsAsync()
+        public async Task<int> SendPendingNotificationsAsync()
         {
+            int sentNotifications = 0;
             var pendingNotifications
                 = await _scheduleRequestService.GetPendingNotificationsAsync();
 
             if (pendingNotifications?.Count > 0)
             {
-                _logger.LogDebug("Found {PendingNotificationCount} pending notifications",
+                _logger.LogDebug("Found {PendingNotificationCount} pending notification(s)",
                     pendingNotifications.Count);
 
                 Configuration settings = null;
@@ -95,81 +103,63 @@ namespace Ocuda.Ops.Service
                 {
                     settings = await GetEmailSettingsAsync();
                 }
-                catch (OcudaEmailException) { }
+                catch (OcudaEmailException oex)
+                {
+                    _logger.LogError("Error finding email settings: {ErrorMessage}", oex.Message);
+                }
 
                 if (settings != null)
                 {
                     foreach (var pending in pendingNotifications)
                     {
-                        var setupId = (int)pending.ScheduleRequestSubject.RelatedEmailSetupId;
-                        var lang = pending.Language
+                        try
+                        {
+                            var lang = pending.Language
                             .Equals("English", StringComparison.OrdinalIgnoreCase)
                                 ? "en-US"
                                 : pending.Language;
+                            _logger.LogTrace("Using language: {Language}", pending.Language);
 
-                        var culture = CultureInfo.GetCultureInfo(lang);
+                            var culture = CultureInfo.GetCultureInfo(lang);
+                            _logger.LogTrace("Found culture: {Culture}", culture.DisplayName);
 
-                        var emailSetupText = await _emailService.GetEmailSetupAsync(setupId, lang);
+                            var sentEmail = await SendAsync(pending,
+                                settings,
+                                lang,
+                                new Dictionary<string, string>
+                                {
+                                    { "ScheduledDate",
+                                        pending.RequestedTime.ToString("d", culture) },
+                                    { "ScheduledTime",
+                                        pending.RequestedTime.ToString("t", culture) },
+                                    { "Scheduled", pending.RequestedTime.ToString("g", culture) },
+                                    { "Subject", pending.ScheduleRequestSubject.Subject }
+                                },
+                                EmailType.ScheduleNotification);
 
-                        var emailTemplateText = await _emailService
-                            .GetEmailTemplateAsync(emailSetupText.EmailSetup.EmailTemplateId, lang);
-
-                        var emailDetails = new Details
-                        {
-                            FromEmailAddress = emailSetupText.EmailSetup.FromEmailAddress,
-                            FromName = emailSetupText.EmailSetup.FromName,
-                            ToEmailAddress = pending.Email.Trim(),
-                            ToName = pending.Name?.Trim(),
-                            UrlParameters = emailSetupText.UrlParameters,
-                            Preview = emailSetupText.Preview,
-                            TemplateHtml = emailTemplateText.TemplateHtml,
-                            TemplateText = emailTemplateText.TemplateText,
-                            BodyText = emailSetupText.BodyText,
-                            BodyHtml = emailSetupText.BodyHtml,
-                            Tags = new Dictionary<string, string>
+                            if (sentEmail != null)
                             {
-                                { "ScheduledDate", pending.RequestedTime.ToString("d", culture) },
-                                { "ScheduledTime", pending.RequestedTime.ToString("t", culture) },
-                                { "Scheduled", pending.RequestedTime.ToString("g", culture) },
-                                { "Subject", pending.ScheduleRequestSubject.Subject }
-                            },
-                            BccEmailAddress = settings.BccAddress,
-                            OverrideEmailToAddress = settings.OverrideToAddress,
-                            Password = settings.OutgoingPassword,
-                            Port = settings.OutgoingPort,
-                            RestrictToDomain = settings.RestrictToDomain,
-                            Server = settings.OutgoingHost,
-                            Subject = emailSetupText.Subject,
-                            Username = settings.OutgoingLogin
-                        };
+                                sentNotifications++;
 
-                        try
-                        {
-                            var sentEmail = await _emailService.SendAsync(emailDetails);
-                            await _scheduleRequestService.SetNotificationSentAsync(pending);
-
-                            await _scheduleLogRepository.AddAsync(new ScheduleLog
-                            {
-                                CreatedAt = DateTime.Now,
-                                Notes = $"Request confirmation email sent to {pending.Email.Trim()}.",
-                                ScheduleRequestId = pending.Id,
-                                RelatedEmailId = sentEmail?.Id
-                            });
-                            await _scheduleLogRepository.SaveAsync();
+                                await _scheduleRequestService.SetNotificationSentAsync(pending);
+                            }
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError("Error sending email setup {EmailSetupId} to {EmailTo}: {ErrorMessage}",
-                                emailSetupText.EmailSetup.Id,
-                                pending.Email.Trim(),
+                            _logger.LogError("Sending pending notification id {RequestId} failed: {ErrorMessage}",
+                                pending.Id,
                                 ex.Message);
                         }
+
+                        await Task.Delay(TimeSpan.FromSeconds(2));
                     }
                 }
             }
+
+            return sentNotifications;
         }
 
-        public async Task SendFollowupAsync(ScheduleRequest request)
+        public async Task<bool> SendFollowupAsync(ScheduleRequest request)
         {
             if (request == null)
             {
@@ -185,7 +175,55 @@ namespace Ocuda.Ops.Service
 
             if (settings != null)
             {
-                var setupId = (int)request.ScheduleRequestSubject.FollowupEmailSetupId;
+                var lang = request.Language
+                    .Equals("English", StringComparison.OrdinalIgnoreCase)
+                        ? "en-US"
+                        : request.Language;
+
+                var culture = CultureInfo.GetCultureInfo(lang);
+                try
+                {
+                    var sentEmail = await SendAsync(request,
+                        settings,
+                        lang,
+                        new Dictionary<string, string>
+                        {
+                            { "Scheduled", request.RequestedTime.ToString(culture) },
+                            { "Subject", request.ScheduleRequestSubject.Subject }
+                        },
+                        EmailType.Followup);
+
+                    if (sentEmail != null)
+                    {
+                        await _scheduleRequestService.SetFollowupSentAsync(request);
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Sending followup notification id {RequestId} failed: {ErrorMessage}",
+                        request.Id,
+                        ex.Message);
+                }
+            }
+            return false;
+        }
+
+        public async Task<EmailRecord> SendCancellationAsync(ScheduleRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+            Configuration settings = null;
+            try
+            {
+                settings = await GetEmailSettingsAsync();
+            }
+            catch (OcudaEmailException) { }
+
+            if (settings != null)
+            {
                 var lang = request.Language
                     .Equals("English", StringComparison.OrdinalIgnoreCase)
                         ? "en-US"
@@ -193,60 +231,143 @@ namespace Ocuda.Ops.Service
 
                 var culture = CultureInfo.GetCultureInfo(lang);
 
-                var emailSetupText = await _emailService.GetEmailSetupAsync(setupId, lang);
-
-                var emailTemplateText = await _emailService
-                    .GetEmailTemplateAsync(emailSetupText.EmailSetup.EmailTemplateId, lang);
-
-                var emailDetails = new Details
-                {
-                    FromEmailAddress = emailSetupText.EmailSetup.FromEmailAddress,
-                    FromName = emailSetupText.EmailSetup.FromName,
-                    ToEmailAddress = request.Email.Trim(),
-                    ToName = request.Name?.Trim(),
-                    UrlParameters = emailSetupText.UrlParameters,
-                    Preview = emailSetupText.Preview,
-                    TemplateHtml = emailTemplateText.TemplateHtml,
-                    TemplateText = emailTemplateText.TemplateText,
-                    BodyText = emailSetupText.BodyText,
-                    BodyHtml = emailSetupText.BodyHtml,
-                    Tags = new Dictionary<string, string>
-                            {
-                                { "Scheduled", request.RequestedTime.ToString(culture) },
-                                { "Subject", request.ScheduleRequestSubject.Subject }
-                            },
-                    BccEmailAddress = settings.BccAddress,
-                    OverrideEmailToAddress = settings.OverrideToAddress,
-                    Password = settings.OutgoingPassword,
-                    Port = settings.OutgoingPort,
-                    RestrictToDomain = settings.RestrictToDomain,
-                    Server = settings.OutgoingHost,
-                    Subject = emailSetupText.Subject,
-                    Username = settings.OutgoingLogin
-                };
-
                 try
                 {
-                    var sentEmail = await _emailService.SendAsync(emailDetails);
+                    return await SendAsync(request,
+                        settings,
+                        lang,
+                        new Dictionary<string, string>
+                        {
+                            { "Scheduled", request.RequestedTime.ToString(culture) },
+                            { "Subject", request.ScheduleRequestSubject.Subject }
+                        },
+                        EmailType.Cancellation);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Sending cancellation notification id {RequestId} failed: {ErrorMessage}",
+                        request.Id,
+                        ex.Message);
+                }
+            }
+            return null;
+        }
+
+        private async Task<EmailRecord> SendAsync(ScheduleRequest request,
+            Configuration settings,
+            string lang,
+            Dictionary<string, string> tagDictionary,
+            EmailType emailType)
+        {
+            int? setupIdLookup = 0;
+            string emailDescription = null;
+
+            switch (emailType)
+            {
+                case EmailType.ScheduleNotification:
+                    setupIdLookup = (int)request.ScheduleRequestSubject.RelatedEmailSetupId;
+                    emailDescription = "Request confirmation email";
+                    break;
+
+                case EmailType.Followup:
+                    setupIdLookup = (int)request.ScheduleRequestSubject.FollowupEmailSetupId;
+                    emailDescription = "Follow-up email";
+                    break;
+
+                case EmailType.Cancellation:
+                    setupIdLookup = (int)request.ScheduleRequestSubject.CancellationEmailSetupId;
+                    emailDescription = "Cancellation email";
+                    break;
+            }
+
+            if (setupIdLookup == null)
+            {
+                return null;
+            }
+
+            int setupId = (int)setupIdLookup;
+
+            var emailSetupText = await _emailService.GetEmailSetupAsync(setupId, lang);
+            _logger.LogTrace("Email setup for language {Language}: HTML {HtmlLength} chars, text {TextLength} chars",
+                emailSetupText.PromenadeLanguageName,
+                emailSetupText.BodyHtml.Length,
+                emailSetupText.BodyText.Length);
+
+            var emailTemplateText = await _emailService
+                .GetEmailTemplateAsync(emailSetupText.EmailSetup.EmailTemplateId, lang);
+            _logger.LogTrace("Email template: HTML {HtmlLength} chars, text {TextLength} chars",
+                emailTemplateText.TemplateHtml.Length,
+                emailTemplateText.TemplateText.Length);
+
+            var emailDetails = new Details
+            {
+                FromEmailAddress = emailSetupText.EmailSetup.FromEmailAddress,
+                FromName = emailSetupText.EmailSetup.FromName,
+                ToEmailAddress = request.Email.Trim(),
+                ToName = request.Name?.Trim(),
+                UrlParameters = emailSetupText.UrlParameters,
+                Preview = emailSetupText.Preview,
+                TemplateHtml = emailTemplateText.TemplateHtml,
+                TemplateText = emailTemplateText.TemplateText,
+                BodyText = emailSetupText.BodyText,
+                BodyHtml = emailSetupText.BodyHtml,
+                Tags = tagDictionary,
+                BccEmailAddress = settings.BccAddress,
+                OverrideEmailToAddress = settings.OverrideToAddress,
+                Password = settings.OutgoingPassword,
+                Port = settings.OutgoingPort,
+                RestrictToDomain = settings.RestrictToDomain,
+                Server = settings.OutgoingHost,
+                Subject = emailSetupText.Subject,
+                Username = settings.OutgoingLogin
+            };
+
+            try
+            {
+                _logger.LogTrace("{EmailDescription} (setup {EmailSetupId}) sending to {EmailTo}...",
+                    emailDescription,
+                    emailSetupText.EmailSetup.Id,
+                    request.Email.Trim());
+
+                var sentEmail = await _emailService.SendAsync(emailDetails);
+
+                if (sentEmail != null)
+                {
+                    _logger.LogInformation("{EmailDescription} (setup {EmailSetupId}) sent to {EmailTo}",
+                        emailDescription,
+                        emailSetupText.EmailSetup.Id,
+                        request.Email.Trim());
+
                     await _scheduleRequestService.SetFollowupSentAsync(request);
 
                     await _scheduleLogRepository.AddAsync(new ScheduleLog
                     {
                         CreatedAt = DateTime.Now,
-                        Notes = $"Follow-up email sent to {request.Email.Trim()}.",
+                        Notes = $"{emailDescription} sent to {request.Email.Trim()}.",
                         ScheduleRequestId = request.Id,
                         RelatedEmailId = sentEmail?.Id
                     });
                     await _scheduleLogRepository.SaveAsync();
+
+                    return sentEmail;
                 }
-                catch (Exception ex)
+                else
                 {
-                    _logger.LogError("Error sending email setup {EmailSetupId} to {EmailTo}: {ErrorMessage}",
+                    _logger.LogWarning("{EmailDescription} (setup {EmailSetupId}) failed sending to {EmailTo}",
+                        emailDescription,
                         emailSetupText.EmailSetup.Id,
-                        request.Email.Trim(),
-                        ex.Message);
+                        request.Email.Trim());
                 }
             }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error sending email setup {EmailSetupId} to {EmailTo}: {ErrorMessage}",
+                    emailSetupText.EmailSetup.Id,
+                    request.Email.Trim(),
+                    ex.Message);
+            }
+
+            return null;
         }
     }
 }

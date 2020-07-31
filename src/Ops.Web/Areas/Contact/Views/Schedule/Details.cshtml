@@ -38,7 +38,42 @@
             </div>
         </div>
     </div>
-
+    <div class="modal" tabindex="-1" role="dialog" id="cancelModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cancel appointment</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to cancel this schedule request and email the customer?</p>
+                </div>
+                <div class="modal-footer">
+                    <form asp-controller="Schedule"
+                          asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Cancel))"
+                          method="post"
+                          role="form"
+                          style="display: inline;">
+                        <input type="hidden"
+                               name="RequestId"
+                               value="@Model.ScheduleRequest.Id" />
+                        <button type="button"
+                                data-dismiss="modal"
+                                class="btn btn-outline-dark">
+                            Never mind
+                        </button>
+                        <button type="submit"
+                                class="btn btn-outline-danger btn-spinner">
+                            Cancel Appointment
+                            <span class="fa fa-spinner fa-pulse fa-fw d-none"></span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row mb-3">
         <div class="col-6">
             <h1>
@@ -62,19 +97,22 @@
                            value="Claim" />
                 </form>
             }
-            else if (!Model.ScheduleLogs.Where(_ => _.IsComplete == true).Any())
+            else if (!Model.ScheduleLogs.Where(_ => _.IsComplete == true).Any()
+                && !Model.ScheduleRequest.IsCancelled)
             {
                 <button type="button"
-                        class="btn btn-outline-danger mt-2 mb-1 mr-1 float-right"
+                        class="btn btn-outline-warning mt-2 mb-1 mr-1 float-right"
                         data-toggle="modal"
                         data-target="#unclaimModal">
                     Unclaim
                 </button>
+                <button type="button"
+                        class="btn btn-outline-danger mt-2 mb-1 mr-4 float-right"
+                        data-toggle="modal"
+                        data-target="#cancelModal">
+                    Cancel Appointment
+                </button>
             }
-            <a asp-controller="Schedule"
-               asp-action="Index"
-               asp-route-requestedDate="@Model.ScheduleRequest.RequestedTime.ToString("yyyy-MM-dd")"
-               class="btn btn-outline-dark mt-2 mb-1 mr-2 float-right">Back</a>
         </div>
     </div>
 
@@ -131,7 +169,7 @@
             <div class="col-sm-3 text-sm-right"><strong>Claimed at</strong></div>
             <div class="col-sm-9">@Model.ScheduleClaim.CreatedAt</div>
         </div>
-        @if (Model.IsClaimedByCurrentUser)
+        @if (Model.IsClaimedByCurrentUser && !Model.ScheduleRequest.IsCancelled)
         {
             <div class="row mt-4 mb-4">
                 <div class="col-sm-9 offset-md-3 h4">Add log entry</div>

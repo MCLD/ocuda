@@ -64,34 +64,6 @@ namespace Ocuda.Utility.Logging
                 }
             }
 
-            string sqlLog = config.GetConnectionString(Keys.Configuration.OcudaLoggingDatabase);
-            if (!string.IsNullOrEmpty(sqlLog))
-            {
-                loggerConfig
-                    .WriteTo.Logger(_ => _
-                    .Filter.ByExcluding(Matching.FromSource(errorControllerName))
-                    .WriteTo.MSSqlServer(sqlLog,
-                        "Logs",
-                        autoCreateSqlTable: true,
-                        restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information,
-                        columnOptions: new Serilog.Sinks.MSSqlServer.ColumnOptions
-                        {
-                            AdditionalColumns = new[]
-                            {
-                                new Serilog.Sinks.MSSqlServer.SqlColumn(Enrichment.Application,
-                                    System.Data.SqlDbType.NVarChar) { DataLength = 255 },
-                                new Serilog.Sinks.MSSqlServer.SqlColumn(Enrichment.Version,
-                                    System.Data.SqlDbType.NVarChar) { DataLength = 255 },
-                                new Serilog.Sinks.MSSqlServer.SqlColumn(Enrichment.Identifier,
-                                    System.Data.SqlDbType.NVarChar) { DataLength = 255 },
-                                new Serilog.Sinks.MSSqlServer.SqlColumn(Enrichment.Instance,
-                                    System.Data.SqlDbType.NVarChar) { DataLength = 255 },
-                                new Serilog.Sinks.MSSqlServer.SqlColumn(Enrichment.RemoteAddress,
-                                    System.Data.SqlDbType.NVarChar) { DataLength = 255 }
-                            }
-                        }));
-            }
-
             string seqEndpoint = config[Keys.Configuration.OcudaSeqEndpoint];
             if (!string.IsNullOrEmpty(seqEndpoint))
             {
