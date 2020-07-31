@@ -65,5 +65,44 @@ namespace Ocuda.Ops.Service
             _scheduleRequestRepository.Update(request);
             await _scheduleRequestRepository.SaveAsync();
         }
+
+        public async Task CancelAsync(ScheduleRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+            request.IsCancelled = true;
+            _scheduleRequestRepository.Update(request);
+            await _scheduleRequestRepository.SaveAsync();
+        }
+
+        public async Task UnclaimAsync(int scheduleRequestId)
+        {
+            var request = await _scheduleRequestRepository.GetRequestAsync(scheduleRequestId);
+            request.IsClaimed = false;
+            _scheduleRequestRepository.Update(request);
+            await _scheduleRequestRepository.SaveAsync();
+        }
+
+        public async Task<ScheduleRequest> SetClaimedAsync(int scheduleRequestId)
+        {
+            var request = await _scheduleRequestRepository.GetRequestAsync(scheduleRequestId);
+
+            request.IsClaimed = true;
+
+            _scheduleRequestRepository.Update(request);
+            await _scheduleRequestRepository.SaveAsync();
+
+            return request;
+        }
+
+        public async Task SetUnderwayAsync(int scheduleRequestId)
+        {
+            var request = await GetRequestAsync(scheduleRequestId);
+            request.IsUnderway = true;
+            _scheduleRequestRepository.Update(request);
+            await _scheduleRequestRepository.SaveAsync();
+        }
     }
 }

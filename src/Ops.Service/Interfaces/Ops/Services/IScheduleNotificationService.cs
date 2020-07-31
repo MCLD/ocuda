@@ -5,7 +5,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IScheduleNotificationService
     {
-        Task SendPendingNotificationsAsync();
-        Task SendFollowupAsync(ScheduleRequest request);
+        Task<int> SendPendingNotificationsAsync();
+        Task<bool> SendFollowupAsync(ScheduleRequest request);
+        Task<Ocuda.Ops.Models.Entities.EmailRecord> SendCancellationAsync(ScheduleRequest request);
     }
 }

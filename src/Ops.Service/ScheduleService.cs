@@ -8,7 +8,6 @@ using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 
 namespace Ocuda.Ops.Service
 {
@@ -18,7 +17,7 @@ namespace Ocuda.Ops.Service
         private readonly IScheduleLogCallDispositionRepository _scheduleLogCallDispositionRepository;
         private readonly IScheduleLogRepository _scheduleLogRepository;
         private readonly IScheduleNotificationService _scheduleNotificationService;
-        private readonly IScheduleRequestRepository _scheduleRequestRepository;
+        private readonly IScheduleRequestService _scheduleRequestService;
 
         public ScheduleService(ILogger<ScheduleService> logger,
             IHttpContextAccessor httpContextAccessor,
@@ -26,7 +25,7 @@ namespace Ocuda.Ops.Service
             IScheduleLogCallDispositionRepository scheduleLogCallDispositionRepository,
             IScheduleLogRepository scheduleLogRepository,
             IScheduleNotificationService scheduleNotificationService,
-            IScheduleRequestRepository scheduleRequestRepository)
+            IScheduleRequestService scheduleRequestService)
             : base(logger, httpContextAccessor)
         {
             _scheduleClaimRepository = scheduleClaimRepository
@@ -37,11 +36,11 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(scheduleLogRepository));
             _scheduleNotificationService = scheduleNotificationService
                 ?? throw new ArgumentNullException(nameof(scheduleNotificationService));
-            _scheduleRequestRepository = scheduleRequestRepository
-                ?? throw new ArgumentNullException(nameof(scheduleRequestRepository));
+            _scheduleRequestService = scheduleRequestService
+                ?? throw new ArgumentNullException(nameof(scheduleRequestService));
         }
 
-        public async Task<ScheduleClaim> AddAsync(int scheduleRequestId)
+        public async Task<ScheduleClaim> ClaimAsync(int scheduleRequestId)
         {
             var updatedClaim = await _scheduleClaimRepository.AddSaveAsync(new ScheduleClaim
             {
@@ -50,17 +49,13 @@ namespace Ocuda.Ops.Service
                 UserId = GetCurrentUserId()
             });
 
-            var request = await _scheduleRequestRepository.GetRequestAsync(scheduleRequestId);
-
-            request.IsClaimed = true;
-            _scheduleRequestRepository.Update(request);
-            await _scheduleRequestRepository.SaveAsync();
+            var request = await _scheduleRequestService.SetClaimedAsync(scheduleRequestId);
 
             await AddLogAsync(new ScheduleLog
             {
                 Notes = "Request claimed.",
                 ScheduleRequestId = request.Id
-            }, false);
+            });
 
             return updatedClaim;
         }
@@ -70,16 +65,39 @@ namespace Ocuda.Ops.Service
             _scheduleClaimRepository.Remove(scheduleRequestId);
             await _scheduleClaimRepository.SaveAsync();
 
-            var request = await _scheduleRequestRepository.GetRequestAsync(scheduleRequestId);
-            request.IsClaimed = false;
-            _scheduleRequestRepository.Update(request);
-            await _scheduleRequestRepository.SaveAsync();
+            await _scheduleRequestService.UnclaimAsync(scheduleRequestId);
 
             await AddLogAsync(new ScheduleLog
             {
                 Notes = "Request unclaimed.",
-                ScheduleRequestId = request.Id
-            }, false);
+                ScheduleRequestId = scheduleRequestId
+            });
+        }
+
+        public async Task CancelAsync(int scheduleRequestId)
+        {
+            var request = await _scheduleRequestService.GetRequestAsync(scheduleRequestId);
+
+            await AddLogAsync(new ScheduleLog
+            {
+                Notes = "Schedule request cancelled.",
+                ScheduleRequestId = scheduleRequestId,
+                IsCancelled = true
+            });
+
+            if (!string.IsNullOrEmpty(request.Email)
+                && request.ScheduleRequestSubject.CancellationEmailSetupId != null)
+            {
+                var sentEmail = await _scheduleNotificationService.SendCancellationAsync(request);
+                if (sentEmail != null)
+                {
+                    request.CancellationSentAt = DateTime.Now;
+                }
+            }
+
+            request.IsCancelled = true;
+
+            await _scheduleRequestService.CancelAsync(request);
         }
 
         public async Task<IEnumerable<ScheduleClaim>> GetClaimsAsync(int[] scheduleRequestIds)
@@ -91,8 +109,12 @@ namespace Ocuda.Ops.Service
         {
             return await _scheduleClaimRepository.GetClaimsForUserAsync(GetCurrentUserId());
         }
+        public Task AddLogAsync(ScheduleLog log)
+        {
+            return AddLogAsync(log, false);
+        }
 
-        public async Task AddLogAsync(ScheduleLog log, bool markAsUnderway)
+        public async Task AddLogAsync(ScheduleLog log, bool setUnderway)
         {
             if (log == null)
             {
@@ -103,7 +125,7 @@ namespace Ocuda.Ops.Service
 
             log.CreatedAt = DateTime.Now;
             log.UserId = GetCurrentUserId();
-            if (log.IsComplete)
+            if (log.IsComplete || log.IsCancelled)
             {
                 var claims = await _scheduleClaimRepository.GetClaimsAsync(new int[]
                 {
@@ -112,7 +134,7 @@ namespace Ocuda.Ops.Service
 
                 claim = claims.SingleOrDefault();
 
-                if (claim != null && !claim.IsComplete)
+                if (claim?.IsComplete == false)
                 {
                     claim.IsComplete = true;
                 }
@@ -125,19 +147,26 @@ namespace Ocuda.Ops.Service
             await _scheduleLogRepository.AddAsync(log);
             await _scheduleLogRepository.SaveAsync();
 
-            var request = await _scheduleRequestRepository
-                .GetRequestAsync(log.ScheduleRequestId);
-
-            if (markAsUnderway && !request.IsUnderway)
+            if (log.IsComplete)
             {
-                request.IsUnderway = true;
-                _scheduleRequestRepository.Update(request);
-                await _scheduleRequestRepository.SaveAsync();
+                var request = await _scheduleRequestService.GetRequestAsync(log.ScheduleRequestId);
+                bool handled = false;
+                if (request?.ScheduleRequestSubject.FollowupEmailSetupId != null)
+                {
+                    handled = await _scheduleNotificationService.SendFollowupAsync(request);
+                }
+                if (!handled)
+                {
+                    await AddLogAsync(new ScheduleLog
+                    {
+                        Notes = "Completed, no email sent.",
+                        ScheduleRequestId = log.ScheduleRequestId
+                    });
+                }
             }
-
-            if (log.IsComplete && request?.ScheduleRequestSubject?.FollowupEmailSetupId != null)
+            else if (setUnderway)
             {
-                await _scheduleNotificationService.SendFollowupAsync(request);
+                await _scheduleRequestService.SetUnderwayAsync(log.ScheduleRequestId);
             }
 
             if (claim != null)

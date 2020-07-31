@@ -128,7 +128,7 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
         [Route("[action]")]
         public async Task<IActionResult> Claim(int requestId)
         {
-            await _scheduleService.AddAsync(requestId);
+            await _scheduleService.ClaimAsync(requestId);
 
             return RedirectToAction(nameof(Details), new { requestId });
         }
@@ -138,6 +138,15 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
         public async Task<IActionResult> Unclaim(int requestId)
         {
             await _scheduleService.UnclaimAsync(requestId);
+
+            return RedirectToAction(nameof(Details), new { requestId });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> Cancel(int requestId)
+        {
+            await _scheduleService.CancelAsync(requestId);
 
             return RedirectToAction(nameof(Details), new { requestId });
         }
