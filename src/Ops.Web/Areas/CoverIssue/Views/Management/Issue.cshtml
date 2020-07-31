@@ -38,7 +38,7 @@
 <div class="row mb-2 mt-4">
     <div class="col-12">
         <a asp-action="Index" class="btn btn-outline-secondary text-dark">Return to list</a>
-        @if (Model.Header.HasPendingIssue)
+        @if (Model.Header.HasPendingIssue && Model.CanEdit)
         {
             <form asp-action="@nameof(ManagementController.ResolveIssue)" class="d-inline-block" method="post" role="form">
                 <input asp-for="HeaderId" value="@Model.Header.Id" type="hidden" />

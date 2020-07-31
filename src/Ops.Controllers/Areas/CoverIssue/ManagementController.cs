@@ -13,7 +13,6 @@ using Ocuda.Utility.Models;
 namespace Ocuda.Ops.Controllers.Areas.CoverIssue
 {
     [Area("CoverIssue")]
-    [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]")]
     [Route("[area]/[controller]")]
     public class ManagementController : BaseController<ManagementController>
@@ -75,10 +74,12 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
                 return RedirectToAction(nameof(Index));
             }
 
+            var siteManager = UserClaim(ClaimType.SiteManager);
             var viewModel = new DetailViewModel
             {
                 Header = header,
-                Details = await _coverIssueService.GetDetailsByHeaderIdAsync(header.Id)
+                Details = await _coverIssueService.GetDetailsByHeaderIdAsync(header.Id),
+                CanEdit = !string.IsNullOrEmpty(siteManager)
             };
 
             var leapBibUrl = await _siteSettingService.GetSettingStringAsync(
@@ -96,21 +97,25 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
         [Route("[action]")]
         public async Task<IActionResult> ResolveIssue(DetailViewModel model)
         {
-            try
+            var siteManager = UserClaim(ClaimType.SiteManager);
+            if (!string.IsNullOrEmpty(siteManager))
             {
-                var header = await _coverIssueService.GetHeaderByIdAsync(model.HeaderId);
+                try
+                {
+                    var header = await _coverIssueService.GetHeaderByIdAsync(model.HeaderId);
 
-                await _coverIssueService.ResolveCoverIssueAsnyc(header.Id);
-                ShowAlertSuccess("Issue marked as resolved!");
-                return RedirectToAction(nameof(Issue), new { id = header.Id });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex,
-                    "Error resolving cover issue for header {HeaderId}: {Message}",
-                    model.HeaderId,
-                    ex.Message);
-                ShowAlertDanger("An error occured while trying to make the issue as resolved");
+                    await _coverIssueService.ResolveCoverIssueAsnyc(header.Id);
+                    ShowAlertSuccess("Issue marked as resolved!");
+                    return RedirectToAction(nameof(Issue), new { id = header.Id });
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex,
+                        "Error resolving cover issue for header {HeaderId}: {Message}",
+                        model.HeaderId,
+                        ex.Message);
+                    ShowAlertDanger("An error occured while trying to make the issue as resolved");
+                }
             }
             return RedirectToAction(nameof(Index));
         }
