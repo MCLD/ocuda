@@ -14,6 +14,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
 {
     [Area("CoverIssue")]
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
+    [Route("[area]")]
     [Route("[area]/[controller]")]
     public class ManagementController : BaseController<ManagementController>
     {
