@@ -2,11 +2,6 @@
 
 <h3>Cover Issues</h3>
 
-@if (Model.CoverIssueHeaders.Count == 0)
-{
-    <div class="alert alert-warning">No Issues Found</div>
-}
-
 <div class="row mb-2">
     <div class="col-12">
         <ul class="nav nav-pills">
@@ -39,16 +34,27 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var header in Model.CoverIssueHeaders)
+        @if (Model.CoverIssueHeaders.Count == 0)
         {
             <tr>
-                <td>
-                    <a asp-action="@(nameof(ManagementController.Issue))" asp-route-id="@header.Id" class="rowlink">
-                        @header.BibId
-                    </a>
+                <td colspan="2">
+                    No Issues Found
                 </td>
-                <td>@header.LastResolved?.ToShortDateString()</td>
             </tr>
+        }
+        else
+        {
+            @foreach (var header in Model.CoverIssueHeaders)
+            {
+                <tr>
+                    <td>
+                        <a asp-action="@(nameof(ManagementController.Issue))" asp-route-id="@header.Id" class="rowlink">
+                            @header.BibId
+                        </a>
+                    </td>
+                    <td>@header.LastResolved?.ToShortDateString()</td>
+                </tr>
+            }
         }
     </tbody>
 </table>
