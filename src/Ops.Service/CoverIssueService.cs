@@ -40,6 +40,11 @@ namespace Ocuda.Ops.Service
             return await _coverIssueHeaderRepository.FindAsync(id);
         }
 
+        public async Task<CoverIssueHeader> GetHeaderByBibIdAsync(int bibId)
+        {
+            return await _coverIssueHeaderRepository.GetByBibIdAsync(bibId);
+        }
+
         public async Task<ICollection<CoverIssueDetail>> GetDetailsByHeaderIdAsync(int headerId)
         {
             return await _coverIssueDetailRepository.GetByHeaderIdAsync(headerId,
