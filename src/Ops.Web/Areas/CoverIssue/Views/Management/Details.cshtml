@@ -1,39 +1,44 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.CoverIssue.ViewModels.Management.DetailViewModel
 
-<h3>
-    @if (!string.IsNullOrWhiteSpace(Model.LeapPath))
-    {
-        <a href="@Model.LeapPath" target="_blank">Cover Issue - Bib ID @Model.Header.BibId</a>
-    }
-    else
-    {
-        @:Cover Issue - Bib ID @Model.Header.BibId
-    }
-</h3>
+<h1>Cover Issue - Bib ID @Model.Header.BibId</h1>
+<hr />
 
-<h4>Reports</h4>
-
-<table class="table table-sm table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Reported By</th>
-            <th>Reported On</th>
-            <th>Resolved</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var detail in Model.Details)
+<div class="row">
+    <div class="col-12">
+        <h2 class="d-inline-block">Reports</h2>
+        @if (!string.IsNullOrWhiteSpace(Model.LeapPath))
         {
-            <tr>
-                <td>@detail.CreatedByUser.Name</td>
-                <td>@detail.CreatedAt.ToShortDateString()</td>
-                <td>
-                    <span class="@(!detail.IsResolved ? null : "fas fa-check")"></span>
-                </td>
-            </tr>
+            <a href="@Model.LeapPath" target="_blank" class="btn btn-info float-right">View in Leap</a>
         }
-    </tbody>
-</table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div>
+            <table class="table table-sm table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Reported By</th>
+                        <th>Reported On</th>
+                        <th>Resolved</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var detail in Model.Details)
+                    {
+                        <tr>
+                            <td>@detail.CreatedByUser.Name</td>
+                            <td>@detail.CreatedAt.ToShortDateString()</td>
+                            <td>
+                                <span class="@(!detail.IsResolved ? null : "fas fa-check")"></span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 <div class="row mb-2 mt-4">
     <div class="col-12">
