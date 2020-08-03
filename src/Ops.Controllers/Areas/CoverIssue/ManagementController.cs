@@ -105,7 +105,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
 
                     await _coverIssueService.ResolveCoverIssueAsnyc(header.Id);
                     ShowAlertSuccess("Issue marked as resolved!");
-                    return RedirectToAction(nameof(Details), new { id = header.Id });
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
