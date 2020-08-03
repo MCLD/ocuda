@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
@@ -63,7 +62,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
         }
 
         [Route("[action]/{id}")]
-        public async Task<IActionResult> Issue(int id)
+        public async Task<IActionResult> Details(int id)
         {
             var header = await _coverIssueService.GetHeaderByIdAsync(id);
             if (header == null)
@@ -106,7 +105,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
 
                     await _coverIssueService.ResolveCoverIssueAsnyc(header.Id);
                     ShowAlertSuccess("Issue marked as resolved!");
-                    return RedirectToAction(nameof(Issue), new { id = header.Id });
+                    return RedirectToAction(nameof(Details), new { id = header.Id });
                 }
                 catch (Exception ex)
                 {
