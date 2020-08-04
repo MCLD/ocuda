@@ -113,6 +113,10 @@
                     Cancel Appointment
                 </button>
             }
+            <a class="btn btn-outline-dark mt-2 mb-1 mr-4 float-right"
+               asp-controller="Schedule"
+               asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Index))"
+               asp-route-requestedDate="@Model.RequestedDate">Back</a>
         </div>
     </div>
 
