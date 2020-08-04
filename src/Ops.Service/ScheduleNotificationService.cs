@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
@@ -17,10 +18,13 @@ namespace Ocuda.Ops.Service
     public class ScheduleNotificationService
         : BaseService<ScheduleNotificationService>, IScheduleNotificationService
     {
+        private readonly IDistributedCache _cache;
         private readonly IEmailService _emailService;
         private readonly IScheduleLogRepository _scheduleLogRepository;
         private readonly IScheduleRequestService _scheduleRequestService;
         private readonly ISiteSettingService _siteSettingService;
+
+        private const int CacheEmailHours = 1;
 
         private enum EmailType
         {
@@ -31,11 +35,13 @@ namespace Ocuda.Ops.Service
 
         public ScheduleNotificationService(ILogger<ScheduleNotificationService> logger,
             IHttpContextAccessor httpContextAccessor,
+            IDistributedCache cache,
             IEmailService emailService,
             IScheduleLogRepository scheduleLogRepsitory,
             IScheduleRequestService scheduleRequestService,
             ISiteSettingService siteSettingService) : base(logger, httpContextAccessor)
         {
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
             _scheduleLogRepository = scheduleLogRepsitory
                 ?? throw new ArgumentNullException(nameof(scheduleLogRepsitory));
@@ -286,16 +292,52 @@ namespace Ocuda.Ops.Service
             }
 
             int setupId = (int)setupIdLookup;
+            
+            var emailSetupCacheKey = string.Format(CultureInfo.InvariantCulture,
+                Utility.Keys.Cache.OpsEmailSetup,
+                setupId,
+                lang);
+            var emailSetupText
+                = await GetFromCacheAsync<EmailSetupText>(_cache, emailSetupCacheKey);
+            var emailSetupFromCache = emailSetupText != null;
 
-            var emailSetupText = await _emailService.GetEmailSetupAsync(setupId, lang);
-            _logger.LogTrace("Email setup for language {Language}: HTML {HtmlLength} chars, text {TextLength} chars",
+            if (!emailSetupFromCache)
+            {
+                emailSetupText = await _emailService.GetEmailSetupAsync(setupId, lang);
+                await SaveToCacheAsync(_cache,
+                    emailSetupCacheKey,
+                    emailSetupText,
+                    CacheEmailHours);
+
+            }
+
+            _logger.LogTrace("Email setup for language {Language}{Cached}: HTML {HtmlLength} chars, text {TextLength} chars",
                 emailSetupText.PromenadeLanguageName,
+                emailSetupFromCache ? " (cached)" : "",
                 emailSetupText.BodyHtml.Length,
                 emailSetupText.BodyText.Length);
 
-            var emailTemplateText = await _emailService
-                .GetEmailTemplateAsync(emailSetupText.EmailSetup.EmailTemplateId, lang);
-            _logger.LogTrace("Email template: HTML {HtmlLength} chars, text {TextLength} chars",
+            var emailTemplateCacheKey = string.Format(
+                CultureInfo.InvariantCulture,
+                Utility.Keys.Cache.OpsEmailTemplate,
+                emailSetupText.EmailSetup.EmailTemplateId,
+                lang);
+            var emailTemplateText
+                = await GetFromCacheAsync<EmailTemplateText>(_cache, emailTemplateCacheKey);
+            var emailTemplateFromCache = emailTemplateText != null;
+
+            if (!emailTemplateFromCache)
+            {
+                emailTemplateText = await _emailService
+                 .GetEmailTemplateAsync(emailSetupText.EmailSetup.EmailTemplateId, lang);
+                await SaveToCacheAsync(_cache,
+                    emailTemplateCacheKey,
+                    emailTemplateText,
+                    CacheEmailHours);
+            }
+
+            _logger.LogTrace("Email template{Cached}: HTML {HtmlLength} chars, text {TextLength} chars",
+                emailTemplateFromCache ? " (cached)" : "",
                 emailTemplateText.TemplateHtml.Length,
                 emailTemplateText.TemplateText.Length);
 

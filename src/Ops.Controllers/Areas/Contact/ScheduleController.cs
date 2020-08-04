@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Ocuda.Ops.Controllers.Abstract;
@@ -15,16 +16,20 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
     [Route("[area]/[controller]")]
     public class ScheduleController : BaseController<ScheduleController>
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IScheduleService _scheduleService;
         private readonly IScheduleRequestService _scheduleRequestService;
         private readonly IUserService _userService;
 
         public ScheduleController(ServiceFacades.Controller<ScheduleController> context,
+            IHttpContextAccessor httpContextAccessor,
             IScheduleService scheduleService,
             IScheduleRequestService scheduleRequestService,
             IUserService userService)
             : base(context)
         {
+            _httpContextAccessor = httpContextAccessor
+                ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _scheduleService = scheduleService
                 ?? throw new ArgumentNullException(nameof(scheduleService));
             _scheduleRequestService = scheduleRequestService
@@ -51,6 +56,16 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
             var claims = await _scheduleService
                 .GetClaimsAsync(requests.Select(_ => _.Id).ToArray());
 
+            if (date != DateTime.MinValue)
+            {
+                _httpContextAccessor.HttpContext.Session.SetString("ScheduleController.Index",
+                    date.ToString("O", CultureInfo.InvariantCulture));
+            }
+            else
+            {
+                _httpContextAccessor.HttpContext.Session.Remove("ScheduleController.Index");
+            }
+
             return View(new ScheduleIndexViewModel
             {
                 ViewDescription = date == DateTime.MinValue
@@ -67,7 +82,8 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
         {
             var viewModel = new ScheduleDetailViewModel
             {
-                ScheduleRequest = await _scheduleRequestService.GetRequestAsync(requestId)
+                ScheduleRequest = await _scheduleRequestService.GetRequestAsync(requestId),
+                RequestedDate = GetSavedIndexParameter()
             };
 
             if (viewModel.ScheduleRequest.ScheduleRequestSubject.FollowupEmailSetupId != null)
@@ -124,13 +140,41 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
             return View(viewModel);
         }
 
+        private string GetSavedIndexParameter()
+        {
+            var sessionDate = _httpContextAccessor
+                .HttpContext
+                .Session
+                .GetString("ScheduleController.Index");
+            if (!string.IsNullOrEmpty(sessionDate)
+                && DateTime.TryParse(sessionDate, out DateTime date))
+            {
+                return date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+            }
+            return null;
+        }
+
+        private string GetClearSavedIndexParameter()
+        {
+            var savedIndexParameter = GetSavedIndexParameter();
+            _httpContextAccessor
+                .HttpContext
+                .Session
+                .Remove("ScheduleController.Index");
+            return savedIndexParameter;
+        }
+
         [HttpPost]
         [Route("[action]")]
         public async Task<IActionResult> Claim(int requestId)
         {
             await _scheduleService.ClaimAsync(requestId);
 
-            return RedirectToAction(nameof(Details), new { requestId });
+            TempData[TempDataKey.AlertInfo] = $"You have claimed request #{requestId}.";
+
+            var requestedDate = GetClearSavedIndexParameter();
+
+            return RedirectToAction(nameof(Index), new { requestedDate });
         }
 
         [HttpPost]
@@ -139,7 +183,11 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
         {
             await _scheduleService.UnclaimAsync(requestId);
 
-            return RedirectToAction(nameof(Details), new { requestId });
+            TempData[TempDataKey.AlertWarning] = $"You have unclaimed request #{requestId}.";
+
+            var requestedDate = GetClearSavedIndexParameter();
+
+            return RedirectToAction(nameof(Index), new { requestedDate });
         }
 
         [HttpPost]
@@ -148,7 +196,11 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
         {
             await _scheduleService.CancelAsync(requestId);
 
-            return RedirectToAction(nameof(Details), new { requestId });
+            TempData[TempDataKey.AlertWarning] = $"Request #{requestId} has been cancelled.";
+
+            var requestedDate = GetClearSavedIndexParameter();
+
+            return RedirectToAction(nameof(Index), new { requestedDate });
         }
 
         [HttpPost]
@@ -165,8 +217,20 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
                 await _scheduleService.AddLogAsync(addLog, true);
             }
 
-            return RedirectToAction(nameof(Details),
-                new { requestId = addLog.ScheduleRequestId });
+            if (addLog.IsComplete)
+            {
+                TempData[TempDataKey.AlertSuccess]
+                    = $"Request #{addLog.ScheduleRequestId} marked as closed!";
+            }
+            else
+            {
+                TempData[TempDataKey.AlertInfo]
+                    = $"Comment posted to request #{addLog.ScheduleRequestId}.";
+            }
+
+            var requestedDate = GetClearSavedIndexParameter();
+
+            return RedirectToAction(nameof(Index), new { requestedDate });
         }
     }
 }
