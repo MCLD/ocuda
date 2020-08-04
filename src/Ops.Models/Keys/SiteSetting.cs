@@ -30,6 +30,7 @@
         public struct SiteManagement
         {
             public const string PromenadeUrl = "SiteManagement.PromenadeUrl";
+            public const string OpsUrl = "SiteManagement.OpsUrl";
         }
 
         public struct UserInterface
