@@ -292,7 +292,7 @@ namespace Ocuda.Ops.Service
             }
 
             int setupId = (int)setupIdLookup;
-            
+
             var emailSetupCacheKey = string.Format(CultureInfo.InvariantCulture,
                 Utility.Keys.Cache.OpsEmailSetup,
                 setupId,
@@ -304,11 +304,28 @@ namespace Ocuda.Ops.Service
             if (!emailSetupFromCache)
             {
                 emailSetupText = await _emailService.GetEmailSetupAsync(setupId, lang);
+
+                if (emailSetupText == null)
+                {
+                    // perhaps we didn't match the culture, try default
+                    emailSetupText = await _emailService.GetEmailSetupAsync(setupId,
+                        System.Threading.Thread.CurrentThread.CurrentCulture.Name);
+                    _logger.LogWarning("Email setup id {EmailSetupId} not found for language {Language}, {FoundOrNot} for default language {DefaultLanguage}",
+                        setupId,
+                        lang,
+                        emailSetupText == null ? "not found" : "found",
+                        System.Threading.Thread.CurrentThread.CurrentCulture.Name);
+                }
+
+                if (emailSetupText == null)
+                {
+                    throw new OcudaException($"Missing email setup ID {setupId}");
+                }
+
                 await SaveToCacheAsync(_cache,
                     emailSetupCacheKey,
                     emailSetupText,
                     CacheEmailHours);
-
             }
 
             _logger.LogTrace("Email setup for language {Language}{Cached}: HTML {HtmlLength} chars, text {TextLength} chars",
@@ -330,6 +347,26 @@ namespace Ocuda.Ops.Service
             {
                 emailTemplateText = await _emailService
                  .GetEmailTemplateAsync(emailSetupText.EmailSetup.EmailTemplateId, lang);
+
+                if (emailTemplateText == null)
+                {
+                    // perhaps we didn't match the culture, try default
+                    emailTemplateText = await _emailService.GetEmailTemplateAsync(
+                        emailSetupText.EmailSetup.EmailTemplateId,
+                        System.Threading.Thread.CurrentThread.CurrentCulture.Name);
+
+                    _logger.LogWarning("Email template id {EmailTemplateId} not found for language {Language}, {FoundOrNot} for default language {DefaultLanguage}",
+                        emailSetupText.EmailSetup.EmailTemplateId,
+                        lang,
+                        emailSetupText == null ? "not found" : "found",
+                        System.Threading.Thread.CurrentThread.CurrentCulture.Name);
+                }
+
+                if (emailTemplateText == null)
+                {
+                    throw new OcudaException($"Missing email template ID {emailSetupText.EmailSetup.EmailTemplateId}");
+                }
+
                 await SaveToCacheAsync(_cache,
                     emailTemplateCacheKey,
                     emailTemplateText,
