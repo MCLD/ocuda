@@ -25,6 +25,7 @@ namespace Ocuda.Ops.Service
         private readonly ISiteSettingService _siteSettingService;
 
         private const int CacheEmailHours = 1;
+        private const string DefaultLanguage = "en-US";
 
         private enum EmailType
         {
@@ -122,7 +123,7 @@ namespace Ocuda.Ops.Service
                         {
                             var lang = pending.Language
                             .Equals("English", StringComparison.OrdinalIgnoreCase)
-                                ? "en-US"
+                                ? DefaultLanguage
                                 : pending.Language;
                             _logger.LogTrace("Using language: {Language}", pending.Language);
 
@@ -309,12 +310,12 @@ namespace Ocuda.Ops.Service
                 {
                     // perhaps we didn't match the culture, try default
                     emailSetupText = await _emailService.GetEmailSetupAsync(setupId,
-                        System.Threading.Thread.CurrentThread.CurrentCulture.Name);
+                        DefaultLanguage);
                     _logger.LogWarning("Email setup id {EmailSetupId} not found for language {Language}, {FoundOrNot} for default language {DefaultLanguage}",
                         setupId,
                         lang,
                         emailSetupText == null ? "not found" : "found",
-                        System.Threading.Thread.CurrentThread.CurrentCulture.Name);
+                        DefaultLanguage);
                 }
 
                 if (emailSetupText == null)
@@ -353,13 +354,13 @@ namespace Ocuda.Ops.Service
                     // perhaps we didn't match the culture, try default
                     emailTemplateText = await _emailService.GetEmailTemplateAsync(
                         emailSetupText.EmailSetup.EmailTemplateId,
-                        System.Threading.Thread.CurrentThread.CurrentCulture.Name);
+                        DefaultLanguage);
 
                     _logger.LogWarning("Email template id {EmailTemplateId} not found for language {Language}, {FoundOrNot} for default language {DefaultLanguage}",
                         emailSetupText.EmailSetup.EmailTemplateId,
                         lang,
                         emailSetupText == null ? "not found" : "found",
-                        System.Threading.Thread.CurrentThread.CurrentCulture.Name);
+                        DefaultLanguage);
                 }
 
                 if (emailTemplateText == null)
