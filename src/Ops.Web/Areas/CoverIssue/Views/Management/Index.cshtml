@@ -2,29 +2,60 @@
 
 <h3>Cover Issues</h3>
 
+<div class="modal fade" tabindex="-1" role="dialog" id="bookmarkletModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bookmarklet for reporting cover issues</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="bookmarklet-error-div" class="d-none">
+                    <span class="fas fa-exclamation-triangle"></span>
+                    <p id="bookmarklet-error-message" class="d-inline-block"></p>
+                    <span class="fas fa-exclamation-triangle"></span>
+                </div>
+                <div id="bookmarklet-div" class="d-none">
+                    <p>Drag this button on to your bookmarks toolbar so, that it's available while you are viewing an item. This bookmarklet only works with LEAP.</p>
+                    <a href="" class="btn btn-info" id="bookmarkletButton">LEAP Cover Issue</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row mb-2">
     <div class="col-12">
-        <ul class="nav nav-pills">
-            <li class="nav-item">
-                <a asp-action="@nameof(ManagementController.Index)"
-                   asp-route-Type=""
-                   class="nav-link"
-                   ActiveBy routeKey="type" value=",@Ocuda.Utility.Models.CoverIssueType.New">
-                    @Ocuda.Utility.Models.CoverIssueType.New.ToString()
-                </a>
-            </li>
-            <li class="nav-item">
-                <a asp-action="@nameof(ManagementController.Index)"
-                   asp-route-Type="@Ocuda.Utility.Models.CoverIssueType.Closed"
-                   class="nav-link"
-                   ActiveBy routeKey="type"
-                   value="@Ocuda.Utility.Models.CoverIssueType.Closed">
-                    @Ocuda.Utility.Models.CoverIssueType.Closed.ToString()
-                </a>
-            </li>
-        </ul>
-        <hr />
+        <div class="d-inline-block">
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a asp-action="@nameof(ManagementController.Index)"
+                       asp-route-Type=""
+                       class="nav-link"
+                       ActiveBy routeKey="type" value=",@Ocuda.Utility.Models.CoverIssueType.New">
+                        @Ocuda.Utility.Models.CoverIssueType.New.ToString()
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-action="@nameof(ManagementController.Index)"
+                       asp-route-Type="@Ocuda.Utility.Models.CoverIssueType.Closed"
+                       class="nav-link"
+                       ActiveBy routeKey="type"
+                       value="@Ocuda.Utility.Models.CoverIssueType.Closed">
+                        @Ocuda.Utility.Models.CoverIssueType.Closed.ToString()
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <button class="btn btn-info float-right"
+                data-toggle="modal"
+                data-target="#bookmarkletModal">
+            Bookmarklet
+        </button>
     </div>
+    <hr />
 </div>
 <table class="table table-sm table-bordered link-table">
     <thead>
@@ -75,6 +106,25 @@
             $(".rowlink").each(function () {
                 $(this).height($(this).parent().height() + 11);
             });
+        });
+        $('#bookmarkletModal').on('shown.bs.modal', function () {
+            $.get("@Url.Action(nameof(ManagementController.GetBookmarklet))",
+                function (response) {
+                    if (response.success) {
+                        $('#bookmarklet-div').removeClass("d-none");
+                        $('#bookmarklet-error-div').addClass("d-none");
+                        $("#bookmarkletButton").attr("href", response.bookmarklet);
+                    }
+                    else {
+                        $('#bookmarklet-error-div').removeClass("d-none");
+                        $('#bookmarklet-div').addClass("d-none");
+                        console.log(response.message);
+                        $("#bookmarklet-error-message").text(response.message);
+                    }
+            });
+        });
+        $("#bookmarkletButton").on("click", function (event) {
+            event.preventDefault();
         });
     </script>
 }

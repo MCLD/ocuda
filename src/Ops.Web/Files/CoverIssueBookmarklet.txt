@@ -1,0 +1,19 @@
+﻿javascript:(function() {
+	if (document.getElementsByClassName('displayInPAC')[0].checked) {
+		elem = document.querySelector('[id^="bib-record-index"]'); 
+		if(elem == null) { 
+			elem = document.querySelector('[id^="itemNameDisplay-"]').id; 
+			pid = elem.split("itemNameDisplay-")[1]; 
+			bibId = document.getElementById("bib-" + pid).children[0].text.trim(); 
+			window.open("{0}CoverIssue/Reporting/" + bibId.toString()); 
+		} 
+		else { 
+			elemarr = elem.id.split("-"); 
+			bibId = elemarr[elemarr.length-1]; 
+			window.open("{0}CoverIssue/Reporting/" + bibId.toString()); 
+		}
+	}
+	else {
+		alert("Title is not displayed in the PAC.")
+	}
+})();

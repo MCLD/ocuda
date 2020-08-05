@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
@@ -8,6 +10,7 @@ using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
+using Stubble.Core;
 
 namespace Ocuda.Ops.Controllers.Areas.CoverIssue
 {
@@ -17,15 +20,21 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
     public class ManagementController : BaseController<ManagementController>
     {
         private readonly ICoverIssueService _coverIssueService;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
         public static string Name { get { return "Management"; } }
         public static string Area { get { return "CoverIssue"; } }
 
+        private static string CoverIssueBookmarklet = "CoverIssueBookmarklet.txt";
+
         public ManagementController(ServiceFacades.Controller<ManagementController> context,
-            ICoverIssueService coverIssueService) : base(context)
+            ICoverIssueService coverIssueService,
+            IWebHostEnvironment hostingEnvironment) : base(context)
         {
             _coverIssueService = coverIssueService
                 ?? throw new ArgumentNullException(nameof(coverIssueService));
+            _hostingEnvironment = hostingEnvironment
+                ?? throw new ArgumentNullException(nameof(hostingEnvironment));
         }
 
         [Route("")]
@@ -117,6 +126,28 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
                 }
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        [Route("[action]")]
+        public async Task<JsonResult> GetBookmarklet()
+        {
+            try
+            {
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Files");
+                filePath = Path.Combine(filePath, CoverIssueBookmarklet);
+                using (var sr = new StreamReader(filePath))
+                {
+                    var baseUrl = await _siteSettingService
+                        .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.OpsUrl);
+                    var bookmarklet = sr.ReadToEnd();
+                    bookmarklet = bookmarklet.Replace("{0}", baseUrl).Trim();
+                    return Json(new { success = true, bookmarklet });
+                }
+            }
+            catch
+            {
+                return Json(new { success = false, message = "Could not retrieve bookmarklet" });
+            }     
         }
     }
 }
