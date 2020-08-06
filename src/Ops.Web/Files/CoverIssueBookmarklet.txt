@@ -14,6 +14,6 @@
 		}
 	}
 	else {
-		alert("Title is not displayed in the PAC.")
+		alert("This item is set to not Display in PAC in Polaris.")
 	}
 })();
