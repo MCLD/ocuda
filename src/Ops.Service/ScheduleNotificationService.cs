@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
@@ -17,10 +18,14 @@ namespace Ocuda.Ops.Service
     public class ScheduleNotificationService
         : BaseService<ScheduleNotificationService>, IScheduleNotificationService
     {
+        private readonly IDistributedCache _cache;
         private readonly IEmailService _emailService;
         private readonly IScheduleLogRepository _scheduleLogRepository;
         private readonly IScheduleRequestService _scheduleRequestService;
         private readonly ISiteSettingService _siteSettingService;
+
+        private const int CacheEmailHours = 1;
+        private const string DefaultLanguage = "en-US";
 
         private enum EmailType
         {
@@ -31,11 +36,13 @@ namespace Ocuda.Ops.Service
 
         public ScheduleNotificationService(ILogger<ScheduleNotificationService> logger,
             IHttpContextAccessor httpContextAccessor,
+            IDistributedCache cache,
             IEmailService emailService,
             IScheduleLogRepository scheduleLogRepsitory,
             IScheduleRequestService scheduleRequestService,
             ISiteSettingService siteSettingService) : base(logger, httpContextAccessor)
         {
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
             _scheduleLogRepository = scheduleLogRepsitory
                 ?? throw new ArgumentNullException(nameof(scheduleLogRepsitory));
@@ -116,7 +123,7 @@ namespace Ocuda.Ops.Service
                         {
                             var lang = pending.Language
                             .Equals("English", StringComparison.OrdinalIgnoreCase)
-                                ? "en-US"
+                                ? DefaultLanguage
                                 : pending.Language;
                             _logger.LogTrace("Using language: {Language}", pending.Language);
 
@@ -287,15 +294,88 @@ namespace Ocuda.Ops.Service
 
             int setupId = (int)setupIdLookup;
 
-            var emailSetupText = await _emailService.GetEmailSetupAsync(setupId, lang);
-            _logger.LogTrace("Email setup for language {Language}: HTML {HtmlLength} chars, text {TextLength} chars",
+            var emailSetupCacheKey = string.Format(CultureInfo.InvariantCulture,
+                Utility.Keys.Cache.OpsEmailSetup,
+                setupId,
+                lang);
+            var emailSetupText
+                = await GetFromCacheAsync<EmailSetupText>(_cache, emailSetupCacheKey);
+            var emailSetupFromCache = emailSetupText != null;
+
+            if (!emailSetupFromCache)
+            {
+                emailSetupText = await _emailService.GetEmailSetupAsync(setupId, lang);
+
+                if (emailSetupText == null)
+                {
+                    // perhaps we didn't match the culture, try default
+                    emailSetupText = await _emailService.GetEmailSetupAsync(setupId,
+                        DefaultLanguage);
+                    _logger.LogWarning("Email setup id {EmailSetupId} not found for language {Language}, {FoundOrNot} for default language {DefaultLanguage}",
+                        setupId,
+                        lang,
+                        emailSetupText == null ? "not found" : "found",
+                        DefaultLanguage);
+                }
+
+                if (emailSetupText == null)
+                {
+                    throw new OcudaException($"Missing email setup ID {setupId}");
+                }
+
+                await SaveToCacheAsync(_cache,
+                    emailSetupCacheKey,
+                    emailSetupText,
+                    CacheEmailHours);
+            }
+
+            _logger.LogTrace("Email setup for language {Language}{Cached}: HTML {HtmlLength} chars, text {TextLength} chars",
                 emailSetupText.PromenadeLanguageName,
+                emailSetupFromCache ? " (cached)" : "",
                 emailSetupText.BodyHtml.Length,
                 emailSetupText.BodyText.Length);
 
-            var emailTemplateText = await _emailService
-                .GetEmailTemplateAsync(emailSetupText.EmailSetup.EmailTemplateId, lang);
-            _logger.LogTrace("Email template: HTML {HtmlLength} chars, text {TextLength} chars",
+            var emailTemplateCacheKey = string.Format(
+                CultureInfo.InvariantCulture,
+                Utility.Keys.Cache.OpsEmailTemplate,
+                emailSetupText.EmailSetup.EmailTemplateId,
+                lang);
+            var emailTemplateText
+                = await GetFromCacheAsync<EmailTemplateText>(_cache, emailTemplateCacheKey);
+            var emailTemplateFromCache = emailTemplateText != null;
+
+            if (!emailTemplateFromCache)
+            {
+                emailTemplateText = await _emailService
+                 .GetEmailTemplateAsync(emailSetupText.EmailSetup.EmailTemplateId, lang);
+
+                if (emailTemplateText == null)
+                {
+                    // perhaps we didn't match the culture, try default
+                    emailTemplateText = await _emailService.GetEmailTemplateAsync(
+                        emailSetupText.EmailSetup.EmailTemplateId,
+                        DefaultLanguage);
+
+                    _logger.LogWarning("Email template id {EmailTemplateId} not found for language {Language}, {FoundOrNot} for default language {DefaultLanguage}",
+                        emailSetupText.EmailSetup.EmailTemplateId,
+                        lang,
+                        emailSetupText == null ? "not found" : "found",
+                        DefaultLanguage);
+                }
+
+                if (emailTemplateText == null)
+                {
+                    throw new OcudaException($"Missing email template ID {emailSetupText.EmailSetup.EmailTemplateId}");
+                }
+
+                await SaveToCacheAsync(_cache,
+                    emailTemplateCacheKey,
+                    emailTemplateText,
+                    CacheEmailHours);
+            }
+
+            _logger.LogTrace("Email template{Cached}: HTML {HtmlLength} chars, text {TextLength} chars",
+                emailTemplateFromCache ? " (cached)" : "",
                 emailTemplateText.TemplateHtml.Length,
                 emailTemplateText.TemplateText.Length);
 

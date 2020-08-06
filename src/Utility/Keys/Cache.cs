@@ -41,6 +41,16 @@
         public static readonly string OpsJobStop = "jobstop.{0}";
 
         /// <summary>
+        /// Cached email setup element, {0} is the id of the element, {1} is the language id
+        /// </summary>
+        public static readonly string OpsEmailSetup = "emailsetup.{0}.{1}";
+
+        /// <summary>
+        /// Cached email template element, {0} is the id of the element, {1} is the language id
+        /// </summary>
+        public static readonly string OpsEmailTemplate = "emailtemplate.{0}.{1}";
+
+        /// <summary>
         /// Default language ID
         /// </summary>
         public static readonly string PromDefaultLanguageId = "langid-default";
