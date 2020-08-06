@@ -7,16 +7,14 @@ using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Service.Abstract
 {
-    public abstract class BaseService<TService>
+    public abstract class BaseService<TService> : Utility.Services.OcudaBaseService<TService>
     {
-        protected readonly ILogger<TService> _logger;
-
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         protected BaseService(ILogger<TService> logger,
             IHttpContextAccessor httpContextAccessor)
+            : base(logger)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _httpContextAccessor = httpContextAccessor
                 ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }

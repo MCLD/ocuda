@@ -28,5 +28,6 @@ namespace Ocuda.Ops.Controllers.ViewModels.Contact
         public ScheduleLog AddLog { get; set; }
         public IEnumerable<SelectListItem> CallDispositions { get; set; }
         public string FinishMessage { get; set; }
+        public string RequestedDate { get; set; }
     }
 }

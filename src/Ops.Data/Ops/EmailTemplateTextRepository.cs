@@ -29,7 +29,7 @@ namespace Ocuda.Ops.Data.Ops
                     TemplateText = _.TemplateText
                 })
                 .AsNoTracking()
-                .SingleAsync();
+                .SingleOrDefaultAsync();
         }
     }
 }
