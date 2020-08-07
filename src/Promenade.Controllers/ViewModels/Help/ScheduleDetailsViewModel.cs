@@ -67,5 +67,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Help
                 return new CultureInfo(ScheduleRequest?.Language).NativeName;
             }
         }
+
+        public bool ShowEmailMessage { get; set; }
     }
 }
