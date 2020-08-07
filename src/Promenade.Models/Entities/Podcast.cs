@@ -9,35 +9,48 @@ namespace Ocuda.Promenade.Models.Entities
         public int Id { get; set; }
 
         [MaxLength(255)]
+        [Required]
         public string Title { get; set; }
 
-        [MaxLength(255)]
-        public string Subtitle { get; set; }
-
-        [MaxLength(2000)]
-        public string Description { get; set; }
+        [MaxLength(50)]
+        [Required]
+        public string Stub { get; set; }
 
         [MaxLength(255)]
         public string Author { get; set; }
 
-        [MaxLength(255)]
-        public string Link { get; set; }
+        [MaxLength(1000)]
+        [Required]
+        public string Description { get; set; }
 
-        [MaxLength(32)]
+        [MaxLength(1000)]
+        [Required]
+        public string Category { get; set; }
+
+        [MaxLength(255)]
+        [Required]
+        public string ImageUrl { get; set; }
+
+        [MaxLength(8)]
+        [Required]
         public string Language { get; set; }
 
-        [MaxLength(255)]
-        public string ITunesName { get; set; }
+        public bool IsExplicit { get; set; }
+
+        public bool IsSerial { get; set; }
 
         [MaxLength(255)]
-        public string ITunesEmail { get; set; }
-
-        public bool Explicit { get; set; }
-
-        [MaxLength(255)]
-        public string Image { get; set; }
+        [Required]
+        public string OwnerName { get; set; }
 
         [MaxLength(255)]
-        public string Category { get; set; }
+        [Required]
+        public string OwnerEmail { get; set; }
+
+        public bool IsBlocked { get; set; }
+
+        public bool IsCompleted { get; set; }
+
+        public bool IsDeleted { get; set; }
     }
 }

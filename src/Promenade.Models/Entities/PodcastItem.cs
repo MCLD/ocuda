@@ -13,35 +13,50 @@ namespace Ocuda.Promenade.Models.Entities
         public Podcast Podcast { get; set; }
 
         [MaxLength(255)]
+        [Required]
         public string Title { get; set; }
 
-        [MaxLength(255)]
-        public string Subtitle { get; set; }
+        [MaxLength(50)]
+        [Required]
+        public string Stub { get; set; }
 
-        [MaxLength(2000)]
+        [MaxLength(1000)]
+        [Required]
         public string Description { get; set; }
 
-        [MaxLength(255)]
-        public string Link { get; set; }
+        public bool IsExplicit { get; set; }
 
         [MaxLength(255)]
-        public string EnclosureUrl { get; set; }
+        public string ImageUrl { get; set; }
 
         [MaxLength(255)]
-        public string EnclosureType { get; set; }
+        public string Keywords { get; set; }
 
-        public int EnclosureLength { get; set; }
-
-        public DateTime? PublishDate { get; set; }
+        public int? Season { get; set; }
+        public int? Episode { get; set; }
 
         [MaxLength(255)]
-        public string Author { get; set; }
+        [Required]
+        public string MediaUrl { get; set; }
+
+        [MaxLength(32)]
+        [Required]
+        public string MediaType { get; set; }
+
+        public int MediaSize { get; set; }
 
         public int Duration { get; set; }
 
-        public bool Explicit { get; set; }
-
         [MaxLength(255)]
+        [Required]
         public string Guid { get; set; }
+
+        public bool GuidPermaLink { get; set; }
+
+        public DateTime? PublishDate { get; set; }
+
+        public bool IsBlocked { get; set; }
+
+        public bool IsDeleted { get; set; }
     }
 }
