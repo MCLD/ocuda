@@ -79,6 +79,8 @@ namespace Ocuda.Promenade.Controllers
                 PaginateModel = paginateModel
             };
 
+            PageTitle = Name;
+
             return View(viewModel);
         }
 
@@ -130,6 +132,12 @@ namespace Ocuda.Promenade.Controllers
                 PaginateModel = paginateModel
             };
 
+            var scheme = (await _siteSettingService
+                .GetSettingBoolAsync(SiteSetting.Site.IsTLS)) ? "https" : "http";
+            viewModel.RSSUrl = new Uri(
+                Url.Action(nameof(RSS), Name, new { stub = podcast.Stub }, scheme),
+                UriKind.Absolute).AbsoluteUri;
+
             foreach (var item in viewModel.PodcastItems)
             {
                 item.MediaUrl = _pathResolverService.GetPublicContentUrl(item.MediaUrl);
@@ -140,6 +148,8 @@ namespace Ocuda.Promenade.Controllers
                     viewModel.ShowEpisodeImages = true;
                 }
             }
+
+            PageTitle = podcast.Title;
 
             return View(viewModel);
         }
@@ -162,14 +172,20 @@ namespace Ocuda.Promenade.Controllers
             }
 
             podcast.ImageUrl = _pathResolverService.GetPublicContentUrl(podcast.ImageUrl);
-            podcastItem.ImageUrl = _pathResolverService.GetPublicContentUrl(podcastItem.ImageUrl);
             podcastItem.MediaUrl = _pathResolverService.GetPublicContentUrl(podcastItem.MediaUrl);
+            if (!string.IsNullOrWhiteSpace(podcastItem.ImageUrl))
+            {
+                podcastItem.ImageUrl = _pathResolverService
+                    .GetPublicContentUrl(podcastItem.ImageUrl);
+            }
 
             var viewModel = new EpisodeViewModel
             {
                 Podcast = podcast,
                 PodcastItem = podcastItem
             };
+
+            PageTitle = $"{podcastItem.Title} - {podcast.Title}";
 
             return View(viewModel);
         }

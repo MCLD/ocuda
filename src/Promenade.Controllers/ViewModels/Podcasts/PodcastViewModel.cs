@@ -10,6 +10,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Podcasts
         public ICollection<PodcastDirectoryInfo> PodcastDirectoryInfos { get; set; }
         public ICollection<PodcastItem> PodcastItems { get; set; }
         public PaginateModel PaginateModel { get; set; }
+        public string RSSUrl { get; set; }
         public bool ShowEpisodeImages { get; set; }
     }
 }

@@ -1,5 +1,10 @@
 ﻿@model Ocuda.Promenade.Controllers.ViewModels.Podcasts.PodcastViewModel
 
+@section metadata {
+    <link rel="alternate" type="application/rss+xml" title="Podcast"
+          href="@Model.RSSUrl" />
+}
+
 <div class="row">
     <div class="col-6 col-md-3 mx-auto">
         <img class="img-thumbnail img-fluid" src="@Model.Podcast.ImageUrl" alt="@Model.Podcast.Title" />
