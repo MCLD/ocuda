@@ -8,8 +8,8 @@ using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Ops.Service.Models;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service
 {
