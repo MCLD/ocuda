@@ -39,6 +39,8 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.Id, _.LanguageId });
             modelBuilder.Entity<Page>()
                 .HasKey(_ => new { _.LanguageId, _.PageHeaderId });
+            modelBuilder.Entity<PodcastDirectoryInfo>()
+                .HasKey(_ => new { _.PodcastId, _.PodcastDirectoryId });
             modelBuilder.Entity<SegmentText>()
                 .HasKey(_ => new { _.LanguageId, _.SegmentId });
         }
@@ -69,6 +71,8 @@ namespace Ocuda.Ops.Data
         public DbSet<NavigationText> NavigationTexts { get; set; }
         public DbSet<Page> Pages { get; set; }
         public DbSet<PageHeader> PageHeaders { get; set; }
+        public DbSet<PodcastDirectory> PodcastDirectories { get; set; }
+        public DbSet<PodcastDirectoryInfo> PodcastDirectoryInfos { get; set; }
         public DbSet<PodcastItem> PodcastItems { get; set; }
         public DbSet<Podcast> Podcasts { get; set; }
         public DbSet<ScheduleRequest> ScheduleRequest { get; set; }
