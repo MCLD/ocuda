@@ -134,9 +134,7 @@ namespace Ocuda.Promenade.Controllers
 
             var scheme = (await _siteSettingService
                 .GetSettingBoolAsync(SiteSetting.Site.IsTLS)) ? "https" : "http";
-            viewModel.RSSUrl = new Uri(
-                Url.Action(nameof(RSS), Name, new { stub = podcast.Stub }, scheme),
-                UriKind.Absolute).AbsoluteUri;
+            viewModel.RSSUrl = Url.Action(nameof(RSS), Name, new { stub = podcast.Stub }, scheme);
 
             foreach (var item in viewModel.PodcastItems)
             {
