@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -52,5 +53,7 @@ namespace Ocuda.Promenade.Models.Entities
         public bool IsCompleted { get; set; }
 
         public bool IsDeleted { get; set; }
+
+        public ICollection<PodcastItem> PodcastItems { get; set; }
     }
 }

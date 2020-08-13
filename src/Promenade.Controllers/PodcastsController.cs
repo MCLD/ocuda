@@ -8,10 +8,12 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Ocuda.Promenade.Controllers.Abstract;
+using Ocuda.Promenade.Controllers.ViewModels.Podcasts;
 using Ocuda.Promenade.Models.Keys;
 using Ocuda.Promenade.Service;
+using Ocuda.Promenade.Service.Filters;
+using Ocuda.Utility.Models;
 using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Controllers
@@ -36,34 +38,153 @@ namespace Ocuda.Promenade.Controllers
         }
 
         [Route("")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            return View();
+            var filter = new BaseFilter(page);
+
+            var podcasts = await _podcastService.GetPaginatedListAsync(filter);
+
+            var paginateModel = new PaginateModel
+            {
+                ItemCount = podcasts.Count,
+                CurrentPage = page,
+                ItemsPerPage = filter.Take.Value
+            };
+            if (paginateModel.PastMaxPage)
+            {
+                return RedirectToRoute(
+                    new
+                    {
+                        page = paginateModel.LastPage ?? 1
+                    });
+            }
+
+            if (podcasts.Count == 1)
+            {
+                return RedirectToAction(nameof(Podcast), new { stub = podcasts.Data.First().Stub });
+            }
+            else if (podcasts.Count == 0)
+            {
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
+
+            foreach (var podcast in podcasts.Data)
+            {
+                podcast.ImageUrl = _pathResolverService.GetPublicContentUrl(podcast.ImageUrl);
+            }
+
+            var viewModel = new IndexViewModel
+            {
+                Podcasts = podcasts.Data,
+                PaginateModel = paginateModel
+            };
+
+            return View(viewModel);
         }
 
         [Route("{stub}")]
-        public async Task<IActionResult> Podcast(string stub)
+        public async Task<IActionResult> Podcast(string stub, int page = 1)
         {
-            return View();
+            var podcast = await _podcastService.GetByStubAsync(stub?.Trim());
+
+            if (podcast == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            var filter = new PodcastFilter(page)
+            {
+                SerialOrdering = podcast.IsSerial
+            };
+
+            var podcastItems = await _podcastService.GetPaginatedItemsByPodcastIdAsync(podcast.Id,
+                filter);
+            var paginateModel = new PaginateModel
+            {
+                ItemCount = podcastItems.Count,
+                CurrentPage = page,
+                ItemsPerPage = filter.Take.Value
+            };
+            if (paginateModel.PastMaxPage)
+            {
+                return RedirectToRoute(
+                    new
+                    {
+                        page = paginateModel.LastPage ?? 1
+                    });
+            }
+
+            if (podcastItems.Count == 0)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            podcast.ImageUrl = _pathResolverService.GetPublicContentUrl(podcast.ImageUrl);
+
+            var viewModel = new PodcastViewModel
+            {
+                Podcast = podcast,
+                PodcastDirectoryInfos = await _podcastService.GetDirectoryInfosByPodcastIdAsync(
+                    podcast.Id),
+                PodcastItems = podcastItems.Data,
+                PaginateModel = paginateModel
+            };
+
+            foreach (var item in viewModel.PodcastItems)
+            {
+                item.MediaUrl = _pathResolverService.GetPublicContentUrl(item.MediaUrl);
+
+                if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                {
+                    item.ImageUrl = _pathResolverService.GetPublicContentUrl(item.ImageUrl);
+                    viewModel.ShowEpisodeImages = true;
+                }
+            }
+
+            return View(viewModel);
         }
 
         [Route("{podcastStub}/{episodeStub}")]
         public async Task<IActionResult> Episode(string podcastStub, string episodeStub)
         {
-            return View();
+            var podcast = await _podcastService.GetByStubAsync(podcastStub?.Trim());
+
+            if (podcast == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            var podcastItem = await _podcastService.GetItemByStubAsync(episodeStub?.Trim());
+
+            if (podcastItem == null)
+            {
+                return RedirectToAction(nameof(Podcast), new { stub = podcastStub });
+            }
+
+            podcast.ImageUrl = _pathResolverService.GetPublicContentUrl(podcast.ImageUrl);
+            podcastItem.ImageUrl = _pathResolverService.GetPublicContentUrl(podcastItem.ImageUrl);
+            podcastItem.MediaUrl = _pathResolverService.GetPublicContentUrl(podcastItem.MediaUrl);
+
+            var viewModel = new EpisodeViewModel
+            {
+                Podcast = podcast,
+                PodcastItem = podcastItem
+            };
+
+            return View(viewModel);
         }
 
         [Route("[action]/{stub}")]
         public async Task<IActionResult> RSS(string stub)
         {
-            var podcast = await _podcastService.GetPodcastByStubAsync(stub?.Trim());
+            var podcast = await _podcastService.GetByStubAsync(stub?.Trim(), true);
 
             if (podcast == null)
             {
                 return NotFound();
             }
 
-            var podcastItems = await _podcastService.GetItemsByPodcastIdAsync(podcast.Id);
+            var podcastItems = await _podcastService.GetItemsByPodcastIdAsync(podcast.Id, true);
 
             if (podcastItems.Count == 0)
             {

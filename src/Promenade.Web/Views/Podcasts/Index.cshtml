@@ -1,0 +1,29 @@
+﻿@model Ocuda.Promenade.Controllers.ViewModels.Podcasts.IndexViewModel
+
+<div class="row">
+    @foreach (var podcast in Model.Podcasts)
+    {
+        <div class="col-12 col-md-4">
+            <div class="card">
+                <a href="@Url.Action(nameof(PodcastsController.Podcast), new { stub = podcast.Stub})">
+                    <img class="card-img-top"
+                         alt="@podcast.Title"
+                         src="@podcast.ImageUrl" />
+                </a>
+                <div class="card-body">
+                    <div class="card-title h5"><a href="@Url.Action(nameof(PodcastsController.Podcast), new { stub = podcast.Stub})">@podcast.Title</a></div>
+                    <p class="card-text">@podcast.Description</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (Model.PaginateModel.MaxPage > 1)
+{
+    <div class="row justify-content-center mt-4">
+        <div class="col-auto">
+            <paginate paginateModel="@Model.PaginateModel"></paginate>
+        </div>
+    </div>
+}

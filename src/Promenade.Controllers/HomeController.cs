@@ -12,6 +12,8 @@ namespace Ocuda.Promenade.Controllers
         protected override PageType PageType
         { get { return PageType.Home; } }
 
+        public static string Name { get { return "Home"; } }
+
         public HomeController(ServiceFacades.Controller<HomeController> context,
             PageService pageService,
             RedirectService redirectService,

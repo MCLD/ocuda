@@ -1,0 +1,59 @@
+﻿@model Ocuda.Promenade.Controllers.ViewModels.Podcasts.PodcastViewModel
+
+<div class="row">
+    <div class="col-6 col-md-3 mx-auto">
+        <img class="img-thumbnail img-fluid" src="@Model.Podcast.ImageUrl" alt="@Model.Podcast.Title" />
+    </div>
+    <div class="col-12 col-md-9">
+        <div class="h5">@Model.Podcast.Title</div>
+        <p>@Model.Podcast.Description</p>
+        <div class="row">
+            <div class="col-12">
+                @foreach (var directoryInfo in Model.PodcastDirectoryInfos)
+                {
+                    <a href="@directoryInfo.Url"
+                       target="_blank"
+                       class="btn btn-outline-secondary mt-1">@directoryInfo.PodcastDirectory.Name</a>
+                }
+                <a href="@Url.Action(nameof(PodcastsController.RSS), new { stub = Model.Podcast.Stub })"
+                   target="_blank"
+                   class="btn btn-outline-secondary mt-1">RSS</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+<hr />
+
+@foreach (var item in Model.PodcastItems)
+{
+    <div class="row">
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 col-md-5 col-lg-6 col-xl-7">
+                    <div class="mb-2"><em>@item.PublishDate.Value.ToLongDateString()</em></div>
+                    <div class="mb-2"><a href="@Url.Action(nameof(PodcastsController.Episode), new { podcastStub = Model.Podcast.Stub, episodeStub = item.Stub})"><strong>@item.Title</strong></a></div>
+                </div>
+                <div class="col-12 col-md-7 col-lg-6 col-xl-5 text-right">
+                    <audio controls class="mb-2">
+                        <source src="@item.MediaUrl" type="@item.MediaType" />
+                    </audio>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <p>@item.Description</p>
+        </div>
+    </div>
+    <hr />
+}
+
+@if (Model.PaginateModel.MaxPage > 1)
+{
+    <div class="row justify-content-center mt-4">
+        <div class="col-auto">
+            <paginate paginateModel="@Model.PaginateModel"></paginate>
+        </div>
+    </div>
+}
+
