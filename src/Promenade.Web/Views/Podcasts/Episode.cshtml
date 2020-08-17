@@ -1,0 +1,13 @@
+﻿@model Ocuda.Promenade.Controllers.ViewModels.Podcasts.EpisodeViewModel
+
+<div class="row">
+    <div class="col-12">
+        <div class="mb-2"><a href="@Url.Action(nameof(PodcastsController.Podcast), new { stub = Model.Podcast.Stub})">@Model.Podcast.Title</a></div>
+        <div class="mb-2"><strong>@Model.PodcastItem.Title</strong></div>
+        <div class="mb-2"><em>@Model.PodcastItem.PublishDate.Value.ToLongDateString()</em></div>
+        <audio controls class="mb-2">
+            <source src="@Model.PodcastItem.MediaUrl" type="@Model.PodcastItem.MediaType" />
+        </audio>
+        <p>@Model.PodcastItem.Description</p>
+    </div>
+</div>
