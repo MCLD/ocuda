@@ -1,13 +1,17 @@
 ﻿@model Ocuda.Promenade.Controllers.ViewModels.Podcasts.PodcastViewModel
 
 @section metadata {
-    <link rel="alternate" type="application/rss+xml" title="Podcast"
+    <link rel="alternate"
+          type="application/rss+xml"
+          title="Podcast"
           href="@Model.RSSUrl" />
 }
 
 <div class="row">
     <div class="col-6 col-md-3 mx-auto">
-        <img class="img-thumbnail img-fluid" src="@Model.Podcast.ImageUrl" alt="@Model.Podcast.Title" />
+        <img class="img-thumbnail img-fluid"
+             src="@Model.Podcast.ImageUrl"
+             alt="Logo for @Model.Podcast.Title" />
     </div>
     <div class="col-12 col-md-9">
         <div class="h5">@Model.Podcast.Title</div>
@@ -17,12 +21,12 @@
                 @foreach (var directoryInfo in Model.PodcastDirectoryInfos)
                 {
                     <a href="@directoryInfo.Url"
-                       target="_blank"
-                       class="btn btn-outline-secondary mt-1">@directoryInfo.PodcastDirectory.Name</a>
+                       class="btn btn-outline-secondary mt-1"
+                       target="_blank">@directoryInfo.PodcastDirectory.Name</a>
                 }
                 <a href="@Url.Action(nameof(PodcastsController.RSS), new { stub = Model.Podcast.Stub })"
                    target="_blank"
-                   class="btn btn-outline-secondary mt-1">RSS</a>
+                   class="btn btn-outline-secondary mt-1"><span class="fas fa-rss-square"></span> RSS</a>
             </div>
         </div>
     </div>
@@ -36,8 +40,8 @@
         <div class="col-12">
             <div class="row">
                 <div class="col-12 col-md-5 col-lg-6 col-xl-7">
-                    <div class="mb-2"><em>@item.PublishDate.Value.ToLongDateString()</em></div>
-                    <div class="mb-2"><a href="@Url.Action(nameof(PodcastsController.Episode), new { podcastStub = Model.Podcast.Stub, episodeStub = item.Stub})"><strong>@item.Title</strong></a></div>
+                    <div class="mb-2 lead"><a href="@Url.Action(nameof(PodcastsController.Episode), new { podcastStub = Model.Podcast.Stub, episodeStub = item.Stub})"><strong>@item.Title</strong></a></div>
+                    <div class="mb-2"><em>Episode @item.Episode, published @item.PublishDate.Value.ToLongDateString().</em></div>
                 </div>
                 <div class="col-12 col-md-7 col-lg-6 col-xl-5 text-right">
                     <audio controls class="mb-2">
@@ -61,4 +65,3 @@
         </div>
     </div>
 }
-
