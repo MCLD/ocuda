@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -49,12 +50,12 @@ namespace Ocuda.Ops.Controllers.Filters
         public async Task OnResourceExecutionAsync(ResourceExecutingContext context,
             ResourceExecutionDelegate next)
         {
-            if(context == null)
+            if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if(next == null)
+            if (next == null)
             {
                 throw new ArgumentNullException(nameof(next));
             }
@@ -220,6 +221,7 @@ namespace Ocuda.Ops.Controllers.Filters
 
                         // pull lists of AD groups that should be site and section managers
                         var claimGroups = await _authorizationService.GetClaimGroupsAsync();
+                        var permissionGroups = await _authorizationService.GetPermissionGroupsAsync();
                         var sectionManagerGroups
                             = await _authorizationService.GetSectionManagerGroupsAsync();
 
@@ -245,7 +247,15 @@ namespace Ocuda.Ops.Controllers.Filters
                                     }
                                 }
 
-                                foreach (var sectionManaged 
+                                var permissionList = permissionGroups
+                                    .Where(_ => _.GroupName == groupName);
+                                foreach (var permission in permissionList)
+                                {
+                                    claimantOf.Add(ClaimType.PermissionId,
+                                        permission.Id.ToString(CultureInfo.InvariantCulture));
+                                }
+
+                                foreach (var sectionManaged
                                     in sectionManagerGroups.Where(_ => _.GroupName == groupName))
                                 {
                                     if (!sectionManagerOf.Contains(sectionManaged.Section.Name))
@@ -263,15 +273,17 @@ namespace Ocuda.Ops.Controllers.Filters
 
                         if (isSiteManager)
                         {
-                            // if the user is a site manager, add the site manager claim
-                            claims.Add(new Claim(ClaimType.SiteManager,
-                                ClaimType.SiteManager));
-
                             // also add each individual permission claim
                             foreach (var claimType in claimGroups)
                             {
                                 claims.Add(new Claim(claimType.ClaimType,
                                     ClaimType.SiteManager));
+                            }
+
+                            foreach (var permissionId in permissionGroups.Select(_ => _.Id))
+                            {
+                                claims.Add(new Claim(ClaimType.PermissionId,
+                                    permissionId.ToString(CultureInfo.InvariantCulture)));
                             }
                         }
                         else
@@ -312,13 +324,13 @@ namespace Ocuda.Ops.Controllers.Filters
                 }
             }
 
-            using (LogContext.PushProperty(Utility.Logging.Enrichment.RouteAction, 
+            using (LogContext.PushProperty(Utility.Logging.Enrichment.RouteAction,
                 context.RouteData?.Values["action"]))
-            using (LogContext.PushProperty(Utility.Logging.Enrichment.RouteArea, 
+            using (LogContext.PushProperty(Utility.Logging.Enrichment.RouteArea,
                 context.RouteData?.Values["area"]))
-            using (LogContext.PushProperty(Utility.Logging.Enrichment.RouteController, 
+            using (LogContext.PushProperty(Utility.Logging.Enrichment.RouteController,
                 context.RouteData?.Values["controller"]))
-            using (LogContext.PushProperty(Utility.Logging.Enrichment.RouteId, 
+            using (LogContext.PushProperty(Utility.Logging.Enrichment.RouteId,
                 context.RouteData?.Values["id"]))
             using (LogContext.PushProperty(Utility.Logging.Enrichment.UserId, userId))
             using (LogContext.PushProperty(Utility.Logging.Enrichment.Username, username))

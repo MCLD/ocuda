@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -40,6 +41,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<UserMetadataType> AddAsync(UserMetadataType metadataType)
         {
+            Contract.Requires(metadataType != null);
+
             metadataType.CreatedAt = DateTime.Now;
             metadataType.CreatedBy = GetCurrentUserId();
             metadataType.Name = metadataType.Name?.Trim();
@@ -54,6 +57,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<UserMetadataType> EditAsync(UserMetadataType metadataType)
         {
+            Contract.Requires(metadataType != null);
+
             var currentMetadataType = await _userMetadataTypeRepository.FindAsync(metadataType.Id);
 
             currentMetadataType.Name = metadataType.Name?.Trim();
@@ -79,7 +84,7 @@ namespace Ocuda.Ops.Service
         {
             if (await _userMetadataTypeRepository.IsDuplicateAsync(metadataType))
             {
-                throw new OcudaException($"Metdata type '{metadataType.Name}' already exists.");
+                throw new OcudaException($"Metadata type '{metadataType.Name}' already exists.");
             }
         }
     }

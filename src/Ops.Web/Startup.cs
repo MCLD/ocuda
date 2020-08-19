@@ -19,8 +19,10 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Ops.Web.JobScheduling;
 using Ocuda.Ops.Web.StartupHelper;
+using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
+using Ocuda.Utility.Providers;
 
 namespace Ocuda.Ops.Web
 {
@@ -148,6 +150,8 @@ namespace Ocuda.Ops.Web
                     .AddSessionStateTempDataProvider();
             }
 
+            services.AddScoped<IDateTimeProvider, CurrentDateTimeProvider>();
+
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // service facades
@@ -189,6 +193,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.LinkLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository,
                 Data.Ops.LinkRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupRepository,
+                Data.Ops.PermissionGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPostRepository,
                 Data.Ops.PostRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
@@ -285,6 +291,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Utility.Services.Interfaces.IPathResolverService,
                 Utility.Services.PathResolverService>();
             services.AddScoped<IPostService, PostService>();
+            services.AddScoped<IPermissionGroupService, PermissionGroupService>();
             services.AddScoped<IRosterService, RosterService>();
             services.AddScoped<IScheduleNotificationService, ScheduleNotificationService>();
             services.AddScoped<IScheduleService, ScheduleService>();
