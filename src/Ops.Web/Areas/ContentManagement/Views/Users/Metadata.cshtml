@@ -101,7 +101,7 @@ else
                     }
                     else {
                         ResetSpinners(button);
-                        SetValidationMessage(modal.find("#addName"), response.message);
+                        SetValidation(modal.find("#addName"), response.message);
                     }
                 }, 500);
             });
@@ -131,7 +131,7 @@ else
                     }
                     else {
                         ResetSpinners(button);
-                        SetValidationMessage(modal.find("#editName"), response.message);
+                        SetValidation(modal.find("#editName"), response.message);
                     }
                 }, 500);
             });

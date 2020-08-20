@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -22,7 +21,10 @@ namespace Ocuda.Ops.Data.Ops
         public override async Task<ICollection<SectionManagerGroup>> ToListAsync(
             params Expression<Func<SectionManagerGroup, IComparable>>[] orderBys)
         {
-            Contract.Requires(orderBys != null && orderBys.Any());
+            if (orderBys == null || orderBys.Count() == 0)
+            {
+                throw new ArgumentNullException(nameof(orderBys));
+            }
 
             return await DbSetOrdered(orderBys)
                 .Include(_ => _.Section)
