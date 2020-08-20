@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -49,7 +48,10 @@ namespace Ocuda.Ops.Data.Ops
         public override async Task<ICollection<PermissionGroup>> ToListAsync(
             params Expression<Func<PermissionGroup, IComparable>>[] orderBys)
         {
-            Contract.Requires(orderBys?.Any() == true);
+            if (orderBys == null || orderBys.Length == 0)
+            {
+                throw new ArgumentNullException(nameof(orderBys));
+            }
 
             return await DbSetOrdered(orderBys).AsNoTracking().ToListAsync();
         }

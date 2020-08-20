@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
@@ -28,7 +29,7 @@ namespace Ocuda.Ops.Service
 
         public async Task EnsureSiteManagerGroupAsync(int currentUserId, string group)
         {
-            if (string.IsNullOrEmpty(group))
+            if(group == null)
             {
                 throw new ArgumentNullException(nameof(group));
             }

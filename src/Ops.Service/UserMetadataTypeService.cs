@@ -41,7 +41,10 @@ namespace Ocuda.Ops.Service
 
         public async Task<UserMetadataType> AddAsync(UserMetadataType metadataType)
         {
-            Contract.Requires(metadataType != null);
+            if (metadataType == null)
+            {
+                throw new ArgumentNullException(nameof(metadataType));
+            }
 
             metadataType.CreatedAt = DateTime.Now;
             metadataType.CreatedBy = GetCurrentUserId();
@@ -57,7 +60,10 @@ namespace Ocuda.Ops.Service
 
         public async Task<UserMetadataType> EditAsync(UserMetadataType metadataType)
         {
-            Contract.Requires(metadataType != null);
+            if (metadataType == null)
+            {
+                throw new ArgumentNullException(nameof(metadataType));
+            }
 
             var currentMetadataType = await _userMetadataTypeRepository.FindAsync(metadataType.Id);
 

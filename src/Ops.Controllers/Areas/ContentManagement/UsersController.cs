@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -67,6 +68,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]")]
         public async Task<JsonResult> CreateMetadataType(UserMetadataType metadataType)
         {
+            if(metadataType == null)
+            {
+                throw new ArgumentNullException(nameof(metadataType));
+            }
+
             var success = false;
             var message = string.Empty;
 
@@ -88,6 +94,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]")]
         public async Task<JsonResult> EditMetadataType(UserMetadataType metadataType)
         {
+            if (metadataType == null)
+            {
+                throw new ArgumentNullException(nameof(metadataType));
+            }
+
             var success = false;
             var message = string.Empty;
 
@@ -109,6 +120,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]")]
         public async Task<JsonResult> DeleteMetadataType(UserMetadataType metadataType)
         {
+            if (metadataType == null)
+            {
+                throw new ArgumentNullException(nameof(metadataType));
+            }
+
             var success = false;
             var message = string.Empty;
 
@@ -159,6 +175,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]")]
         public async Task<JsonResult> CreatePermissionGroup(PermissionGroup permissionGroup)
         {
+            if (permissionGroup == null)
+            {
+                throw new ArgumentNullException(nameof(permissionGroup));
+            }
+
             var success = false;
             var message = string.Empty;
 
@@ -180,6 +201,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]")]
         public async Task<JsonResult> EditPermissionGroup(PermissionGroup permissionGroup)
         {
+            if (permissionGroup == null)
+            {
+                throw new ArgumentNullException(nameof(permissionGroup));
+            }
+
             var success = false;
             var message = string.Empty;
 
@@ -202,6 +228,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]")]
         public async Task<JsonResult> DeletePermissionGroup(PermissionGroup permissionGroup)
         {
+            if (permissionGroup == null)
+            {
+                throw new ArgumentNullException(nameof(permissionGroup));
+            }
+
             var success = false;
             var message = string.Empty;
 

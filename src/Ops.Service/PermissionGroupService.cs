@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -41,7 +40,10 @@ namespace Ocuda.Ops.Service
 
         public async Task<PermissionGroup> AddAsync(PermissionGroup permissionGroup)
         {
-            Contract.Requires(permissionGroup != null);
+            if (permissionGroup == null)
+            {
+                throw new ArgumentNullException(nameof(permissionGroup));
+            }
 
             permissionGroup.CreatedAt = _dateTimeProvider.Now;
             permissionGroup.CreatedBy = GetCurrentUserId();
@@ -58,7 +60,10 @@ namespace Ocuda.Ops.Service
 
         public async Task<PermissionGroup> EditAsync(PermissionGroup permissionGroup)
         {
-            Contract.Requires(permissionGroup != null);
+            if (permissionGroup == null)
+            {
+                throw new ArgumentNullException(nameof(permissionGroup));
+            }
 
             var currentPermissionGroup
                 = await _permissionGroupRepository.FindAsync(permissionGroup.Id);

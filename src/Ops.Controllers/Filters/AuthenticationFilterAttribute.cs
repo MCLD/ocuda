@@ -11,6 +11,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Helpers;
 using Ocuda.Utility.Keys;
 using Serilog.Context;
@@ -18,18 +19,20 @@ using Serilog.Context;
 namespace Ocuda.Ops.Controllers.Filters
 {
     [AttributeUsage(AttributeTargets.All, AllowMultiple = false)]
-    public sealed class AuthenticationFilter : Attribute, IAsyncResourceFilter
+    public sealed class AuthenticationFilterAttribute : Attribute, IAsyncResourceFilter
     {
-        private readonly ILogger<AuthenticationFilter> _logger;
+        private readonly ILogger<AuthenticationFilterAttribute> _logger;
         private readonly IConfiguration _config;
+        private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IDistributedCache _cache;
         private readonly WebHelper _webHelper;
         private readonly IAuthorizationService _authorizationService;
         private readonly ILdapService _ldapService;
         private readonly IUserService _userService;
 
-        public AuthenticationFilter(ILogger<AuthenticationFilter> logger,
+        public AuthenticationFilterAttribute(ILogger<AuthenticationFilterAttribute> logger,
             IConfiguration configuration,
+            IDateTimeProvider dateTimeProvider,
             IDistributedCache cache,
             WebHelper webHelper,
             IAuthorizationService authorizationService,
@@ -39,6 +42,8 @@ namespace Ocuda.Ops.Controllers.Filters
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _dateTimeProvider = dateTimeProvider
+                ?? throw new ArgumentNullException(nameof(dateTimeProvider));
             _webHelper = webHelper ?? throw new ArgumentNullException(nameof(webHelper));
             _authorizationService = authorizationService
                 ?? throw new ArgumentNullException(nameof(authorizationService));
@@ -63,7 +68,7 @@ namespace Ocuda.Ops.Controllers.Filters
             string username = null;
             string userId = null;
 
-            var now = DateTime.Now;
+            var now = _dateTimeProvider.Now;
             var authRedirectUrl = _config[Configuration.OpsAuthRedirect];
 
             if (!string.IsNullOrEmpty(authRedirectUrl))
@@ -125,13 +130,16 @@ namespace Ocuda.Ops.Controllers.Filters
 
                     // check if there's a username stored in the cache
                     // if so, the authentication has redirected us back here
-                    username
-                        = await _cache.GetStringAsync(string.Format(Cache.OpsUsername, id));
+                    username = await _cache
+                        .GetStringAsync(string.Format(CultureInfo.InvariantCulture,
+                            Cache.OpsUsername,
+                            id));
 
                     if (string.IsNullOrEmpty(username))
                     {
                         // if there is no username: set a return url and redirect to authentication
-                        await _cache.SetStringAsync(string.Format(Cache.OpsReturn, id),
+                        await _cache.SetStringAsync(string
+                                .Format(CultureInfo.InvariantCulture, Cache.OpsReturn, id),
                             _webHelper.GetCurrentUrl(context.HttpContext),
                             cacheExpiration);
 
@@ -139,7 +147,10 @@ namespace Ocuda.Ops.Controllers.Filters
                             = _config[Configuration.OpsDistributedCacheInstanceDiscriminator]
                             ?? string.Empty;
 
-                        var url = string.Format(authRedirectUrl, id, cacheDiscriminator);
+                        var url = string.Format(CultureInfo.InvariantCulture,
+                            authRedirectUrl,
+                            id,
+                            cacheDiscriminator);
 
                         context.HttpContext.Response.Redirect(url);
                         return;
@@ -147,11 +158,14 @@ namespace Ocuda.Ops.Controllers.Filters
                     else
                     {
                         // remove the username from the cache
-                        await _cache.RemoveAsync(string.Format(Cache.OpsUsername, id));
+                        await _cache.RemoveAsync(string.Format(CultureInfo.InvariantCulture,
+                            Cache.OpsUsername,
+                            id));
 
                         // check if there's a domain name specified and strip it from the username
                         var domainName = _config[Configuration.OpsDomainName];
-                        if (!string.IsNullOrEmpty(domainName) && username.StartsWith(domainName))
+                        if (!string.IsNullOrEmpty(domainName)
+                            && username.StartsWith(domainName, StringComparison.OrdinalIgnoreCase))
                         {
                             username = username.Substring(domainName.Length + 1);
                         }
@@ -188,33 +202,41 @@ namespace Ocuda.Ops.Controllers.Filters
                             await _userService.LoggedInUpdateAsync(user);
                         }
 
-                        userId = user.Id.ToString();
+                        userId = user.Id.ToString(CultureInfo.InvariantCulture);
 
                         // start creating the user's claims with their username
                         var claims = new HashSet<Claim>
                         {
                             new Claim(ClaimType.Username, username),
                             new Claim(ClaimType.UserId, userId),
-                            new Claim(ClaimType.AuthenticatedAt, now.ToString("O"))
+                            new Claim(ClaimType.AuthenticatedAt, now
+                                .ToString("O", CultureInfo.InvariantCulture))
                         };
 
                         // loop through groups in the distributed cache from authentication
                         // prime the loop
                         int groupId = 1;
                         var adGroupName
-                            = await _cache.GetStringAsync(string.Format(Cache.OpsGroup,
-                                id,
-                                groupId));
+                            = await _cache.GetStringAsync(string
+                                .Format(CultureInfo.InvariantCulture,
+                                    Cache.OpsGroup,
+                                    id,
+                                    groupId));
                         var adGroupNames = new List<string>();
                         while (!string.IsNullOrEmpty(adGroupName))
                         {
                             adGroupNames.Add(adGroupName);
                             // once it's in our list, remove it from the cache
-                            await _cache.RemoveAsync(string.Format(Cache.OpsGroup, id, groupId));
-                            groupId++;
-                            adGroupName = await _cache.GetStringAsync(string.Format(Cache.OpsGroup,
+                            await _cache.RemoveAsync(string.Format(CultureInfo.InvariantCulture,
+                                Cache.OpsGroup,
                                 id,
                                 groupId));
+                            groupId++;
+                            adGroupName = await _cache
+                                .GetStringAsync(string.Format(CultureInfo.InvariantCulture,
+                                    Cache.OpsGroup,
+                                    id,
+                                    groupId));
                         }
 
                         bool isSiteManager = false;
@@ -311,7 +333,9 @@ namespace Ocuda.Ops.Controllers.Filters
                         await context.HttpContext.SignInAsync(new ClaimsPrincipal(identity));
 
                         // remove the return URL from the cache
-                        await _cache.RemoveAsync(string.Format(Cache.OpsReturn, id));
+                        await _cache.RemoveAsync(string.Format(CultureInfo.InvariantCulture,
+                            Cache.OpsReturn,
+                            id));
 
                         context.HttpContext.Response.Cookies.Delete(Cookie.OpsAuthId);
 

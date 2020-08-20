@@ -159,7 +159,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped(typeof(Data.ServiceFacade.Repository<>));
 
             // filters
-            services.AddScoped<Controllers.Filters.AuthenticationFilter>();
+            services.AddScoped<Controllers.Filters.AuthenticationFilterAttribute>();
             services.AddScoped<Controllers.Filters.ExternalResourceFilterAttribute>();
             services.AddScoped<Controllers.Filters.NavigationFilterAttribute>();
             services.AddScoped<Controllers.Filters.UserFilterAttribute>();
