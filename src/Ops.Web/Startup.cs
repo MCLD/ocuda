@@ -214,6 +214,8 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserRepository,
                 Data.Ops.UserRepository>();
 
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselRepository,
+                Data.Promenade.CarouselRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICategoryRepository,
                 Data.Promenade.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaCategoryRepository,
@@ -262,8 +264,9 @@ namespace Ocuda.Ops.Web
             // services
             services.AddScoped<Service.Interfaces.Ops.Services.IAuthorizationService,
                 AuthorizationService>();
-            services.AddScoped<ICoverIssueService, CoverIssueService>();
+            services.AddScoped<ICarouselService, CarouselService>();
             services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<ICoverIssueService, CoverIssueService>();
             services.AddScoped<IEmediaService, EmediaService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IExternalResourcePromService, ExternalResourcePromService>();

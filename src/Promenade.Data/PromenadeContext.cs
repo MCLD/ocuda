@@ -12,6 +12,12 @@ namespace Ocuda.Promenade.Data
         {
             // configure composite keys
             // https://docs.microsoft.com/en-us/ef/core/modeling/keys
+            modelBuilder.Entity<CarouselButtonLabelText>()
+                .HasKey(_ => new { _.CarouselButtonLabelId, _.LanguageId });
+            modelBuilder.Entity<CarouselItemText>()
+                .HasKey(_ => new { _.CarouselItemId, _.LanguageId });
+            modelBuilder.Entity<CarouselText>()
+                .HasKey(_ => new { _.CarouselId, _.LanguageId });
             modelBuilder.Entity<CategoryText>()
                 .HasKey(_ => new { _.CategoryId, _.LanguageId });
             modelBuilder.Entity<EmediaCategory>()
@@ -28,6 +34,8 @@ namespace Ocuda.Promenade.Data
                 .HasKey(_ => new { _.Id, _.LanguageId });
             modelBuilder.Entity<Page>()
                 .HasKey(_ => new { _.LanguageId, _.PageHeaderId });
+            modelBuilder.Entity<PageDetailText>()
+                .HasKey(_ => new { _.PageDetailId, _.LanguageId });
             modelBuilder.Entity<PodcastDirectoryInfo>()
                 .HasKey(_ => new { _.PodcastId, _.PodcastDirectoryId });
             modelBuilder.Entity<SegmentText>()
@@ -35,6 +43,13 @@ namespace Ocuda.Promenade.Data
         }
 
         // Read-Only
+        public DbSet<CarouselButtonLabel> CarouselButtonLabels { get; }
+        public DbSet<CarouselButton> CarouselButtons { get; }
+        public DbSet<CarouselButtonLabelText> CarouselButtonLabelTexts { get; }
+        public DbSet<CarouselItem> CarouselItems { get; }
+        public DbSet<CarouselItemText> CarouselItemTexts { get; }
+        public DbSet<Carousel> Carousels { get; }
+        public DbSet<CarouselText> CarouselTexts { get; }
         public DbSet<Category> Categories { get; }
         public DbSet<CategoryText> CategoryTexts { get; }
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
@@ -52,6 +67,9 @@ namespace Ocuda.Promenade.Data
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; }
         public DbSet<Navigation> Navigations { get; }
         public DbSet<NavigationText> NavigationTexts { get; }
+        public DbSet<PageDetail> PageDetails { get; }
+        public DbSet<PageDetailText> PageDetailTexts { get; }
+        public DbSet<PageItem> PageItems { get; }
         public DbSet<Page> Pages { get; }
         public DbSet<PodcastDirectory> PodcastDirectories { get; }
         public DbSet<PodcastDirectoryInfo> PodcastDirectoryInfos { get; set; }

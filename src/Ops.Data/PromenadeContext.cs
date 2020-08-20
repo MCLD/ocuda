@@ -23,6 +23,12 @@ namespace Ocuda.Ops.Data
 
             // configure composite keys
             // https://docs.microsoft.com/en-us/ef/core/modeling/keys
+            modelBuilder.Entity<CarouselButtonLabelText>()
+                .HasKey(_ => new { _.CarouselButtonLabelId, _.LanguageId });
+            modelBuilder.Entity<CarouselItemText>()
+                .HasKey(_ => new { _.CarouselItemId, _.LanguageId });
+            modelBuilder.Entity<CarouselText>()
+                .HasKey(_ => new { _.CarouselId, _.LanguageId });
             modelBuilder.Entity<CategoryText>()
                 .HasKey(_ => new { _.CategoryId, _.LanguageId });
             modelBuilder.Entity<EmediaCategory>()
@@ -39,6 +45,8 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.Id, _.LanguageId });
             modelBuilder.Entity<Page>()
                 .HasKey(_ => new { _.LanguageId, _.PageHeaderId });
+            modelBuilder.Entity<PageDetailText>()
+                .HasKey(_ => new { _.PageDetailId, _.LanguageId });
             modelBuilder.Entity<PodcastDirectoryInfo>()
                 .HasKey(_ => new { _.PodcastId, _.PodcastDirectoryId });
             modelBuilder.Entity<SegmentText>()
@@ -51,6 +59,13 @@ namespace Ocuda.Ops.Data
         public new string GetCurrentMigration() => Database.GetAppliedMigrations().Last();
         #endregion IMigratableContext
 
+        public DbSet<CarouselButtonLabel> CarouselButtonLabels { get; set; }
+        public DbSet<CarouselButton> CarouselButtons { get; set; }
+        public DbSet<CarouselButtonLabelText> CarouselButtonLabelTexts { get; set; }
+        public DbSet<CarouselItem> CarouselItems { get; set; }
+        public DbSet<CarouselItemText> CarouselItemTexts { get; set; }
+        public DbSet<Carousel> Carousels { get; set; }
+        public DbSet<CarouselText> CarouselTexts { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<CategoryText> CategoryTexts { get; set; }
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
@@ -69,6 +84,9 @@ namespace Ocuda.Ops.Data
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; set; }
         public DbSet<Navigation> Navigations { get; set; }
         public DbSet<NavigationText> NavigationTexts { get; set; }
+        public DbSet<PageDetail> PageDetails { get; set; }
+        public DbSet<PageDetailText> PageDetailTexts { get; set; }
+        public DbSet<PageItem> PageItems { get; set; }
         public DbSet<Page> Pages { get; set; }
         public DbSet<PageHeader> PageHeaders { get; set; }
         public DbSet<PodcastDirectory> PodcastDirectories { get; set; }
