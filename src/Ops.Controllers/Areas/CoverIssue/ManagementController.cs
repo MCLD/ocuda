@@ -10,13 +10,11 @@ using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
-using Stubble.Core;
 
 namespace Ocuda.Ops.Controllers.Areas.CoverIssue
 {
     [Area("CoverIssue")]
     [Route("[area]")]
-    [Route("[area]/[controller]")]
     public class ManagementController : BaseController<ManagementController>
     {
         private readonly ICoverIssueService _coverIssueService;
@@ -147,7 +145,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
             catch
             {
                 return Json(new { success = false, message = "Could not retrieve bookmarklet" });
-            }     
+            }
         }
     }
 }
