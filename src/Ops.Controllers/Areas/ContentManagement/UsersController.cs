@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -68,7 +67,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]")]
         public async Task<JsonResult> CreateMetadataType(UserMetadataType metadataType)
         {
-            if(metadataType == null)
+            if (metadataType == null)
             {
                 throw new ArgumentNullException(nameof(metadataType));
             }
