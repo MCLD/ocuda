@@ -1,20 +1,9 @@
 ﻿@using Ocuda.Ops.Controllers.Areas.SiteManagement
 
+<h1>Site management</h1>
+
 <div class="justify-content-center d-flex align-items-center flex-wrap">
-    <div class="col-xs-12 col-sm-4 space-above">
-        <div class="card">
-            <div class="card-header">
-                <h3>@CategoriesController.Name</h3>
-            </div>
-            <div class="card-body mx-auto">
-                <a asp-area="@CategoriesController.Area"
-                   asp-controller="@CategoriesController.Name"
-                   asp-action="@nameof(CategoriesController.Index)"
-                   class="btn btn-info">View @CategoriesController.Name</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-xs-12 col-sm-4 space-above">
+    <div class="col-xs-12 col-sm-4 mt-2">
         <div class="card">
             <div class="card-header">
                 <h3>@EmediaController.Name</h3>
@@ -23,50 +12,15 @@
                 <a asp-area="@EmediaController.Area"
                    asp-controller="@EmediaController.Name"
                    asp-action="@nameof(EmediaController.Index)"
-                   class="btn btn-info">View @EmediaController.Name</a>
+                   class="btn btn-outline-info mt-1">@EmediaController.Name</a>
+                <a asp-area="@CategoriesController.Area"
+                   asp-controller="@CategoriesController.Name"
+                   asp-action="@nameof(CategoriesController.Index)"
+                   class="btn btn-outline-info mt-1">Emedia Categories</a>
             </div>
         </div>
     </div>
-    <div class="col-xs-12 col-sm-4 space-above">
-        <div class="card">
-            <div class="card-header">
-                <h3>External Resources</h3>
-            </div>
-            <div class="card-body mx-auto">
-                <a asp-area="@ExternalResourcesController.Area"
-                   asp-controller="@ExternalResourcesController.Name"
-                   asp-action="@nameof(ExternalResourcesController.Index)"
-                   class="btn btn-info">View External Resources</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-xs-12 col-sm-4 space-above">
-        <div class="card">
-            <div class="card-header">
-                <h3>@FeaturesController.Name</h3>
-            </div>
-            <div class="card-body mx-auto">
-                <a asp-area="@FeaturesController.Area"
-                   asp-controller="@FeaturesController.Name"
-                   asp-action="@nameof(FeaturesController.Index)"
-                   class="btn btn-info">View @FeaturesController.Name</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-xs-12 col-sm-4 space-above">
-        <div class="card">
-            <div class="card-header">
-                <h3>@GroupsController.Name</h3>
-            </div>
-            <div class="card-body mx-auto">
-                <a asp-area="@GroupsController.Area"
-                   asp-controller="@GroupsController.Name"
-                   asp-action="@nameof(GroupsController.Index)"
-                   class="btn btn-info mx-auto">View @GroupsController.Name</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-xs-12 col-sm-4 space-above">
+    <div class="col-xs-12 col-sm-4 mt-2">
         <div class="card">
             <div class="card-header">
                 <h3>@LocationsController.Name</h3>
@@ -75,11 +29,20 @@
                 <a asp-area="@LocationsController.Area"
                    asp-controller="@LocationsController.Name"
                    asp-action="@nameof(LocationsController.Index)"
-                   class="btn btn-info">View @LocationsController.Name</a>
+                   class="btn btn-outline-info mt-1">@LocationsController.Name</a>
+                <a asp-area="@GroupsController.Area"
+                   asp-controller="@GroupsController.Name"
+                   asp-action="@nameof(GroupsController.Index)"
+                   class="btn btn-outline-info mt-1 mx-auto">Location @GroupsController.Name</a>
+
+                <a asp-area="@FeaturesController.Area"
+                   asp-controller="@FeaturesController.Name"
+                   asp-action="@nameof(FeaturesController.Index)"
+                   class="btn btn-outline-info mt-1">Location @FeaturesController.Name</a>
             </div>
         </div>
     </div>
-    <div class="col-xs-12 col-sm-4 space-above">
+    <div class="col-xs-12 col-sm-4 mt-2">
         <div class="card">
             <div class="card-header">
                 <h3>@PagesController.Name</h3>
@@ -88,11 +51,11 @@
                 <a asp-area="@PagesController.Area"
                    asp-controller="@PagesController.Name"
                    asp-action="@nameof(PagesController.Index)"
-                   class="btn btn-info">View @PagesController.Name</a>
+                   class="btn btn-outline-info mt-1">View @PagesController.Name</a>
             </div>
         </div>
     </div>
-    <div class="col-xs-12 col-sm-4 space-above">
+    <div class="col-xs-12 col-sm-4 mt-2">
         <div class="card">
             <div class="card-header">
                 <h3>@SegmentsController.Name</h3>
@@ -101,24 +64,28 @@
                 <a asp-area="@SegmentsController.Area"
                    asp-controller="@SegmentsController.Name"
                    asp-action="@nameof(SegmentsController.Index)"
-                   class="btn btn-info">View @SegmentsController.Name</a>
+                   class="btn btn-outline-info mt-1">View @SegmentsController.Name</a>
             </div>
         </div>
     </div>
-    <div class="col-xs-12 col-sm-4 space-above">
+    <div class="col-xs-12 col-sm-4 mt-2">
         <div class="card">
             <div class="card-header">
                 <h3>Site Settings</h3>
             </div>
             <div class="card-body mx-auto">
+                <a asp-area="@ExternalResourcesController.Area"
+                   asp-controller="@ExternalResourcesController.Name"
+                   asp-action="@nameof(ExternalResourcesController.Index)"
+                   class="btn btn-outline-info mt-1">External Resources</a>
                 <a asp-area="@SiteSettingsController.Area"
                    asp-controller="@SiteSettingsController.Name"
                    asp-action="@nameof(SiteSettingsController.Index)"
-                   class="btn btn-info">View Site Settings</a>
+                   class="btn btn-outline-info mt-1">Site Settings</a>
             </div>
         </div>
     </div>
-    <div class="col-xs-12 col-sm-4 space-above">
+    <div class="col-xs-12 col-sm-4 mt-2">
         <div class="card">
             <div class="card-header">
                 <h3>Social Cards</h3>
@@ -127,7 +94,7 @@
                 <a asp-area="@SocialCardsController.Area"
                    asp-controller="@SocialCardsController.Name"
                    asp-action="@nameof(SocialCardsController.Index)"
-                   class="btn btn-info">View Social Cards</a>
+                   class="btn btn-outline-info mt-1">View Social Cards</a>
             </div>
         </div>
     </div>
