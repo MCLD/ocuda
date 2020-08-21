@@ -1,13 +1,20 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages.IndexViewModel
 
 <form id="addForm" role="form">
-    <div modal id="addModal" isLarge="true" name="Page"  type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+    <div modal
+         id="addModal"
+         isLarge="true"
+         name="Page"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addName" asp-for="PageHeader.PageName" formgroup />
         <input id="addStub" asp-for="PageHeader.Stub" formgroup />
         <select id="addType" asp-for="PageHeader.Type" formgroup>
             @foreach (var type in (PageType[])Enum.GetValues(typeof(PageType)))
             {
-                <option value="@Convert.ToInt32(type)" selected="@(type == Model.PageType ? "selected" : null)">@type</option>
+                <option value="@Convert.ToInt32(type)"
+                        selected="@(type == Model.PageType ? "selected" : null)">
+                    @type
+                </option>
             }
         </select>
     </div>
@@ -15,7 +22,11 @@
 
 <form id="editForm" role="form">
     <input id="editId" asp-for="PageHeader.Id" type="hidden" />
-    <div modal id="editModal" isLarge="true" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+    <div modal
+         id="editModal"
+         isLarge="true"
+         name="Page"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
         <input id="editName" asp-for="PageHeader.PageName" formgroup />
         <input id="editStub" asp-for="PageHeader.Stub" formgroup readonly />
         <select id="editType" asp-for="PageHeader.Type" formgroup disabled>
@@ -27,42 +38,51 @@
     </div>
 </form>
 
-<form asp-controller="@PagesController.Name" asp-action="@(nameof(PagesController.Delete))" method="post" role="form">
+<form asp-controller="@PagesController.Name"
+      asp-action="@(nameof(PagesController.Delete))"
+      method="post"
+      role="form">
     <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
     <input id="deleteType" asp-for="PageType" type="hidden" />
 
     <input id="deleteId" asp-for="PageHeader.Id" type="hidden" />
     <input id="deleteName" asp-for="PageHeader.PageName" type="hidden" />
 
-    <div modal id="deleteModal" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+    <div modal id="deleteModal"
+         name="Page"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
 </form>
 
 <div class="row mb-2">
     <div class="col-12">
         <ul class="nav nav-pills">
             <li class="nav-item">
-                <a asp-action="@nameof(PagesController.Index)" asp-route-Type=""
+                <a asp-action="@nameof(PagesController.Index)"
+                   asp-route-Type=""
                    class="nav-link"
                    ActiveBy routeKey="type" value=",@PageType.Home">
                     @PageType.Home.ToString()
                 </a>
             </li>
             <li class="nav-item">
-                <a asp-action="@nameof(PagesController.Index)" asp-route-Type="@PageType.About"
+                <a asp-action="@nameof(PagesController.Index)"
+                   asp-route-Type="@PageType.About"
                    class="nav-link"
                    ActiveBy routeKey="type" value="@PageType.About">
                     @PageType.About.ToString()
                 </a>
             </li>
             <li class="nav-item">
-                <a asp-action="@nameof(PagesController.Index)" asp-route-Type="@PageType.News"
+                <a asp-action="@nameof(PagesController.Index)"
+                   asp-route-Type="@PageType.News"
                    class="nav-link"
                    ActiveBy routeKey="type" value="@PageType.News">
                     @PageType.News.ToString()
                 </a>
             </li>
             <li class="nav-item">
-                <a asp-action="@nameof(PagesController.Index)" asp-route-Type="@PageType.Subject"
+                <a asp-action="@nameof(PagesController.Index)"
+                   asp-route-Type="@PageType.Subject"
                    class="nav-link"
                    ActiveBy routeKey="type" value="@PageType.Subject">
                     @PageType.Subject.ToString()
@@ -104,7 +124,9 @@ else
                         {
                             <tr>
                                 <td class="td-class">
-                                    <a asp-action="@(nameof(PagesController.Detail))" asp-route-id="@header.Id" class="rowlink">
+                                    <a asp-action="@(nameof(PagesController.Detail))"
+                                       asp-route-id="@header.Id"
+                                       class="rowlink">
                                         @header.PageName
                                     </a>
                                 </td>
@@ -112,6 +134,11 @@ else
                                 <td>@header.Type.ToString()</td>
                                 <td> @string.Join(", ", header.PageLanguages)</td>
                                 <td align="center" class="on-top">
+                                    <a asp-action="@(nameof(PagesController.ContentPermissions))"
+                                       asp-route-id="@header.Id"
+                                       class="btn btn-primary btn-xs">
+                                        <span class="fas fa-user-plus" aria-hidden="true"></span>
+                                    </a>
                                     <button type="button"
                                             class="btn btn-primary btn-xs"
                                             data-toggle="modal"

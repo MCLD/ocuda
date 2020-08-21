@@ -4,10 +4,16 @@
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
 
-<form asp-controller="@PagesController.Name" asp-action="@(nameof(PagesController.DeletePage))" method="post" role="form">
+<form asp-controller="@PagesController.Name"
+      asp-action="@(nameof(PagesController.DeletePage))"
+      method="post"
+      role="form">
     <input id="deleteHeaderId" asp-for="HeaderId" type="hidden" />
     <input id="deleteLanguageId" asp-for="LanguageId" type="hidden" />
-    <div modal id="deleteModal" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+    <div modal
+         id="deleteModal"
+         name="Page"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
 </form>
 
 <div class="row" style="padding-top: 1rem;">
@@ -94,7 +100,9 @@
 
     <div class="row">
         <div class="offset-md-3 col-md-9">
-            <a asp-action="Index" asp-route-Type="@Model.HeaderType" class="btn btn-outline-secondary text-dark">Cancel</a>
+            <a asp-action="Index"
+               asp-route-Type="@Model.HeaderType"
+               class="btn btn-outline-secondary text-dark">Cancel</a>
             <button type="submit" class="btn btn-success" buttonspinner>
                 Save
             </button>

@@ -193,6 +193,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.LinkLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository,
                 Data.Ops.LinkRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupPageContentRepository,
+                Data.Ops.PermissionGroupPageContentRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupRepository,
                 Data.Ops.PermissionGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPostRepository,

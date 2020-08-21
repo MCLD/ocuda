@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
@@ -26,6 +28,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     {
         private readonly ILanguageService _languageService;
         private readonly IPageService _pageService;
+        private readonly IPermissionGroupService _permissionGroupService;
         private readonly ISocialCardService _socialCardService;
 
         public static string Name { get { return "Pages"; } }
@@ -34,11 +37,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         public PagesController(ServiceFacades.Controller<PagesController> context,
             ILanguageService languageService,
             IPageService pageService,
+            IPermissionGroupService permissionGroupService,
             ISocialCardService socialCardService) : base(context)
         {
             _languageService = languageService
                 ?? throw new ArgumentNullException(nameof(languageService));
             _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
+            _permissionGroupService = permissionGroupService
+                ?? throw new ArgumentNullException(nameof(permissionGroupService));
             _socialCardService = socialCardService
                 ?? throw new ArgumentNullException(nameof(socialCardService));
         }
@@ -191,7 +197,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ShowAlertDanger("Unable to delete page: ", ex.Message);
             }
 
-            return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage, Type = model.PageType });
+            return RedirectToAction(nameof(Index), new
+            {
+                page = model.PaginateModel.CurrentPage,
+                Type = model.PageType
+            });
         }
 
         [HttpPost]
@@ -340,6 +350,78 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ShowAlertWarning("Unable to preview page");
                 return RedirectToAction("Index");
             }
+        }
+
+        [Route("[action]/{id}")]
+        public async Task<IActionResult> ContentPermissions(int id)
+        {
+            var header = await _pageService.GetHeaderByIdAsync(id);
+
+            var permissionGroups = await _permissionGroupService.GetAllAsync();
+            var pagePermissions = await _permissionGroupService.GetPermissionsAsync(id);
+
+            var availableGroups = new Dictionary<int, string>();
+            var assignedGroups = new Dictionary<int, string>();
+
+            foreach (var permissionGroup in permissionGroups)
+            {
+                var permission = pagePermissions
+                    .SingleOrDefault(_ => _.PermissionGroupId == permissionGroup.Id);
+                if (permission == null)
+                {
+                    availableGroups.Add(permissionGroup.Id, permissionGroup.PermissionGroupName);
+                }
+                else
+                {
+                    assignedGroups.Add(permissionGroup.Id, permissionGroup.PermissionGroupName);
+                }
+            }
+
+            return View(new ContentPermissionsViewModel
+            {
+                HeaderName = header.PageName,
+                HeaderStub = header.Stub,
+                HeaderType = header.Type,
+                HeaderId = header.Id,
+                AvailableGroups = availableGroups,
+                AssignedGroups = assignedGroups
+            });
+        }
+
+        [HttpPost]
+        [Route("[action]/{headerId}/{permissionGroupId}")]
+        public async Task<IActionResult> AddPermissionGroup(int headerId, int permissionGroupId)
+        {
+            try
+            {
+                await _permissionGroupService
+                    .AddPageHeaderPermissionGroupAsync(headerId, permissionGroupId);
+                AlertInfo = "Content permission added.";
+            }
+            catch (Exception ex)
+            {
+                AlertDanger = $"Problem adding permission: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(ContentPermissions), new { id = headerId });
+        }
+
+        [HttpPost]
+        [Route("[action]/{headerId}/{permissionGroupId}")]
+        public async Task<IActionResult> RemovePermissionGroup(int headerId, int permissionGroupId)
+        {
+            try
+            {
+                await _permissionGroupService
+                    .RemovePageHeaderPermissionGroupAsync(headerId, permissionGroupId);
+                AlertInfo = "Content permission removed.";
+            }
+            catch (Exception ex)
+            {
+                AlertDanger = $"Problem removing permission: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(ContentPermissions), new { id = headerId });
         }
     }
 }
