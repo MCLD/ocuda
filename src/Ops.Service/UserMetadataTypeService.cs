@@ -40,6 +40,11 @@ namespace Ocuda.Ops.Service
 
         public async Task<UserMetadataType> AddAsync(UserMetadataType metadataType)
         {
+            if (metadataType == null)
+            {
+                throw new ArgumentNullException(nameof(metadataType));
+            }
+
             metadataType.CreatedAt = DateTime.Now;
             metadataType.CreatedBy = GetCurrentUserId();
             metadataType.Name = metadataType.Name?.Trim();
@@ -54,6 +59,11 @@ namespace Ocuda.Ops.Service
 
         public async Task<UserMetadataType> EditAsync(UserMetadataType metadataType)
         {
+            if (metadataType == null)
+            {
+                throw new ArgumentNullException(nameof(metadataType));
+            }
+
             var currentMetadataType = await _userMetadataTypeRepository.FindAsync(metadataType.Id);
 
             currentMetadataType.Name = metadataType.Name?.Trim();
@@ -79,7 +89,7 @@ namespace Ocuda.Ops.Service
         {
             if (await _userMetadataTypeRepository.IsDuplicateAsync(metadataType))
             {
-                throw new OcudaException($"Metdata type '{metadataType.Name}' already exists.");
+                throw new OcudaException($"Metadata type '{metadataType.Name}' already exists.");
             }
         }
     }

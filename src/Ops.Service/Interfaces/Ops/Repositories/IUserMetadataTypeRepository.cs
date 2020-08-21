@@ -9,7 +9,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
     public interface IUserMetadataTypeRepository : IOpsRepository<UserMetadataType, int>
     {
         Task<ICollection<UserMetadataType>> GetAllAsync();
-        Task<DataWithCount<ICollection<UserMetadataType>>> GetPaginatedListAsync(BaseFilter filter);
+        Task<DataWithCount<ICollection<UserMetadataType>>>
+            GetPaginatedListAsync(BaseFilter filter);
         Task<bool> IsDuplicateAsync(UserMetadataType metadataType);
     }
 }

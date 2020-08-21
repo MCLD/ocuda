@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -77,7 +76,10 @@ namespace Ocuda.Ops.Data
         public virtual async Task<ICollection<TEntity>>
             ToListAsync(params Expression<Func<TEntity, IComparable>>[] orderBys)
         {
-            Contract.Requires(orderBys != null && orderBys.Any());
+            if (orderBys == null || orderBys.Count() == 0)
+            {
+                throw new ArgumentNullException(nameof(orderBys));
+            }
 
             return await DbSetOrdered(orderBys)
                 .AsNoTracking()
@@ -88,7 +90,10 @@ namespace Ocuda.Ops.Data
             int take,
             params Expression<Func<TEntity, IComparable>>[] orderBys)
         {
-            Contract.Requires(orderBys != null && orderBys.Any());
+            if (orderBys == null || orderBys.Count() == 0)
+            {
+                throw new ArgumentNullException(nameof(orderBys));
+            }
 
             return await DbSetOrdered(orderBys)
                 .AsNoTracking()
