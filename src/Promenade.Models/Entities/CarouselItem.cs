@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -13,5 +15,10 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         [MaxLength(255)]
         public string Name { get; set; }
+
+        public ICollection<CarouselButton> Buttons { get; set; }
+
+        [NotMapped]
+        public CarouselItemText CarouselItemText { get; set; }
     }
 }

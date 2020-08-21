@@ -9,8 +9,12 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
     public interface ICarouselService
     {
         Task<Carousel> CreateAsync(Carousel carousel);
+        Task<CarouselItem> CreateItemAsync(CarouselItem carouselItem);
         Task DeleteAsync(int carouselId);
+        Task DeleteItemAsync(int carouselItemId);
         Task<Carousel> EditAsync(Carousel carousel);
+        Task<CarouselItem> EditItemAsync(CarouselItem carouselItem);
+        Task<Carousel> GetCarouselDetailsAsync(int id, int languageId);
         Task<DataWithCount<ICollection<Carousel>>> GetPaginatedListAsync(BaseFilter filter);
     }
 }

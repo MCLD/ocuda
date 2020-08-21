@@ -9,5 +9,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Carousels
         public ICollection<Carousel> Carousels { get; set; }
         public PaginateModel PaginateModel { get; set; }
         public Carousel Carousel { get; set; }
+        public CarouselText CarouselText { get; set; }
     }
 }

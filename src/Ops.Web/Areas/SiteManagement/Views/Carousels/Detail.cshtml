@@ -1,0 +1,68 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Carousels.DetailViewModel
+
+<form id="editCarouselTextForm" asp-controller="@CarouselsController.Name" asp-action="@nameof(CarouselsController.EditCarouselText)">
+    <input id="editCarouselTextCarousel" asp-for="Carousel.Id" type="hidden" />
+    <input id="editCarouseLanguage" asp-for="LanguageId" type="hidden" />
+
+    <div modal id="editCarouselTextModal" isLarge="true" name="Carousel Text" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <input id="editCarouselTextTitle" asp-for="CarouselText.Title" value="@Model.Carousel.CarouselText?.Title" />
+    </div>
+</form>
+
+<form id="addCarouselItem" asp-controller="@CarouselsController.Name" asp-action="@nameof(CarouselsController.AddCarouselItem)">
+    <input id="addCarouselItemCarousel" asp-for="Carousel.Id" type="hidden" />
+    <input id="addCarouselItemLanguage" asp-for="LanguageId" type="hidden" />
+
+    <div modal id="addCarouselItemModal" isLarge="true" name="Carousel Item" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+        <input id="addCarouselItemName" asp-for="CarouselItem.Name" />
+    </div>
+</form>
+
+<div class="row pt-1">
+    <div class="col-12">
+        <input asp-for="Carousel.Name" formgroup readonly />
+        <select asp-for="SelectLanguage" asp-items="Model.LanguageList" formgroup></select>
+    </div>
+</div>
+
+<div class="row pb-1">
+    <div class="col-12 col-md-9 offset-md-3">
+        <hr />
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        @foreach (var item in Model.Carousel.Items)
+        {
+            <div class="accordion" id="accordion@(item.Id)">
+                <div class="card">
+                    <div class="card-header" id="heading@(item.Id)">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link btn-block text-left"
+                                    type="button"
+                                    data-toggle="collapse"
+                                    data-target="#collapse@(item.Id)"
+                                    aria-controls="collapse@(item.Id)"
+                                    aria-expanded="false">@item.Name</button>
+                        </h2>
+                    </div>
+                    <div id="collapse@(item.Id)"
+                         class="collapse"
+                         data-parent="#accordion@(item.Id)"
+                         aria-labelledby="heading@(item.Id)">
+                        <form>
+                            <input id="carouselItem@(item.Id)Label" asp-for="CarouselItemText.Label" value="@item.CarouselItemText.Label" />
+                            <input id="carouselItem@(item.Id)ImageUrl" asp-for="CarouselItemText.ImageUrl" value="@item.CarouselItemText.ImageUrl" />
+                            <input id="carouselItem@(item.Id)Title" asp-for="CarouselItemText.Title" value="@item.CarouselItemText.Title" />
+                            <input id="carouselItem@(item.Id)Description" asp-for="CarouselItemText.Description" value="@item.CarouselItemText.Description" />
+                            <button type="submit" class="btn btn-success" button-spinner>
+                                Save
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

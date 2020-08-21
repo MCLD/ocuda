@@ -214,8 +214,14 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserRepository,
                 Data.Ops.UserRepository>();
 
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselItemRepository,
+                Data.Promenade.CarouselItemRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselItemTextRepository,
+                Data.Promenade.CarouselItemTextRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselRepository,
                 Data.Promenade.CarouselRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselTextRepository,
+                Data.Promenade.CarouselTextRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICategoryRepository,
                 Data.Promenade.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaCategoryRepository,

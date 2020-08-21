@@ -11,7 +11,8 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Promenade
 {
-    public class CarouselRepository : GenericRepository<PromenadeContext, Carousel>, ICarouselRepository
+    public class CarouselRepository : GenericRepository<PromenadeContext, Carousel>,
+        ICarouselRepository
     {
         public CarouselRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<CarouselRepository> logger) : base(repositoryFacade, logger)
@@ -39,8 +40,19 @@ namespace Ocuda.Ops.Data.Promenade
                 Data = await query
                     .OrderBy(_ => _.Name)
                     .ApplyPagination(filter)
+                    .Include(_ => _.Items)
                     .ToListAsync()
             };
+        }
+
+        public async Task<Carousel> GetIncludingChildrenAsync(int id)
+        {
+            return await DbSet
+                .Where(_ => _.Id == id)
+                .Include(_ => _.Items)
+                .ThenInclude(_ => _.Buttons)
+                .AsNoTracking()
+                .SingleOrDefaultAsync();
         }
     }
 }

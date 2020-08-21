@@ -8,7 +8,7 @@
 
 <form id="editForm" role="form">
     <input id="editId" asp-for="Carousel.Id" type="hidden" />
-    <div modal id="editModal" isLarge="true" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+    <div modal id="editModal" isLarge="true" name="Carousel" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
         <input id="editName" asp-for="Carousel.Name" formgroup />
     </div>
 </form>
@@ -19,7 +19,7 @@
     <input id="deleteId" asp-for="Carousel.Id" type="hidden" />
     <input id="deleteName" asp-for="Carousel.Name" type="hidden" />
 
-    <div modal id="deleteModal" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+    <div modal id="deleteModal" name="Carousel" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
 </form>
 
 <div class="mb-2">
@@ -46,7 +46,7 @@
                     {
                         <tr>
                             <td>
-                                <a asp-action="@(nameof(PagesController.Detail))" asp-route-id="@carousel.Id" class="rowlink">
+                                <a asp-action="@(nameof(CarouselsController.Detail))" asp-route-id="@carousel.Id" class="rowlink">
                                     @carousel.Name
                                 </a>
                             </td>
