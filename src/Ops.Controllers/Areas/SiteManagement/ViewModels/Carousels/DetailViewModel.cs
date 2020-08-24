@@ -12,6 +12,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Carousels
         public CarouselItem CarouselItem { get; set; }
         public CarouselItemText CarouselItemText { get; set; }
 
+        public string LanguageName { get; set; }
         public int LanguageId { get; set; }
 
         public SelectList LanguageList { get; set; }
@@ -19,6 +20,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Carousels
         [DisplayName("Language")]
         public string SelectLanguage { get; set; }
 
-        public int OpenItemId { get; set; }
+        public int? FocusItemId { get; set; }
     }
 }

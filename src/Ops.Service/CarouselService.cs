@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -50,6 +51,7 @@ namespace Ocuda.Ops.Service
             carousel.CarouselText = await _carouselTextRepository
                 .GetByCarouselAndLanguageAsync(id, languageId);
 
+            carousel.Items = carousel.Items.OrderBy(_ => _.Order).ToList();
             foreach (var item in carousel.Items)
             {
                 item.CarouselItemText = await _carouselItemTextRepository
@@ -89,6 +91,13 @@ namespace Ocuda.Ops.Service
         public async Task<CarouselItem> CreateItemAsync(CarouselItem carouselItem)
         {
             carouselItem.Name = carouselItem.Name?.Trim();
+
+            var maxSortOrder = await _carouselItemRepository
+                .GetMaxSortOrderForCarouselAsync(carouselItem.CarouselId);
+            if (maxSortOrder.HasValue)
+            {
+                carouselItem.Order = maxSortOrder.Value + 1;
+            }
 
             await _carouselItemRepository.AddAsync(carouselItem);
             await _carouselItemRepository.SaveAsync();

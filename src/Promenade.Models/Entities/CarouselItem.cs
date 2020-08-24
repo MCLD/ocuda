@@ -10,6 +10,9 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public int Id { get; set; }
 
+        public int CarouselId { get; set; }
+        public Carousel Carousel { get; set; }
+
         public int Order { get; set; }
 
         [Required]

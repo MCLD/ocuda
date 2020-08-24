@@ -5,16 +5,16 @@
     <input id="editCarouseLanguage" asp-for="LanguageId" type="hidden" />
 
     <div modal id="editCarouselTextModal" isLarge="true" name="Carousel Text" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
-        <input id="editCarouselTextTitle" asp-for="CarouselText.Title" value="@Model.Carousel.CarouselText?.Title" />
+        <input id="editCarouselTextTitle" asp-for="CarouselText.Title" value="@Model.Carousel.CarouselText?.Title" formgroup />
     </div>
 </form>
 
-<form id="addCarouselItem" asp-controller="@CarouselsController.Name" asp-action="@nameof(CarouselsController.AddCarouselItem)">
-    <input id="addCarouselItemCarousel" asp-for="Carousel.Id" type="hidden" />
+<form id="addCarouselItemForm">
     <input id="addCarouselItemLanguage" asp-for="LanguageId" type="hidden" />
+    <input id="addCarouselItemCarouselId" asp-for="CarouselItem.CarouselId" value="@Model.Carousel.Id" type="hidden" />
 
     <div modal id="addCarouselItemModal" isLarge="true" name="Carousel Item" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
-        <input id="addCarouselItemName" asp-for="CarouselItem.Name" />
+        <input id="addCarouselItemName" asp-for="CarouselItem.Name" formgroup />
     </div>
 </form>
 
@@ -31,6 +31,16 @@
     </div>
 </div>
 
+<div class="row pb1">
+    <div class="col-12 col-md-9 offset-md-3">
+        <button class="btn btn-outline-secondary text-dark"
+                data-toggle="modal"
+                data-target="#addCarouselItemModal">
+            Add item
+        </button>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-12">
         @foreach (var item in Model.Carousel.Items)
@@ -44,25 +54,47 @@
                                     data-toggle="collapse"
                                     data-target="#collapse@(item.Id)"
                                     aria-controls="collapse@(item.Id)"
-                                    aria-expanded="false">@item.Name</button>
-                        </h2>
-                    </div>
-                    <div id="collapse@(item.Id)"
-                         class="collapse"
-                         data-parent="#accordion@(item.Id)"
-                         aria-labelledby="heading@(item.Id)">
-                        <form>
-                            <input id="carouselItem@(item.Id)Label" asp-for="CarouselItemText.Label" value="@item.CarouselItemText.Label" />
-                            <input id="carouselItem@(item.Id)ImageUrl" asp-for="CarouselItemText.ImageUrl" value="@item.CarouselItemText.ImageUrl" />
-                            <input id="carouselItem@(item.Id)Title" asp-for="CarouselItemText.Title" value="@item.CarouselItemText.Title" />
-                            <input id="carouselItem@(item.Id)Description" asp-for="CarouselItemText.Description" value="@item.CarouselItemText.Description" />
-                            <button type="submit" class="btn btn-success" button-spinner>
-                                Save
-                            </button>
-                        </form>
+                                    aria-expanded="@(Model.FocusItemId == item.Id ? "true" : "false")">
+                                @item.Name
+                                </button>
+                            </h2>
+                        </div>
+                        <div id="collapse@(item.Id)"
+                             class="collapse @(Model.FocusItemId == item.Id ? "show" : null)"
+                             data-parent="#accordion@(item.Id)"
+                             aria-labelledby="heading@(item.Id)">
+                            <form>
+                                <input id="carouselItem@(item.Id)Label" asp-for="CarouselItemText.Label" value="@item.CarouselItemText?.Label" formgroup />
+                                <input id="carouselItem@(item.Id)ImageUrl" asp-for="CarouselItemText.ImageUrl" value="@item.CarouselItemText?.ImageUrl" formgroup />
+                                <input id="carouselItem@(item.Id)Title" asp-for="CarouselItemText.Title" value="@item.CarouselItemText?.Title" formgroup />
+                                <input id="carouselItem@(item.Id)Description" asp-for="CarouselItemText.Description" value="@item.CarouselItemText?.Description" formgroup />
+                                <button type="submit" class="btn btn-success" button-spinner>
+                                    Save
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
-        }
+            }
     </div>
 </div>
+
+@section scripts {
+    <script>
+        $("#addCarouselItemForm").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.post("@(Url.Action(nameof(CarouselsController.AddCarouselItem), CarouselsController.Name))",
+                form.serialize(),
+                function (response) {
+                    if (response.success == true) {
+                        location.href = response.url;
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
+        });
+    </script>
+} 

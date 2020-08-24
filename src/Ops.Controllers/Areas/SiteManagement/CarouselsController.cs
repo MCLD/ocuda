@@ -175,7 +175,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         [Route("[action]/{id}")]
-        public async Task<IActionResult> Detail(int id, string language)
+        public async Task<IActionResult> Detail(int id, string language, int? item)
         {
             var languages = await _languageService.GetActiveAsync();
 
@@ -188,6 +188,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var viewModel = new DetailViewModel
             {
                 Carousel = carousel,
+                FocusItemId = item,
+                LanguageName = language,
                 LanguageId = selectedLanguage.Id,
                 LanguageList = new SelectList(languages, nameof(Language.Name),
                     nameof(Language.Description), selectedLanguage.Name),
@@ -214,11 +216,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 try
                 {
                     var carouselItem = await _carouselService.CreateItemAsync(model.CarouselItem);
+
                     response = new JsonResponse
                     {
                         Success = true,
-                        Url = Url.Action(nameof(Detail), new { id = model.Carousel.Id })
+                        Url = Url.Action(nameof(Detail), new { id = model.CarouselItem.CarouselId, item = carouselItem.Id })
                     };
+
                     ShowAlertSuccess($"Created carousel item: {carouselItem.Name}");
                 }
                 catch (OcudaException ex)

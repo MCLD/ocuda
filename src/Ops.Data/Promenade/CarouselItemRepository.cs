@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
@@ -22,6 +23,14 @@ namespace Ocuda.Ops.Data.Promenade
                 _context.Entry(entity).State = EntityState.Detached;
             }
             return entity;
+        }
+
+        public async Task<int?> GetMaxSortOrderForCarouselAsync(int carouselId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.CarouselId == carouselId)
+                .MaxAsync(_ => (int?)_.Order);
         }
     }
 }
