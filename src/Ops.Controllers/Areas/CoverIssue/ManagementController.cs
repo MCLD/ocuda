@@ -18,7 +18,6 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
     public class ManagementController : BaseController<ManagementController>
     {
         private readonly ICoverIssueService _coverIssueService;
-        private readonly IWebHostEnvironment _hostingEnvironment;
 
         public static string Name { get { return "Management"; } }
         public static string Area { get { return "CoverIssue"; } }
@@ -26,13 +25,10 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
         private static string CoverIssueBookmarklet = "CoverIssueBookmarklet.txt";
 
         public ManagementController(ServiceFacades.Controller<ManagementController> context,
-            ICoverIssueService coverIssueService,
-            IWebHostEnvironment hostingEnvironment) : base(context)
+            ICoverIssueService coverIssueService) : base(context)
         {
             _coverIssueService = coverIssueService
                 ?? throw new ArgumentNullException(nameof(coverIssueService));
-            _hostingEnvironment = hostingEnvironment
-                ?? throw new ArgumentNullException(nameof(hostingEnvironment));
         }
 
         [Route("")]
