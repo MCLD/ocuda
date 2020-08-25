@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Carousels;
+using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
@@ -175,6 +176,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         [Route("[action]/{id}")]
+        [RestoreModelState(Key = nameof(Detail))]
         public async Task<IActionResult> Detail(int id, string language, int? item)
         {
             var languages = await _languageService.GetActiveAsync();
@@ -188,6 +190,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var viewModel = new DetailViewModel
             {
                 Carousel = carousel,
+                CarouselId = carousel.Id,
                 FocusItemId = item,
                 LanguageName = language,
                 LanguageId = selectedLanguage.Id,
@@ -217,10 +220,17 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     var carouselItem = await _carouselService.CreateItemAsync(model.CarouselItem);
 
+                    var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
+
                     response = new JsonResponse
                     {
                         Success = true,
-                        Url = Url.Action(nameof(Detail), new { id = model.CarouselItem.CarouselId, item = carouselItem.Id })
+                        Url = Url.Action(nameof(Detail), new
+                        {
+                            id = model.CarouselItem.CarouselId,
+                            language = language.IsDefault ? null : language.Name,
+                            item = carouselItem.Id
+                        })
                     };
 
                     ShowAlertSuccess($"Created carousel item: {carouselItem.Name}");
@@ -252,9 +262,43 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
+        public async Task<JsonResult> ChangeItemSort(int id, bool increase)
+        {
+            var success = false;
+            var message = string.Empty;
+
+            try
+            {
+                await _carouselService.UpdateItemSortOrder(id, increase);
+                success = true;
+            }
+            catch (OcudaException ex)
+            {
+                message = ex.Message;
+            }
+
+            return Json(new { success, message });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        [SaveModelState(Key = nameof(Detail))]
         public async Task<IActionResult> EditCarouselItemText(DetailViewModel model)
         {
-            return null;
+            if (ModelState.IsValid)
+            {
+                await _carouselService.SetItemTextAsync(model.CarouselItemText);
+            }
+
+            var language = await _languageService.GetActiveByIdAsync(
+                model.CarouselItemText.LanguageId);
+
+            return RedirectToAction(nameof(Detail), new
+            {
+                id = model.CarouselId,
+                language = language.IsDefault ? null : language.Name,
+                item = model.CarouselItemText.CarouselItemId
+            });
         }
     }
 }

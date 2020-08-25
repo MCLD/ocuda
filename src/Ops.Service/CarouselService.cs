@@ -9,6 +9,7 @@ using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service
@@ -121,5 +122,70 @@ namespace Ocuda.Ops.Service
             _carouselItemRepository.Remove(carouselItem);
             await _carouselItemRepository.SaveAsync();
         }
+
+        public async Task UpdateItemSortOrder(int id, bool increase)
+        {
+            var item = await _carouselItemRepository.FindAsync(id);
+
+            int newSortOrder;
+            if (increase)
+            {
+                newSortOrder = item.Order + 1;
+            }
+            else
+            {
+                if (item.Order == 0)
+                {
+                    throw new OcudaException("Item is already in the first position.");
+                }
+                newSortOrder = item.Order - 1;
+            }
+            
+            var itemInPosition = await _carouselItemRepository.GetByCarouselAndOrderAsync(
+                item.CarouselId, newSortOrder);
+
+            if (itemInPosition == null)
+            {
+                throw new OcudaException("Item is already in the last position.");
+            }
+
+            itemInPosition.Order = item.Order;
+            item.Order = newSortOrder;
+
+            _carouselItemRepository.Update(item);
+            _carouselItemRepository.Update(itemInPosition);
+            await _carouselItemRepository.SaveAsync();
+        }
+
+        public async Task<CarouselItemText> SetItemTextAsync(CarouselItemText itemText)
+        {
+            var currentText = await _carouselItemTextRepository.GetByCarouselItemAndLanguageAsync(
+                itemText.CarouselItemId, itemText.LanguageId);
+
+            if (currentText == null)
+            {
+                itemText.Description = itemText.Description?.Trim();
+                itemText.ImageUrl = itemText.ImageUrl?.Trim();
+                itemText.Label = itemText.Label?.Trim();
+                itemText.Title = itemText.Title?.Trim();
+
+                await _carouselItemTextRepository.AddAsync(itemText);
+                await _carouselItemTextRepository.SaveAsync();
+                return itemText;
+            }
+            else
+            {
+                currentText.Description = itemText.Description?.Trim();
+                currentText.ImageUrl = itemText.ImageUrl?.Trim();
+                currentText.Label = itemText.Label?.Trim();
+                currentText.Title = itemText.Title?.Trim();
+
+                _carouselItemTextRepository.Update(currentText);
+                await _carouselItemTextRepository.SaveAsync();
+                return currentText;
+            }
+        }
+
+
     }
 }
