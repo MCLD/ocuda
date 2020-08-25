@@ -333,7 +333,7 @@ namespace Ocuda.Promenade.Controllers
                 item.Links.Add(SyndicationLink.CreateMediaEnclosureLink(
                     new UriBuilder()
                     {
-                        Host = itemUri.Scheme,
+                        Host = itemUri.Host,
                         Path = _pathResolverService.GetPublicContentUrl(podcastItem.MediaUrl),
                         Port = itemUri.Port,
                         Scheme = itemUri.Scheme
@@ -358,7 +358,7 @@ namespace Ocuda.Promenade.Controllers
                 {
                     var itemImageUrl = new UriBuilder()
                     {
-                        Host = itemUri.Scheme,
+                        Host = itemUri.Host,
                         Path = _pathResolverService.GetPublicContentUrl(podcastItem.ImageUrl),
                         Port = itemUri.Port,
                         Scheme = itemUri.Scheme
