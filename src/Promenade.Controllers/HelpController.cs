@@ -311,6 +311,8 @@ namespace Ocuda.Promenade.Controllers
                 TempData.Remove(TempDataDateTime);
                 TempData.Remove(TempDataSubjectId);
 
+                viewModel.ShowEmailMessage = selectedSubject.RequireEmail;
+
                 return View("Scheduled", viewModel);
             }
             else

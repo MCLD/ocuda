@@ -1,4 +1,4 @@
-﻿namespace Ocuda.Ops.Service.Models
+﻿namespace Ocuda.Utility.Models
 {
     public class DataWithCount<TDataType>
     {

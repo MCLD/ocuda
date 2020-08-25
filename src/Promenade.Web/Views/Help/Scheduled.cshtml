@@ -13,7 +13,16 @@ else
     <h1>Your time is scheduled</h1>
 }
 
-<p class="lead">Here are the details:</p>
+@if (Model.ShowEmailMessage)
+{
+    <p class="lead pt-2">
+        <strong>
+            Please check your email for important information about this appointment.
+        </strong>
+    </p>
+}
+
+<p class="lead">Here are the details of your appointment:</p>
 
 <div class="row">
     <div class="col-md-3 text-md-right"><strong>Requested date and time</strong></div>

@@ -10,7 +10,7 @@ using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Abstract
 {
-    [ServiceFilter(typeof(AuthenticationFilter))]
+    [ServiceFilter(typeof(AuthenticationFilterAttribute))]
     [ServiceFilter(typeof(ExternalResourceFilterAttribute))]
     [ServiceFilter(typeof(NavigationFilterAttribute))]
     [ServiceFilter(typeof(UserFilterAttribute))]

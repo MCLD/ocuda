@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Promenade external resource management
 - Promenade site setting management
 - Posts to Ops homepage
+- Podcast functionality to promenade
 
 ### Changed
 - Default to only logging Warnings for Microsoft and System namespaces
