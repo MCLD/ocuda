@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.ServiceModel.Syndication;
@@ -197,6 +198,8 @@ namespace Ocuda.Promenade.Controllers
             {
                 return NotFound();
             }
+
+            long lastModified = podcast.UpdatedAt.Ticks;
 
             var podcastItems = await _podcastService.GetItemsByPodcastIdAsync(podcast.Id, true);
 
@@ -398,6 +401,11 @@ namespace Ocuda.Promenade.Controllers
                 }
 
                 items.Add(item);
+
+                lastModified = Math.Max(
+                    Math.Max(podcastItem.UpdatedAt.Ticks,
+                        podcastItem.PublishDate?.Ticks ?? 0),
+                    lastModified);
             }
 
             feed.Items = items;
@@ -410,16 +418,20 @@ namespace Ocuda.Promenade.Controllers
                 Indent = true
             };
 
-            using (var stream = new MemoryStream())
+            using var stream = new MemoryStream();
+            using (var xmlWriter = XmlWriter.Create(stream, settings))
             {
-                using (var xmlWriter = XmlWriter.Create(stream, settings))
-                {
-                    var rssFormatter = new Rss20FeedFormatter(feed, false);
-                    rssFormatter.WriteTo(xmlWriter);
-                    xmlWriter.Flush();
-                }
-                return File(stream.ToArray(), "application/rss+xml; charset=utf-8");
+                var rssFormatter = new Rss20FeedFormatter(feed, false);
+                rssFormatter.WriteTo(xmlWriter);
+                xmlWriter.Flush();
             }
+
+            Response.Headers.Add("Last-Modified",
+                new DateTime(lastModified)
+                    .ToUniversalTime()
+                    .ToString("R", CultureInfo.InvariantCulture));
+
+            return File(stream.ToArray(), "application/rss+xml; charset=utf-8");
         }
     }
 }
