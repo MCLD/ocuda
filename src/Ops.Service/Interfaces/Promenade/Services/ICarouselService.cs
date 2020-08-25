@@ -16,5 +16,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<CarouselItem> EditItemAsync(CarouselItem carouselItem);
         Task<Carousel> GetCarouselDetailsAsync(int id, int languageId);
         Task<DataWithCount<ICollection<Carousel>>> GetPaginatedListAsync(BaseFilter filter);
+        Task<CarouselItemText> SetItemTextAsync(CarouselItemText itemText);
+        Task UpdateItemSortOrder(int id, bool increase);
     }
 }

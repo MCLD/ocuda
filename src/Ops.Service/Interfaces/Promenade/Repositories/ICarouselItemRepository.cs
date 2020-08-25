@@ -6,6 +6,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     public interface ICarouselItemRepository : IGenericRepository<CarouselItem>
     {
         Task<CarouselItem> FindAsync(int id);
+        Task<CarouselItem> GetByCarouselAndOrderAsync(int carouselId, int order);
         Task<int?> GetMaxSortOrderForCarouselAsync(int carouselId);
     }
 }

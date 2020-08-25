@@ -7,6 +7,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Carousels
     public class DetailViewModel
     {
         public Carousel Carousel { get; set; }
+        public int CarouselId { get; set; }
+
         public CarouselText CarouselText { get; set; }
 
         public CarouselItem CarouselItem { get; set; }
