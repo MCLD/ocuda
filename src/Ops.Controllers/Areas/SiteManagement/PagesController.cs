@@ -22,7 +22,6 @@ using Ocuda.Utility.Models;
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 {
     [Area("SiteManagement")]
-    [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]/[controller]")]
     public class PagesController : BaseController<PagesController>
     {
@@ -85,7 +84,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 PageHeaders = headerList.Data,
                 PaginateModel = paginateModel,
-                PageType = filter.PageType.Value
+                PageType = filter.PageType.Value,
+                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
+                PermissionIds = UserClaims(ClaimType.PermissionId)
             };
 
             return View(viewModel);
@@ -93,6 +94,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> Create(IndexViewModel model)
         {
             JsonResponse response;
@@ -142,6 +144,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> Edit(IndexViewModel model)
         {
             JsonResponse response;
@@ -184,6 +187,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> Delete(IndexViewModel model)
         {
             try
@@ -223,6 +227,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [Route("[action]/{id}")]
         [RestoreModelState]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> Detail(int id, string language)
         {
             var header = await _pageService.GetHeaderByIdAsync(id);
@@ -268,6 +273,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpPost]
         [Route("[action]/{id?}")]
         [SaveModelState]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> Detail(DetailViewModel model)
         {
             var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
@@ -304,6 +310,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> DeletePage(DetailViewModel model)
         {
             var page = await _pageService.GetByHeaderAndLanguageAsync(model.HeaderId,
@@ -353,6 +360,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         [Route("[action]/{id}")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> ContentPermissions(int id)
         {
             var header = await _pageService.GetHeaderByIdAsync(id);
@@ -390,6 +398,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]/{headerId}/{permissionGroupId}")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> AddPermissionGroup(int headerId, int permissionGroupId)
         {
             try
@@ -408,6 +417,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]/{headerId}/{permissionGroupId}")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> RemovePermissionGroup(int headerId, int permissionGroupId)
         {
             try

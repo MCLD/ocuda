@@ -10,5 +10,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
         public PaginateModel PaginateModel { get; set; }
         public PageType PageType { get; set; }
         public PageHeader PageHeader { get; set; }
+        public bool IsSiteManager { get; set; }
+        public IList<string> PermissionIds { get; set; }
     }
 }

@@ -24,6 +24,9 @@ namespace Ocuda.Promenade.Models.Entities
 
         [NotMapped]
         public ICollection<string> PageLanguages { get; set; }
+
+        [NotMapped]
+        public IEnumerable<string> PermissionGroupIds { get; set; }
     }
 
     public enum PageType

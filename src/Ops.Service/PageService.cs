@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
@@ -17,17 +20,22 @@ namespace Ocuda.Ops.Service
     {
         private readonly IPageHeaderRepository _pageHeaderRepository;
         private readonly IPageRepository _pageRepository;
+        private readonly IPermissionGroupPageContentRepository
+            _permissionGroupPageContentRepository;
 
         public PageService(ILogger<PageService> logger,
             IHttpContextAccessor httpContextAccessor,
             IPageHeaderRepository pageHeaderRepository,
-            IPageRepository pageRepository)
+            IPageRepository pageRepository,
+            IPermissionGroupPageContentRepository permissionGroupPageContentRepository)
             : base(logger, httpContextAccessor)
         {
             _pageHeaderRepository = pageHeaderRepository
                 ?? throw new ArgumentNullException(nameof(pageRepository));
             _pageRepository = pageRepository
                 ?? throw new ArgumentNullException(nameof(pageRepository));
+            _permissionGroupPageContentRepository = permissionGroupPageContentRepository
+                ?? throw new ArgumentNullException(nameof(permissionGroupPageContentRepository));
         }
 
         public async Task<Page> GetByHeaderAndLanguageAsync(int headerId, int languageId)
@@ -68,7 +76,15 @@ namespace Ocuda.Ops.Service
         public async Task<DataWithCount<ICollection<PageHeader>>> GetPaginatedHeaderListAsync(
             PageFilter filter)
         {
-            return await _pageHeaderRepository.GetPaginatedListAsync(filter);
+            var headerList = await _pageHeaderRepository.GetPaginatedListAsync(filter);
+            foreach (var header in headerList.Data)
+            {
+                var perms
+                    = await _permissionGroupPageContentRepository.GetByPageHeaderId(header.Id);
+                header.PermissionGroupIds = perms.Select(_ => _.PermissionGroupId
+                    .ToString(CultureInfo.InvariantCulture));
+            }
+            return headerList;
         }
 
         public async Task<PageHeader> GetHeaderByIdAsync(int id)

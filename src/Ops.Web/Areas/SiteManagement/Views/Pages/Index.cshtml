@@ -109,7 +109,7 @@ else
     <div class="row">
         <div class="col-12">
             <div>
-                <table class="table table-sm table-bordered link-table">
+                <table class="table table-sm table-bordered table-hover table-striped">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -123,40 +123,58 @@ else
                         @foreach (var header in Model.PageHeaders)
                         {
                             <tr>
-                                <td class="td-class">
+                                <td class="align-middle">
                                     <a asp-action="@(nameof(PagesController.Detail))"
-                                       asp-route-id="@header.Id"
-                                       class="rowlink">
+                                       asp-route-id="@header.Id">
                                         @header.PageName
                                     </a>
                                 </td>
-                                <td>@header.Stub</td>
-                                <td>@header.Type.ToString()</td>
-                                <td> @string.Join(", ", header.PageLanguages)</td>
-                                <td align="center" class="on-top">
-                                    <a asp-action="@(nameof(PagesController.ContentPermissions))"
-                                       asp-route-id="@header.Id"
-                                       class="btn btn-primary btn-xs">
-                                        <span class="fas fa-user-plus" aria-hidden="true"></span>
-                                    </a>
-                                    <button type="button"
-                                            class="btn btn-primary btn-xs"
-                                            data-toggle="modal"
-                                            data-target="#editModal"
-                                            data-id="@header.Id"
-                                            data-name="@header.PageName"
-                                            data-stub="@header.Stub"
-                                            data-type="@((int)header.Type)">
-                                        <span class="fas fa-edit" aria-hidden="true"></span>
-                                    </button>
-                                    <button type="button"
-                                            class="btn btn-danger btn-xs"
-                                            data-toggle="modal"
-                                            data-target="#deleteModal"
-                                            data-id="@header.Id"
-                                            data-name="@header.PageName">
-                                        <span class="fas fa-times" aria-hidden="true"></span>
-                                    </button>
+                                <td class="align-middle">@header.Stub</td>
+                                <td class="align-middle">@header.Type.ToString()</td>
+                                <td class="align-middle">@string.Join(", ", header.PageLanguages)</td>
+                                <td class="align-middle">
+                                    @if (Model.IsSiteManager)
+                                    {
+                                        <a asp-action="@(nameof(PagesController.ContentPermissions))"
+                                           asp-route-id="@header.Id"
+                                           title="Page content permissions"
+                                           class="btn btn-link">
+                                            <span class="fas fa-user-plus" aria-hidden="true"></span>
+                                        </a>
+                                        <button type="button"
+                                                class="btn btn-link"
+                                                data-toggle="modal"
+                                                data-target="#editModal"
+                                                data-id="@header.Id"
+                                                data-name="@header.PageName"
+                                                data-stub="@header.Stub"
+                                                data-type="@((int)header.Type)"
+                                                title="Edit page name">
+                                            <span class="fas fa-cog" aria-hidden="true"></span>
+                                        </button>
+                                    }
+                                    @if (Model.IsSiteManager
+                                       || Model.PermissionIds.Any(_ => header.PermissionGroupIds.Contains(_)))
+                                    {
+                                        <a asp-action="@(nameof(PagesController.Detail))"
+                                           asp-route-id="@header.Id"
+                                           class="btn btn-link"
+                                           title="Edit page content">
+                                            <span class="far fa-file-alt" aria-hidden="true"></span>
+                                        </a>
+                                    }
+                                    @if (Model.IsSiteManager)
+                                    {
+                                        <button type="button"
+                                                class="btn btn-link"
+                                                data-toggle="modal"
+                                                data-target="#deleteModal"
+                                                data-id="@header.Id"
+                                                data-name="@header.PageName"
+                                                title="Delete page">
+                                            <span class="far fa-trash-alt" aria-hidden="true"></span>
+                                        </button>
+                                    }
                                 </td>
                             </tr>
                         }
