@@ -123,15 +123,6 @@ namespace Ocuda.Ops.Models.Defaults
                 Value = "",
                 Type = SiteSettingType.StringNullable
             },
-            new SiteSetting
-            {
-                Id = Keys.SiteSetting.SiteManagement.OpsUrl,
-                Name = "Ops Url",
-                Description = "Ops url with scheme and host",
-                Category = "Site Management",
-                Value = "",
-                Type = SiteSettingType.StringNullable
-            },
             #endregion
             #region UserInterface
             new SiteSetting
