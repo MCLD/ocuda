@@ -242,6 +242,8 @@ ModelManifest.xml
 
 
 ##### Project-specific #####
+dist/*
+
 src/Ops.Web/logs/*
 src/Ops.Web/shared/*
 src/Ops.Web.WindowsAuth/logs/*
