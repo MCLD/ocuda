@@ -3,7 +3,7 @@ namespace Ocuda.Utility.Models
 {
     public enum CoverIssueType
     {
-        New,
+        Open,
         Closed
     }
 }

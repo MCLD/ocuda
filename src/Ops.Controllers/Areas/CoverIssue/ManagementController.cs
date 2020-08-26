@@ -37,7 +37,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
         {
             var filter = new CoverIssueFilter(page)
             {
-                CoverIssueType = type ?? CoverIssueType.New
+                CoverIssueType = type ?? CoverIssueType.Open
             };
             var headers = await _coverIssueService.GetPaginatedHeaderListAsync(filter);
 

@@ -46,7 +46,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             var items = DbSet.AsNoTracking();
 
-            return filter.CoverIssueType == CoverIssueType.New ?
+            return filter.CoverIssueType == CoverIssueType.Open ?
                 items.Where(_ => _.HasPendingIssue)
                 : items.Where(_ => !_.HasPendingIssue);
         }
