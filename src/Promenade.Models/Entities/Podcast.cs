@@ -58,5 +58,11 @@ namespace Ocuda.Promenade.Models.Entities
         public ICollection<PodcastItem> PodcastItems { get; set; }
 
         public DateTime UpdatedAt { get; set; }
+
+        [MaxLength(255)]
+        public string Subtitle { get; set; }
+
+        [MaxLength(255)]
+        public string Copyright { get; set; }
     }
 }

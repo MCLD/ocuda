@@ -51,6 +51,7 @@ namespace Ocuda.Promenade.Controllers
                 CurrentPage = page,
                 ItemsPerPage = filter.Take.Value
             };
+
             if (paginateModel.PastMaxPage)
             {
                 return RedirectToRoute(
@@ -108,6 +109,7 @@ namespace Ocuda.Promenade.Controllers
                 CurrentPage = page,
                 ItemsPerPage = filter.Take.Value
             };
+
             if (paginateModel.PastMaxPage)
             {
                 return RedirectToRoute(
@@ -235,12 +237,23 @@ namespace Ocuda.Promenade.Controllers
                     podcastUri)
             {
                 Language = podcast.Language,
-                ImageUrl = imageUrl
+                ImageUrl = imageUrl,
             };
+
+            if (!string.IsNullOrEmpty(podcast.Copyright))
+            {
+                feed.Copyright = new TextSyndicationContent(podcast.Copyright);
+            }
+
             feed.AttributeExtensions.Add(googleName, googleNS.ToString());
             feed.AttributeExtensions.Add(itunesName, itunesNS.ToString());
 
             feed.ElementExtensions.Add("title", itunesNS.ToString(), podcast.Title);
+
+            if (!string.IsNullOrEmpty(podcast.Subtitle))
+            {
+                feed.ElementExtensions.Add("subtitle", itunesNS.ToString(), podcast.Subtitle);
+            }
 
             feed.ElementExtensions.Add("description", googleNS.ToString(), podcast.Description);
             feed.ElementExtensions.Add("summary", itunesNS.ToString(), podcast.Description);
@@ -328,10 +341,18 @@ namespace Ocuda.Promenade.Controllers
 
                 item.ElementExtensions.Add("title", itunesNS.ToString(), podcastItem.Title);
 
+                if (!string.IsNullOrEmpty(podcastItem.Subtitle))
+                {
+                    feed.ElementExtensions.Add("subtitle", itunesNS.ToString(), podcastItem.Subtitle);
+                }
+
                 item.ElementExtensions.Add("description", googleNS.ToString(),
                     podcastItem.Description);
                 item.ElementExtensions.Add("summary", itunesNS.ToString()
                     , podcastItem.Description);
+
+                feed.ElementExtensions.Add("author", googleNS.ToString(), podcast.Author);
+                feed.ElementExtensions.Add("author", itunesNS.ToString(), podcast.Author);
 
                 item.Links.Add(SyndicationLink.CreateMediaEnclosureLink(
                     new UriBuilder()
@@ -354,7 +375,9 @@ namespace Ocuda.Promenade.Controllers
 
                 if (!string.IsNullOrWhiteSpace(podcastItem.Keywords))
                 {
-                    item.ElementExtensions.Add("keywords", itunesNS.ToString(), podcastItem.Keywords);
+                    item.ElementExtensions.Add("keywords",
+                        itunesNS.ToString(),
+                        podcastItem.Keywords);
                 }
 
                 if (!string.IsNullOrWhiteSpace(podcastItem.ImageUrl))
@@ -409,6 +432,8 @@ namespace Ocuda.Promenade.Controllers
             }
 
             feed.Items = items;
+
+            feed.LastUpdatedTime = new DateTime(lastModified);
 
             var settings = new XmlWriterSettings
             {

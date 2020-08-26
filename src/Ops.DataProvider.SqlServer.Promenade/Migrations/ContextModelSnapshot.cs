@@ -711,6 +711,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("nvarchar(1000)")
                         .HasMaxLength(1000);
 
+                    b.Property<string>("Copyright")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(1000)")
@@ -755,6 +759,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(50)")
                         .HasMaxLength(50);
+
+                    b.Property<string>("Subtitle")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -874,6 +882,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(50)")
                         .HasMaxLength(50);
+
+                    b.Property<string>("Subtitle")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
 
                     b.Property<string>("Title")
                         .IsRequired()
