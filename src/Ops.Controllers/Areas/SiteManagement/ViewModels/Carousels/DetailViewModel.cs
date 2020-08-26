@@ -22,6 +22,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Carousels
         [DisplayName("Language")]
         public string SelectLanguage { get; set; }
 
+        public SelectList LabelList { get; set; }
+
         public int? FocusItemId { get; set; }
     }
 }

@@ -169,7 +169,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting carousel: {Message}", ex.Message);
-                ShowAlertDanger("Unable to delete carousel: ", ex.Message);
+                ShowAlertDanger($"Error deleting carousel: {model.Carousel.Name}");
             }
 
             return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
@@ -196,6 +196,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 LanguageId = selectedLanguage.Id,
                 LanguageList = new SelectList(languages, nameof(Language.Name),
                     nameof(Language.Description), selectedLanguage.Name),
+                LabelList = new SelectList(await _carouselService.GetButtonLabelsAsync(), 
+                    nameof(CarouselButtonLabel.Id), nameof(Carousel.Name))
             };
 
             return View(viewModel);
@@ -258,6 +260,30 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
 
             return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeleteCarouselItem(DetailViewModel model)
+        {
+            try
+            {
+                await _carouselService.DeleteItemAsync(model.CarouselItem.Id);
+                ShowAlertSuccess($"Deleted item: {model.CarouselItem.Name}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting carousel item: {Message}", ex.Message);
+                ShowAlertDanger($"Error deleting item: {model.Carousel.Name}");
+            }
+
+            var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
+
+            return RedirectToAction(nameof(Detail), new
+            {
+                id = model.Carousel.Id,
+                language = language.IsDefault ? null : language.Name
+            });
         }
 
         [HttpPost]

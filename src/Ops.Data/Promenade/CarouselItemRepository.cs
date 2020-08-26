@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -39,6 +40,14 @@ namespace Ocuda.Ops.Data.Promenade
                 .AsNoTracking()
                 .Where(_ => _.CarouselId == carouselId && _.Order == order)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<CarouselItem>> GetCarouselSubsequentAsync(int carouselId, int order)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.CarouselId == carouselId && _.Order > order)
+                .ToListAsync();
         }
     }
 }
