@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.ServiceModel.Syndication;
@@ -50,6 +51,7 @@ namespace Ocuda.Promenade.Controllers
                 CurrentPage = page,
                 ItemsPerPage = filter.Take.Value
             };
+
             if (paginateModel.PastMaxPage)
             {
                 return RedirectToRoute(
@@ -107,6 +109,7 @@ namespace Ocuda.Promenade.Controllers
                 CurrentPage = page,
                 ItemsPerPage = filter.Take.Value
             };
+
             if (paginateModel.PastMaxPage)
             {
                 return RedirectToRoute(
@@ -198,6 +201,8 @@ namespace Ocuda.Promenade.Controllers
                 return NotFound();
             }
 
+            long lastModified = podcast.UpdatedAt.Ticks;
+
             var podcastItems = await _podcastService.GetItemsByPodcastIdAsync(podcast.Id, true);
 
             if (podcastItems.Count == 0)
@@ -232,12 +237,23 @@ namespace Ocuda.Promenade.Controllers
                     podcastUri)
             {
                 Language = podcast.Language,
-                ImageUrl = imageUrl
+                ImageUrl = imageUrl,
             };
+
+            if (!string.IsNullOrEmpty(podcast.Copyright))
+            {
+                feed.Copyright = new TextSyndicationContent(podcast.Copyright);
+            }
+
             feed.AttributeExtensions.Add(googleName, googleNS.ToString());
             feed.AttributeExtensions.Add(itunesName, itunesNS.ToString());
 
             feed.ElementExtensions.Add("title", itunesNS.ToString(), podcast.Title);
+
+            if (!string.IsNullOrEmpty(podcast.Subtitle))
+            {
+                feed.ElementExtensions.Add("subtitle", itunesNS.ToString(), podcast.Subtitle);
+            }
 
             feed.ElementExtensions.Add("description", googleNS.ToString(), podcast.Description);
             feed.ElementExtensions.Add("summary", itunesNS.ToString(), podcast.Description);
@@ -325,10 +341,18 @@ namespace Ocuda.Promenade.Controllers
 
                 item.ElementExtensions.Add("title", itunesNS.ToString(), podcastItem.Title);
 
+                if (!string.IsNullOrEmpty(podcastItem.Subtitle))
+                {
+                    feed.ElementExtensions.Add("subtitle", itunesNS.ToString(), podcastItem.Subtitle);
+                }
+
                 item.ElementExtensions.Add("description", googleNS.ToString(),
                     podcastItem.Description);
                 item.ElementExtensions.Add("summary", itunesNS.ToString()
                     , podcastItem.Description);
+
+                feed.ElementExtensions.Add("author", googleNS.ToString(), podcast.Author);
+                feed.ElementExtensions.Add("author", itunesNS.ToString(), podcast.Author);
 
                 item.Links.Add(SyndicationLink.CreateMediaEnclosureLink(
                     new UriBuilder()
@@ -351,7 +375,9 @@ namespace Ocuda.Promenade.Controllers
 
                 if (!string.IsNullOrWhiteSpace(podcastItem.Keywords))
                 {
-                    item.ElementExtensions.Add("keywords", itunesNS.ToString(), podcastItem.Keywords);
+                    item.ElementExtensions.Add("keywords",
+                        itunesNS.ToString(),
+                        podcastItem.Keywords);
                 }
 
                 if (!string.IsNullOrWhiteSpace(podcastItem.ImageUrl))
@@ -398,9 +424,16 @@ namespace Ocuda.Promenade.Controllers
                 }
 
                 items.Add(item);
+
+                lastModified = Math.Max(
+                    Math.Max(podcastItem.UpdatedAt.Ticks,
+                        podcastItem.PublishDate?.Ticks ?? 0),
+                    lastModified);
             }
 
             feed.Items = items;
+
+            feed.LastUpdatedTime = new DateTime(lastModified);
 
             var settings = new XmlWriterSettings
             {
@@ -410,16 +443,20 @@ namespace Ocuda.Promenade.Controllers
                 Indent = true
             };
 
-            using (var stream = new MemoryStream())
+            using var stream = new MemoryStream();
+            using (var xmlWriter = XmlWriter.Create(stream, settings))
             {
-                using (var xmlWriter = XmlWriter.Create(stream, settings))
-                {
-                    var rssFormatter = new Rss20FeedFormatter(feed, false);
-                    rssFormatter.WriteTo(xmlWriter);
-                    xmlWriter.Flush();
-                }
-                return File(stream.ToArray(), "application/rss+xml; charset=utf-8");
+                var rssFormatter = new Rss20FeedFormatter(feed, false);
+                rssFormatter.WriteTo(xmlWriter);
+                xmlWriter.Flush();
             }
+
+            Response.Headers.Add("Last-Modified",
+                new DateTime(lastModified)
+                    .ToUniversalTime()
+                    .ToString("R", CultureInfo.InvariantCulture));
+
+            return File(stream.ToArray(), "application/rss+xml; charset=utf-8");
         }
     }
 }

@@ -71,6 +71,16 @@
         public static readonly string PromPage = "page.{0}.{1}.{2}";
 
         /// <summary>
+        /// Cached podcast info, {0} is the podcast stub, {1} is whether to include blocked items
+        /// </summary>
+        public static readonly string PromPodcast = "podcast.{0}.{1}";
+
+        /// <summary>
+        /// Cached podcast items, {0} is the podcast id, {1} is whether to include blocked items
+        /// </summary>
+        public static readonly string PromPodcastItems = "podcastitems.{0}.{1}";
+
+        /// <summary>
         /// Cached redirect path, {0} is the requested path
         /// </summary>
         public static readonly string PromRedirectPath = "redir.{0}";

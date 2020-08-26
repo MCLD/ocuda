@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
@@ -60,7 +61,11 @@ namespace Ocuda.Promenade.Web
                 services.AddApplicationInsightsTelemetry();
             }
 
-            services.AddResponseCompression();
+            services.AddResponseCompression(_ =>
+            {
+                _.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                        new[] { "application/rss+xml" });
+            });
 
             services.AddResponseCaching();
 

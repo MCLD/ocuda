@@ -58,5 +58,10 @@ namespace Ocuda.Promenade.Models.Entities
         public bool IsBlocked { get; set; }
 
         public bool IsDeleted { get; set; }
+
+        public DateTime UpdatedAt { get; set; }
+
+        [MaxLength(255)]
+        public string Subtitle { get; set; }
     }
 }
