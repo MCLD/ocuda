@@ -152,9 +152,9 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
                 filePath = Path.Combine(filePath, CoverIssueBookmarklet);
                 using (var sr = new StreamReader(filePath))
                 {
-                    var baseUrl = await _siteSettingService
-                        .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.OpsUrl);
-                    var bookmarklet = sr.ReadToEnd();
+                    var baseUrl = Url.Action(nameof(Report), Name, new { bibId = 0 }, Request.Scheme);
+                    baseUrl = baseUrl.TrimEnd('0');
+                    var bookmarklet = await sr.ReadToEndAsync();
                     bookmarklet = bookmarklet.Replace("{0}", baseUrl).Trim();
                     return Json(new { success = true, bookmarklet });
                 }
