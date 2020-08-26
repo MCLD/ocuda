@@ -18,6 +18,26 @@
     </div>
 </form>
 
+<form asp-action="@(nameof(CarouselsController.DeleteCarouselItem))" method="post" role="form">
+    <input id="deleteItemCarousel" asp-for="Carousel.Id" type="hidden" />
+    <input id="deleteItemLanguage" asp-for="LanguageId" type="hidden" />
+
+
+    <input id="deleteItemId" asp-for="CarouselItem.Id" type="hidden" />
+    <input id="deleteItemName" asp-for="CarouselItem.Name" type="hidden" />
+
+    <div modal id="deleteItemModal" name="Carousel Item" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+</form>
+
+<form id="addItemButtonModal">
+    <input id="addCarouselItemLanguage" asp-for="LanguageId" type="hidden" />
+    <input id="addCarouselItemCarouselId" asp-for="CarouselItem.CarouselId" value="@Model.Carousel.Id" type="hidden" />
+
+    <div modal id="addCarouselItemModal" isLarge="true" name="Carousel Item" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+        <input id="addCarouselItemName" asp-for="CarouselItem.Name" formgroup />
+    </div>
+</form>
+
 <div class="row pt-1">
     <div class="col-12">
         <input asp-for="Carousel.Name" formgroup readonly />
@@ -71,8 +91,11 @@
                                     disabled="@(item.Id == Model.Carousel.Items.Last().Id ? "disabled" : null)">
                                 <span class="fas fa-arrow-down"></span>
                             </button>
-                            <button class="btn btn-sm btn-danger itemDelete"
-                                    data-id="@item.Id">
+                            <button class="btn btn-sm btn-danger"
+                                    data-toggle="modal"
+                                    data-target="#deleteItemModal"
+                                    data-id="@item.Id"
+                                    data-name="@item.Name">
                                 <span class="fas fa-times"></span>
                             </button>
                         </div>
@@ -95,6 +118,12 @@
                                 Save
                             </button>
                         </form>
+                        <hr />
+                        <button class="btn btn-outline-secondary text-dark"
+                                data-toggle="modal"
+                                data-target="#addItemButtonModal">
+                            Add button
+                        </button>
                     </div>
                 </div>
             </div>
@@ -132,6 +161,16 @@
                     ResetSpinners(form.find(".btn-spinner"));
                 }
             });
+        });
+
+        $("#deleteItemModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+            var modal = $(this);
+            $("#deleteItemId").val(id);
+            $("#deleteItemName").val(name);
+            modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
         });
 
         $(".changeSort").on("click", function () {

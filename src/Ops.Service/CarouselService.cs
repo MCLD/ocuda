@@ -16,6 +16,7 @@ namespace Ocuda.Ops.Service
 {
     public class CarouselService : BaseService<CarouselService>, ICarouselService
     {
+        private readonly ICarouselButtonLabelRepository _carouselButtonLabelRepository;
         private readonly ICarouselItemRepository _carouselItemRepository;
         private readonly ICarouselItemTextRepository _carouselItemTextRepository;
         private readonly ICarouselRepository _carouselRepository;
@@ -23,12 +24,15 @@ namespace Ocuda.Ops.Service
 
         public CarouselService(ILogger<CarouselService> logger,
             IHttpContextAccessor httpContextAccessor,
+            ICarouselButtonLabelRepository carouselButtonLabelRepository,
             ICarouselItemRepository carouselItemRepository,
             ICarouselItemTextRepository carouselItemTextRepository,
             ICarouselRepository carouselRepository,
             ICarouselTextRepository carouselTextRepository)
             : base(logger, httpContextAccessor)
         {
+            _carouselButtonLabelRepository = carouselButtonLabelRepository
+                ?? throw new ArgumentNullException(nameof(carouselButtonLabelRepository));
             _carouselItemRepository = carouselItemRepository
                 ?? throw new ArgumentNullException(nameof(carouselItemRepository));
             _carouselItemTextRepository = carouselItemTextRepository
@@ -119,6 +123,15 @@ namespace Ocuda.Ops.Service
         {
             var carouselItem = await _carouselItemRepository.FindAsync(carouselItemId);
 
+            var subsequentItems = await _carouselItemRepository.GetCarouselSubsequentAsync(
+                carouselItem.CarouselId, carouselItem.Order);
+
+            if (subsequentItems.Count > 0)
+            {
+                subsequentItems.ForEach(_ => _.Order--);
+                _carouselItemRepository.UpdateRange(subsequentItems);
+            }
+
             _carouselItemRepository.Remove(carouselItem);
             await _carouselItemRepository.SaveAsync();
         }
@@ -186,6 +199,9 @@ namespace Ocuda.Ops.Service
             }
         }
 
-
+        public async Task<ICollection<CarouselButtonLabel>> GetButtonLabelsAsync()
+        {
+            return await _carouselButtonLabelRepository.GetAllAsync();
+        }
     }
 }

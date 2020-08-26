@@ -222,6 +222,10 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserRepository,
                 Data.Ops.UserRepository>();
 
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselButtonLabelRepository,
+                Data.Promenade.CarouselButtonLabelRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselButtonRepository,
+                Data.Promenade.CarouselButtonRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselItemRepository,
                 Data.Promenade.CarouselItemRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselItemTextRepository,
