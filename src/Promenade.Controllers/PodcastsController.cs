@@ -343,7 +343,9 @@ namespace Ocuda.Promenade.Controllers
 
                 if (!string.IsNullOrEmpty(podcastItem.Subtitle))
                 {
-                    feed.ElementExtensions.Add("subtitle", itunesNS.ToString(), podcastItem.Subtitle);
+                    item.ElementExtensions.Add("subtitle",
+                        itunesNS.ToString(),
+                        podcastItem.Subtitle);
                 }
 
                 item.ElementExtensions.Add("description", googleNS.ToString(),
@@ -423,12 +425,17 @@ namespace Ocuda.Promenade.Controllers
                     item.ElementExtensions.Add("block", itunesNS.ToString(), "Yes");
                 }
 
+                var itemLastModified = Math.Max(podcastItem.UpdatedAt.Ticks,
+                    podcastItem.PublishDate?.Ticks ?? 0);
+
+                if (itemLastModified > 0)
+                {
+                    item.LastUpdatedTime = new DateTime(itemLastModified);
+                }
+
                 items.Add(item);
 
-                lastModified = Math.Max(
-                    Math.Max(podcastItem.UpdatedAt.Ticks,
-                        podcastItem.PublishDate?.Ticks ?? 0),
-                    lastModified);
+                lastModified = Math.Max(itemLastModified, lastModified);
             }
 
             feed.Items = items;
