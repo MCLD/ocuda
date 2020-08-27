@@ -351,8 +351,8 @@ namespace Ocuda.Promenade.Controllers
                 item.ElementExtensions.Add("summary", itunesNS.ToString()
                     , podcastItem.Description);
 
-                feed.ElementExtensions.Add("author", googleNS.ToString(), podcast.Author);
-                feed.ElementExtensions.Add("author", itunesNS.ToString(), podcast.Author);
+                item.ElementExtensions.Add("author", googleNS.ToString(), podcast.Author);
+                item.ElementExtensions.Add("author", itunesNS.ToString(), podcast.Author);
 
                 item.Links.Add(SyndicationLink.CreateMediaEnclosureLink(
                     new UriBuilder()
