@@ -92,13 +92,16 @@
     </div>
 </div>
 
-<div class="mb-2">
-    <button class="btn btn-outline-secondary text-dark"
-            data-toggle="modal"
-            data-target="#addModal">
-        Create Page
-    </button>
-</div>
+@if (Model.IsSiteManager)
+{
+    <div class="mb-2">
+        <button class="btn btn-outline-secondary text-dark"
+                data-toggle="modal"
+                data-target="#addModal">
+            Create Page
+        </button>
+    </div>
+}
 
 @if (Model.PageHeaders.Count() == 0)
 {
@@ -124,10 +127,17 @@ else
                         {
                             <tr>
                                 <td class="align-middle">
-                                    <a asp-action="@(nameof(PagesController.Detail))"
-                                       asp-route-id="@header.Id">
+                                    @if (Model.IsSiteManager || Model.PermissionIds.Any(_ => header.PermissionGroupIds.Contains(_)))
+                                    {
+                                        <a asp-action="@(nameof(PagesController.Detail))"
+                                           asp-route-id="@header.Id">
+                                            @header.PageName
+                                        </a>
+                                    }
+                                    else
+                                    {
                                         @header.PageName
-                                    </a>
+                                    }
                                 </td>
                                 <td class="align-middle">@header.Stub</td>
                                 <td class="align-middle">@header.Type.ToString()</td>
@@ -153,8 +163,7 @@ else
                                             <span class="fas fa-cog" aria-hidden="true"></span>
                                         </button>
                                     }
-                                    @if (Model.IsSiteManager
-                                       || Model.PermissionIds.Any(_ => header.PermissionGroupIds.Contains(_)))
+                                    @if (Model.IsSiteManager || Model.PermissionIds.Any(_ => header.PermissionGroupIds.Contains(_)))
                                     {
                                         <a asp-action="@(nameof(PagesController.Detail))"
                                            asp-route-id="@header.Id"

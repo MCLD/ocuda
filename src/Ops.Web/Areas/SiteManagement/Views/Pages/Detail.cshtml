@@ -53,17 +53,20 @@
                         }
                     </div>
                 </div>
-                <div class="col-3">
-                    <button type="button"
-                            class="btn btn-danger float-right"
-                            data-toggle="modal"
-                            data-target="#deleteModal"
-                            data-headerId="@Model.Page.PageHeaderId"
-                            data-languageId="@Model.LanguageId"
-                            data-languageDescription="@Model.LanguageDescription">
-                        Delete
-                    </button>
-                </div>
+                @if (Model.IsSiteManager)
+                {
+                    <div class="col-3">
+                        <button type="button"
+                                class="btn btn-danger float-right"
+                                data-toggle="modal"
+                                data-target="#deleteModal"
+                                data-headerId="@Model.Page.PageHeaderId"
+                                data-languageId="@Model.LanguageId"
+                                data-languageDescription="@Model.LanguageDescription">
+                            Delete
+                        </button>
+                    </div>
+                }
             </div>
         </div>
     </div>

@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Filters;
@@ -141,6 +144,13 @@ namespace Ocuda.Ops.Controllers.Abstract
                     return -1;
                 }
             }
+        }
+
+        protected IActionResult RedirectToUnauthorized()
+        {
+            return RedirectToAction(nameof(HomeController.Unauthorized),
+               HomeController.Name,
+               new { area = "", returnUrl = Request.Path });
         }
     }
 }

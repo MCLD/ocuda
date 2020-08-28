@@ -79,6 +79,13 @@ namespace Ocuda.Ops.Controllers.Filters
 
                 bool authenticateUser = usernameClaim == null;
 
+                var reauth = context.HttpContext.Request.Query["reauthenticate"];
+
+                if (reauth.Count > 0)
+                {
+                    authenticateUser = true;
+                }
+
                 if (!authenticateUser)
                 {
                     // user is logged in, ensure they exist in the database
@@ -249,6 +256,7 @@ namespace Ocuda.Ops.Controllers.Filters
 
                         var sectionManagerOf = new List<string>();
                         var claimantOf = new Dictionary<string, string>();
+                        var inPermissionGroup = new List<int>();
 
                         // loop through group names and look up if each group provides claims
                         // claims can be provided via ClaimGroups or SectionManagerGroups
@@ -273,8 +281,7 @@ namespace Ocuda.Ops.Controllers.Filters
                                     .Where(_ => _.GroupName == groupName);
                                 foreach (var permission in permissionList)
                                 {
-                                    claimantOf.Add(ClaimType.PermissionId,
-                                        permission.Id.ToString(CultureInfo.InvariantCulture));
+                                    inPermissionGroup.Add(permission.Id);
                                 }
 
                                 foreach (var sectionManaged
@@ -314,6 +321,12 @@ namespace Ocuda.Ops.Controllers.Filters
                             foreach (var claim in claimantOf)
                             {
                                 claims.Add(new Claim(claim.Key, claim.Value));
+                            }
+
+                            foreach (var permissionId in inPermissionGroup)
+                            {
+                                claims.Add(new Claim(ClaimType.PermissionId,
+                                    permissionId.ToString(CultureInfo.InvariantCulture)));
                             }
 
                             // add section management claims

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -225,11 +226,38 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
+
+        private async Task<bool> HasPagePermissionAsync(int pageHeaderId)
+        {
+            if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
+            {
+                return true;
+            }
+            else
+            {
+                var permissionClaims = UserClaims(ClaimType.PermissionId);
+                if (permissionClaims.Count > 0)
+                {
+                    var permissionGroups = await _permissionGroupService
+                        .GetPermissionsAsync(pageHeaderId);
+                    var permissionGroupsStrings = permissionGroups
+                        .Select(_ => _.PermissionGroupId.ToString(CultureInfo.InvariantCulture));
+
+                    return permissionClaims.Any(_ => permissionGroupsStrings.Contains(_));
+                }
+                return false;
+            }
+        }
+
         [Route("[action]/{id}")]
         [RestoreModelState]
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> Detail(int id, string language)
         {
+            if (!await HasPagePermissionAsync(id))
+            {
+                return RedirectToUnauthorized();
+            }
+
             var header = await _pageService.GetHeaderByIdAsync(id);
 
             var languages = await _languageService.GetActiveAsync();
@@ -253,7 +281,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 LanguageList = new SelectList(languages, nameof(Language.Name),
                     nameof(Language.Description), selectedLanguage.Name),
                 SocialCardList = new SelectList(await _socialCardService.GetListAsync(),
-                    nameof(SocialCard.Id), nameof(SocialCard.Title), page?.SocialCardId)
+                    nameof(SocialCard.Id), nameof(SocialCard.Title), page?.SocialCardId),
+                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
             };
 
             if (page?.IsPublished == true)
