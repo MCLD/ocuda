@@ -226,7 +226,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
-
         private async Task<bool> HasPagePermissionAsync(int pageHeaderId)
         {
             if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
@@ -239,7 +238,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 if (permissionClaims.Count > 0)
                 {
                     var permissionGroups = await _permissionGroupService
-                        .GetPermissionsAsync(pageHeaderId);
+                        .GetPagePermissionsAsync(pageHeaderId);
                     var permissionGroupsStrings = permissionGroups
                         .Select(_ => _.PermissionGroupId.ToString(CultureInfo.InvariantCulture));
 
@@ -292,7 +291,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                 if (!string.IsNullOrWhiteSpace(baseUrl))
                 {
-                    viewModel.PageUrl = $"{baseUrl}{selectedLanguage.Name}/{page.PageHeader.Type.ToString()}/{page.PageHeader.Stub}";
+                    viewModel.PageUrl = $"{baseUrl}{selectedLanguage.Name}/{page.PageHeader.Type}/{page.PageHeader.Stub}";
                 }
             }
 
@@ -302,9 +301,18 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpPost]
         [Route("[action]/{id?}")]
         [SaveModelState]
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> Detail(DetailViewModel model)
         {
+            if (model == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (!await HasPagePermissionAsync(model.HeaderId))
+            {
+                return RedirectToUnauthorized();
+            }
+
             var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
 
             if (ModelState.IsValid)
@@ -395,7 +403,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var header = await _pageService.GetHeaderByIdAsync(id);
 
             var permissionGroups = await _permissionGroupService.GetAllAsync();
-            var pagePermissions = await _permissionGroupService.GetPermissionsAsync(id);
+            var pagePermissions = await _permissionGroupService.GetPagePermissionsAsync(id);
 
             var availableGroups = new Dictionary<int, string>();
             var assignedGroups = new Dictionary<int, string>();

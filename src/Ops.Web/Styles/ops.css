@@ -76,11 +76,6 @@ a.rowlink {
     color: green;
 }
 
-.navbar .dropdown-item:hover {
-    color: inherit;
-    background: inherit;
-}
-
 .navcolumn {
     height: 100%;
     width: 0;
@@ -171,7 +166,7 @@ span.format-addr {
     font-style: italic;
 }
 
-td.group-item:hover, td.feature-item:hover{
+td.group-item:hover, td.feature-item:hover {
     cursor: pointer;
 }
 
@@ -179,15 +174,19 @@ tr.itemRow td {
     vertical-align: middle;
     word-wrap: break-word;
 }
+
 tr.row-link {
     cursor: pointer;
 }
-tr.row-link.selected {
-    background-color: lemonchiffon;
-}
-tr.row-link.selected:hover {
-    background-color: beige;
-}
+
+    tr.row-link.selected {
+        background-color: lemonchiffon;
+    }
+
+        tr.row-link.selected:hover {
+            background-color: beige;
+        }
+
 .stretched-link::after {
     position: absolute;
     top: 0;
@@ -239,7 +238,7 @@ a.rowlink {
         padding-top: 15px;
     }
 
-    .navcolumn a {
-        font-size: 18px;
-    }
+        .navcolumn a {
+            font-size: 18px;
+        }
 }

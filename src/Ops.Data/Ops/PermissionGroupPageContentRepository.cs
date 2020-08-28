@@ -19,6 +19,14 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
+        public async Task<bool> AnyPermissionGroupIdAsync(int[] permissionGroupIds)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => permissionGroupIds.Contains(_.PermissionGroupId))
+                .AnyAsync();
+        }
+
         public async Task<ICollection<PermissionGroupPageContent>> GetByPageHeaderId(int pageHeaderId)
         {
             return await DbSet

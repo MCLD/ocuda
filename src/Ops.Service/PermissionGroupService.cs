@@ -108,7 +108,7 @@ namespace Ocuda.Ops.Service
         }
 
         public async Task<ICollection<PermissionGroupPageContent>>
-            GetPermissionsAsync(int pageHeaderId)
+            GetPagePermissionsAsync(int pageHeaderId)
         {
             return await _permissionGroupPageContentRepository.GetByPageHeaderId(pageHeaderId);
         }
@@ -132,5 +132,15 @@ namespace Ocuda.Ops.Service
             await _permissionGroupPageContentRepository.SaveAsync();
         }
 
+        public async Task<bool> HasPageContentPermissionAsync(int[] permissionGroupIds)
+        {
+            return await _permissionGroupPageContentRepository
+                .AnyPermissionGroupIdAsync(permissionGroupIds);
+        }
+
+        public async Task<ICollection<PermissionGroup>> GetGroupsAsync(int[] permissionGroupIds)
+        {
+            return await _permissionGroupRepository.GetGroupsAsync(permissionGroupIds);
+        }
     }
 }

@@ -15,5 +15,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
             ToListAsync(params Expression<Func<PermissionGroup, IComparable>>[] orderBys);
         Task<bool> IsDuplicateAsync(PermissionGroup permissionGroup);
         Task<ICollection<PermissionGroup>> GetAllAsync();
+        Task<ICollection<PermissionGroup>> GetGroupsAsync(int[] permissionGroupIds);
     }
 }

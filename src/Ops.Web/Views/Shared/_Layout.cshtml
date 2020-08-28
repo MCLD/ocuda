@@ -55,33 +55,37 @@
 
         <div class="collapse navbar-collapse justify-content-end">
             <ul class="navbar-nav">
-                @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
+                @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true || Context.User?.HasClaim(ClaimType.HasPermissions, ClaimType.HasPermissions) == true)
                 {
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle"
                            href="#"
-                           id="navbarDropdown"
+                           id="navbarManagementDropdown"
                            role="button"
                            data-toggle="dropdown"
                            aria-haspopup="true"
-                           aria-expanded="false">
+                           aria-expanded="false"
+                           title="Management">
                             <span class="fa fa-cog"></span>
-                            Management
                         </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <div class="dropdown-menu dropdown-menu-right"
+                             aria-labelledby="navbarManagementDropdown">
+                            @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
+                            {
+                                <a class="dropdown-item"
+                                   asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
+                                   asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement))"
+                                   asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">
+                                    <span class="fa fa-network-wired"></span>
+                                    Intranet Management
+                                </a>
+                            }
                             <a class="dropdown-item"
-                               asp-controller="ContentManagement"
-                               asp-route-area=""
-                               asp-action="@(nameof(ContentManagementController.Index))">
-                                <span class="fa fa-network-wired"></span>
-                                Intranet
-                            </a>
-                            <a class="dropdown-item"
-                               asp-controller="SiteManagement"
-                               asp-route-area=""
-                               asp-action="@(nameof(ContentManagementController.Index))">
+                               asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
+                               asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement))"
+                               asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">
                                 <span class="fa fa-globe-americas"></span>
-                                Site
+                                Site Management
                             </a>
                         </div>
                     </li>

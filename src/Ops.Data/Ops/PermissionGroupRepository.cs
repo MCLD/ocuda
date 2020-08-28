@@ -26,6 +26,14 @@ namespace Ocuda.Ops.Data.Ops
             return await DbSet.AsNoTracking().ToListAsync();
         }
 
+        public async Task<ICollection<PermissionGroup>> GetGroupsAsync(int[] permissionGroupIds)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => permissionGroupIds.Contains(_.Id))
+                .ToListAsync();
+        }
+
         public async Task<DataWithCount<ICollection<PermissionGroup>>>
             GetPaginatedListAsync(BaseFilter filter)
         {
