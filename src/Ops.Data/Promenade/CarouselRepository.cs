@@ -54,5 +54,16 @@ namespace Ocuda.Ops.Data.Promenade
                 .AsNoTracking()
                 .SingleOrDefaultAsync();
         }
+
+        public async Task<Carousel> GetIncludingChildrenWithLabelsAsync(int id)
+        {
+            return await DbSet
+                .Where(_ => _.Id == id)
+                .Include(_ => _.Items)
+                .ThenInclude(_ => _.Buttons)
+                .ThenInclude(_ => _.Label)
+                .AsNoTracking()
+                .SingleOrDefaultAsync();
+        }
     }
 }

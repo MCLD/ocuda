@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -17,6 +18,7 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string Url { get; set; }
 
+        [DisplayName("Label")]
         public int LabelId { get; set; }
         public CarouselButtonLabel Label { get; set; }
     }

@@ -26,6 +26,15 @@ namespace Ocuda.Ops.Data.Promenade
             return entity;
         }
 
+        public async Task<CarouselItem> GetIncludingChildrenAsync(int id)
+        {
+            return await DbSet
+                .Where(_ => _.Id == id)
+                .Include(_ => _.Buttons)
+                .AsNoTracking()
+                .SingleOrDefaultAsync();
+        }
+
         public async Task<int?> GetMaxSortOrderForCarouselAsync(int carouselId)
         {
             return await DbSet

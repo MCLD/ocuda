@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Ocuda.Promenade.Models.Entities;
 
@@ -14,7 +16,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Carousels
         public CarouselItem CarouselItem { get; set; }
         public CarouselItemText CarouselItemText { get; set; }
 
-        public string LanguageName { get; set; }
+        public CarouselButton CarouselButton { get; set; }
+
         public int LanguageId { get; set; }
 
         public SelectList LanguageList { get; set; }
@@ -24,6 +27,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Carousels
 
         public SelectList LabelList { get; set; }
 
+        public string AllowedImageDomains { get; set; }
+        public string AllowedLinkDomains { get; set; }
+
         public int? FocusItemId { get; set; }
+        public string ItemErrorMessage { get; set; }
     }
 }

@@ -9,6 +9,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     public interface ICarouselRepository : IGenericRepository<Carousel>
     {
         Task<Carousel> FindAsync(int id);
+        Task<Carousel> GetIncludingChildrenWithLabelsAsync(int id);
         Task<Carousel> GetIncludingChildrenAsync(int id);
         Task<DataWithCount<ICollection<Carousel>>> GetPaginatedListAsync(BaseFilter filter);
     }

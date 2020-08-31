@@ -23,6 +23,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class CarouselsController : BaseController<CarouselsController>
     {
+        private const string DetailModelStateKey = "Carousels.Detail";
+        private const string ItemErrorMessageKey = "Carousels.ItemErrorMessage";
+
         private readonly ICarouselService _carouselService;
         private readonly ILanguageService _languageService;
 
@@ -176,7 +179,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         [Route("[action]/{id}")]
-        [RestoreModelState(Key = nameof(Detail))]
+        [RestoreModelState(Key = DetailModelStateKey)]
         public async Task<IActionResult> Detail(int id, string language, int? item)
         {
             var languages = await _languageService.GetActiveAsync();
@@ -192,12 +195,18 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 Carousel = carousel,
                 CarouselId = carousel.Id,
                 FocusItemId = item,
-                LanguageName = language,
+                ItemErrorMessage = TempData[ItemErrorMessageKey] as string,
                 LanguageId = selectedLanguage.Id,
                 LanguageList = new SelectList(languages, nameof(Language.Name),
                     nameof(Language.Description), selectedLanguage.Name),
-                LabelList = new SelectList(await _carouselService.GetButtonLabelsAsync(), 
-                    nameof(CarouselButtonLabel.Id), nameof(Carousel.Name))
+                LabelList = new SelectList(await _carouselService.GetButtonLabelsAsync(),
+                    nameof(CarouselButtonLabel.Id), nameof(Carousel.Name)),
+                AllowedImageDomains = (await _siteSettingService.GetSettingStringAsync(
+                    Models.Keys.SiteSetting.Carousel.ImageRestrictToDomains))
+                    .Replace(",", ", "),
+                AllowedLinkDomains = (await _siteSettingService.GetSettingStringAsync(
+                    Models.Keys.SiteSetting.Carousel.LinkRestrictToDomains))
+                    .Replace(",", ", "),
             };
 
             return View(viewModel);
@@ -205,9 +214,22 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
+        [SaveModelState(Key = DetailModelStateKey)]
         public async Task<IActionResult> EditCarouselText(DetailViewModel model)
         {
-            return null;
+            if (ModelState.IsValid)
+            {
+                await _carouselService.SetCarouselTextAsync(model.CarouselText);
+                ShowAlertSuccess("Updated carousel text.");
+            }
+
+            var language = await _languageService.GetActiveByIdAsync(model.CarouselText.LanguageId);
+
+            return RedirectToAction(nameof(Detail), new
+            {
+                id = model.CarouselText.CarouselId,
+                language = language.IsDefault ? null : language.Name
+            });
         }
 
         [HttpPost]
@@ -235,7 +257,60 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         })
                     };
 
-                    ShowAlertSuccess($"Created carousel item: {carouselItem.Name}");
+                    ShowAlertSuccess($"Created item: {carouselItem.Name}");
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
+            }
+            else
+            {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
+                };
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> EditCarouselItem(DetailViewModel model)
+        {
+            JsonResponse response;
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var carouselItem = await _carouselService.EditItemAsync(
+                        model.CarouselItem);
+
+                    var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
+
+                    response = new JsonResponse
+                    {
+                        Success = true,
+                        Url = Url.Action(nameof(Detail), new
+                        {
+                            id = carouselItem.CarouselId,
+                            language = language.IsDefault ? null : language.Name,
+                            item = carouselItem.Id
+                        })
+                    };
+
+                    ShowAlertSuccess($"Updated item: {carouselItem.Name}");
                 }
                 catch (OcudaException ex)
                 {
@@ -274,28 +349,35 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting carousel item: {Message}", ex.Message);
-                ShowAlertDanger($"Error deleting item: {model.Carousel.Name}");
+                ShowAlertDanger($"Error deleting item: {model.CarouselItem.Name}");
             }
 
             var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
 
             return RedirectToAction(nameof(Detail), new
             {
-                id = model.Carousel.Id,
+                id = model.CarouselId,
                 language = language.IsDefault ? null : language.Name
             });
         }
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<JsonResult> ChangeItemSort(int id, bool increase)
+        public async Task<JsonResult> ChangeSort(int id, bool increase, bool item)
         {
             var success = false;
             var message = string.Empty;
 
             try
             {
-                await _carouselService.UpdateItemSortOrder(id, increase);
+                if (item)
+                {
+                    await _carouselService.UpdateItemSortOrder(id, increase);
+                }
+                else
+                {
+                    await _carouselService.UpdateButtonSortOrder(id, increase);
+                }
                 success = true;
             }
             catch (OcudaException ex)
@@ -308,12 +390,19 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
-        [SaveModelState(Key = nameof(Detail))]
         public async Task<IActionResult> EditCarouselItemText(DetailViewModel model)
         {
             if (ModelState.IsValid)
             {
-                await _carouselService.SetItemTextAsync(model.CarouselItemText);
+                try
+                {
+                    await _carouselService.SetItemTextAsync(model.CarouselItemText);
+                    ShowAlertSuccess("Updated item text");
+                }
+                catch (OcudaException ex)
+                {
+                    TempData[ItemErrorMessageKey] = $"Unable to update item: {ex.Message}";
+                }
             }
 
             var language = await _languageService.GetActiveByIdAsync(
@@ -324,6 +413,138 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 id = model.CarouselId,
                 language = language.IsDefault ? null : language.Name,
                 item = model.CarouselItemText.CarouselItemId
+            });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> AddItemButton(DetailViewModel model)
+        {
+            JsonResponse response;
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var carouselButton = await _carouselService.CreateButtonAsync(
+                        model.CarouselButton);
+
+                    var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
+
+                    response = new JsonResponse
+                    {
+                        Success = true,
+                        Url = Url.Action(nameof(Detail), new
+                        {
+                            id = model.CarouselId,
+                            language = language.IsDefault ? null : language.Name,
+                            item = carouselButton.CarouselItemId
+                        })
+                    };
+
+                    ShowAlertSuccess("Added button");
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
+            }
+            else
+            {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
+                };
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> EditItemButton(DetailViewModel model)
+        {
+            JsonResponse response;
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var carouselButton = await _carouselService.EditButtonAsync(
+                        model.CarouselButton);
+
+                    var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
+
+                    response = new JsonResponse
+                    {
+                        Success = true,
+                        Url = Url.Action(nameof(Detail), new
+                        {
+                            id = model.CarouselId,
+                            language = language.IsDefault ? null : language.Name,
+                            item = carouselButton.CarouselItemId
+                        })
+                    };
+
+                    ShowAlertSuccess("Updated button");
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
+            }
+            else
+            {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
+                };
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeleteItemButton(DetailViewModel model)
+        {
+            try
+            {
+                await _carouselService.DeleteButtonAsync(model.CarouselButton.Id);
+
+                ShowAlertSuccess("Deleted button");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting carousel button: {Message}", ex.Message);
+                ShowAlertDanger("Error deleting button.");
+            }
+
+            var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
+
+            return RedirectToAction(nameof(Detail), new
+            {
+                id = model.CarouselId,
+                language = language.IsDefault ? null : language.Name,
+                item = model.CarouselButton.CarouselItemId
             });
         }
     }
