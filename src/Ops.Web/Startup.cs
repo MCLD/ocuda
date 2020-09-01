@@ -266,6 +266,10 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.PageRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageHeaderRepository,
                 Data.Promenade.PageHeaderRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageLayoutRepository,
+                Data.Promenade.PageLayoutRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageLayoutTextRepository,
+                Data.Promenade.PageLayoutTextRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IScheduleRequestRepository,
                 Data.Promenade.ScheduleRequestRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IScheduleRequestSubjectRepository,

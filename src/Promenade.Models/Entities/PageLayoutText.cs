@@ -2,10 +2,10 @@
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class PageDetailText
+    public class PageLayoutText
     {
-        public int PageDetailId { get; set; }
-        public PageDetail PageDetail { get; set; }
+        public int PageLayoutId { get; set; }
+        public PageLayout PageLayout { get; set; }
 
         public int LanguageId { get; set; }
         public Language Language { get; set; }

@@ -19,6 +19,8 @@ namespace Ocuda.Ops.Service
     public class PageService : BaseService<PageService>, IPageService
     {
         private readonly IPageHeaderRepository _pageHeaderRepository;
+        private readonly IPageLayoutRepository _pageLayoutRepository;
+        private readonly IPageLayoutTextRepository _pageLayoutTextRepository;
         private readonly IPageRepository _pageRepository;
         private readonly IPermissionGroupPageContentRepository
             _permissionGroupPageContentRepository;
@@ -26,12 +28,18 @@ namespace Ocuda.Ops.Service
         public PageService(ILogger<PageService> logger,
             IHttpContextAccessor httpContextAccessor,
             IPageHeaderRepository pageHeaderRepository,
+            IPageLayoutRepository pageLayoutRepository,
+            IPageLayoutTextRepository pageLayoutTextRepository,
             IPageRepository pageRepository,
             IPermissionGroupPageContentRepository permissionGroupPageContentRepository)
             : base(logger, httpContextAccessor)
         {
             _pageHeaderRepository = pageHeaderRepository
                 ?? throw new ArgumentNullException(nameof(pageRepository));
+            _pageLayoutRepository = pageLayoutRepository
+                ?? throw new ArgumentNullException(nameof(pageLayoutRepository));
+            _pageLayoutTextRepository = pageLayoutTextRepository
+                ?? throw new ArgumentNullException(nameof(pageLayoutTextRepository));
             _pageRepository = pageRepository
                 ?? throw new ArgumentNullException(nameof(pageRepository));
             _permissionGroupPageContentRepository = permissionGroupPageContentRepository
@@ -129,9 +137,22 @@ namespace Ocuda.Ops.Service
         public async Task DeleteHeaderAsync(int id)
         {
             var header = await _pageHeaderRepository.FindAsync(id);
-            var pages = await _pageRepository.GetByHeaderIdAsync(header.Id);
 
-            _pageRepository.RemoveRange(pages);
+            if (header.IsLayoutPage)
+            {
+                var layoutTexts = await _pageLayoutTextRepository.GetAllForHeaderAsync(header.Id);
+                _pageLayoutTextRepository.RemoveRange(layoutTexts);
+
+                var layouts = await _pageLayoutRepository.GetAllForHeaderIncludingChildrenAsync(
+                    header.Id);
+                _pageLayoutRepository.RemoveRange(layouts);
+            }
+            else
+            {
+                var pages = await _pageRepository.GetByHeaderIdAsync(header.Id);
+                _pageRepository.RemoveRange(pages);
+            }
+
             _pageHeaderRepository.Remove(header);
             await _pageHeaderRepository.SaveAsync();
         }
@@ -140,6 +161,50 @@ namespace Ocuda.Ops.Service
         {
             header.Stub = header.Stub?.Trim().ToLower();
             return await _pageHeaderRepository.StubInUseAsync(header);
+        }
+
+        public async Task<PageLayout> GetLayoutByIdAsync(int id)
+        {
+            return await _pageLayoutRepository.FindAsync(id);
+        }
+
+        public async Task<DataWithCount<ICollection<PageLayout>>>
+            GetPaginatedLayoutListForHeaderAsync(int headerId, BaseFilter filter)
+        {
+            return await _pageLayoutRepository.GetPaginatedListForHeaderAsync(headerId, filter);
+        }
+
+        public async Task<PageLayout> CreateLayoutAsync(PageLayout layout)
+        {
+            layout.Name = layout.Name.Trim();
+
+            await _pageLayoutRepository.AddAsync(layout);
+            await _pageLayoutRepository.SaveAsync();
+
+            return layout;
+        }
+
+        public async Task<PageLayout> EditLayoutAsync(PageLayout layout)
+        {
+            var currentlayout = await _pageLayoutRepository.FindAsync(layout.Id);
+            currentlayout.Name = layout.Name?.Trim();
+            currentlayout.SocialCardId = layout.SocialCardId;
+            currentlayout.StartDate = layout.StartDate;
+
+            _pageLayoutRepository.Update(currentlayout);
+            await _pageLayoutRepository.SaveAsync();
+            return currentlayout;
+        }
+
+        public async Task DeleteLayoutAsync(int id)
+        {
+            var layout = await _pageLayoutRepository.GetIncludingChildrenAsync(id);
+
+            var texts = await _pageLayoutTextRepository.GetAllForLayoutAsync(layout.Id);
+            _pageLayoutTextRepository.RemoveRange(texts);
+
+            _pageLayoutRepository.Remove(layout);
+            await _pageLayoutRepository.SaveAsync();
         }
     }
 }

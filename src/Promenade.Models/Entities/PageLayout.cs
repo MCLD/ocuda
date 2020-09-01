@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Promenade.Models.Entities
 {
-    public class PageDetail
+    public class PageLayout
     {
         [Key]
         [Required]
@@ -17,9 +18,11 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string Name { get; set; }
 
+        [DisplayName("Social Card")]
         public int? SocialCardId { get; set; }
         public SocialCard SocialCard { get; set; }
 
+        [DisplayName("Start Date")]
         public DateTime? StartDate { get; set; }
 
         public ICollection<PageItem> Items { get; set; }

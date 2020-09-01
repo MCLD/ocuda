@@ -17,6 +17,11 @@
                 </option>
             }
         </select>
+        <select id="addLayout" asp-for="PageHeader.IsLayoutPage" formgroup>
+            <option></option>
+            <option value="False">No</option>
+            <option value="True">Yes</option>
+        </select>
     </div>
 </form>
 
@@ -34,6 +39,10 @@
             {
                 <option value="@Convert.ToInt32(type)" selected>@type</option>
             }
+        </select>
+        <select id="editLayout" asp-for="PageHeader.IsLayoutPage" formgroup disabled>
+            <option value="False">No</option>
+            <option value="True">Yes</option>
         </select>
     </div>
 </form>
@@ -129,7 +138,7 @@ else
                                 <td class="align-middle">
                                     @if (Model.IsSiteManager || Model.PermissionIds.Any(_ => header.PermissionGroupIds.Contains(_)))
                                     {
-                                        <a asp-action="@(nameof(PagesController.Detail))"
+                                        <a asp-action="@(header.IsLayoutPage ? nameof(PagesController.Layouts) : nameof(PagesController.Detail))"
                                            asp-route-id="@header.Id">
                                             @header.PageName
                                         </a>
@@ -156,6 +165,7 @@ else
                                                 data-toggle="modal"
                                                 data-target="#editModal"
                                                 data-id="@header.Id"
+                                                data-layout="@header.IsLayoutPage"
                                                 data-name="@header.PageName"
                                                 data-stub="@header.Stub"
                                                 data-type="@((int)header.Type)"
@@ -261,11 +271,13 @@ else
         $("#editModal").on("show.bs.modal", function (e) {
             var button = $(e.relatedTarget);
             var id = button.data("id");
+            var layout = button.data("layout");
             var name = button.data("name");
             var stub = button.data("stub");
             var type = button.data("type");
 
             $("#editId").val(id);
+            $("#editLayout").val(layout);
             $("#editName").val(name);
             $("#editStub").val(stub);
             $("#editType").val(type);

@@ -22,6 +22,9 @@ namespace Ocuda.Promenade.Models.Entities
 
         public PageType Type { get; set; }
 
+        [DisplayName("Layout Page?")]
+        public bool IsLayoutPage { get; set; }
+
         [NotMapped]
         public ICollection<string> PageLanguages { get; set; }
 

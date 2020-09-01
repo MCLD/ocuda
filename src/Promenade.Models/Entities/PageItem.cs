@@ -8,8 +8,8 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public int Id { get; set; }
 
-        public int PageDetailId { get; set; }
-        public PageDetail PageDetail { get; set; }
+        public int PageLayoutId { get; set; }
+        public PageLayout PageLayout { get; set; }
 
         public int Order { get; set; }
 

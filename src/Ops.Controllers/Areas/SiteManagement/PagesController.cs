@@ -113,9 +113,18 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     var header = await _pageService.CreateHeaderAsync(model.PageHeader);
                     response = new JsonResponse
                     {
-                        Success = true,
-                        Url = Url.Action(nameof(Detail), new { id = header.Id })
+                        Success = true
                     };
+
+                    if (header.IsLayoutPage)
+                    {
+                        response.Url = Url.Action(nameof(Layouts), new { id = header.Id });
+                    }
+                    else
+                    {
+                        response.Url = Url.Action(nameof(Detail), new { id = header.Id });
+                    }
+
                     ShowAlertSuccess($"Created page: {header.PageName}");
                 }
                 catch (OcudaException ex)
@@ -259,6 +268,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var header = await _pageService.GetHeaderByIdAsync(id);
 
+            if (header.IsLayoutPage)
+            {
+                return RedirectToAction(nameof(Layouts), new { id = header.Id });
+            }
+
             var languages = await _languageService.GetActiveAsync();
 
             var selectedLanguage = languages
@@ -394,6 +408,201 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ShowAlertWarning("Unable to preview page");
                 return RedirectToAction("Index");
             }
+        }
+        [Route("[action]/{id}")]
+        [RestoreModelState]
+        public async Task<IActionResult> Layouts(int id, int page = 1)
+        {
+            if (!await HasPagePermissionAsync(id))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var header = await _pageService.GetHeaderByIdAsync(id);
+
+            if (!header.IsLayoutPage)
+            {
+                return RedirectToAction(nameof(Detail), new { id = header.Id });
+            }
+
+            var filter = new BaseFilter(page);
+
+            var layoutList = await _pageService.GetPaginatedLayoutListForHeaderAsync(id, filter);
+
+            var paginateModel = new PaginateModel
+            {
+                ItemCount = layoutList.Count,
+                CurrentPage = page,
+                ItemsPerPage = filter.Take.Value
+            };
+            if (paginateModel.PastMaxPage)
+            {
+                return RedirectToRoute(
+                    new
+                    {
+                        page = paginateModel.LastPage ?? 1
+                    });
+            }
+
+            var viewModel = new LayoutsViewModel
+            {
+                PageLayouts = layoutList.Data,
+                PaginateModel = paginateModel,
+                HeaderId = header.Id,
+                HeaderName = header.PageName,
+                HeaderStub = header.Stub,
+                HeaderType = header.Type,
+                SocialCardList = new SelectList(await _socialCardService.GetListAsync(),
+                    nameof(SocialCard.Id), nameof(SocialCard.Title))
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> CreateLayout(LayoutsViewModel model)
+        {
+            JsonResponse response;
+
+            if (await HasPagePermissionAsync(model.PageLayout.PageHeaderId))
+            {
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        var layout = await _pageService.CreateLayoutAsync(model.PageLayout);
+                        response = new JsonResponse
+                        {
+                            Success = true,
+                            Url = Url.Action(nameof(LayoutDetail), new { id = layout.Id })
+                        };
+
+                        ShowAlertSuccess($"Created layout: {layout.Name}");
+                    }
+                    catch (OcudaException ex)
+                    {
+                        response = new JsonResponse
+                        {
+                            Success = false,
+                            Message = ex.Message
+                        };
+                    }
+                }
+                else
+                {
+                    var errors = ModelState.Values
+                        .SelectMany(_ => _.Errors)
+                        .Select(_ => _.ErrorMessage);
+
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = string.Join(Environment.NewLine, errors)
+                    };
+                }
+            }
+            else
+            {
+                response = new JsonResponse
+                {
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> EditLayout(LayoutsViewModel model)
+        {
+            JsonResponse response;
+
+            var pageLayout = await _pageService.GetLayoutByIdAsync(model.PageLayout.Id);
+
+            if (await HasPagePermissionAsync(pageLayout.PageHeaderId))
+            {
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        var layout = await _pageService.EditLayoutAsync(model.PageLayout);
+                        response = new JsonResponse
+                        {
+                            Success = true
+                        };
+
+                        ShowAlertSuccess($"Updated layout: {layout.Name}");
+                    }
+                    catch (OcudaException ex)
+                    {
+                        response = new JsonResponse
+                        {
+                            Success = false,
+                            Message = ex.Message
+                        };
+                    }
+                }
+                else
+                {
+                    var errors = ModelState.Values
+                        .SelectMany(_ => _.Errors)
+                        .Select(_ => _.ErrorMessage);
+
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = string.Join(Environment.NewLine, errors)
+                    };
+                }
+            }
+            else
+            {
+                response = new JsonResponse
+                {
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeleteLayout(LayoutsViewModel model)
+        {
+            var pageLayout = await _pageService.GetLayoutByIdAsync(model.PageLayout.Id);
+
+            if (!await HasPagePermissionAsync(pageLayout.PageHeaderId))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            try
+            {
+                await _pageService.DeleteLayoutAsync(model.PageLayout.Id);
+                ShowAlertSuccess($"Deleted layout: {model.PageLayout.Name}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting page layout: {Message}", ex.Message);
+                ShowAlertDanger("Unable to delete layout: ", ex.Message);
+            }
+
+            return RedirectToAction(nameof(Layouts), new
+            {
+                id = pageLayout.PageHeaderId,
+                page = model.PaginateModel.CurrentPage
+            });
+        }
+
+        [Route("[action]/{id}")]
+        public async Task<IActionResult> LayoutDetail(int id)
+        {
+            return View();
         }
 
         [Route("[action]/{id}")]
