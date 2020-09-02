@@ -79,7 +79,7 @@
 <div class="row pt-2">
     <div class="col-12">
         <input asp-for="PageLayout.Name" formgroup readonly />
-        <input asp-for="PageLayout.StartDate" formgroup readonly />
+        <input asp-for="PageLayout.StartDate" value="@Model.PageLayout.StartDate?.ToString()" formgroup readonly />
         <select asp-for="SelectLanguage" asp-items="Model.LanguageList" formgroup></select>
         <div class="row">
             <div class="col-md-3 offset-md-3">
