@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -26,5 +27,8 @@ namespace Ocuda.Promenade.Models.Entities
         public DateTime? StartDate { get; set; }
 
         public ICollection<PageItem> Items { get; set; }
+
+        [NotMapped]
+        public PageLayoutText PageLayoutText { get; set; }
     }
 }

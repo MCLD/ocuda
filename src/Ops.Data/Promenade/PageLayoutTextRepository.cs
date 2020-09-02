@@ -16,6 +16,15 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
+        public async Task<PageLayoutText> GetByPageLayoutAndLanguageAsync(int layoutId,
+            int languageId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.PageLayoutId == layoutId && _.LanguageId == languageId)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<ICollection<PageLayoutText>> GetAllForHeaderAsync(int headerId)
         {
             return await DbSet

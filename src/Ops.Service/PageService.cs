@@ -19,6 +19,7 @@ namespace Ocuda.Ops.Service
     public class PageService : BaseService<PageService>, IPageService
     {
         private readonly IPageHeaderRepository _pageHeaderRepository;
+        private readonly IPageItemRepository _pageItemRepository;
         private readonly IPageLayoutRepository _pageLayoutRepository;
         private readonly IPageLayoutTextRepository _pageLayoutTextRepository;
         private readonly IPageRepository _pageRepository;
@@ -28,6 +29,7 @@ namespace Ocuda.Ops.Service
         public PageService(ILogger<PageService> logger,
             IHttpContextAccessor httpContextAccessor,
             IPageHeaderRepository pageHeaderRepository,
+            IPageItemRepository pageItemRepository,
             IPageLayoutRepository pageLayoutRepository,
             IPageLayoutTextRepository pageLayoutTextRepository,
             IPageRepository pageRepository,
@@ -36,6 +38,8 @@ namespace Ocuda.Ops.Service
         {
             _pageHeaderRepository = pageHeaderRepository
                 ?? throw new ArgumentNullException(nameof(pageRepository));
+            _pageItemRepository = pageItemRepository
+                ?? throw new ArgumentNullException(nameof(pageItemRepository));
             _pageLayoutRepository = pageLayoutRepository
                 ?? throw new ArgumentNullException(nameof(pageLayoutRepository));
             _pageLayoutTextRepository = pageLayoutTextRepository
@@ -145,6 +149,10 @@ namespace Ocuda.Ops.Service
 
                 var layouts = await _pageLayoutRepository.GetAllForHeaderIncludingChildrenAsync(
                     header.Id);
+
+                var items = layouts.SelectMany(_ => _.Items).ToList();
+                _pageItemRepository.RemoveRange(items);
+
                 _pageLayoutRepository.RemoveRange(layouts);
             }
             else
@@ -166,6 +174,14 @@ namespace Ocuda.Ops.Service
         public async Task<PageLayout> GetLayoutByIdAsync(int id)
         {
             return await _pageLayoutRepository.FindAsync(id);
+        }
+
+        public async Task<PageLayout> GetLayoutDetailsAsync(int id)
+        {
+            var layout = await _pageLayoutRepository.GetIncludingChildrenWithItemContent(id);
+            layout.Items = layout.Items.OrderBy(_ => _.Order).ToList();
+
+            return layout;
         }
 
         public async Task<DataWithCount<ICollection<PageLayout>>>
@@ -203,8 +219,148 @@ namespace Ocuda.Ops.Service
             var texts = await _pageLayoutTextRepository.GetAllForLayoutAsync(layout.Id);
             _pageLayoutTextRepository.RemoveRange(texts);
 
+            _pageItemRepository.RemoveRange(layout.Items);
             _pageLayoutRepository.Remove(layout);
             await _pageLayoutRepository.SaveAsync();
+        }
+
+        public async Task<PageLayoutText> GetTextByLayoutAndLanguageAsync(int layoutId,
+            int languageId)
+        {
+            return await _pageLayoutTextRepository.GetByPageLayoutAndLanguageAsync(
+                layoutId, languageId);
+        }
+
+        public async Task<PageLayoutText> SetLayoutTextAsync(PageLayoutText layoutText)
+        {
+            var currentText = await _pageLayoutTextRepository.GetByPageLayoutAndLanguageAsync(
+                layoutText.PageLayoutId, layoutText.LanguageId);
+
+            if (currentText == null)
+            {
+                layoutText.Title = layoutText.Title?.Trim();
+
+                await _pageLayoutTextRepository.AddAsync(layoutText);
+                await _pageLayoutTextRepository.SaveAsync();
+                return layoutText;
+            }
+            else
+            {
+                currentText.Title = layoutText.Title?.Trim();
+
+                _pageLayoutTextRepository.Update(currentText);
+                await _pageLayoutTextRepository.SaveAsync();
+                return currentText;
+            }
+        }
+
+        public async Task<PageItem> CreateItemAsync(PageItem pageItem)
+        {
+            if (!pageItem.CarouselId.HasValue && !pageItem.SegmentId.HasValue)
+            {
+                throw new OcudaException("No content selected");
+            }
+
+            if (pageItem.CarouselId.HasValue)
+            {
+                pageItem.SegmentId = null;
+            }
+
+            var maxSortOrder = await _pageItemRepository.GetMaxSortOrderForLayoutAsync(
+                pageItem.PageLayoutId);
+            if (maxSortOrder.HasValue)
+            {
+                pageItem.Order = maxSortOrder.Value + 1;
+            }
+
+            await _pageItemRepository.AddAsync(pageItem);
+            await _pageItemRepository.SaveAsync();
+            return pageItem;
+        }
+
+        public async Task<PageItem> EditItemAsync(PageItem pageItem)
+        {
+            if (!pageItem.CarouselId.HasValue && !pageItem.SegmentId.HasValue)
+            {
+                throw new OcudaException("No content selected");
+            }
+
+            var currentPageItem = await _pageItemRepository.FindAsync(pageItem.Id);
+            if (pageItem.CarouselId.HasValue)
+            {
+                currentPageItem.CarouselId = pageItem.CarouselId;
+                currentPageItem.SegmentId = null;
+            }
+            else
+            {
+                currentPageItem.SegmentId = pageItem.SegmentId;
+            }
+
+            _pageItemRepository.Update(currentPageItem);
+            await _pageItemRepository.SaveAsync();
+            return currentPageItem;
+        }
+
+        public async Task DeleteItemAsync(int pageItemId)
+        {
+            var pageItem = await _pageItemRepository
+                .FindAsync(pageItemId);
+
+            if (pageItem == null)
+            {
+                throw new OcudaException("Page item does not exist.");
+            }
+
+            var subsequentItems = await _pageItemRepository.GetLayoutSubsequentAsync(
+                pageItem.PageLayoutId, pageItem.Order);
+
+            if (subsequentItems.Count > 0)
+            {
+                subsequentItems.ForEach(_ => _.Order--);
+                _pageItemRepository.UpdateRange(subsequentItems);
+            }
+
+            _pageItemRepository.Remove(pageItem);
+            await _pageItemRepository.SaveAsync();
+        }
+
+        public async Task UpdateItemSortOrder(int id, bool increase)
+        {
+            var item = await _pageItemRepository.FindAsync(id);
+
+            int newSortOrder;
+            if (increase)
+            {
+                newSortOrder = item.Order + 1;
+            }
+            else
+            {
+                if (item.Order == 0)
+                {
+                    throw new OcudaException("Item is already in the first position.");
+                }
+                newSortOrder = item.Order - 1;
+            }
+
+            var itemInPosition = await _pageItemRepository.GetByLayoutAndOrderAsync(
+                item.PageLayoutId, newSortOrder);
+
+            if (itemInPosition == null)
+            {
+                throw new OcudaException("Item is already in the last position.");
+            }
+
+            itemInPosition.Order = item.Order;
+            item.Order = newSortOrder;
+
+            _pageItemRepository.Update(item);
+            _pageItemRepository.Update(itemInPosition);
+            await _pageItemRepository.SaveAsync();
+        }
+
+        public async Task<int> GetHeaderIdForItemAsync(int itemId)
+        {
+            return await _pageItemRepository.GetHeaderIdForItemAsync(itemId);
         }
     }
 }

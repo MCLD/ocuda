@@ -52,6 +52,11 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(siteSettingService));
         }
 
+        public async Task<ICollection<Carousel>> GetAllAsync()
+        {
+            return await _carouselRepository.GetAllAsync();
+        }
+
         public async Task<DataWithCount<ICollection<Carousel>>> GetPaginatedListAsync(
             BaseFilter filter)
         {
@@ -136,7 +141,7 @@ namespace Ocuda.Ops.Service
             }
             else
             {
-                currentText.Title = currentText.Title?.Trim();
+                currentText.Title = carouselText.Title?.Trim();
 
                 _carouselTextRepository.Update(currentText);
                 await _carouselTextRepository.SaveAsync();

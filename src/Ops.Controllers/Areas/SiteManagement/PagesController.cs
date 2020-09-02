@@ -26,25 +26,33 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class PagesController : BaseController<PagesController>
     {
+        private readonly ICarouselService _carouselService;
         private readonly ILanguageService _languageService;
         private readonly IPageService _pageService;
         private readonly IPermissionGroupService _permissionGroupService;
+        private readonly ISegmentService _segmentService;
         private readonly ISocialCardService _socialCardService;
 
         public static string Name { get { return "Pages"; } }
         public static string Area { get { return "SiteManagement"; } }
 
         public PagesController(ServiceFacades.Controller<PagesController> context,
+            ICarouselService carouselService,
             ILanguageService languageService,
             IPageService pageService,
             IPermissionGroupService permissionGroupService,
+            ISegmentService segmentService,
             ISocialCardService socialCardService) : base(context)
         {
+            _carouselService = carouselService
+                ?? throw new ArgumentNullException(nameof(carouselService));
             _languageService = languageService
                 ?? throw new ArgumentNullException(nameof(languageService));
             _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
             _permissionGroupService = permissionGroupService
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
+            _segmentService = segmentService
+                ?? throw new ArgumentNullException(nameof(segmentService));
             _socialCardService = socialCardService
                 ?? throw new ArgumentNullException(nameof(socialCardService));
         }
@@ -600,9 +608,266 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         [Route("[action]/{id}")]
-        public async Task<IActionResult> LayoutDetail(int id)
+        [HttpGet]
+        [RestoreModelState]
+        public async Task<IActionResult> LayoutDetail(int id, string language)
         {
-            return View();
+            var pageLayout = await _pageService.GetLayoutDetailsAsync(id);
+
+            if (!await HasPagePermissionAsync(pageLayout.PageHeaderId))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var languages = await _languageService.GetActiveAsync();
+
+            var selectedLanguage = languages
+                .FirstOrDefault(_ => _.Name.Equals(language, StringComparison.OrdinalIgnoreCase))
+                ?? languages.Single(_ => _.IsDefault);
+
+            pageLayout.PageLayoutText = await _pageService.GetTextByLayoutAndLanguageAsync(
+                pageLayout.Id, selectedLanguage.Id);
+
+            var viewModel = new LayoutDetailViewModel
+            {
+                PageLayout = pageLayout,
+                PageLayoutId = pageLayout.Id,
+                LanguageId = selectedLanguage.Id,
+                LanguageList = new SelectList(languages, nameof(Language.Name),
+                    nameof(Language.Description), selectedLanguage.Name),
+                CarouselList = new SelectList(await _carouselService.GetAllAsync(),
+                    nameof(Carousel.Id), nameof(Carousel.Name)),
+                SegmentList = new SelectList(await _segmentService.GetActiveSegmentsAsync(),
+                    nameof(Segment.Id), nameof(Segment.Name))
+            };
+
+            return View(viewModel);
+        }
+
+        [Route("[action]/{id}")]
+        [SaveModelState]
+        public async Task<IActionResult> LayoutDetail(LayoutDetailViewModel model)
+        {
+            var pageLayout = await _pageService.GetLayoutByIdAsync(
+                model.PageLayoutText.PageLayoutId);
+
+            if (!await HasPagePermissionAsync(pageLayout.PageHeaderId))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            if (ModelState.IsValid)
+            {
+                await _pageService.SetLayoutTextAsync(model.PageLayoutText);
+                ShowAlertSuccess("Updated layout text.");
+            }
+
+            var language = await _languageService.GetActiveByIdAsync(
+                model.PageLayoutText.LanguageId);
+
+            return RedirectToAction(nameof(LayoutDetail), new
+            {
+                id = pageLayout.Id,
+                language = language.IsDefault ? null : language.Name
+            });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> CreatePageItem(LayoutDetailViewModel model)
+        {
+            JsonResponse response;
+
+            var pageLayout = await _pageService.GetLayoutByIdAsync(model.PageItem.PageLayoutId);
+
+            if (await HasPagePermissionAsync(pageLayout.PageHeaderId))
+            {
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        var pageItem = await _pageService.CreateItemAsync(model.PageItem);
+
+                        var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
+
+                        response = new JsonResponse
+                        {
+                            Success = true,
+                            Url = Url.Action(nameof(LayoutDetail), new
+                            {
+                                id = pageItem.PageLayoutId,
+                                language = language.IsDefault ? null : language.Name
+                            })
+                        };
+
+                        ShowAlertSuccess("Created layout item");
+                    }
+                    catch (OcudaException ex)
+                    {
+                        response = new JsonResponse
+                        {
+                            Success = false,
+                            Message = ex.Message
+                        };
+                    }
+                }
+                else
+                {
+                    var errors = ModelState.Values
+                        .SelectMany(_ => _.Errors)
+                        .Select(_ => _.ErrorMessage);
+
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = string.Join(Environment.NewLine, errors)
+                    };
+                }
+            }
+            else
+            {
+                response = new JsonResponse
+                {
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> EditPageItem(LayoutDetailViewModel model)
+        {
+            JsonResponse response;
+
+            var headerId = await _pageService.GetHeaderIdForItemAsync(model.PageItem.Id);
+
+            if (await HasPagePermissionAsync(headerId))
+            {
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        var pageItem = await _pageService.EditItemAsync(model.PageItem);
+
+                        var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
+
+                        response = new JsonResponse
+                        {
+                            Success = true,
+                            Url = Url.Action(nameof(LayoutDetail), new
+                            {
+                                id = pageItem.PageLayoutId,
+                                language = language.IsDefault ? null : language.Name
+                            })
+                        };
+
+                        ShowAlertSuccess("Updated layout item");
+                    }
+                    catch (OcudaException ex)
+                    {
+                        response = new JsonResponse
+                        {
+                            Success = false,
+                            Message = ex.Message
+                        };
+                    }
+                }
+                else
+                {
+                    var errors = ModelState.Values
+                        .SelectMany(_ => _.Errors)
+                        .Select(_ => _.ErrorMessage);
+
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = string.Join(Environment.NewLine, errors)
+                    };
+                }
+            }
+            else
+            {
+                response = new JsonResponse
+                {
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeletePageItem(LayoutDetailViewModel model)
+        {
+            var headerId = await _pageService.GetHeaderIdForItemAsync(model.PageItem.Id);
+
+            if (!await HasPagePermissionAsync(headerId))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            try
+            {
+                await _pageService.DeleteItemAsync(model.PageItem.Id);
+                ShowAlertSuccess("Deleted layout item");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting page item: {Message}", ex.Message);
+                ShowAlertDanger("Error deleting layout item");
+            }
+
+            var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
+
+            return RedirectToAction(nameof(LayoutDetail), new
+            {
+                id = model.PageLayoutId,
+                language = language.IsDefault ? null : language.Name
+            });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<JsonResult> ChangeSort(int id, bool increase)
+        {
+            JsonResponse response;
+
+            var headerId = await _pageService.GetHeaderIdForItemAsync(id);
+
+            if (await HasPagePermissionAsync(headerId))
+            {
+                try
+                {
+                    await _pageService.UpdateItemSortOrder(id, increase);
+                    response = new JsonResponse
+                    {
+                        Success = true
+                    };
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Message = ex.Message,
+                        Success = false
+                    };
+                }
+            }
+            else
+            {
+                response = new JsonResponse
+                {
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+
+            return Json(response);
         }
 
         [Route("[action]/{id}")]

@@ -17,6 +17,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<Carousel> EditAsync(Carousel carousel);
         Task<CarouselButton> EditButtonAsync(CarouselButton carouselButton);
         Task<CarouselItem> EditItemAsync(CarouselItem carouselItem);
+        Task<ICollection<Carousel>> GetAllAsync();
         Task<ICollection<CarouselButtonLabel>> GetButtonLabelsAsync();
         Task<Carousel> GetCarouselDetailsAsync(int id, int languageId);
         Task<DataWithCount<ICollection<Carousel>>> GetPaginatedListAsync(BaseFilter filter);

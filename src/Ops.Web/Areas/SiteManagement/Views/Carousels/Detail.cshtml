@@ -1,14 +1,5 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Carousels.DetailViewModel
 
-<form asp-controller="@CarouselsController.Name" asp-action="@nameof(CarouselsController.EditCarouselText)">
-    <input id="editCarouselTextLanguage" asp-for="LanguageId" type="hidden" />
-    <input id="editCarouselTextId" asp-for="Carousel.Id" type="hidden" />
-
-    <div modal id="editCarouselTextModal" isLarge="true" name="Carousel Text" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
-        <input id="editCarouselTextTitle" asp-for="CarouselText.Title" value="@Model.Carousel.CarouselText?.Title" formgroup />
-    </div>
-</form>
-
 <form id="addItemForm" role="form">
     <input id="addItemLanguage" asp-for="LanguageId" type="hidden" />
     <input id="addItemCarouselId" asp-for="CarouselItem.CarouselId" value="@Model.CarouselId" type="hidden" />
@@ -447,6 +438,9 @@
                                     prevRow.find(".increaseSortButton").attr("disabled", "disabled");
                                 }
                             }
+                        }
+                        else {
+                            alert(response.message);
                         }
                 });
             }

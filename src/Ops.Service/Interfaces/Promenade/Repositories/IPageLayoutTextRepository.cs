@@ -8,5 +8,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     {
         Task<ICollection<PageLayoutText>> GetAllForHeaderAsync(int headerId);
         Task<ICollection<PageLayoutText>> GetAllForLayoutAsync(int layoutId);
+        Task<PageLayoutText> GetByPageLayoutAndLanguageAsync(int layoutId, int languageId);
     }
 }

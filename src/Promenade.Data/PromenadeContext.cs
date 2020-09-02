@@ -68,7 +68,7 @@ namespace Ocuda.Promenade.Data
         public DbSet<Navigation> Navigations { get; }
         public DbSet<NavigationText> NavigationTexts { get; }
         public DbSet<PageItem> PageItems { get; }
-        public DbSet<PageLayout> Pagelayouts { get; }
+        public DbSet<PageLayout> PageLayouts { get; }
         public DbSet<PageLayoutText> PageLayoutTexts { get; }
         public DbSet<Page> Pages { get; }
         public DbSet<PodcastDirectory> PodcastDirectories { get; }

@@ -58,6 +58,18 @@ namespace Ocuda.Ops.Data.Promenade
                 .SingleOrDefaultAsync();
         }
 
+        public async Task<PageLayout> GetIncludingChildrenWithItemContent(int id)
+        {
+            return await DbSet
+                .Where(_ => _.Id == id)
+                .Include(_ => _.Items)
+                    .ThenInclude(_ => _.Carousel)
+                .Include(_ => _.Items)
+                    .ThenInclude(_ => _.Segment)
+                .AsNoTracking()
+                .SingleOrDefaultAsync();
+        }
+
         public async Task<ICollection<PageLayout>> GetAllForHeaderIncludingChildrenAsync(
             int headerId)
         {

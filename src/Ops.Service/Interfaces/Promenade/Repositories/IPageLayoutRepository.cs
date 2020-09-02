@@ -11,6 +11,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
         Task<PageLayout> FindAsync(int id);
         Task<ICollection<PageLayout>> GetAllForHeaderIncludingChildrenAsync(int headerId);
         Task<PageLayout> GetIncludingChildrenAsync(int id);
+        Task<PageLayout> GetIncludingChildrenWithItemContent(int id);
         Task<DataWithCount<ICollection<PageLayout>>> GetPaginatedListForHeaderAsync(int headerId,
             BaseFilter filter);
     }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -13,9 +14,11 @@ namespace Ocuda.Promenade.Models.Entities
 
         public int Order { get; set; }
 
+        [DisplayName("Carousel")]
         public int? CarouselId { get; set; }
         public Carousel Carousel { get; set; }
 
+        [DisplayName("Segment")]
         public int? SegmentId { get; set; }
         public Segment Segment { get; set; }
     }

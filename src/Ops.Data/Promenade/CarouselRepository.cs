@@ -29,6 +29,14 @@ namespace Ocuda.Ops.Data.Promenade
             return entity;
         }
 
+        public async Task<ICollection<Carousel>> GetAllAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .OrderBy(_ => _.Name)
+                .ToListAsync();
+        }
+
         public async Task<DataWithCount<ICollection<Carousel>>> GetPaginatedListAsync(
             BaseFilter filter)
         {
