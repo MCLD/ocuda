@@ -151,7 +151,7 @@ else
                                 <td class="align-middle">@header.Stub</td>
                                 <td class="align-middle">@header.Type.ToString()</td>
                                 <td class="align-middle">@string.Join(", ", header.PageLanguages)</td>
-                                <td class="align-middle">
+                                <td class="align-middle text-nowrap">
                                     @if (Model.IsSiteManager)
                                     {
                                         <a asp-action="@(nameof(PagesController.ContentPermissions))"
