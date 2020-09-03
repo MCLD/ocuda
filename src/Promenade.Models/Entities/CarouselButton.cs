@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -21,5 +22,8 @@ namespace Ocuda.Promenade.Models.Entities
         [DisplayName("Label")]
         public int LabelId { get; set; }
         public CarouselButtonLabel Label { get; set; }
+
+        [NotMapped]
+        public CarouselButtonLabelText LabelText { get; set; }
     }
 }

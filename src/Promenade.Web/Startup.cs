@@ -231,6 +231,14 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<Controllers.Filters.LayoutFilter>();
 
             // repositories
+            services.AddScoped<Service.Interfaces.Repositories.ICarouselButtonLabelTextRepository,
+                Data.Promenade.CarouselButtonLabelTextRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ICarouselItemTextRepository,
+                Data.Promenade.CarouselItemTextRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ICarouselRepository,
+                Data.Promenade.CarouselRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ICarouselTextRepository,
+                Data.Promenade.CarouselTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ICategoryRepository,
                 Data.Promenade.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ICategoryTextRepository,
@@ -265,6 +273,12 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.NavigationRepository>();
             services.AddScoped<Service.Interfaces.Repositories.INavigationTextRepository,
                 Data.Promenade.NavigationTextRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IPageHeaderRepository,
+                Data.Promenade.PageHeaderRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IPageLayoutRepository,
+                Data.Promenade.PageLayoutRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IPageLayoutTextRepository,
+                Data.Promenade.PageLayoutTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IPageRepository,
                 Data.Promenade.PageRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IPodcastItemRepository,
@@ -297,6 +311,7 @@ namespace Ocuda.Promenade.Web
                 Utility.Services.PathResolverService>();
 
             // promenade servicews
+            services.AddScoped<CarouselService>();
             services.AddScoped<CategoryService>();
             services.AddScoped<EmediaService>();
             services.AddScoped<ExternalResourceService>();

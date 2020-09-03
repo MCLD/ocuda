@@ -144,5 +144,35 @@
         /// Cached schedule subjects
         /// </summary>
         public static readonly string PromScheduleSubjects = "schedulesubjects";
+
+        /// <summary>
+        /// Cached carousel, {0} is the carousel id
+        /// </summary>
+        public static readonly string PromCarousel = "carousel.{0}";
+
+        /// <summary>
+        /// Cached carousel text, {0} is the language id, {1} is the id
+        /// </summary>
+        public static readonly string PromCarouselText = "carouseltext.{0}.{1}";
+
+        /// <summary>
+        /// Cached carousel item text, {0} is the language id, {1} is the id
+        /// </summary>
+        public static readonly string PromCarouselItemText = "carouselitemtext.{0}.{1}";
+
+        /// <summary>
+        /// Cached carousel button label text, {0} is the language id, {1} is the id
+        /// </summary>
+        public static readonly string PromCarouselButtonLabelText = "carouselbuttonlabeltext.{0}.{1}";
+
+        /// <summary>
+        /// Cached page layout, {0} is the layout id
+        /// </summary>
+        public static readonly string PromPageLayout = "pagelayout.{0}";
+
+        /// <summary>
+        /// Cached page layout text, {0} is the language id, {1} is the id
+        /// </summary>
+        public static readonly string PromPageLayoutText = "pagelayouttext.{0}.{1}";
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -21,5 +22,8 @@ namespace Ocuda.Promenade.Models.Entities
         [DisplayName("Segment")]
         public int? SegmentId { get; set; }
         public Segment Segment { get; set; }
+
+        [NotMapped]
+        public SegmentText SegmentText { get; set; }
     }
 }
