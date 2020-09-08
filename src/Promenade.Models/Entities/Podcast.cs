@@ -33,6 +33,9 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public string ImageUrl { get; set; }
 
+        [MaxLength(255)]
+        public string ImageThumbnailUrl { get; set; }
+
         [MaxLength(8)]
         [Required]
         public string Language { get; set; }
