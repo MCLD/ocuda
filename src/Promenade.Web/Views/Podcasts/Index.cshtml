@@ -8,7 +8,7 @@
                 <a href="@Url.Action(nameof(PodcastsController.Podcast), new { stub = podcast.Stub})">
                     <img class="card-img-top"
                          alt="@podcast.Title"
-                         src="@podcast.ImageUrl" />
+                         src="@(podcast.ImageThumbnailUrl ?? podcast.ImageUrl)" />
                 </a>
                 <div class="card-body">
                     <div class="card-title h5"><a href="@Url.Action(nameof(PodcastsController.Podcast), new { stub = podcast.Stub})">@podcast.Title</a></div>

@@ -73,6 +73,11 @@ namespace Ocuda.Promenade.Controllers
             foreach (var podcast in podcasts.Data)
             {
                 podcast.ImageUrl = _pathResolverService.GetPublicContentUrl(podcast.ImageUrl);
+                if (!string.IsNullOrEmpty(podcast.ImageThumbnailUrl))
+                {
+                    podcast.ImageThumbnailUrl
+                        = _pathResolverService.GetPublicContentUrl(podcast.ImageThumbnailUrl);
+                }
             }
 
             var viewModel = new IndexViewModel
@@ -126,6 +131,12 @@ namespace Ocuda.Promenade.Controllers
 
             podcast.ImageUrl = _pathResolverService.GetPublicContentUrl(podcast.ImageUrl);
 
+            if (!string.IsNullOrEmpty(podcast.ImageThumbnailUrl))
+            {
+                podcast.ImageThumbnailUrl
+                    = _pathResolverService.GetPublicContentUrl(podcast.ImageThumbnailUrl);
+            }
+
             var viewModel = new PodcastViewModel
             {
                 Podcast = podcast,
@@ -173,6 +184,12 @@ namespace Ocuda.Promenade.Controllers
             }
 
             podcast.ImageUrl = _pathResolverService.GetPublicContentUrl(podcast.ImageUrl);
+            if (!string.IsNullOrEmpty(podcast.ImageThumbnailUrl))
+            {
+                podcast.ImageThumbnailUrl
+                    = _pathResolverService.GetPublicContentUrl(podcast.ImageThumbnailUrl);
+            }
+
             podcastItem.MediaUrl = _pathResolverService.GetPublicContentUrl(podcastItem.MediaUrl);
             if (!string.IsNullOrWhiteSpace(podcastItem.ImageUrl))
             {
