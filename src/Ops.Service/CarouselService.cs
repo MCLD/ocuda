@@ -108,8 +108,8 @@ namespace Ocuda.Ops.Service
             await DeleteNoSaveAsync(carouselId);
             await _carouselRepository.SaveAsync();
         }
-        
-        public async Task DeleteNoSaveAsync (int carouselId)
+
+        public async Task DeleteNoSaveAsync(int carouselId)
         {
             var carousel = await _carouselRepository.GetIncludingChildrenAsync(carouselId);
 
@@ -253,13 +253,12 @@ namespace Ocuda.Ops.Service
         {
             var imageUrl = itemText.ImageUrl?.Trim();
 
-            var allowedImageDomains = (await _siteSettingService.GetSettingStringAsync(
-                    Models.Keys.SiteSetting.Carousel.ImageRestrictToDomains))
-                    .Split(',')
-                    .ToList();
+            var delimitedImageDomains = await _siteSettingService.GetSettingStringAsync(
+                    Models.Keys.SiteSetting.Carousel.ImageRestrictToDomains);
 
-            if (allowedImageDomains.Count > 0)
+            if (!string.IsNullOrWhiteSpace(delimitedImageDomains))
             {
+                var allowedImageDomains = delimitedImageDomains.Split(',').ToList();
 
                 string imageDomain;
                 try
@@ -314,13 +313,13 @@ namespace Ocuda.Ops.Service
         {
             button.Url = button.Url?.Trim();
 
-            var allowedLinkDomains = (await _siteSettingService.GetSettingStringAsync(
-                    Models.Keys.SiteSetting.Carousel.LinkRestrictToDomains))
-                    .Split(',')
-                    .ToList();
+            var delimitedLinkDomains = await _siteSettingService.GetSettingStringAsync(
+                    Models.Keys.SiteSetting.Carousel.LinkRestrictToDomains);
 
-            if (allowedLinkDomains.Count > 0)
+            if (!string.IsNullOrWhiteSpace(delimitedLinkDomains))
             {
+                var allowedLinkDomains = delimitedLinkDomains.Split(',').ToList();
+
                 string linkDomain;
                 try
                 {
@@ -354,13 +353,13 @@ namespace Ocuda.Ops.Service
         {
             var linkUrl = carouselButton.Url?.Trim();
 
-            var allowedLinkDomains = (await _siteSettingService.GetSettingStringAsync(
-                    Models.Keys.SiteSetting.Carousel.LinkRestrictToDomains))
-                    .Split(',')
-                    .ToList();
+            var delimitedLinkDomains = await _siteSettingService.GetSettingStringAsync(
+                    Models.Keys.SiteSetting.Carousel.LinkRestrictToDomains);
 
-            if (allowedLinkDomains.Count > 0)
+            if (!string.IsNullOrWhiteSpace(delimitedLinkDomains))
             {
+                var allowedLinkDomains = delimitedLinkDomains.Split(',').ToList();
+
                 string linkDomain;
                 try
                 {
