@@ -34,6 +34,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<PageLayoutText> GetTextByLayoutAndLanguageAsync(int layoutId, int languageId);
         Task<PageLayout> GetLayoutForItemAsync(int itemId);
         Task<PageItem> GetItemByIdAsync(int id);
-        Task DeleteItemNoSaveAsync(int pageItemId);
+        Task DeleteItemNoSaveAsync(int pageItemId, bool ignoreSort = false);
     }
 }

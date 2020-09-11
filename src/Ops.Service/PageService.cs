@@ -158,9 +158,13 @@ namespace Ocuda.Ops.Service
                 var layouts = await _pageLayoutRepository.GetAllForHeaderIncludingChildrenAsync(
                     header.Id);
 
-                foreach (var item in layouts.SelectMany(_ => _.Items))
+                foreach (var layout in layouts)
                 {
-                    await DeleteItemNoSaveAsync(item.Id);
+                    foreach (var item in layout.Items)
+                    {
+                        await DeleteItemNoSaveAsync(item.Id, true);
+                    }
+                    layout.Items = null;
                 }
 
                 _pageLayoutRepository.RemoveRange(layouts);
@@ -227,12 +231,13 @@ namespace Ocuda.Ops.Service
             var layout = await _pageLayoutRepository.GetIncludingChildrenAsync(id);
 
             var texts = await _pageLayoutTextRepository.GetAllForLayoutAsync(layout.Id);
-                _pageLayoutTextRepository.RemoveRange(texts);
+            _pageLayoutTextRepository.RemoveRange(texts);
 
             foreach (var item in layout.Items)
             {
-                await DeleteItemNoSaveAsync(item.Id);
+                await DeleteItemNoSaveAsync(item.Id, true);
             }
+            layout.Items = null;
 
             _pageLayoutRepository.Remove(layout);
             await _pageLayoutRepository.SaveAsync();
@@ -334,7 +339,7 @@ namespace Ocuda.Ops.Service
             await _pageItemRepository.SaveAsync();
         }
 
-        public async Task DeleteItemNoSaveAsync(int pageItemId)
+        public async Task DeleteItemNoSaveAsync(int pageItemId, bool ignoreSort = false)
         {
             var pageItem = await _pageItemRepository.FindAsync(pageItemId);
 
@@ -352,13 +357,16 @@ namespace Ocuda.Ops.Service
                 await _segmentService.DeleteNoSaveAsync(pageItem.SegmentId.Value);
             }
 
-            var subsequentItems = await _pageItemRepository.GetLayoutSubsequentAsync(
-                pageItem.PageLayoutId, pageItem.Order);
-
-            if (subsequentItems.Count > 0)
+            if (!ignoreSort)
             {
-                subsequentItems.ForEach(_ => _.Order--);
-                _pageItemRepository.UpdateRange(subsequentItems);
+                var subsequentItems = await _pageItemRepository.GetLayoutSubsequentAsync(
+                    pageItem.PageLayoutId, pageItem.Order);
+
+                if (subsequentItems.Count > 0)
+                {
+                    subsequentItems.ForEach(_ => _.Order--);
+                    _pageItemRepository.UpdateRange(subsequentItems);
+                }
             }
 
             _pageItemRepository.Remove(pageItem);
