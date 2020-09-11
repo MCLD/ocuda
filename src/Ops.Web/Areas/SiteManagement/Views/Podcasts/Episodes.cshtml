@@ -1,0 +1,64 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Podcasts.EpisodeIndexViewModel
+
+<h1>
+    Podcast Episodes
+    <small class="text-muted">@Model.PodcastTitle</small>
+</h1>
+
+@if (Model.Episodes.Count() == 0)
+{
+    <div class="alert alert-warning">No episodes found.</div>
+}
+else
+{
+    <div class="row">
+        <div class="col-12 my-2">
+            <a asp-action="@(nameof(PodcastsController.AddEpisode))"
+               asp-route-podcastId="@Model.PodcastId"
+               class="btn btn-outline-success btn-lg">
+                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                Add Episode
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-sm table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>Episode</th>
+                        <th>Title</th>
+                        <th>Publish Date</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var episode in Model.Episodes)
+                    {
+                        <tr>
+                            <td class="align-middle">@episode.Episode</td>
+                            <td class="align-middle">@episode.Title</td>
+                            <td class="align-middle">@episode.PublishDate</td>
+                            <td class="align-middle text-nowrap">
+                                @*@if (Model.IsSiteManager || Model.PermissionIds?.Any(_ => episode.PermissionGroupIds.Contains(_)) == true)
+                                    {*@
+                                <a asp-action="@(nameof(PodcastsController.EditEpisode))"
+                                   asp-route-episodeId="@episode.Id"
+                                   class="btn btn-link"
+                                   title="Edit">
+                                    <span class="fas fa-edit" aria-hidden="true"></span>
+                                </a>
+                                @*}*@
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @if (Model.PaginateModel.MaxPage > 1)
+    {
+        <paginate paginateModel="@Model.PaginateModel"></paginate>
+    }
+}

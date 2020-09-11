@@ -1,0 +1,184 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Podcasts.EpisodeDetailsViewModel
+
+<div class="modal" tabindex="-1" role="dialog" id="uploadModal">
+    <div class="modal-dialog" role="document">
+        <form asp-action="@nameof(PodcastsController.UpdatePodcastFile)"
+              enctype="multipart/form-data"
+              method="post">
+            <input asp-for="Episode.Id" type="hidden" />
+            <input asp-for="EditEpisode" type="hidden" />
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Upload podcast file</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Select a file to upload:</p>
+                    <input asp-for="UploadedFile" type="file" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class="btn btn-outline-success btn-spinner">
+                        <span class="fas fa-file-upload"></span>
+                        Upload file
+                        <span class="fas fa-spinner fa-pulse fa-fw d-none"></span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12 col-sm-8">
+        <h1>
+            @(Model.EditEpisode ? "Edit" : "Add") Podcast Episode
+            <small class="text-muted">@Model.PodcastTitle</small>
+        </h1>
+    </div>
+    <div class="col-12 col-sm-4">
+        <a asp-action="@nameof(PodcastsController.Episodes)"
+           asp-controller="@PodcastsController.Name"
+           asp-route-podcastId="@Model.Episode.PodcastId"
+           class="btn btn-outline-dark btn-lg float-sm-right">
+            <span class="fas fa-list-ol"></span>
+            Episode List
+        </a>
+    </div>
+</div>
+
+<form asp-action="@nameof(PodcastsController.AddUpdateEpisode)" method="post" role="form">
+    <div class="row">
+        <div class="col">
+            <input asp-for="EditEpisode" type="hidden" />
+            <input asp-for="Episode.PodcastId" type="hidden" />
+            <input asp-for="Episode.Id" type="hidden" />
+            <input asp-for="Episode.Episode" formgroup />
+            <input asp-for="Episode.Title" formgroup />
+            <input asp-for="Episode.Subtitle" formgroup />
+            <textarea asp-for="Episode.Description" rows="4" formgroup></textarea>
+            <input asp-for="Episode.Keywords" formgroup />
+            @if (Model.Episode.MediaSize > 0)
+            {
+                <input asp-for="Episode.PublishDate" type="date" formgroup />
+            }
+            else
+            {
+                <div class="row form-group">
+                    <div class="col-md-3 text-right">
+                        <label asp-for="Episode.PublishDate"></label>
+                    </div>
+                    <div class="col-md-9">
+                        <span class="text-danger font-weight-bold">
+                            Please upload the podcast file to set a publish date and time.
+                        </span>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-md-9 offset-md-3">
+            <button type="submit"
+                    class="btn btn-outline-success btn-spinner btn-lg">
+                <span class="far fa-save"></span>
+                Save
+                <span class="fas fa-spinner fa-pulse fa-fw d-none"></span>
+            </button>
+        </div>
+    </div>
+</form>
+
+@if (Model.EditEpisode)
+{
+    <div class="row my-3">
+        <div class="col-md-3 text-right">
+            <span class="h3">File details</span>
+        </div>
+    </div>
+    @if (Model.Episode.MediaSize > 0)
+    {
+
+        {
+            <div class="row my-3">
+                <div class="col-md-3 text-right">
+                    File name
+                </div>
+                <div class="col-md-9">
+                    @if (Model.FileMissing)
+                    {
+                        <div class="alert alert-danger">
+                            <span class="fa fa-exclamation-triangle"></span>
+                            File missing: @Model.Filename
+                        </div>
+
+                    }
+                    else
+                    {
+                        @Model.Filename
+                    }
+                </div>
+            </div>
+            if (!Model.FileMissing)
+            {
+                <div class="row my-3">
+                    <div class="col-md-3 text-right">
+                        File uploaded
+                    </div>
+                    <div class="col-md-9">
+                        @Model.UploadedAt
+                    </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col-md-3 text-right">
+                        File size
+                    </div>
+                    <div class="col-md-9">
+                        @Model.Episode.MediaSize bytes
+                    </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col-md-3 text-right">
+                        Duration
+                    </div>
+                    <div class="col-md-9">
+                        @Model.Episode.Duration seconds
+                    </div>
+                </div>
+            }
+        }
+    }
+    <div class="row my-3">
+        <div class="col-md-3 text-right pt-1">
+            Upload podcast
+        </div>
+        <div class="col-md-9">
+            <button type="button"
+                    class="btn btn-sm btn-outline-primary"
+                    data-toggle="modal"
+                    data-target="#uploadModal">
+                @if (Model.Episode.MediaSize > 0)
+                {
+                    @:Replace podcast file
+                }
+                else
+                {
+                    @:Add podcast file
+                }
+            </button>
+        </div>
+    </div>
+    <div class="row my-3">
+        <div class="col-md-3 text-right">
+            Maximum allowed file size
+        </div>
+        <div class="col-md-9">
+            @Model.MaximumFileSizeMB MB
+        </div>
+    </div>
+}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Promenade.Models.Entities
@@ -53,6 +54,7 @@ namespace Ocuda.Promenade.Models.Entities
 
         public bool GuidPermaLink { get; set; }
 
+        [DisplayName("Publish date and time")]
         public DateTime? PublishDate { get; set; }
 
         public bool IsBlocked { get; set; }

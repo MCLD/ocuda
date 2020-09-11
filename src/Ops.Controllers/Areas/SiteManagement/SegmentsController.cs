@@ -14,6 +14,7 @@ using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
@@ -214,17 +215,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         inUseByTag.InnerHtml.AppendHtml(inUseByItem);
                     }
 
-                    using (var inUseByHtml = new StringWriter())
-                    {
-                        inUseByTag.WriteTo(inUseByHtml, HtmlEncoder.Default);
-                        ShowAlertDanger($"{alertMessage} {inUseByHtml}");
-                    }
+                    using var inUseByHtml = new StringWriter();
+                    inUseByTag.WriteTo(inUseByHtml, HtmlEncoder.Default);
+                    ShowAlertDanger($"{alertMessage} {inUseByHtml}");
                 }
                 else
                 {
                     ShowAlertDanger(alertMessage);
                 }
-
             }
             catch (Exception ex)
             {
@@ -234,7 +232,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
         }
-
 
         [Route("[action]/{id}")]
         [RestoreModelState]
@@ -365,7 +362,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         return false;
                     }
                     var permissionGroups = await _permissionGroupService
-                        .GetPagePermissionsAsync(pageHeaderId.Value);
+                        .GetPermissionsAsync<PermissionGroupPageContent>(pageHeaderId.Value);
                     var permissionGroupsStrings = permissionGroups
                         .Select(_ => _.PermissionGroupId.ToString(CultureInfo.InvariantCulture));
 

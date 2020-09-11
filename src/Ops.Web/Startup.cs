@@ -193,6 +193,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.LinkLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository,
                 Data.Ops.LinkRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupPodcastItemRepository,
+                Data.Ops.PermissionGroupPodcastItemRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupPageContentRepository,
                 Data.Ops.PermissionGroupPageContentRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupRepository,
@@ -274,6 +276,10 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.PageLayoutRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageLayoutTextRepository,
                 Data.Promenade.PageLayoutTextRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPodcastRepository,
+                Data.Promenade.PodcastRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPodcastItemsRepository,
+                Data.Promenade.PodcastItemsRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IScheduleRequestRepository,
                 Data.Promenade.ScheduleRequestRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IScheduleRequestSubjectRepository,
@@ -311,8 +317,10 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ILocationFeatureService, LocationFeatureService>();
             services.AddScoped<ILinkService, LinkService>();
             services.AddScoped<IPageService, PageService>();
+            services.AddScoped<IPublicFilesService, PublicFilesService>();
             services.AddScoped<Utility.Services.Interfaces.IPathResolverService,
                 Utility.Services.PathResolverService>();
+            services.AddScoped<IPodcastService, PodcastService>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IPermissionGroupService, PermissionGroupService>();
             services.AddScoped<IRosterService, RosterService>();

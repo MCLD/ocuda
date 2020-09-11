@@ -4,5 +4,6 @@
     {
         public bool IsSiteManager { get; set; }
         public bool HasPagePermissions { get; set; }
+        public bool HasPodcastPermissions { get; set; }
     }
 }

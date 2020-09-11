@@ -36,6 +36,8 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.SectionId, _.CategoryId });
             modelBuilder.Entity<PermissionGroupPageContent>()
                 .HasKey(_ => new { _.PermissionGroupId, _.PageHeaderId });
+            modelBuilder.Entity<PermissionGroupPodcastItem>()
+                .HasKey(_ => new { _.PermissionGroupId, _.PodcastId });
             modelBuilder.Entity<PostCategory>()
                 .HasKey(_ => new { _.PostId, _.CategoryId });
         }
@@ -64,6 +66,7 @@ namespace Ocuda.Ops.Data
         public DbSet<LinkLibrary> LinkLibraries { get; set; }
         public DbSet<PermissionGroup> PermissionGroups { get; set; }
         public DbSet<PermissionGroupPageContent> PermissionGroupPageContents { get; set; }
+        public DbSet<PermissionGroupPodcastItem> PermissionGroupPodcastItems { get; set; }
         public DbSet<PostCategory> PostCategories { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Category> Categories { get; set; }

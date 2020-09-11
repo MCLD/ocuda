@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -67,5 +68,11 @@ namespace Ocuda.Promenade.Models.Entities
 
         [MaxLength(255)]
         public string Copyright { get; set; }
+
+        [NotMapped]
+        public IEnumerable<string> PermissionGroupIds { get; set; }
+
+        [NotMapped]
+        public int EpisodeCount { get; set; }
     }
 }

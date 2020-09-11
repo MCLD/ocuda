@@ -26,7 +26,8 @@ namespace Ocuda.Ops.Data.Ops
             return await DbSet.AsNoTracking().ToListAsync();
         }
 
-        public async Task<ICollection<PermissionGroup>> GetGroupsAsync(int[] permissionGroupIds)
+        public async Task<ICollection<PermissionGroup>>
+            GetGroupsAsync(IEnumerable<int> permissionGroupIds)
         {
             return await DbSet
                 .AsNoTracking()

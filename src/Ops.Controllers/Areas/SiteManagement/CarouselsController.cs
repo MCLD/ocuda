@@ -10,6 +10,7 @@ using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Carousels;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
@@ -212,7 +213,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     viewModel.ButtonUrlInfoMessage
                         = $"Urls are restricted to the following domains: {AllowedLinkDomains}";
                 }
-                    
             }
 
             return View(viewModel);
@@ -506,7 +506,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             if (await HasCaroseulPermissionAsync(carouselId))
             {
-
                 if (ModelState.IsValid)
                 {
                     try
@@ -614,7 +613,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         return false;
                     }
                     var permissionGroups = await _permissionGroupService
-                        .GetPagePermissionsAsync(pageHeaderId.Value);
+                        .GetPermissionsAsync<PermissionGroupPageContent>(pageHeaderId.Value);
                     var permissionGroupsStrings = permissionGroups
                         .Select(_ => _.PermissionGroupId.ToString(CultureInfo.InvariantCulture));
 
