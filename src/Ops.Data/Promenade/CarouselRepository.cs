@@ -73,5 +73,23 @@ namespace Ocuda.Ops.Data.Promenade
                 .AsNoTracking()
                 .SingleOrDefaultAsync();
         }
+
+        public async Task<int?> GetPageHeaderIdForCarouselAsync(int id)
+        {
+            return await _context.PageItems
+                .AsNoTracking()
+                .Where(_ => _.CarouselId == id)
+                .Select(_ => _.PageLayout.PageHeaderId)
+                .SingleOrDefaultAsync();
+        }
+
+        public async Task<int?> GetPageLayoutIdForCarouselAsync(int id)
+        {
+            return await _context.PageItems
+                .AsNoTracking()
+                .Where(_ => _.CarouselId == id)
+                .Select(_ => _.PageLayout.Id)
+                .SingleOrDefaultAsync();
+        }
     }
 }

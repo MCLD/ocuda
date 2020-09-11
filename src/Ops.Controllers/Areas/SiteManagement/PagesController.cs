@@ -635,10 +635,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 LanguageId = selectedLanguage.Id,
                 LanguageList = new SelectList(languages, nameof(Language.Name),
                     nameof(Language.Description), selectedLanguage.Name),
-                CarouselList = new SelectList(await _carouselService.GetAllAsync(),
-                    nameof(Carousel.Id), nameof(Carousel.Name)),
-                SegmentList = new SelectList(await _segmentService.GetActiveSegmentsAsync(),
-                    nameof(Segment.Id), nameof(Segment.Name))
             };
 
             return View(viewModel);
@@ -678,29 +674,59 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            var pageLayout = await _pageService.GetLayoutByIdAsync(model.PageItem.PageLayoutId);
+            var layout = await _pageService.GetLayoutByIdAsync(model.PageItem.PageLayoutId);
 
-            if (await HasPagePermissionAsync(pageLayout.PageHeaderId))
+            if (await HasPagePermissionAsync(layout.PageHeaderId))
             {
+                if (model.Carousel == null && model.Segment == null)
+                {
+                    ModelState.AddModelError("PageItem", "No content to add.");
+                }
+
+                if (model.Segment != null
+                    && model.Segment.StartDate.HasValue && model.Segment.EndDate.HasValue
+                    && model.Segment.StartDate > model.Segment.EndDate)
+                {
+                    ModelState.AddModelError("Segment.StartDate",
+                        "Start Date cannot be after the End Date.");
+                }
+
                 if (ModelState.IsValid)
                 {
                     try
                     {
+                        if (model.Carousel != null)
+                        {
+                            model.PageItem.Carousel = model.Carousel;
+                        }
+                        else if (model.Segment != null)
+                        {
+                            model.PageItem.Segment = model.Segment;
+                        }
+
                         var pageItem = await _pageService.CreateItemAsync(model.PageItem);
 
-                        var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
+                        string url = null;
+                        if (pageItem.Carousel != null)
+                        {
+                            url = Url.Action(nameof(CarouselsController.Detail),
+                                CarouselsController.Name,
+                                new { id = pageItem.Carousel.Id });
+                        }
+                        else if (pageItem.Segment != null)
+                        {
+                            url = Url.Action(nameof(SegmentsController.Detail),
+                                SegmentsController.Name,
+                                new { id = pageItem.Segment.Id });
+                        }
 
                         response = new JsonResponse
                         {
                             Success = true,
-                            Url = Url.Action(nameof(LayoutDetail), new
-                            {
-                                id = pageItem.PageLayoutId,
-                                language = language.IsDefault ? null : language.Name
-                            })
+                            Url = url
                         };
 
-                        ShowAlertSuccess("Created layout item");
+                        ShowAlertSuccess("Created item for layout");
                     }
                     catch (OcudaException ex)
                     {
@@ -742,15 +768,44 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            var headerId = await _pageService.GetHeaderIdForItemAsync(model.PageItem.Id);
+            var layout = await _pageService.GetLayoutForItemAsync(model.PageItem.Id);
 
-            if (await HasPagePermissionAsync(headerId))
+            if (await HasPagePermissionAsync(layout.PageHeaderId))
             {
+                var pageItem = await _pageService.GetItemByIdAsync(model.PageItem.Id);
+
+                if (pageItem.CarouselId.HasValue && model.Carousel == null)
+                {
+                    ModelState.AddModelError("PageItem", "No carousel submitted");
+                }
+                else if (pageItem.SegmentId.HasValue)
+                {
+                    if (model.Segment == null)
+                    {
+                        ModelState.AddModelError("PageItem", "No segment submitted");
+                    }
+                    else if (model.Segment.StartDate.HasValue && model.Segment.EndDate.HasValue
+                        && model.Segment.StartDate > model.Segment.EndDate)
+                    {
+                        ModelState.AddModelError("Segment.StartDate",
+                            "Start Date cannot be after the End Date.");
+                    }
+                }
+
                 if (ModelState.IsValid)
                 {
                     try
                     {
-                        var pageItem = await _pageService.EditItemAsync(model.PageItem);
+                        if (pageItem.CarouselId.HasValue)
+                        {
+                            model.Carousel.Id = pageItem.CarouselId.Value;
+                            await _carouselService.EditAsync(model.Carousel);
+                        }
+                        else if (pageItem.SegmentId.HasValue)
+                        {
+                            model.Segment.Id = pageItem.SegmentId.Value;
+                            await _segmentService.EditAsync(model.Segment);
+                        }
 
                         var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
 
@@ -759,7 +814,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             Success = true,
                             Url = Url.Action(nameof(LayoutDetail), new
                             {
-                                id = pageItem.PageLayoutId,
+                                id = layout.Id,
                                 language = language.IsDefault ? null : language.Name
                             })
                         };
@@ -804,9 +859,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> DeletePageItem(LayoutDetailViewModel model)
         {
-            var headerId = await _pageService.GetHeaderIdForItemAsync(model.PageItem.Id);
+            var layout = await _pageService.GetLayoutForItemAsync(model.PageItem.Id);
 
-            if (!await HasPagePermissionAsync(headerId))
+            if (!await HasPagePermissionAsync(layout.PageHeaderId))
             {
                 return RedirectToUnauthorized();
             }
@@ -826,7 +881,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             return RedirectToAction(nameof(LayoutDetail), new
             {
-                id = model.PageLayoutId,
+                id = layout.Id,
                 language = language.IsDefault ? null : language.Name
             });
         }
@@ -837,9 +892,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            var headerId = await _pageService.GetHeaderIdForItemAsync(id);
+            var layout = await _pageService.GetLayoutForItemAsync(id);
 
-            if (await HasPagePermissionAsync(headerId))
+            if (await HasPagePermissionAsync(layout.PageHeaderId))
             {
                 try
                 {

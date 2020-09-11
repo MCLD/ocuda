@@ -25,6 +25,8 @@ namespace Ocuda.Ops.Service
         private readonly IPageRepository _pageRepository;
         private readonly IPermissionGroupPageContentRepository
             _permissionGroupPageContentRepository;
+        private readonly ICarouselService _carouselService;
+        private readonly ISegmentService _segmentService;
 
         public PageService(ILogger<PageService> logger,
             IHttpContextAccessor httpContextAccessor,
@@ -33,7 +35,9 @@ namespace Ocuda.Ops.Service
             IPageLayoutRepository pageLayoutRepository,
             IPageLayoutTextRepository pageLayoutTextRepository,
             IPageRepository pageRepository,
-            IPermissionGroupPageContentRepository permissionGroupPageContentRepository)
+            IPermissionGroupPageContentRepository permissionGroupPageContentRepository,
+            ICarouselService carouselService,
+            ISegmentService segmentService)
             : base(logger, httpContextAccessor)
         {
             _pageHeaderRepository = pageHeaderRepository
@@ -48,6 +52,10 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(pageRepository));
             _permissionGroupPageContentRepository = permissionGroupPageContentRepository
                 ?? throw new ArgumentNullException(nameof(permissionGroupPageContentRepository));
+            _carouselService = carouselService
+                ?? throw new ArgumentNullException(nameof(carouselService));
+            _segmentService = segmentService
+                ?? throw new ArgumentNullException(nameof(segmentService));
         }
 
         public async Task<Page> GetByHeaderAndLanguageAsync(int headerId, int languageId)
@@ -150,8 +158,10 @@ namespace Ocuda.Ops.Service
                 var layouts = await _pageLayoutRepository.GetAllForHeaderIncludingChildrenAsync(
                     header.Id);
 
-                var items = layouts.SelectMany(_ => _.Items).ToList();
-                _pageItemRepository.RemoveRange(items);
+                foreach (var item in layouts.SelectMany(_ => _.Items))
+                {
+                    await DeleteItemNoSaveAsync(item.Id);
+                }
 
                 _pageLayoutRepository.RemoveRange(layouts);
             }
@@ -217,9 +227,13 @@ namespace Ocuda.Ops.Service
             var layout = await _pageLayoutRepository.GetIncludingChildrenAsync(id);
 
             var texts = await _pageLayoutTextRepository.GetAllForLayoutAsync(layout.Id);
-            _pageLayoutTextRepository.RemoveRange(texts);
+                _pageLayoutTextRepository.RemoveRange(texts);
 
-            _pageItemRepository.RemoveRange(layout.Items);
+            foreach (var item in layout.Items)
+            {
+                await DeleteItemNoSaveAsync(item.Id);
+            }
+
             _pageLayoutRepository.Remove(layout);
             await _pageLayoutRepository.SaveAsync();
         }
@@ -254,16 +268,29 @@ namespace Ocuda.Ops.Service
             }
         }
 
+        public async Task<PageItem> GetItemByIdAsync(int id)
+        {
+            return await _pageItemRepository.FindAsync(id);
+        }
+
         public async Task<PageItem> CreateItemAsync(PageItem pageItem)
         {
-            if (!pageItem.CarouselId.HasValue && !pageItem.SegmentId.HasValue)
-            {
-                throw new OcudaException("No content selected");
-            }
+            pageItem.CarouselId = null;
+            pageItem.SegmentId = null;
 
-            if (pageItem.CarouselId.HasValue)
+            if (pageItem.Carousel != null)
             {
-                pageItem.SegmentId = null;
+                pageItem.Segment = null;
+                pageItem.Carousel = await _carouselService.CreateNoSaveAsync(pageItem.Carousel);
+            }
+            else if (pageItem.Segment != null)
+            {
+                pageItem.Carousel = null;
+                pageItem.Segment = await _segmentService.CreateNoSaveAsync(pageItem.Segment);
+            }
+            if (pageItem.Carousel == null && pageItem.Segment == null)
+            {
+                throw new OcudaException("No type selected");
             }
 
             var maxSortOrder = await _pageItemRepository.GetMaxSortOrderForLayoutAsync(
@@ -303,12 +330,26 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteItemAsync(int pageItemId)
         {
-            var pageItem = await _pageItemRepository
-                .FindAsync(pageItemId);
+            await DeleteItemNoSaveAsync(pageItemId);
+            await _pageItemRepository.SaveAsync();
+        }
+
+        public async Task DeleteItemNoSaveAsync(int pageItemId)
+        {
+            var pageItem = await _pageItemRepository.FindAsync(pageItemId);
 
             if (pageItem == null)
             {
                 throw new OcudaException("Page item does not exist.");
+            }
+
+            if (pageItem.CarouselId.HasValue)
+            {
+                await _carouselService.DeleteNoSaveAsync(pageItem.CarouselId.Value);
+            }
+            if (pageItem.SegmentId.HasValue)
+            {
+                await _segmentService.DeleteNoSaveAsync(pageItem.SegmentId.Value);
             }
 
             var subsequentItems = await _pageItemRepository.GetLayoutSubsequentAsync(
@@ -321,7 +362,6 @@ namespace Ocuda.Ops.Service
             }
 
             _pageItemRepository.Remove(pageItem);
-            await _pageItemRepository.SaveAsync();
         }
 
         public async Task UpdateItemSortOrder(int id, bool increase)
@@ -358,9 +398,9 @@ namespace Ocuda.Ops.Service
             await _pageItemRepository.SaveAsync();
         }
 
-        public async Task<int> GetHeaderIdForItemAsync(int itemId)
+        public async Task<PageLayout> GetLayoutForItemAsync(int itemId)
         {
-            return await _pageItemRepository.GetHeaderIdForItemAsync(itemId);
+            return await _pageItemRepository.GetLayoutForItemAsync(itemId);
         }
     }
 }

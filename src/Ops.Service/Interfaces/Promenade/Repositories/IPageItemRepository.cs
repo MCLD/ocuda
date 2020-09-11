@@ -8,7 +8,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     {
         Task<PageItem> FindAsync(int id);
         Task<PageItem> GetByLayoutAndOrderAsync(int layoutId, int order);
-        Task<int> GetHeaderIdForItemAsync(int itemId);
+        Task<PageLayout> GetLayoutForItemAsync(int itemId);
         Task<List<PageItem>> GetLayoutSubsequentAsync(int layoutId, int order);
         Task<int?> GetMaxSortOrderForLayoutAsync(int layoutId);
     }

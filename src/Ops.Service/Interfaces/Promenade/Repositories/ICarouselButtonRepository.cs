@@ -8,7 +8,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     {
         Task<CarouselButton> FindAsync(int id);
         Task<CarouselButton> GetByItemAndOrderAsync(int itemId, int order);
-        Task<List<CarouselButton>> GetCarouselSubsequentAsync(int itemId, int order);
+        Task<int> GetCarouselIdForButtonAsync(int id);
+        Task<List<CarouselButton>> GetItemSubsequentAsync(int itemId, int order);
         Task<int?> GetMaxSortOrderForItemAsync(int itemId);
     }
 }

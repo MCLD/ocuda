@@ -30,5 +30,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Carousels
 
         public int? FocusItemId { get; set; }
         public string ItemErrorMessage { get; set; }
+
+        public int? PageLayoutId { get; set; }
     }
 }

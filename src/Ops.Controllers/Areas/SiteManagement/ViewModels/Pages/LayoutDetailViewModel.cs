@@ -20,7 +20,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
         [DisplayName("Language")]
         public string SelectLanguage { get; set; }
 
-        public SelectList CarouselList { get; set; }
-        public SelectList SegmentList { get; set; }
+        public Carousel Carousel { get; set; }
+        public Promenade.Models.Entities.Segment Segment { get; set; }
     }
 }

@@ -31,7 +31,9 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<PageItem> EditItemAsync(PageItem pageItem);
         Task DeleteItemAsync(int pageItemId);
         Task UpdateItemSortOrder(int id, bool increase);
-        Task<int> GetHeaderIdForItemAsync(int itemId);
         Task<PageLayoutText> GetTextByLayoutAndLanguageAsync(int layoutId, int languageId);
+        Task<PageLayout> GetLayoutForItemAsync(int itemId);
+        Task<PageItem> GetItemByIdAsync(int id);
+        Task DeleteItemNoSaveAsync(int pageItemId);
     }
 }

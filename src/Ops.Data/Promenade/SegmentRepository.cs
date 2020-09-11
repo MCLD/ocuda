@@ -48,5 +48,23 @@ namespace Ocuda.Ops.Data.Promenade
                     .ToListAsync()
             };
         }
+
+        public async Task<int?> GetPageHeaderIdForSegmentAsync(int id)
+        {
+            return await _context.PageItems
+                .AsNoTracking()
+                .Where(_ => _.SegmentId == id)
+                .Select(_ => _.PageLayout.PageHeaderId)
+                .SingleOrDefaultAsync();
+        }
+
+        public async Task<int?> GetPageLayoutIdForSegmentAsync(int id)
+        {
+            return await _context.PageItems
+                .AsNoTracking()
+                .Where(_ => _.SegmentId == id)
+                .Select(_ => _.PageLayoutId)
+                .SingleOrDefaultAsync();
+        }
     }
 }

@@ -42,12 +42,21 @@ namespace Ocuda.Ops.Data.Promenade
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<List<CarouselButton>> GetCarouselSubsequentAsync(int itemId, int order)
+        public async Task<List<CarouselButton>> GetItemSubsequentAsync(int itemId, int order)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.CarouselItemId == itemId && _.Order > order)
                 .ToListAsync();
+        }
+
+        public async Task<int> GetCarouselIdForButtonAsync(int id)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Id == id)
+                .Select(_ => _.CarouselItem.CarouselId)
+                .SingleOrDefaultAsync();
         }
     }
 }

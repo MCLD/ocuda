@@ -13,5 +13,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
         Task<Carousel> GetIncludingChildrenAsync(int id);
         Task<DataWithCount<ICollection<Carousel>>> GetPaginatedListAsync(BaseFilter filter);
         Task<ICollection<Carousel>> GetAllAsync();
+        Task<int?> GetPageHeaderIdForCarouselAsync(int id);
+        Task<int?> GetPageLayoutIdForCarouselAsync(int id);
     }
 }

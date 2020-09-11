@@ -50,12 +50,12 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
-        public async Task<int> GetHeaderIdForItemAsync(int itemId)
+        public async Task<PageLayout> GetLayoutForItemAsync(int itemId)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.Id == itemId)
-                .Select(_ => _.PageLayout.PageHeaderId)
+                .Select(_ => _.PageLayout)
                 .SingleOrDefaultAsync();
         }
     }

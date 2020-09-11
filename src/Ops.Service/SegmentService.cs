@@ -70,10 +70,17 @@ namespace Ocuda.Ops.Service
 
         public async Task<Segment> CreateAsync(Segment segment)
         {
+            segment = await CreateNoSaveAsync(segment);
+
+            await _segmentRepository.SaveAsync();
+            return segment;
+        }
+
+        public async Task<Segment> CreateNoSaveAsync(Segment segment)
+        {
             segment.Name = segment.Name?.Trim();
 
             await _segmentRepository.AddAsync(segment);
-            await _segmentRepository.SaveAsync();
             return segment;
         }
 
@@ -81,7 +88,7 @@ namespace Ocuda.Ops.Service
         {
             var currentSegment = await _segmentRepository.FindAsync(segment.Id);
 
-            currentSegment.Name = segment.Name.Trim();
+            currentSegment.Name = segment.Name?.Trim();
             currentSegment.IsActive = segment.IsActive;
             currentSegment.StartDate = segment.StartDate;
             currentSegment.EndDate = segment.EndDate;
@@ -102,12 +109,18 @@ namespace Ocuda.Ops.Service
                 throw ocudaException;
             }
 
+            await DeleteNoSaveAsync(id);
+           
+            await _segmentRepository.SaveAsync();
+        }
+
+        public async Task DeleteNoSaveAsync(int id)
+        {
             var segment = await _segmentRepository.FindAsync(id);
             var segmentTexts = await _segmentTextRepository.GetBySegmentIdAsync(segment.Id);
 
             _segmentTextRepository.RemoveRange(segmentTexts);
             _segmentRepository.Remove(segment);
-            await _segmentRepository.SaveAsync();
         }
 
         public async Task CreateSegmentTextAsync(SegmentText segmentText)
@@ -141,7 +154,7 @@ namespace Ocuda.Ops.Service
             var inUseBy = new List<string>();
 
             var emediaGroups = await _emediaGroupRepository.GetUsingSegmentAsync(id);
-            foreach (var emediaGroup  in emediaGroups)
+            foreach (var emediaGroup in emediaGroups)
             {
                 inUseBy.Add($"Emedia Group: {emediaGroup.Name}");
             }
@@ -160,6 +173,16 @@ namespace Ocuda.Ops.Service
             }
 
             return inUseBy;
+        }
+
+        public async Task<int?> GetPageHeaderIdForSegmentAsync(int id)
+        {
+            return await _segmentRepository.GetPageHeaderIdForSegmentAsync(id);
+        }
+
+        public async Task<int?> GetPageLayoutIdForSegmentAsync(int id)
+        {
+            return await _segmentRepository.GetPageLayoutIdForSegmentAsync(id);
         }
     }
 }
