@@ -72,10 +72,13 @@ namespace Ocuda.Promenade.Service
             {
                 carousel = await _carouselRepository.GetIncludingChildrenAsync(carouselId);
 
-                carousel.Items = carousel.Items?.OrderBy(_ => _.Order).ToList();
-                foreach (var item in carousel.Items)
+                if (carousel != null)
                 {
-                    item.Buttons = item.Buttons?.OrderBy(_ => _.Order).ToList();
+                    carousel.Items = carousel.Items?.OrderBy(_ => _.Order).ToList();
+                    foreach (var item in carousel.Items)
+                    {
+                        item.Buttons = item.Buttons?.OrderBy(_ => _.Order).ToList();
+                    }
                 }
 
                 await SaveToCacheAsync(_cache, carouselCacheKey, carousel, cachePagesInHours);

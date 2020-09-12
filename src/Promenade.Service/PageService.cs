@@ -243,7 +243,14 @@ namespace Ocuda.Promenade.Service
             {
                 pageLayout = await _pageLayoutRepository.GetIncludingChildrenAsync(layoutId.Value);
 
-                pageLayout.Items = pageLayout.Items?.OrderBy(_ => _.Order).ToList();
+                if (pageLayout != null)
+                {
+                    pageLayout.Items = pageLayout.Items?.OrderBy(_ => _.Order).ToList();
+                    foreach (var item in pageLayout.Items)
+                    {
+                        item.PageLayout = null;
+                    }
+                }
 
                 await SaveToCacheAsync(_cache, layoutCacheKey, pageLayout, cachePagesInHours);
             }
