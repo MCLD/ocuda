@@ -1,5 +1,5 @@
 ﻿javascript:(function() {
-    elem = document.querySelector('[id^="bib-record-index"]'); 
+    elem = document.querySelector('[id^="bib-record-index"]');
     if(elem == null) { 
 	    elem = document.querySelector('[id^="itemNameDisplay-"]').id; 
 	    pid = elem.split("itemNameDisplay-")[1]; 
@@ -9,6 +9,6 @@
     else { 
 	    elemarr = elem.id.split("-"); 
 	    bibId = elemarr[elemarr.length-1]; 
-	    window.open("{0}" + bibId.toString()); 
+	    window.open("{0}CoverIssue/Report/" + bibId.toString()); 
     }
 })();
