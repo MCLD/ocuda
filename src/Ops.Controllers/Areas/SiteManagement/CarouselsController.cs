@@ -183,7 +183,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 LanguageList = new SelectList(languages, nameof(Language.Name),
                     nameof(Language.Description), selectedLanguage.Name),
                 LabelList = new SelectList(await _carouselService.GetButtonLabelsAsync(),
-                    nameof(CarouselButtonLabel.Id)),
+                    nameof(CarouselButtonLabel.Id), nameof(CarouselButtonLabel.Name)),
                 AllowedImageDomains = (await _siteSettingService.GetSettingStringAsync(
                     Models.Keys.SiteSetting.Carousel.ImageRestrictToDomains))
                     .Replace(",", ", "),
