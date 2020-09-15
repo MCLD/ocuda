@@ -23,6 +23,7 @@ namespace Ocuda.Ops.Service
         private readonly ICarouselItemTextRepository _carouselItemTextRepository;
         private readonly ICarouselRepository _carouselRepository;
         private readonly ICarouselTextRepository _carouselTextRepository;
+        private readonly ILanguageRepository _languageRepository;
         private readonly ISiteSettingService _siteSettingService;
 
         public CarouselService(ILogger<CarouselService> logger,
@@ -33,6 +34,7 @@ namespace Ocuda.Ops.Service
             ICarouselItemTextRepository carouselItemTextRepository,
             ICarouselRepository carouselRepository,
             ICarouselTextRepository carouselTextRepository,
+            ILanguageRepository languageRepository,
             ISiteSettingService siteSettingService)
             : base(logger, httpContextAccessor)
         {
@@ -48,6 +50,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(carouselRepository));
             _carouselTextRepository = carouselTextRepository
                 ?? throw new ArgumentNullException(nameof(carouselTextRepository));
+            _languageRepository = languageRepository
+                ?? throw new ArgumentNullException(nameof(languageRepository));
             _siteSettingService = siteSettingService
                 ?? throw new ArgumentNullException(nameof(siteSettingService));
         }
@@ -77,6 +81,14 @@ namespace Ocuda.Ops.Service
             return carousel;
         }
 
+        public async Task<string> GetDefaultNameForCarouselAsync(int carouselId)
+        {
+            var defaultLanguageId = await _languageRepository.GetDefaultLanguageId();
+            return (await _carouselTextRepository.GetByCarouselAndLanguageAsync(carouselId,
+                defaultLanguageId))
+                .Title;
+        }
+
         public async Task<Carousel> CreateAsync(Carousel carousel)
         {
             carousel = await CreateNoSaveAsync(carousel);
@@ -87,20 +99,14 @@ namespace Ocuda.Ops.Service
 
         public async Task<Carousel> CreateNoSaveAsync(Carousel carousel)
         {
-            carousel.Name = carousel.Name?.Trim();
+            var carouselText = carousel.CarouselText;
+            carouselText.LanguageId = await _languageRepository.GetDefaultLanguageId();
+            carouselText.Carousel = carousel;
+            carouselText.Title = carouselText.Title?.Trim();
 
             await _carouselRepository.AddAsync(carousel);
+            await _carouselTextRepository.AddAsync(carouselText);
             return carousel;
-        }
-
-        public async Task<Carousel> EditAsync(Carousel carousel)
-        {
-            var currentCarousel = await _carouselRepository.FindAsync(carousel.Id);
-            currentCarousel.Name = carousel.Name?.Trim();
-
-            _carouselRepository.Update(currentCarousel);
-            await _carouselRepository.SaveAsync();
-            return currentCarousel;
         }
 
         public async Task DeleteAsync(int carouselId)
@@ -161,9 +167,28 @@ namespace Ocuda.Ops.Service
             return await _carouselItemRepository.FindAsync(id);
         }
 
+        public async Task<string> GetDefaultNameForItemAsync(int itemId)
+        {
+            var defaultLanguageId = await _languageRepository.GetDefaultLanguageId();
+            return (await _carouselItemTextRepository.GetByCarouselItemAndLanguageAsync(itemId, 
+                defaultLanguageId))
+                .Label;
+        }
+
         public async Task<CarouselItem> CreateItemAsync(CarouselItem carouselItem)
         {
-            carouselItem.Name = carouselItem.Name?.Trim();
+            var itemText = carouselItem.CarouselItemText;
+
+            var imageUrl = itemText.ImageUrl?.Trim();
+            await ValidateItemImageUrl(imageUrl);
+
+            itemText.LanguageId = await _languageRepository.GetDefaultLanguageId();
+            itemText.CarouselItem = carouselItem;
+            itemText.Description = itemText.Description?.Trim();
+            itemText.ImageUrl = imageUrl;
+            itemText.Label = itemText.Label?.Trim();
+            itemText.Title = itemText.Title?.Trim();
+            
 
             var maxSortOrder = await _carouselItemRepository
                 .GetMaxSortOrderForCarouselAsync(carouselItem.CarouselId);
@@ -173,18 +198,9 @@ namespace Ocuda.Ops.Service
             }
 
             await _carouselItemRepository.AddAsync(carouselItem);
+            await _carouselItemTextRepository.AddAsync(itemText);
             await _carouselItemRepository.SaveAsync();
             return carouselItem;
-        }
-
-        public async Task<CarouselItem> EditItemAsync(CarouselItem carouselItem)
-        {
-            var currentCarouselItem = await _carouselItemRepository.FindAsync(carouselItem.Id);
-            currentCarouselItem.Name = carouselItem.Name?.Trim();
-
-            _carouselItemRepository.Update(currentCarouselItem);
-            await _carouselItemRepository.SaveAsync();
-            return currentCarouselItem;
         }
 
         public async Task DeleteItemAsync(int carouselItemId)
@@ -252,30 +268,7 @@ namespace Ocuda.Ops.Service
         public async Task<CarouselItemText> SetItemTextAsync(CarouselItemText itemText)
         {
             var imageUrl = itemText.ImageUrl?.Trim();
-
-            var delimitedImageDomains = await _siteSettingService.GetSettingStringAsync(
-                    Models.Keys.SiteSetting.Carousel.ImageRestrictToDomains);
-
-            if (!string.IsNullOrWhiteSpace(delimitedImageDomains))
-            {
-                var allowedImageDomains = delimitedImageDomains.Split(',').ToList();
-
-                string imageDomain;
-                try
-                {
-                    imageDomain = new Uri(imageUrl).Host.Split('.', 2)[1];
-                }
-                catch (Exception)
-                {
-                    throw new OcudaException("Invalid Image URL");
-                }
-
-                if (!allowedImageDomains.Any(_ => _
-                    .IndexOf(imageDomain, StringComparison.OrdinalIgnoreCase) != -1))
-                {
-                    throw new OcudaException("Image URL is not from an accepted domain.");
-                }
-            }
+            await ValidateItemImageUrl(imageUrl);
 
             var currentText = await _carouselItemTextRepository.GetByCarouselItemAndLanguageAsync(
                 itemText.CarouselItemId, itemText.LanguageId);
@@ -301,6 +294,33 @@ namespace Ocuda.Ops.Service
                 _carouselItemTextRepository.Update(currentText);
                 await _carouselItemTextRepository.SaveAsync();
                 return currentText;
+            }
+        }
+
+        private async Task ValidateItemImageUrl(string imageUrl)
+        {
+            var delimitedImageDomains = await _siteSettingService.GetSettingStringAsync(
+                    Models.Keys.SiteSetting.Carousel.ImageRestrictToDomains);
+
+            if (!string.IsNullOrWhiteSpace(delimitedImageDomains))
+            {
+                var allowedImageDomains = delimitedImageDomains.Split(',').ToList();
+
+                string imageDomain;
+                try
+                {
+                    imageDomain = new Uri(imageUrl).Host.Split('.', 2)[1];
+                }
+                catch (Exception)
+                {
+                    throw new OcudaException("Invalid Image URL");
+                }
+
+                if (!allowedImageDomains.Any(_ => _
+                    .IndexOf(imageDomain, StringComparison.OrdinalIgnoreCase) != -1))
+                {
+                    throw new OcudaException("Image URL is not from an accepted domain.");
+                }
             }
         }
 

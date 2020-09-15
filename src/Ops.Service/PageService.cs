@@ -193,7 +193,7 @@ namespace Ocuda.Ops.Service
         public async Task<PageLayout> GetLayoutDetailsAsync(int id)
         {
             var layout = await _pageLayoutRepository.GetIncludingChildrenWithItemContent(id);
-            layout.Items = layout.Items.OrderBy(_ => _.Order).ToList();
+            layout.Items = layout.Items?.OrderBy(_ => _.Order).ToList();
 
             return layout;
         }

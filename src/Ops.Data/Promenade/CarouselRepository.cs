@@ -33,7 +33,6 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .OrderBy(_ => _.Name)
                 .ToListAsync();
         }
 
@@ -46,7 +45,6 @@ namespace Ocuda.Ops.Data.Promenade
             {
                 Count = await query.CountAsync(),
                 Data = await query
-                    .OrderBy(_ => _.Name)
                     .ApplyPagination(filter)
                     .Include(_ => _.Items)
                     .ToListAsync()
@@ -88,7 +86,7 @@ namespace Ocuda.Ops.Data.Promenade
             return await _context.PageItems
                 .AsNoTracking()
                 .Where(_ => _.CarouselId == id)
-                .Select(_ => _.PageLayout.Id)
+                .Select(_ => (int?)_.PageLayoutId)
                 .SingleOrDefaultAsync();
         }
     }

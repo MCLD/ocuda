@@ -5,18 +5,11 @@
     <input id="addItemCarouselId" asp-for="CarouselItem.CarouselId" value="@Model.CarouselId" type="hidden" />
 
     <div modal id="addItemModal" isLarge="true" name="Item" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
-        <input id="addItemName" asp-for="CarouselItem.Name" formgroup />
-    </div>
-</form>
-
-<form id="editItemForm" role="form">
-    <input id="editItemLanguage" asp-for="LanguageId" type="hidden" />
-    <input id="editItemCarouselId" asp-for="CarouselItem.CarouselId" value="@Model.CarouselId" type="hidden" />
-
-    <input id="editItemId" asp-for="CarouselItem.Id" type="hidden" />
-
-    <div modal id="editItemModal" isLarge="true" name="Item" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
-        <input id="editItemName" asp-for="CarouselItem.Name" formgroup />
+        <input id="addItemLabel" asp-for="CarouselItem.CarouselItemText.Label" formgroup />
+        <input id="addItemImageUrl" asp-for="CarouselItem.CarouselItemText.ImageUrl" formgroup
+               info-tooltip="@(!string.IsNullOrWhiteSpace(Model.AllowedImageDomains) ? $"Images are restricted to the following domains: {Model.AllowedImageDomains}" : null )" />
+        <input id="addItemTitle" asp-for="CarouselItem.CarouselItemText.Title" formgroup />
+        <textarea id="addItemDescription" asp-for="CarouselItem.CarouselItemText.Description" formgroup></textarea>
     </div>
 </form>
 
@@ -71,7 +64,6 @@
 
 <div class="row pt-1">
     <div class="col-12">
-        <input asp-for="Carousel.Name" formgroup readonly />
         <select asp-for="SelectLanguage" asp-items="Model.LanguageList" formgroup></select>
     </div>
 </div>
@@ -97,7 +89,7 @@
                         <a asp-controller="@PagesController.Name"
                            asp-action="@nameof(PagesController.LayoutDetail)"
                            asp-route-id="@Model.PageLayoutId.Value"
-                           class="btn btn-outline-secondary text-dark">Cancel</a>
+                           class="btn btn-outline-secondary text-dark">Back</a>
                     }
                     else
                     {
@@ -156,13 +148,6 @@
                                     data-item="true"
                                     disabled="@(item.Id == Model.Carousel.Items.Last().Id ? "disabled" : null)">
                                 <span class="fas fa-arrow-down"></span>
-                            </button>
-                            <button class="btn btn-sm btn-primary"
-                                    data-toggle="modal"
-                                    data-target="#editItemModal"
-                                    data-id="@item.Id"
-                                    data-name="@item.Name">
-                                <span class="fas fa-pencil-alt"></span>
                             </button>
                             <button class="btn btn-sm btn-danger"
                                     data-toggle="modal"
@@ -289,31 +274,6 @@
             e.preventDefault();
             var form = $(this);
             $.post("@(Url.Action(nameof(CarouselsController.AddCarouselItem), CarouselsController.Name))",
-                form.serialize(),
-                function (response) {
-                if (response.success == true) {
-                    location.href = response.url;
-                }
-                else {
-                    alert(response.message);
-                    ResetSpinners(form.find(".btn-spinner"));
-                }
-            });
-        });
-
-        $("#editItemModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var name = button.data("name");
-
-            $("#editItemId").val(id);
-            $("#editItemName").val(name);
-        });
-
-        $("#editItemForm").submit(function (e) {
-            e.preventDefault();
-            var form = $(this);
-            $.post("@(Url.Action(nameof(CarouselsController.EditCarouselItem), CarouselsController.Name))",
                 form.serialize(),
                 function (response) {
                 if (response.success == true) {

@@ -16,12 +16,12 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task DeleteButtonAsync(int carouselButtonId);
         Task DeleteItemAsync(int carouselItemId);
         Task DeleteNoSaveAsync(int carouselId);
-        Task<Carousel> EditAsync(Carousel carousel);
         Task<CarouselButton> EditButtonAsync(CarouselButton carouselButton);
-        Task<CarouselItem> EditItemAsync(CarouselItem carouselItem);
         Task<ICollection<CarouselButtonLabel>> GetButtonLabelsAsync();
         Task<Carousel> GetCarouselDetailsAsync(int id, int languageId);
         Task<int> GetCarouselIdForButtonAsync(int id);
+        Task<string> GetDefaultNameForCarouselAsync(int carouselId);
+        Task<string> GetDefaultNameForItemAsync(int itemId);
         Task<CarouselItem> GetItemByIdAsync(int id);
         Task<int?> GetPageHeaderIdForCarouselAsync(int id);
         Task<int?> GetPageLayoutIdForCarouselAsync(int id);

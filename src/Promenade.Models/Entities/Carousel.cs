@@ -10,13 +10,12 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public int Id { get; set; }
 
-        [Required]
-        [MaxLength(255)]
-        public string Name { get; set; }
-
         public ICollection<CarouselItem> Items { get; set; }
 
         [NotMapped]
         public CarouselText CarouselText { get; set; }
+
+        [NotMapped]
+        public string Name { get; set; }
     }
 }

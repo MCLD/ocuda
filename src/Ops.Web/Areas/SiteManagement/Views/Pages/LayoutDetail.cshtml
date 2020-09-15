@@ -1,9 +1,5 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages.LayoutDetailViewModel
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/dt-picker.min.css" asp-append-version="true" />
-}
-
 <form id="addForm" role="form">
     <input id="addLanguage" asp-for="LanguageId" type="hidden" />
     <input id="addLayout" asp-for="PageItem.PageLayoutId" value="@Model.PageLayoutId" type="hidden" />
@@ -23,49 +19,10 @@
             </div>
         </div>
         <div id="addCarouselFields">
-            <input id="addCarouselName" asp-for="Carousel.Name" formgroup />
+            <input id="addCarouselTitle" asp-for="Carousel.CarouselText.Title" formgroup />
         </div>
         <div id="addSegmentFields" class="d-none">
             <input id="addSegmentName" asp-for="Segment.Name" formgroup disabled />
-            <input id="addSegmentStartDate" asp-for="Segment.StartDate" formgroup datetime-picker="DateTimePickerType.DateTime" disabled />
-            <input id="addSegmentEndDate" asp-for="Segment.EndDate" formgroup datetime-picker="DateTimePickerType.DateTime" disabled />
-            <select id="addSegmentIsActive" asp-for="Segment.IsActive" formgroup disabled>
-                <option value="false">No</option>
-                <option value="true">Yes</option>
-            </select>
-        </div>
-    </div>
-</form>
-
-<form id="editForm" role="form">
-    <input id="editLanguage" asp-for="LanguageId" type="hidden" />
-    <input id="editItem" asp-for="PageItem.Id" type="hidden" />
-
-    <div modal
-         id="editModal"
-         isLarge="true"
-         name="Layout Item"
-         type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
-        <div class="row form-group">
-            <label class="col-form-label text-md-right col-md-3">Item Type</label>
-            <div class="form-group-inner col-md-9">
-                <select id="editType" class="form-control" disabled="disabled">
-                    <option value="carousel">Carousel</option>
-                    <option value="segment">Segment</option>
-                </select>
-            </div>
-        </div>
-        <div id="editCarouselFields" class="d-none">
-            <input id="editCarouselName" asp-for="Carousel.Name" formgroup />
-        </div>
-        <div id="editSegmentFields" class="d-none">
-            <input id="editSegmentName" asp-for="Segment.Name" formgroup />
-            <input id="editSegmentStartDate" asp-for="Segment.StartDate" formgroup datetime-picker="DateTimePickerType.DateTime" />
-            <input id="editSegmentEndDate" asp-for="Segment.EndDate" formgroup datetime-picker="DateTimePickerType.DateTime" />
-            <select id="editSegmentIsActive" asp-for="Segment.IsActive" formgroup>
-                <option value="false">No</option>
-                <option value="true">Yes</option>
-            </select>
         </div>
     </div>
 </form>
@@ -80,6 +37,19 @@
     <div modal id="deleteModal"
          name="Layout Item"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+</form>
+
+<form id="editSegmentForm" role="form">
+    <input id="editSegmentLanguage" asp-for="LanguageId" type="hidden" />
+    <input id="editSegmentItem" asp-for="PageItem.Id" type="hidden" />
+
+    <div modal
+         id="editSegmentModal"
+         isLarge="true"
+         name="Segment"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <input id="editSegmentName" asp-for="Segment.Name" formgroup />
+    </div>
 </form>
 
 <div class="row pt-2">
@@ -173,19 +143,11 @@
                             disabled="@(item.Id == Model.PageLayout.Items.Last().Id ? "disabled" : null)">
                         <span class="fas fa-arrow-down" aria-hidden="true"></span>
                     </button>
-                    <button type="button"
-                            class="btn btn-link"
-                            data-toggle="modal"
-                            data-target="#editModal"
-                            data-id="@item.Id"
-                            data-carousel="@(Newtonsoft.Json.JsonConvert.SerializeObject(item.Carousel))"
-                            data-segment="@(Newtonsoft.Json.JsonConvert.SerializeObject(item.Segment))"
-                            data-active="@item.Segment?.IsActive"
-                            title="Edit @(item.CarouselId.HasValue ? "carousel" : "segment")">
-                        <span class="fas fa-cog" aria-hidden="true"></span>
-                    </button>
                     @if (item.CarouselId.HasValue)
                     {
+                        <button type="button" class="btn btn-link invisible">
+                            <span class="fas fa-cog" aria-hidden="true"></span>
+                        </button>
                         <a asp-controller="@CarouselsController.Name"
                            asp-action="@(nameof(CarouselsController.Detail))"
                            asp-route-id="@item.CarouselId.Value"
@@ -194,8 +156,17 @@
                             <span class="far fa-file-alt" aria-hidden="true"></span>
                         </a>
                     }
-                    else
+                    else if (item.SegmentId.HasValue)
                     {
+                        <button type="button"
+                                class="btn btn-link"
+                                data-toggle="modal"
+                                data-target="#editSegmentModal"
+                                data-id="@item.Id"
+                                data-ame="@item.Segment.Name"
+                                title="Edit segment">
+                            <span class="fas fa-cog" aria-hidden="true"></span>
+                        </button>
                         <a asp-controller="@SegmentsController.Name"
                            asp-action="@(nameof(SegmentsController.Detail))"
                            asp-route-id="@item.SegmentId.Value"
@@ -209,7 +180,7 @@
                             data-toggle="modal"
                             data-target="#deleteModal"
                             data-id="@item.Id"
-                            data-name="@(item.Carousel?.Name ?? item.Segment?.Name)"
+                            data-name="@(item.Carousel?.Name?? item.Segment?.Name)"
                             data-carousel="@item.CarouselId"
                             data-segment="@item.SegmentId"
                             title="Delete layout item">
@@ -223,13 +194,7 @@
 </table>
 
 @section Scripts {
-    <script src="~/js/dt-picker.min.js" asp-append-version="true"></script>
     <script>
-        $(".datetimepicker").datetimepicker({
-            allowInputToggle: true,
-            sideBySide: true
-        });
-
         $("#SelectLanguage").on("change", function () {
             window.location.href = "@Url.Action(nameof(PagesController.LayoutDetail), new { id = Model.PageLayoutId})" + "?language=" + $(this).val();
         });
@@ -247,7 +212,6 @@
             }
         });
 
-        var blah;
         $("#addForm").submit(function (e) {
             e.preventDefault();
             var form = $(this);
@@ -262,51 +226,6 @@
                         ResetSpinners(form.find(".btn-spinner"));
                     }
                 });
-        });
-
-        $("#editModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var carousel = button.data("carousel");
-            var segment = button.data("segment");
-
-            $("#editItem").val(id);
-
-            if (carousel) {
-                $("#editCarouselName").val(carousel.Name);
-
-                $("#editSegmentFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
-                $("#editCarouselFields").removeClass("d-none").find("input").removeAttr("disabled");
-
-                $("#editType").val("carousel");
-            }
-            else {
-                $("#editSegmentName").val(segment.Name);
-                $("#editSegmentStartDate").val(segment.StartDate);
-                $("#editSegmentEndDate").val(segment.EndDate);
-                $("#editSegmentIsActive").val(segment.IsActive.toString());
-
-                $("#editCarouselFields").addClass("d-none").find("input").attr("disabled", "disabled");
-                $("#editSegmentFields").removeClass("d-none").find("input, select").removeAttr("disabled");
-
-                $("#editType").val("segment");
-            }
-        });
-
-        $("#editForm").submit(function (e) {
-            e.preventDefault();
-            var form = $(this);
-            $.post("@(Url.Action(nameof(PagesController.EditPageItem), PagesController.Name))",
-                form.serialize(),
-                function (response) {
-                if (response.success == true) {
-                    location.href = response.url;
-                }
-                else {
-                    alert(response.message);
-                    ResetSpinners(form.find(".btn-spinner"));
-                }
-            });
         });
 
         $("#deleteModal").on("show.bs.modal", function (e) {
@@ -328,6 +247,31 @@
             $("#deleteId").val(id);
             $("#deleteName").val(name);
             modal.find(".modal-text").text("Are you sure you want to delete the " + type +  " \"" + name + "\"?");
+        });
+
+        $("#editSegmentModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+
+            $("#editSegmentItem").val(id);
+            $("#editSegmentName").val(name);
+        });
+
+        $("#editSegmentForm").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.post("@(Url.Action(nameof(PagesController.EditPageItem), PagesController.Name))",
+                form.serialize(),
+                function (response) {
+                if (response.success == true) {
+                    location.href = response.url;
+                }
+                else {
+                    alert(response.message);
+                    ResetSpinners(form.find(".btn-spinner"));
+                }
+            });
         });
 
         $(".changeSort").on("click", function () {

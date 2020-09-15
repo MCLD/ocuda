@@ -2,14 +2,7 @@
 
 <form id="addForm" role="form">
     <div modal id="addModal" isLarge="true" name="Carousel" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
-        <input id="addName" asp-for="Carousel.Name" formgroup />
-    </div>
-</form>
-
-<form id="editForm" role="form">
-    <input id="editId" asp-for="Carousel.Id" type="hidden" />
-    <div modal id="editModal" isLarge="true" name="Carousel" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
-        <input id="editName" asp-for="Carousel.Name" formgroup />
+        <input id="addTitle" asp-for="Carousel.CarouselText.Title" formgroup />
     </div>
 </form>
 
@@ -52,14 +45,6 @@
                             </td>
                             <td>@carousel.Items.Count</td>
                             <td align="center" class="on-top">
-                                <button type="button"
-                                        class="btn btn-primary btn-xs"
-                                        data-toggle="modal"
-                                        data-target="#editModal"
-                                        data-id="@carousel.Id"
-                                        data-name="@carousel.Name">
-                                    <span class="fas fa-edit" aria-hidden="true"></span>
-                                </button>
                                 <button type="button"
                                         class="btn btn-danger btn-xs"
                                         data-toggle="modal"
@@ -114,31 +99,6 @@
                 function (response) {
                     if (response.success == true) {
                         location.href = response.url;
-                    }
-                    else {
-                        alert(response.message);
-                        ResetSpinners(form.find(".btn-spinner"));
-                    }
-                });
-        });
-
-        $("#editModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var name = button.data("name");
-
-            $("#editId").val(id);
-            $("#editName").val(name);
-        });
-
-        $("#editForm").submit(function (e) {
-            e.preventDefault();
-            var form = $(this);
-            $.post("@(Url.Action(nameof(CarouselsController.Edit), CarouselsController.Name))",
-                form.serialize(),
-                function (response) {
-                    if (response.success == true) {
-                        location.reload();
                     }
                     else {
                         alert(response.message);

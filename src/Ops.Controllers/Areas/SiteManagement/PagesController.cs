@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
@@ -459,9 +460,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 HeaderId = header.Id,
                 HeaderName = header.PageName,
                 HeaderStub = header.Stub,
-                HeaderType = header.Type,
-                SocialCardList = new SelectList(await _socialCardService.GetListAsync(),
-                    nameof(SocialCard.Id), nameof(SocialCard.Title))
+                HeaderType = header.Type
             };
 
             return View(viewModel);
@@ -479,6 +478,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     try
                     {
+                        model.PageLayout.SocialCardId = null;
                         var layout = await _pageService.CreateLayoutAsync(model.PageLayout);
                         response = new JsonResponse
                         {
@@ -536,6 +536,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     try
                     {
+                        model.PageLayout.SocialCardId = null;
                         var layout = await _pageService.EditLayoutAsync(model.PageLayout);
                         response = new JsonResponse
                         {
@@ -628,6 +629,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             pageLayout.PageLayoutText = await _pageService.GetTextByLayoutAndLanguageAsync(
                 pageLayout.Id, selectedLanguage.Id);
 
+            foreach (var item in pageLayout.Items)
+            {
+                if (item.CarouselId.HasValue)
+                {
+                    item.Carousel.Name = await _carouselService.GetDefaultNameForCarouselAsync(
+                        item.CarouselId.Value);
+                }
+            }
+
             var viewModel = new LayoutDetailViewModel
             {
                 PageLayout = pageLayout,
@@ -683,14 +693,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     ModelState.AddModelError("PageItem", "No content to add.");
                 }
 
-                if (model.Segment != null
-                    && model.Segment.StartDate.HasValue && model.Segment.EndDate.HasValue
-                    && model.Segment.StartDate > model.Segment.EndDate)
-                {
-                    ModelState.AddModelError("Segment.StartDate",
-                        "Start Date cannot be after the End Date.");
-                }
-
                 if (ModelState.IsValid)
                 {
                     try
@@ -701,6 +703,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         }
                         else if (model.Segment != null)
                         {
+                            model.Segment.IsActive = true;
+                            model.Segment.EndDate = null;
+                            model.Segment.StartDate = null;
                             model.PageItem.Segment = model.Segment;
                         }
 
@@ -774,35 +779,24 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 var pageItem = await _pageService.GetItemByIdAsync(model.PageItem.Id);
 
-                if (pageItem.CarouselId.HasValue && model.Carousel == null)
+                if (pageItem.CarouselId.HasValue)
                 {
-                    ModelState.AddModelError("PageItem", "No carousel submitted");
+                    ModelState.AddModelError("PageItem", "Carousels can only be edited from the carousel page");
                 }
-                else if (pageItem.SegmentId.HasValue)
+                else if (pageItem.SegmentId.HasValue && model.Segment == null)
                 {
-                    if (model.Segment == null)
-                    {
-                        ModelState.AddModelError("PageItem", "No segment submitted");
-                    }
-                    else if (model.Segment.StartDate.HasValue && model.Segment.EndDate.HasValue
-                        && model.Segment.StartDate > model.Segment.EndDate)
-                    {
-                        ModelState.AddModelError("Segment.StartDate",
-                            "Start Date cannot be after the End Date.");
-                    }
+                    ModelState.AddModelError("PageItem", "No segment submitted");
                 }
 
                 if (ModelState.IsValid)
                 {
                     try
                     {
-                        if (pageItem.CarouselId.HasValue)
+                        if (pageItem.SegmentId.HasValue)
                         {
-                            model.Carousel.Id = pageItem.CarouselId.Value;
-                            await _carouselService.EditAsync(model.Carousel);
-                        }
-                        else if (pageItem.SegmentId.HasValue)
-                        {
+                            model.Segment.IsActive = true;
+                            model.Segment.EndDate = null;
+                            model.Segment.StartDate = null;
                             model.Segment.Id = pageItem.SegmentId.Value;
                             await _segmentService.EditAsync(model.Segment);
                         }

@@ -72,6 +72,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     });
             }
 
+            foreach (var carousel in carouselList.Data)
+            {
+                carousel.Name = await _carouselService.GetDefaultNameForCarouselAsync(
+                    carousel.Id);
+            }
+
             var viewModel = new IndexViewModel
             {
                 Carousels = carouselList.Data,
@@ -98,50 +104,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         Success = true,
                         Url = Url.Action(nameof(Detail), new { id = carousel.Id })
                     };
-                    ShowAlertSuccess($"Created carousel: {carousel.Name}");
-                }
-                catch (OcudaException ex)
-                {
-                    response = new JsonResponse
-                    {
-                        Success = false,
-                        Message = ex.Message
-                    };
-                }
-            }
-            else
-            {
-                var errors = ModelState.Values
-                    .SelectMany(_ => _.Errors)
-                    .Select(_ => _.ErrorMessage);
-
-                response = new JsonResponse
-                {
-                    Success = false,
-                    Message = string.Join(Environment.NewLine, errors)
-                };
-            }
-
-            return Json(response);
-        }
-
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> Edit(IndexViewModel model)
-        {
-            JsonResponse response;
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    var carousel = await _carouselService.EditAsync(model.Carousel);
-                    response = new JsonResponse
-                    {
-                        Success = true
-                    };
-                    ShowAlertSuccess($"Updated carousel: {carousel.Name}");
+                    ShowAlertSuccess($"Created carousel: {carousel.CarouselText.Title}");
                 }
                 catch (OcudaException ex)
                 {
@@ -204,6 +167,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var carousel = await _carouselService.GetCarouselDetailsAsync(id, selectedLanguage.Id);
 
+            foreach (var carouselItem in carousel.Items)
+            {
+                carouselItem.Name = await _carouselService.GetDefaultNameForItemAsync(
+                    carouselItem.Id);
+            }
+
             var viewModel = new DetailViewModel
             {
                 Carousel = carousel,
@@ -214,7 +183,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 LanguageList = new SelectList(languages, nameof(Language.Name),
                     nameof(Language.Description), selectedLanguage.Name),
                 LabelList = new SelectList(await _carouselService.GetButtonLabelsAsync(),
-                    nameof(CarouselButtonLabel.Id), nameof(Carousel.Name)),
+                    nameof(CarouselButtonLabel.Id)),
                 AllowedImageDomains = (await _siteSettingService.GetSettingStringAsync(
                     Models.Keys.SiteSetting.Carousel.ImageRestrictToDomains))
                     .Replace(",", ", "),
@@ -280,72 +249,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             })
                         };
 
-                        ShowAlertSuccess($"Created item: {carouselItem.Name}");
-                    }
-                    catch (OcudaException ex)
-                    {
-                        response = new JsonResponse
-                        {
-                            Success = false,
-                            Message = ex.Message
-                        };
-                    }
-                }
-                else
-                {
-                    var errors = ModelState.Values
-                        .SelectMany(_ => _.Errors)
-                        .Select(_ => _.ErrorMessage);
-
-                    response = new JsonResponse
-                    {
-                        Success = false,
-                        Message = string.Join(Environment.NewLine, errors)
-                    };
-                }
-            }
-            else
-            {
-                response = new JsonResponse
-                {
-                    Message = "Unauthorized",
-                    Success = false
-                };
-            }
-
-            return Json(response);
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> EditCarouselItem(DetailViewModel model)
-        {
-            JsonResponse response;
-
-            var carouselItem = await _carouselService.GetItemByIdAsync(model.CarouselItem.Id);
-
-            if (await HasCaroseulPermissionAsync(carouselItem.CarouselId))
-            {
-                if (ModelState.IsValid)
-                {
-                    try
-                    {
-                        carouselItem = await _carouselService.EditItemAsync(model.CarouselItem);
-
-                        var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
-
-                        response = new JsonResponse
-                        {
-                            Success = true,
-                            Url = Url.Action(nameof(Detail), new
-                            {
-                                id = carouselItem.CarouselId,
-                                language = language.IsDefault ? null : language.Name,
-                                item = carouselItem.Id
-                            })
-                        };
-
-                        ShowAlertSuccess($"Updated item: {carouselItem.Name}");
+                        ShowAlertSuccess($"Created item: {carouselItem.CarouselItemText.Label}");
                     }
                     catch (OcudaException ex)
                     {

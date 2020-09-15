@@ -14,9 +14,6 @@
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addName" asp-for="PageLayout.Name" formgroup />
         <input id="addStartDate" asp-for="PageLayout.StartDate" formgroup datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
-        <select id="addSocialCard" asp-for="PageLayout.SocialCardId" asp-items="Model.SocialCardList" formgroup>
-            <option></option>
-        </select>
     </div>
 </form>
 
@@ -29,9 +26,6 @@
          type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
         <input id="editName" asp-for="PageLayout.Name" formgroup />
         <input id="editStartDate" asp-for="PageLayout.StartDate" formgroup datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
-        <select id="editSocialCard" asp-for="PageLayout.SocialCardId" asp-items="Model.SocialCardList" formgroup>
-            <option></option>
-        </select>
     </div>
 </form>
 
@@ -106,7 +100,6 @@
                                         data-target="#editModal"
                                         data-id="@layout.Id"
                                         data-name="@layout.Name"
-                                        data-social="@layout.SocialCardId"
                                         data-startdate="@layout.StartDate"
                                         title="Edit layout">
                                     <span class="fas fa-cog" aria-hidden="true"></span>
@@ -169,12 +162,10 @@
             var button = $(e.relatedTarget);
             var id = button.data("id");
             var name = button.data("name");
-            var social = button.data("social");
             var startDate = button.data("startdate");
 
             $("#editId").val(id);
             $("#editName").val(name);
-            $("#editSocialCard").val(social);
             $("#editStartDate").val(startDate);
         });
 

@@ -10,7 +10,7 @@ using Ocuda.Ops.DataProvider.SqlServer.Promenade;
 namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20200911184629_prom_v1.0.0.72")]
+    [Migration("20200915205152_prom_v1.0.0.72")]
     partial class prom_v10072
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,11 +45,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
 
                     b.HasKey("Id");
 
@@ -132,11 +127,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<int>("CarouselId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
 
                     b.Property<int>("Order")
                         .HasColumnType("int");

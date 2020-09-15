@@ -23,8 +23,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
         [DisplayName("Type")]
         public PageType HeaderType { get; set; }
 
-        public SelectList SocialCardList { get; set; }
-
         public bool IsSiteManager { get; set; }
     }
 }

@@ -31,8 +31,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(maxLength: 255, nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1")
                 },
                 constraints: table =>
                 {
@@ -99,8 +98,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CarouselId = table.Column<int>(nullable: false),
-                    Order = table.Column<int>(nullable: false),
-                    Name = table.Column<string>(maxLength: 255, nullable: false)
+                    Order = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
