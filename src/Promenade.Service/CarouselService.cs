@@ -77,7 +77,13 @@ namespace Ocuda.Promenade.Service
                     carousel.Items = carousel.Items?.OrderBy(_ => _.Order).ToList();
                     foreach (var item in carousel.Items)
                     {
+                        item.Carousel = null;
                         item.Buttons = item.Buttons?.OrderBy(_ => _.Order).ToList();
+
+                        foreach (var button in item.Buttons)
+                        {
+                            button.CarouselItem = null;
+                        }
                     }
                 }
 
