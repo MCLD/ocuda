@@ -54,7 +54,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
             if (pageHeader.IsLayoutPage)
             {
-                return await ReturnLayoutPageAsync(pageHeader.Id);
+                return await ReturnLayoutPageAsync(pageHeader.Id, stub);
             }
             else
             {
@@ -92,7 +92,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
             return View(viewModel);
         }
 
-        private async Task<IActionResult> ReturnLayoutPageAsync(int headerId)
+        private async Task<IActionResult> ReturnLayoutPageAsync(int headerId, string stub)
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
@@ -127,7 +127,8 @@ namespace Ocuda.Promenade.Controllers.Abstract
             var viewModel = new PageLayoutViewModel
             {
                 CanonicalUrl = await GetCanonicalUrl(),
-                HasCarousels = pageLayout.Items.Any(_ => _.CarouselId.HasValue)
+                HasCarousels = pageLayout.Items.Any(_ => _.CarouselId.HasValue),
+                Stub = stub?.Trim()
             };
 
             if (pageLayout.SocialCardId.HasValue)
@@ -143,6 +144,34 @@ namespace Ocuda.Promenade.Controllers.Abstract
             PageTitle = pageLayout.PageLayoutText?.Title;
 
             return View("LayoutPage", viewModel);
+        }
+
+        protected async Task<IActionResult> ReturnCarouselItemAsync(string stub, int id)
+        {
+            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
+            var pageHeader = await _pageService.GetHeaderByStubAndTypeAsync(stub, PageType);
+
+            if (pageHeader == null || !pageHeader.IsLayoutPage)
+            {
+                return NotFound();
+            }
+
+            var carouselItem = await _carouselService.GetItemForHeaderAsync(pageHeader.Id, id,
+                forceReload);
+
+            if (carouselItem == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new CarouselItemViewModel
+            {
+                Item = carouselItem,
+                ReturnUrl = Url.Action(nameof(Page), PageTitle, new { stub })
+            };
+
+            return View("CarouselItem", viewModel);
         }
     }
 }

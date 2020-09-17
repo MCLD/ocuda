@@ -30,5 +30,11 @@ namespace Ocuda.Promenade.Controllers
         {
             return await ReturnPageAsync(nameof(Index));
         }
+
+        [Route("{stub?}/item/{id}")]
+        public async Task<IActionResult> CarouselItem(string stub, int id)
+        {
+            return await ReturnCarouselItemAsync(stub, id);
+        }
     }
 }

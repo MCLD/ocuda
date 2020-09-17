@@ -233,6 +233,8 @@ namespace Ocuda.Promenade.Web
             // repositories
             services.AddScoped<Service.Interfaces.Repositories.ICarouselButtonLabelTextRepository,
                 Data.Promenade.CarouselButtonLabelTextRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ICarouselItemRepository,
+                Data.Promenade.CarouselItemRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ICarouselItemTextRepository,
                 Data.Promenade.CarouselItemTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ICarouselRepository,

@@ -54,7 +54,7 @@
                             @foreach (var carouselItem in item.Carousel.Items)
                             {
                                 <div>
-                                    <a href="@carouselItem.Buttons.FirstOrDefault()?.Url"
+                                    <a href="@Url.Action(nameof(HomeController.CarouselItem), new { stub = Model.Stub, id = carouselItem.Id })"
                                        class="prom-carousel-modal"
                                        data-title="@carouselItem.CarouselItemText.Title"
                                        data-img="@carouselItem.CarouselItemText.ImageUrl"
