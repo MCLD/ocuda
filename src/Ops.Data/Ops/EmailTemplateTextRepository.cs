@@ -20,14 +20,15 @@ namespace Ocuda.Ops.Data.Ops
             string languageName)
         {
             return await DbSet
-                .AsNoTracking()
                 .Where(_ => _.EmailTemplateId == emailTemplateId
                     && _.PromenadeLanguageName == languageName)
                 .Select(_ => new EmailTemplateText
                 {
+                    EmailTemplateId = _.EmailTemplateId,
                     TemplateHtml = _.TemplateHtml,
                     TemplateText = _.TemplateText
                 })
+                .AsNoTracking()
                 .SingleOrDefaultAsync();
         }
     }

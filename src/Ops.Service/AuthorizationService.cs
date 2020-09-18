@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
@@ -11,21 +10,25 @@ namespace Ocuda.Ops.Service
 {
     public class AuthorizationService : IAuthorizationService
     {
-        private readonly ISectionManagerGroupRepository _sectionManagerGroupRepository;
         private readonly IClaimGroupRepository _claimGroupRepository;
+        private readonly IPermissionGroupRepository _permissionGroupRepository;
+        private readonly ISectionManagerGroupRepository _sectionManagerGroupRepository;
 
-        public AuthorizationService(ISectionManagerGroupRepository sectionManagerGroupRepository,
-            IClaimGroupRepository claimGroupRepository)
+        public AuthorizationService(IClaimGroupRepository claimGroupRepository,
+            IPermissionGroupRepository permissionGroupRepository,
+            ISectionManagerGroupRepository sectionManagerGroupRepository)
         {
-            _sectionManagerGroupRepository = sectionManagerGroupRepository
-                ?? throw new ArgumentNullException(nameof(sectionManagerGroupRepository));
             _claimGroupRepository = claimGroupRepository
                 ?? throw new ArgumentNullException(nameof(claimGroupRepository));
+            _permissionGroupRepository = permissionGroupRepository
+                ?? throw new ArgumentNullException(nameof(permissionGroupRepository));
+            _sectionManagerGroupRepository = sectionManagerGroupRepository
+                ?? throw new ArgumentNullException(nameof(sectionManagerGroupRepository));
         }
 
         public async Task EnsureSiteManagerGroupAsync(int currentUserId, string group)
         {
-            if (string.IsNullOrEmpty(group))
+            if (group == null)
             {
                 throw new ArgumentNullException(nameof(group));
             }
@@ -53,8 +56,12 @@ namespace Ocuda.Ops.Service
 
         public async Task<IEnumerable<SectionManagerGroup>> GetSectionManagerGroupsAsync()
         {
-            return await _sectionManagerGroupRepository
-                .ToListAsync(_ => _.GroupName);
+            return await _sectionManagerGroupRepository.ToListAsync(_ => _.GroupName);
+        }
+
+        public async Task<ICollection<PermissionGroup>> GetPermissionGroupsAsync()
+        {
+            return await _permissionGroupRepository.ToListAsync(_ => _.GroupName);
         }
     }
 }

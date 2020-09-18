@@ -7,7 +7,6 @@
         public static readonly string OcudaFileShared = "Ocuda.FileShared";
         public static readonly string OcudaInstance = "Ocuda.Instance";
         public static readonly string OcudaJobSleepSeconds = "Ocuda.JobSleepSeconds";
-        public static readonly string OcudaLoggingDatabase = "Ocuda.LoggingDatabase";
         public static readonly string OcudaLoggingRollingFile = "Ocuda.LoggingRollingFile";
         public static readonly string OcudaLoggingRollingHttpFile = "Ocuda.LoggingRollingHttpFile";
         public static readonly string OcudaProxyAddress = "Ocuda.ProxyAddress";

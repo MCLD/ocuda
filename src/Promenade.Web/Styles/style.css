@@ -315,3 +315,23 @@ a.prom-leftnav-header:hover {
 .prom-carousel .prom-carousel-next {
     right: 0;
 }
+
+/* paginate page input styling */
+
+.page-link {
+    height: 36px;
+}
+
+.page-input {
+    padding: .5rem;
+    text-align: center;
+    width: 60px;
+    -moz-appearance: textfield;
+    -webkit-appearance: none;
+}
+
+    .page-input::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+        margin: 0;
+        -moz-appearance: textfield;
+        -webkit-appearance: none;
+    }

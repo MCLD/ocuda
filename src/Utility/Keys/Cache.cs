@@ -41,6 +41,16 @@
         public static readonly string OpsJobStop = "jobstop.{0}";
 
         /// <summary>
+        /// Cached email setup element, {0} is the id of the element, {1} is the language id
+        /// </summary>
+        public static readonly string OpsEmailSetup = "emailsetup.{0}.{1}";
+
+        /// <summary>
+        /// Cached email template element, {0} is the id of the element, {1} is the language id
+        /// </summary>
+        public static readonly string OpsEmailTemplate = "emailtemplate.{0}.{1}";
+
+        /// <summary>
         /// Default language ID
         /// </summary>
         public static readonly string PromDefaultLanguageId = "langid-default";
@@ -59,6 +69,16 @@
         /// Cached page, {0} is the language id, {1} is the type, {2} is the stub
         /// </summary>
         public static readonly string PromPage = "page.{0}.{1}.{2}";
+
+        /// <summary>
+        /// Cached podcast info, {0} is the podcast stub, {1} is whether to include blocked items
+        /// </summary>
+        public static readonly string PromPodcast = "podcast.{0}.{1}";
+
+        /// <summary>
+        /// Cached podcast items, {0} is the podcast id, {1} is whether to include blocked items
+        /// </summary>
+        public static readonly string PromPodcastItems = "podcastitems.{0}.{1}";
 
         /// <summary>
         /// Cached redirect path, {0} is the requested path

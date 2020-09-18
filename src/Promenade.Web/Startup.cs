@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
@@ -60,7 +61,11 @@ namespace Ocuda.Promenade.Web
                 services.AddApplicationInsightsTelemetry();
             }
 
-            services.AddResponseCompression();
+            services.AddResponseCompression(_ =>
+            {
+                _.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                        new[] { "application/rss+xml" });
+            });
 
             services.AddResponseCaching();
 
@@ -262,6 +267,10 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.NavigationTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IPageRepository,
                 Data.Promenade.PageRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IPodcastItemRepository,
+                Data.Promenade.PodcastItemRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IPodcastRepository,
+                Data.Promenade.PodcastRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IScheduleRequestRepository,
                 Data.Promenade.ScheduleRequestRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IScheduleRequestSubjectRepository,
@@ -296,6 +305,7 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<NavigationService>();
             services.AddScoped<PageService>();
             services.AddScoped<RedirectService>();
+            services.AddScoped<PodcastService>();
             services.AddScoped<ScheduleService>();
             services.AddScoped<SegmentService>();
             services.AddScoped<SiteAlertService>();

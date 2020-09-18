@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ocuda.Ops.Service.Filters;
-using Ocuda.Ops.Service.Models;
 using Ocuda.Promenade.Models;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
