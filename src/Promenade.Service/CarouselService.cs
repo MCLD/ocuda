@@ -24,6 +24,7 @@ namespace Ocuda.Promenade.Service
         private readonly ICarouselItemRepository _carouselItemRepository;
         private readonly ICarouselItemTextRepository _carouselItemTextRepository;
         private readonly ICarouselRepository _carouselRepository;
+        private readonly ICarouselTemplateRepository _carouselTemplateRepository;
         private readonly ICarouselTextRepository _carouselTextRepository;
         private readonly IPageLayoutRepository _pageLayoutRepository;
         private readonly LanguageService _languageService;
@@ -37,6 +38,7 @@ namespace Ocuda.Promenade.Service
             ICarouselItemRepository carouselItemRepository,
             ICarouselItemTextRepository carouselItemTextRepository,
             ICarouselRepository carouselRepository,
+            ICarouselTemplateRepository carouselTemplateRepository,
             ICarouselTextRepository carouselTextRepository,
             IPageLayoutRepository pageLayoutRepository,
             LanguageService languageService)
@@ -54,6 +56,8 @@ namespace Ocuda.Promenade.Service
                 ?? throw new ArgumentNullException(nameof(carouselItemTextRepository));
             _carouselRepository = carouselRepository
                 ?? throw new ArgumentNullException(nameof(carouselRepository));
+            _carouselTemplateRepository = carouselTemplateRepository
+                ?? throw new ArgumentNullException(nameof(carouselTemplateRepository));
             _carouselTextRepository = carouselTextRepository
                 ?? throw new ArgumentNullException(nameof(carouselTextRepository));
             _pageLayoutRepository = pageLayoutRepository
@@ -82,6 +86,9 @@ namespace Ocuda.Promenade.Service
 
                 if (carousel != null)
                 {
+                    var template = await _carouselTemplateRepository
+                        .GetTemplateForCarouselAsync(carousel.Id);
+
                     carousel.Items = carousel.Items?.OrderBy(_ => _.Order).ToList();
                     foreach (var item in carousel.Items)
                     {
@@ -91,6 +98,11 @@ namespace Ocuda.Promenade.Service
                         foreach (var button in item.Buttons)
                         {
                             button.CarouselItem = null;
+
+                            if (!string.IsNullOrWhiteSpace(template?.ButtonUrlTemplate))
+                            {
+                                button.Url = template.ButtonUrlTemplate.Replace("{0}", button.Url);
+                            }
                         }
                     }
                 }

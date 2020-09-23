@@ -96,7 +96,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 PaginateModel = paginateModel,
                 PageType = filter.PageType.Value,
                 IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
-                PermissionIds = UserClaims(ClaimType.PermissionId)
+                PermissionIds = UserClaims(ClaimType.PermissionId),
+                CarouselTemplates = new SelectList(await _carouselService.GetAllTemplatesAsync(),
+                    nameof(CarouselTemplate.Id), nameof(CarouselTemplate.Name))
             };
 
             return View(viewModel);
@@ -119,6 +121,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 try
                 {
+                    if (!model.PageHeader.IsLayoutPage)
+                    {
+                        model.PageHeader.LayoutCarouselTemplateId = null;
+                    }
+
                     var header = await _pageService.CreateHeaderAsync(model.PageHeader);
                     response = new JsonResponse
                     {

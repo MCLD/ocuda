@@ -10,7 +10,7 @@ using Ocuda.Ops.DataProvider.SqlServer.Promenade;
 namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20200915205152_prom_v1.0.0.72")]
+    [Migration("20200923231750_prom_v1.0.0.72")]
     partial class prom_v10072
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -169,6 +169,35 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.HasIndex("LanguageId");
 
                     b.ToTable("CarouselItemTexts");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ButtonUrlInfo")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("ButtonUrlLabel")
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
+
+                    b.Property<string>("ButtonUrlTemplate")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CarouselTemplates");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselText", b =>
@@ -834,6 +863,9 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Property<bool>("IsLayoutPage")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("LayoutCarouselTemplateId")
+                        .HasColumnType("int");
+
                     b.Property<string>("PageName")
                         .IsRequired()
                         .HasColumnType("nvarchar(255)")
@@ -848,6 +880,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LayoutCarouselTemplateId");
 
                     b.ToTable("PageHeaders");
                 });
@@ -1636,6 +1670,14 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.HasOne("Ocuda.Promenade.Models.Entities.SocialCard", "SocialCard")
                         .WithMany()
                         .HasForeignKey("SocialCardId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageHeader", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.CarouselTemplate", "LayoutCarouselTemplate")
+                        .WithMany()
+                        .HasForeignKey("LayoutCarouselTemplateId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 

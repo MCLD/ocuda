@@ -49,6 +49,7 @@ namespace Ocuda.Promenade.Data
         public DbSet<CarouselItem> CarouselItems { get; }
         public DbSet<CarouselItemText> CarouselItemTexts { get; }
         public DbSet<Carousel> Carousels { get; }
+        public DbSet<CarouselTemplate> CarouselTemplates { get; }
         public DbSet<CarouselText> CarouselTexts { get; }
         public DbSet<Category> Categories { get; }
         public DbSet<CategoryText> CategoryTexts { get; }
@@ -67,7 +68,7 @@ namespace Ocuda.Promenade.Data
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; }
         public DbSet<Navigation> Navigations { get; }
         public DbSet<NavigationText> NavigationTexts { get; }
-        public DbSet<PageItem> PageItems { get; }
+        public DbSet<PageItem> PageItems { get; set; }
         public DbSet<PageLayout> PageLayouts { get; set; }
         public DbSet<PageLayoutText> PageLayoutTexts { get; }
         public DbSet<Page> Pages { get; }

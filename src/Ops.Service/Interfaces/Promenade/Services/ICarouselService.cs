@@ -17,6 +17,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task DeleteItemAsync(int carouselItemId);
         Task DeleteNoSaveAsync(int carouselId);
         Task<CarouselButton> EditButtonAsync(CarouselButton carouselButton);
+        Task<ICollection<CarouselTemplate>> GetAllTemplatesAsync();
         Task<ICollection<CarouselButtonLabel>> GetButtonLabelsAsync();
         Task<Carousel> GetCarouselDetailsAsync(int id, int languageId);
         Task<int> GetCarouselIdForButtonAsync(int id);
@@ -26,6 +27,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<int?> GetPageHeaderIdForCarouselAsync(int id);
         Task<int?> GetPageLayoutIdForCarouselAsync(int id);
         Task<DataWithCount<ICollection<Carousel>>> GetPaginatedListAsync(BaseFilter filter);
+        Task<CarouselTemplate> GetTemplateForPageLayoutAsync(int id);
         Task<CarouselText> SetCarouselTextAsync(CarouselText carouselText);
         Task<CarouselItemText> SetItemTextAsync(CarouselItemText itemText);
         Task UpdateButtonSortOrder(int id, bool increase);

@@ -187,11 +187,33 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 AllowedImageDomains = (await _siteSettingService.GetSettingStringAsync(
                     Models.Keys.SiteSetting.Carousel.ImageRestrictToDomains))
                     .Replace(",", ", "),
-                AllowedLinkDomains = (await _siteSettingService.GetSettingStringAsync(
-                    Models.Keys.SiteSetting.Carousel.LinkRestrictToDomains))
-                    .Replace(",", ", "),
                 PageLayoutId = await _carouselService.GetPageLayoutIdForCarouselAsync(carousel.Id)
             };
+
+            if (viewModel.PageLayoutId.HasValue)
+            {
+                viewModel.CarouselTemplate = await _carouselService
+                    .GetTemplateForPageLayoutAsync(viewModel.PageLayoutId.Value);
+
+                if (!string.IsNullOrWhiteSpace(viewModel.CarouselTemplate?.ButtonUrlTemplate))
+                {
+                    viewModel.ButtonUrlInfoMessage = viewModel.CarouselTemplate.ButtonUrlInfo;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(viewModel.CarouselTemplate?.ButtonUrlTemplate))
+            {
+                var AllowedLinkDomains = (await _siteSettingService.GetSettingStringAsync(
+                    Models.Keys.SiteSetting.Carousel.LinkRestrictToDomains))
+                    .Replace(",", ", ");
+
+                if (!string.IsNullOrWhiteSpace(AllowedLinkDomains))
+                {
+                    viewModel.ButtonUrlInfoMessage
+                        = $"Urls are restricted to the following domains: {AllowedLinkDomains}";
+                }
+                    
+            }
 
             return View(viewModel);
         }

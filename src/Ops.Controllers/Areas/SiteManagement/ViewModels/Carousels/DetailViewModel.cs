@@ -16,6 +16,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Carousels
 
         public CarouselButton CarouselButton { get; set; }
 
+        public CarouselTemplate CarouselTemplate { get; set; }
+
         public int LanguageId { get; set; }
 
         public SelectList LanguageList { get; set; }
@@ -26,7 +28,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Carousels
         public SelectList LabelList { get; set; }
 
         public string AllowedImageDomains { get; set; }
-        public string AllowedLinkDomains { get; set; }
+
+        public string ButtonUrlInfoMessage { get; set; }
 
         public int? FocusItemId { get; set; }
         public string ItemErrorMessage { get; set; }

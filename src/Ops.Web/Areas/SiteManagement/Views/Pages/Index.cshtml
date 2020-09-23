@@ -22,6 +22,15 @@
             <option value="False">No</option>
             <option value="True">Yes</option>
         </select>
+        <div id="addTemplateContainer" class="d-none">
+            <select id="addCarouselTemplate"
+                    asp-for="PageHeader.LayoutCarouselTemplateId"
+                    asp-items="@Model.CarouselTemplates"
+                    formgroup
+                    disabled>
+                <option></option>
+            </select>
+        </div>
     </div>
 </form>
 
@@ -44,6 +53,15 @@
             <option value="False">No</option>
             <option value="True">Yes</option>
         </select>
+        <div id="editTemplateContainer" class="d-none">
+            <select id="editCarouselTemplate"
+                    asp-for="PageHeader.LayoutCarouselTemplateId"
+                    asp-items="@Model.CarouselTemplates"
+                    formgroup
+                    disabled>
+                <option></option>
+            </select>
+        </div>
     </div>
 </form>
 
@@ -169,6 +187,7 @@ else
                                                 data-name="@header.PageName"
                                                 data-stub="@header.Stub"
                                                 data-type="@((int)header.Type)"
+                                                data-carouseltemplate="@header.LayoutCarouselTemplateId"
                                                 title="Edit page name">
                                             <span class="fas fa-cog" aria-hidden="true"></span>
                                         </button>
@@ -249,6 +268,15 @@ else
             }
         })
 
+        $("#addLayout").on("change", function () {
+            if ($(this).val() == "True") {
+                $("#addTemplateContainer").removeClass("d-none").find("select").removeAttr("disabled");
+            }
+            else {
+                $("#addTemplateContainer").addClass("d-none").find("select").attr("disabled", "disabled");
+            }
+        });
+
         $("#addForm").submit(function (e) {
             e.preventDefault();
             var form = $(this);
@@ -275,12 +303,21 @@ else
             var name = button.data("name");
             var stub = button.data("stub");
             var type = button.data("type");
+            var carouselTemplate = button.data("carouseltemplate");
 
             $("#editId").val(id);
             $("#editLayout").val(layout);
             $("#editName").val(name);
             $("#editStub").val(stub);
             $("#editType").val(type);
+            $("#editCarouselTemplate").val(carouselTemplate);
+
+            if (layout == "True") {
+                $("#editTemplateContainer").removeClass("d-none");
+            }
+            else {
+                $("#editTemplateContainer").addClass("d-none");
+            }
         });
 
         $("#editForm").submit(function (e) {

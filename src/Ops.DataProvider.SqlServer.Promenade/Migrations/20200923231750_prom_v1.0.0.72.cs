@@ -13,6 +13,11 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                 nullable: false,
                 defaultValue: false);
 
+            migrationBuilder.AddColumn<int>(
+                name: "LayoutCarouselTemplateId",
+                table: "PageHeaders",
+                nullable: true);
+
             migrationBuilder.CreateTable(
                 name: "CarouselButtonLabels",
                 columns: table => new
@@ -36,6 +41,22 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Carousels", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CarouselTemplates",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(maxLength: 255, nullable: false),
+                    ButtonUrlLabel = table.Column<string>(maxLength: 50, nullable: true),
+                    ButtonUrlInfo = table.Column<string>(maxLength: 255, nullable: true),
+                    ButtonUrlTemplate = table.Column<string>(maxLength: 255, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CarouselTemplates", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -252,6 +273,11 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_PageHeaders_LayoutCarouselTemplateId",
+                table: "PageHeaders",
+                column: "LayoutCarouselTemplateId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CarouselButtonLabelTexts_LanguageId",
                 table: "CarouselButtonLabelTexts",
                 column: "LanguageId");
@@ -310,10 +336,22 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                 name: "IX_PageLayoutTexts_LanguageId",
                 table: "PageLayoutTexts",
                 column: "LanguageId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_PageHeaders_CarouselTemplates_LayoutCarouselTemplateId",
+                table: "PageHeaders",
+                column: "LayoutCarouselTemplateId",
+                principalTable: "CarouselTemplates",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_PageHeaders_CarouselTemplates_LayoutCarouselTemplateId",
+                table: "PageHeaders");
+
             migrationBuilder.DropTable(
                 name: "CarouselButtonLabelTexts");
 
@@ -322,6 +360,9 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
             migrationBuilder.DropTable(
                 name: "CarouselItemTexts");
+
+            migrationBuilder.DropTable(
+                name: "CarouselTemplates");
 
             migrationBuilder.DropTable(
                 name: "CarouselTexts");
@@ -344,8 +385,16 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
             migrationBuilder.DropTable(
                 name: "Carousels");
 
+            migrationBuilder.DropIndex(
+                name: "IX_PageHeaders_LayoutCarouselTemplateId",
+                table: "PageHeaders");
+
             migrationBuilder.DropColumn(
                 name: "IsLayoutPage",
+                table: "PageHeaders");
+
+            migrationBuilder.DropColumn(
+                name: "LayoutCarouselTemplateId",
                 table: "PageHeaders");
         }
     }

@@ -16,6 +16,7 @@ namespace Ocuda.Promenade.Models.Entities
         public int Order { get; set; }
 
         [Required]
+        [DisplayName("Link Value")]
         [MaxLength(255)]
         public string Url { get; set; }
 

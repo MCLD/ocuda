@@ -22,6 +22,7 @@ namespace Ocuda.Ops.Service
         private readonly ICarouselItemRepository _carouselItemRepository;
         private readonly ICarouselItemTextRepository _carouselItemTextRepository;
         private readonly ICarouselRepository _carouselRepository;
+        private readonly ICarouselTemplateRepository _carouselTemplateRepository;
         private readonly ICarouselTextRepository _carouselTextRepository;
         private readonly ILanguageRepository _languageRepository;
         private readonly ISiteSettingService _siteSettingService;
@@ -33,6 +34,7 @@ namespace Ocuda.Ops.Service
             ICarouselItemRepository carouselItemRepository,
             ICarouselItemTextRepository carouselItemTextRepository,
             ICarouselRepository carouselRepository,
+            ICarouselTemplateRepository carouselTemplateRepository,
             ICarouselTextRepository carouselTextRepository,
             ILanguageRepository languageRepository,
             ISiteSettingService siteSettingService)
@@ -48,6 +50,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(carouselItemTextRepository));
             _carouselRepository = carouselRepository
                 ?? throw new ArgumentNullException(nameof(carouselRepository));
+            _carouselTemplateRepository = carouselTemplateRepository
+                ?? throw new ArgumentNullException(nameof(carouselTemplateRepository));
             _carouselTextRepository = carouselTextRepository
                 ?? throw new ArgumentNullException(nameof(carouselTextRepository));
             _languageRepository = languageRepository
@@ -170,7 +174,7 @@ namespace Ocuda.Ops.Service
         public async Task<string> GetDefaultNameForItemAsync(int itemId)
         {
             var defaultLanguageId = await _languageRepository.GetDefaultLanguageId();
-            return (await _carouselItemTextRepository.GetByCarouselItemAndLanguageAsync(itemId, 
+            return (await _carouselItemTextRepository.GetByCarouselItemAndLanguageAsync(itemId,
                 defaultLanguageId))
                 .Label;
         }
@@ -188,7 +192,7 @@ namespace Ocuda.Ops.Service
             itemText.ImageUrl = imageUrl;
             itemText.Label = itemText.Label?.Trim();
             itemText.Title = itemText.Title?.Trim();
-            
+
 
             var maxSortOrder = await _carouselItemRepository
                 .GetMaxSortOrderForCarouselAsync(carouselItem.CarouselId);
@@ -333,27 +337,33 @@ namespace Ocuda.Ops.Service
         {
             button.Url = button.Url?.Trim();
 
-            var delimitedLinkDomains = await _siteSettingService.GetSettingStringAsync(
-                    Models.Keys.SiteSetting.Carousel.LinkRestrictToDomains);
+            var carouselTemplate = await _carouselTemplateRepository
+                .GetByCarouselItemAsync(button.CarouselItemId);
 
-            if (!string.IsNullOrWhiteSpace(delimitedLinkDomains))
+            if (string.IsNullOrWhiteSpace(carouselTemplate?.ButtonUrlTemplate))
             {
-                var allowedLinkDomains = delimitedLinkDomains.Split(',').ToList();
+                var delimitedLinkDomains = await _siteSettingService.GetSettingStringAsync(
+                        Models.Keys.SiteSetting.Carousel.LinkRestrictToDomains);
 
-                string linkDomain;
-                try
+                if (!string.IsNullOrWhiteSpace(delimitedLinkDomains))
                 {
-                    linkDomain = new Uri(button.Url).Host.Split('.', 2)[1];
-                }
-                catch (Exception)
-                {
-                    throw new OcudaException("Invalid URL");
-                }
+                    var allowedLinkDomains = delimitedLinkDomains.Split(',').ToList();
 
-                if (!allowedLinkDomains.Any(_ => _
-                    .IndexOf(linkDomain, StringComparison.OrdinalIgnoreCase) != -1))
-                {
-                    throw new OcudaException("URL is not from an accepted domain.");
+                    string linkDomain;
+                    try
+                    {
+                        linkDomain = new Uri(button.Url).Host.Split('.', 2)[1];
+                    }
+                    catch (Exception)
+                    {
+                        throw new OcudaException("Invalid URL");
+                    }
+
+                    if (!allowedLinkDomains.Any(_ => _
+                        .IndexOf(linkDomain, StringComparison.OrdinalIgnoreCase) != -1))
+                    {
+                        throw new OcudaException("URL is not from an accepted domain.");
+                    }
                 }
             }
 
@@ -371,33 +381,40 @@ namespace Ocuda.Ops.Service
 
         public async Task<CarouselButton> EditButtonAsync(CarouselButton carouselButton)
         {
+            var currentCarouselButton = await _carouselButtonRepository.FindAsync(carouselButton.Id);
+
             var linkUrl = carouselButton.Url?.Trim();
 
-            var delimitedLinkDomains = await _siteSettingService.GetSettingStringAsync(
+            var carouselTemplate = await _carouselTemplateRepository
+                .GetByCarouselItemAsync(currentCarouselButton.CarouselItemId);
+
+            if (string.IsNullOrWhiteSpace(carouselTemplate?.ButtonUrlTemplate))
+            {
+                var delimitedLinkDomains = await _siteSettingService.GetSettingStringAsync(
                     Models.Keys.SiteSetting.Carousel.LinkRestrictToDomains);
 
-            if (!string.IsNullOrWhiteSpace(delimitedLinkDomains))
-            {
-                var allowedLinkDomains = delimitedLinkDomains.Split(',').ToList();
+                if (!string.IsNullOrWhiteSpace(delimitedLinkDomains))
+                {
+                    var allowedLinkDomains = delimitedLinkDomains.Split(',').ToList();
 
-                string linkDomain;
-                try
-                {
-                    linkDomain = new Uri(linkUrl).Host.Split('.', 2)[1];
-                }
-                catch (Exception)
-                {
-                    throw new OcudaException("Invalid URL");
-                }
+                    string linkDomain;
+                    try
+                    {
+                        linkDomain = new Uri(linkUrl).Host.Split('.', 2)[1];
+                    }
+                    catch (Exception)
+                    {
+                        throw new OcudaException("Invalid URL");
+                    }
 
-                if (!allowedLinkDomains.Any(_ => _
-                    .IndexOf(linkDomain, StringComparison.OrdinalIgnoreCase) != -1))
-                {
-                    throw new OcudaException("URL is not from an accepted domain.");
+                    if (!allowedLinkDomains.Any(_ => _
+                        .IndexOf(linkDomain, StringComparison.OrdinalIgnoreCase) != -1))
+                    {
+                        throw new OcudaException("URL is not from an accepted domain.");
+                    }
                 }
             }
 
-            var currentCarouselButton = await _carouselButtonRepository.FindAsync(carouselButton.Id);
             currentCarouselButton.LabelId = carouselButton.LabelId;
             currentCarouselButton.Url = carouselButton.Url?.Trim();
 
@@ -470,6 +487,16 @@ namespace Ocuda.Ops.Service
         public async Task<int> GetCarouselIdForButtonAsync(int id)
         {
             return await _carouselButtonRepository.GetCarouselIdForButtonAsync(id);
+        }
+
+        public async Task<ICollection<CarouselTemplate>> GetAllTemplatesAsync()
+        {
+            return await _carouselTemplateRepository.GetAllAsync();
+        }
+
+        public async Task<CarouselTemplate> GetTemplateForPageLayoutAsync(int id)
+        {
+            return await _carouselTemplateRepository.GetForPageLayoutAsync(id);
         }
     }
 }

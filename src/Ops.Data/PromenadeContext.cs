@@ -65,6 +65,7 @@ namespace Ocuda.Ops.Data
         public DbSet<CarouselItem> CarouselItems { get; set; }
         public DbSet<CarouselItemText> CarouselItemTexts { get; set; }
         public DbSet<Carousel> Carousels { get; set; }
+        public DbSet<CarouselTemplate> CarouselTemplates { get; set; }
         public DbSet<CarouselText> CarouselTexts { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<CategoryText> CategoryTexts { get; set; }

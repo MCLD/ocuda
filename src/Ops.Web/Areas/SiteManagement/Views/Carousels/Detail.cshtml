@@ -33,8 +33,9 @@
         <select id="addButtonLabel" asp-for="CarouselButton.LabelId" asp-items="Model.LabelList" formgroup>
             <option></option>
         </select>
-        <input id="addButtonUrl" asp-for="CarouselButton.Url" formgroup
-               info-tooltip="@(!string.IsNullOrWhiteSpace(Model.AllowedLinkDomains) ? $"Urls are restricted to the following domains: {Model.AllowedLinkDomains}" : null )" />
+        <input id="addButtonUrl" asp-for="CarouselButton.Url" formgroup 
+               label-name="@(!string.IsNullOrWhiteSpace(Model.CarouselTemplate?.ButtonUrlLabel) ? Model.CarouselTemplate.ButtonUrlLabel : nameof(CarouselButton.Url))"
+               info-tooltip="@(!string.IsNullOrWhiteSpace(Model.ButtonUrlInfoMessage) ? Model.ButtonUrlInfoMessage : null )" />
     </div>
 </form>
 
@@ -48,7 +49,8 @@
         <select id="editButtonLabel" asp-for="CarouselButton.LabelId" asp-items="Model.LabelList" formgroup></select>
 
         <input id="editButtonUrl" asp-for="CarouselButton.Url" formgroup
-               info-tooltip="@(!string.IsNullOrWhiteSpace(Model.AllowedLinkDomains) ? $"Urls are restricted to the following domains: {Model.AllowedLinkDomains}" : null )" />
+               label-name="@(!string.IsNullOrWhiteSpace(Model.CarouselTemplate?.ButtonUrlLabel) ? Model.CarouselTemplate.ButtonUrlLabel : nameof(CarouselButton.Url))"
+               info-tooltip="@(!string.IsNullOrWhiteSpace(Model.ButtonUrlInfoMessage) ? Model.ButtonUrlInfoMessage : null )" />
     </div>
 </form>
 
