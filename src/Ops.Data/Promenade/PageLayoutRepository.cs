@@ -64,6 +64,7 @@ namespace Ocuda.Ops.Data.Promenade
                 .Where(_ => _.Id == id)
                 .Include(_ => _.Items)
                     .ThenInclude(_ => _.Carousel)
+                        .ThenInclude(_ => _.Items)
                 .Include(_ => _.Items)
                     .ThenInclude(_ => _.Segment)
                 .AsNoTracking()

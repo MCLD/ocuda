@@ -50,7 +50,9 @@
         <input asp-for="HeaderType" formgroup readonly />
         <div class="row">
             <div class="col-md-3 offset-md-3">
-                <a asp-action="@(nameof(PagesController.Index))" class="btn btn-outline-secondary text-dark">
+                <a asp-action="@(nameof(PagesController.Index))" 
+                   asp-route-Type="@Model.HeaderType" 
+                   class="btn btn-outline-secondary text-dark">
                     Return to Page List
                 </a>
             </div>
