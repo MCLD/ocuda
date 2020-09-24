@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 let buttonText =
                     '<a href="' +
                     b.Link +
-                    '" class="btn btn-outline-primary mx-1">' +
+                    '" target="_blank" class="btn btn-outline-primary m-1">' +
                     b.Button +
                     "</a>";
                 $(".modal-content-footer").append(buttonText);
