@@ -63,7 +63,7 @@ namespace Ocuda.Ops.Data.Promenade
             return await _context.PageItems
                 .AsNoTracking()
                 .Where(_ => _.SegmentId == id)
-                .Select(_ => _.PageLayoutId)
+                .Select(_ => (int?)_.PageLayoutId)
                 .SingleOrDefaultAsync();
         }
     }
