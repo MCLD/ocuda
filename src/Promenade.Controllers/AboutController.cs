@@ -14,10 +14,13 @@ namespace Ocuda.Promenade.Controllers
         { get { return PageType.About; } }
 
         public AboutController(ServiceFacades.Controller<AboutController> context,
+            CarouselService carouselService,
             PageService pageService,
             RedirectService redirectService,
+            SegmentService segmentService,
             SocialCardService socialCardService)
-            : base(context, pageService, redirectService, socialCardService)
+            : base(context, carouselService, pageService, redirectService, segmentService,
+                  socialCardService)
         {
         }
 
@@ -25,6 +28,12 @@ namespace Ocuda.Promenade.Controllers
         public async Task<IActionResult> Page(string stub)
         {
             return await ReturnPageAsync(stub);
+        }
+
+        [Route("{stub?}/item/{id}")]
+        public async Task<IActionResult> CarouselItem(string stub, int id)
+        {
+            return await ReturnCarouselItemAsync(stub, id);
         }
     }
 }

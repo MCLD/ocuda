@@ -14,5 +14,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
             BaseFilter filter);
 
         Task<ICollection<Segment>> GetAllActiveSegmentsAsync();
+        Task<int?> GetPageHeaderIdForSegmentAsync(int id);
+        Task<int?> GetPageLayoutIdForSegmentAsync(int id);
     }
 }

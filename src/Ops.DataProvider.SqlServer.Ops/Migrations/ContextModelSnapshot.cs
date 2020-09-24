@@ -657,6 +657,19 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.ToTable("PermissionGroups");
                 });
 
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupPageContent", b =>
+                {
+                    b.Property<int>("PermissionGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PageHeaderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PermissionGroupId", "PageHeaderId");
+
+                    b.ToTable("PermissionGroupPageContents");
+                });
+
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.Post", b =>
                 {
                     b.Property<int>("Id")

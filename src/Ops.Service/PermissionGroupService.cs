@@ -18,16 +18,22 @@ namespace Ocuda.Ops.Service
         : BaseService<PermissionGroupService>, IPermissionGroupService
     {
         private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly IPermissionGroupPageContentRepository
+            _permissionGroupPageContentRepository;
         private readonly IPermissionGroupRepository _permissionGroupRepository;
 
         public PermissionGroupService(ILogger<PermissionGroupService> logger,
             IHttpContextAccessor httpContextAccessor,
             IDateTimeProvider dateTimeProvider,
+            IPermissionGroupPageContentRepository permissionGroupPageContentRepository,
             IPermissionGroupRepository permissionGroupRepository)
             : base(logger, httpContextAccessor)
         {
             _dateTimeProvider = dateTimeProvider
                 ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+            _permissionGroupPageContentRepository
+                = permissionGroupPageContentRepository
+                ?? throw new ArgumentNullException(nameof(permissionGroupPageContentRepository));
             _permissionGroupRepository = permissionGroupRepository
                 ?? throw new ArgumentNullException(nameof(permissionGroupRepository));
         }
@@ -94,6 +100,47 @@ namespace Ocuda.Ops.Service
             {
                 throw new OcudaException($"Permission group '{permissionGroup.PermissionGroupName}' already exists.");
             }
+        }
+
+        public async Task<ICollection<PermissionGroup>> GetAllAsync()
+        {
+            return await _permissionGroupRepository.GetAllAsync();
+        }
+
+        public async Task<ICollection<PermissionGroupPageContent>>
+            GetPagePermissionsAsync(int pageHeaderId)
+        {
+            return await _permissionGroupPageContentRepository.GetByPageHeaderId(pageHeaderId);
+        }
+
+        public async Task AddPageHeaderPermissionGroupAsync(int pageHeaderId, int permissionGroupId)
+        {
+            await _permissionGroupPageContentRepository.AddAsync(new PermissionGroupPageContent
+            {
+                PageHeaderId = pageHeaderId,
+                PermissionGroupId = permissionGroupId
+            });
+            await _permissionGroupPageContentRepository.SaveAsync();
+        }
+        public async Task RemovePageHeaderPermissionGroupAsync(int pageHeaderId, int permissionGroupId)
+        {
+            _permissionGroupPageContentRepository.Remove(new PermissionGroupPageContent
+            {
+                PageHeaderId = pageHeaderId,
+                PermissionGroupId = permissionGroupId
+            });
+            await _permissionGroupPageContentRepository.SaveAsync();
+        }
+
+        public async Task<bool> HasPageContentPermissionAsync(int[] permissionGroupIds)
+        {
+            return await _permissionGroupPageContentRepository
+                .AnyPermissionGroupIdAsync(permissionGroupIds);
+        }
+
+        public async Task<ICollection<PermissionGroup>> GetGroupsAsync(int[] permissionGroupIds)
+        {
+            return await _permissionGroupRepository.GetGroupsAsync(permissionGroupIds);
         }
     }
 }

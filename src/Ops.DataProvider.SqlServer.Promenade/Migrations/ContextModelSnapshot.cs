@@ -37,6 +37,187 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.ToTable("DataProtectionKeys");
                 });
 
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Carousel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Carousels");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselButton", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CarouselItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LabelId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarouselItemId");
+
+                    b.HasIndex("LabelId");
+
+                    b.ToTable("CarouselButtons");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselButtonLabel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CarouselButtonLabels");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselButtonLabelText", b =>
+                {
+                    b.Property<int>("CarouselButtonLabelId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(32)")
+                        .HasMaxLength(32);
+
+                    b.HasKey("CarouselButtonLabelId", "LanguageId");
+
+                    b.HasIndex("LanguageId");
+
+                    b.ToTable("CarouselButtonLabelTexts");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CarouselId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarouselId");
+
+                    b.ToTable("CarouselItems");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselItemText", b =>
+                {
+                    b.Property<int>("CarouselItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(2000)")
+                        .HasMaxLength(2000);
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.HasKey("CarouselItemId", "LanguageId");
+
+                    b.HasIndex("LanguageId");
+
+                    b.ToTable("CarouselItemTexts");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ButtonUrlInfo")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("ButtonUrlLabel")
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
+
+                    b.Property<string>("ButtonUrlTemplate")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CarouselTemplates");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselText", b =>
+                {
+                    b.Property<int>("CarouselId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.HasKey("CarouselId", "LanguageId");
+
+                    b.HasIndex("LanguageId");
+
+                    b.ToTable("CarouselTexts");
+                });
+
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -677,6 +858,12 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<bool>("IsLayoutPage")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("LayoutCarouselTemplateId")
+                        .HasColumnType("int");
+
                     b.Property<string>("PageName")
                         .IsRequired()
                         .HasColumnType("nvarchar(255)")
@@ -692,7 +879,89 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("LayoutCarouselTemplateId");
+
                     b.ToTable("PageHeaders");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("CarouselId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PageLayoutId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SegmentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarouselId");
+
+                    b.HasIndex("PageLayoutId");
+
+                    b.HasIndex("SegmentId");
+
+                    b.ToTable("PageItems");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageLayout", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<int>("PageHeaderId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SocialCardId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PageHeaderId");
+
+                    b.HasIndex("SocialCardId");
+
+                    b.ToTable("PageLayouts");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageLayoutText", b =>
+                {
+                    b.Property<int>("PageLayoutId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.HasKey("PageLayoutId", "LanguageId");
+
+                    b.HasIndex("LanguageId");
+
+                    b.ToTable("PageLayoutTexts");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Podcast", b =>
@@ -1183,6 +1452,75 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.ToTable("UrlRedirectAccesses");
                 });
 
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselButton", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.CarouselItem", "CarouselItem")
+                        .WithMany("Buttons")
+                        .HasForeignKey("CarouselItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.CarouselButtonLabel", "Label")
+                        .WithMany()
+                        .HasForeignKey("LabelId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselButtonLabelText", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.CarouselButtonLabel", "CarouselButtonLabel")
+                        .WithMany()
+                        .HasForeignKey("CarouselButtonLabelId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselItem", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Carousel", "Carousel")
+                        .WithMany("Items")
+                        .HasForeignKey("CarouselId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselItemText", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.CarouselItem", "CarouselItem")
+                        .WithMany()
+                        .HasForeignKey("CarouselItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselText", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Carousel", "Carousel")
+                        .WithMany()
+                        .HasForeignKey("CarouselId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CategoryText", b =>
                 {
                     b.HasOne("Ocuda.Promenade.Models.Entities.Category", "Category")
@@ -1331,6 +1669,62 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .WithMany()
                         .HasForeignKey("SocialCardId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageHeader", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.CarouselTemplate", "LayoutCarouselTemplate")
+                        .WithMany()
+                        .HasForeignKey("LayoutCarouselTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageItem", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Carousel", "Carousel")
+                        .WithMany()
+                        .HasForeignKey("CarouselId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.PageLayout", "PageLayout")
+                        .WithMany("Items")
+                        .HasForeignKey("PageLayoutId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Segment", "Segment")
+                        .WithMany()
+                        .HasForeignKey("SegmentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageLayout", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.PageHeader", "PageHeader")
+                        .WithMany()
+                        .HasForeignKey("PageHeaderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.SocialCard", "SocialCard")
+                        .WithMany()
+                        .HasForeignKey("SocialCardId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageLayoutText", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.PageLayout", "PageLayout")
+                        .WithMany()
+                        .HasForeignKey("PageLayoutId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PodcastDirectoryInfo", b =>

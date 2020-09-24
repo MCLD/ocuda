@@ -19,5 +19,21 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<PageHeader> EditHeaderAsync(PageHeader header);
         Task DeleteHeaderAsync(int id);
         Task<bool> StubInUseAsync(PageHeader header);
+        Task<DataWithCount<ICollection<PageLayout>>> GetPaginatedLayoutListForHeaderAsync(
+            int headerId, BaseFilter filter);
+        Task<PageLayout> CreateLayoutAsync(PageLayout layout);
+        Task<PageLayout> EditLayoutAsync(PageLayout layout);
+        Task DeleteLayoutAsync(int id);
+        Task<PageLayout> GetLayoutByIdAsync(int id);
+        Task<PageLayout> GetLayoutDetailsAsync(int id);
+        Task<PageLayoutText> SetLayoutTextAsync(PageLayoutText layoutText);
+        Task<PageItem> CreateItemAsync(PageItem pageItem);
+        Task<PageItem> EditItemAsync(PageItem pageItem);
+        Task DeleteItemAsync(int pageItemId);
+        Task UpdateItemSortOrder(int id, bool increase);
+        Task<PageLayoutText> GetTextByLayoutAndLanguageAsync(int layoutId, int languageId);
+        Task<PageLayout> GetLayoutForItemAsync(int itemId);
+        Task<PageItem> GetItemByIdAsync(int id);
+        Task DeleteItemNoSaveAsync(int pageItemId, bool ignoreSort = false);
     }
 }
