@@ -3,14 +3,14 @@
 @section metadata {
     <link rel="alternate"
           type="application/rss+xml"
-          title="Podcast"
+          title="@Model.Podcast.Title"
           href="@Model.RSSUrl" />
 }
 
 <div class="row">
     <div class="col-6 col-md-3 mx-auto">
         <img class="img-thumbnail img-fluid"
-             src="@Model.Podcast.ImageUrl"
+             src="@(Model.Podcast.ImageThumbnailUrl ?? Model.Podcast.ImageUrl)"
              alt="Logo for @Model.Podcast.Title" />
     </div>
     <div class="col-12 col-md-9">

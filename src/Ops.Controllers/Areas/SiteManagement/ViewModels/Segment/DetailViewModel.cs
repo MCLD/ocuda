@@ -28,5 +28,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment
 
         [DisplayName("Language")]
         public Language SelectedLanguage { get; set; }
+
+        public int? PageLayoutId { get; set; }
     }
 }

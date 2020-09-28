@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
@@ -190,7 +191,8 @@ namespace Ocuda.Ops.Controllers.Filters
                             var rosterUser = await _userService.LookupUserByEmailAsync(user.Email);
                             if (rosterUser != null)
                             {
-                                user = await _userService.UpdateRosterUserAsync(rosterUser.Id, user);
+                                user = await _userService
+                                    .UpdateRosterUserAsync(rosterUser.Id, user);
                             }
                             else
                             {
@@ -243,12 +245,14 @@ namespace Ocuda.Ops.Controllers.Filters
 
                         // pull lists of AD groups that should be site and section managers
                         var claimGroups = await _authorizationService.GetClaimGroupsAsync();
-                        var permissionGroups = await _authorizationService.GetPermissionGroupsAsync();
+                        var permissionGroups
+                            = await _authorizationService.GetPermissionGroupsAsync();
                         var sectionManagerGroups
                             = await _authorizationService.GetSectionManagerGroupsAsync();
 
                         var sectionManagerOf = new List<string>();
                         var claimantOf = new Dictionary<string, string>();
+                        var inPermissionGroup = new List<int>();
 
                         // loop through group names and look up if each group provides claims
                         // claims can be provided via ClaimGroups or SectionManagerGroups
@@ -259,8 +263,8 @@ namespace Ocuda.Ops.Controllers.Filters
                             // once the user is a site manager, we can stop looking up more rights
                             if (!isSiteManager)
                             {
-                                var claimList = claimGroups.Where(_ => _.GroupName == groupName);
-                                foreach (var claim in claimList)
+                                foreach (var claim in claimGroups
+                                    .Where(_ => _.GroupName == groupName))
                                 {
                                     if (claim.ClaimType != ClaimType.SectionManager
                                         && !claimantOf.ContainsKey(claim.ClaimType))
@@ -273,8 +277,7 @@ namespace Ocuda.Ops.Controllers.Filters
                                     .Where(_ => _.GroupName == groupName);
                                 foreach (var permission in permissionList)
                                 {
-                                    claimantOf.Add(ClaimType.PermissionId,
-                                        permission.Id.ToString(CultureInfo.InvariantCulture));
+                                    inPermissionGroup.Add(permission.Id);
                                 }
 
                                 foreach (var sectionManaged
@@ -293,6 +296,8 @@ namespace Ocuda.Ops.Controllers.Filters
                             }
                         }
 
+                        bool hasPermissions = false;
+
                         if (isSiteManager)
                         {
                             // also add each individual permission claim
@@ -304,6 +309,7 @@ namespace Ocuda.Ops.Controllers.Filters
 
                             foreach (var permissionId in permissionGroups.Select(_ => _.Id))
                             {
+                                hasPermissions = true;
                                 claims.Add(new Claim(ClaimType.PermissionId,
                                     permissionId.ToString(CultureInfo.InvariantCulture)));
                             }
@@ -316,12 +322,25 @@ namespace Ocuda.Ops.Controllers.Filters
                                 claims.Add(new Claim(claim.Key, claim.Value));
                             }
 
+                            foreach (var permissionId in inPermissionGroup)
+                            {
+                                hasPermissions = true;
+                                claims.Add(new Claim(ClaimType.PermissionId,
+                                    permissionId.ToString(CultureInfo.InvariantCulture)));
+                            }
+
                             // add section management claims
                             foreach (var sectionName in sectionManagerOf)
                             {
                                 claims.Add(new Claim(ClaimType.SectionManager,
                                     sectionName));
                             }
+                        }
+
+                        if (hasPermissions)
+                        {
+                            claims.Add(new Claim(ClaimType.HasPermissions,
+                                ClaimType.HasPermissions));
                         }
 
                         // TODO: probably change the role claim type to our roles and not AD groups

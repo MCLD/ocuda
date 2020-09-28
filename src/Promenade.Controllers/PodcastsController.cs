@@ -73,6 +73,11 @@ namespace Ocuda.Promenade.Controllers
             foreach (var podcast in podcasts.Data)
             {
                 podcast.ImageUrl = _pathResolverService.GetPublicContentUrl(podcast.ImageUrl);
+                if (!string.IsNullOrEmpty(podcast.ImageThumbnailUrl))
+                {
+                    podcast.ImageThumbnailUrl
+                        = _pathResolverService.GetPublicContentUrl(podcast.ImageThumbnailUrl);
+                }
             }
 
             var viewModel = new IndexViewModel
@@ -126,6 +131,12 @@ namespace Ocuda.Promenade.Controllers
 
             podcast.ImageUrl = _pathResolverService.GetPublicContentUrl(podcast.ImageUrl);
 
+            if (!string.IsNullOrEmpty(podcast.ImageThumbnailUrl))
+            {
+                podcast.ImageThumbnailUrl
+                    = _pathResolverService.GetPublicContentUrl(podcast.ImageThumbnailUrl);
+            }
+
             var viewModel = new PodcastViewModel
             {
                 Podcast = podcast,
@@ -173,6 +184,12 @@ namespace Ocuda.Promenade.Controllers
             }
 
             podcast.ImageUrl = _pathResolverService.GetPublicContentUrl(podcast.ImageUrl);
+            if (!string.IsNullOrEmpty(podcast.ImageThumbnailUrl))
+            {
+                podcast.ImageThumbnailUrl
+                    = _pathResolverService.GetPublicContentUrl(podcast.ImageThumbnailUrl);
+            }
+
             podcastItem.MediaUrl = _pathResolverService.GetPublicContentUrl(podcastItem.MediaUrl);
             if (!string.IsNullOrWhiteSpace(podcastItem.ImageUrl))
             {
@@ -343,7 +360,9 @@ namespace Ocuda.Promenade.Controllers
 
                 if (!string.IsNullOrEmpty(podcastItem.Subtitle))
                 {
-                    feed.ElementExtensions.Add("subtitle", itunesNS.ToString(), podcastItem.Subtitle);
+                    item.ElementExtensions.Add("subtitle",
+                        itunesNS.ToString(),
+                        podcastItem.Subtitle);
                 }
 
                 item.ElementExtensions.Add("description", googleNS.ToString(),
@@ -351,8 +370,8 @@ namespace Ocuda.Promenade.Controllers
                 item.ElementExtensions.Add("summary", itunesNS.ToString()
                     , podcastItem.Description);
 
-                feed.ElementExtensions.Add("author", googleNS.ToString(), podcast.Author);
-                feed.ElementExtensions.Add("author", itunesNS.ToString(), podcast.Author);
+                item.ElementExtensions.Add("author", googleNS.ToString(), podcast.Author);
+                item.ElementExtensions.Add("author", itunesNS.ToString(), podcast.Author);
 
                 item.Links.Add(SyndicationLink.CreateMediaEnclosureLink(
                     new UriBuilder()
@@ -423,12 +442,17 @@ namespace Ocuda.Promenade.Controllers
                     item.ElementExtensions.Add("block", itunesNS.ToString(), "Yes");
                 }
 
+                var itemLastModified = Math.Max(podcastItem.UpdatedAt.Ticks,
+                    podcastItem.PublishDate?.Ticks ?? 0);
+
+                if (itemLastModified > 0)
+                {
+                    item.LastUpdatedTime = new DateTime(itemLastModified);
+                }
+
                 items.Add(item);
 
-                lastModified = Math.Max(
-                    Math.Max(podcastItem.UpdatedAt.Ticks,
-                        podcastItem.PublishDate?.Ticks ?? 0),
-                    lastModified);
+                lastModified = Math.Max(itemLastModified, lastModified);
             }
 
             feed.Items = items;

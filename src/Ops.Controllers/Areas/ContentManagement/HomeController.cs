@@ -3,18 +3,18 @@ using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Utility.Keys;
 
-namespace Ocuda.Ops.Controllers
+namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 {
+    [Area("ContentManagement")]
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
-    [Route("[controller]")]
-    public class SiteManagementController : BaseController<SiteManagementController>
+    [Route("[area]")]
+    public class HomeController : BaseController<HomeController>
     {
-        public static string Name { get { return "SiteManagement"; } }
+        public static string Name { get { return "Home"; } }
 
-        public SiteManagementController(ServiceFacades.Controller<SiteManagementController> context)
+        public HomeController(ServiceFacades.Controller<HomeController> context)
             : base(context)
         {
-
         }
 
         [Route("")]
@@ -22,6 +22,5 @@ namespace Ocuda.Ops.Controllers
         {
             return View();
         }
-
     }
 }

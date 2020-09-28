@@ -4,6 +4,7 @@
     {
         public const string ADGroup = "ADGroup";
         public const string AuthenticatedAt = "AuthenticatedAt";
+        public const string HasPermissions = "HasPermissions";
         public const string PermissionId = "PermissionId";
         public const string SectionManager = "SectionManager";
         public const string SiteManager = "SiteManager";

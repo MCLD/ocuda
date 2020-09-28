@@ -110,7 +110,9 @@ else
 
 <div class="row">
     <div class="col-12">
-        <a asp-controller="@Ocuda.Ops.Controllers.SiteManagementController.Name"
+        <a asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement))"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))"
            class="btn btn-outline-secondary text-dark">
             Return to Site Management
         </a>
