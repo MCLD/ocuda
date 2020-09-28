@@ -83,16 +83,16 @@
                         }
                         if (topNavigation?.Navigations.Count() > 0)
                         {
-                            <div class="@(l10n?.Count() > 1 ? "col-9" : "col-12") prom-right-nav">
+                            <ul class="nav justify-content-end nav-pills @(l10n?.Count() > 1 ? "col-9" : "col-12") prom-right-nav">
                                 @foreach (var item in topNavigation.Navigations)
                                 {
                                     if (item.ChangeToLinkWhenExtraSmall || item.Navigations.Count() == 0)
                                     {
-                                        <div class="@(item.Navigations.Count() == 0 ? "" : "prom-nav-link")">
+                                        <li class="nav-item @(item.Navigations.Count() == 0 ? "" : "prom-nav-link")">
                                             <a title="@item.NavigationText.Title"
                                                aria-label="@item.NavigationText.AriaLabel"
                                                href="@(string.IsNullOrEmpty(item.Link) ? "#" : item.Link)"
-                                               class="@(item.NavigationText.Label == null ? "" : "d-flex align-items-center")">
+                                               class="nav-link @(item.NavigationText.Label == null ? "" : "d-flex align-items-center")">
                                                 @if (!string.IsNullOrEmpty(item.Icon))
                                                 {
                                                     <span class="@item.Icon @(item.NavigationText.Label == null ? "" : "prom-fa-space")"></span>
@@ -102,12 +102,12 @@
                                                     <span class="@(item.HideTextWhenExtraSmall ? "hidden-xxs" : "")">@item.NavigationText.Label</span>
                                                 }
                                             </a>
-                                        </div>
+                                        </li>
                                     }
                                     if (item.Navigations.Count() > 0)
                                     {
-                                        <div role="presentation" class="dropdown @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : "")">
-                                            <a class="dropdown-toggle @(item.NavigationText.Label == null ? "" : "d-flex align-items-center")"
+                                        <li role="presentation" class="dropdown @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : "")">
+                                            <a class="nav-link dropdown-toggle @(item.NavigationText.Label == null ? "" : "d-flex align-items-center")"
                                                data-toggle="dropdown"
                                                href="#"
                                                role="button"
@@ -138,10 +138,10 @@
                                                     </li>
                                                 }
                                             </ul>
-                                        </div>
+                                        </li>
                                     }
                                 }
-                            </div>
+                            </ul>
                         }
                     }
                 }
