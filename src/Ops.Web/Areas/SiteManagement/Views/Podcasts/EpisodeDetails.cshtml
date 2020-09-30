@@ -16,7 +16,9 @@
                 </div>
                 <div class="modal-body">
                     <p>Select a file to upload:</p>
-                    <input asp-for="UploadedFile" type="file" />
+                    <input asp-for="UploadedFile"
+                           accept=".mp3"
+                           type="file" />
                 </div>
                 <div class="modal-footer">
                     <button type="button"
@@ -60,7 +62,22 @@
             <input asp-for="EditEpisode" type="hidden" />
             <input asp-for="Episode.PodcastId" type="hidden" />
             <input asp-for="Episode.Id" type="hidden" />
-            <input asp-for="Episode.Episode" formgroup />
+            @if (Model.EditEpisode)
+            {
+                <input asp-for="Episode.Episode" type="hidden" />
+                <div class="row form-group">
+                    <div class="col-md-3 text-right">
+                        <label asp-for="Episode.Episode"></label>
+                    </div>
+                    <div class="col-md-9">
+                        @Model.Episode.Episode
+                    </div>
+                </div>
+            }
+            else
+            {
+                <input asp-for="Episode.Episode" formgroup />
+            }
             <input asp-for="Episode.Title" formgroup />
             <input asp-for="Episode.Subtitle" formgroup />
             <textarea asp-for="Episode.Description" rows="4" formgroup></textarea>

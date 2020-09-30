@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Podcasts;
-using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -134,7 +133,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         [Route("[action]/{podcastId}")]
-        [RestoreModelState]
         public async Task<IActionResult> AddEpisode(int podcastId)
         {
             if (!await HasPermissionAsync<PermissionGroupPodcastItem>(_permissionGroupService,
@@ -158,7 +156,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         [Route("[action]/{episodeId}")]
-        [RestoreModelState]
         public async Task<IActionResult> EditEpisode(int episodeId)
         {
             var episode = await _podcastService.GetPodcastItemByIdAsync(episodeId);
@@ -205,7 +202,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [Route("[action]")]
         [HttpPost]
-        [SaveModelState]
         public async Task<IActionResult> AddUpdateEpisode(EpisodeDetailsViewModel viewModel)
         {
             if (viewModel == null)
@@ -255,6 +251,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             else
             {
+                // insert new episode
+
                 if (viewModel.Episode?.Episode == null || viewModel.Episode.Episode == 0)
                 {
                     ModelState.Clear();
@@ -270,7 +268,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     return View("EpisodeDetails", viewModel);
                 }
 
-                // new
                 string baseUrl = await _siteSettingService
                         .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.PromenadeUrl);
 
@@ -355,7 +352,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
-        [SaveModelState]
         [RequestSizeLimit(MaximumFileSizeBytes)]
         public async Task<IActionResult> UpdatePodcastFile(EpisodeDetailsViewModel viewModel)
         {
@@ -393,6 +389,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     {
                         System.IO.File.Delete(path);
                     }
+
                     using var outputFile = new FileStream(path, FileMode.CreateNew);
                     await viewModel.UploadedFile.CopyToAsync(outputFile);
                     outputFile.Close();
