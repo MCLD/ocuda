@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
@@ -18,6 +19,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
     public class ManagementController : BaseController<ManagementController>
     {
         private readonly ICoverIssueService _coverIssueService;
+        private readonly IPermissionGroupService _permissionGroupService;
 
         public static string Name { get { return "Management"; } }
         public static string Area { get { return "CoverIssue"; } }
@@ -25,10 +27,13 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
         private static string CoverIssueBookmarklet = "CoverIssueBookmarklet.txt";
 
         public ManagementController(ServiceFacades.Controller<ManagementController> context,
-            ICoverIssueService coverIssueService) : base(context)
+            ICoverIssueService coverIssueService,
+            IPermissionGroupService permissionGroupService) : base(context)
         {
             _coverIssueService = coverIssueService
                 ?? throw new ArgumentNullException(nameof(coverIssueService));
+            _permissionGroupService = permissionGroupService
+                ?? throw new ArgumentNullException(nameof(permissionGroupService));
         }
 
         [Route("")]
@@ -76,12 +81,11 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
                 return RedirectToAction(nameof(Index));
             }
 
-            var siteManager = UserClaim(ClaimType.SiteManager);
             var viewModel = new DetailViewModel
             {
                 Header = header,
                 Details = await _coverIssueService.GetDetailsByHeaderIdAsync(header.Id),
-                CanEdit = !string.IsNullOrEmpty(siteManager)
+                CanEdit = await HasCoverIssueManagementPermissionAsync()
             };
 
             var leapBibUrl = await _siteSettingService.GetSettingStringAsync(
@@ -120,26 +124,27 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
         [Route("[action]")]
         public async Task<IActionResult> ResolveIssue(DetailViewModel model)
         {
-            var siteManager = UserClaim(ClaimType.SiteManager);
-            if (!string.IsNullOrEmpty(siteManager))
+            if (!await HasCoverIssueManagementPermissionAsync())
             {
-                try
-                {
-                    var header = await _coverIssueService.GetHeaderByIdAsync(model.HeaderId);
-
-                    await _coverIssueService.ResolveCoverIssueAsnyc(header.Id);
-                    ShowAlertSuccess("Issue marked as resolved!");
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex,
-                        "Error resolving cover issue for header {HeaderId}: {Message}",
-                        model.HeaderId,
-                        ex.Message);
-                    ShowAlertDanger("An error occured while trying to make the issue as resolved");
-                }
+                return RedirectToUnauthorized();
             }
+
+            try
+            {
+                var header = await _coverIssueService.GetHeaderByIdAsync(model.HeaderId);
+
+                await _coverIssueService.ResolveCoverIssueAsnyc(header.Id);
+                ShowAlertSuccess("Issue marked as resolved!");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "Error resolving cover issue for header {HeaderId}: {Message}",
+                    model.HeaderId,
+                    ex.Message);
+                ShowAlertDanger("An error occured while trying to make the issue as resolved");
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -162,6 +167,29 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
             catch
             {
                 return Json(new { success = false, message = "Could not retrieve bookmarklet" });
+            }
+        }
+
+        private async Task<bool> HasCoverIssueManagementPermissionAsync()
+        {
+            if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
+            {
+                return true;
+            }
+            else
+            {
+                var permissionClaims = UserClaims(ClaimType.PermissionId);
+                if (permissionClaims.Count > 0)
+                {
+                    var permissionGroups = await _permissionGroupService
+                        .GetApplicationPermissionGroupsAsync(
+                            ApplicationPermission.CoverIssueManagement);
+                    var permissionGroupsStrings = permissionGroups
+                        .Select(_ => _.Id.ToString(CultureInfo.InvariantCulture));
+
+                    return permissionClaims.Any(_ => permissionGroupsStrings.Contains(_));
+                }
+                return false;
             }
         }
     }

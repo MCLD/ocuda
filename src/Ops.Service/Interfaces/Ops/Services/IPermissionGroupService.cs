@@ -18,5 +18,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task RemovePageHeaderPermissionGroupAsync(int pageHeaderId, int permissionGroupId);
         Task<bool> HasPageContentPermissionAsync(int[] permissionGroupIds);
         Task<ICollection<PermissionGroup>> GetGroupsAsync(int[] permissionGroupIds);
+        Task<int> GetApplicationPermissionGroupCountAsync(string permission);
+        Task<ICollection<PermissionGroup>> GetApplicationPermissionGroupsAsync(string permission);
+        Task AddApplicationPermissionGroupAsync(string applicationPermission, int permissionGroupId);
+        Task RemoveApplicationPermissionGroupAsync(string applicationPermission, int permissionGroupId);
     }
 }
