@@ -98,7 +98,8 @@ namespace Ocuda.Promenade.Controllers
 
             foreach (var location in viewModel.Locations)
             {
-                location.CurrentStatus = await _locationService.GetCurrentStatusAsync(location.Id);
+                location.CurrentStatus
+                    = await _locationService.GetCurrentStatusAsync(location.Id);
             }
 
             return viewModel;
