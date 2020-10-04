@@ -336,6 +336,15 @@ namespace Ocuda.Promenade.Service
                 };
             }
 
+            if (location.HoursSegmentId != null)
+            {
+                return new LocationHoursResult
+                {
+                    IsSpecialHours = true,
+                    StatusMessage = "Special Hours"
+                };
+            }
+
             if (location.IsClosed)
             {
                 return new LocationHoursResult

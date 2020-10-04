@@ -46,7 +46,7 @@
             <div class="col-12 col-md-6 col-lg-4 mt-2 mb-3 d-flex">
                 <div class="prom-location-tile flex-fill w-100">
                     @if (!string.IsNullOrEmpty(location.MapLink)
-                 && !string.IsNullOrEmpty(location.MapImagePath))
+                && !string.IsNullOrEmpty(location.MapImagePath))
                     {
                         <a href="@location.MapLink">
                             <img src="@location.MapImagePath"
@@ -54,7 +54,7 @@
                                  style="width: 100%;" />
                         </a>
                     }
-                    <div class="status-bar @(location.CurrentStatus.IsCurrentlyOpen ? "bg-success" : "bg-danger")">&nbsp;</div>
+                    <div class="status-bar @(location.CurrentStatus.IsCurrentlyOpen ? "bg-success" : location.CurrentStatus.IsSpecialHours ? "bg-primary" : "bg-danger")">&nbsp;</div>
                     <div class="px-3 pt-2 pb-3">
                         <span class="h3">
                             @if (!string.IsNullOrWhiteSpace(location.LocatorName))
@@ -78,7 +78,7 @@
                             @location.State,
                             @location.Zip
                         </p>
-                        <p class="@(location.CurrentStatus.IsCurrentlyOpen ? "text-success" : "text-danger")">
+                        <p class="@(location.CurrentStatus.IsCurrentlyOpen ? "text-success" : location.CurrentStatus.IsSpecialHours ? "text-primary" : "text-danger")">
                             <strong>@location.CurrentStatus.StatusMessage</strong>
                         </p>
                         <div class="row">
