@@ -113,7 +113,7 @@
                     if (response.success) {
                         $('#bookmarklet-div').removeClass("d-none");
                         $('#bookmarklet-error-div').addClass("d-none");
-                        $("#bookmarkletButton").attr("href", response.bookmarklet);
+                        $("#bookmarkletButton").attr("href", "javascript:" + response.bookmarklet);
                     }
                     else {
                         $('#bookmarklet-error-div').removeClass("d-none");

@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
@@ -18,18 +19,22 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
     [Route("[area]")]
     public class ManagementController : BaseController<ManagementController>
     {
+        private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly ICoverIssueService _coverIssueService;
         private readonly IPermissionGroupService _permissionGroupService;
 
         public static string Name { get { return "Management"; } }
         public static string Area { get { return "CoverIssue"; } }
 
-        private static string CoverIssueBookmarklet = "CoverIssueBookmarklet.txt";
+        private static readonly string BookmarkletFilePath = "js/coverissue-bookmarklet.min.js";
 
         public ManagementController(ServiceFacades.Controller<ManagementController> context,
+            IWebHostEnvironment hostingEnvironment,
             ICoverIssueService coverIssueService,
             IPermissionGroupService permissionGroupService) : base(context)
         {
+            _hostingEnvironment = hostingEnvironment
+                ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _coverIssueService = coverIssueService
                 ?? throw new ArgumentNullException(nameof(coverIssueService));
             _permissionGroupService = permissionGroupService
@@ -153,8 +158,8 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
         {
             try
             {
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Files");
-                filePath = Path.Combine(filePath, CoverIssueBookmarklet);
+                var filePath = Path.Combine(_hostingEnvironment.WebRootPath,
+                    BookmarkletFilePath);
                 using (var sr = new StreamReader(filePath))
                 {
                     var baseUrl = Url.Action(nameof(Report), Name, new { bibId = 0 }, Request.Scheme);
