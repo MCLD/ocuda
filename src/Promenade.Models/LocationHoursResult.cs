@@ -12,5 +12,6 @@ namespace Ocuda.Promenade.Models
         public bool IsCurrentlyOpen { get; set; }
         public bool IsOverride { get; set; }
         public string StatusMessage { get; set; }
+        public bool IsSpecialHours { get; set; }
     }
 }
