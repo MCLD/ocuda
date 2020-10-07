@@ -14,6 +14,10 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<PermissionGroup> EditAsync(PermissionGroup permissionGroup);
         Task DeleteAsync(int permissionGroupId);
         Task<ICollection<PermissionGroup>> GetAllAsync();
+        Task<int> GetApplicationPermissionGroupCountAsync(string permission);
+        Task<ICollection<PermissionGroup>> GetApplicationPermissionGroupsAsync(string permission);
+        Task AddApplicationPermissionGroupAsync(string applicationPermission, int permissionGroupId);
+        Task RemoveApplicationPermissionGroupAsync(string applicationPermission, int permissionGroupId);
         Task<ICollection<T>> GetPermissionsAsync<T>(int itemId)
             where T : PermissionGroupMappingBase;
         Task AddToPermissionGroupAsync<T>(int itemId, int permissionGroupId)

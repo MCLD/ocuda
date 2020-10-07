@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Abstract;
+using Ocuda.Ops.Models.Definitions;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
@@ -19,6 +21,8 @@ namespace Ocuda.Ops.Service
         : BaseService<PermissionGroupService>, IPermissionGroupService
     {
         private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly IPermissionGroupApplicationRepository
+            _permissionGroupApplicationRepository;
         private readonly IPermissionGroupPageContentRepository
             _permissionGroupPageContentRepository;
         private readonly IPermissionGroupPodcastItemRepository
@@ -28,6 +32,7 @@ namespace Ocuda.Ops.Service
         public PermissionGroupService(ILogger<PermissionGroupService> logger,
             IHttpContextAccessor httpContextAccessor,
             IDateTimeProvider dateTimeProvider,
+            IPermissionGroupApplicationRepository permissionGroupApplicationRepository,
             IPermissionGroupPageContentRepository permissionGroupPageContentRepository,
             IPermissionGroupPodcastItemRepository permissionGroupPodcastItemRepository,
             IPermissionGroupRepository permissionGroupRepository)
@@ -35,6 +40,8 @@ namespace Ocuda.Ops.Service
         {
             _dateTimeProvider = dateTimeProvider
                 ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+            _permissionGroupApplicationRepository = permissionGroupApplicationRepository
+                ?? throw new ArgumentNullException(nameof(permissionGroupApplicationRepository));
             _permissionGroupPageContentRepository
                 = permissionGroupPageContentRepository
                 ?? throw new ArgumentNullException(nameof(permissionGroupPageContentRepository));
@@ -128,7 +135,6 @@ namespace Ocuda.Ops.Service
                     .GetByPodcastId(itemId));
             }
 
-
             throw new OcudaException($"Unable to get permissions for {nameof(T)}");
         }
 
@@ -202,13 +208,65 @@ namespace Ocuda.Ops.Service
             }
 
             throw new OcudaException($"Unable to look up permissions for {nameof(T)}");
-
         }
 
         public async Task<ICollection<PermissionGroup>>
             GetGroupsAsync(IEnumerable<int> permissionGroupIds)
         {
             return await _permissionGroupRepository.GetGroupsAsync(permissionGroupIds);
+        }
+
+        public async Task<int> GetApplicationPermissionGroupCountAsync(string permission)
+        {
+            return await _permissionGroupApplicationRepository
+                .GetApplicationPermissionGroupCountAsync(permission);
+        }
+
+        public async Task<ICollection<PermissionGroup>> GetApplicationPermissionGroupsAsync(
+            string permission)
+        {
+            return await _permissionGroupApplicationRepository
+                .GetApplicationPermissionGroupsAsync(permission);
+        }
+
+        public async Task AddApplicationPermissionGroupAsync(string applicationPermission,
+            int permissionGroupId)
+        {
+            var permission = ApplicationPermissionDefinitions.ApplicationPermissions
+                .SingleOrDefault(_ => string.Equals(_.Id, applicationPermission,
+                    StringComparison.OrdinalIgnoreCase));
+
+            if (permission == null)
+            {
+                throw new OcudaException("Invalid application permission.");
+            }
+
+            await _permissionGroupApplicationRepository.AddAsync(new PermissionGroupApplication
+            {
+                ApplicationPermission = applicationPermission,
+                PermissionGroupId = permissionGroupId
+            });
+            await _permissionGroupApplicationRepository.SaveAsync();
+        }
+
+        public async Task RemoveApplicationPermissionGroupAsync(string applicationPermission,
+            int permissionGroupId)
+        {
+            var permission = ApplicationPermissionDefinitions.ApplicationPermissions
+                .SingleOrDefault(_ => string.Equals(_.Id, applicationPermission,
+                    StringComparison.OrdinalIgnoreCase));
+
+            if (permission == null)
+            {
+                throw new OcudaException("Invalid application permission.");
+            }
+
+            _permissionGroupApplicationRepository.Remove(new PermissionGroupApplication
+            {
+                ApplicationPermission = applicationPermission,
+                PermissionGroupId = permissionGroupId
+            });
+            await _permissionGroupPageContentRepository.SaveAsync();
         }
     }
 }

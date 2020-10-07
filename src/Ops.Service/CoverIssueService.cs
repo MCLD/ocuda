@@ -30,7 +30,7 @@ namespace Ocuda.Ops.Service
         }
 
         public async Task<DataWithCount<ICollection<CoverIssueHeader>>> GetPaginatedHeaderListAsync(
-            BaseFilter filter)
+            CoverIssueFilter filter)
         {
             return await _coverIssueHeaderRepository.GetPaginiatedListAsync(filter);
         }
@@ -40,9 +40,14 @@ namespace Ocuda.Ops.Service
             return await _coverIssueHeaderRepository.FindAsync(id);
         }
 
+        public async Task<CoverIssueHeader> GetHeaderByBibIdAsync(int bibId)
+        {
+            return await _coverIssueHeaderRepository.GetByBibIdAsync(bibId);
+        }
+
         public async Task<ICollection<CoverIssueDetail>> GetDetailsByHeaderIdAsync(int headerId)
         {
-            return await _coverIssueDetailRepository.GetByHeaderIdAsync(headerId, 
+            return await _coverIssueDetailRepository.GetByHeaderIdAsync(headerId,
                 includeCreatedByUser: true);
         }
 
@@ -94,7 +99,7 @@ namespace Ocuda.Ops.Service
 
             _coverIssueHeaderRepository.Update(header);
 
-            var details = await _coverIssueDetailRepository.GetByHeaderIdAsync(header.Id, 
+            var details = await _coverIssueDetailRepository.GetByHeaderIdAsync(header.Id,
                 resolved: false);
 
             foreach (var detail in details)

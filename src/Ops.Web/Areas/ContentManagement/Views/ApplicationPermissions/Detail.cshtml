@@ -1,0 +1,79 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.ApplicationPermissions.DetailViewModel
+
+<a class="btn btn-outline-dark float-right"
+   asp-action="@(nameof(ApplicationPermissionsController.Index))">
+    <span class="fa fa-backward"></span>
+    Back
+</a>
+<h1>Assign application permissions</h1>
+
+<div class="row pt-1">
+    <div class="col-12">
+        <input asp-for="ApplicationPermission.Name" formgroup readonly />
+        <input asp-for="ApplicationPermission.Info" formgroup readonly />
+    </div>
+</div>
+
+<div class="row pt-1">
+    <div class="col-12 col-sm-6">
+        <div class="card">
+            <div class="card-header">
+                Available Groups
+            </div>
+            <ul class="list-group list-group-flush">
+                @if (Model.AvailableGroups?.Count > 0)
+                {
+                    foreach (var availableGroup in Model.AvailableGroups)
+                    {
+                        <li class="list-group-item">
+                            <form asp-area="@ApplicationPermissionsController.Area"
+                                  asp-controller="@ApplicationPermissionsController.Name"
+                                  asp-action="@(nameof(ApplicationPermissionsController.AddPermissionGroup))">
+                                <input asp-for="ApplicationPermission.Id" type="hidden" />
+                                <input asp-for="PermissionGroupId" value="@availableGroup.Id" type="hidden" />
+                                @availableGroup.PermissionGroupName
+                                <button class="btn btn-link text-success float-right">
+                                    <span class="fa fa-plus-circle"></span>
+                                </button>
+                            </form>
+                        </li>
+                    }
+                }
+                else
+                {
+                    <li class="list-group-item">No groups available.</li>
+                }
+            </ul>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6">
+        <div class="card">
+            <div class="card-header">
+                Assigned Groups
+            </div>
+            <ul class="list-group list-group-flush">
+                @if (Model.AssignedGroups?.Count > 0)
+                {
+                    foreach (var assignedGroup in Model.AssignedGroups)
+                    {
+                        <li class="list-group-item">
+                            <form asp-controller="@ApplicationPermissionsController.Name"
+                                  asp-action="@(nameof(ApplicationPermissionsController.RemovePermissionGroup))">
+                                <input asp-for="ApplicationPermission.Id" type="hidden" />
+                                <input asp-for="PermissionGroupId" value="@assignedGroup.Id" type="hidden" />
+                                @assignedGroup.PermissionGroupName
+                                <button class="btn btn-link text-danger float-right">
+                                    <span class="fa fa-minus-circle"></span>
+                                </button>
+                            </form>
+                        </li>
+                    }
+                }
+                else
+                {
+                    <li class="list-group-item">No groups assigned.</li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
