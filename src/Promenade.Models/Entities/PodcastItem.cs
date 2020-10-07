@@ -54,7 +54,7 @@ namespace Ocuda.Promenade.Models.Entities
 
         public bool GuidPermaLink { get; set; }
 
-        [DisplayName("Publish date and time")]
+        [DisplayName("Publish date")]
         public DateTime? PublishDate { get; set; }
 
         public bool IsBlocked { get; set; }
