@@ -9,5 +9,6 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue.ViewModels.Management
         public ICollection<CoverIssueDetail> Details { get; set; }
         public string LeapPath { get; set; }
         public int HeaderId { get; set; }
+        public bool CanEdit { get; set; }
     }
 }

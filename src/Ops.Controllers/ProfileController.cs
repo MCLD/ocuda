@@ -35,6 +35,7 @@ namespace Ocuda.Ops.Controllers
 
         [Route("")]
         [Route("[action]")]
+        [Route("[action]/{id}")]
         public async Task<IActionResult> Index(string id)
         {
             var viewModel = new IndexViewModel

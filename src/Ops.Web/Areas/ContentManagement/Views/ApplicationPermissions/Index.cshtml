@@ -1,0 +1,56 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.ApplicationPermissions.IndexViewModel
+
+<h1>Application Permissions</h1>
+
+<table class="table table-sm table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Permission Name </th>
+            <th>Assigned Groups</th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var permission in Model.ApplicationPermissions)
+        {
+            <tr>
+                <td>
+                    @permission.Data.Name
+                    <span class="far fa-question-circle"
+                          title="@permission.Data.Info"
+                          data-toggle="tooltip"
+                          data-placement="top">
+                    </span>
+                </td>
+                <td>@permission.Count</td>
+                <td align="center">
+                    <a asp-action="@(nameof(ApplicationPermissionsController.Detail))"
+                       asp-route-id="@permission.Data.Id"
+                       title="Add permission groups"
+                       class="btn btn-link">
+                        <span class="fas fa-user-plus" aria-hidden="true"></span>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="row">
+    <div class="col-12">
+        <a asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))"
+           class="btn btn-outline-secondary text-dark">
+            Return to Content Management
+        </a>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+}
