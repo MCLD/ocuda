@@ -1,24 +1,32 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Podcasts.EpisodeIndexViewModel
 
-<h1>
-    Podcast Episodes
-    <small class="text-muted">@Model.PodcastTitle</small>
-</h1>
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Podcast Episodes
+            <small class="text-muted">@Model.PodcastTitle</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        @if (Model.IsSiteManager || Model.HasPermission)
+        {
+            <a asp-action="@(nameof(PodcastsController.AddEpisode))"
+               asp-route-podcastId="@Model.PodcastId"
+               class="btn btn-outline-success mt-2 mb-1 mr-1 float-right">
+                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                Add Episode
+            </a>
+        }
+        <a class="btn btn-outline-dark mt-2 mb-1 mr-4 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.PodcastsController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.PodcastsController.Index))">Back</a>
+    </div>
+</div>
 
 @if (Model.Episodes.Count() == 0)
 {
     <div class="alert alert-warning">No episodes found.</div>
 }
-<div class="row">
-    <div class="col-12 my-2">
-        <a asp-action="@(nameof(PodcastsController.AddEpisode))"
-           asp-route-podcastId="@Model.PodcastId"
-           class="btn btn-outline-success btn-lg">
-            <span class="fas fa-plus-circle" aria-hidden="true"></span>
-            Add Episode
-        </a>
-    </div>
-</div>
 @if (Model.Episodes.Count() > 0)
 {
     <div class="row">
@@ -40,15 +48,15 @@
                             <td class="align-middle">@episode.Title</td>
                             <td class="align-middle">@episode.PublishDate</td>
                             <td class="align-middle text-nowrap">
-                                @*@if (Model.IsSiteManager || Model.PermissionIds?.Any(_ => episode.PermissionGroupIds.Contains(_)) == true)
-                                    {*@
-                                <a asp-action="@(nameof(PodcastsController.EditEpisode))"
-                                   asp-route-episodeId="@episode.Id"
-                                   class="btn btn-link"
-                                   title="Edit">
-                                    <span class="fas fa-edit" aria-hidden="true"></span>
-                                </a>
-                                @*}*@
+                                @if (Model.IsSiteManager || Model.HasPermission)
+                                {
+                                    <a asp-action="@(nameof(PodcastsController.EditEpisode))"
+                                       asp-route-episodeId="@episode.Id"
+                                       class="btn btn-link"
+                                       title="Edit">
+                                        <span class="fas fa-edit" aria-hidden="true"></span>
+                                    </a>
+                                }
                             </td>
                         </tr>
                     }

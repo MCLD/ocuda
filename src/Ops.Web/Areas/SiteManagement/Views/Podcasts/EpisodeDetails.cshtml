@@ -38,21 +38,19 @@
     </div>
 </div>
 
-<div class="row mb-4">
-    <div class="col-12 col-sm-8">
+
+<div class="row mb-2">
+    <div class="col-sm-6">
         <h1>
-            @(Model.EditEpisode ? "Edit" : "Add") Podcast Episode
+            @(Model.EditEpisode ? "Edit" : "Add") Episode
             <small class="text-muted">@Model.PodcastTitle</small>
         </h1>
     </div>
-    <div class="col-12 col-sm-4">
-        <a asp-action="@nameof(PodcastsController.Episodes)"
+    <div class="col-sm-6">
+        <a class="btn btn-outline-dark mt-2 mb-1 float-right"
+           asp-action="@nameof(PodcastsController.Episodes)"
            asp-controller="@PodcastsController.Name"
-           asp-route-podcastId="@Model.Episode.PodcastId"
-           class="btn btn-outline-dark btn-lg float-sm-right">
-            <span class="fas fa-list-ol"></span>
-            Episode List
-        </a>
+           asp-route-podcastId="@Model.Episode.PodcastId">Back</a>
     </div>
 </div>
 

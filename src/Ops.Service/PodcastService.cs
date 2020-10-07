@@ -40,6 +40,9 @@ namespace Ocuda.Ops.Service
         {
             var podcast = await _podcastRepository.GetByIdAsync(podcastId);
             podcast.EpisodeCount = await _podcastItemRepository.GetEpisodeCount(podcastId);
+            var perms = await _permissionGroupPodcastItemRepository.GetByPodcastId(podcastId);
+            podcast.PermissionGroupIds = perms.Select(_ => _.PermissionGroupId
+                .ToString(CultureInfo.InvariantCulture));
             return podcast;
         }
 

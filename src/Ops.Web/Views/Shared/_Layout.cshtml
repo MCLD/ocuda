@@ -43,9 +43,10 @@
            asp-area=""
            asp-route-section=""
            asp-controller="Home"
-           asp-action="@(nameof(HomeController.Index))">
-            <span class="fa fa-home"></span>
-            <span class="font-weight-light">Home</span>
+           asp-action="@(nameof(HomeController.Index))"
+           title="Intranet">
+            <span class="fas fa-info-circle"></span>
+            Intranet
         </a>
         <button class="navbar-toggler btn-sm justify-self-end" type="button"
                 data-toggle="collapse" data-target=".navbar-collapse">
@@ -65,6 +66,7 @@
                        aria-expanded="false"
                        title="Customer Service">
                         <span class="fas fa-users"></span>
+                        Customer Service
                     </a>
                     <div class="dropdown-menu"
                          aria-labelledby="navbarPeopleDropdown">
@@ -89,6 +91,7 @@
                        aria-expanded="false"
                        title="Materials">
                         <span class="fas fa-book"></span>
+                        Materials
                     </a>
                     <div class="dropdown-menu"
                          aria-labelledby="navbarMaterialsDropdown">

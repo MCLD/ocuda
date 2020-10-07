@@ -1,80 +1,89 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Podcasts.IndexViewModel
 
-    <h1>Podcasts</h1>
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>Podcasts</h1>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-outline-dark mt-2 mb-1 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">Back</a>
+    </div>
+</div>
 
-    @if (Model.Podcasts.Count() == 0)
-    {
-        <div class="alert alert-warning">No podcasts found.</div>
-    }
-    else
-    {
-        <div class="row">
-            <div class="col-12">
-                <div>
-                    <table class="table table-sm table-bordered table-hover table-striped">
-                        <thead>
+@if (Model.Podcasts.Count() == 0)
+{
+    <div class="alert alert-warning">No podcasts found.</div>
+}
+else
+{
+    <div class="row">
+        <div class="col-12">
+            <div>
+                <table class="table table-sm table-bordered table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Stub</th>
+                            <th>Episodes</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var podcast in Model.Podcasts)
+                        {
                             <tr>
-                                <th>Title</th>
-                                <th>Stub</th>
-                                <th>Episodes</th>
-                                <th>&nbsp;</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var podcast in Model.Podcasts)
-                            {
-                                <tr>
-                                    <td class="align-middle">
-                                        @if (Model.IsSiteManager)
-                                        {
-                                            <a asp-action="@nameof(PodcastsController.Detail)"
-                                               asp-route-podcastId="@podcast.Id">
-                                                @podcast.Title
-                                            </a>
-                                        }
-                                        else
-                                        {
+                                <td class="align-middle">
+                                    @if (Model.IsSiteManager)
+                                    {
+                                        <a asp-action="@nameof(PodcastsController.Details)"
+                                           asp-route-podcastId="@podcast.Id">
                                             @podcast.Title
-                                        }
-                                    </td>
-                                    <td class="align-middle">@podcast.Stub</td>
-                                    <td class="align-middle">@podcast.EpisodeCount</td>
-                                    <td class="align-middle text-nowrap">
-                                        @if (Model.IsSiteManager)
-                                        {
-                                            <a asp-action="@(nameof(PodcastsController.ContentPermissions))"
-                                               asp-route-podcastId="@podcast.Id"
-                                               title="Podcast episode permissions"
-                                               class="btn btn-link">
-                                                <span class="fas fa-user-plus" aria-hidden="true"></span>
-                                            </a>
-                                            <a asp-action="@(nameof(PodcastsController.Detail))"
-                                               asp-route-podcastId="@podcast.Id"
-                                               class="btn btn-link"
-                                               title="Edit podcast configuration">
-                                                <span class="far fa-file-alt" aria-hidden="true"></span>
-                                            </a>
-                                        }
-                                        @if (Model.IsSiteManager || Model.PermissionIds?.Any(_ => podcast.PermissionGroupIds.Contains(_)) == true)
-                                        {
-                                            <a asp-action="@(nameof(PodcastsController.Episodes))"
-                                               asp-route-podcastId="@podcast.Id"
-                                               class="btn btn-link"
-                                               title="Episodes">
-                                                <span class="fas fa-list-ol" aria-hidden="true"></span>
-                                            </a>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        @podcast.Title
+                                    }
+                                </td>
+                                <td class="align-middle">@podcast.Stub</td>
+                                <td class="align-middle">@podcast.EpisodeCount</td>
+                                <td class="align-middle text-nowrap">
+                                    @if (Model.IsSiteManager)
+                                    {
+                                        <a asp-action="@(nameof(PodcastsController.Permissions))"
+                                           asp-route-podcastId="@podcast.Id"
+                                           title="Podcast episode permissions"
+                                           class="btn btn-link">
+                                            <span class="fas fa-user-plus" aria-hidden="true"></span>
+                                        </a>
+                                    }
+                                    <a asp-action="@(nameof(PodcastsController.Details))"
+                                       asp-route-podcastId="@podcast.Id"
+                                       class="btn btn-link"
+                                       title="Podcast details">
+                                        <span class="far fa-file-alt" aria-hidden="true"></span>
+                                    </a>
+                                    @if (Model.IsSiteManager || Model.PermissionIds?.Any(_ => podcast.PermissionGroupIds.Contains(_)) == true)
+                                    {
+                                        <a asp-action="@(nameof(PodcastsController.Episodes))"
+                                           asp-route-podcastId="@podcast.Id"
+                                           class="btn btn-link"
+                                           title="Episodes">
+                                            <span class="fas fa-list-ol" aria-hidden="true"></span>
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
+    </div>
 
-        @if (Model.PaginateModel.MaxPage > 1)
-        {
-            <paginate paginateModel="@Model.PaginateModel"></paginate>
-        }
+    @if (Model.PaginateModel.MaxPage > 1)
+    {
+        <paginate paginateModel="@Model.PaginateModel"></paginate>
     }
+}

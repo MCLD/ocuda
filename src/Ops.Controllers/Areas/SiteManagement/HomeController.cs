@@ -32,8 +32,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             var viewModel = new IndexViewModel
             {
-                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
-                HasPagePermissions = false
+                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
             };
 
             var permissionIds = UserClaims(ClaimType.PermissionId);
@@ -49,9 +48,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     .HasPermissionAsync<PermissionGroupPodcastItem>(numericPermissionIds);
             }
 
-            if (!viewModel.IsSiteManager && !viewModel.HasPagePermissions)
+            if(!viewModel.HasPermissions)
             {
-                return RedirectToUnauthorized();
+                AlertWarning = "It appears that you do not have any Site Administration permissions. Please contact your system administrator for more information.";
             }
 
             return View(viewModel);

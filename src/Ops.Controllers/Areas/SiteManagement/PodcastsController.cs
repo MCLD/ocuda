@@ -84,11 +84,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         [Route("[action]/{podcastId}")]
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        public async Task<IActionResult> Detail(int podcastId)
+        public async Task<IActionResult> Details(int podcastId)
         {
-            // TODO: Implement the detail method
-            return NotFound();
+            var promenadeUrl = await _siteSettingService
+                    .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.PromenadeUrl);
+
+            return View(new DetailsViewModel
+            {
+                Podcast = await _podcastService.GetByIdAsync(podcastId),
+                PromenadeUrl = promenadeUrl.Trim('/')
+            });
         }
 
         [Route("[action]/{podcastId}")]
@@ -126,7 +131,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 Episodes = episodes.Data,
                 PaginateModel = paginateModel,
                 IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
-                PermissionIds = UserClaims(ClaimType.PermissionId)
+                HasPermission = UserClaims(ClaimType.PermissionId).Any(_ => podcast.PermissionGroupIds?.Contains(_) == true)
             };
 
             return View(viewModel);
@@ -280,7 +285,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     viewModel.Episode.Episode);
                 viewModel.Episode.Guid = string.Format(CultureInfo.InvariantCulture,
                     "{0}/podcasts/{1}/ep-{2}/",
-                    baseUrl,
+                    baseUrl.Trim('/'),
                     podcast.Stub,
                     viewModel.Episode.Episode);
                 viewModel.Episode.GuidPermaLink = true;
@@ -355,10 +360,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [RequestSizeLimit(MaximumFileSizeBytes)]
         public async Task<IActionResult> UpdatePodcastFile(EpisodeDetailsViewModel viewModel)
         {
-            if (viewModel.UploadedFile == null)
+            if (viewModel?.UploadedFile == null)
             {
                 return RedirectToAction(nameof(EditEpisode),
-                    new { episodeId = viewModel.Episode.Id });
+                    new { episodeId = viewModel?.Episode?.Id });
             }
 
             var podcastItem = await _podcastService.GetPodcastItemByIdAsync(viewModel.Episode.Id);
@@ -435,7 +440,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [Route("[action]/{podcastId}")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        public async Task<IActionResult> ContentPermissions(int podcastId)
+        public async Task<IActionResult> Permissions(int podcastId)
         {
             var podcast = await _podcastService.GetByIdAsync(podcastId);
 
@@ -487,13 +492,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 AlertDanger = $"Problem adding permission: {ex.Message}";
             }
 
-            return RedirectToAction(nameof(ContentPermissions), new { podcastId });
+            return RedirectToAction(nameof(Permissions), new { podcastId });
         }
 
         [HttpPost]
         [Route("[action]/{podcastId}/{permissionGroupId}")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        public async Task<IActionResult> RemovePermissionGroup(int podcastId, int permissionGroupId)
+        public async Task<IActionResult> RemovePermissionGroup(int podcastId,
+            int permissionGroupId)
         {
             try
             {
@@ -507,7 +513,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 AlertDanger = $"Problem removing permission: {ex.Message}";
             }
 
-            return RedirectToAction(nameof(ContentPermissions), new { podcastId });
+            return RedirectToAction(nameof(Permissions), new { podcastId });
         }
     }
 }

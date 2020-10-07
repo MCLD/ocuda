@@ -1,11 +1,17 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Podcasts.EpisodePermissionsViewModel
 
-<a class="btn btn-outline-dark float-right"
-   asp-action="@(nameof(PodcastsController.Index))" e>
-    <span class="fa fa-backward"></span>
-    Back
-</a>
-<h1>Assign content permissions</h1>
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Podcast Permissions
+            <small class="text-muted">@Model.Title</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-outline-dark mt-2 mb-1 float-right"
+           asp-action="@(nameof(PodcastsController.Index))">Back</a>
+    </div>
+</div>
 
 <div class="row pt-1">
     <div class="col-12">
