@@ -10,7 +10,7 @@
     <div class="col-12 col-md-6 py-2">
         @if (Model.Header.HasPendingIssue && Model.CanEdit)
         {
-            <form asp-action="@nameof(ManagementController.ResolveIssue)"
+            <form asp-action="@nameof(HomeController.ResolveIssue)"
                   class="d-inline-block float-right mx-1"
                   method="post"
                   role="form">

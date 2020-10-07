@@ -17,17 +17,17 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
 {
     [Area("CoverIssue")]
     [Route("[area]")]
-    public class ManagementController : BaseController<ManagementController>
+    public class HomeController : BaseController<HomeController>
     {
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly ICoverIssueService _coverIssueService;
         private readonly IPermissionGroupService _permissionGroupService;
 
-        public static string Name { get { return "Management"; } }
+        public static string Name { get { return "Home"; } }
         
         private const string BookmarkletFilePath = "js/coverissue-bookmarklet.min.js";
 
-        public ManagementController(ServiceFacades.Controller<ManagementController> context,
+        public HomeController(ServiceFacades.Controller<HomeController> context,
             IWebHostEnvironment hostingEnvironment,
             ICoverIssueService coverIssueService,
             IPermissionGroupService permissionGroupService) : base(context)
@@ -41,7 +41,6 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
         }
 
         [Route("")]
-        [Route("[action]")]
         public async Task<IActionResult> Index(int page = 1, CoverIssueType? type = null)
         {
             var filter = new CoverIssueFilter(page)
@@ -118,7 +117,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
                 await _coverIssueService.AddCoverIssueAsync(bibId);
                 var header = await _coverIssueService.GetHeaderByBibIdAsync(bibId);
                 ShowAlertSuccess("The cover issue has been reported!");
-                return RedirectToAction(nameof(ManagementController.Details),
+                return RedirectToAction(nameof(HomeController.Details),
                     new { id = header.Id });
             }
             catch (Exception ex)
@@ -128,7 +127,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
                     bibId,
                     ex.Message);
                 ShowAlertDanger("There was an error reporting this cover issue.");
-                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                return base.RedirectToAction(nameof(Controllers.HomeController.Index), Controllers.HomeController.Name);
             }
         }
 

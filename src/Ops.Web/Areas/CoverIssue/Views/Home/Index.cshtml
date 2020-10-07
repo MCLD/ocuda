@@ -47,7 +47,7 @@
         <div class="d-inline-block">
             <ul class="nav nav-pills">
                 <li class="nav-item">
-                    <a asp-action="@nameof(ManagementController.Index)"
+                    <a asp-action="@nameof(HomeController.Index)"
                        asp-route-Type=""
                        class="nav-link"
                        ActiveBy routeKey="type" value=",@Ocuda.Utility.Models.CoverIssueType.Open">
@@ -55,7 +55,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a asp-action="@nameof(ManagementController.Index)"
+                    <a asp-action="@nameof(HomeController.Index)"
                        asp-route-Type="@Ocuda.Utility.Models.CoverIssueType.Closed"
                        class="nav-link"
                        ActiveBy routeKey="type"
@@ -91,7 +91,7 @@
             {
                 <tr>
                     <td>
-                        <a asp-action="@(nameof(ManagementController.Details))"
+                        <a asp-action="@(nameof(HomeController.Details))"
                            asp-route-id="@header.Id">
                             @header.BibId
                         </a>
@@ -138,7 +138,7 @@
 @section scripts {
     <script>
         $('#bookmarkletModal').on('show.bs.modal', function () {
-            $.get("@Url.Action(nameof(ManagementController.GetBookmarklet))",
+            $.get("@Url.Action(nameof(HomeController.GetBookmarklet))",
                 function (response) {
                     if (response.success) {
                         $('#bookmarklet-div').removeClass("d-none");
