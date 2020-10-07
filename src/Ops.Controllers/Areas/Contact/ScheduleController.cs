@@ -21,6 +21,8 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
         private readonly IScheduleRequestService _scheduleRequestService;
         private readonly IUserService _userService;
 
+        public static string Name { get { return "Schedule"; } }
+
         public ScheduleController(ServiceFacades.Controller<ScheduleController> context,
             IHttpContextAccessor httpContextAccessor,
             IScheduleService scheduleService,

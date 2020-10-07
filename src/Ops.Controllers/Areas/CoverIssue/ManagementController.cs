@@ -24,9 +24,8 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
         private readonly IPermissionGroupService _permissionGroupService;
 
         public static string Name { get { return "Management"; } }
-        public static string Area { get { return "CoverIssue"; } }
-
-        private static readonly string BookmarkletFilePath = "js/coverissue-bookmarklet.min.js";
+        
+        private const string BookmarkletFilePath = "js/coverissue-bookmarklet.min.js";
 
         public ManagementController(ServiceFacades.Controller<ManagementController> context,
             IWebHostEnvironment hostingEnvironment,
@@ -68,7 +67,12 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
             var viewModel = new IndexViewModel
             {
                 CoverIssueHeaders = headers.Data,
-                PaginateModel = paginateModel
+                PaginateModel = paginateModel,
+                LeapPath = await _siteSettingService.GetSettingStringAsync(Models
+                    .Keys
+                    .SiteSetting
+                    .CoverIssueReporting
+                    .LeapBibUrl)
             };
 
             return View(viewModel);
@@ -93,8 +97,11 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
                 CanEdit = await HasCoverIssueManagementPermissionAsync()
             };
 
-            var leapBibUrl = await _siteSettingService.GetSettingStringAsync(
-                Ops.Models.Keys.SiteSetting.CoverIssueReporting.LeapBibUrl);
+            var leapBibUrl = await _siteSettingService.GetSettingStringAsync(Models
+                .Keys
+                .SiteSetting
+                .CoverIssueReporting
+                .LeapBibUrl);
 
             if (!string.IsNullOrWhiteSpace(leapBibUrl))
             {
@@ -171,7 +178,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
             }
             catch
             {
-                return Json(new { success = false, message = "Could not retrieve bookmarklet" });
+                return Json(new { success = false, message = "Could not retrieve bookmarklet, contact an administrator." });
             }
         }
 

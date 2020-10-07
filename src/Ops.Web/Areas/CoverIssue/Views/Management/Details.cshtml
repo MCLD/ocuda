@@ -1,25 +1,51 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.CoverIssue.ViewModels.Management.DetailViewModel
 
-<h1>Cover Issue - Bib ID @Model.Header.BibId</h1>
-<hr />
-
 <div class="row">
-    <div class="col-12">
-        <h2 class="d-inline-block">Reports</h2>
+    <div class="col-12 col-md-6">
+        <h1>
+            Cover Issues
+            <small class="text-muted">id @Model.Header.BibId</small>
+        </h1>
+    </div>
+    <div class="col-12 col-md-6 py-2">
+        @if (Model.Header.HasPendingIssue && Model.CanEdit)
+        {
+            <form asp-action="@nameof(ManagementController.ResolveIssue)"
+                  class="d-inline-block float-right mx-1"
+                  method="post"
+                  role="form">
+                <input asp-for="HeaderId" value="@Model.Header.Id" type="hidden" />
+                <button type="submit" class="btn btn-outline-success">
+                    <span class="far fa-check-square"></span>
+                    Mark resolved
+                </button>
+            </form>
+        }
         @if (!string.IsNullOrWhiteSpace(Model.LeapPath))
         {
-            <a href="@Model.LeapPath" target="_blank" class="btn btn-info float-right">View in Leap</a>
+            <a href="@Model.LeapPath"
+               target="_blank"
+               class="btn btn-outline-info float-right d-inline-block mx-1">
+                <span class="fas fa-book-reader"></span>
+                Leap
+            </a>
         }
+        <a asp-action="Index" class="btn btn-outline-secondary text-dark ml-1 mr-4 float-right">
+            <span class="fas fa-arrow-left"></span>
+            Back
+        </a>
+
     </div>
 </div>
+
 <div class="row">
     <div class="col-12">
         <div>
             <table class="table table-sm table-bordered table-striped">
                 <thead>
                     <tr>
-                        <th>Reported By</th>
-                        <th>Reported On</th>
+                        <th>Reported by</th>
+                        <th>Reported on</th>
                         <th>Resolved</th>
                     </tr>
                 </thead>
@@ -27,7 +53,13 @@
                     @foreach (var detail in Model.Details)
                     {
                         <tr>
-                            <td>@detail.CreatedByUser.Name</td>
+                            <td>
+                                <a asp-controller="Profile"
+                                   asp-area=""
+                                   asp-action="Index"
+                                   asp-route-id="@detail.CreatedByUser.Username"
+                                   target="_blank">@detail.CreatedByUser.Name</a>
+                            </td>
                             <td>@detail.CreatedAt.ToShortDateString()</td>
                             <td>
                                 <span class="@(!detail.IsResolved ? null : "fas fa-check")"></span>
@@ -37,19 +69,5 @@
                 </tbody>
             </table>
         </div>
-    </div>
-</div>
-
-<div class="row mb-2 mt-4">
-    <div class="col-12">
-        <a asp-action="Index" class="btn btn-outline-secondary text-dark">Return to list</a>
-        @if (Model.Header.HasPendingIssue && Model.CanEdit)
-        {
-            <form asp-action="@nameof(ManagementController.ResolveIssue)" class="d-inline-block" method="post" role="form">
-                <input asp-for="HeaderId" value="@Model.Header.Id" type="hidden" />
-
-                <button type="submit" class="btn btn-success">Mark resolved</button>
-            </form>
-        }
     </div>
 </div>
