@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
@@ -251,33 +250,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
-        private async Task<bool> HasPagePermissionAsync(int pageHeaderId)
-        {
-            if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
-            {
-                return true;
-            }
-            else
-            {
-                var permissionClaims = UserClaims(ClaimType.PermissionId);
-                if (permissionClaims.Count > 0)
-                {
-                    var permissionGroups = await _permissionGroupService
-                        .GetPagePermissionsAsync(pageHeaderId);
-                    var permissionGroupsStrings = permissionGroups
-                        .Select(_ => _.PermissionGroupId.ToString(CultureInfo.InvariantCulture));
-
-                    return permissionClaims.Any(_ => permissionGroupsStrings.Contains(_));
-                }
-                return false;
-            }
-        }
-
         [Route("[action]/{id}")]
         [RestoreModelState]
         public async Task<IActionResult> Detail(int id, string language)
         {
-            if (!await HasPagePermissionAsync(id))
+            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService, id))
             {
                 return RedirectToUnauthorized();
             }
@@ -338,7 +315,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToAction(nameof(Index));
             }
 
-            if (!await HasPagePermissionAsync(model.HeaderId))
+            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+                model.HeaderId))
             {
                 return RedirectToUnauthorized();
             }
@@ -429,7 +407,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [RestoreModelState]
         public async Task<IActionResult> Layouts(int id, int page = 1)
         {
-            if (!await HasPagePermissionAsync(id))
+            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService, id))
             {
                 return RedirectToUnauthorized();
             }
@@ -479,7 +457,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            if (await HasPagePermissionAsync(model.PageLayout.PageHeaderId))
+            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+                model.PageLayout.PageHeaderId))
             {
                 if (ModelState.IsValid)
                 {
@@ -537,7 +516,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var pageLayout = await _pageService.GetLayoutByIdAsync(model.PageLayout.Id);
 
-            if (await HasPagePermissionAsync(pageLayout.PageHeaderId))
+            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+                pageLayout.PageHeaderId))
             {
                 if (ModelState.IsValid)
                 {
@@ -592,7 +572,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             var pageLayout = await _pageService.GetLayoutByIdAsync(model.PageLayout.Id);
 
-            if (!await HasPagePermissionAsync(pageLayout.PageHeaderId))
+            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+                pageLayout.PageHeaderId))
             {
                 return RedirectToUnauthorized();
             }
@@ -622,7 +603,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             var pageLayout = await _pageService.GetLayoutDetailsAsync(id);
 
-            if (!await HasPagePermissionAsync(pageLayout.PageHeaderId))
+            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+                pageLayout.PageHeaderId))
             {
                 return RedirectToUnauthorized();
             }
@@ -664,7 +646,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var pageLayout = await _pageService.GetLayoutByIdAsync(
                 model.PageLayoutText.PageLayoutId);
 
-            if (!await HasPagePermissionAsync(pageLayout.PageHeaderId))
+            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+                pageLayout.PageHeaderId))
             {
                 return RedirectToUnauthorized();
             }
@@ -693,7 +676,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var layout = await _pageService.GetLayoutByIdAsync(model.PageItem.PageLayoutId);
 
-            if (await HasPagePermissionAsync(layout.PageHeaderId))
+            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+                layout.PageHeaderId))
             {
                 if (model.Carousel == null && model.Segment == null)
                 {
@@ -782,7 +766,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var layout = await _pageService.GetLayoutForItemAsync(model.PageItem.Id);
 
-            if (await HasPagePermissionAsync(layout.PageHeaderId))
+            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+                layout.PageHeaderId))
             {
                 var pageItem = await _pageService.GetItemByIdAsync(model.PageItem.Id);
 
@@ -862,7 +847,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             var layout = await _pageService.GetLayoutForItemAsync(model.PageItem.Id);
 
-            if (!await HasPagePermissionAsync(layout.PageHeaderId))
+            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+                layout.PageHeaderId))
             {
                 return RedirectToUnauthorized();
             }
@@ -895,7 +881,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var layout = await _pageService.GetLayoutForItemAsync(id);
 
-            if (await HasPagePermissionAsync(layout.PageHeaderId))
+            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+                layout.PageHeaderId))
             {
                 try
                 {
@@ -933,7 +920,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var header = await _pageService.GetHeaderByIdAsync(id);
 
             var permissionGroups = await _permissionGroupService.GetAllAsync();
-            var pagePermissions = await _permissionGroupService.GetPagePermissionsAsync(id);
+            var pagePermissions = await _permissionGroupService
+                .GetPermissionsAsync<PermissionGroupPageContent>(id);
 
             var availableGroups = new Dictionary<int, string>();
             var assignedGroups = new Dictionary<int, string>();
@@ -971,7 +959,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             try
             {
                 await _permissionGroupService
-                    .AddPageHeaderPermissionGroupAsync(headerId, permissionGroupId);
+                    .AddToPermissionGroupAsync<PermissionGroupPageContent>(headerId,
+                    permissionGroupId);
                 AlertInfo = "Content permission added.";
             }
             catch (Exception ex)
@@ -990,7 +979,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             try
             {
                 await _permissionGroupService
-                    .RemovePageHeaderPermissionGroupAsync(headerId, permissionGroupId);
+                    .RemoveFromPermissionGroupAsync<PermissionGroupPageContent>(headerId,
+                    permissionGroupId);
                 AlertInfo = "Content permission removed.";
             }
             catch (Exception ex)

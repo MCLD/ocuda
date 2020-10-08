@@ -11,6 +11,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
             GetByPermissionGroupId(int permissionGroupId);
         public Task<ICollection<PermissionGroupPageContent>> GetByPageHeaderId(int pageHeaderId);
 
-        public Task<bool> AnyPermissionGroupIdAsync(int[] permissionGroupIds);
+        public Task<bool> AnyPermissionGroupIdAsync(IEnumerable<int> permissionGroupIds);
     }
 }

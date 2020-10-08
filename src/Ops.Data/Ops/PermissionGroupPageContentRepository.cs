@@ -19,7 +19,7 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
-        public async Task<bool> AnyPermissionGroupIdAsync(int[] permissionGroupIds)
+        public async Task<bool> AnyPermissionGroupIdAsync(IEnumerable<int> permissionGroupIds)
         {
             return await DbSet
                 .AsNoTracking()
@@ -27,7 +27,8 @@ namespace Ocuda.Ops.Data.Ops
                 .AnyAsync();
         }
 
-        public async Task<ICollection<PermissionGroupPageContent>> GetByPageHeaderId(int pageHeaderId)
+        public async Task<ICollection<PermissionGroupPageContent>>
+            GetByPageHeaderId(int pageHeaderId)
         {
             return await DbSet
                 .AsNoTracking()

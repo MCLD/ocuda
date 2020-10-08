@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Filters;
+using Ocuda.Ops.Models.Abstract;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
@@ -150,6 +153,34 @@ namespace Ocuda.Ops.Controllers.Abstract
             return RedirectToAction(nameof(HomeController.Unauthorized),
                HomeController.Name,
                new { area = "", returnUrl = new Uri(Request.GetDisplayUrl()) });
+        }
+
+        protected async Task<bool> HasPermissionAsync<TPermissonGroupMappingBase>(
+            IPermissionGroupService permissionGroupService,
+            int itemId) where TPermissonGroupMappingBase : PermissionGroupMappingBase
+        {
+            if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
+            {
+                return true;
+            }
+            else
+            {
+                var permissionClaims = UserClaims(ClaimType.PermissionId);
+                if (permissionClaims.Count > 0)
+                {
+                    if (permissionGroupService == null)
+                    {
+                        throw new ArgumentNullException(nameof(permissionGroupService));
+                    }
+                    var permissionGroups = await permissionGroupService
+                        .GetPermissionsAsync<TPermissonGroupMappingBase>(itemId);
+                    var permissionGroupsStrings = permissionGroups
+                        .Select(_ => _.PermissionGroupId.ToString(CultureInfo.InvariantCulture));
+
+                    return permissionClaims.Any(_ => permissionGroupsStrings.Contains(_));
+                }
+                return false;
+            }
         }
     }
 }

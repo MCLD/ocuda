@@ -86,7 +86,7 @@ namespace Ocuda.Ops.Controllers
                         .Select(_ => int.Parse(_, CultureInfo.InvariantCulture));
 
                     var permissionLookup = await _permissionGroupService
-                        .GetGroupsAsync(permissionGroupIds.ToArray());
+                        .GetGroupsAsync(permissionGroupIds);
 
                     viewModel.Permissions = permissionLookup
                         .Select(_ => _.PermissionGroupName)

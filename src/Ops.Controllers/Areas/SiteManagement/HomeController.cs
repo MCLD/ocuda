@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Home;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
 
@@ -31,8 +32,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             var viewModel = new IndexViewModel
             {
-                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
-                HasPagePermissions = false
+                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
             };
 
             var permissionIds = UserClaims(ClaimType.PermissionId);
@@ -40,14 +40,17 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (permissionIds?.Count > 0)
             {
                 var numericPermissionIds = permissionIds
-                    .Select(_ => int.Parse(_, CultureInfo.InvariantCulture));
+                    .Select(_ => int.Parse(_, CultureInfo.InvariantCulture))
+                    .ToArray();
                 viewModel.HasPagePermissions = await _permissionGroupService
-                    .HasPageContentPermissionAsync(numericPermissionIds.ToArray());
+                    .HasPermissionAsync<PermissionGroupPageContent>(numericPermissionIds);
+                viewModel.HasPodcastPermissions = await _permissionGroupService
+                    .HasPermissionAsync<PermissionGroupPodcastItem>(numericPermissionIds);
             }
 
-            if (!viewModel.IsSiteManager && !viewModel.HasPagePermissions)
+            if(!viewModel.HasPermissions)
             {
-                return RedirectToUnauthorized();
+                AlertWarning = "It appears that you do not have any Site Administration permissions. Please contact your system administrator for more information.";
             }
 
             return View(viewModel);

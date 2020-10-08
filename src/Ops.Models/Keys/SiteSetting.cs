@@ -35,6 +35,7 @@
 
         public struct SiteManagement
         {
+            public const string PromenadePublicPath = "SiteManagement.PromenadePublicPath";
             public const string PromenadeUrl = "SiteManagement.PromenadeUrl";
         }
 

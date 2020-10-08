@@ -15,7 +15,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.6")
+                .HasAnnotation("ProductVersion", "3.1.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -682,6 +682,19 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.HasKey("PermissionGroupId", "PageHeaderId");
 
                     b.ToTable("PermissionGroupPageContents");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupPodcastItem", b =>
+                {
+                    b.Property<int>("PermissionGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PodcastId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PermissionGroupId", "PodcastId");
+
+                    b.ToTable("PermissionGroupPodcastItems");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.Post", b =>

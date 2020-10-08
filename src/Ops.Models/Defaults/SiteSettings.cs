@@ -136,6 +136,15 @@ namespace Ocuda.Ops.Models.Defaults
             #region SiteManagement
             new SiteSetting
             {
+                Id = Keys.SiteSetting.SiteManagement.PromenadePublicPath,
+                Name = "Promenade Public Path",
+                Description = "Drive path to the Promenade 'public' folder",
+                Category = "Site Management",
+                Value = "",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
                 Id = Keys.SiteSetting.SiteManagement.PromenadeUrl,
                 Name = "Promenade Url",
                 Description = "Promenade url with scheme and host",
