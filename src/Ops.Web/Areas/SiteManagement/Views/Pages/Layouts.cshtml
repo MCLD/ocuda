@@ -4,8 +4,31 @@
     <link rel="stylesheet" href="~/css/dt-picker.min.css" asp-append-version="true" />
 }
 
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Page Layouts
+            <small class="text-muted">@Model.HeaderName</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <button class="btn btn-outline-success mt-2 mb-1 float-right"
+                data-toggle="modal"
+                data-target="#addModal">
+            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            Add Layout
+        </button>
+        <a class="btn btn-outline-dark mt-2 mb-1 mr-4 float-right"
+           asp-action="@(nameof(PagesController.Index))"
+           asp-route-Type="@Model.HeaderType">Back</a>
+    </div>
+</div>
+
 <form id="addForm" role="form">
-    <input id="addHeader" asp-for="PageLayout.PageHeaderId" value="@Model.HeaderId" type="hidden" />
+    <input id="addHeader"
+           asp-for="PageLayout.PageHeaderId"
+           value="@Model.HeaderId"
+           type="hidden" />
 
     <div modal
          id="addModal"
@@ -13,7 +36,10 @@
          name="Page Layout"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addName" asp-for="PageLayout.Name" formgroup />
-        <input id="addStartDate" asp-for="PageLayout.StartDate" formgroup datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
+        <input id="addStartDate"
+               asp-for="PageLayout.StartDate"
+               formgroup
+               datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
     </div>
 </form>
 
@@ -25,7 +51,10 @@
          name="Page Layout"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
         <input id="editName" asp-for="PageLayout.Name" formgroup />
-        <input id="editStartDate" asp-for="PageLayout.StartDate" formgroup datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
+        <input id="editStartDate"
+               asp-for="PageLayout.StartDate"
+               formgroup
+               datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
     </div>
 </form>
 
@@ -43,31 +72,11 @@
          type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
 </form>
 
-<div class="row" style="padding-top: 1rem;">
+<div class="row">
     <div class="col-12">
         <input asp-for="HeaderName" formgroup readonly />
         <input asp-for="HeaderStub" formgroup readonly />
         <input asp-for="HeaderType" formgroup readonly />
-        <div class="row">
-            <div class="col-md-3 offset-md-3">
-                <a asp-action="@(nameof(PagesController.Index))" 
-                   asp-route-Type="@Model.HeaderType" 
-                   class="btn btn-outline-secondary text-dark">
-                    Return to Page List
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row pb-2">
-    <div class="col-12">
-        <hr />
-        <button class="btn btn-outline-secondary text-dark"
-                data-toggle="modal"
-                data-target="#addModal">
-            Add Layout
-        </button>
     </div>
 </div>
 
