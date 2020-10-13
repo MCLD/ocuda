@@ -4,6 +4,21 @@
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
 
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Page
+            <small class="text-muted">@Model.Page?.Title</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-outline-dark mt-2 mb-1 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.PagesController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.PagesController.Index))"
+           asp-route-Type="@Model.HeaderType">Back</a>
+    </div>
+</div>
+
 <form asp-controller="@PagesController.Name"
       asp-action="@(nameof(PagesController.DeletePage))"
       method="post"
@@ -103,10 +118,10 @@
 
     <div class="row">
         <div class="offset-md-3 col-md-9">
-            <a asp-action="Index"
-               asp-route-Type="@Model.HeaderType"
-               class="btn btn-outline-secondary text-dark">Cancel</a>
-            <button type="submit" class="btn btn-success" buttonspinner>
+            <button type="submit"
+                    class="btn btn-outline-success btn-lg"
+                    button-spinner>
+                <span class="far fa-save"></span>
                 Save
             </button>
         </div>

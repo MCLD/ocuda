@@ -457,7 +457,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+            if (await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
                 model.PageLayout.PageHeaderId))
             {
                 if (ModelState.IsValid)
@@ -516,7 +516,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var pageLayout = await _pageService.GetLayoutByIdAsync(model.PageLayout.Id);
 
-            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+            if (await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
                 pageLayout.PageHeaderId))
             {
                 if (ModelState.IsValid)
@@ -676,7 +676,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var layout = await _pageService.GetLayoutByIdAsync(model.PageItem.PageLayoutId);
 
-            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+            if (await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
                 layout.PageHeaderId))
             {
                 if (model.Carousel == null && model.Segment == null)
@@ -766,7 +766,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var layout = await _pageService.GetLayoutForItemAsync(model.PageItem.Id);
 
-            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+            if (await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
                 layout.PageHeaderId))
             {
                 var pageItem = await _pageService.GetItemByIdAsync(model.PageItem.Id);
@@ -881,7 +881,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var layout = await _pageService.GetLayoutForItemAsync(id);
 
-            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+            if (await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
                 layout.PageHeaderId))
             {
                 try

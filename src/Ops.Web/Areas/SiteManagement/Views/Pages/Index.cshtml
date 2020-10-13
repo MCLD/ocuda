@@ -1,5 +1,25 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages.IndexViewModel
 
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>Pages</h1>
+    </div>
+    <div class="col-sm-6">
+        @if (Model.IsSiteManager)
+        {
+            <button class="btn btn-outline-success mt-2 mb-1 float-right"
+                    data-toggle="modal"
+                    data-target="#addModal">
+                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                Add Page
+            </button>
+        }
+        <a class="btn btn-outline-dark mt-2 mb-1 mr-4 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">Back</a>
+    </div>
+</div>
+
 <form id="addForm" role="form">
     <div modal
          id="addModal"
@@ -119,17 +139,6 @@
     </div>
 </div>
 
-@if (Model.IsSiteManager)
-{
-    <div class="mb-2">
-        <button class="btn btn-outline-secondary text-dark"
-                data-toggle="modal"
-                data-target="#addModal">
-            Create Page
-        </button>
-    </div>
-}
-
 @if (Model.PageHeaders.Count() == 0)
 {
     <div class="alert alert-warning">No Pages Found</div>
@@ -227,17 +236,6 @@ else
         <paginate paginateModel="@Model.PaginateModel"></paginate>
     }
 }
-
-<div class="row">
-    <div class="col-12">
-        <a asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement))"
-           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))"
-           class="btn btn-outline-secondary text-dark">
-            Return to Site Management
-        </a>
-    </div>
-</div>
 
 @section scripts {
     <script>
