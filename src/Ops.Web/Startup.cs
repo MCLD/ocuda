@@ -193,6 +193,12 @@ namespace Ocuda.Ops.Web
                 Data.Ops.LinkLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository,
                 Data.Ops.LinkRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupApplicationRepository,
+                Data.Ops.PermissionGroupApplicationRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupPodcastItemRepository,
+                Data.Ops.PermissionGroupPodcastItemRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupPageContentRepository,
+                Data.Ops.PermissionGroupPageContentRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupRepository,
                 Data.Ops.PermissionGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPostRepository,
@@ -220,6 +226,20 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserRepository,
                 Data.Ops.UserRepository>();
 
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselButtonLabelRepository,
+                Data.Promenade.CarouselButtonLabelRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselButtonRepository,
+                Data.Promenade.CarouselButtonRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselItemRepository,
+                Data.Promenade.CarouselItemRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselItemTextRepository,
+                Data.Promenade.CarouselItemTextRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselRepository,
+                Data.Promenade.CarouselRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselTemplateRepository,
+                Data.Promenade.CarouselTemplateRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselTextRepository,
+                Data.Promenade.CarouselTextRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICategoryRepository,
                 Data.Promenade.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaCategoryRepository,
@@ -252,6 +272,16 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.PageRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageHeaderRepository,
                 Data.Promenade.PageHeaderRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageItemRepository,
+                Data.Promenade.PageItemRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageLayoutRepository,
+                Data.Promenade.PageLayoutRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageLayoutTextRepository,
+                Data.Promenade.PageLayoutTextRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPodcastRepository,
+                Data.Promenade.PodcastRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPodcastItemsRepository,
+                Data.Promenade.PodcastItemsRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IScheduleRequestRepository,
                 Data.Promenade.ScheduleRequestRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IScheduleRequestSubjectRepository,
@@ -268,8 +298,9 @@ namespace Ocuda.Ops.Web
             // services
             services.AddScoped<Service.Interfaces.Ops.Services.IAuthorizationService,
                 AuthorizationService>();
-            services.AddScoped<ICoverIssueService, CoverIssueService>();
+            services.AddScoped<ICarouselService, CarouselService>();
             services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<ICoverIssueService, CoverIssueService>();
             services.AddScoped<IEmediaService, EmediaService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IExternalResourcePromService, ExternalResourcePromService>();
@@ -288,8 +319,10 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ILocationFeatureService, LocationFeatureService>();
             services.AddScoped<ILinkService, LinkService>();
             services.AddScoped<IPageService, PageService>();
+            services.AddScoped<IPublicFilesService, PublicFilesService>();
             services.AddScoped<Utility.Services.Interfaces.IPathResolverService,
                 Utility.Services.PathResolverService>();
+            services.AddScoped<IPodcastService, PodcastService>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IPermissionGroupService, PermissionGroupService>();
             services.AddScoped<IRosterService, RosterService>();

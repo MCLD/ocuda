@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Encodings.Web;
@@ -13,7 +14,9 @@ using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
@@ -23,25 +26,30 @@ using Ocuda.Utility.Models;
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 {
     [Area("SiteManagement")]
-    [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]/[controller]")]
     public class SegmentsController : BaseController<SegmentsController>
     {
         private readonly ILanguageService _languageService;
+        private readonly IPermissionGroupService _permissionGroupService;
         private readonly ISegmentService _segmentService;
+
         public static string Name { get { return "Segments"; } }
         public static string Area { get { return "SiteManagement"; } }
 
         public SegmentsController(ServiceFacades.Controller<SegmentsController> context,
             ILanguageService languageService,
+            IPermissionGroupService permissionGroupService,
             ISegmentService segmentService) : base(context)
         {
             _languageService = languageService
                 ?? throw new ArgumentNullException(nameof(languageService));
+            _permissionGroupService = permissionGroupService
+                ?? throw new ArgumentNullException(nameof(permissionGroupService));
             _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
         }
 
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [Route("")]
         [Route("[action]/{page}")]
         public async Task<IActionResult> Index(int page = 1)
@@ -81,6 +89,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return View(viewModel);
         }
 
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpPost]
         [Route("[action]")]
         public async Task<IActionResult> Create(IndexViewModel model)
@@ -131,6 +140,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpPost]
         [Route("[action]")]
         [SaveModelState]
@@ -180,6 +190,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpPost]
         [Route("[action]")]
         public async Task<IActionResult> Delete(IndexViewModel model)
@@ -204,17 +215,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         inUseByTag.InnerHtml.AppendHtml(inUseByItem);
                     }
 
-                    using (var inUseByHtml = new StringWriter())
-                    {
-                        inUseByTag.WriteTo(inUseByHtml, HtmlEncoder.Default);
-                        ShowAlertDanger($"{alertMessage} {inUseByHtml}");
-                    }
+                    using var inUseByHtml = new StringWriter();
+                    inUseByTag.WriteTo(inUseByHtml, HtmlEncoder.Default);
+                    ShowAlertDanger($"{alertMessage} {inUseByHtml}");
                 }
                 else
                 {
                     ShowAlertDanger(alertMessage);
                 }
-
             }
             catch (Exception ex)
             {
@@ -225,11 +233,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
         }
 
-
         [Route("[action]/{id}")]
         [RestoreModelState]
         public async Task<IActionResult> Detail(int id, string language)
         {
+            if (!await HasSegmentPermissionAsync(id))
+            {
+                return RedirectToUnauthorized();
+            }
+
             var segment = await _segmentService.GetByIdAsync(id);
             if (segment == null)
             {
@@ -258,6 +270,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 LanguageDescription = selectedLanguage.Description,
                 LanguageList = new SelectList(languages, nameof(Language.Name),
                     nameof(Language.Description), selectedLanguage.Name),
+                PageLayoutId = await _segmentService.GetPageLayoutIdForSegmentAsync(segment.Id)
             };
 
             return View(viewModel);
@@ -268,6 +281,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> Detail(DetailViewModel model)
         {
+            if (!await HasSegmentPermissionAsync(model.SegmentId))
+            {
+                return RedirectToUnauthorized();
+            }
+
             var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
 
             if (ModelState.IsValid)
@@ -304,6 +322,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> DeleteText(DetailViewModel model)
         {
+            if (!await HasSegmentPermissionAsync(model.SegmentId))
+            {
+                return RedirectToUnauthorized();
+            }
+
             var segmentText = await _segmentService.GetBySegmentAndLanguageAsync(model.SegmentId,
                 model.LanguageId);
 
@@ -319,6 +342,34 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     id = model.SegmentId,
                     language = language.Name
                 });
+        }
+
+        private async Task<bool> HasSegmentPermissionAsync(int segmentId)
+        {
+            if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
+            {
+                return true;
+            }
+            else
+            {
+                var permissionClaims = UserClaims(ClaimType.PermissionId);
+                if (permissionClaims.Count > 0)
+                {
+                    var pageHeaderId = await _segmentService.GetPageHeaderIdForSegmentAsync(
+                        segmentId);
+                    if (!pageHeaderId.HasValue)
+                    {
+                        return false;
+                    }
+                    var permissionGroups = await _permissionGroupService
+                        .GetPermissionsAsync<PermissionGroupPageContent>(pageHeaderId.Value);
+                    var permissionGroupsStrings = permissionGroups
+                        .Select(_ => _.PermissionGroupId.ToString(CultureInfo.InvariantCulture));
+
+                    return permissionClaims.Any(_ => permissionGroupsStrings.Contains(_));
+                }
+                return false;
+            }
         }
     }
 }

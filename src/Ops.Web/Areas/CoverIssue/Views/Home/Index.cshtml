@@ -1,0 +1,160 @@
+﻿@model Ocuda.Ops.Controllers.Areas.CoverIssue.ViewModels.Management.IndexViewModel
+
+<div class="modal fade" tabindex="-1" role="dialog" id="bookmarkletModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bookmarklet for reporting cover issues</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="bookmarklet-error-div" class="d-none">
+                    <span class="fas fa-exclamation-triangle"></span>
+                    <p id="bookmarklet-error-message" class="d-inline-block"></p>
+                    <span class="fas fa-exclamation-triangle"></span>
+                </div>
+                <div id="bookmarklet-div" class="d-none">
+                    <p>
+                        Drag this button to your bookmarks toolbar and click when viewing an item
+                        in Leap with an invalid cover.
+                    </p>
+                    <a href="#" class="btn btn-info" id="bookmarkletButton">Cover Issue</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-md-6">
+        <h1>Cover Issues</h1>
+    </div>
+    <div class="col-12 col-md-6 py-2">
+        <button class="btn btn-outline-info float-right mx-1"
+                data-toggle="modal"
+                data-target="#bookmarkletModal">
+            <span class="fas fa-bookmark"></span>
+            Bookmarklet
+        </button>
+    </div>
+</div>
+
+
+<div class="row mb-2">
+    <div class="col-12">
+        <div class="d-inline-block">
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a asp-action="@nameof(HomeController.Index)"
+                       asp-route-Type=""
+                       class="nav-link"
+                       ActiveBy routeKey="type" value=",@Ocuda.Utility.Models.CoverIssueType.Open">
+                        @Ocuda.Utility.Models.CoverIssueType.Open.ToString()
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-action="@nameof(HomeController.Index)"
+                       asp-route-Type="@Ocuda.Utility.Models.CoverIssueType.Closed"
+                       class="nav-link"
+                       ActiveBy routeKey="type"
+                       value="@Ocuda.Utility.Models.CoverIssueType.Closed">
+                        @Ocuda.Utility.Models.CoverIssueType.Closed.ToString()
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<table class="table table-sm table-bordered link-table">
+    <thead>
+        <tr>
+            <th>Bib ID</th>
+            <th>Status</th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.CoverIssueHeaders.Count == 0)
+        {
+            <tr>
+                <td colspan="3">
+                    No issues found.
+                </td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var header in Model.CoverIssueHeaders)
+            {
+                <tr>
+                    <td>
+                        <a asp-action="@(nameof(HomeController.Details))"
+                           asp-route-id="@header.Id">
+                            @header.BibId
+                        </a>
+                    </td>
+                    <td class="font-weight-bold">
+                        @if (header.LastResolved == null)
+                        {
+                            if (DateTime.Now.AddDays(-7) > header.LastResolved)
+                            {
+                                <span class="text-danger">Open since @header.CreatedAt.ToShortDateString()</span>
+                            }
+                            else
+                            {
+                                <span class="text-warning">Open since @header.CreatedAt.ToShortDateString()</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-success">Closed on @header.LastResolved?.ToShortDateString()</span>
+                        }
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(Model.LeapPath))
+                        {
+                            <a href="@(Model.LeapPath + header.BibId)"
+                               class="btn btn-sm btn-outline-info"
+                               target="_blank">
+                                <span class="fas fa-book-reader"></span>
+                                Leap
+                            </a>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@if (Model.PaginateModel.MaxPage > 1)
+{
+    <paginate paginateModel="@Model.PaginateModel"></paginate>
+}
+
+@section scripts {
+    <script>
+        $('#bookmarkletModal').on('show.bs.modal', function () {
+            $.get("@Url.Action(nameof(HomeController.GetBookmarklet))",
+                function (response) {
+                    if (response.success) {
+                        $('#bookmarklet-div').removeClass("d-none");
+                        $('#bookmarklet-error-div').addClass("d-none");
+                        $("#bookmarkletButton").attr("href", "javascript:" + response.bookmarklet);
+                    }
+                    else {
+                        $('#bookmarklet-error-div').removeClass("d-none");
+                        $('#bookmarklet-div').addClass("d-none");
+                        console.log(response.message);
+                        $("#bookmarklet-error-message").text(response.message);
+                    }
+            });
+        });
+        $("#bookmarkletButton").on("click", function (event) {
+            event.preventDefault();
+        });
+    </script>
+}

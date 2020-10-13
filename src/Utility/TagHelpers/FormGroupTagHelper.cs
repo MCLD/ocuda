@@ -22,6 +22,7 @@ namespace Ocuda.Utility.TagHelpers
         private const string infoTooltipAttributeName = "info-tooltip";
         private const string onBlurJs = "on-blur-js";
         private const string labelClassAttribute = "label-class";
+        private const string labelNameAttribute = "label-name";
         private const string dateTimePickerAttribute = "datetime-picker";
 
         private const string defaultWrapperDivClass = "row form-group";
@@ -73,6 +74,9 @@ namespace Ocuda.Utility.TagHelpers
 
         [HtmlAttributeName(labelClassAttribute)]
         public string LabelClass { get; set; }
+
+        [HtmlAttributeName(labelNameAttribute)]
+        public string LabelName { get; set; }
 
         [HtmlAttributeName(dateTimePickerAttribute)]
         public DateTimePickerType? DateTimePicker { get; set; }
@@ -131,6 +135,12 @@ namespace Ocuda.Utility.TagHelpers
                 };
 
             TagHelperOutput labelOutput = CreateTagHelperOutput("label", null);
+
+
+            if (!string.IsNullOrWhiteSpace(LabelName))
+            {
+                labelOutput.Content.SetContent(LabelName);
+            }
 
             await labelTagHelper.ProcessAsync(context, labelOutput);
 

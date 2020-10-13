@@ -15,7 +15,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.6")
+                .HasAnnotation("ProductVersion", "3.1.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -655,6 +655,46 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.HasIndex("UpdatedBy");
 
                     b.ToTable("PermissionGroups");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupApplication", b =>
+                {
+                    b.Property<int>("PermissionGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ApplicationPermission")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.HasKey("PermissionGroupId", "ApplicationPermission");
+
+                    b.ToTable("PermissionGroupApplication");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupPageContent", b =>
+                {
+                    b.Property<int>("PermissionGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PageHeaderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PermissionGroupId", "PageHeaderId");
+
+                    b.ToTable("PermissionGroupPageContents");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupPodcastItem", b =>
+                {
+                    b.Property<int>("PermissionGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PodcastId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PermissionGroupId", "PodcastId");
+
+                    b.ToTable("PermissionGroupPodcastItems");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.Post", b =>
@@ -1402,6 +1442,15 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupApplication", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.PermissionGroup", "PermissionGroup")
+                        .WithMany()
+                        .HasForeignKey("PermissionGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.Post", b =>

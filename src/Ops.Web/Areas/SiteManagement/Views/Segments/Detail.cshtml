@@ -58,7 +58,17 @@
 
     <div class="row">
         <div class="offset-md-3 col-md-9">
-            <a asp-action="Index" class="btn btn-outline-secondary text-dark">Cancel</a>
+            @if (Model.PageLayoutId.HasValue)
+            {
+                <a asp-controller="@PagesController.Name" 
+                   asp-action="@nameof(PagesController.LayoutDetail)" 
+                   asp-route-id="@Model.PageLayoutId.Value" 
+                   class="btn btn-outline-secondary text-dark">Cancel</a>
+            }
+            else
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary text-dark">Cancel</a>
+            }
             <button type="submit" class="btn btn-success" buttonspinner>
                 Save
             </button>

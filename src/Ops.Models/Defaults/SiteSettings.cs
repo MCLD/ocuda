@@ -8,6 +8,26 @@ namespace Ocuda.Ops.Models.Defaults
     {
         public static IEnumerable<SiteSetting> Get { get; } = new[]
         {
+            #region Carousel
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.Carousel.ImageRestrictToDomains,
+                Name = "Image restrict to domain",
+                Description = "Restrict carousel images to only these domains, comma delimited",
+                Category = "Carousel",
+                Value = "",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.Carousel.LinkRestrictToDomains,
+                Name = "Link restrict to domain",
+                Description = "Restrict carousel links to only these domains, comma delimited",
+                Category = "Carousel",
+                Value = "",
+                Type = SiteSettingType.StringNullable
+            },
+            #endregion
             #region CoverIssueReporting
             new SiteSetting
             {
@@ -114,6 +134,15 @@ namespace Ocuda.Ops.Models.Defaults
             },
             #endregion
             #region SiteManagement
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.SiteManagement.PromenadePublicPath,
+                Name = "Promenade Public Path",
+                Description = "Drive path to the Promenade 'public' folder",
+                Category = "Site Management",
+                Value = "",
+                Type = SiteSettingType.StringNullable
+            },
             new SiteSetting
             {
                 Id = Keys.SiteSetting.SiteManagement.PromenadeUrl,

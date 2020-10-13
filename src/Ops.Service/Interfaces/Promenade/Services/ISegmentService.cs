@@ -21,5 +21,9 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task CreateSegmentTextAsync(SegmentText segmentText);
         Task EditSegmentTextAsync(SegmentText segmentText);
         Task DeleteSegmentTextAsync(SegmentText segmentText);
+        Task<Segment> CreateNoSaveAsync(Segment segment);
+        Task DeleteNoSaveAsync(int id);
+        Task<int?> GetPageHeaderIdForSegmentAsync(int id);
+        Task<int?> GetPageLayoutIdForSegmentAsync(int id);
     }
 }

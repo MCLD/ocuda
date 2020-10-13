@@ -28,6 +28,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Promenade site setting management
 - Posts to Ops homepage
 - Podcast functionality to promenade
+- Add layout pages
+- Application permission handling and administration
 
 ### Changed
 - Default to only logging Warnings for Microsoft and System namespaces

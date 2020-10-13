@@ -50,6 +50,16 @@
     }
   },
   {
+    "outputFileName": "wwwroot/js/coverissue-bookmarklet.min.js",
+    "inputFiles": [
+      "Scripts/CoverIssue-Bookmarklet.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    }
+  },
+  {
     "outputFileName": "wwwroot/css/main.min.css",
     "inputFiles": [
       "node_modules/bootstrap/dist/css/bootstrap.css",

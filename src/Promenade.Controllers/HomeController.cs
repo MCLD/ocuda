@@ -15,10 +15,13 @@ namespace Ocuda.Promenade.Controllers
         public static string Name { get { return "Home"; } }
 
         public HomeController(ServiceFacades.Controller<HomeController> context,
+            CarouselService carouselService,
             PageService pageService,
             RedirectService redirectService,
+            SegmentService segmentService,
             SocialCardService socialCardService)
-            : base(context, pageService, redirectService, socialCardService)
+            : base(context, carouselService, pageService, redirectService, segmentService, 
+                  socialCardService)
         {
         }
 
@@ -26,6 +29,12 @@ namespace Ocuda.Promenade.Controllers
         public async Task<IActionResult> Index()
         {
             return await ReturnPageAsync(nameof(Index));
+        }
+
+        [Route("{stub?}/item/{id}")]
+        public async Task<IActionResult> CarouselItem(string stub, int id)
+        {
+            return await ReturnCarouselItemAsync(stub, id);
         }
     }
 }

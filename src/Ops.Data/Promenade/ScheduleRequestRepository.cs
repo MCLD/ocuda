@@ -43,7 +43,6 @@ namespace Ocuda.Ops.Data.Promenade
         public async Task<IEnumerable<ScheduleRequest>> GetUnclaimedRequestsAsync()
         {
             return await DbSet
-                .Include(_ => _.ScheduleRequestSubject)
                 .Where(_ => !_.IsClaimed)
                 .OrderBy(_ => _.RequestedTime)
                 .AsNoTracking()

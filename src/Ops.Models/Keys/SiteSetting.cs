@@ -2,6 +2,12 @@
 {
     public struct SiteSetting
     {
+        public struct Carousel
+        {
+            public const string ImageRestrictToDomains = "Carousel.ImageRestricToDomains";
+            public const string LinkRestrictToDomains = "Carousel.LinkRestrictToDomains";
+        }
+
         public struct CoverIssueReporting
         {
             public const string LeapBibUrl = "CoverIssueReporting.LeapBibUrl";
@@ -29,6 +35,7 @@
 
         public struct SiteManagement
         {
+            public const string PromenadePublicPath = "SiteManagement.PromenadePublicPath";
             public const string PromenadeUrl = "SiteManagement.PromenadeUrl";
         }
 

@@ -1,0 +1,327 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages.LayoutDetailViewModel
+
+<form id="addForm" role="form">
+    <input id="addLanguage" asp-for="LanguageId" type="hidden" />
+    <input id="addLayout" asp-for="PageItem.PageLayoutId" value="@Model.PageLayoutId" type="hidden" />
+
+    <div modal
+         id="addModal"
+         isLarge="true"
+         name="Layout Item"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+        <div class="row form-group">
+            <label class="col-form-label text-md-right col-md-3">Item Type</label>
+            <div class="form-group-inner col-md-9">
+                <select id="addType" class="form-control">
+                    <option value="carousel">Carousel</option>
+                    <option value="segment">Segment</option>
+                </select>
+            </div>
+        </div>
+        <div id="addCarouselFields">
+            <input id="addCarouselTitle" asp-for="Carousel.CarouselText.Title" formgroup />
+        </div>
+        <div id="addSegmentFields" class="d-none">
+            <input id="addSegmentName" asp-for="Segment.Name" formgroup disabled />
+        </div>
+    </div>
+</form>
+
+<form asp-controller="@PagesController.Name"
+      asp-action="@(nameof(PagesController.DeletePageItem))"
+      method="post"
+      role="form">
+    <input id="deleteLanguage" asp-for="LanguageId" type="hidden" />
+    <input id="deleteId" asp-for="PageItem.Id" type="hidden" />
+
+    <div modal id="deleteModal"
+         name="Layout Item"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+</form>
+
+<form id="editSegmentForm" role="form">
+    <input id="editSegmentLanguage" asp-for="LanguageId" type="hidden" />
+    <input id="editSegmentItem" asp-for="PageItem.Id" type="hidden" />
+
+    <div modal
+         id="editSegmentModal"
+         isLarge="true"
+         name="Segment"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <input id="editSegmentName" asp-for="Segment.Name" formgroup />
+    </div>
+</form>
+
+<div class="row pt-2">
+    <div class="col-12">
+        <input asp-for="PageLayout.Name" formgroup readonly />
+        <input asp-for="PageLayout.StartDate" value="@Model.PageLayout.StartDate" type="datetime" formgroup readonly />
+        <select asp-for="SelectLanguage" asp-items="Model.LanguageList" formgroup></select>
+    </div>
+</div>
+
+<div class="row pb-2">
+    <div class="col-12 col-md-9 offset-md-3">
+        <hr class="mt-2" />
+    </div>
+</div>
+
+<div class="row pb-1">
+    <div class="col-12">
+        <form asp-action="@nameof(PagesController.LayoutDetail)" method="post" role="form">
+            <input asp-for="PageLayoutText.PageLayoutId" value="@Model.PageLayoutId" type="hidden" />
+            <input asp-for="PageLayoutText.LanguageId" value="@Model.LanguageId" type="hidden" />
+
+            <input asp-for="PageLayoutText.Title" value="@Model.PageLayout.PageLayoutText?.Title" formgroup />
+
+            <div class="row">
+                <div class="offset-md-3 col-md-9">
+                    <a asp-action="@(nameof(PagesController.Layouts))"
+                       asp-route-id="@Model.PageLayout.PageHeaderId"
+                       class="btn btn-outline-secondary text-dark">
+                        Back
+                    </a>
+                    <button type="submit" class="btn btn-success" buttonspinner>
+                        Save
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row pb-2">
+    <div class="col-12">
+        <hr />
+        <button class="btn btn-outline-secondary text-dark"
+                data-toggle="modal"
+                data-target="#addModal">
+            Add Item
+        </button>
+    </div>
+</div>
+
+<table class="table table-sm table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Items</th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.PageLayout.Items)
+        {
+            <tr>
+                @if (item.CarouselId.HasValue)
+                {
+                    <td>@item.Carousel.Name</td>
+                    <td>Carousel</td>
+                    <td>@item.Carousel.Items.Count</td>
+                }
+                else
+                {
+                    <td>@item.Segment.Name</td>
+                    <td>Segment</td>
+                    <td>&nbsp;</td>
+                }
+                <td align="center">
+                    <button type="button"
+                            class="btn btn-link changeSort decreaseSortButton"
+                            data-id="@item.Id"
+                            data-increase="false"
+                            data-item="true"
+                            disabled="@(item.Id == Model.PageLayout.Items.First().Id ? "disabled" : null)">
+                        <span class="fas fa-arrow-up" aria-hidden="true"></span>
+                    </button>
+                    <button class="btn btn-link changeSort increaseSortButton"
+                            data-id="@item.Id"
+                            data-increase="true"
+                            data-item="true"
+                            disabled="@(item.Id == Model.PageLayout.Items.Last().Id ? "disabled" : null)">
+                        <span class="fas fa-arrow-down" aria-hidden="true"></span>
+                    </button>
+                    @if (item.CarouselId.HasValue)
+                    {
+                        <button type="button" class="btn btn-link invisible">
+                            <span class="fas fa-cog" aria-hidden="true"></span>
+                        </button>
+                        <a asp-controller="@CarouselsController.Name"
+                           asp-action="@(nameof(CarouselsController.Detail))"
+                           asp-route-id="@item.CarouselId.Value"
+                           class="btn btn-link"
+                           title="Edit carousel content">
+                            <span class="far fa-file-alt" aria-hidden="true"></span>
+                        </a>
+                    }
+                    else if (item.SegmentId.HasValue)
+                    {
+                        <button type="button"
+                                class="btn btn-link"
+                                data-toggle="modal"
+                                data-target="#editSegmentModal"
+                                data-id="@item.Id"
+                                data-ame="@item.Segment.Name"
+                                title="Edit segment">
+                            <span class="fas fa-cog" aria-hidden="true"></span>
+                        </button>
+                        <a asp-controller="@SegmentsController.Name"
+                           asp-action="@(nameof(SegmentsController.Detail))"
+                           asp-route-id="@item.SegmentId.Value"
+                           class="btn btn-link"
+                           title="Edit segment content">
+                            <span class="far fa-file-alt" aria-hidden="true"></span>
+                        </a>
+                    }
+                    <button type="button"
+                            class="btn btn-link"
+                            data-toggle="modal"
+                            data-target="#deleteModal"
+                            data-id="@item.Id"
+                            data-name="@(item.Carousel?.Name?? item.Segment?.Name)"
+                            data-carousel="@item.CarouselId"
+                            data-segment="@item.SegmentId"
+                            title="Delete layout item">
+                        <span class="fas fa-trash-alt" aria-hidden="true"></span>
+                    </button>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        $("#SelectLanguage").on("change", function () {
+            window.location.href = "@Url.Action(nameof(PagesController.LayoutDetail), new { id = Model.PageLayoutId})" + "?language=" + $(this).val();
+        });
+
+        $("#addType").on("change", function () {
+            var type = $(this).val();
+
+            if (type == "carousel") {
+                $("#addSegmentFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
+                $("#addCarouselFields").removeClass("d-none").find("input").removeAttr("disabled");
+            }
+            else {
+                $("#addCarouselFields").addClass("d-none").find("input").attr("disabled", "disabled")
+                $("#addSegmentFields").removeClass("d-none").find("input, select").removeAttr("disabled");
+            }
+        });
+
+        $("#addForm").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.post("@(Url.Action(nameof(PagesController.CreatePageItem), PagesController.Name))",
+                form.serialize(),
+                function (response) {
+                    if (response.success == true) {
+                        location.href = response.url;
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
+        });
+
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+            var carousel = button.data("carousel");
+            var segment = button.data("segment");
+            var modal = $(this);
+
+            var type;
+            if (carousel) {
+                type = "carousel";
+            }
+            else if (segment) {
+                type = "segment";
+            }
+
+            $("#deleteId").val(id);
+            $("#deleteName").val(name);
+            modal.find(".modal-text").text("Are you sure you want to delete the " + type +  " \"" + name + "\"?");
+        });
+
+        $("#editSegmentModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+
+            $("#editSegmentItem").val(id);
+            $("#editSegmentName").val(name);
+        });
+
+        $("#editSegmentForm").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.post("@(Url.Action(nameof(PagesController.EditPageItem), PagesController.Name))",
+                form.serialize(),
+                function (response) {
+                if (response.success == true) {
+                    location.href = response.url;
+                }
+                else {
+                    alert(response.message);
+                    ResetSpinners(form.find(".btn-spinner"));
+                }
+            });
+        });
+
+        $(".changeSort").on("click", function () {
+            var button = $(this);
+            var id = button.data("id");
+            var increase = button.data("increase");
+            var icon = button.children("span");
+            if (icon.hasClass("fa-spinner") == false) {
+                icon.removeClass("fa-arrow-up fa-arrow-down").addClass("fa-spinner fa-pulse");
+                $.post("@Url.Action(nameof(PagesController.ChangeSort))",
+                    { id, increase },
+                    function (response) {
+                        icon.removeClass("fa-spinner fa-pulse");
+                        if (increase) {
+                            icon.addClass("fa-arrow-down");
+                        }
+                        else {
+                            icon.addClass("fa-arrow-up");
+                        }
+                        if (response.success) {
+                            var row = button.closest("tr");
+                            if (increase) {
+                                var nextRow = row.next();
+                                row.insertAfter(nextRow);
+                                row.find(".decreaseSortButton").removeAttr("disabled");
+                                if (row.next().length == 0) {
+                                    row.find(".increaseSortButton").attr("disabled", "disabled");
+                                }
+                                nextRow.find(".increaseSortButton").removeAttr("disabled");
+                                if (nextRow.prev().length == 0) {
+                                    nextRow.find(".decreaseSortButton").attr("disabled", "disabled");
+                                }
+                            }
+                            else {
+                                var prevRow = row.prev();
+                                row.insertBefore(prevRow);
+                                row.find(".increaseSortButton").removeAttr("disabled");
+                                if (row.prev().length == 0) {
+                                    row.find(".decreaseSortButton").attr("disabled", "disabled");
+                                }
+                                prevRow.find(".decreaseSortButton").removeAttr("disabled");
+                                if (prevRow.next().length == 0) {
+                                    prevRow.find(".increaseSortButton").attr("disabled", "disabled");
+                                }
+                            }
+                        }
+                        else {
+                            alert(response.message);
+                        }
+                });
+            }
+        });
+    </script>
+}

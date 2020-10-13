@@ -1,0 +1,72 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Podcasts.EpisodeIndexViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Podcast Episodes
+            <small class="text-muted">@Model.PodcastTitle</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        @if (Model.IsSiteManager || Model.HasPermission)
+        {
+            <a asp-action="@(nameof(PodcastsController.AddEpisode))"
+               asp-route-podcastId="@Model.PodcastId"
+               class="btn btn-outline-success mt-2 mb-1 mr-1 float-right">
+                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                Add Episode
+            </a>
+        }
+        <a class="btn btn-outline-dark mt-2 mb-1 mr-4 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.PodcastsController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.PodcastsController.Index))">Back</a>
+    </div>
+</div>
+
+@if (Model.Episodes.Count() == 0)
+{
+    <div class="alert alert-warning">No episodes found.</div>
+}
+@if (Model.Episodes.Count() > 0)
+{
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-sm table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>Episode</th>
+                        <th>Title</th>
+                        <th>Publish Date</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var episode in Model.Episodes)
+                    {
+                        <tr>
+                            <td class="align-middle">@episode.Episode</td>
+                            <td class="align-middle">@episode.Title</td>
+                            <td class="align-middle">@episode.PublishDate</td>
+                            <td class="align-middle text-nowrap">
+                                @if (Model.IsSiteManager || Model.HasPermission)
+                                {
+                                    <a asp-action="@(nameof(PodcastsController.EditEpisode))"
+                                       asp-route-episodeId="@episode.Id"
+                                       class="btn btn-link"
+                                       title="Edit">
+                                        <span class="fas fa-edit" aria-hidden="true"></span>
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @if (Model.PaginateModel.MaxPage > 1)
+    {
+        <paginate paginateModel="@Model.PaginateModel"></paginate>
+    }
+}

@@ -1,6 +1,9 @@
 ﻿@model Ocuda.Ops.Controllers.ViewModels.Profile.IndexViewModel
 
-<form asp-controller="Profile" asp-action="@(nameof(ProfileController.EditNickname))" method="post" role="form">
+<form asp-controller="@ProfileController.Name"
+      asp-action="@(nameof(ProfileController.EditNickname))"
+      method="post"
+      role="form">
     <input id="editId" asp-for="User.Id" type="hidden" />
     <input id="editUsername" asp-for="User.Username" type="hidden" />
     <div modal id="editModal" name="Nickname" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
@@ -10,74 +13,128 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-sm-3 text-sm-right font-weight-bold">Name</div>
-        <div class="col-sm-9">@Model.User.Name</div>
-    </div>
+        <div class="col-12 col-md-6">
+            <div class="card mb-2">
+                <div class="card-header">
+                    <span class="h5 font-weight-bold">@Model.User.Name</span>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-sm mb-0">
+                        <tr>
+                            <th>Nickname</th>
+                            <td>
+                                @(Model.User.Nickname ?? "None")
+                                @if (Model.CanEdit)
+                                {
+                                    <a href="#"
+                                       class="float-right pr-2"
+                                       data-toggle="modal"
+                                       data-target="#editModal"
+                                       data-id="@Model.User.Id"
+                                       data-nickname="@Model.User.Nickname"
+                                       title="Edit nickname">
+                                        <span class="fa fa-xs fa-edit"></span>
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Title</th>
+                            <td>@Model.User.Title</td>
+                        </tr>
+                        <tr>
+                            <th>Supervisor</th>
+                            <td>
+                                @if (Model.User.Supervisor?.Name == null)
+                                {
+                                    @:None
+                                }
+                                else
+                                {
+                                    <a asp-controller="@ProfileController.Name"
+                                       asp-action="@nameof(ProfileController.Index)"
+                                       asp-route-id="@Model.User.Supervisor.Username">@Model.User.Supervisor.Name</a>
+                                }
+                            </td>
+                        </tr>
+                        @if (Model.DirectReports != null && Model.DirectReports.Count > 0)
+                        {
 
-    <div class="row">
-        <div class="col-sm-3 text-sm-right font-weight-bold">Nickname</div>
-        <div class="col-sm-9">
-            @(Model.User.Nickname ?? "None")
-            @if (Model.CanEdit)
-            {
-                <button type="button"
-                        class="fa fa-pencil-alt"
-                        data-toggle="modal"
-                        data-target="#editModal"
-                        data-id="@Model.User.Id"
-                        data-nickname="@Model.User.Nickname"></button>
-            }
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-sm-3 text-sm-right font-weight-bold">Title</div>
-        <div class="col-sm-9">@Model.User.Title</div>
-    </div>
-
-    <div class="row">
-        <div class="col-sm-3 text-sm-right font-weight-bold">Supervisor</div>
-        <div class="col-sm-9">
-            @if (Model.User.Supervisor?.Name == null)
-            {
-                @:None
-            }
-            else
-            {
-                <a href="@Url.Action("Index", "Profile", new { id = Model.User.Supervisor.Username})">@Model.User.Supervisor.Name</a>
-            }
-        </div>
-    </div>
-
-    @if (Model.DirectReports != null && Model.DirectReports.Count > 0)
-    {
-        <div class="row">
-            <div class="col-sm-3 text-sm-right font-weight-bold">Direct reports</div>
-            <div class="col-sm-9">
-                @foreach (var directReport in Model.DirectReports)
-                {
-                    @if (string.IsNullOrEmpty(directReport.Username))
-                    {
-                        @directReport.Name<br />
-                    }
-                    else
-                    {
-                        <a href="@Url.Action("Index", "Profile", new { id = directReport.Username })">@directReport.Name</a><br />
-                    }
-                }
+                            <tr>
+                                <th class="align-top">Direct reports</th>
+                                <td>
+                                    @foreach (var directReport in Model.DirectReports)
+                                    {
+                                        @if (string.IsNullOrEmpty(directReport.Username))
+                                        {
+                                            @directReport.Name<br />
+                                        }
+                                        else
+                                        {
+                                            <a asp-controller="@ProfileController.Name"
+                                               asp-action="@nameof(ProfileController.Index)"
+                                               asp-route-id="@directReport.Username">@directReport.Name</a><br />
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                        }
+                        <tr>
+                            <th>Email</th>
+                            <td><a href="mailto:@Model.User.Email">@Model.User.Email</a></td>
+                        </tr>
+                        <tr>
+                            <th>Phone</th>
+                            <td>@Model.User.Phone</td>
+                        </tr>
+                        @if (Model.UserViewingSelf)
+                        {
+                            <tr>
+                                <th>Authenticated at</th>
+                                <td>
+                                    @Model.AuthenticatedAt
+                                    <a asp-action="Reauthenticate"
+                                       asp-controller="@ProfileController.Name"
+                                       class="float-right pr-2"
+                                       title="Reauthenticate">
+                                        <span class="fa fa-xs fa-redo-alt"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
             </div>
         </div>
 
-    }
-
-    <div class="row">
-        <div class="col-sm-3 text-sm-right font-weight-bold">Email</div>
-        <div class="col-sm-9"><a href="mailto:@Model.User.Email">@Model.User.Email</a></div>
-    </div>
-
-    <div class="row">
-        <div class="col-sm-3 text-sm-right font-weight-bold">Phone</div>
-        <div class="col-sm-9">@Model.User.Phone</div>
+        @if (Model?.Permissions?.Count() > 0)
+        {
+            <div class="col-12 col-md-6">
+                <div class="card mb-2">
+                    <div class="card-header">
+                        <span class="h5">Permission Groups</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            @foreach (var permission in Model.Permissions)
+                            {
+                                if (permission == "Site manager")
+                                {
+                                    <li class="list-group-item p-2 font-weight-bold">
+                                        @permission
+                                        <span class="fa fa-xs fa-star" style="color: gold;"></span>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="list-group-item p-2">@permission</li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 </div>
 

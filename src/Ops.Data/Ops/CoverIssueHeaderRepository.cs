@@ -28,9 +28,9 @@ namespace Ocuda.Ops.Data.Ops
         }
 
         public async Task<DataWithCount<ICollection<CoverIssueHeader>>> GetPaginiatedListAsync(
-            BaseFilter filter)
+            CoverIssueFilter filter)
         {
-            var query = DbSet.AsNoTracking();
+            var query = ApplyFilters(filter);
 
             return new DataWithCount<ICollection<CoverIssueHeader>>
             {
@@ -41,6 +41,14 @@ namespace Ocuda.Ops.Data.Ops
                 .ApplyPagination(filter)
                 .ToListAsync()
             };
+        }
+        private IQueryable<CoverIssueHeader> ApplyFilters(CoverIssueFilter filter)
+        {
+            var items = DbSet.AsNoTracking();
+
+            return filter.CoverIssueType == CoverIssueType.Open ?
+                items.Where(_ => _.HasPendingIssue)
+                : items.Where(_ => !_.HasPendingIssue);
         }
     }
 }

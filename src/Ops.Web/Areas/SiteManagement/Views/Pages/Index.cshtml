@@ -1,21 +1,46 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages.IndexViewModel
 
 <form id="addForm" role="form">
-    <div modal id="addModal" isLarge="true" name="Page"  type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+    <div modal
+         id="addModal"
+         isLarge="true"
+         name="Page"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addName" asp-for="PageHeader.PageName" formgroup />
         <input id="addStub" asp-for="PageHeader.Stub" formgroup />
         <select id="addType" asp-for="PageHeader.Type" formgroup>
             @foreach (var type in (PageType[])Enum.GetValues(typeof(PageType)))
             {
-                <option value="@Convert.ToInt32(type)" selected="@(type == Model.PageType ? "selected" : null)">@type</option>
+                <option value="@Convert.ToInt32(type)"
+                        selected="@(type == Model.PageType ? "selected" : null)">
+                    @type
+                </option>
             }
         </select>
+        <select id="addLayout" asp-for="PageHeader.IsLayoutPage" formgroup>
+            <option></option>
+            <option value="False">No</option>
+            <option value="True">Yes</option>
+        </select>
+        <div id="addTemplateContainer" class="d-none">
+            <select id="addCarouselTemplate"
+                    asp-for="PageHeader.LayoutCarouselTemplateId"
+                    asp-items="@Model.CarouselTemplates"
+                    formgroup
+                    disabled>
+                <option></option>
+            </select>
+        </div>
     </div>
 </form>
 
 <form id="editForm" role="form">
     <input id="editId" asp-for="PageHeader.Id" type="hidden" />
-    <div modal id="editModal" isLarge="true" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+    <div modal
+         id="editModal"
+         isLarge="true"
+         name="Page"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
         <input id="editName" asp-for="PageHeader.PageName" formgroup />
         <input id="editStub" asp-for="PageHeader.Stub" formgroup readonly />
         <select id="editType" asp-for="PageHeader.Type" formgroup disabled>
@@ -24,45 +49,67 @@
                 <option value="@Convert.ToInt32(type)" selected>@type</option>
             }
         </select>
+        <select id="editLayout" asp-for="PageHeader.IsLayoutPage" formgroup disabled>
+            <option value="False">No</option>
+            <option value="True">Yes</option>
+        </select>
+        <div id="editTemplateContainer" class="d-none">
+            <select id="editCarouselTemplate"
+                    asp-for="PageHeader.LayoutCarouselTemplateId"
+                    asp-items="@Model.CarouselTemplates"
+                    formgroup
+                    disabled>
+                <option></option>
+            </select>
+        </div>
     </div>
 </form>
 
-<form asp-controller="@PagesController.Name" asp-action="@(nameof(PagesController.Delete))" method="post" role="form">
+<form asp-controller="@PagesController.Name"
+      asp-action="@(nameof(PagesController.Delete))"
+      method="post"
+      role="form">
     <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
     <input id="deleteType" asp-for="PageType" type="hidden" />
 
     <input id="deleteId" asp-for="PageHeader.Id" type="hidden" />
     <input id="deleteName" asp-for="PageHeader.PageName" type="hidden" />
 
-    <div modal id="deleteModal" name="Page" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+    <div modal id="deleteModal"
+         name="Page"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
 </form>
 
 <div class="row mb-2">
     <div class="col-12">
         <ul class="nav nav-pills">
             <li class="nav-item">
-                <a asp-action="@nameof(PagesController.Index)" asp-route-Type=""
+                <a asp-action="@nameof(PagesController.Index)"
+                   asp-route-Type=""
                    class="nav-link"
                    ActiveBy routeKey="type" value=",@PageType.Home">
                     @PageType.Home.ToString()
                 </a>
             </li>
             <li class="nav-item">
-                <a asp-action="@nameof(PagesController.Index)" asp-route-Type="@PageType.About"
+                <a asp-action="@nameof(PagesController.Index)"
+                   asp-route-Type="@PageType.About"
                    class="nav-link"
                    ActiveBy routeKey="type" value="@PageType.About">
                     @PageType.About.ToString()
                 </a>
             </li>
             <li class="nav-item">
-                <a asp-action="@nameof(PagesController.Index)" asp-route-Type="@PageType.News"
+                <a asp-action="@nameof(PagesController.Index)"
+                   asp-route-Type="@PageType.News"
                    class="nav-link"
                    ActiveBy routeKey="type" value="@PageType.News">
                     @PageType.News.ToString()
                 </a>
             </li>
             <li class="nav-item">
-                <a asp-action="@nameof(PagesController.Index)" asp-route-Type="@PageType.Subject"
+                <a asp-action="@nameof(PagesController.Index)"
+                   asp-route-Type="@PageType.Subject"
                    class="nav-link"
                    ActiveBy routeKey="type" value="@PageType.Subject">
                     @PageType.Subject.ToString()
@@ -72,13 +119,16 @@
     </div>
 </div>
 
-<div class="mb-2">
-    <button class="btn btn-outline-secondary text-dark"
-            data-toggle="modal"
-            data-target="#addModal">
-        Create Page
-    </button>
-</div>
+@if (Model.IsSiteManager)
+{
+    <div class="mb-2">
+        <button class="btn btn-outline-secondary text-dark"
+                data-toggle="modal"
+                data-target="#addModal">
+            Create Page
+        </button>
+    </div>
+}
 
 @if (Model.PageHeaders.Count() == 0)
 {
@@ -89,7 +139,7 @@ else
     <div class="row">
         <div class="col-12">
             <div>
-                <table class="table table-sm table-bordered link-table">
+                <table class="table table-sm table-bordered table-hover table-striped">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -103,33 +153,66 @@ else
                         @foreach (var header in Model.PageHeaders)
                         {
                             <tr>
-                                <td class="td-class">
-                                    <a asp-action="@(nameof(PagesController.Detail))" asp-route-id="@header.Id" class="rowlink">
+                                <td class="align-middle">
+                                    @if (Model.IsSiteManager || Model.PermissionIds.Any(_ => header.PermissionGroupIds.Contains(_)))
+                                    {
+                                        <a asp-action="@(header.IsLayoutPage ? nameof(PagesController.Layouts) : nameof(PagesController.Detail))"
+                                           asp-route-id="@header.Id">
+                                            @header.PageName
+                                        </a>
+                                    }
+                                    else
+                                    {
                                         @header.PageName
-                                    </a>
+                                    }
                                 </td>
-                                <td>@header.Stub</td>
-                                <td>@header.Type.ToString()</td>
-                                <td> @string.Join(", ", header.PageLanguages)</td>
-                                <td align="center" class="on-top">
-                                    <button type="button"
-                                            class="btn btn-primary btn-xs"
-                                            data-toggle="modal"
-                                            data-target="#editModal"
-                                            data-id="@header.Id"
-                                            data-name="@header.PageName"
-                                            data-stub="@header.Stub"
-                                            data-type="@((int)header.Type)">
-                                        <span class="fas fa-edit" aria-hidden="true"></span>
-                                    </button>
-                                    <button type="button"
-                                            class="btn btn-danger btn-xs"
-                                            data-toggle="modal"
-                                            data-target="#deleteModal"
-                                            data-id="@header.Id"
-                                            data-name="@header.PageName">
-                                        <span class="fas fa-times" aria-hidden="true"></span>
-                                    </button>
+                                <td class="align-middle">@header.Stub</td>
+                                <td class="align-middle">@header.Type.ToString()</td>
+                                <td class="align-middle">@string.Join(", ", header.PageLanguages)</td>
+                                <td class="align-middle text-nowrap">
+                                    @if (Model.IsSiteManager)
+                                    {
+                                        <a asp-action="@(nameof(PagesController.ContentPermissions))"
+                                           asp-route-id="@header.Id"
+                                           title="Page content permissions"
+                                           class="btn btn-link">
+                                            <span class="fas fa-user-plus" aria-hidden="true"></span>
+                                        </a>
+                                        <button type="button"
+                                                class="btn btn-link"
+                                                data-toggle="modal"
+                                                data-target="#editModal"
+                                                data-id="@header.Id"
+                                                data-layout="@header.IsLayoutPage"
+                                                data-name="@header.PageName"
+                                                data-stub="@header.Stub"
+                                                data-type="@((int)header.Type)"
+                                                data-carouseltemplate="@header.LayoutCarouselTemplateId"
+                                                title="Edit page name">
+                                            <span class="fas fa-cog" aria-hidden="true"></span>
+                                        </button>
+                                    }
+                                    @if (Model.IsSiteManager || Model.PermissionIds.Any(_ => header.PermissionGroupIds.Contains(_)))
+                                    {
+                                        <a asp-action="@(nameof(PagesController.Detail))"
+                                           asp-route-id="@header.Id"
+                                           class="btn btn-link"
+                                           title="Edit page content">
+                                            <span class="far fa-file-alt" aria-hidden="true"></span>
+                                        </a>
+                                    }
+                                    @if (Model.IsSiteManager)
+                                    {
+                                        <button type="button"
+                                                class="btn btn-link"
+                                                data-toggle="modal"
+                                                data-target="#deleteModal"
+                                                data-id="@header.Id"
+                                                data-name="@header.PageName"
+                                                title="Delete page">
+                                            <span class="far fa-trash-alt" aria-hidden="true"></span>
+                                        </button>
+                                    }
                                 </td>
                             </tr>
                         }
@@ -147,7 +230,9 @@ else
 
 <div class="row">
     <div class="col-12">
-        <a asp-controller="@Ocuda.Ops.Controllers.SiteManagementController.Name"
+        <a asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement))"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))"
            class="btn btn-outline-secondary text-dark">
             Return to Site Management
         </a>
@@ -183,6 +268,15 @@ else
             }
         })
 
+        $("#addLayout").on("change", function () {
+            if ($(this).val() == "True") {
+                $("#addTemplateContainer").removeClass("d-none").find("select").removeAttr("disabled");
+            }
+            else {
+                $("#addTemplateContainer").addClass("d-none").find("select").attr("disabled", "disabled");
+            }
+        });
+
         $("#addForm").submit(function (e) {
             e.preventDefault();
             var form = $(this);
@@ -205,14 +299,25 @@ else
         $("#editModal").on("show.bs.modal", function (e) {
             var button = $(e.relatedTarget);
             var id = button.data("id");
+            var layout = button.data("layout");
             var name = button.data("name");
             var stub = button.data("stub");
             var type = button.data("type");
+            var carouselTemplate = button.data("carouseltemplate");
 
             $("#editId").val(id);
+            $("#editLayout").val(layout);
             $("#editName").val(name);
             $("#editStub").val(stub);
             $("#editType").val(type);
+            $("#editCarouselTemplate").val(carouselTemplate);
+
+            if (layout == "True") {
+                $("#editTemplateContainer").removeClass("d-none");
+            }
+            else {
+                $("#editTemplateContainer").addClass("d-none");
+            }
         });
 
         $("#editForm").submit(function (e) {
