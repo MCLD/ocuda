@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Podcasts;
 using Ocuda.Ops.Models.Entities;
@@ -379,10 +380,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             if (!Directory.Exists(path))
             {
+                _logger.LogInformation("Creating podcast directory: {Path}", path);
                 Directory.CreateDirectory(path);
             }
 
-            path = Path.Combine(path, FilenameOfEpisode(podcast.Stub, podcastItem.Episode));
+            string episodeFilename = FilenameOfEpisode(podcast.Stub, podcastItem.Episode);
+
+            path = Path.Combine(path, episodeFilename);
 
             ModelState.Clear();
 
@@ -392,6 +396,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     if (System.IO.File.Exists(path))
                     {
+                        _logger.LogInformation("Removing existing podcast file at: {Path}", path);
                         System.IO.File.Delete(path);
                     }
 
@@ -407,6 +412,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     podcastItem.UpdatedAt = _dateTimeProvider.Now;
                     await _podcastService.UpdatePodcastItemAsync(podcastItem);
 
+                    _logger.LogInformation("Podcast uploaded for id {Id}: {Filename} - {MediaSize} bytes",
+                        viewModel.Episode.Id,
+                        episodeFilename,
+                        podcastFileInfo.MediaSize);
                     AlertSuccess = "Podcast file updated successfully.";
 
                     return RedirectToAction(nameof(EditEpisode),
@@ -414,6 +423,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError("An error occured on podcast upload: {ErrorMessage}",
+                        ex.Message);
+
                     ModelState.AddModelError(nameof(EpisodeDetailsViewModel.UploadedFile),
                         $"Unable to save file: {ex.Message}");
 
