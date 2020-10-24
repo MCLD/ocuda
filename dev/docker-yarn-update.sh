@@ -24,6 +24,8 @@ mkdir -p /app/src/Ops.Web/wwwroot/css/fonts
 cp /app/src/Ops.Web/node_modules/slick-carousel/slick/fonts/* /app/src/Ops.Web/wwwroot/css/fonts/
 rm /app/src/Ops.Web/wwwroot/css/ajax-loader.gif
 cp /app/src/Ops.Web/node_modules/slick-carousel/slick/ajax-loader.gif /app/src/Ops.Web/wwwroot/css/
+# Build to activate bundler/minifier
+cd /app/src/Ops.Web && dotnet build
 
 # Promenade
 rm -rf /app/src/Promenade.Web/node_modules/*
@@ -38,3 +40,6 @@ mkdir -p /app/src/Promenade.Web/wwwroot/css/fonts
 cp /app/src/Promenade.Web/node_modules/slick-carousel/slick/fonts/* /app/src/Promenade.Web/wwwroot/css/fonts/
 rm /app/src/Promenade.Web/wwwroot/css/ajax-loader.gif
 cp /app/src/Promenade.Web/node_modules/slick-carousel/slick/ajax-loader.gif /app/src/Promenade.Web/wwwroot/css/
+# Build to activate bundler/minifier
+cd /app/src/Promenade.Web && dotnet build
+
