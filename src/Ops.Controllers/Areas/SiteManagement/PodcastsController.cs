@@ -26,8 +26,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class PodcastsController : BaseController<PodcastsController>
     {
-        private const string ValidContentType = "audio/mpeg";
+        private const string PodcastContentType = "audio/mpeg";
         private const long MaximumFileSizeBytes = 75 * 1024 * 1024;
+
+        private static readonly string[] AcceptedContentTypes = {
+            PodcastContentType,
+            "audio/mp3",
+            "audio/mpeg3",
+            "audio/x-mpeg-3"
+        };
 
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IPermissionGroupService _permissionGroupService;
@@ -291,7 +298,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     podcast.Stub,
                     viewModel.Episode.Episode);
                 viewModel.Episode.GuidPermaLink = true;
-                viewModel.Episode.MediaType = ValidContentType;
+                viewModel.Episode.MediaType = PodcastContentType;
                 viewModel.Episode.Season = 1;
 
                 ModelState.Clear();
@@ -391,7 +398,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             ModelState.Clear();
 
-            if (viewModel.UploadedFile.ContentType == ValidContentType)
+            if (AcceptedContentTypes.Contains(viewModel.UploadedFile.ContentType))
             {
                 try
                 {
@@ -437,7 +444,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                         PodcastItem podcastFileInfo = _podcastService.GetFileInfo(path);
 
-                        podcastItem.MediaType = viewModel.UploadedFile.ContentType;
+                        podcastItem.MediaType = PodcastContentType;
                         podcastItem.Duration = podcastFileInfo.Duration;
                         podcastItem.MediaSize = podcastFileInfo.MediaSize;
                         podcastItem.UpdatedAt = _dateTimeProvider.Now;
@@ -475,11 +482,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             else
             {
-                _logger.LogInformation("Uploaded file {Path} was not valid content type {ValidContentType}, it was {UploadedContentType}",
+                _logger.LogInformation("Uploaded file {Path} was not a valid content type, it was {UploadedContentType}",
                     path,
-                    ValidContentType,
                     viewModel.UploadedFile.ContentType);
-                AlertDanger = $"Please upload a valid file of type: {ValidContentType}.";
+                AlertDanger = $"Please upload a valid file of type: {PodcastContentType}.";
                 ModelState.AddModelError(nameof(EpisodeDetailsViewModel.UploadedFile),
                     "Please upload an .mp3 file.");
             }
