@@ -400,26 +400,57 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         System.IO.File.Delete(path);
                     }
 
-                    using var outputFile = new FileStream(path, FileMode.CreateNew);
-                    await viewModel.UploadedFile.CopyToAsync(outputFile);
-                    outputFile.Close();
+                    _logger.LogInformation("Creating new podcast file, size {Size}: {Path}",
+                        viewModel.UploadedFile.Length,
+                        path);
+                    bool uploadSuccess = false;
 
-                    PodcastItem podcastFileInfo = _podcastService.GetFileInfo(path);
+                    try
+                    {
+                        using var outputFile = new FileStream(path, FileMode.Create);
+                        if (outputFile.CanWrite)
+                        {
+                            await viewModel.UploadedFile.CopyToAsync(outputFile);
+                            await outputFile.FlushAsync();
+                            uploadSuccess = true;
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Cannot write to podcast file: {Path}",
+                                path);
+                        }
+                        outputFile.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("Podcast file upload failure for {Path}: {ErrorMessage}",
+                            path,
+                            ex.Message);
+                        ModelState.AddModelError(nameof(EpisodeDetailsViewModel.UploadedFile),
+                            $"Unable to save file: {ex.Message}");
+                    }
 
-                    podcastItem.MediaType = viewModel.UploadedFile.ContentType;
-                    podcastItem.Duration = podcastFileInfo.Duration;
-                    podcastItem.MediaSize = podcastFileInfo.MediaSize;
-                    podcastItem.UpdatedAt = _dateTimeProvider.Now;
-                    await _podcastService.UpdatePodcastItemAsync(podcastItem);
+                    if (uploadSuccess)
+                    {
+                        _logger.LogInformation("Podcast uploaded successfully, updating database");
 
-                    _logger.LogInformation("Podcast uploaded for id {Id}: {Filename} - {MediaSize} bytes",
-                        viewModel.Episode.Id,
-                        episodeFilename,
-                        podcastFileInfo.MediaSize);
-                    AlertSuccess = "Podcast file updated successfully.";
+                        PodcastItem podcastFileInfo = _podcastService.GetFileInfo(path);
 
-                    return RedirectToAction(nameof(EditEpisode),
-                        new { episodeId = viewModel.Episode.Id });
+                        podcastItem.MediaType = viewModel.UploadedFile.ContentType;
+                        podcastItem.Duration = podcastFileInfo.Duration;
+                        podcastItem.MediaSize = podcastFileInfo.MediaSize;
+                        podcastItem.UpdatedAt = _dateTimeProvider.Now;
+                        await _podcastService.UpdatePodcastItemAsync(podcastItem);
+
+                        _logger.LogInformation("Podcast uploaded for id {Id}: {Filename} - {MediaSize} bytes",
+                            viewModel.Episode.Id,
+                            episodeFilename,
+                            podcastFileInfo.MediaSize);
+                        AlertSuccess = "Podcast file updated successfully.";
+
+                        return RedirectToAction(nameof(EditEpisode),
+                            new { episodeId = viewModel.Episode.Id });
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -443,6 +474,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             else
             {
+                _logger.LogInformation("Uploaded file was not of type audio/mpeg: {Path}", path);
                 ModelState.AddModelError(nameof(EpisodeDetailsViewModel.UploadedFile),
                     "Please upload an .mp3 file.");
             }
