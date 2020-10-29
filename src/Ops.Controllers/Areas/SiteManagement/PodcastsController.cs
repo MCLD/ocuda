@@ -484,7 +484,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     "Please upload an .mp3 file.");
             }
 
-            return View("EpisodeDetails", viewModel);
+            return RedirectToAction(nameof(EditEpisode), new { episodeId = viewModel.Episode.Id });
         }
 
         [Route("[action]/{podcastId}")]
