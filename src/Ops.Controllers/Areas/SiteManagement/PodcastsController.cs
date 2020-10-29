@@ -26,6 +26,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class PodcastsController : BaseController<PodcastsController>
     {
+        private const string ValidContentType = "audio/mpeg";
         private const long MaximumFileSizeBytes = 75 * 1024 * 1024;
 
         private readonly IDateTimeProvider _dateTimeProvider;
@@ -290,7 +291,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     podcast.Stub,
                     viewModel.Episode.Episode);
                 viewModel.Episode.GuidPermaLink = true;
-                viewModel.Episode.MediaType = "audio/mpeg";
+                viewModel.Episode.MediaType = ValidContentType;
                 viewModel.Episode.Season = 1;
 
                 ModelState.Clear();
@@ -390,7 +391,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             ModelState.Clear();
 
-            if (viewModel.UploadedFile.ContentType == "audio/mpeg")
+            if (viewModel.UploadedFile.ContentType == ValidContentType)
             {
                 try
                 {
@@ -474,7 +475,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             else
             {
-                _logger.LogInformation("Uploaded file was not of type audio/mpeg: {Path}", path);
+                _logger.LogInformation("Uploaded file {Path} was not valid content type {ValidContentType}, it was {UploadedContentType}",
+                    path,
+                    ValidContentType,
+                    viewModel.UploadedFile.ContentType);
+                AlertDanger = $"Please upload a valid file of type: {ValidContentType}.";
                 ModelState.AddModelError(nameof(EpisodeDetailsViewModel.UploadedFile),
                     "Please upload an .mp3 file.");
             }
