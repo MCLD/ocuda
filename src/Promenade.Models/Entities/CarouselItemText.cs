@@ -13,6 +13,7 @@ namespace Ocuda.Promenade.Models.Entities
 
         [Required]
         [MaxLength(100)]
+        [DisplayName("Label under image")]
         public string Label { get; set; }
 
         [Required]
@@ -21,6 +22,7 @@ namespace Ocuda.Promenade.Models.Entities
         public string ImageUrl { get; set; }
 
         [MaxLength(255)]
+        [DisplayName("Title in popup")]
         public string Title { get; set; }
 
         [MaxLength(2000)]

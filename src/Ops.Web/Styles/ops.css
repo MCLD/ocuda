@@ -242,3 +242,7 @@ a.rowlink {
             font-size: 18px;
         }
 }
+
+.rotate90 {
+    transform: rotate(90deg);
+}

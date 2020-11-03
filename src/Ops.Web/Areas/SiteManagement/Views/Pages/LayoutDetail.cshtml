@@ -74,8 +74,11 @@
 
 <div class="row pt-2">
     <div class="col-12">
-        <input asp-for="PageLayout.Name" formgroup readonly />
-        <input asp-for="PageLayout.StartDate" value="@Model.PageLayout.StartDate" type="datetime" formgroup readonly />
+        <input asp-for="PageLayout.StartDate"
+               value="@Model.PageLayout.StartDate"
+               type="datetime"
+               formgroup
+               readonly />
         <select asp-for="SelectLanguage" asp-items="Model.LanguageList" formgroup></select>
     </div>
 </div>
@@ -89,9 +92,13 @@
 <div class="row pb-1">
     <div class="col-12">
         <form asp-action="@nameof(PagesController.LayoutDetail)" method="post" role="form">
-            <input asp-for="PageLayoutText.PageLayoutId" value="@Model.PageLayoutId" type="hidden" />
+            <input asp-for="PageLayoutText.PageLayoutId"
+                   value="@Model.PageLayoutId"
+                   type="hidden" />
             <input asp-for="PageLayoutText.LanguageId" value="@Model.LanguageId" type="hidden" />
-            <input asp-for="PageLayoutText.Title" value="@Model.PageLayout.PageLayoutText?.Title" formgroup />
+            <input asp-for="PageLayoutText.Title"
+                   value="@Model.PageLayout.PageLayoutText?.Title"
+                   formgroup />
 
             <div class="row">
                 <div class="offset-md-3 col-md-9">
@@ -119,6 +126,23 @@
                 </tr>
             </thead>
             <tbody>
+                @if (Model.PageLayout.Items?.Count == 0)
+                {
+                <td colspan="4">
+                    <em style="font-size: larger; color: #666;">
+                        Layout has no items.
+                        <a href="#"
+                           class="text-success"
+                           data-toggle="modal"
+                           data-target="#addModal">
+                            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                            Add a layout item.
+                        </a>
+                    </em>
+                </td>
+            }
+            else
+            {
                 @foreach (var item in Model.PageLayout.Items)
                 {
                     <tr>
@@ -183,7 +207,7 @@
                                 </a>
                             }
                             <button type="button"
-                                    class="btn btn-link"
+                                    class="btn btn-link text-danger"
                                     data-toggle="modal"
                                     data-target="#deleteModal"
                                     data-id="@item.Id"
@@ -191,19 +215,19 @@
                                     data-carousel="@item.CarouselId"
                                     data-segment="@item.SegmentId"
                                     title="Delete layout item">
-                                <span class="fas fa-trash-alt" aria-hidden="true"></span>
+                                <span class="fas fa-times-circle" aria-hidden="true"></span>
                             </button>
                         </td>
-
                     </tr>
                 }
-            </tbody>
-        </table>
+            }
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 
-@section Scripts {
-    <script>
+    @section Scripts {
+        <script>
         $("#SelectLanguage").on("change", function () {
             window.location.href = "@Url.Action(nameof(PagesController.LayoutDetail), new { id = Model.PageLayoutId})" + "?language=" + $(this).val();
         });
@@ -333,5 +357,5 @@
                 });
             }
         });
-    </script>
-}
+        </script>
+    }
