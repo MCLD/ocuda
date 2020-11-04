@@ -156,16 +156,14 @@
                 <div class="accordion mt-2" id="accordion@(item.Id)">
                     <div class="card">
                         <div class="card-header d-flex" id="heading@(item.Id)">
-                            <div class="card-title h5 mb-0 flex-grow-1">
+                            <div class="card-title h5 mb-0 flex-grow-1"
+                                 data-toggle="collapse"
+                                 data-target="#collapse@(item.Id)"
+                                 aria-controls="collapse@(item.Id)"
+                                 aria-expanded="@(Model.FocusItemId == item.Id ? "true" : "false")">
                                 <span id="disclosure@(item.Id)"
                                       class="fas fa-caret-right mr-1"></span>
-                                <a href="#"
-                                   data-toggle="collapse"
-                                   data-target="#collapse@(item.Id)"
-                                   aria-controls="collapse@(item.Id)"
-                                   aria-expanded="@(Model.FocusItemId == item.Id ? "true" : "false")">
-                                    @item.Name
-                                </a>
+                                @item.Name
                             </div>
                             <div>
                                 <button class="btn btn-sm btn-secondary changeSort decreaseSortButton"

@@ -63,10 +63,8 @@
       method="post"
       role="form">
     <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
-
     <input id="deleteId" asp-for="PageLayout.Id" type="hidden" />
     <input id="deleteName" asp-for="PageLayout.Name" type="hidden" />
-
     <div modal id="deleteModal"
          name="Page"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
@@ -74,7 +72,7 @@
 
 <div class="row">
     <div class="col-12">
-        <input asp-for="HeaderName" formgroup readonly />
+        <span class="d-none"><input asp-for="HeaderName" formgroup readonly /></span>
         <input asp-for="HeaderStub" formgroup readonly />
         <input asp-for="HeaderType" formgroup readonly />
     </div>
@@ -93,45 +91,65 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var layout in Model.PageLayouts)
+                    @if (Model.PageLayouts?.Count == 0)
                     {
                         <tr>
-                            <td class="align-middle">
-                                <a asp-action="@nameof(PagesController.LayoutDetail)"
-                                   asp-route-id="@layout.Id">
-                                    @layout.Name
-                                </a>
-                            </td>
-                            <td class="align-middle">@layout.StartDate</td>
-                            <td class="align-middle">@layout.Items.Count()</td>
-                            <td class="align-middle">
-                                <button type="button"
-                                        class="btn btn-link"
-                                        data-toggle="modal"
-                                        data-target="#editModal"
-                                        data-id="@layout.Id"
-                                        data-name="@layout.Name"
-                                        data-startdate="@layout.StartDate"
-                                        title="Edit layout">
-                                    <span class="fas fa-cog" aria-hidden="true"></span>
-                                </button>
-                                <a asp-action="@(nameof(PagesController.LayoutDetail))"
-                                   asp-route-id="@layout.Id"
-                                   class="btn btn-link"
-                                   title="Edit layout content">
-                                    <span class="far fa-file-alt" aria-hidden="true"></span>
-                                </a>
-                                <button type="button"
-                                        class="btn btn-link text-danger"
-                                        data-toggle="modal"
-                                        data-target="#deleteModal"
-                                        data-id="@layout.Id"
-                                        data-name="@layout.Name"
-                                        title="Delete layout">
-                                    <span class="fas fa-times-circle" aria-hidden="true"></span>
-                                </button>
+                            <td colspan="4">
+                                <em style="font-size: larger; color: #666;">
+                                    Page has no layouts.
+                                    <a href="#"
+                                       class="text-success"
+                                       data-toggle="modal"
+                                       data-target="#addModal">
+                                        <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                                        Add a page layout.
+                                    </a>
+                                </em>
                             </td>
                         </tr>
+                    }
+                    else
+                    {
+                        @foreach (var layout in Model.PageLayouts)
+                        {
+                            <tr>
+                                <td class="align-middle">
+                                    <a asp-action="@nameof(PagesController.LayoutDetail)"
+                                       asp-route-id="@layout.Id">
+                                        @layout.Name
+                                    </a>
+                                </td>
+                                <td class="align-middle">@layout.StartDate</td>
+                                <td class="align-middle">@layout.Items.Count()</td>
+                                <td class="align-middle">
+                                    <button type="button"
+                                            class="btn btn-link"
+                                            data-toggle="modal"
+                                            data-target="#editModal"
+                                            data-id="@layout.Id"
+                                            data-name="@layout.Name"
+                                            data-startdate="@layout.StartDate"
+                                            title="Edit layout">
+                                        <span class="fas fa-cog" aria-hidden="true"></span>
+                                    </button>
+                                    <a asp-action="@(nameof(PagesController.LayoutDetail))"
+                                       asp-route-id="@layout.Id"
+                                       class="btn btn-link"
+                                       title="Edit layout content">
+                                        <span class="far fa-file-alt" aria-hidden="true"></span>
+                                    </a>
+                                    <button type="button"
+                                            class="btn btn-link text-danger"
+                                            data-toggle="modal"
+                                            data-target="#deleteModal"
+                                            data-id="@layout.Id"
+                                            data-name="@layout.Name"
+                                            title="Delete layout">
+                                        <span class="fas fa-times-circle" aria-hidden="true"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>
