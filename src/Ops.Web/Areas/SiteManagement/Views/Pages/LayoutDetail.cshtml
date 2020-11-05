@@ -74,8 +74,12 @@
 
 <div class="row pt-2">
     <div class="col-12">
-        <input asp-for="PageLayout.Name" formgroup readonly />
-        <input asp-for="PageLayout.StartDate" value="@Model.PageLayout.StartDate" type="datetime" formgroup readonly />
+        <span class="d-none"><input asp-for="PageLayout.Name" formgroup readonly /></span>
+        <input asp-for="PageLayout.StartDate"
+               value="@Model.PageLayout.StartDate"
+               type="datetime"
+               formgroup
+               readonly />
         <select asp-for="SelectLanguage" asp-items="Model.LanguageList" formgroup></select>
     </div>
 </div>
@@ -89,9 +93,13 @@
 <div class="row pb-1">
     <div class="col-12">
         <form asp-action="@nameof(PagesController.LayoutDetail)" method="post" role="form">
-            <input asp-for="PageLayoutText.PageLayoutId" value="@Model.PageLayoutId" type="hidden" />
+            <input asp-for="PageLayoutText.PageLayoutId"
+                   value="@Model.PageLayoutId"
+                   type="hidden" />
             <input asp-for="PageLayoutText.LanguageId" value="@Model.LanguageId" type="hidden" />
-            <input asp-for="PageLayoutText.Title" value="@Model.PageLayout.PageLayoutText?.Title" formgroup />
+            <input asp-for="PageLayoutText.Title"
+                   value="@Model.PageLayout.PageLayoutText?.Title"
+                   formgroup />
 
             <div class="row">
                 <div class="offset-md-3 col-md-9">
@@ -119,83 +127,102 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.PageLayout.Items)
+                @if (Model.PageLayout.Items?.Count == 0)
                 {
                     <tr>
-                        @if (item.CarouselId.HasValue)
-                        {
-                            <td>@item.Carousel.Name</td>
-                            <td>Carousel</td>
-                            <td>@item.Carousel.Items.Count</td>
-                        }
-                        else
-                        {
-                            <td>@item.Segment.Name</td>
-                            <td>Segment</td>
-                            <td>&nbsp;</td>
-                        }
-                        <td align="center">
-                            <button type="button"
-                                    class="btn btn-link changeSort decreaseSortButton"
-                                    data-id="@item.Id"
-                                    data-increase="false"
-                                    data-item="true"
-                                    disabled="@(item.Id == Model.PageLayout.Items.First().Id ? "disabled" : null)">
-                                <span class="fas fa-arrow-up" aria-hidden="true"></span>
-                            </button>
-                            <button class="btn btn-link changeSort increaseSortButton"
-                                    data-id="@item.Id"
-                                    data-increase="true"
-                                    data-item="true"
-                                    disabled="@(item.Id == Model.PageLayout.Items.Last().Id ? "disabled" : null)">
-                                <span class="fas fa-arrow-down" aria-hidden="true"></span>
-                            </button>
+                        <td colspan="4">
+                            <em style="font-size: larger; color: #666;">
+                                Layout has no items.
+                                <a href="#"
+                                   class="text-success"
+                                   data-toggle="modal"
+                                   data-target="#addModal">
+                                    <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                                    Add a layout item.
+                                </a>
+                            </em>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model.PageLayout.Items)
+                    {
+                        <tr>
                             @if (item.CarouselId.HasValue)
                             {
-                                <button type="button" class="btn btn-link invisible">
-                                    <span class="fas fa-cog" aria-hidden="true"></span>
-                                </button>
-                                <a asp-controller="@CarouselsController.Name"
-                                   asp-action="@(nameof(CarouselsController.Detail))"
-                                   asp-route-id="@item.CarouselId.Value"
-                                   class="btn btn-link"
-                                   title="Edit carousel content">
-                                    <span class="far fa-file-alt" aria-hidden="true"></span>
-                                </a>
+                                <td>@item.Carousel.Name</td>
+                                <td>Carousel</td>
+                                <td>@item.Carousel.Items.Count</td>
                             }
-                            else if (item.SegmentId.HasValue)
+                            else
                             {
-                                <button type="button"
-                                        class="btn btn-link"
-                                        data-toggle="modal"
-                                        data-target="#editSegmentModal"
-                                        data-id="@item.Id"
-                                        data-ame="@item.Segment.Name"
-                                        title="Edit segment">
-                                    <span class="fas fa-cog" aria-hidden="true"></span>
-                                </button>
-                                <a asp-controller="@SegmentsController.Name"
-                                   asp-action="@(nameof(SegmentsController.Detail))"
-                                   asp-route-id="@item.SegmentId.Value"
-                                   class="btn btn-link"
-                                   title="Edit segment content">
-                                    <span class="far fa-file-alt" aria-hidden="true"></span>
-                                </a>
+                                <td>@item.Segment.Name</td>
+                                <td>Segment</td>
+                                <td>&nbsp;</td>
                             }
-                            <button type="button"
-                                    class="btn btn-link"
-                                    data-toggle="modal"
-                                    data-target="#deleteModal"
-                                    data-id="@item.Id"
-                                    data-name="@(item.Carousel?.Name?? item.Segment?.Name)"
-                                    data-carousel="@item.CarouselId"
-                                    data-segment="@item.SegmentId"
-                                    title="Delete layout item">
-                                <span class="fas fa-trash-alt" aria-hidden="true"></span>
-                            </button>
-                        </td>
-
-                    </tr>
+                            <td align="center">
+                                <button type="button"
+                                        class="btn btn-link changeSort decreaseSortButton"
+                                        data-id="@item.Id"
+                                        data-increase="false"
+                                        data-item="true"
+                                        disabled="@(item.Id == Model.PageLayout.Items.First().Id ? "disabled" : null)">
+                                    <span class="fas fa-arrow-up" aria-hidden="true"></span>
+                                </button>
+                                <button class="btn btn-link changeSort increaseSortButton"
+                                        data-id="@item.Id"
+                                        data-increase="true"
+                                        data-item="true"
+                                        disabled="@(item.Id == Model.PageLayout.Items.Last().Id ? "disabled" : null)">
+                                    <span class="fas fa-arrow-down" aria-hidden="true"></span>
+                                </button>
+                                @if (item.CarouselId.HasValue)
+                                {
+                                    <button type="button" class="btn btn-link invisible">
+                                        <span class="fas fa-cog" aria-hidden="true"></span>
+                                    </button>
+                                    <a asp-controller="@CarouselsController.Name"
+                                       asp-action="@(nameof(CarouselsController.Detail))"
+                                       asp-route-id="@item.CarouselId.Value"
+                                       class="btn btn-link"
+                                       title="Edit carousel content">
+                                        <span class="far fa-file-alt" aria-hidden="true"></span>
+                                    </a>
+                                }
+                                else if (item.SegmentId.HasValue)
+                                {
+                                    <button type="button"
+                                            class="btn btn-link"
+                                            data-toggle="modal"
+                                            data-target="#editSegmentModal"
+                                            data-id="@item.Id"
+                                            data-name="@item.Segment.Name"
+                                            title="Edit segment">
+                                        <span class="fas fa-cog" aria-hidden="true"></span>
+                                    </button>
+                                    <a asp-controller="@SegmentsController.Name"
+                                       asp-action="@(nameof(SegmentsController.Detail))"
+                                       asp-route-id="@item.SegmentId.Value"
+                                       class="btn btn-link"
+                                       title="Edit segment content">
+                                        <span class="far fa-file-alt" aria-hidden="true"></span>
+                                    </a>
+                                }
+                                <button type="button"
+                                        class="btn btn-link text-danger"
+                                        data-toggle="modal"
+                                        data-target="#deleteModal"
+                                        data-id="@item.Id"
+                                        data-name="@(item.Carousel?.Name?? item.Segment?.Name)"
+                                        data-carousel="@item.CarouselId"
+                                        data-segment="@item.SegmentId"
+                                        title="Delete layout item">
+                                    <span class="fas fa-times-circle" aria-hidden="true"></span>
+                                </button>
+                            </td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>

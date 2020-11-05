@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -35,6 +34,7 @@ namespace Ocuda.Utility.TagHelpers
         private const string confirmButtonClass = "modal-btn-confirm";
         private const string deleteButtonClass = "btn btn-danger btn-spinner";
         private const string saveButtonClass = "btn btn-success btn-spinner";
+        private const string saveIconClass = "far fa-save mr-1";
         private const string footerDeleteIconClass = "fa fa-times mr-1";
         private const string buttonSpinnerClass = "fa fa-spinner fa-lg fa-pulse fa-fw ml-1 d-none";
 
@@ -208,7 +208,9 @@ namespace Ocuda.Utility.TagHelpers
                 else
                 {
                     confirmButton.AddCssClass(saveButtonClass);
-
+                    var icon = new TagBuilder("span");
+                    icon.AddCssClass(saveIconClass);
+                    confirmButton.InnerHtml.AppendHtml(icon);
                     confirmButton.InnerHtml.Append("Save");
                 }
 
