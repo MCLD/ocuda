@@ -101,7 +101,9 @@ namespace Ocuda.Promenade.Service
 
                             if (!string.IsNullOrWhiteSpace(template?.ButtonUrlTemplate))
                             {
-                                button.Url = template.ButtonUrlTemplate.Replace("{0}", button.Url);
+                                button.Url = template.ButtonUrlTemplate.Replace("{0}",
+                                    button.Url,
+                                    StringComparison.OrdinalIgnoreCase);
                             }
                         }
                     }
@@ -244,11 +246,21 @@ namespace Ocuda.Promenade.Service
 
                 if (carouselItem != null)
                 {
+                    var template = await _carouselTemplateRepository
+                        .GetTemplateForCarouselAsync(carouselItem.CarouselId);
+
                     carouselItem.Buttons = carouselItem.Buttons?.OrderBy(_ => _.Order).ToList();
 
                     foreach (var button in carouselItem.Buttons)
                     {
                         button.CarouselItem = null;
+
+                        if (!string.IsNullOrWhiteSpace(template?.ButtonUrlTemplate))
+                        {
+                            button.Url = template.ButtonUrlTemplate.Replace("{0}",
+                                button.Url,
+                                StringComparison.OrdinalIgnoreCase);
+                        }
                     }
                 }
 
