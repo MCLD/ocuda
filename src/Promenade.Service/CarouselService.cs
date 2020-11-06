@@ -101,7 +101,9 @@ namespace Ocuda.Promenade.Service
 
                             if (!string.IsNullOrWhiteSpace(template?.ButtonUrlTemplate))
                             {
-                                button.Url = template.ButtonUrlTemplate.Replace("{0}", button.Url);
+                                button.Url = template.ButtonUrlTemplate.Replace("{0}",
+                                    button.Url,
+                                    StringComparison.OrdinalIgnoreCase);
                             }
                         }
                     }
@@ -255,7 +257,9 @@ namespace Ocuda.Promenade.Service
 
                         if (!string.IsNullOrWhiteSpace(template?.ButtonUrlTemplate))
                         {
-                            button.Url = template.ButtonUrlTemplate.Replace("{0}", button.Url);
+                            button.Url = template.ButtonUrlTemplate.Replace("{0}",
+                                button.Url,
+                                StringComparison.OrdinalIgnoreCase);
                         }
                     }
                 }
