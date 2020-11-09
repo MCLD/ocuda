@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -627,6 +628,21 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 }
             }
 
+            string previewLink = null;
+
+            var pageHeader = await _pageService.GetHeaderByIdAsync(pageLayout.PageHeaderId);
+            var baseUrl = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.PromenadeUrl);
+
+            if (pageHeader != null && !string.IsNullOrEmpty(baseUrl))
+            {
+                previewLink = string.Format(CultureInfo.InvariantCulture,
+                    "{0}{1}/{2}",
+                    baseUrl,
+                    pageHeader.Type.ToString().ToLower(CultureInfo.InvariantCulture),
+                    pageHeader.Stub);
+            }
+
             var viewModel = new LayoutDetailViewModel
             {
                 PageLayout = pageLayout,
@@ -634,6 +650,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 LanguageId = selectedLanguage.Id,
                 LanguageList = new SelectList(languages, nameof(Language.Name),
                     nameof(Language.Description), selectedLanguage.Name),
+                PreviewLink = previewLink
             };
 
             return View(viewModel);

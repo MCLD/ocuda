@@ -219,9 +219,30 @@ namespace Ocuda.Promenade.Service
             return await _pageHeaderRepository.GetByStubAndTypeAsync(stub?.Trim(), type);
         }
 
-        public async Task<PageLayout> GetLayoutPageByHeaderAsync(int headerId, bool forceReload)
+        public async Task<PageLayout> GetLayoutPageByHeaderAsync(int headerId,
+            bool forceReload,
+            string previewIdString)
         {
-            var layoutId = await _pageLayoutRepository.GetCurrentLayoutIdForHeaderAsync(headerId);
+            bool isPreview = false;
+            int? layoutId = null;
+
+            if (!string.IsNullOrEmpty(previewIdString) &&
+                Guid.TryParse(previewIdString, out Guid previewIdGuid))
+            {
+                layoutId = await _pageLayoutRepository
+                    .GetPreviewLayoutIdAsync(headerId, previewIdGuid);
+            }
+
+            if (layoutId.HasValue)
+            {
+                isPreview = true;
+                forceReload = true;
+            }
+            else
+            {
+                layoutId = await _pageLayoutRepository.GetCurrentLayoutIdForHeaderAsync(headerId);
+            }
+
             if (!layoutId.HasValue)
             {
                 return null;
@@ -319,6 +340,8 @@ namespace Ocuda.Promenade.Service
                             cachePagesInHours);
                     }
                 }
+
+                pageLayout.IsPreview = isPreview;
             }
 
             return pageLayout;

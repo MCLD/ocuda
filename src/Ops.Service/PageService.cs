@@ -207,6 +207,7 @@ namespace Ocuda.Ops.Service
         public async Task<PageLayout> CreateLayoutAsync(PageLayout layout)
         {
             layout.Name = layout.Name.Trim();
+            layout.PreviewId = Guid.NewGuid();
 
             await _pageLayoutRepository.AddAsync(layout);
             await _pageLayoutRepository.SaveAsync();

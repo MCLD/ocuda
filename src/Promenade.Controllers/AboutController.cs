@@ -24,13 +24,22 @@ namespace Ocuda.Promenade.Controllers
         {
         }
 
-        [Route("{stub?}")]
+        [HttpGet("{stub?}")]
         public async Task<IActionResult> Page(string stub)
         {
             return await ReturnPageAsync(stub);
         }
 
-        [Route("{stub?}/item/{id}")]
+        [HttpPost("{stub?}")]
+        public async Task<IActionResult> PagePreview(string stub)
+        {
+            var pagePreview = await ReturnPreviewPageAsync(stub,
+                HttpContext.Request.Query["PreviewId"]);
+
+            return pagePreview;
+        }
+
+        [HttpGet("{stub?}/item/{id}")]
         public async Task<IActionResult> CarouselItem(string stub, int id)
         {
             return await ReturnCarouselItemAsync(stub, id);

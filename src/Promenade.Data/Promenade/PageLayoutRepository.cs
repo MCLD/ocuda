@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -29,9 +30,20 @@ namespace Ocuda.Promenade.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.PageHeaderId == headerId && _.StartDate.HasValue
+                .Where(_ => _.PageHeaderId == headerId
+                    && _.StartDate.HasValue
                     && _.StartDate < _dateTimeProvider.Now)
                 .OrderByDescending(_ => _.StartDate)
+                .Select(_ => _.Id)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<int?> GetPreviewLayoutIdAsync(int headerId, Guid previewId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.PageHeaderId == headerId
+                    && _.PreviewId == previewId)
                 .Select(_ => _.Id)
                 .FirstOrDefaultAsync();
         }

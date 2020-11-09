@@ -30,5 +30,10 @@ namespace Ocuda.Promenade.Models.Entities
 
         [NotMapped]
         public PageLayoutText PageLayoutText { get; set; }
+
+        public Guid PreviewId { get; set; }
+
+        [NotMapped]
+        public bool IsPreview { get; set; }
     }
 }

@@ -14,6 +14,19 @@
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
             Add Item
         </button>
+        @if (!string.IsNullOrEmpty(Model.PreviewLink))
+        {
+            <form action="@Model.PreviewLink"
+                  method="post"
+                  role="form"
+                  target="_blank">
+                <input type="hidden" name="PreviewId" value="@Model.PageLayout.PreviewId" />
+                <button class="btn btn-outline-info mr-2 mt-2 mb-1 float-right">
+                    <span class="fas fa-file-alt"></span>
+                    Preview
+                </button>
+            </form>
+        }
         <a class="btn btn-outline-dark mt-2 mb-1 mr-4 float-right"
            asp-action="@(nameof(PagesController.Layouts))"
            asp-route-id="@Model.PageLayout.PageHeaderId">Back</a>
