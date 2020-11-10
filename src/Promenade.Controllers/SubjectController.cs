@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Models.Entities;
@@ -24,13 +25,20 @@ namespace Ocuda.Promenade.Controllers
         {
         }
 
-        [Route("{stub?}")]
+        [HttpGet("{stub?}")]
         public async Task<IActionResult> Page(string stub)
         {
             return await ReturnPageAsync(stub);
         }
 
-        [Route("{stub?}/item/{id}")]
+        [HttpPost("{stub?}")]
+        public async Task<IActionResult> PagePreview(string stub)
+        {
+            return await ReturnPreviewPageAsync(stub,
+                HttpContext.Request.Form["PreviewId"].FirstOrDefault());
+        }
+
+        [HttpGet("{stub?}/item/{id}")]
         public async Task<IActionResult> CarouselItem(string stub, int id)
         {
             return await ReturnCarouselItemAsync(stub, id);

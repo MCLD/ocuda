@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Service.Interfaces.Repositories
@@ -7,5 +8,6 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
     {
         Task<int?> GetCurrentLayoutIdForHeaderAsync(int headerId);
         Task<PageLayout> GetIncludingChildrenAsync(int id);
+        Task<int?> GetPreviewLayoutIdAsync(int headerId, Guid previewId);
     }
 }

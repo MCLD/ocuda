@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -627,6 +629,25 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 }
             }
 
+            string previewLink = null;
+
+            var pageHeader = await _pageService.GetHeaderByIdAsync(pageLayout.PageHeaderId);
+            var baseUrl = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.PromenadeUrl);
+
+            if (pageHeader != null && !string.IsNullOrEmpty(baseUrl))
+            {
+                var previewLinkBuilder = new StringBuilder(baseUrl);
+                if (pageHeader.Type != PageType.Home)
+                {
+                    previewLinkBuilder.Append(pageHeader.Type.ToString().ToLowerInvariant())
+                        .Append('/')
+                        .Append(pageHeader.Stub)
+                        .Append('/');
+                }
+                previewLink = previewLinkBuilder.ToString();
+            }
+
             var viewModel = new LayoutDetailViewModel
             {
                 PageLayout = pageLayout,
@@ -634,6 +655,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 LanguageId = selectedLanguage.Id,
                 LanguageList = new SelectList(languages, nameof(Language.Name),
                     nameof(Language.Description), selectedLanguage.Name),
+                PreviewLink = previewLink
             };
 
             return View(viewModel);

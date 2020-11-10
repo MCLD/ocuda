@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
 using Ocuda.Promenade.Controllers.ViewModels.Shared;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service;
@@ -11,19 +10,13 @@ namespace Ocuda.Promenade.Controllers.Abstract
 {
     public abstract class BasePageController<T> : BaseController<T>
     {
-        private readonly CarouselService _carouselService;
-        private readonly PageService _pageService;
-        private readonly RedirectService _redirectService;
-        private readonly SegmentService _segmentService;
-        private readonly SocialCardService _socialCardService;
-
         protected abstract PageType PageType { get; }
 
-        protected CarouselService CarouselService { get { return _carouselService; } }
-        protected PageService PageService { get { return _pageService; } }
-        protected RedirectService RedirectService { get { return _redirectService; } }
-        protected SegmentService SegmentService { get { return _segmentService; } }
-        protected SocialCardService SocialCardService { get { return _socialCardService; } }
+        protected CarouselService CarouselService { get; }
+        protected PageService PageService { get; }
+        protected RedirectService RedirectService { get; }
+        protected SegmentService SegmentService { get; }
+        protected SocialCardService SocialCardService { get; }
 
         protected BasePageController(ServiceFacades.Controller<T> context,
             CarouselService carouselService,
@@ -32,20 +25,20 @@ namespace Ocuda.Promenade.Controllers.Abstract
             SegmentService segmentService,
             SocialCardService socialCardService) : base(context)
         {
-            _carouselService = carouselService
+            CarouselService = carouselService
                 ?? throw new ArgumentNullException(nameof(carouselService));
-            _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
-            _redirectService = redirectService
+            PageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
+            RedirectService = redirectService
                 ?? throw new ArgumentNullException(nameof(redirectService));
-            _segmentService = segmentService
+            SegmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
-            _socialCardService = socialCardService
+            SocialCardService = socialCardService
                 ?? throw new ArgumentNullException(nameof(socialCardService));
         }
 
         protected async Task<IActionResult> ReturnPageAsync(string stub)
         {
-            var pageHeader = await _pageService.GetHeaderByStubAndTypeAsync(stub, PageType);
+            var pageHeader = await PageService.GetHeaderByStubAndTypeAsync(stub, PageType);
 
             if (pageHeader == null)
             {
@@ -54,7 +47,28 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
             if (pageHeader.IsLayoutPage)
             {
-                return await ReturnLayoutPageAsync(pageHeader.Id, stub);
+                return await ReturnLayoutPageAsync(pageHeader.Id, stub, null);
+            }
+            else
+            {
+                return await ReturnContentPageAsync(stub);
+            }
+        }
+
+        protected async Task<IActionResult> ReturnPreviewPageAsync(string stub, string previewId)
+        {
+            var pageHeader = await PageService.GetHeaderByStubAndTypeAsync(stub, PageType);
+
+            if (pageHeader == null)
+            {
+                return NotFound();
+            }
+
+            if (pageHeader.IsLayoutPage)
+            {
+                return await ReturnLayoutPageAsync(pageHeader.Id,
+                    stub,
+                    previewId);
             }
             else
             {
@@ -66,7 +80,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
-            var page = await _pageService.GetContentPageByStubAndType(stub, PageType, forceReload);
+            var page = await PageService.GetContentPageByStubAndType(stub, PageType, forceReload);
 
             if (page == null)
             {
@@ -81,7 +95,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
             if (page.SocialCardId.HasValue)
             {
-                var card = await _socialCardService.GetByIdAsync(page.SocialCardId.Value,
+                var card = await SocialCardService.GetByIdAsync(page.SocialCardId.Value,
                     forceReload);
                 card.Url = viewModel.CanonicalUrl;
                 viewModel.SocialCard = card;
@@ -92,11 +106,15 @@ namespace Ocuda.Promenade.Controllers.Abstract
             return View(viewModel);
         }
 
-        private async Task<IActionResult> ReturnLayoutPageAsync(int headerId, string stub)
+        private async Task<IActionResult> ReturnLayoutPageAsync(int headerId,
+            string stub,
+            string previewId)
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
-            var pageLayout = await _pageService.GetLayoutPageByHeaderAsync(headerId, forceReload);
+            var pageLayout = await PageService.GetLayoutPageByHeaderAsync(headerId,
+                forceReload,
+                previewId);
 
             if (pageLayout == null)
             {
@@ -107,12 +125,12 @@ namespace Ocuda.Promenade.Controllers.Abstract
             {
                 if (item.CarouselId.HasValue)
                 {
-                    item.Carousel = await _carouselService.GetByIdAsync(item.CarouselId.Value,
+                    item.Carousel = await CarouselService.GetByIdAsync(item.CarouselId.Value,
                         forceReload);
                 }
                 else if (item.SegmentId.HasValue)
                 {
-                    item.SegmentText = await _segmentService.GetSegmentTextBySegmentIdAsync(
+                    item.SegmentText = await SegmentService.GetSegmentTextBySegmentIdAsync(
                         item.SegmentId.Value,
                         forceReload);
 
@@ -133,7 +151,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
             if (pageLayout.SocialCardId.HasValue)
             {
-                pageLayout.SocialCard = await _socialCardService.GetByIdAsync(
+                pageLayout.SocialCard = await SocialCardService.GetByIdAsync(
                     pageLayout.SocialCardId.Value,
                     forceReload);
                 pageLayout.SocialCard.Url = viewModel.CanonicalUrl;
@@ -150,14 +168,14 @@ namespace Ocuda.Promenade.Controllers.Abstract
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
-            var pageHeader = await _pageService.GetHeaderByStubAndTypeAsync(stub, PageType);
+            var pageHeader = await PageService.GetHeaderByStubAndTypeAsync(stub, PageType);
 
-            if (pageHeader == null || !pageHeader.IsLayoutPage)
+            if (pageHeader?.IsLayoutPage != true)
             {
                 return NotFound();
             }
 
-            var carouselItem = await _carouselService.GetItemForHeaderAsync(pageHeader.Id, id,
+            var carouselItem = await CarouselService.GetItemForHeaderAsync(pageHeader.Id, id,
                 forceReload);
 
             if (carouselItem == null)

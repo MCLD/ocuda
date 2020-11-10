@@ -14,6 +14,19 @@
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
             Add Item
         </button>
+        @if (!string.IsNullOrEmpty(Model.PreviewLink))
+        {
+            <form action="@Model.PreviewLink"
+                  method="post"
+                  role="form"
+                  target="_blank">
+                <input type="hidden" name="PreviewId" value="@Model.PageLayout.PreviewId" />
+                <button class="btn btn-outline-info mr-2 mt-2 mb-1 float-right">
+                    <span class="fas fa-file-alt"></span>
+                    Preview
+                </button>
+            </form>
+        }
         <a class="btn btn-outline-dark mt-2 mb-1 mr-4 float-right"
            asp-action="@(nameof(PagesController.Layouts))"
            asp-route-id="@Model.PageLayout.PageHeaderId">Back</a>
@@ -75,6 +88,14 @@
 <div class="row pt-2">
     <div class="col-12">
         <span class="d-none"><input asp-for="PageLayout.Name" formgroup readonly /></span>
+        @if (Model.PageLayout.StartDate == null)
+        {
+            <div class="col-md-9 offset-md-3">
+                <div class="alert alert-warning">
+                    With no start date, this page will never be active.
+                </div>
+            </div>
+        }
         <input asp-for="PageLayout.StartDate"
                value="@Model.PageLayout.StartDate"
                type="datetime"
