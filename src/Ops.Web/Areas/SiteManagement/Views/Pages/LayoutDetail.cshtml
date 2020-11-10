@@ -88,6 +88,14 @@
 <div class="row pt-2">
     <div class="col-12">
         <span class="d-none"><input asp-for="PageLayout.Name" formgroup readonly /></span>
+        @if (Model.PageLayout.StartDate == null)
+        {
+            <div class="col-md-9 offset-md-3">
+                <div class="alert alert-warning">
+                    With no start date, this page will never be active.
+                </div>
+            </div>
+        }
         <input asp-for="PageLayout.StartDate"
                value="@Model.PageLayout.StartDate"
                type="datetime"

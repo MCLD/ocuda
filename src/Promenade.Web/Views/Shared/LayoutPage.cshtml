@@ -38,8 +38,10 @@
     <div class="row">
         <div class="col-12 col-md-6 offset-md-3">
             <div class="alert alert-info">
-                You are viewing a preview of how this page will appear as of
-                @Model.PageLayout.StartDate.
+                You are viewing a preview of how this page will
+                @(Model.PageLayout.StartDate == null 
+                    ? "appear." 
+                    : $"appear as of {Model.PageLayout.StartDate}.")
             </div>
         </div>
     </div>

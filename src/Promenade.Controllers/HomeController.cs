@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Models.Entities;
@@ -9,8 +10,7 @@ namespace Ocuda.Promenade.Controllers
     [Route("{culture:cultureConstraint?}")]
     public class HomeController : BasePageController<HomeController>
     {
-        protected override PageType PageType
-        { get { return PageType.Home; } }
+        protected override PageType PageType { get { return PageType.Home; } }
 
         public static string Name { get { return "Home"; } }
 
@@ -20,18 +20,25 @@ namespace Ocuda.Promenade.Controllers
             RedirectService redirectService,
             SegmentService segmentService,
             SocialCardService socialCardService)
-            : base(context, carouselService, pageService, redirectService, segmentService, 
+            : base(context, carouselService, pageService, redirectService, segmentService,
                   socialCardService)
         {
         }
 
-        [Route("")]
+        [HttpGet("")]
         public async Task<IActionResult> Index()
         {
             return await ReturnPageAsync(nameof(Index));
         }
 
-        [Route("{stub?}/item/{id}")]
+        [HttpPost("")]
+        public async Task<IActionResult> PagePreview()
+        {
+            return await ReturnPreviewPageAsync(nameof(Index),
+                HttpContext.Request.Form["PreviewId"].FirstOrDefault());
+        }
+
+        [HttpGet("{stub?}/item/{id}")]
         public async Task<IActionResult> CarouselItem(string stub, int id)
         {
             return await ReturnCarouselItemAsync(stub, id);

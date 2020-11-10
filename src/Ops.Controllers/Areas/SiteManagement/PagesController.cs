@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -636,11 +637,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             if (pageHeader != null && !string.IsNullOrEmpty(baseUrl))
             {
-                previewLink = string.Format(CultureInfo.InvariantCulture,
-                    "{0}{1}/{2}",
-                    baseUrl,
-                    pageHeader.Type.ToString().ToLower(CultureInfo.InvariantCulture),
-                    pageHeader.Stub);
+                var previewLinkBuilder = new StringBuilder(baseUrl);
+                if (pageHeader.Type != PageType.Home)
+                {
+                    previewLinkBuilder.Append(pageHeader.Type.ToString().ToLowerInvariant())
+                        .Append('/')
+                        .Append(pageHeader.Stub)
+                        .Append('/');
+                }
+                previewLink = previewLinkBuilder.ToString();
             }
 
             var viewModel = new LayoutDetailViewModel
