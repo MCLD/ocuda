@@ -220,9 +220,10 @@ namespace Ocuda.Promenade.Service
         }
 
         public async Task<PageLayout> GetLayoutPageByHeaderAsync(int headerId,
-            bool forceReload,
+            bool forceReloadRequested,
             string previewIdString)
         {
+            bool forceReload = forceReloadRequested;
             bool isPreview = false;
             int? layoutId = null;
 
