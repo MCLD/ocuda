@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Controllers.ViewModels.Shared;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service;
@@ -115,6 +116,9 @@ namespace Ocuda.Promenade.Controllers.Abstract
             // always force reload previews
             if (!string.IsNullOrEmpty(previewId))
             {
+                _logger.LogInformation("Showing preview for {Stub}: {PreviewId}",
+                    stub,
+                    previewId);
                 forceReload = true;
             }
 
