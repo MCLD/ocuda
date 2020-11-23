@@ -112,6 +112,12 @@ namespace Ocuda.Promenade.Controllers.Abstract
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
+            // always force reload previews
+            if (!string.IsNullOrEmpty(previewId))
+            {
+                forceReload = true;
+            }
+
             var pageLayout = await PageService.GetLayoutPageByHeaderAsync(headerId,
                 forceReload,
                 previewId);
