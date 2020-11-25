@@ -256,7 +256,7 @@ namespace Ocuda.Promenade.Service
                 Utility.Keys.Cache.PromPageLayout,
                 layoutId.Value);
 
-            if (cachePagesInHours != null && !forceReload)
+            if (cachePagesInHours.HasValue && !forceReload)
             {
                 pageLayout = await GetFromCacheAsync<PageLayout>(_cache, layoutCacheKey);
             }
@@ -274,7 +274,26 @@ namespace Ocuda.Promenade.Service
                     }
                 }
 
-                await SaveToCacheAsync(_cache, layoutCacheKey, pageLayout, cachePagesInHours);
+                // look up next active date/time
+                // figure out what is smaller, cachePagesInHorus or next active date/time
+                if (cachePagesInHours.HasValue)
+                {
+                    var cachePageTime = TimeSpan.FromHours(cachePagesInHours.Value);
+                    var nextUp = await _pageLayoutRepository.GetNextStartDate(headerId);
+
+                    if (nextUp.HasValue)
+                    {
+                        var nextUpIn = nextUp.Value - _dateTimeProvider.Now;
+                        if (nextUpIn.Ticks < TimeSpan.FromHours(cachePagesInHours.Value).Ticks)
+                        {
+                            _logger.LogInformation("Shortening cache time to {CacheForTime} as next layout activates at {StartDate}",
+                                nextUpIn,
+                                nextUp.Value);
+                            cachePageTime = nextUpIn;
+                        }
+                    }
+                    await SaveToCacheAsync(_cache, layoutCacheKey, pageLayout, cachePageTime);
+                }
             }
 
             if (pageLayout != null)

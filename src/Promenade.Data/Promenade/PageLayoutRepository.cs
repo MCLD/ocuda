@@ -47,5 +47,17 @@ namespace Ocuda.Promenade.Data.Promenade
                 .Select(_ => _.Id)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<DateTime?> GetNextStartDate(int headerId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.PageHeaderId == headerId
+                    && _.StartDate.HasValue
+                    && _.StartDate >= _dateTimeProvider.Now)
+                .OrderBy(_ => _.StartDate)
+                .Select(_ => _.StartDate)
+                .FirstOrDefaultAsync();
+        }
     }
 }

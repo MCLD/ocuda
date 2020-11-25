@@ -9,5 +9,6 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
         Task<int?> GetCurrentLayoutIdForHeaderAsync(int headerId);
         Task<PageLayout> GetIncludingChildrenAsync(int id);
         Task<int?> GetPreviewLayoutIdAsync(int headerId, Guid previewId);
+        Task<DateTime?> GetNextStartDate(int headerId);
     }
 }
