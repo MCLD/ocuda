@@ -51,7 +51,28 @@ namespace Ocuda.Utility.Services
             T item,
             int? cacheDurationHours) where T : class
         {
-            if (cacheDurationHours == null || string.IsNullOrEmpty(cacheKey) || item == null)
+            if (cacheDurationHours == null
+                || cacheDurationHours < 1
+                || string.IsNullOrEmpty(cacheKey)
+                || item == null)
+            {
+                return;
+            }
+
+            await SaveToCacheAsync<T>(cache,
+                cacheKey,
+                item,
+                TimeSpan.FromHours((int)cacheDurationHours));
+        }
+
+        protected async Task SaveToCacheAsync<T>(IDistributedCache cache,
+            string cacheKey,
+            T item,
+            TimeSpan? expireIn) where T : class
+        {
+            if (!expireIn.HasValue
+                || string.IsNullOrEmpty(cacheKey)
+                || item == null)
             {
                 return;
             }
@@ -62,13 +83,14 @@ namespace Ocuda.Utility.Services
                 itemJson,
                 new DistributedCacheEntryOptions
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromHours((int)cacheDurationHours)
+                    AbsoluteExpirationRelativeToNow = expireIn
                 });
 
-            _logger.LogDebug("Cache miss for {CacheKey}, caching {Type}: {Length} characters",
+            _logger.LogDebug("Cache miss for {CacheKey}, caching {Type}: {Length} characters for {CacheTimeSpan}",
                 cacheKey,
                 typeof(T),
-                itemJson.Length);
+                itemJson.Length,
+                expireIn);
         }
     }
 }
