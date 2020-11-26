@@ -180,5 +180,15 @@
         /// Cached page layout text, {0} is the language id, {1} is the id
         /// </summary>
         public static readonly string PromPageLayoutText = "pagelayouttext.{0}.{1}";
+
+        /// <summary>
+        /// Cached page header info, {0} is the stub, {1} is the page type
+        /// </summary>
+        public static readonly string PromPageHeader = "pageheader.{0}.{1}";
+
+        /// <summary>
+        /// Cached current page layout id from header, {0} is the header id
+        /// </summary>
+        public static readonly string PromPageCurrentLayoutId = "currentpagelayoutid.{0}";
     }
 }

@@ -214,9 +214,37 @@ namespace Ocuda.Promenade.Service
             }
         }
 
-        public async Task<PageHeader> GetHeaderByStubAndTypeAsync(string stub, PageType type)
+        public async Task<PageHeader> GetHeaderByStubAndTypeAsync(string stub,
+            PageType type,
+            bool forceReload)
         {
-            return await _pageHeaderRepository.GetByStubAndTypeAsync(stub?.Trim(), type);
+            var cachePagesInHours = GetPageCacheDuration(_config);
+            string headerCacheKey = string.Format(CultureInfo.InvariantCulture,
+                Utility.Keys.Cache.PromPageHeader,
+                stub,
+                type);
+
+            PageHeader pageHeader = null;
+
+            if (cachePagesInHours.HasValue && !forceReload)
+            {
+                pageHeader = await GetFromCacheAsync<PageHeader>(_cache, headerCacheKey);
+            }
+
+            if (pageHeader == null)
+            {
+                pageHeader = await _pageHeaderRepository.GetByStubAndTypeAsync(stub?.Trim(), type);
+
+                if (cachePagesInHours.HasValue && pageHeader != null)
+                {
+                    await SaveToCacheAsync(_cache,
+                        headerCacheKey,
+                        pageHeader,
+                        cachePagesInHours);
+                }
+            }
+
+            return pageHeader;
         }
 
         public async Task<PageLayout> GetLayoutPageByHeaderAsync(int headerId,
@@ -234,6 +262,8 @@ namespace Ocuda.Promenade.Service
                     .GetPreviewLayoutIdAsync(headerId, previewIdGuid);
             }
 
+            var cacheSpan = GetPageCacheSpan(_config);
+
             if (layoutId.HasValue)
             {
                 isPreview = true;
@@ -241,7 +271,42 @@ namespace Ocuda.Promenade.Service
             }
             else
             {
-                layoutId = await _pageLayoutRepository.GetCurrentLayoutIdForHeaderAsync(headerId);
+                string currentLayoutIdCacheKey = string.Format(CultureInfo.InvariantCulture,
+                    Utility.Keys.Cache.PromPageCurrentLayoutId,
+                    headerId);
+
+                if (cacheSpan.HasValue && !forceReload)
+                {
+                    layoutId = await GetIntFromCacheAsync(_cache, currentLayoutIdCacheKey);
+                }
+
+                if (!layoutId.HasValue)
+                {
+                    layoutId = await _pageLayoutRepository
+                        .GetCurrentLayoutIdForHeaderAsync(headerId);
+
+                    if (layoutId.HasValue && cacheSpan.HasValue)
+                    {
+                        var nextUp = await _pageLayoutRepository.GetNextStartDate(headerId);
+                        if (nextUp.HasValue)
+                        {
+                            var earliestSpan = GetCacheDuration(cacheSpan.Value, nextUp.Value);
+                            if (earliestSpan.HasValue && earliestSpan.Value != cacheSpan.Value)
+                            {
+                                _logger.LogInformation("Shortening layout id {LayoutId} cache to {CacheForTime}, next layout activates at {StartDate}",
+                                    layoutId,
+                                    earliestSpan,
+                                    nextUp.Value);
+                                cacheSpan = earliestSpan.Value;
+                            }
+                        }
+
+                        await SaveIntToCacheAsync(_cache,
+                            currentLayoutIdCacheKey,
+                            layoutId.Value,
+                            cacheSpan);
+                    }
+                }
             }
 
             if (!layoutId.HasValue)
@@ -251,12 +316,11 @@ namespace Ocuda.Promenade.Service
 
             PageLayout pageLayout = null;
 
-            var cachePagesInHours = GetPageCacheDuration(_config);
             string layoutCacheKey = string.Format(CultureInfo.InvariantCulture,
                 Utility.Keys.Cache.PromPageLayout,
                 layoutId.Value);
 
-            if (cachePagesInHours.HasValue && !forceReload)
+            if (cacheSpan.HasValue && !forceReload)
             {
                 pageLayout = await GetFromCacheAsync<PageLayout>(_cache, layoutCacheKey);
             }
@@ -264,7 +328,6 @@ namespace Ocuda.Promenade.Service
             if (pageLayout == null)
             {
                 pageLayout = await _pageLayoutRepository.GetIncludingChildrenAsync(layoutId.Value);
-
                 if (pageLayout != null)
                 {
                     pageLayout.Items = pageLayout.Items?.OrderBy(_ => _.Order).ToList();
@@ -274,26 +337,7 @@ namespace Ocuda.Promenade.Service
                     }
                 }
 
-                // look up next active date/time
-                // figure out what is smaller, cachePagesInHorus or next active date/time
-                if (cachePagesInHours.HasValue)
-                {
-                    var cachePageTime = TimeSpan.FromHours(cachePagesInHours.Value);
-                    var nextUp = await _pageLayoutRepository.GetNextStartDate(headerId);
-
-                    if (nextUp.HasValue)
-                    {
-                        var nextUpIn = nextUp.Value - _dateTimeProvider.Now;
-                        if (nextUpIn.Ticks < TimeSpan.FromHours(cachePagesInHours.Value).Ticks)
-                        {
-                            _logger.LogInformation("Shortening cache time to {CacheForTime} as next layout activates at {StartDate}",
-                                nextUpIn,
-                                nextUp.Value);
-                            cachePageTime = nextUpIn;
-                        }
-                    }
-                    await SaveToCacheAsync(_cache, layoutCacheKey, pageLayout, cachePageTime);
-                }
+                await SaveToCacheAsync(_cache, layoutCacheKey, pageLayout, cacheSpan);
             }
 
             if (pageLayout != null)
@@ -316,7 +360,7 @@ namespace Ocuda.Promenade.Service
                         currentLangaugeId,
                         pageLayout.Id);
 
-                    if (cachePagesInHours != null && !forceReload)
+                    if (cacheSpan.HasValue && !forceReload)
                     {
                         pageLayout.PageLayoutText = await GetFromCacheAsync<PageLayoutText>(_cache,
                             layoutTextCacheKey);
@@ -330,7 +374,7 @@ namespace Ocuda.Promenade.Service
                         await SaveToCacheAsync(_cache,
                             layoutTextCacheKey,
                             pageLayout.PageLayoutText,
-                            cachePagesInHours);
+                            cacheSpan);
                     }
                 }
 
@@ -343,7 +387,7 @@ namespace Ocuda.Promenade.Service
                         defaultLanguageId,
                         pageLayout.Id);
 
-                    if (cachePagesInHours != null && !forceReload)
+                    if (cacheSpan.HasValue && !forceReload)
                     {
                         pageLayout.PageLayoutText = await GetFromCacheAsync<PageLayoutText>(_cache,
                             layoutTextCacheKey);
@@ -357,7 +401,7 @@ namespace Ocuda.Promenade.Service
                         await SaveToCacheAsync(_cache,
                             layoutTextCacheKey,
                             pageLayout.PageLayoutText,
-                            cachePagesInHours);
+                            cacheSpan);
                     }
                 }
 

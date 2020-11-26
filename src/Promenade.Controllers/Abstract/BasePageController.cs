@@ -39,7 +39,11 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
         protected async Task<IActionResult> ReturnPageAsync(string stub)
         {
-            var pageHeader = await PageService.GetHeaderByStubAndTypeAsync(stub, PageType);
+            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
+            var pageHeader = await PageService.GetHeaderByStubAndTypeAsync(stub,
+                PageType,
+                forceReload);
 
             if (pageHeader == null)
             {
@@ -58,7 +62,11 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
         protected async Task<IActionResult> ReturnPreviewPageAsync(string stub, string previewId)
         {
-            var pageHeader = await PageService.GetHeaderByStubAndTypeAsync(stub, PageType);
+            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
+            var pageHeader = await PageService.GetHeaderByStubAndTypeAsync(stub,
+                PageType,
+                forceReload);
 
             if (pageHeader == null)
             {
@@ -131,7 +139,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
                 return NotFound();
             }
 
-            foreach (var item in pageLayout.Items)
+            foreach (var item in pageLayout?.Items)
             {
                 if (item.CarouselId.HasValue)
                 {
@@ -178,7 +186,9 @@ namespace Ocuda.Promenade.Controllers.Abstract
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
-            var pageHeader = await PageService.GetHeaderByStubAndTypeAsync(stub, PageType);
+            var pageHeader = await PageService.GetHeaderByStubAndTypeAsync(stub,
+                PageType,
+                forceReload);
 
             if (pageHeader?.IsLayoutPage != true)
             {
