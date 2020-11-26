@@ -56,7 +56,7 @@ namespace Ocuda.Promenade.Service.Abstract
 
         protected TimeSpan? GetCacheDuration(TimeSpan cacheSpan, DateTime nextItemStart)
         {
-            if (cacheSpan.TotalSeconds == 0 || nextItemStart == default)
+            if (cacheSpan.TotalSeconds < 60 || nextItemStart == default)
             {
                 return null;
             }
