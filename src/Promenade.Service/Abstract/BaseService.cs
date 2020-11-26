@@ -41,5 +41,30 @@ namespace Ocuda.Promenade.Service.Abstract
 
             return cachePagesInHours;
         }
+
+        protected static TimeSpan? GetPageCacheSpan(IConfiguration config)
+        {
+            var duration = GetPageCacheDuration(config);
+
+            if (!duration.HasValue)
+            {
+                return null;
+            }
+
+            return TimeSpan.FromHours(duration.Value);
+        }
+
+        protected TimeSpan? GetCacheDuration(TimeSpan cacheSpan, DateTime nextItemStart)
+        {
+            if (cacheSpan.TotalSeconds < 60 || nextItemStart == default)
+            {
+                return null;
+            }
+
+            var nextUpIn = nextItemStart - _dateTimeProvider.Now;
+            return nextUpIn.Ticks < cacheSpan.Ticks
+                ? nextUpIn
+                : cacheSpan;
+        }
     }
 }

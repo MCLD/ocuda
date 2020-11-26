@@ -46,6 +46,35 @@ namespace Ocuda.Utility.Services
             return null;
         }
 
+        protected async Task<int?> GetIntFromCacheAsync(IDistributedCache cache, string cacheKey)
+        {
+            if (cache == null || string.IsNullOrEmpty(cacheKey))
+            {
+                return null;
+            }
+
+            var cachedValue = await cache.GetAsync(cacheKey);
+
+            if (cachedValue?.Length > 0)
+            {
+                _logger.LogTrace("Cache hit for {CacheKey}", cacheKey);
+
+                try
+                {
+                    return BitConverter.ToInt32(cachedValue);
+                }
+                catch (ArgumentOutOfRangeException ex)
+                {
+                    _logger.LogWarning(ex,
+                        "Error converting int with key {CacheKey} from cache: {ErrorMessage}",
+                        cacheKey,
+                        ex.Message);
+                    await cache.RemoveAsync(cacheKey);
+                }
+            }
+            return null;
+        }
+
         protected async Task SaveToCacheAsync<T>(IDistributedCache cache,
             string cacheKey,
             T item,
@@ -92,5 +121,32 @@ namespace Ocuda.Utility.Services
                 itemJson.Length,
                 expireIn);
         }
+
+        protected async Task SaveIntToCacheAsync(IDistributedCache cache,
+            string cacheKey,
+            int item,
+            TimeSpan? expireIn)
+        {
+            if (cache == null || !expireIn.HasValue || string.IsNullOrEmpty(cacheKey))
+            {
+                return;
+            }
+
+            var bytes = BitConverter.GetBytes(item);
+
+            await cache.SetAsync(cacheKey,
+                BitConverter.GetBytes(item),
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = expireIn
+                });
+
+            _logger.LogDebug("Cache miss for {CacheKey}, caching int: {Value} as {Bytes} for {CacheTimeSpan}",
+                cacheKey,
+                item,
+                bytes,
+                expireIn);
+        }
+
     }
 }
