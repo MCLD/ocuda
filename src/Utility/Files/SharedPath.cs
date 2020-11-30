@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Ocuda.Utility.Files
 {
@@ -15,7 +16,8 @@ namespace Ocuda.Utility.Files
             }
             else
             {
-                path = Path.Combine(Directory.GetCurrentDirectory(), DefaultSharedDirectoryPath);
+                path = Path.Combine(PlatformServices.Default.Application.ApplicationBasePath,
+                    DefaultSharedDirectoryPath);
                 Directory.CreateDirectory(path);
             }
             return path;

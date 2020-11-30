@@ -39,7 +39,7 @@ namespace Ops.Web.WindowsAuth
             {
                 instanceName += ".";
             }
-            services.AddDistributedRedisCache(_ =>
+            services.AddStackExchangeRedisCache(_ =>
             {
                 _.Configuration = redisConfiguration;
                 _.InstanceName = instanceName;

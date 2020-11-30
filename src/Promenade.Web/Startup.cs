@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Localization.Routing;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Routing;
@@ -85,6 +87,8 @@ namespace Ocuda.Promenade.Web
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+            services.AddHealthChecks();
+
             // configure distributed cache
             if (_config[Configuration.PromenadeDistributedCache]?.ToUpperInvariant() == "REDIS")
             {
@@ -106,7 +110,7 @@ namespace Ocuda.Promenade.Web
                 _config[Configuration.OcudaRuntimeRedisCacheConfiguration]
                     = redisConfiguration;
                 _config[Configuration.OcudaRuntimeRedisCacheInstance] = instanceName;
-                services.AddDistributedRedisCache(_ =>
+                services.AddStackExchangeRedisCache(_ =>
                 {
                     _.Configuration = redisConfiguration;
                     _.InstanceName = instanceName;
@@ -154,6 +158,8 @@ namespace Ocuda.Promenade.Web
                                 .UseSqlServer(promCs)
                                 .AddInterceptors(new DbLoggingInterceptor()),
                                 poolSize);
+                        services.AddHealthChecks()
+                            .AddDbContextCheck<DataProvider.SqlServer.Promenade.Context>();
                     }
                     else
                     {
@@ -170,6 +176,8 @@ namespace Ocuda.Promenade.Web
                             DataProvider.SqlServer.Promenade.Context>(_ => _
                                 .UseSqlServer(promCs)
                                 .AddInterceptors(new DbLoggingInterceptor()));
+                        services.AddHealthChecks()
+                            .AddDbContextCheck<DataProvider.SqlServer.Promenade.Context>();
                     }
                     else
                     {
@@ -190,7 +198,8 @@ namespace Ocuda.Promenade.Web
 
             if (_isDevelopment)
             {
-                services.AddControllersWithViews()
+                services.AddControllersWithViews(_ =>
+                        _.ModelBinderProviders.RemoveType<DateTimeModelBinderProvider>())
                     .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                     .AddDataAnnotationsLocalization(_ =>
                     {
@@ -202,7 +211,8 @@ namespace Ocuda.Promenade.Web
             }
             else
             {
-                services.AddControllersWithViews()
+                services.AddControllersWithViews(_ =>
+                        _.ModelBinderProviders.RemoveType<DateTimeModelBinderProvider>())
                     .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                     .AddDataAnnotationsLocalization(_ =>
                     {
@@ -446,7 +456,11 @@ namespace Ocuda.Promenade.Web
 
             app.UseSession();
 
-            app.UseEndpoints(endpoints => endpoints.MapControllers());
+            app.UseEndpoints(_ =>
+            {
+                _.MapControllers();
+                _.MapHealthChecks("/health");
+            });
         }
     }
 }

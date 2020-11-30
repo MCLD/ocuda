@@ -1,19 +1,27 @@
 # Get build image
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-stage
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-stage
 WORKDIR /app
 
 # Copy source
 COPY . ./
 
-# Run tests if they are present
-RUN bash run-tests.bash test/Ops
+# Restore packages
+RUN dotnet restore
+
+# Build project and run tests
+RUN bash ./run-tests.bash
 
 # Publish
 RUN dotnet publish -c Release -o "/app/publish/ops" "src/Ops.Web"
 
 # Get runtime image
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 as publish-stage
+FROM mcr.microsoft.com/dotnet/aspnet:5.0 as publish-stage
 WORKDIR /app
+
+# Install curl for health monitoring
+RUN apt-get update \
+	&& apt-get install --no-install-recommends -y curl=7.64.0-4+deb10u1 \
+	&& rm -rf /var/lib/apt/lists/*
 
 # Bring in metadata via --build-arg
 ARG BRANCH=unknown
@@ -49,6 +57,9 @@ VOLUME ["/app/shared"]
 
 # Port 80 for http
 EXPOSE 80
+
+# Configure health check
+HEALTHCHECK CMD curl --fail http://localhost/health/ || exit
 
 # Set entrypoint
 ENTRYPOINT ["dotnet", "Ocuda.Ops.Web.dll"]
