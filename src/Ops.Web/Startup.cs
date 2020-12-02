@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -53,6 +55,8 @@ namespace Ocuda.Ops.Web
                     = new Microsoft.AspNetCore.Localization.RequestCulture(culture);
             });
 
+            services.AddHealthChecks();
+
             switch (_config[Configuration.OpsDistributedCache])
             {
                 case "Redis":
@@ -74,7 +78,7 @@ namespace Ocuda.Ops.Web
                     _config[Configuration.OcudaRuntimeRedisCacheConfiguration]
                         = redisConfiguration;
                     _config[Configuration.OcudaRuntimeRedisCacheInstance] = instanceName;
-                    services.AddDistributedRedisCache(_ =>
+                    services.AddStackExchangeRedisCache(_ =>
                     {
                         _.Configuration = redisConfiguration;
                         _.InstanceName = instanceName;
@@ -98,6 +102,9 @@ namespace Ocuda.Ops.Web
                         DataProvider.SqlServer.Ops.Context>(_ => _.UseSqlServer(opsCs));
                     services.AddDbContextPool<PromenadeContext,
                         DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
+                    services.AddHealthChecks()
+                        .AddDbContextCheck<OpsContext>()
+                        .AddDbContextCheck<PromenadeContext>();
                     break;
                 default:
                     throw new OcudaException("No Configuration.OpsDatabaseProvider configured.");
@@ -140,13 +147,15 @@ namespace Ocuda.Ops.Web
 
             if (_isDevelopment)
             {
-                services.AddControllersWithViews()
+                services.AddControllersWithViews(_ =>
+                        _.ModelBinderProviders.RemoveType<DateTimeModelBinderProvider>())
                     .AddSessionStateTempDataProvider()
                     .AddRazorRuntimeCompilation();
             }
             else
             {
-                services.AddControllersWithViews()
+                services.AddControllersWithViews(_ =>
+                        _.ModelBinderProviders.RemoveType<DateTimeModelBinderProvider>())
                     .AddSessionStateTempDataProvider();
             }
 
@@ -424,7 +433,11 @@ namespace Ocuda.Ops.Web
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => endpoints.MapControllers());
+            app.UseEndpoints(_ =>
+            {
+                _.MapControllers();
+                _.MapHealthChecks("/health");
+            });
         }
     }
 }

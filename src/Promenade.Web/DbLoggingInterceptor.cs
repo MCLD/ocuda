@@ -15,7 +15,7 @@ namespace Ocuda.Promenade.Web
             _logger = Log.Logger.ForContext(GetType());
         }
 
-        public override Task<InterceptionResult<DbDataReader>>
+        public override ValueTask<InterceptionResult<DbDataReader>>
             ReaderExecutingAsync(DbCommand command,
                 CommandEventData eventData,
                 InterceptionResult<DbDataReader> result,

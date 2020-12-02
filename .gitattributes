@@ -12,5 +12,9 @@ src/Ops.DataProvider.SqlServer.Promenade/Migrations/* linguist-generated=true
 src/Ops.Web/node_modules linguist-vendored
 src/Promenade.Web/node_modules linguist-vendored
 
+# fix script line endings
+*.sh eol=lf
+*.bash eol=lf
+
 # fix CHANGELOG.md to default to union merge
 CHANGELOG merge=union
