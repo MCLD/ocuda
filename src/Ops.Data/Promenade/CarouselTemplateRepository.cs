@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +14,7 @@ namespace Ocuda.Ops.Data.Promenade
 
         public CarouselTemplateRepository(
             ServiceFacade.Repository<PromenadeContext> repositoryFacade,
-            ILogger<CarouselTemplateRepository> logger) : base (repositoryFacade, logger)
+            ILogger<CarouselTemplateRepository> logger) : base(repositoryFacade, logger)
         {
         }
 

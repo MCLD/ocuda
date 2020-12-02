@@ -26,7 +26,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         public SiteSettingsController(ServiceFacades.Controller<SiteSettingsController> context,
             ISiteSettingPromService siteSettingPromService) : base(context)
         {
-            _siteSettingPromService = siteSettingPromService 
+            _siteSettingPromService = siteSettingPromService
                 ?? throw new ArgumentNullException(nameof(siteSettingPromService));
         }
 
@@ -63,7 +63,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 try
                 {
-                    if(model == null)
+                    if (model == null)
                     {
                         throw new OcudaException("No site setting provided to update.");
                     }

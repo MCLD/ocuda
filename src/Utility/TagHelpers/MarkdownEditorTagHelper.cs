@@ -1,7 +1,5 @@
-﻿using System.Text.Encodings.Web;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Ocuda.Utility.TagHelpers.Extensions;
 

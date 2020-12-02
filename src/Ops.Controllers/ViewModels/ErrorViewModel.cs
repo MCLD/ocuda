@@ -1,5 +1,3 @@
-using System;
-
 namespace Ocuda.Ops.Controllers.ViewModels
 {
     public class ErrorViewModel

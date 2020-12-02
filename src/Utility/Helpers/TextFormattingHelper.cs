@@ -6,7 +6,7 @@ namespace Ocuda.Utility.Helpers
     {
         public static string FormatPhone(string tenDigits)
         {
-            if(string.IsNullOrWhiteSpace(tenDigits) || tenDigits.Length < 10)
+            if (string.IsNullOrWhiteSpace(tenDigits) || tenDigits.Length < 10)
             {
                 return tenDigits;
             }

@@ -1,7 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Security.Claims;
-using System.Globalization;
-using System.Collections.Generic;
 
 namespace Ocuda.Ops.Service.Abstract
 {

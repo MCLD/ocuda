@@ -57,7 +57,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             {
                 try
                 {
-                    if(model == null)
+                    if (model == null)
                     {
                         throw new OcudaException("No site setting provided to update.");
                     }

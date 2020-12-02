@@ -1,6 +1,4 @@
-﻿using Ocuda.Ops.Models.Entities;
-
-namespace Ocuda.Ops.Service.Filters
+﻿namespace Ocuda.Ops.Service.Filters
 {
     public class BlogFilter : BaseFilter
     {

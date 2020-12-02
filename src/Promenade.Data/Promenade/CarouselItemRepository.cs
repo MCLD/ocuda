@@ -16,7 +16,7 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<CarouselItem> GetForLayoutIncludingChildrenByIdAsync(int itemId, 
+        public async Task<CarouselItem> GetForLayoutIncludingChildrenByIdAsync(int itemId,
             int layoutId)
         {
             return await _context.PageLayouts

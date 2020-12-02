@@ -97,7 +97,7 @@ namespace Ocuda.Ops.Service
                         var attributes = entry.GetAttributeSet().GetEnumerator();
                         while (attributes.MoveNext())
                         {
-                            var attribute = (LdapAttribute)attributes.Current;
+                            var attribute = attributes.Current;
                             switch (attribute.Name)
                             {
                                 case ADsAMAccountName:
@@ -137,7 +137,7 @@ namespace Ocuda.Ops.Service
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, 
+                    _logger.LogError(ex,
                         "Problem connecting to LDAP server {LDAPServer}: {Message}",
                         ldapServer,
                         ex.Message);

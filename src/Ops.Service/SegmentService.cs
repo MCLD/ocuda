@@ -110,7 +110,7 @@ namespace Ocuda.Ops.Service
             }
 
             await DeleteNoSaveAsync(id);
-           
+
             await _segmentRepository.SaveAsync();
         }
 

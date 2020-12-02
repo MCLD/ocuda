@@ -124,7 +124,7 @@ namespace Ocuda.Promenade.Service
             if (!forceReload)
             {
                 setting = await _cache.GetStringAsync(cacheKey);
-                if(setting?.Equals(NoValue, StringComparison.OrdinalIgnoreCase) == true)
+                if (setting?.Equals(NoValue, StringComparison.OrdinalIgnoreCase) == true)
                 {
                     return null;
                 }
