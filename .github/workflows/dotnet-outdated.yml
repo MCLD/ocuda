@@ -9,4 +9,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: k7hpn/dotnet-outdated-action@v1.1
+    - uses: k7hpn/dotnet-outdated-action@v1.2
