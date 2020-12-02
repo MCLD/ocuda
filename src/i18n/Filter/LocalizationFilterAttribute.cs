@@ -83,7 +83,7 @@ namespace Ocuda.i18n.Filter
                     }
                 }
                 context.HttpContext.Items[LocalizationItemKey.HrefLang] = cultureHrefLang;
-                context.HttpContext.Items[LocalizationItemKey.L10n] 
+                context.HttpContext.Items[LocalizationItemKey.L10n]
                     = cultureList.OrderBy(_ => _.Text);
             }
 

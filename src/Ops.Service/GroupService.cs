@@ -22,9 +22,9 @@ namespace Ocuda.Ops.Service
         public GroupService(ILogger<GroupService> logger,
             IHttpContextAccessor httpContextAccessor,
             IGroupRepository groupRepository
-            ,ILocationGroupRepository locationGroupRepository,
+            , ILocationGroupRepository locationGroupRepository,
             ILocationService locationService)
-            : base (logger, httpContextAccessor)
+            : base(logger, httpContextAccessor)
         {
             _groupRepository = groupRepository
                 ?? throw new ArgumentNullException(nameof(groupRepository));

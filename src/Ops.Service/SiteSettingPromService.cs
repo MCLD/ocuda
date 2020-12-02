@@ -13,7 +13,7 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service
 {
-    public class SiteSettingPromService 
+    public class SiteSettingPromService
         : BaseService<SiteSettingPromService>, ISiteSettingPromService
     {
         private readonly ISiteSettingPromRepository _siteSettingPromRepository;

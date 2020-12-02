@@ -8,7 +8,7 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data.Promenade
 {
-    public class SegmentTextRepository 
+    public class SegmentTextRepository
         : GenericRepository<PromenadeContext, SegmentText>, ISegmentTextRepository
     {
         public SegmentTextRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,

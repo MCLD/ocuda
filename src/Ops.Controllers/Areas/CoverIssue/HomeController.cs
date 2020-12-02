@@ -24,7 +24,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
         private readonly IPermissionGroupService _permissionGroupService;
 
         public static string Name { get { return "Home"; } }
-        
+
         private const string BookmarkletFilePath = "js/coverissue-bookmarklet.min.js";
 
         public HomeController(ServiceFacades.Controller<HomeController> context,

@@ -19,7 +19,7 @@ namespace Ocuda.Ops.Web.JobScheduling
                 ?? throw new ArgumentNullException(nameof(scheduleNotificationService));
         }
 
-        public async override Task ExecuteAsync(CancellationToken stoppingToken)
+        public override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             StartProcessing();
 

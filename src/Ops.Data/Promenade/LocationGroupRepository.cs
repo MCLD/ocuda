@@ -37,7 +37,7 @@ namespace Ocuda.Ops.Data.Promenade
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.GroupId == groupId)
-                .OrderBy(_=>_.DisplayOrder)
+                .OrderBy(_ => _.DisplayOrder)
                 .ToListAsync();
         }
 

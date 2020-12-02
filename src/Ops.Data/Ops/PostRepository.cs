@@ -48,7 +48,7 @@ namespace Ocuda.Ops.Data.Ops
             {
                 query = query.Where(_ => _.ShowOnHomePage == filter.IsShownOnHomePage.Value);
             }
-                
+
             if (filter.CategoryId.HasValue)
             {
                 query = query
