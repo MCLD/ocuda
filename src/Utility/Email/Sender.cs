@@ -134,7 +134,7 @@ namespace Ocuda.Utility.Email
                 message.Bcc.Add(MailboxAddress.Parse(details.BccEmailAddress));
             }
 
-            using var client = new SmtpClient()
+            using var client = new SmtpClient
             {
                 // accept any STARTTLS certificate
                 ServerCertificateValidationCallback = (_, __, ___, ____) => true,

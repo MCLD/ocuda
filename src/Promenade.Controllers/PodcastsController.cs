@@ -240,7 +240,7 @@ namespace Ocuda.Promenade.Controllers
                 Url.Action(nameof(Podcast), Name, new { stub = podcast.Stub }, scheme),
                 UriKind.Absolute);
 
-            var imageUrl = new UriBuilder()
+            var imageUrl = new UriBuilder
             {
                 Host = podcastUri.Host,
                 Path = _pathResolverService.GetPublicContentUrl(podcast.ImageUrl),
@@ -374,7 +374,7 @@ namespace Ocuda.Promenade.Controllers
                 item.ElementExtensions.Add("author", itunesNS.ToString(), podcast.Author);
 
                 item.Links.Add(SyndicationLink.CreateMediaEnclosureLink(
-                    new UriBuilder()
+                    new UriBuilder
                     {
                         Host = itemUri.Host,
                         Path = _pathResolverService.GetPublicContentUrl(podcastItem.MediaUrl),
@@ -401,7 +401,7 @@ namespace Ocuda.Promenade.Controllers
 
                 if (!string.IsNullOrWhiteSpace(podcastItem.ImageUrl))
                 {
-                    var itemImageUrl = new UriBuilder()
+                    var itemImageUrl = new UriBuilder
                     {
                         Host = itemUri.Host,
                         Path = _pathResolverService.GetPublicContentUrl(podcastItem.ImageUrl),
