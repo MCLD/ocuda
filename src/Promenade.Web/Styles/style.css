@@ -16,6 +16,23 @@ span.prom-fa-space {
     }
 }
 
+/* footer */
+footer {
+    background-color: #333;
+    height: 51px;
+}
+
+    footer a,
+    footer a:hover {
+        color: white;
+        padding: 0.75rem 0;
+        text-decoration: none;
+    }
+
+        footer a:hover .prom-footer-link-text {
+            text-decoration: underline;
+        }
+
 /* top nav bar */
 .prom-nav-top {
     background-color: #666;
@@ -96,23 +113,6 @@ span.prom-fa-space {
 .prom-content-container {
     background-color: #ccc;
 }
-
-/* footer */
-footer {
-    background-color: #333;
-    height: 51px;
-}
-
-    footer a,
-    footer a:hover {
-        color: white;
-        padding: 0.75rem 0;
-        text-decoration: none;
-    }
-
-        footer a:hover .prom-footer-link-text {
-            text-decoration: underline;
-        }
 
 .prom-leftnav-container {
     padding: 1rem 0.5rem;
