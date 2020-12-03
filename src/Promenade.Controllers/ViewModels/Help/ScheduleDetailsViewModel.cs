@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Ocuda.Promenade.Models.Entities;
@@ -31,8 +32,16 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Help
 
         public ScheduleRequest ScheduleRequest { get; set; }
 
+        public ICollection<SelectListItem> Languages
+        {
+            get
+            {
+                return _languages;
+            }
+        }
+
         //TODO use available site langauges for this
-        public SelectListItem[] Languages = new SelectListItem[]
+        private static readonly SelectListItem[] _languages = new[]
         {
             new SelectListItem
             {

@@ -103,7 +103,8 @@ footer {
     height: 51px;
 }
 
-    footer a, footer a:hover {
+    footer a,
+    footer a:hover {
         color: white;
         padding: 0.75rem 0;
         text-decoration: none;
@@ -316,7 +317,8 @@ footer {
     -webkit-appearance: none;
 }
 
-    .page-input::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+    .page-input::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
         margin: 0;
         -moz-appearance: textfield;
         -webkit-appearance: none;

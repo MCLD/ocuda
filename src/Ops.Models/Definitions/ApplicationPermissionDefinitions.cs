@@ -6,7 +6,7 @@ namespace Ocuda.Ops.Models.Definitions
 {
     public static class ApplicationPermissionDefinitions
     {
-        public static List<ApplicationPermissionDefinition> ApplicationPermissions
+        public static readonly List<ApplicationPermissionDefinition> ApplicationPermissions
             = new List<ApplicationPermissionDefinition>
         {
             new ApplicationPermissionDefinition
