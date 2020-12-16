@@ -1,9 +1,10 @@
-name: Build Docker images
+name: "Build - action"
 
 on: [push, pull_request]
 
 jobs:
   ops:
+    name: "Ops Docker"
     runs-on: ubuntu-latest
 
     steps:
@@ -26,6 +27,7 @@ jobs:
       run: ./docker-build.bash
 
   promenade:
+    name: "Promenade Docker"
     runs-on: ubuntu-latest
 
     steps:
