@@ -9,7 +9,7 @@ COPY . ./
 RUN dotnet restore
 
 # Build project and run tests
-RUN bash ./run-tests.bash
+RUN dotnet test
 
 # Publish
 RUN dotnet publish -c Release -o "/app/publish/ops" "src/Ops.Web"
