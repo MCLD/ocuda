@@ -170,17 +170,19 @@ if [[ -n $dockertag ]]; then
 fi
 
 # Construct complete Docker image and tag from provided values
-BLD_DOCKER_IMAGE=${BLD_DOCKER_IMAGE}:${BLD_DOCKER_TAG}
 BLD_DOCKER_LATEST=${BLD_DOCKER_IMAGE}:latest
+BLD_DOCKER_IMAGE=${BLD_DOCKER_IMAGE}:${BLD_DOCKER_TAG}
 BLD_FULL_DOCKER_IMAGE=${BLD_DOCKER_IMAGE}
 BLD_FULL_DOCKER_LATEST=${BLD_DOCKER_LATEST}
 
 if [[ -n ${CR_OWNER-} ]]; then
+  msg "${BLUE}===${NOFORMAT} Adding container registry owner $CR_OWNER"
   BLD_FULL_DOCKER_IMAGE=${CR_OWNER}/${BLD_FULL_DOCKER_IMAGE}
   BLD_FULL_DOCKER_LATEST=${CR_OWNER}/${BLD_FULL_DOCKER_LATEST}
 fi
 
 if [[ -n ${CR_HOST-} ]]; then
+  msg "${BLUE}===${NOFORMAT} Adding container registry host $CR_HOST"
   BLD_FULL_DOCKER_IMAGE=${CR_HOST}/${BLD_FULL_DOCKER_IMAGE}
   BLD_FULL_DOCKER_LATEST=${CR_HOST}/${BLD_FULL_DOCKER_LATEST}
 fi
