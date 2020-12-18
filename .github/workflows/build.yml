@@ -10,9 +10,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Run build.bash
+      - name: "Ops Docker"
         env:
           BLD_DOCKER_IMAGE: ops
+          CR_OWNER: ${{secrets.CR_OWNER}}
           CR_PASSWORD: ${{secrets.CR_PASSWORD}}
           CR_USER: ${{secrets.CR_USER}}
           GHCR_PAT: ${{secrets.GHCR_PAT}}
@@ -26,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Run build.bash
+      - name: "Promenade Docker"
         env:
           BLD_DOCKER_IMAGE: promenade
           CR_OWNER: ${{secrets.CR_OWNER}}
