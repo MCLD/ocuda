@@ -13,12 +13,11 @@ jobs:
       - name: Run build.bash
         env:
           BLD_DOCKER_IMAGE: ops
-          BLD_DOCKERFILE: Dockerfile_ops
           CR_PASSWORD: ${{secrets.CR_PASSWORD}}
           CR_USER: ${{secrets.CR_USER}}
           GHCR_PAT: ${{secrets.GHCR_PAT}}
           GHCR_USER: ${{secrets.GHCR_USER}}
-        run: ./build.bash
+        run: ./build.bash -df Dockerfile_ops
 
   promenade:
     name: "Promenade Docker"
@@ -30,9 +29,8 @@ jobs:
       - name: Run build.bash
         env:
           BLD_DOCKER_IMAGE: promenade
-          BLD_DOCKERFILE: Dockerfile_promenade
           CR_PASSWORD: ${{secrets.CR_PASSWORD}}
           CR_USER: ${{secrets.CR_USER}}
           GHCR_PAT: ${{secrets.GHCR_PAT}}
           GHCR_USER: ${{secrets.GHCR_USER}}
-        run: ./build.bash
+        run: ./build.bash -df Dockerfile_promenade
