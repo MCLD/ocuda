@@ -244,7 +244,7 @@ if [[ $BLD_PUSH = true ]]; then
     msg "${BLUE}===${NOFORMAT} Pushing image to ghcr.io/${ghcrowner}/${BLD_DOCKER_IMAGE}"
     docker tag "${BLD_FULL_DOCKER_IMAGE}" "ghcr.io/${ghcrowner}/${BLD_DOCKER_IMAGE}"
     echo "$GHCR_PAT" | \
-    docker login ghcr.io -u "$dockeruser" --password-stdin || exit $?
+    docker login ghcr.io -u "${ghcruser}" --password-stdin || exit $?
     docker push "ghcr.io/${ghcrowner}/${BLD_DOCKER_IMAGE}"
 
     if [[ $BLD_RELEASE = "true" ]]; then
@@ -284,7 +284,7 @@ else
   --build-arg IMAGE_CREATED="$BLD_VERSION_DATE" \
   --build-arg IMAGE_REVISION="$BLD_COMMIT" \
   --build-arg IMAGE_VERSION="$BLD_VERSION" \
-  --target build-stage .
+  --target build .
   msg "${GREEN}===${NOFORMAT} Docker image built"
   msg "${ORANGE}===${NOFORMAT} Not pushing Docker image: branch is not main, develop, or versioned release"
 fi

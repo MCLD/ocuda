@@ -1,5 +1,5 @@
 # Get build image
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-stage
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /app
 
 # Copy source
@@ -15,7 +15,7 @@ RUN dotnet test
 RUN dotnet publish -c Release -o "/app/publish/ops" "src/Ops.Web"
 
 # Get runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:5.0 as publish-stage
+FROM mcr.microsoft.com/dotnet/aspnet:5.0 as publish
 WORKDIR /app
 
 # Install curl for health monitoring
@@ -50,7 +50,7 @@ ENV org.opencontainers.image.created=$IMAGE_CREATED \
     org.opencontainers.image.version=$IMAGE_VERSION
 
 # Copy source
-COPY --from=build-stage "/app/publish/ops" .
+COPY --from=build "/app/publish/ops" .
 
 # Persist shared directory
 VOLUME ["/app/shared"]
