@@ -96,6 +96,19 @@
         <div class="col-xs-12 col-sm-4 mt-2">
             <div class="card">
                 <div class="card-header">
+                    <h3>@ScheduleController.Name</h3>
+                </div>
+                <div class="card-body mx-auto">
+                    <a asp-area="@ScheduleController.Area"
+                       asp-controller="@ScheduleController.Name"
+                       asp-action="@nameof(ScheduleController.Limits)"
+                       class="btn btn-outline-info mt-1">View @ScheduleController.Name</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-4 mt-2">
+            <div class="card">
+                <div class="card-header">
                     <h3>@SegmentsController.Name</h3>
                 </div>
                 <div class="card-body mx-auto">
