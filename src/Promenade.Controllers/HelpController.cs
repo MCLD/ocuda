@@ -199,20 +199,36 @@ namespace Ocuda.Promenade.Controllers
                 if (viewModel.RequestedTime.TimeOfDay
                     < firstAvailable.Date.AddHours(StartHour).TimeOfDay)
                 {
+                    DateTime earliestTime;
+                    if (firstAvailable.Date == viewModel.RequestedDate.Date)
+                    {
+                        earliestTime = firstAvailable;
+                    }
+                    else
+                    {
+                        earliestTime = firstAvailable.Date.AddHours(startHour);
+                    }
+
                     ModelState.AddModelError(nameof(viewModel.RequestedTime),
                         string.Format(CultureInfo.CurrentCulture,
                             ErrorEarliestTime,
                             firstAvailable.ToShortTimeString()));
                     viewModel.RequestedTime = firstAvailable.ToLocalTime();
+                            earliestTime.ToShortTimeString()));
+                    viewModel.RequestedTime = earliestTime.ToLocalTime();
                 }
                 else if (viewModel.RequestedTime.TimeOfDay
                     > firstAvailable.Date.AddHours(StartHour + AvailableHours).TimeOfDay)
                 {
+                    DateTime latestTime = firstAvailable.Date.AddHours(startHour + availableHours);
+
                     ModelState.AddModelError(nameof(viewModel.RequestedTime),
                         string.Format(CultureInfo.InvariantCulture,
                             ErrorTimeBefore,
                             firstAvailable.AddHours(AvailableHours).ToShortTimeString()));
                     viewModel.RequestedTime = firstAvailable.AddHours(AvailableHours).ToLocalTime();
+                            latestTime.ToShortTimeString()));
+                    viewModel.RequestedTime = latestTime.ToLocalTime();
                 }
             }
 
