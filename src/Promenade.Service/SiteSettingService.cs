@@ -112,6 +112,46 @@ namespace Ocuda.Promenade.Service
             return await GetSettingValueAsync(key, forceReload);
         }
 
+        public async Task<double> GetSettingDoubleAsync(string key)
+        {
+            return await GetSettingDoubleAsync(key, false);
+        }
+
+        public async Task<double> GetSettingDoubleAsync(string key, bool forceReload)
+        {
+            var settingValue = await GetSettingValueAsync(key, forceReload);
+
+            if (double.TryParse(settingValue, out double result))
+            {
+                return result;
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(settingValue))
+                {
+                    _logger.LogError("Invalid value for Promenade double setting {SiteSettingKey}: {SiteSettingValue}",
+                        key,
+                        settingValue);
+                }
+
+                var defaultSetting = GetDefaultSetting(key);
+                if (double.TryParse(defaultSetting.Value, out double defaultResult))
+                {
+                    return defaultResult;
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(defaultSetting.Value))
+                    {
+                        _logger.LogCritical("Invalid default value for Promenade double setting {SiteSettingKey}: {SiteSettingValue}",
+                            key,
+                            settingValue);
+                    }
+                    return default;
+                }
+            }
+        }
+
         private async Task<string> GetSettingValueAsync(string key, bool forceReload)
         {
             long start = Stopwatch.GetTimestamp();

@@ -299,6 +299,8 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.PodcastItemRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IPodcastRepository,
                 Data.Promenade.PodcastRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IScheduleRequestLimitRepository,
+                Data.Promenade.ScheduleRequestLimitRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IScheduleRequestRepository,
                 Data.Promenade.ScheduleRequestRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IScheduleRequestSubjectRepository,
