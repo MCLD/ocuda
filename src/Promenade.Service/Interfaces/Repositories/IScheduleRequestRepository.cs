@@ -9,9 +9,9 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
     public interface IScheduleRequestRepository : IGenericRepository<ScheduleRequest>
     {
         public Task<ScheduleRequest> AddSaveAsync(ScheduleRequest scheduleRequest);
-        Task<ICollection<DataWithCount<int>>> GetDayRequestCountsAsync(DateTime requesteTime,
+        Task<ICollection<DataWithCount<int>>> GetDayRequestCountsAsync(DateTime requestedTime,
             DateTime firstAvailable);
-        Task<ICollection<DataWithCount<DateTime>>> GetHourRequestCountsAsync(DateTime requesteTime, 
+        Task<ICollection<DataWithCount<DateTime>>> GetHourRequestCountsAsync(DateTime requestedTime,
             DateTime firstAvailable);
         Task<int> GetTimeSlotCountAsync(DateTime requestTime);
     }

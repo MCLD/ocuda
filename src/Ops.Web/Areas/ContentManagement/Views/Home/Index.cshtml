@@ -1,14 +1,14 @@
 ﻿@using Ocuda.Ops.Controllers.Areas.ContentManagement
 
-<h1>Intranet management</h1>
+<h1>Content management</h1>
 
-<div class="justify-content-center d-flex align-items-center flex-wrap">
-    <div class="col-xs-12 col-sm-4 mt-2">
+<div class="justify-content-center d-flex flex-wrap">
+    <div class="col-12 col-md-4 my-2">
         <div class="card">
-            <div class="card-header">
-                <h3>Sections</h3>
+            <div class="card-header lead font-weight-bold">
+                Sections
             </div>
-            <div class="card-body mx-auto">
+            <div class="card-body">
                 <a asp-area="@SectionController.Area"
                    asp-controller="@SectionController.Name"
                    asp-action="@nameof(SectionController.Index)"
@@ -17,12 +17,12 @@
         </div>
     </div>
 
-    <div class="col-xs-12 col-sm-4 mt-2">
+    <div class="col-12 col-md-4 my-2">
         <div class="card">
-            <div class="card-header">
-                <h3>Site configuration</h3>
+            <div class="card-header lead font-weight-bold">
+                Site configuration
             </div>
-            <div class="card-body mx-auto">
+            <div class="card-body">
                 <a asp-area="@ApplicationPermissionsController.Area"
                    asp-controller="@ApplicationPermissionsController.Name"
                    asp-action="@nameof(ApplicationPermissionsController.Index)"
@@ -38,12 +38,12 @@
             </div>
         </div>
     </div>
-    <div class="col-xs-12 col-sm-4 mt-2">
+    <div class="col-12 col-md-4 my-2">
         <div class="card">
-            <div class="card-header">
-                <h3>User Management</h3>
+            <div class="card-header lead font-weight-bold">
+                User Management
             </div>
-            <div class="card-body mx-auto">
+            <div class="card-body">
                 <a asp-area="@UsersController.Area"
                    asp-controller="@UsersController.Name"
                    asp-action="@nameof(UsersController.Metadata)"

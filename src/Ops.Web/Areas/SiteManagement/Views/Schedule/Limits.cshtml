@@ -13,9 +13,12 @@
             @foreach (var day in Model.AvailableDays)
             {
                 <li class="nav-item">
-                    <a asp-action="@nameof(ScheduleController.Limits)" asp-route-day="@day"
+                    <a asp-action="@nameof(ScheduleController.Limits)"
+                       asp-route-day="@day"
                        class="nav-link"
-                       ActiveBy routeKey="day" value="@(day == Model.AvailableDays.First() ? "," : null)@day">
+                       ActiveBy
+                       routeKey="day"
+                       value="@(day == Model.AvailableDays.First() ? "," : null)@day">
                         @day
                     </a>
                 </li>
@@ -32,16 +35,21 @@
         <div class="col-12">
             @foreach (var limit in Model.DayLimits)
             {
-                <div class="row form-group">
-                    <label class=" col-md-3 col-form-label text-md-right">@DateTime.Now.Date.AddHours(limit.Key).ToShortTimeString()</label>
+                <div class="row form-group my-3">
+                    <label class="col-md-2 col-form-label text-md-right">@DateTime.Now.Date.AddHours(limit.Key).ToShortTimeString()</label>
                     <div class="form-group-inner col-md-9">
-                        <input name="DayLimits.@limit.Key" value="@(ViewData.ModelState[$"DayLimits.{limit.Key}"]?.RawValue ?? limit.Value)" class="form-control" type="number" />
-                        <span class="validation-message text-danger" data-valmsg-for="DayLimits.@limit.Key" data-valmsg-replace="true"></span>
+                        <input name="DayLimits.@limit.Key"
+                               value="@(ViewData.ModelState[$"DayLimits.{limit.Key}"]?.RawValue ?? limit.Value)"
+                               class="form-control"
+                               type="number" />
+                        <span class="validation-message text-danger"
+                              data-valmsg-for="DayLimits.@limit.Key"
+                              data-valmsg-replace="true"></span>
                     </div>
                 </div>
             }
             <div class="row justify-content-end">
-                <div class="col-md-9">
+                <div class="col-md-10">
                     <button type="submit"
                             class="btn btn-success"
                             aria-label="Confirm"

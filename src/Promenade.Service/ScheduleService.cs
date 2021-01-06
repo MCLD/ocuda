@@ -133,7 +133,7 @@ namespace Ocuda.Promenade.Service
             var availableTimes = new List<DateTime>();
 
             int hoursCount = 0;
-            for (int hour = (int)startHour; hour < Math.Ceiling(startHour + availableHours); hour++)
+            for (var hour = (int)startHour; hour < Math.Ceiling(startHour + availableHours); hour++)
             {
                 hoursCount++;
 
@@ -165,13 +165,11 @@ namespace Ocuda.Promenade.Service
                 }
             }
 
-            availableTimes = availableTimes
+            return availableTimes
                 .OrderBy(_ => Math.Abs(_.Hour - requestTime.Hour))
                 .Take(SuggestedTimesTake)
                 .OrderBy(_ => _.Hour)
                 .ToList();
-
-            return availableTimes;
         }
 
         public async Task<ICollection<DateTime>> GetHourSuggestedTimesAsync(DateTime requestTime,
@@ -210,13 +208,11 @@ namespace Ocuda.Promenade.Service
                 }
             }
 
-            availableTimes = availableTimes
+            return availableTimes
                 .OrderBy(_ => (_.Date - requestTime.Date).Duration())
                 .Take(SuggestedTimesTake)
                 .OrderBy(_ => _.Date)
                 .ToList();
-
-            return availableTimes;
         }
     }
 }

@@ -32,18 +32,19 @@ namespace Ocuda.Promenade.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => !_.IsCancelled && _.RequestedTime.Date == requestTime.Date
-                    && _.RequestedTime.Hour == requestTime.Hour)
-                .CountAsync();
+                .CountAsync(_ => !_.IsCancelled
+                    && _.RequestedTime.Date == requestTime.Date
+                    && _.RequestedTime.Hour == requestTime.Hour);
         }
 
         public async Task<ICollection<DataWithCount<int>>> GetDayRequestCountsAsync(
-            DateTime requesteTime,
+            DateTime requestedTime,
             DateTime firstAvailable)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => !_.IsCancelled && _.RequestedTime.Date == requesteTime.Date
+                .Where(_ => !_.IsCancelled
+                    && _.RequestedTime.Date == requestedTime.Date
                     && (_.RequestedTime.Date > firstAvailable.Date
                         || _.RequestedTime.Hour >= firstAvailable.Hour))
                 .GroupBy(_ => _.RequestedTime.Hour)
@@ -56,16 +57,17 @@ namespace Ocuda.Promenade.Data.Promenade
         }
 
         public async Task<ICollection<DataWithCount<DateTime>>> GetHourRequestCountsAsync(
-            DateTime requesteTime,
+            DateTime requestedTime,
             DateTime firstAvailable)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => !_.IsCancelled && _.RequestedTime.Hour == requesteTime.Hour
+                .Where(_ => !_.IsCancelled
+                    && _.RequestedTime.Hour == requestedTime.Hour
                     && _.RequestedTime.Date >= firstAvailable.Date
-                    && _.RequestedTime.Date >= requesteTime.Date
+                    && _.RequestedTime.Date >= requestedTime.Date
                         .AddDays(-Enum.GetNames(typeof(DayOfWeek)).Length)
-                    && _.RequestedTime.Date <= requesteTime.Date
+                    && _.RequestedTime.Date <= requestedTime.Date
                         .AddDays(Enum.GetNames(typeof(DayOfWeek)).Length))
                 .GroupBy(_ => _.RequestedTime.Date)
                 .Select(_ => new DataWithCount<DateTime>

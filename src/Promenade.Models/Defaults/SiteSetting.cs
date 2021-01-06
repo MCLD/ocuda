@@ -134,7 +134,7 @@ namespace Ocuda.Promenade.Models.Defaults
             new SiteSetting
             {
                 Category = "Scheduling",
-                Description = "Number of hours scheduling is available, decimals allowed)",
+                Description = "Number of hours scheduling is available (decimals allowed)",
                 Id = Keys.SiteSetting.Scheduling.AvailableHours,
                 Name = "Available hours",
                 Type = SiteSettingType.Double,
@@ -143,7 +143,7 @@ namespace Ocuda.Promenade.Models.Defaults
             new SiteSetting
             {
                 Category = "Scheduling",
-                Description = "Minimum hours from the current time that can be scheduled, decimals allowed)",
+                Description = "Limit scheduling to this many hours after the current time (decimals allowed)",
                 Id = Keys.SiteSetting.Scheduling.BufferHours,
                 Name = "Buffer hours",
                 Type = SiteSettingType.Double,

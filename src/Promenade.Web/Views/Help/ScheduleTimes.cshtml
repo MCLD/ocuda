@@ -15,7 +15,8 @@ else
 
 <div class="row">
     <div class="col-12">
-        <form method="post" action="@Url.Action(nameof(HelpController.ScheduleTimes), HelpController.Name)"
+        <form method="post"
+              action="@Url.Action(nameof(HelpController.ScheduleTimes), HelpController.Name)"
               type="date"
               formgroup>
             <input type="hidden" name="ScheduleRequestTime" value="@Model.ScheduleRequestTime">
@@ -23,21 +24,32 @@ else
             <input asp-for="DisplayTime" formgroup readonly />
             @foreach (var suggestedTime in Model.SuggestedTimes)
             {
-                <div class="row justify-content-end">
+                <div class="row justify-content-end my-1">
                     <div class="col-md-9">
-                        <input type="radio" id="@suggestedTime.ToString()" name="@nameof(Model.SelectedTime)" value="@suggestedTime" />
-                        <label for="@suggestedTime.ToString()">@suggestedTime.ToString()</label>
+                        <input type="radio"
+                               id="@suggestedTime.ToString("s", System.Globalization.CultureInfo.InvariantCulture)"
+                               name="@nameof(Model.SelectedTime)"
+                               value="@suggestedTime.ToString("s", System.Globalization.CultureInfo.InvariantCulture)" />
+                        <label for="@suggestedTime.ToString("s", System.Globalization.CultureInfo.InvariantCulture)">
+                            @suggestedTime.ToLongDateString()
+                            at
+                            @suggestedTime.ToShortTimeString()
+                        </label>
                     </div>
                 </div>
             }
             <div>
-                <div class="row justify-content-end">
+                <div class="row justify-content-end my-1">
                     <div class="col-md-9">
-                        <input type="radio" id="requestedDateTime" name="@nameof(Model.SelectedTime)" value="" required />
+                        <input type="radio"
+                               id="requestedDateTime"
+                               name="@nameof(Model.SelectedTime)"
+                               value=""
+                               required />
                         <label for="requestedDateTime">Request a different time</label>
                     </div>
                 </div>
-                
+
                 <input asp-for="RequestedDate"
                        type="date"
                        formgroup />
