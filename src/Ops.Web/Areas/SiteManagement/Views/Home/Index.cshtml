@@ -3,15 +3,15 @@
 
 <h1>Site management</h1>
 
-<div class="justify-content-center d-flex align-items-center flex-wrap">
+<div class="justify-content-center d-flex flex-wrap">
     @if (Model.IsSiteManager)
     {
-        <div class="col-xs-12 col-sm-4 mt-2">
+        <div class="col-12 col-md-4 my-2">
             <div class="card">
-                <div class="card-header">
-                    <h3>@CarouselsController.Name</h3>
+                <div class="card-header lead font-weight-bold">
+                    @CarouselsController.Name
                 </div>
-                <div class="card-body mx-auto">
+                <div class="card-body">
                     <a asp-area="@CarouselsController.Area"
                        asp-controller="@CarouselsController.Name"
                        asp-action="@nameof(CarouselsController.Index)"
@@ -19,12 +19,12 @@
                 </div>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-4 mt-2">
+        <div class="col-12 col-md-4 my-2">
             <div class="card">
-                <div class="card-header">
-                    <h3>@EmediaController.Name</h3>
+                <div class="card-header lead font-weight-bold">
+                    @EmediaController.Name
                 </div>
-                <div class="card-body mx-auto">
+                <div class="card-body">
                     <a asp-area="@EmediaController.Area"
                        asp-controller="@EmediaController.Name"
                        asp-action="@nameof(EmediaController.Index)"
@@ -36,12 +36,12 @@
                 </div>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-4 mt-2">
+        <div class="col-12 col-md-4 my-2">
             <div class="card">
-                <div class="card-header">
-                    <h3>@LocationsController.Name</h3>
+                <div class="card-header lead font-weight-bold">
+                    @LocationsController.Name
                 </div>
-                <div class="card-body mx-auto">
+                <div class="card-body">
                     <a asp-area="@LocationsController.Area"
                        asp-controller="@LocationsController.Name"
                        asp-action="@nameof(LocationsController.Index)"
@@ -49,24 +49,24 @@
                     <a asp-area="@GroupsController.Area"
                        asp-controller="@GroupsController.Name"
                        asp-action="@nameof(GroupsController.Index)"
-                       class="btn btn-outline-info mt-1 mx-auto">Location @GroupsController.Name</a>
+                       class="btn btn-outline-info mt-1 ">@GroupsController.Name</a>
 
                     <a asp-area="@FeaturesController.Area"
                        asp-controller="@FeaturesController.Name"
                        asp-action="@nameof(FeaturesController.Index)"
-                       class="btn btn-outline-info mt-1">Location @FeaturesController.Name</a>
+                       class="btn btn-outline-info mt-1">@FeaturesController.Name</a>
                 </div>
             </div>
         </div>
     }
     @if (Model.IsSiteManager || Model.HasPagePermissions)
     {
-        <div class="col-xs-12 col-sm-4 mt-2">
+        <div class="col-12 col-md-4 my-2">
             <div class="card">
-                <div class="card-header">
-                    <h3>@PagesController.Name</h3>
+                <div class="card-header lead font-weight-bold">
+                    @PagesController.Name
                 </div>
-                <div class="card-body mx-auto">
+                <div class="card-body">
                     <a asp-area="@PagesController.Area"
                        asp-controller="@PagesController.Name"
                        asp-action="@nameof(PagesController.Index)"
@@ -77,12 +77,12 @@
     }
     @if (Model.IsSiteManager || Model.HasPodcastPermissions)
     {
-        <div class="col-xs-12 col-sm-4 mt-2">
+        <div class="col-12 col-md-4 my-2">
             <div class="card">
-                <div class="card-header">
-                    <h3>@PodcastsController.Name</h3>
+                <div class="card-header lead font-weight-bold">
+                    @PodcastsController.Name
                 </div>
-                <div class="card-body mx-auto">
+                <div class="card-body">
                     <a asp-area="@PodcastsController.Area"
                        asp-controller="@PodcastsController.Name"
                        asp-action="@nameof(PodcastsController.Index)"
@@ -93,12 +93,25 @@
     }
     @if (Model.IsSiteManager)
     {
-        <div class="col-xs-12 col-sm-4 mt-2">
+        <div class="col-12 col-md-4 my-2">
             <div class="card">
-                <div class="card-header">
-                    <h3>@SegmentsController.Name</h3>
+                <div class="card-header lead font-weight-bold">
+                    @ScheduleController.Name
                 </div>
-                <div class="card-body mx-auto">
+                <div class="card-body">
+                    <a asp-area="@ScheduleController.Area"
+                       asp-controller="@ScheduleController.Name"
+                       asp-action="@nameof(ScheduleController.Limits)"
+                       class="btn btn-outline-info mt-1">View @ScheduleController.Name</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4 my-2">
+            <div class="card">
+                <div class="card-header lead font-weight-bold">
+                    @SegmentsController.Name
+                </div>
+                <div class="card-body">
                     <a asp-area="@SegmentsController.Area"
                        asp-controller="@SegmentsController.Name"
                        asp-action="@nameof(SegmentsController.Index)"
@@ -106,12 +119,12 @@
                 </div>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-4 mt-2">
+        <div class="col-12 col-md-4 my-2">
             <div class="card">
-                <div class="card-header">
-                    <h3>Site Settings</h3>
+                <div class="card-header lead font-weight-bold">
+                    Site Settings
                 </div>
-                <div class="card-body mx-auto">
+                <div class="card-body">
                     <a asp-area="@ExternalResourcesController.Area"
                        asp-controller="@ExternalResourcesController.Name"
                        asp-action="@nameof(ExternalResourcesController.Index)"
@@ -123,12 +136,12 @@
                 </div>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-4 mt-2">
+        <div class="col-12 col-md-4 my-2">
             <div class="card">
-                <div class="card-header">
-                    <h3>Social Cards</h3>
+                <div class="card-header lead font-weight-bold">
+                    Social Cards
                 </div>
-                <div class="card-body mx-auto">
+                <div class="card-body">
                     <a asp-area="@SocialCardsController.Area"
                        asp-controller="@SocialCardsController.Name"
                        asp-action="@nameof(SocialCardsController.Index)"

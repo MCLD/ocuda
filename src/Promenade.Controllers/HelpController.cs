@@ -12,6 +12,7 @@ using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.ViewModels.Help;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Helpers;
 
@@ -25,6 +26,8 @@ namespace Ocuda.Promenade.Controllers
 
         private const string RequiredEmail = "The Email field is required.";
         private const string RequiredNotes = "Please help us out by telling us a little about your request.";
+        private const string RequiredDate = "The Requested date field is required.";
+        private const string RequiredTime = "The Requested time field is required.";
 
         private const string ErrorAvailableDays = "This service is only available on the following days: {0}";
         private const string ErrorDateOnAfter = "You must request a date on or after: {0}";
@@ -46,20 +49,13 @@ namespace Ocuda.Promenade.Controllers
             + "."
             + nameof(ScheduleRequest.Notes);
 
-        private const double StartHour = 9;
-        private const double AvailableHours = 7.5;
-        private const double BufferHours = 4;
-        private readonly IList<DayOfWeek> BlockedDays = new List<DayOfWeek>
-        {
-            DayOfWeek.Sunday,
-            DayOfWeek.Saturday
-        };
-
         private static readonly TimeSpan QuantizeSpan = TimeSpan.FromMinutes(30);
 
         private readonly LocationService _locationService;
         private readonly ScheduleService _scheduleService;
         private readonly SegmentService _segmentService;
+
+        public static string Name { get { return "Help"; } }
 
         public HelpController(ServiceFacades.Controller<HelpController> context,
             LocationService locationService,
@@ -75,31 +71,71 @@ namespace Ocuda.Promenade.Controllers
                 ?? throw new ArgumentNullException(nameof(segmentService));
         }
 
-        private DateTime FirstAvailable(DateTime date)
+        private async Task<List<DayOfWeek>> GetBlockedDays()
         {
+            var unavailableDays = (await _siteSettingService.GetSettingStringAsync(
+                Models.Keys.SiteSetting.Scheduling.UnavailableDays))
+                ?.Split(',')
+                .Select(_ => _?.Trim())
+                .Distinct();
+
+            var blockedDays = new List<DayOfWeek>();
+
+            foreach (var day in unavailableDays)
+            {
+                if (Enum.TryParse<DayOfWeek>(day, true, out DayOfWeek result))
+                {
+                    blockedDays.Add(result);
+                }
+                else
+                {
+                    _logger.LogWarning("Invalid blocked day for scheduling: {day}", day);
+                }
+            }
+
+            return blockedDays;
+        }
+
+        private async Task<DateTime> FirstAvailable(DateTime date)
+        {
+            var blockedDays = await GetBlockedDays();
+
+            if (blockedDays.Count >= Enum.GetNames(typeof(DayOfWeek)).Length)
+            {
+                _logger.LogCritical("No available days configured for scheduling.");
+                throw new OcudaException("No available times for scheduling could be found");
+            }
+
             var firstAvailable = date.RoundUp(QuantizeSpan);
 
-            if (firstAvailable.TimeOfDay < firstAvailable.Date.AddHours(StartHour).TimeOfDay)
+            var startHour = await _siteSettingService.GetSettingDoubleAsync(
+                Models.Keys.SiteSetting.Scheduling.StartHour);
+            var availableHours = await _siteSettingService.GetSettingDoubleAsync(
+                Models.Keys.SiteSetting.Scheduling.AvailableHours);
+            var bufferHours = await _siteSettingService.GetSettingDoubleAsync(
+                Models.Keys.SiteSetting.Scheduling.BufferHours);
+
+            if (firstAvailable.TimeOfDay < firstAvailable.Date.AddHours(startHour).TimeOfDay)
             {
-                firstAvailable = firstAvailable.Date.AddHours(StartHour);
+                firstAvailable = firstAvailable.Date.AddHours(startHour);
             }
             else
             {
-                firstAvailable = firstAvailable.AddHours(BufferHours);
+                firstAvailable = firstAvailable.AddHours(bufferHours);
             }
 
             if (firstAvailable.TimeOfDay
-                > firstAvailable.Date.AddHours(StartHour + AvailableHours).TimeOfDay)
+                > firstAvailable.Date.AddHours(startHour + availableHours).TimeOfDay)
             {
-                firstAvailable = firstAvailable.Date.AddDays(1).AddHours(StartHour);
+                firstAvailable = firstAvailable.Date.AddDays(1).AddHours(startHour);
             }
 
-            return firstAvailable.DayOfWeek switch
+            while (blockedDays.Contains(firstAvailable.DayOfWeek))
             {
-                DayOfWeek.Saturday => firstAvailable.Date.AddDays(2).AddHours(StartHour),
-                DayOfWeek.Sunday => firstAvailable.Date.AddDays(1).AddHours(StartHour),
-                _ => firstAvailable
-            };
+                firstAvailable = firstAvailable.Date.AddDays(1).AddHours(startHour);
+            }
+
+            return firstAvailable;
         }
 
         [HttpGet("[action]")]
@@ -107,6 +143,22 @@ namespace Ocuda.Promenade.Controllers
         public async Task<IActionResult> Schedule()
         {
             return await DisplayScheduleFormAsync(null, null);
+        }
+
+        [HttpGet("[action]")]
+        [ResponseCache(NoStore = true)]
+        public async Task<IActionResult> ScheduleTimes()
+        {
+            var scheduleRequestSubjectId = TempData.Peek(TempDataSubjectId) as int?;
+            var requestedTime = TempData.Peek(TempDataDateTime) as DateTime?;
+
+            if (scheduleRequestSubjectId == null || requestedTime == null)
+            {
+                _logger.LogError("TempData items missing in ScheduleTime");
+                return await DisplayScheduleFormAsync(null, SessionTimeout);
+            }
+
+            return await DisplayScheduleTimeFormAsync(null, (DateTime)requestedTime);
         }
 
         [HttpGet("[action]")]
@@ -135,14 +187,24 @@ namespace Ocuda.Promenade.Controllers
                 return RedirectToAction(nameof(Schedule));
             }
 
-            var firstAvailable = FirstAvailable(DateTime.Now);
+            DateTime firstAvailable;
+            try
+            {
+                firstAvailable = await FirstAvailable(DateTime.Now);
+            }
+            catch (OcudaException)
+            {
+                return RedirectToAction(nameof(Schedule));
+            }
 
-            if (BlockedDays.Contains(viewModel.RequestedDate.DayOfWeek))
+            var blockedDays = await GetBlockedDays();
+
+            if (blockedDays.Contains(viewModel.RequestedDate.DayOfWeek))
             {
                 ModelState.AddModelError(nameof(viewModel.RequestedDate),
                     string.Format(CultureInfo.InvariantCulture,
                         ErrorAvailableDays,
-                        new DayOfWeekHelper().ListDays(BlockedDays)));
+                        new DayOfWeekHelper().ListDays(blockedDays)));
             }
 
             // check for all-location closure on that day
@@ -183,7 +245,7 @@ namespace Ocuda.Promenade.Controllers
                 viewModel.RequestedDate = firstAvailable.Date.AddDays(7);
             }
 
-            // if the selected date is today then ensure it's before the first available time
+            // if the selected date is today then ensure it's not before the first available time
             if (viewModel.RequestedDate.Date == DateTime.Now.Date
                 && viewModel.RequestedTime.TimeOfDay < firstAvailable.TimeOfDay)
             {
@@ -195,40 +257,238 @@ namespace Ocuda.Promenade.Controllers
             }
             else
             {
+                var startHour = await _siteSettingService.GetSettingDoubleAsync(
+                    Models.Keys.SiteSetting.Scheduling.StartHour);
+                var availableHours = await _siteSettingService.GetSettingDoubleAsync(
+                    Models.Keys.SiteSetting.Scheduling.AvailableHours);
+
                 // if the selected date is not today, ensure times are within the allowed range
                 if (viewModel.RequestedTime.TimeOfDay
-                    < firstAvailable.Date.AddHours(StartHour).TimeOfDay)
+                    < firstAvailable.Date.AddHours(startHour).TimeOfDay)
                 {
+                    DateTime earliestTime;
+                    if (firstAvailable.Date == viewModel.RequestedDate.Date)
+                    {
+                        earliestTime = firstAvailable;
+                    }
+                    else
+                    {
+                        earliestTime = firstAvailable.Date.AddHours(startHour);
+                    }
+
                     ModelState.AddModelError(nameof(viewModel.RequestedTime),
                         string.Format(CultureInfo.CurrentCulture,
                             ErrorEarliestTime,
-                            firstAvailable.ToShortTimeString()));
-                    viewModel.RequestedTime = firstAvailable.ToLocalTime();
+                            earliestTime.ToShortTimeString()));
+                    viewModel.RequestedTime = earliestTime.ToLocalTime();
                 }
                 else if (viewModel.RequestedTime.TimeOfDay
-                    > firstAvailable.Date.AddHours(StartHour + AvailableHours).TimeOfDay)
+                    > firstAvailable.Date.AddHours(startHour + availableHours).TimeOfDay)
                 {
+                    DateTime latestTime = firstAvailable.Date.AddHours(startHour + availableHours);
+
                     ModelState.AddModelError(nameof(viewModel.RequestedTime),
                         string.Format(CultureInfo.InvariantCulture,
                             ErrorTimeBefore,
-                            firstAvailable.AddHours(AvailableHours).ToShortTimeString()));
-                    viewModel.RequestedTime = firstAvailable.AddHours(AvailableHours).ToLocalTime();
+                            latestTime.ToShortTimeString()));
+                    viewModel.RequestedTime = latestTime.ToLocalTime();
                 }
             }
 
             if (ModelState.IsValid)
             {
+                var requestDateTime = viewModel.RequestedDate + viewModel.RequestedTime.TimeOfDay;
+
                 // store stuff in tempdata
-                TempData[TempDataDateTime] = viewModel.RequestedDate
-                    + viewModel.RequestedTime.TimeOfDay;
+                TempData[TempDataDateTime] = requestDateTime;
                 TempData[TempDataSubjectId] = viewModel.SubjectId;
 
-                // redirect to second form
-                return RedirectToAction(nameof(ScheduleDetails));
+                if (await _scheduleService.IsRequestOverLimitAsync(requestDateTime))
+                {
+                    // redirect to time form if timeslot is full
+                    return RedirectToAction(nameof(ScheduleTimes));
+                }
+                else
+                {
+                    // redirect to second form
+                    return RedirectToAction(nameof(ScheduleDetails));
+                }
             }
             else
             {
                 return await DisplayScheduleFormAsync(viewModel, null);
+            }
+        }
+
+        [HttpPost(nameof(ScheduleTimes))]
+        public async Task<IActionResult> SubmitScheduleTimes(ScheduleTimesViewModel viewModel)
+        {
+            if (viewModel == null)
+            {
+                return RedirectToAction(nameof(ScheduleTimes));
+            }
+
+            // set request date and time from a suggested option
+            if (viewModel.SelectedTime.HasValue)
+            {
+                viewModel.RequestedDate = viewModel.SelectedTime.Value.Date;
+                viewModel.RequestedTime = viewModel.SelectedTime.Value;
+            }
+
+            // re-display the time form if no valid request time
+            if (!viewModel.RequestedDate.HasValue || !viewModel.RequestedTime.HasValue)
+            {
+                if (!viewModel.RequestedDate.HasValue)
+                {
+                    ModelState.AddModelError(nameof(viewModel.RequestedDate), RequiredDate);
+                }
+                if (!viewModel.RequestedTime.HasValue)
+                {
+                    ModelState.AddModelError(nameof(viewModel.RequestedDate), RequiredTime);
+                }
+
+                var requestedTime = TempData.Peek(TempDataDateTime) as DateTime?;
+
+                if (requestedTime == null)
+                {
+                    _logger.LogError("TempData items missing in ScheduleTime");
+                    return await DisplayScheduleFormAsync(null, SessionTimeout);
+                }
+
+                return await DisplayScheduleTimeFormAsync(null, (DateTime)requestedTime);
+            }
+
+            DateTime firstAvailable;
+            try
+            {
+                firstAvailable = await FirstAvailable(DateTime.Now);
+            }
+            catch (OcudaException)
+            {
+                return RedirectToAction(nameof(Schedule));
+            }
+
+            var blockedDays = await GetBlockedDays();
+
+            if (blockedDays.Contains(viewModel.RequestedDate.Value.DayOfWeek))
+            {
+                ModelState.AddModelError(nameof(viewModel.RequestedDate),
+                    string.Format(CultureInfo.InvariantCulture,
+                        ErrorAvailableDays,
+                        new DayOfWeekHelper().ListDays(blockedDays)));
+            }
+
+            // check for all-location closure on that day
+            var closureReason = await _locationService
+                .GetClosureInformationAsync(viewModel.RequestedDate.Value);
+
+            if (!string.IsNullOrEmpty(closureReason))
+            {
+                ModelState.AddModelError(nameof(viewModel.RequestedDate),
+                    string.Format(CultureInfo.InvariantCulture,
+                        ErrorDateClosed,
+                        closureReason));
+            }
+
+            // verify the requested date is not before the first available or 7 days after
+            if (viewModel.RequestedDate.Value.Date < firstAvailable.Date)
+            {
+                if (ModelState.ContainsKey(nameof(viewModel.RequestedDate)))
+                {
+                    ModelState.Remove(nameof(viewModel.RequestedDate));
+                }
+                ModelState.AddModelError(nameof(viewModel.RequestedDate),
+                    string.Format(CultureInfo.InvariantCulture,
+                        ErrorDateOnAfter,
+                        firstAvailable.ToShortDateString()));
+                viewModel.RequestedDate = firstAvailable.Date;
+            }
+            else if (viewModel.RequestedDate.Value.Date > firstAvailable.Date.AddDays(7))
+            {
+                if (ModelState.ContainsKey(nameof(viewModel.RequestedDate)))
+                {
+                    ModelState.Remove(nameof(viewModel.RequestedDate));
+                }
+                ModelState.AddModelError(nameof(viewModel.RequestedDate),
+                    string.Format(CultureInfo.InvariantCulture,
+                        ErrorFurthestDate,
+                        firstAvailable.AddDays(7).ToShortDateString()));
+                viewModel.RequestedDate = firstAvailable.Date.AddDays(7);
+            }
+
+            // if the selected date is today then ensure it's not before the first available time
+            if (viewModel.RequestedDate.Value.Date == DateTime.Now.Date
+                && viewModel.RequestedTime.Value.TimeOfDay < firstAvailable.TimeOfDay)
+            {
+                ModelState.AddModelError(nameof(viewModel.RequestedTime),
+                    string.Format(CultureInfo.CurrentCulture,
+                        ErrorEarliestTime,
+                        firstAvailable.ToShortTimeString()));
+                viewModel.RequestedTime = firstAvailable.ToLocalTime();
+            }
+            else
+            {
+                var startHour = await _siteSettingService.GetSettingDoubleAsync(
+                    Models.Keys.SiteSetting.Scheduling.StartHour);
+                var availableHours = await _siteSettingService.GetSettingDoubleAsync(
+                    Models.Keys.SiteSetting.Scheduling.AvailableHours);
+
+                // if the selected date is not today, ensure times are within the allowed range
+                if (viewModel.RequestedTime.Value.TimeOfDay
+                    < firstAvailable.Date.AddHours(startHour).TimeOfDay)
+                {
+                    DateTime earliestTime;
+                    if (firstAvailable.Date == viewModel.RequestedDate.Value.Date)
+                    {
+                        earliestTime = firstAvailable;
+                    }
+                    else
+                    {
+                        earliestTime = firstAvailable.Date.AddHours(startHour);
+                    }
+
+                    ModelState.AddModelError(nameof(viewModel.RequestedTime),
+                        string.Format(CultureInfo.CurrentCulture,
+                            ErrorEarliestTime,
+                            earliestTime.ToShortTimeString()));
+                    viewModel.RequestedTime = earliestTime.ToLocalTime();
+                }
+                else if (viewModel.RequestedTime.Value.TimeOfDay
+                    > firstAvailable.Date.AddHours(startHour + availableHours).TimeOfDay)
+                {
+                    DateTime latestTime = firstAvailable.Date.AddHours(startHour + availableHours);
+
+                    ModelState.AddModelError(nameof(viewModel.RequestedTime),
+                        string.Format(CultureInfo.InvariantCulture,
+                            ErrorTimeBefore,
+                            latestTime.ToShortTimeString()));
+                    viewModel.RequestedTime = latestTime.ToLocalTime();
+                }
+            }
+
+            var requestDateTime = viewModel.RequestedDate.Value.Date
+                    + viewModel.RequestedTime.Value.TimeOfDay;
+
+            if (ModelState.IsValid)
+            {
+                // store stuff in tempdata
+                TempData[TempDataDateTime] = requestDateTime;
+
+                if (await _scheduleService.IsRequestOverLimitAsync(requestDateTime))
+                {
+                    // redirect to time form if timeslot is full
+                    return RedirectToAction(nameof(ScheduleTimes));
+                }
+                else
+                {
+                    // redirect to second form
+                    return RedirectToAction(nameof(ScheduleDetails));
+                }
+            }
+            else
+            {
+                return await DisplayScheduleTimeFormAsync(viewModel,
+                    viewModel.ScheduleRequestTime); ;
             }
         }
 
@@ -389,19 +649,97 @@ namespace Ocuda.Promenade.Controllers
                 Value = _.Id.ToString(CultureInfo.InvariantCulture)
             });
 
-            var firstAvailable = FirstAvailable(DateTime.Now);
-
-            if (scheduleViewModel.RequestedDate == DateTime.MinValue)
+            try
             {
-                scheduleViewModel.RequestedDate = firstAvailable.Date;
+                var firstAvailable = await FirstAvailable(DateTime.Now);
+
+                if (scheduleViewModel.RequestedDate == DateTime.MinValue)
+                {
+                    scheduleViewModel.RequestedDate = firstAvailable.Date;
+                }
+
+                if (scheduleViewModel.RequestedTime == DateTime.MinValue)
+                {
+                    scheduleViewModel.RequestedTime = firstAvailable.ToLocalTime();
+                }
             }
-
-            if (scheduleViewModel.RequestedTime == DateTime.MinValue)
+            catch (OcudaException ex)
             {
-                scheduleViewModel.RequestedTime = firstAvailable.ToLocalTime();
+                scheduleViewModel.WarningText = ex.Message;
             }
 
             return View("Schedule", scheduleViewModel);
+        }
+
+        private async Task<IActionResult>
+            DisplayScheduleTimeFormAsync(ScheduleTimesViewModel viewModel,
+            DateTime requestedTime)
+        {
+            var enabled = await _siteSettingService
+                .GetSettingBoolAsync(Models.Keys.SiteSetting.Scheduling.Enable);
+
+            if (!enabled)
+            {
+                RedirectToAction(nameof(Schedule));
+            }
+
+            var subjects = await _scheduleService.GetSubjectsAsync(false);
+
+            if (!subjects.Any())
+            {
+                RedirectToAction(nameof(Schedule));
+            }
+
+            var scheduleViewModel = viewModel ?? new ScheduleTimesViewModel()
+            {
+                RequestedDate = requestedTime,
+                RequestedTime = requestedTime
+            };
+
+            scheduleViewModel.ScheduleRequestTime = requestedTime;
+
+            var startHour = await _siteSettingService.GetSettingDoubleAsync(
+                Models.Keys.SiteSetting.Scheduling.StartHour);
+            var availableHours = await _siteSettingService.GetSettingDoubleAsync(
+                Models.Keys.SiteSetting.Scheduling.AvailableHours);
+
+            var firstAvailable = await FirstAvailable(DateTime.Now);
+            var blockedDays = await GetBlockedDays();
+
+            var daySuggestedTimes = await _scheduleService.GetDaySuggestedTimesAsync(
+                requestedTime,
+                startHour,
+                availableHours,
+                firstAvailable);
+
+            var hourSuggestedTimes = await _scheduleService.GetHourSuggestedTimesAsync(
+                requestedTime,
+                firstAvailable,
+                blockedDays);
+
+            scheduleViewModel.SuggestedTimes = daySuggestedTimes
+                .Concat(hourSuggestedTimes)
+                .ToList();
+
+            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
+            int segmentId = await _siteSettingService
+                .GetSettingIntAsync(Models.Keys.SiteSetting.Scheduling.OverLimitSegment,
+                    forceReload);
+
+            if (segmentId != default)
+            {
+                scheduleViewModel.SegmentText = await _segmentService
+                    .GetSegmentTextBySegmentIdAsync(segmentId, forceReload);
+
+                if (!string.IsNullOrEmpty(scheduleViewModel.SegmentText?.Text))
+                {
+                    scheduleViewModel.SegmentText.Text
+                        = CommonMarkConverter.Convert(scheduleViewModel.SegmentText.Text);
+                }
+            }
+
+            return View(nameof(ScheduleTimes), scheduleViewModel);
         }
 
         private async Task<IActionResult>

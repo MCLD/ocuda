@@ -110,6 +110,39 @@ namespace Ocuda.Ops.Service
                     siteSetting.Value);
                 throw new OcudaException($"{siteSetting.Name} requires a value of type {siteSetting.Type}.");
             }
+            else if (siteSetting.Type == SiteSettingType.Double
+                && !double.TryParse(siteSetting.Value, out _))
+            {
+                _logger.LogError("Invalid format for double site setting key {SiteSettingKey}: {SiteSettingValue}",
+                    siteSetting.Id,
+                    siteSetting.Value);
+                throw new OcudaException($"{siteSetting.Name} requires a value of type {siteSetting.Type}.");
+            }
+        }
+
+        public async Task<string> GetSettingStringAsync(string key)
+        {
+            return await GetSettingValueAsync(key);
+        }
+
+        public async Task<double> GetSettingDoubleAsync(string key)
+        {
+            var settingValue = await GetSettingValueAsync(key);
+
+            if (double.TryParse(settingValue, out double result))
+            {
+                return result;
+            }
+            else
+            {
+                throw new OcudaException($"Invalid value for double setting {key}: {settingValue}");
+            }
+        }
+
+        private async Task<string> GetSettingValueAsync(string key)
+        {
+            var siteSetting = await _siteSettingPromRepository.FindAsync(key);
+            return siteSetting.Value;
         }
     }
 }

@@ -1,0 +1,75 @@
+﻿@model Ocuda.Promenade.Controllers.ViewModels.Help.ScheduleTimesViewModel
+
+@if (Model?.SegmentText != null)
+{
+    if (!string.IsNullOrEmpty(Model.SegmentText.Header))
+    {
+        <h1>@Model.SegmentText.Header</h1>
+    }
+    @Html.Raw(Model.SegmentText.Text)
+}
+else
+{
+    <h1>Schedule your time</h1>
+}
+
+<div class="row">
+    <div class="col-12">
+        <form method="post"
+              action="@Url.Action(nameof(HelpController.ScheduleTimes), HelpController.Name)"
+              type="date"
+              formgroup>
+            <input type="hidden" name="ScheduleRequestTime" value="@Model.ScheduleRequestTime">
+
+            <input asp-for="DisplayTime" formgroup readonly />
+            @foreach (var suggestedTime in Model.SuggestedTimes)
+            {
+                <div class="row justify-content-end my-1">
+                    <div class="col-md-9">
+                        <input type="radio"
+                               id="@suggestedTime.ToString("s", System.Globalization.CultureInfo.InvariantCulture)"
+                               name="@nameof(Model.SelectedTime)"
+                               value="@suggestedTime.ToString("s", System.Globalization.CultureInfo.InvariantCulture)" />
+                        <label for="@suggestedTime.ToString("s", System.Globalization.CultureInfo.InvariantCulture)">
+                            @suggestedTime.ToLongDateString()
+                            at
+                            @suggestedTime.ToShortTimeString()
+                        </label>
+                    </div>
+                </div>
+            }
+            <div>
+                <div class="row justify-content-end my-1">
+                    <div class="col-md-9">
+                        <input type="radio"
+                               id="requestedDateTime"
+                               name="@nameof(Model.SelectedTime)"
+                               value=""
+                               required />
+                        <label for="requestedDateTime">Request a different time</label>
+                    </div>
+                </div>
+
+                <input asp-for="RequestedDate"
+                       type="date"
+                       formgroup />
+                <input asp-for="RequestedTime"
+                       type="time"
+                       step="1800"
+                       formgroup />
+            </div>
+            <div>
+                <a href="@Url.Action(nameof(HelpController.Schedule), HelpController.Name)"
+                   class="btn btn-outline-dark m-2 btn-lg float-left">
+                    <span class="fas fa-chevron-left"></span>
+                    Back
+                </a>
+                <button type="submit"
+                        class="btn btn-outline-dark m-2 btn-lg float-right">
+                    Next
+                    <span class="fas fa-chevron-right"></span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

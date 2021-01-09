@@ -5,6 +5,7 @@
         Bool,
         Int,
         String,
-        StringNullable
+        StringNullable,
+        Double
     }
 }
