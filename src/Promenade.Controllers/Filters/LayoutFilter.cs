@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
-using Ocuda.i18n;
 using Ocuda.Promenade.Models.Keys;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility.Models;
@@ -63,31 +61,6 @@ namespace Ocuda.Promenade.Controllers.Filters
             {
                 context.HttpContext.Items[ItemKey.ForceReload] = true;
             }
-
-            // generate list for drop-down
-            var cultureList = new Dictionary<string, string>();
-            var cultureHrefLang = new SortedDictionary<string, string>
-                {
-                    { "x-default", Culture.DefaultName }
-                };
-            foreach (var culture in _l10nOptions.Value.SupportedCultures)
-            {
-                var text = culture.Parent != null
-                    ? culture.Parent.NativeName
-                    : culture.NativeName;
-                cultureList.Add(text, culture.Name);
-                if (!cultureHrefLang.Keys.Contains(culture.Name))
-                {
-                    cultureHrefLang.Add(culture.Name, culture.Name);
-                    if (culture.Parent != null
-                        && !cultureHrefLang.Keys.Contains(culture.Parent.Name))
-                    {
-                        cultureHrefLang.Add(culture.Parent.Name, culture.Parent.Name);
-                    }
-                }
-            }
-            context.HttpContext.Items[ItemKey.HrefLang] = cultureHrefLang;
-            context.HttpContext.Items[ItemKey.L10n] = cultureList;
 
             context.HttpContext.Items[ItemKey.PublicContentPath]
                 = _pathResolverService.GetPublicContentUrl();

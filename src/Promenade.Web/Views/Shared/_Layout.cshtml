@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData[Ocuda.Utility.Keys.ViewData.Title]</title>
     @RenderSection("metadata", required: false)
+    @if (Context.Items[Ocuda.i18n.LocalizationItemKey.HrefLang] != null)
+    {
+        @foreach (var item in ((IDictionary<string, string>)Context.Items[Ocuda.i18n.LocalizationItemKey.HrefLang]))
+        {
+            <link rel="alternate" hreflang="@item.Key" href="@item.Value" />
+        }
+    }
     @{
         var googleAnalyticsTrackingCode = Context.Items[Ocuda.Promenade.Controllers.ItemKey.GoogleAnalyticsTrackingCode] as string;
         if (!string.IsNullOrEmpty(googleAnalyticsTrackingCode))
@@ -56,11 +63,14 @@
         <header>
             <div class="row prom-nav-top">
                 @{
-                    var topNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.TopNavigation] as Ocuda.Promenade.Models.Entities.Navigation;
-                    var l10n = Context.Items[Ocuda.Promenade.Controllers.ItemKey.L10n] as IDictionary<string, string>;
-                    if (topNavigation?.Navigations.Count() > 0 || l10n?.Count() > 1)
+                    var topNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.TopNavigation]
+                        as Ocuda.Promenade.Models.Entities.Navigation;
+                    var currentUiCulture = Context.Items[Ocuda.i18n.LocalizationItemKey.CurrentCulture]
+                        as System.Globalization.CultureInfo;
+                    var l10nLinks = Context.Items[Ocuda.i18n.LocalizationItemKey.L10n] as IDictionary<string, string>;
+                    if (topNavigation?.Navigations.Count() > 0 || l10nLinks?.Count() > 1)
                     {
-                        if (l10n?.Count() > 1)
+                        if (l10nLinks?.Count() > 1)
                         {
                             <div class="@(topNavigation?.Navigations.Count() == 0 ? "col-12" : "col-3")">
                                 <div class="dropdown">
@@ -69,12 +79,13 @@
                                             id="languageDropdown"
                                             data-toggle="dropdown"
                                             aria-haspopup="true" aria-expanded="true">
-                                        English <span class="caret"></span>
+                                        @(currentUiCulture.Parent.NativeName ?? currentUiCulture.NativeName) <span class="caret"></span>
                                     </button>
                                     <div class="dropdown-menu">
-                                        @foreach (var l10nItem in l10n)
+                                        @foreach (var l10nItem in l10nLinks)
                                         {
-                                            <a href="/@l10nItem.Value" class="dropdown-item">@l10nItem.Key</a>
+                                            <a href="@l10nItem.Value"
+                                               class="dropdown-item">@l10nItem.Key</a>
                                         }
                                     </div>
                                 </div>
@@ -82,7 +93,7 @@
                         }
                         if (topNavigation?.Navigations.Count() > 0)
                         {
-                            <div class="@(l10n?.Count() > 1 ? "col-9" : "col-12") prom-right-nav">
+                            <div class="@(l10nLinks?.Count() > 1 ? "col-9" : "col-12") prom-right-nav">
                                 @foreach (var item in topNavigation.Navigations)
                                 {
                                     if (item.ChangeToLinkWhenExtraSmall || item.Navigations.Count() == 0)

@@ -69,8 +69,6 @@ namespace Ocuda.Promenade.Web
                         new[] { "application/rss+xml" });
             });
 
-            services.AddResponseCaching();
-
             services.AddLocalization();
 
             services.Configure<RequestLocalizationOptions>(_ =>
@@ -78,11 +76,6 @@ namespace Ocuda.Promenade.Web
                 _.DefaultRequestCulture = new RequestCulture(Culture.DefaultCulture);
                 _.SupportedCultures = Culture.SupportedCultures;
                 _.SupportedUICultures = Culture.SupportedCultures;
-                _.RequestCultureProviders.Insert(0,
-                    new RouteDataRequestCultureProvider { Options = _ });
-                _.RequestCultureProviders
-                    .Remove(_.RequestCultureProviders
-                        .Single(p => p.GetType() == typeof(QueryStringRequestCultureProvider)));
             });
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -389,14 +382,6 @@ namespace Ocuda.Promenade.Web
                 SupportedCultures = Culture.SupportedCultures,
                 SupportedUICultures = Culture.SupportedCultures
             };
-            requestLocalizationOptions.RequestCultureProviders.Insert(0,
-                new RouteDataRequestCultureProvider { Options = requestLocalizationOptions });
-
-            requestLocalizationOptions
-                .RequestCultureProviders
-                .Remove(requestLocalizationOptions
-                    .RequestCultureProviders
-                    .Single(_ => _.GetType() == typeof(QueryStringRequestCultureProvider)));
 
             app.UseRequestLocalization(requestLocalizationOptions);
 
@@ -442,19 +427,6 @@ namespace Ocuda.Promenade.Web
             }
 
             app.UseRouting();
-
-            app.UseResponseCaching();
-
-            app.Use(async (context, next) =>
-            {
-                context.Response.GetTypedHeaders().CacheControl = new CacheControlHeaderValue
-                {
-                    Public = true,
-                    MaxAge = TimeSpan.FromMinutes(2)
-                };
-
-                await next();
-            });
 
             app.UseSession();
 
