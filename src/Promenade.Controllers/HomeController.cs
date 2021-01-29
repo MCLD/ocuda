@@ -7,7 +7,6 @@ using Ocuda.Promenade.Service;
 
 namespace Ocuda.Promenade.Controllers
 {
-    [Route("{culture:cultureConstraint?}")]
     public class HomeController : BasePageController<HomeController>
     {
         protected override PageType PageType { get { return PageType.Home; } }

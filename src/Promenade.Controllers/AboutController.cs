@@ -7,11 +7,9 @@ using Ocuda.Promenade.Service;
 namespace Ocuda.Promenade.Controllers
 {
     [Route("[Controller]")]
-    [Route("{culture:cultureConstraint}/[Controller]")]
     public class AboutController : BasePageController<AboutController>
     {
-        protected override PageType PageType
-        { get { return PageType.About; } }
+        protected override PageType PageType { get { return PageType.About; } }
 
         public AboutController(ServiceFacades.Controller<AboutController> context,
             CarouselService carouselService,

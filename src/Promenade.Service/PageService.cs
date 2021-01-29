@@ -68,15 +68,6 @@ namespace Ocuda.Promenade.Service
                 .UICulture?
                 .Name;
 
-            int? currentLanguageId = null;
-
-            if (!string.IsNullOrWhiteSpace(currentCultureName))
-            {
-                currentLanguageId = await _languageService.GetLanguageIdAsync(currentCultureName);
-            }
-
-            int? defaultLanguageId = null;
-
             Page page = null;
 
             var cachePagesHoursString
@@ -90,56 +81,59 @@ namespace Ocuda.Promenade.Service
                 cachePagesInHours = cacheInHours;
             }
 
-            if (cachePagesInHours != null && !forceReload)
+            if (currentCultureName != i18n.Culture.DefaultName)
             {
-                if (currentLanguageId != null)
+                int currentLanguageId
+                    = await _languageService.GetLanguageIdAsync(currentCultureName);
+
+                if (cachePagesInHours != null && !forceReload)
                 {
-                    page = await GetPageFromCacheAsync((int)currentLanguageId, type, fixedStub);
+                    page = await GetPageFromCacheAsync(currentLanguageId, type, fixedStub);
                 }
 
                 if (page == null)
                 {
-                    defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync();
-                    page = await GetPageFromCacheAsync((int)defaultLanguageId, type, fixedStub);
-                }
-            }
-
-            if (page == null && currentLanguageId != null)
-            {
-                page = await _pageRepository.GetPublishedByStubAndTypeAsync(fixedStub,
-                    type,
-                    (int)currentLanguageId);
-
-                if (page != null && cachePagesInHours != null)
-                {
-                    await SavePageToCacheAsync(cachePagesInHours ?? 1,
-                        (int)currentLanguageId,
+                    page = await _pageRepository.GetPublishedByStubAndTypeAsync(fixedStub,
                         type,
-                        fixedStub,
-                        page,
-                        forceReload);
+                        currentLanguageId);
+
+                    if (page != null && cachePagesInHours != null)
+                    {
+                        await SavePageToCacheAsync(cachePagesInHours ?? 1,
+                            currentLanguageId,
+                            type,
+                            fixedStub,
+                            page,
+                            forceReload);
+                    }
                 }
             }
 
             if (page == null)
             {
-                if (defaultLanguageId == null)
+                int defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync();
+
+                if (cachePagesInHours != null && !forceReload)
                 {
-                    defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync();
+                    page = await GetPageFromCacheAsync(defaultLanguageId, type, fixedStub);
                 }
 
-                page = await _pageRepository.GetPublishedByStubAndTypeAsync(fixedStub,
-                    type,
-                    (int)defaultLanguageId);
-
-                if (page != null && cachePagesInHours != null)
+                if (page == null)
                 {
-                    await SavePageToCacheAsync(cachePagesInHours ?? 1,
-                        (int)defaultLanguageId,
+                    page = await _pageRepository.GetPublishedByStubAndTypeAsync(fixedStub,
                         type,
-                        fixedStub,
-                        page,
-                        forceReload);
+                        defaultLanguageId);
+
+                    if (page != null && cachePagesInHours != null)
+                    {
+                        await SavePageToCacheAsync(cachePagesInHours ?? 1,
+                            defaultLanguageId,
+                            type,
+                            fixedStub,
+                            page,
+                            forceReload);
+                    }
+
                 }
             }
 
