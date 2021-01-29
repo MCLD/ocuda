@@ -18,7 +18,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using Ocuda.i18n;
-using Ocuda.i18n.RouteConstraint;
 using Ocuda.Promenade.Data;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility.Abstract;
@@ -184,9 +183,6 @@ namespace Ocuda.Promenade.Web
             }
 
             services.AddDataProtection().PersistKeysToDbContext<PromenadeContext>();
-
-            services.Configure<RouteOptions>(_ =>
-                _.ConstraintMap.Add("cultureConstraint", typeof(CultureRouteConstraint)));
 
             if (_isDevelopment)
             {

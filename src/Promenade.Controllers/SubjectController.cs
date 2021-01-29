@@ -8,11 +8,9 @@ using Ocuda.Promenade.Service;
 namespace Ocuda.Promenade.Controllers
 {
     [Route("[Controller]")]
-    [Route("{culture:cultureConstraint}/[Controller]")]
     public class SubjectController : BasePageController<SubjectController>
     {
-        protected override PageType PageType
-        { get { return PageType.Subject; } }
+        protected override PageType PageType { get { return PageType.Subject; } }
 
         public SubjectController(ServiceFacades.Controller<SubjectController> context,
             CarouselService carouselService,
