@@ -11,11 +11,16 @@ namespace Ocuda.Promenade.Controllers
     public class EmediaController : BaseController<EmediaController>
     {
         private readonly EmediaService _emediaService;
+        private readonly SocialCardService _socialCardService;
 
         public EmediaController(ServiceFacades.Controller<EmediaController> context,
-            EmediaService emediaService) : base(context)
+            EmediaService emediaService,
+            SocialCardService socialCardService) : base(context)
         {
-            _emediaService = emediaService ?? throw new ArgumentNullException(nameof(emediaService));
+            _emediaService = emediaService
+                ?? throw new ArgumentNullException(nameof(emediaService));
+            _socialCardService = socialCardService
+                ?? throw new ArgumentNullException(nameof(socialCardService));
         }
 
         [Route("")]
@@ -48,9 +53,20 @@ namespace Ocuda.Promenade.Controllers
                 }
             }
 
+            var emediaSocial = await _siteSettingService
+                .GetSettingIntAsync(Models.Keys.SiteSetting.Social.EmediaCardId, forceReload);
+
+            Models.Entities.SocialCard card = null;
+
+            if (emediaSocial > -1)
+            {
+                card = await _socialCardService.GetByIdAsync(emediaSocial, forceReload);
+            }
+
             var emediaViewModel = new EmediaViewModel
             {
-                GroupedEmedia = groupedEmedia
+                GroupedEmedia = groupedEmedia,
+                SocialCard = card
             };
 
             PageTitle = "eMedia";

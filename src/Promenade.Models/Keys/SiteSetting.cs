@@ -4,6 +4,7 @@
     {
         public struct Social
         {
+            public const string EmediaCardId = "Social.EmediaCardId";
             public const string FacebookUrl = "Social.FacebookUrl";
             public const string InstagramUrl = "Social.InstagramUrl";
             public const string TwitterUrl = "Social.TwitterUrl";
