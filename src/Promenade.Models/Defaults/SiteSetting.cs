@@ -11,6 +11,15 @@ namespace Ocuda.Promenade.Models.Defaults
             #region Social
             new SiteSetting
             {
+                Category = "Social",
+                Description = "Id of a social card for the eMedia page",
+                Id = Keys.SiteSetting.Social.EmediaCardId,
+                Name = "eMedia social card id",
+                Type = SiteSettingType.Int,
+                Value = "-1"
+            },
+            new SiteSetting
+            {
                 Id = Keys.SiteSetting.Social.FacebookUrl,
                 Name = "Facebook URL",
                 Description = "The URL to a Facebook profile",

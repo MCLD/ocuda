@@ -1,5 +1,9 @@
 ﻿@model Ocuda.Promenade.Controllers.ViewModels.Emedias.EmediaViewModel
 
+@section metadata {
+    <socialcard card="@Model.SocialCard"></socialcard>
+}
+
 <div modal id="infoModal"></div>
 
 @foreach (var group in Model.GroupedEmedia)
