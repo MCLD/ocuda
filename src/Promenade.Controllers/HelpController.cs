@@ -106,8 +106,6 @@ namespace Ocuda.Promenade.Controllers
                 throw new OcudaException("No available times for scheduling could be found");
             }
 
-            var firstAvailable = date.RoundUp(QuantizeSpan);
-
             var startHour = await _siteSettingService.GetSettingDoubleAsync(
                 Models.Keys.SiteSetting.Scheduling.StartHour);
             var availableHours = await _siteSettingService.GetSettingDoubleAsync(
@@ -115,13 +113,11 @@ namespace Ocuda.Promenade.Controllers
             var bufferHours = await _siteSettingService.GetSettingDoubleAsync(
                 Models.Keys.SiteSetting.Scheduling.BufferHours);
 
+            var firstAvailable = date.RoundUp(QuantizeSpan).AddHours(bufferHours);
+
             if (firstAvailable.TimeOfDay < firstAvailable.Date.AddHours(startHour).TimeOfDay)
             {
                 firstAvailable = firstAvailable.Date.AddHours(startHour);
-            }
-            else
-            {
-                firstAvailable = firstAvailable.AddHours(bufferHours);
             }
 
             if (firstAvailable.TimeOfDay
