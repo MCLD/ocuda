@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <AssemblyName>Ocuda.Ops.Web</AssemblyName>
-    <AssemblyVersion>1.0.0.93</AssemblyVersion>
+    <AssemblyVersion>1.0.0.94</AssemblyVersion>
     <Authors>Maricopa County Library District Web developers</Authors>
     <CodeAnalysisRuleSet>../../OcudaRuleSet.ruleset</CodeAnalysisRuleSet>
     <Company>Maricopa County Library District</Company>
     <Copyright>Copyright 2018 Maricopa County Library District</Copyright>
-    <FileVersion>1.0.0.93</FileVersion>
+    <FileVersion>1.0.0.94</FileVersion>
     <LangVersion>Latest</LangVersion>
     <PackageLicenseUrl>https://github.com/MCLD/ocuda/blob/develop/LICENSE</PackageLicenseUrl>
     <Product>Ocuda</Product>
@@ -39,19 +39,19 @@
 
   <ItemGroup>
     <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
-    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="5.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.2">
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="5.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.2">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="5.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="5.0.2" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.1" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="5.0.3" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" PrivateAssets="All" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
   </ItemGroup>
 
