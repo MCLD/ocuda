@@ -144,11 +144,13 @@ namespace Ocuda.Promenade.Controllers
             var availableHours = await _siteSettingService.GetSettingDoubleAsync(
                 Models.Keys.SiteSetting.Scheduling.AvailableHours);
 
-            // Round up start hour to nearest half hour
-            startHour = Math.Ceiling(startHour * 2) / 2;
+            // Round up start hour to nearest time interval
+            startHour = Math.Ceiling(startHour / TimeBlockInterval)
+                * TimeBlockInterval;
 
-            //Round down end hour to nearest half hour
-            var endHour = Math.Floor((startHour + availableHours) * 2) / 2;
+            // Round down end hour to nearest time interval
+            var endHour = Math.Floor((startHour + availableHours) / TimeBlockInterval)
+                * TimeBlockInterval;
 
             var timeBlocks = new List<DateTime>();
 
