@@ -30,10 +30,10 @@ else
             <input asp-for="RequestedDate"
                    type="date"
                    formgroup />
-            <input asp-for="RequestedTime"
-                   type="time"
-                   step="1800"
-                   formgroup />
+            <select asp-for="RequestedTime"
+                    asp-items="Model.TimeBlocks"
+                    formgroup>
+            </select>
             <select asp-for="SubjectId"
                     asp-items="Model.Subjects" formgroup></select>
             <div>

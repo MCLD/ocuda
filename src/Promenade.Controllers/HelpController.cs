@@ -21,6 +21,9 @@ namespace Ocuda.Promenade.Controllers
     [Route("[Controller]")]
     public class HelpController : BaseController<HelpController>
     {
+        private const int HoursInADay = 24;
+        private const double TimeBlockInterval = 0.5;
+
         private const string TempDataDateTime = "ScheduleDateTime";
         private const string TempDataSubjectId = "ScheduleSubjectId";
 
@@ -132,6 +135,42 @@ namespace Ocuda.Promenade.Controllers
             }
 
             return firstAvailable;
+        }
+
+        private async Task<IEnumerable<SelectListItem>> GetTimeBlocks()
+        {
+            var startHour = await _siteSettingService.GetSettingDoubleAsync(
+                Models.Keys.SiteSetting.Scheduling.StartHour);
+            var availableHours = await _siteSettingService.GetSettingDoubleAsync(
+                Models.Keys.SiteSetting.Scheduling.AvailableHours);
+
+            // Round up start hour to nearest half hour
+            startHour = Math.Ceiling(startHour * 2) / 2;
+
+            //Round down end hour to nearest half hour
+            var endHour = Math.Floor((startHour + availableHours) * 2) / 2;
+
+            var timeBlocks = new List<DateTime>();
+
+            for (double hour = startHour; hour <= endHour; hour += TimeBlockInterval)
+            {
+                var dayHour = hour % HoursInADay;
+
+                timeBlocks.Add(DateTime.Now.Date.AddHours(dayHour));
+
+                if (timeBlocks.Count >= HoursInADay / TimeBlockInterval)
+                {
+                    break;
+                }
+            }
+
+            return timeBlocks
+                .OrderBy(_ => _.TimeOfDay)
+                .Select(_ => new SelectListItem
+                {
+                    Text = _.ToShortTimeString(),
+                    Value = _.ToString(CultureInfo.CurrentCulture)
+                });
         }
 
         [HttpGet("[action]")]
@@ -664,6 +703,8 @@ namespace Ocuda.Promenade.Controllers
                 scheduleViewModel.WarningText = ex.Message;
             }
 
+            scheduleViewModel.TimeBlocks = await GetTimeBlocks();
+
             return View("Schedule", scheduleViewModel);
         }
 
@@ -689,7 +730,7 @@ namespace Ocuda.Promenade.Controllers
             var scheduleViewModel = viewModel ?? new ScheduleTimesViewModel()
             {
                 RequestedDate = requestedTime,
-                RequestedTime = requestedTime
+                RequestedTime = DateTime.Now.Date.Add(requestedTime.TimeOfDay)
             };
 
             scheduleViewModel.ScheduleRequestTime = requestedTime;
@@ -734,6 +775,8 @@ namespace Ocuda.Promenade.Controllers
                         = CommonMarkConverter.Convert(scheduleViewModel.SegmentText.Text);
                 }
             }
+
+            scheduleViewModel.TimeBlocks = await GetTimeBlocks();
 
             return View(nameof(ScheduleTimes), scheduleViewModel);
         }
