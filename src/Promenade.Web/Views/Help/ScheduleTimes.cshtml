@@ -53,10 +53,10 @@ else
                 <input asp-for="RequestedDate"
                        type="date"
                        formgroup />
-                <input asp-for="RequestedTime"
-                       type="time"
-                       step="1800"
-                       formgroup />
+                <select asp-for="RequestedTime"
+                        asp-items="Model.TimeBlocks"
+                        formgroup>
+                </select>
             </div>
             <div>
                 <a href="@Url.Action(nameof(HelpController.Schedule), HelpController.Name)"

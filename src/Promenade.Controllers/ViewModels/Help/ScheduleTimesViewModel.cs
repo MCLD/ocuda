@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Controllers.ViewModels.Help
@@ -20,6 +21,8 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Help
         public DateTime? RequestedTime { get; set; }
 
         public DateTime ScheduleRequestTime { get; set; }
+
+        public IEnumerable<SelectListItem> TimeBlocks { get; set; }
 
         [Display(Name = "Requested date and time")]
         public string DisplayTime

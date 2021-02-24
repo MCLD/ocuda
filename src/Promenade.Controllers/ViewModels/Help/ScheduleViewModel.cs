@@ -23,5 +23,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Help
         public int SubjectId { get; set; }
 
         public string WarningText { get; set; }
+
+        public IEnumerable<SelectListItem> TimeBlocks { get; set; }
     }
 }
