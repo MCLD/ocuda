@@ -2,7 +2,21 @@
 
 <h1>Content management</h1>
 
-<div class="justify-content-center d-flex flex-wrap">
+<div class="justify-content-left d-flex flex-wrap">
+    <div class="col-12 col-md-4 my-2">
+        <div class="card">
+            <div class="card-header lead font-weight-bold">
+                Digital Displays
+            </div>
+            <div class="card-body">
+                <a asp-area="@SectionController.Area"
+                   asp-controller="@DigitalDisplaysController.Name"
+                   asp-action="@nameof(DigitalDisplaysController.Index)"
+                   class="btn btn-outline-primary mt-1">View Digital Displays</a>
+            </div>
+        </div>
+    </div>
+
     <div class="col-12 col-md-4 my-2">
         <div class="card">
             <div class="card-header lead font-weight-bold">

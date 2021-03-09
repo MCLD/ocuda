@@ -18,21 +18,13 @@ namespace Ocuda.Ops.Service
     public class ScheduleNotificationService
         : BaseService<ScheduleNotificationService>, IScheduleNotificationService
     {
+        private const int CacheEmailHours = 1;
+        private const string DefaultLanguage = "en-US";
         private readonly IDistributedCache _cache;
         private readonly IEmailService _emailService;
         private readonly IScheduleLogRepository _scheduleLogRepository;
         private readonly IScheduleRequestService _scheduleRequestService;
         private readonly ISiteSettingService _siteSettingService;
-
-        private const int CacheEmailHours = 1;
-        private const string DefaultLanguage = "en-US";
-
-        private enum EmailType
-        {
-            ScheduleNotification,
-            Followup,
-            Cancellation
-        }
 
         public ScheduleNotificationService(ILogger<ScheduleNotificationService> logger,
             IHttpContextAccessor httpContextAccessor,
@@ -50,6 +42,13 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(scheduleRequestService));
             _siteSettingService = siteSettingService
                 ?? throw new ArgumentNullException(nameof(siteSettingService));
+        }
+
+        private enum EmailType
+        {
+            ScheduleNotification,
+            Followup,
+            Cancellation
         }
 
         public async Task<Configuration> GetEmailSettingsAsync()
@@ -92,6 +91,100 @@ namespace Ocuda.Ops.Service
             }
 
             return config;
+        }
+
+        public async Task<EmailRecord> SendCancellationAsync(ScheduleRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+            Configuration settings = null;
+            try
+            {
+                settings = await GetEmailSettingsAsync();
+            }
+            catch (OcudaEmailException) { }
+
+            if (settings != null)
+            {
+                var lang = request.Language
+                    .Equals("English", StringComparison.OrdinalIgnoreCase)
+                        ? "en-US"
+                        : request.Language;
+
+                var culture = CultureInfo.GetCultureInfo(lang);
+
+                try
+                {
+                    return await SendAsync(request,
+                        settings,
+                        lang,
+                        new Dictionary<string, string>
+                        {
+                            { "Scheduled", request.RequestedTime.ToString(culture) },
+                            { "Subject", request.ScheduleRequestSubject.Subject }
+                        },
+                        EmailType.Cancellation);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Sending cancellation notification id {RequestId} failed: {ErrorMessage}",
+                        request.Id,
+                        ex.Message);
+                }
+            }
+            return null;
+        }
+
+        public async Task<bool> SendFollowupAsync(ScheduleRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            Configuration settings = null;
+            try
+            {
+                settings = await GetEmailSettingsAsync();
+            }
+            catch (OcudaEmailException) { }
+
+            if (settings != null)
+            {
+                var lang = request.Language
+                    .Equals("English", StringComparison.OrdinalIgnoreCase)
+                        ? "en-US"
+                        : request.Language;
+
+                var culture = CultureInfo.GetCultureInfo(lang);
+                try
+                {
+                    var sentEmail = await SendAsync(request,
+                        settings,
+                        lang,
+                        new Dictionary<string, string>
+                        {
+                            { "Scheduled", request.RequestedTime.ToString(culture) },
+                            { "Subject", request.ScheduleRequestSubject.Subject }
+                        },
+                        EmailType.Followup);
+
+                    if (sentEmail != null)
+                    {
+                        await _scheduleRequestService.SetFollowupSentAsync(request);
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Sending followup notification id {RequestId} failed: {ErrorMessage}",
+                        request.Id,
+                        ex.Message);
+                }
+            }
+            return false;
         }
 
         public async Task<int> SendPendingNotificationsAsync()
@@ -163,101 +256,13 @@ namespace Ocuda.Ops.Service
                 }
             }
 
+            if (sentNotifications > 0)
+            {
+                _logger.LogInformation("Scheduled task sent {NotificationCount} email notifications",
+                    sentNotifications);
+            }
+
             return sentNotifications;
-        }
-
-        public async Task<bool> SendFollowupAsync(ScheduleRequest request)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
-
-            Configuration settings = null;
-            try
-            {
-                settings = await GetEmailSettingsAsync();
-            }
-            catch (OcudaEmailException) { }
-
-            if (settings != null)
-            {
-                var lang = request.Language
-                    .Equals("English", StringComparison.OrdinalIgnoreCase)
-                        ? "en-US"
-                        : request.Language;
-
-                var culture = CultureInfo.GetCultureInfo(lang);
-                try
-                {
-                    var sentEmail = await SendAsync(request,
-                        settings,
-                        lang,
-                        new Dictionary<string, string>
-                        {
-                            { "Scheduled", request.RequestedTime.ToString(culture) },
-                            { "Subject", request.ScheduleRequestSubject.Subject }
-                        },
-                        EmailType.Followup);
-
-                    if (sentEmail != null)
-                    {
-                        await _scheduleRequestService.SetFollowupSentAsync(request);
-                        return true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("Sending followup notification id {RequestId} failed: {ErrorMessage}",
-                        request.Id,
-                        ex.Message);
-                }
-            }
-            return false;
-        }
-
-        public async Task<EmailRecord> SendCancellationAsync(ScheduleRequest request)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
-            Configuration settings = null;
-            try
-            {
-                settings = await GetEmailSettingsAsync();
-            }
-            catch (OcudaEmailException) { }
-
-            if (settings != null)
-            {
-                var lang = request.Language
-                    .Equals("English", StringComparison.OrdinalIgnoreCase)
-                        ? "en-US"
-                        : request.Language;
-
-                var culture = CultureInfo.GetCultureInfo(lang);
-
-                try
-                {
-                    return await SendAsync(request,
-                        settings,
-                        lang,
-                        new Dictionary<string, string>
-                        {
-                            { "Scheduled", request.RequestedTime.ToString(culture) },
-                            { "Subject", request.ScheduleRequestSubject.Subject }
-                        },
-                        EmailType.Cancellation);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("Sending cancellation notification id {RequestId} failed: {ErrorMessage}",
-                        request.Id,
-                        ex.Message);
-                }
-            }
-            return null;
         }
 
         private async Task<EmailRecord> SendAsync(ScheduleRequest request,

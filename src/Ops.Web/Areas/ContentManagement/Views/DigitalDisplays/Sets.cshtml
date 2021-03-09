@@ -1,0 +1,112 @@
+﻿@model SetListViewModel
+
+@using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDisplays
+
+<div class="row">
+    <div class="col-sm-7">
+        <h1>Digital Display Sets</h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Index))">Back</a>
+        <a class="btn btn-outline-primary mt-2 mb-1 mr-4 float-right"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.AddSet))">
+            Add set
+        </a>
+    </div>
+</div>
+
+@await Html.PartialAsync("_DigitalDisplaysPartial")
+
+<table class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Last Content Update</th>
+            <th>Displays</th>
+            <th>Assets</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.DigitalDisplaySets?.Count > 0)
+        {
+            @foreach (var set in Model.DigitalDisplaySets)
+            {
+                <tr>
+                    <td class="align-middle">@set.Name</td>
+                    <td class="align-middle">@(set.LastContentUpdate != DateTime.MinValue ? set.LastContentUpdate : "None yet")</td>
+                    <td class="align-middle">@Model.DisplayCount(set.Id)</td>
+                    <td class="align-middle">@Model.AssetCount(set.Id)</td>
+                    <td class="align-middle">
+                        <a asp-action="@nameof(DigitalDisplaysController.UpdateSet)"
+                           asp-route-digitalDisplaySetId="@set.Id"
+                           class="btn btn-outline-primary my-1"><span class="fas fa-edit"></span></a>
+                        @if (Model.AssetCount(set.Id) == 0 && Model.DisplayCount(set.Id) == 0)
+                        {
+                            <button type="button"
+                                    data-toggle="modal"
+                                    data-target="#deleteSet"
+                                    data-id="@set.Id"
+                                    data-name="@set.Name"
+                                    class="btn btn-outline-danger my-1">
+                                <span class="fas fa-minus-circle"></span>
+                            </button>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr class="table-warning">
+                <td colspan="6">
+                    No digital display sets found.
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<form asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.DeleteSet))">
+    <div class="modal fade"
+         id="deleteSet"
+         data-backdrop="static"
+         data-keyboard="false"
+         tabindex="-1"
+         aria-labelledby="deleteSetLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteSetLabel">Delete digital display set</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="digitalDisplaySetId" id="digitalDisplaySetId" />
+                    Are you sure you want to delete the digital display content set:
+                    <strong><span id="digitalDisplaySetName"></span></strong>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-danger">Delete display set</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        $('#deleteSet').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget)
+            $(this).find('#digitalDisplaySetName').text(button.data('name'))
+            $(this).find('#digitalDisplaySetId').val(button.data('id'));
+        })
+    </script>
+}

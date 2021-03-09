@@ -1,0 +1,190 @@
+﻿@model AssignSetsViewModel
+
+@using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDisplays
+
+<div class="row">
+    <div class="col-sm-7">
+        <h1>Digital Display Sets</h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Index))">Back</a>
+    </div>
+</div>
+
+<div class="row py-2">
+    <div class="col">
+        <p>
+            Assign digital display sets to sync to this digital display.
+        </p>
+    </div>
+</div>
+
+<div class="row py-2">
+    <table class="table table-bordered table-sm col-sm-8 offset-sm-2">
+        <tr>
+            <th>Name</th>
+            <td>@Model.DigitalDisplay.Name</td>
+        </tr>
+        <tr>
+            <th>Last communication attempt</th>
+            <td>@(Model.DigitalDisplay.LastAttempt?.ToString() ?? "none")</td>
+        </tr>
+        <tr>
+            <th>Last communication</th>
+            <td>@(Model.DigitalDisplay.LastCommunication?.ToString() ?? "none")</td>
+        </tr>
+        <tr>
+            <th>Last verification</th>
+            <td>@(Model.DigitalDisplay.LastContentVerification?.ToString() ?? "none")</td>
+        </tr>
+        <tr>
+            <th>Status</th>
+            <td>
+                @if (string.IsNullOrEmpty(Model.DigitalDisplay.Status.Message))
+                {
+                    @:none
+                }
+                else
+                {
+                    @Model.DigitalDisplay.Status.Message
+                    @if (Model.DigitalDisplay.Status.AsOf != default)
+                    {
+                        <small><em>(as of @Model.DigitalDisplay.Status.AsOf)</em></small>
+                    }
+                }
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class="row">
+    <table class="table table-bordered table-sm col-sm-8 offset-sm-2 col-md-6 offset-md-3"
+           data-displayId="@Model.DigitalDisplay.Id">
+        <tr>
+            <th>Set</th>
+            <th>Display is in set</th>
+        </tr>
+        @if (Model.Sets?.Count > 0)
+        {
+            foreach (var set in Model.Sets)
+            {
+                <tr>
+                    <td class="align-middle">@set.Name</td>
+                    <td class="align-middle">
+                        <button class="form-control oc-toggle-set btn btn-outline-dark fa-2x"
+                                style="width: 8rem;"
+                                data-setId="@set.Id"
+                                button-spinner>
+                            @if (Model.DisplaySets.Contains(set.Id))
+                            {
+                                <span class="oc-toggle-check far fa-check-square"></span>
+                            }
+                            else
+                            {
+                                <span class="oc-toggle-check far fa-square"></span>
+                            }
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="2">No sets found.</td>
+            </tr>
+        }
+    </table>
+</div>
+
+<div class="modal fade"
+     id="issueModal"
+     data-backdrop="static"
+     data-keyboard="false"
+     tabindex="-1"
+     aria-labelledby="issueLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="issueLabel">Asset assocation issue</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Could not update asset assocation:
+                <ul id="issueList">
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('.oc-toggle-set').on('click', function (event) {
+            const button = event.currentTarget
+            $(button).prop('disabled', true);
+            var update = new Object();
+            update.SetId = $(button).attr('data-setId')
+            update.DisplayId = $(button).parents('table').attr('data-displayId')
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action(nameof(DigitalDisplaysController.AssignSet))',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify(update),
+                success: function (data, textStatus, jqXHR) {
+                    if (!data.success) {
+                        displayErrors('An error occurred: ' + data.message)
+                    }
+                    else
+                    {
+                        console.log(data.setIds)
+                        $('.oc-toggle-set').each(function (item) {
+                            var thisSetId = $(this).attr('data-setId')
+                            var checkButton = $(this).find('.oc-toggle-check')
+                            if (data.setIds === undefined
+                                || data.setIds.length === 0
+                                || !data.setIds.includes(parseInt(thisSetId))) {
+                                $(checkButton).removeClass('fa-check-square').addClass('fa-square');
+                            }
+                            else
+                            {
+                                $(checkButton).removeClass('fa-square').addClass('fa-check-square');
+                            }
+                        })
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    displayErrors('An error occurred - ' + textStatus + ': ' + errorThrown);
+                },
+                complete: function (jqXHR, textStatus) {
+                    ResetSpinners($(button))
+                    $(button).prop('disabled', false);
+                }
+            })
+        })
+
+        function displayErrors(errorItems) {
+            $('#issueList').empty()
+            if (Array.isArray(errorItems)) {
+                errorItems.forEach(function (item) {
+                    $('#issueList').append('<li>' + item + '</li>')
+                })
+            }
+            else {
+                $('#issueList').append('<li>' + errorItems + '</li>')
+            }
+            $('#issueModal').modal('show')
+        }
+    </script>
+}

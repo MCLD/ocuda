@@ -16,8 +16,6 @@ namespace Ocuda.Ops.Controllers
     [Route("[controller]")]
     public class ProfileController : BaseController<ProfileController>
     {
-        public static string Name { get { return "Profile"; } }
-
         private readonly IHttpContextAccessor _httpContext;
         private readonly IPermissionGroupService _permissionGroupService;
         private readonly IUserService _userService;
@@ -33,9 +31,30 @@ namespace Ocuda.Ops.Controllers
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
-        [Route("")]
+        public static string Name { get { return "Profile"; } }
+
+        [HttpPost]
         [Route("[action]")]
-        [Route("[action]/{id}")]
+        public async Task<IActionResult> EditNickname(IndexViewModel model)
+        {
+            if (ModelState.IsValid && model != null)
+            {
+                try
+                {
+                    var user = await _userService.EditNicknameAsync(model.User);
+                    ShowAlertSuccess($"Updated nickname: {user.Nickname}");
+                }
+                catch (Exception ex)
+                {
+                    ShowAlertDanger("Unable to update nickname: ", ex.Message);
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [Route("")]
+        [Route("{id}")]
         public async Task<IActionResult> Index(string id)
         {
             var viewModel = new IndexViewModel
@@ -55,7 +74,7 @@ namespace Ocuda.Ops.Controllers
                 else
                 {
                     ShowAlertDanger("Could not find user with username: ", id);
-                    return RedirectToAction(nameof(Index), "Home");
+                    return RedirectToAction(nameof(Index), HomeController.Name);
                 }
             }
             else
@@ -71,14 +90,12 @@ namespace Ocuda.Ops.Controllers
 
             viewModel.DirectReports = await _userService.GetDirectReportsAsync(viewModel.User.Id);
 
-            if (viewModel.User.Id == CurrentUserId)
-            {
-                viewModel.CanEdit = true;
-            }
+            viewModel.CanEdit = viewModel.User.Id == CurrentUserId;
 
             if (viewModel.UserViewingSelf)
             {
-                viewModel.AuthenticatedAt = DateTime.Parse(UserClaim(ClaimType.AuthenticatedAt));
+                viewModel.AuthenticatedAt = DateTime.Parse(UserClaim(ClaimType.AuthenticatedAt),
+                    CultureInfo.InvariantCulture);
 
                 if (!string.IsNullOrEmpty(UserClaim(ClaimType.HasPermissions)))
                 {
@@ -94,37 +111,17 @@ namespace Ocuda.Ops.Controllers
                                         .ToList();
                 }
 
-                if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
+                if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
+                    && viewModel.Permissions == null)
                 {
-                    if (viewModel.Permissions == null)
+                    viewModel.Permissions = new List<string>(1)
                     {
-                        viewModel.Permissions = new List<string>(1);
-                    }
-                    viewModel.Permissions.Insert(0, "Site manager");
+                            "Site manager"
+                    };
                 }
             }
 
             return View(viewModel);
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> EditNickname(IndexViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    var user = await _userService.EditNicknameAsync(model.User);
-                    ShowAlertSuccess($"Updated nickname: {user.Nickname}");
-                }
-                catch (Exception ex)
-                {
-                    ShowAlertDanger("Unable to update nickname: ", ex.Message);
-                }
-            }
-
-            return RedirectToAction(nameof(Index));
         }
 
         [Route("[action]")]
