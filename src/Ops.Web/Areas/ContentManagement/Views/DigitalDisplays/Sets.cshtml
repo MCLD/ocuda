@@ -10,10 +10,13 @@
         <a class="btn btn-outline-dark mt-2 mb-1 float-right"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Index))">Back</a>
-        <a class="btn btn-outline-primary mt-2 mb-1 mr-4 float-right"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.AddSet))">
-            Add set
-        </a>
+        @if (Model.IsSiteManager)
+        {
+            <a class="btn btn-outline-primary mt-2 mb-1 mr-4 float-right"
+               asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.AddSet))">
+                Add set
+            </a>
+        }
     </div>
 </div>
 
@@ -40,19 +43,22 @@
                     <td class="align-middle">@Model.DisplayCount(set.Id)</td>
                     <td class="align-middle">@Model.AssetCount(set.Id)</td>
                     <td class="align-middle">
-                        <a asp-action="@nameof(DigitalDisplaysController.UpdateSet)"
-                           asp-route-digitalDisplaySetId="@set.Id"
-                           class="btn btn-outline-primary my-1"><span class="fas fa-edit"></span></a>
-                        @if (Model.AssetCount(set.Id) == 0 && Model.DisplayCount(set.Id) == 0)
+                        @if (Model.IsSiteManager)
                         {
-                            <button type="button"
-                                    data-toggle="modal"
-                                    data-target="#deleteSet"
-                                    data-id="@set.Id"
-                                    data-name="@set.Name"
-                                    class="btn btn-outline-danger my-1">
-                                <span class="fas fa-minus-circle"></span>
-                            </button>
+                            <a asp-action="@nameof(DigitalDisplaysController.UpdateSet)"
+                               asp-route-digitalDisplaySetId="@set.Id"
+                               class="btn btn-outline-primary my-1"><span class="fas fa-edit"></span></a>
+                            @if (Model.AssetCount(set.Id) == 0 && Model.DisplayCount(set.Id) == 0)
+                            {
+                                <button type="button"
+                                        data-toggle="modal"
+                                        data-target="#deleteSet"
+                                        data-id="@set.Id"
+                                        data-name="@set.Name"
+                                        class="btn btn-outline-danger my-1">
+                                    <span class="fas fa-minus-circle"></span>
+                                </button>
+                            }
                         }
                     </td>
                 </tr>

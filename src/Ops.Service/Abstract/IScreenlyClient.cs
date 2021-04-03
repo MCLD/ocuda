@@ -7,7 +7,7 @@ namespace Ocuda.Ops.Service.Abstract
     public interface IScreenlyClient
     {
         /// <summary>
-        /// Add a slide to the specified Screenly digital display
+        /// Add a slide to the specified Screenly OSE digital display
         /// </summary>
         /// <param name="display">Populated <see cref="DigitalDisplay"/> object</param>
         /// <param name="filePath">Path to the slide to upload</param>
@@ -16,14 +16,14 @@ namespace Ocuda.Ops.Service.Abstract
         Task<string> AddSlideAsync(DigitalDisplay display, string filePath, AssetModel assetModel);
 
         /// <summary>
-        /// Get collection of details about slides currently in a Screenly digital display
+        /// Get collection of details about slides currently in a Screenly OSE digital display
         /// </summary>
         /// <param name="display">Populated <see cref="DigitalDisplay"/> object</param>
         /// <returns>An array of populated <see cref="AssetModel"/> objects representing current slides</returns>
         Task<AssetModel[]> GetCurrentSlidesAsync(DigitalDisplay display);
 
         /// <summary>
-        /// Get details about single slide currently in a Screenly digital display
+        /// Get details about single slide currently in a Screenly OSE digital display
         /// </summary>
         /// <param name="display">Populated <see cref="DigitalDisplay"/> object</param>
         /// <param name="assetId">The Screenly AssetId string representing the slide</param>
@@ -31,7 +31,7 @@ namespace Ocuda.Ops.Service.Abstract
         Task<AssetModel> GetSlideAsync(DigitalDisplay display, string assetId);
 
         /// <summary>
-        /// Remove a single slide from a Screenly digital display
+        /// Remove a single slide from a Screenly OSE digital display
         /// </summary>
         /// <param name="display">Populated <see cref="DigitalDisplay"/> object</param>
         /// <param name="assetId">The Screenly AssetId string representing the slide</param>
@@ -41,7 +41,7 @@ namespace Ocuda.Ops.Service.Abstract
         Task<string> RemoveSlideAsync(DigitalDisplay display, string assetId);
 
         /// <summary>
-        /// Update the slideshow metadata for a slide in a Screenly digital display
+        /// Update the slideshow metadata for a slide in a Screenly OSE digital display
         /// </summary>
         /// <param name="display">Populated <see cref="DigitalDisplay"/> object</param>
         /// <param name="assetId">The Screenly AssetId string representing the slide</param>

@@ -67,6 +67,10 @@
                 <th>Uploaded at</th>
                 <td>@Model.DigitalDisplayAsset.CreatedAt</td>
             </tr>
+            <tr>
+                <th>Browser time zone</th>
+                <td class="oc-timezone"></td>
+            </tr>
         </table>
     </div>
 </div>
@@ -184,6 +188,14 @@
 
 @section Scripts {
     <script>
+        $().ready(function () {
+            const tzNegativeMinutes = new Date().getTimezoneOffset();
+            const h = Math.floor(Math.abs(tzNegativeMinutes) / 60)
+            const m = Math.floor(Math.abs(tzNegativeMinutes) - (h * 60))
+            const s = tzNegativeMinutes > 0 ? '-' : ''
+            $('.oc-timezone').text(s + h + ":" + m.toString().padStart(2, '0'))
+        })
+
         $('.oc-apply-to-all').on('click', function (event) {
             const button = event.currentTarget
             $(button).prop('disabled', true);

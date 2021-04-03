@@ -2,7 +2,7 @@
 
 namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDisplays
 {
-    public class UpdatedAssetAllocationsModel
+    public class UpdatedAssetAssociationsModel
     {
         public int AssetId { get; set; }
         public bool Enabled { get; set; }

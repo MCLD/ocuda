@@ -7,6 +7,17 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDispla
         public IDictionary<int, int> DigitalDisplaySetAssets { get; set; }
         public IDictionary<int, int> DigitalDisplaySetDisplays { get; set; }
         public ICollection<Models.Entities.DigitalDisplaySet> DigitalDisplaySets { get; set; }
+        public bool HasDigitalDisplayPermissions { get; set; }
+
+        public bool HasPermissions
+        {
+            get
+            {
+                return IsSiteManager || HasDigitalDisplayPermissions;
+            }
+        }
+
+        public bool IsSiteManager { get; set; }
 
         public int AssetCount(int digitalDisplaySetId)
         {

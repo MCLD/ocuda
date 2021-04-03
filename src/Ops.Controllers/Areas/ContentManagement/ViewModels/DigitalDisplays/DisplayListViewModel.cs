@@ -6,6 +6,17 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDispla
     {
         public ICollection<Models.Entities.DigitalDisplay> DigitalDisplays { get; set; }
         public IDictionary<int, string> DisplaySetNames { get; set; }
+        public bool HasDigitalDisplayPermissions { get; set; }
+
+        public bool HasPermissions
+        {
+            get
+            {
+                return IsSiteManager || HasDigitalDisplayPermissions;
+            }
+        }
+
+        public bool IsSiteManager { get; set; }
         public IDictionary<int, string> Locations { get; set; }
 
         public static string RowClass(Models.Entities.DigitalDisplay display)

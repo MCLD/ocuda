@@ -10,12 +10,15 @@
         <a class="btn btn-outline-dark mt-2 mb-1 float-right"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
-        <button class="btn btn-outline-primary mt-2 mb-1 mr-4 float-right"
-                type="button"
-                data-toggle="modal"
-                data-target="#uploadAsset">
-            Upload asset
-        </button>
+        @if (Model.HasPermissions)
+        {
+            <button class="btn btn-outline-primary mt-2 mb-1 mr-4 float-right"
+                    type="button"
+                    data-toggle="modal"
+                    data-target="#uploadAsset">
+                Upload asset
+            </button>
+        }
     </div>
 </div>
 
@@ -60,19 +63,22 @@
                         Uploaded at: @asset.CreatedAt
                     </td>
                     <td class="align-middle">
-                        <a asp-action="@nameof(DigitalDisplaysController.AssetAssociations)"
-                           asp-route-digitalDisplayAssetId="@asset.Id"
-                           class="btn btn-outline-primary my-1"><span class="fas fa-paperclip"></span></a>
-                        @if (Model.GetSetCount(asset.Id) == "0")
+                        @if (Model.HasPermissions)
                         {
-                            <button type="button"
-                                    data-toggle="modal"
-                                    data-target="#deleteAsset"
-                                    data-id="@asset.Id"
-                                    data-name="@asset.Name"
-                                    class="btn btn-outline-danger my-1">
-                                <span class="fas fa-minus-circle"></span>
-                            </button>
+                            <a asp-action="@nameof(DigitalDisplaysController.AssetAssociations)"
+                               asp-route-digitalDisplayAssetId="@asset.Id"
+                               class="btn btn-outline-primary my-1"><span class="fas fa-paperclip"></span></a>
+                            @if (Model.GetSetCount(asset.Id) == "0")
+                            {
+                                <button type="button"
+                                        data-toggle="modal"
+                                        data-target="#deleteAsset"
+                                        data-id="@asset.Id"
+                                        data-name="@asset.Name"
+                                        class="btn btn-outline-danger my-1">
+                                    <span class="fas fa-minus-circle"></span>
+                                </button>
+                            }
                         }
                     </td>
                 </tr>

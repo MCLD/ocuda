@@ -14,6 +14,7 @@ using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDisplays;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Promenade.Models.Entities;
@@ -24,23 +25,26 @@ using Ocuda.Utility.Models;
 namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 {
     [Area("ContentManagement")]
-    [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]/[controller]")]
     public class DigitalDisplaysController : BaseController<DigitalDisplaysController>
     {
         private readonly IDigitalDisplayService _digitalDisplayService;
         private readonly ILocationService _locationService;
+        private readonly IPermissionGroupService _permissionGroupService;
 
         public DigitalDisplaysController(
             ServiceFacades.Controller<DigitalDisplaysController> context,
             IDigitalDisplayService digitalDisplayService,
-            ILocationService locationService)
+            ILocationService locationService,
+            IPermissionGroupService permissionGroupService)
             : base(context)
         {
             _digitalDisplayService = digitalDisplayService
                 ?? throw new ArgumentNullException(nameof(digitalDisplayService));
             _locationService = locationService
                 ?? throw new ArgumentNullException(nameof(locationService));
+            _permissionGroupService = permissionGroupService
+                ?? throw new ArgumentNullException(nameof(permissionGroupService));
         }
 
         public static string Name { get { return "DigitalDisplays"; } }
@@ -48,6 +52,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [HttpGet]
         [Route("[action]")]
         [SaveModelState]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public IActionResult AddSet()
         {
             return View("AddUpdateSet");
@@ -56,6 +61,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [HttpPost]
         [Route("[action]")]
         [RestoreModelState]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> AddUpdateSet(DigitalDisplaySet digitalDisplaySet)
         {
             if (ModelState.IsValid && digitalDisplaySet != null)
@@ -78,6 +84,12 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]/{digitalDisplayAssetId}")]
         public async Task<IActionResult> AssetAssociations(int digitalDisplayAssetId)
         {
+            if (!await HasContentManagementRightsAsync())
+            {
+                ShowAlertDanger("You do not have permission to associate assets.");
+                return RedirectToAction(nameof(Assets));
+            }
+
             var asset = await _digitalDisplayService.GetAssetAsync(digitalDisplayAssetId);
 
             return View("AssetAssociations", new AssetAssociationViewModel
@@ -92,6 +104,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [HttpGet]
         [Route("[action]")]
         [Route("[action]/{page}")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> Assets(int page = 1)
         {
             var filter = new BaseFilter(page);
@@ -116,14 +129,18 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             return View(new AssetListViewModel
             {
                 DigitalDisplayAssets = assets.Data,
-                PaginateModel = paginateModel,
                 DigitalDisplaySetAssets = assetCounts,
-                ImageUrls = _digitalDisplayService.GetAssetUrlPaths(assets.Data)
+                HasDigitalDisplayPermissions = await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.DigitalDisplayContentManagement),
+                ImageUrls = _digitalDisplayService.GetAssetUrlPaths(assets.Data),
+                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
+                PaginateModel = paginateModel
             });
         }
 
         [HttpPost]
         [Route("[action]")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> AssignSet([FromBody] UpdateSetModel viewmodel)
         {
             if (viewmodel == null)
@@ -161,6 +178,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         [HttpGet]
         [Route("[action]/{displayId}")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> AssignSets(int displayId)
         {
             var displaysSets = await _digitalDisplayService
@@ -178,6 +196,12 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]")]
         public async Task<IActionResult> DeleteAsset(int digitalDisplayAssetId)
         {
+            if (!await HasContentManagementRightsAsync())
+            {
+                ShowAlertDanger("You do not have permission to remove this asset.");
+                return RedirectToAction(nameof(Assets));
+            }
+
             try
             {
                 await _digitalDisplayService.DeleteAssetAsync(digitalDisplayAssetId);
@@ -191,6 +215,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         [HttpPost]
         [Route("[action]")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> DeleteDisplay(int digitalDisplayId)
         {
             await _digitalDisplayService.DeleteDisplayAsync(digitalDisplayId);
@@ -199,6 +224,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         [HttpPost]
         [Route("[action]")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> DeleteSet(int digitalDisplaySetId)
         {
             await _digitalDisplayService.DeleteSetAsync(digitalDisplaySetId);
@@ -226,15 +252,19 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             return View(new DisplayListViewModel
             {
-                Locations = locations.ToDictionary(k => k.Id, v => v.Name),
                 DigitalDisplays = displays,
-                DisplaySetNames = displaySetNames
+                DisplaySetNames = displaySetNames,
+                HasDigitalDisplayPermissions = await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.DigitalDisplayContentManagement),
+                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
+                Locations = locations.ToDictionary(k => k.Id, v => v.Name)
             });
         }
 
         [HttpGet]
         [Route("[action]")]
         [RestoreModelState]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> Provision()
         {
             var digitalDisplaySets = await _digitalDisplayService.GetSetsAsync();
@@ -255,6 +285,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [HttpPost]
         [Route("[action]")]
         [SaveModelState]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> Provision(ProvisionDisplayViewModel viewmodel)
         {
             if (ModelState.IsValid && viewmodel != null)
@@ -269,24 +300,38 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [HttpGet]
         [Route("[action]")]
         [SaveModelState]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> Sets()
         {
             return View(new SetListViewModel
             {
                 DigitalDisplaySets = await _digitalDisplayService.GetSetsAsync(),
                 DigitalDisplaySetAssets = await _digitalDisplayService.GetSetsAssetCountsAsync(),
-                DigitalDisplaySetDisplays = await _digitalDisplayService.GetSetsDisplaysCountsAsync()
+                DigitalDisplaySetDisplays
+                    = await _digitalDisplayService.GetSetsDisplaysCountsAsync(),
+                HasDigitalDisplayPermissions = await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.DigitalDisplayContentManagement),
+                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
             });
         }
 
         [HttpPost]
         [Route("[action]")]
         public async Task<IActionResult>
-            UpdateAssetAssocations([FromBody] UpdatedAssetAllocationsModel update)
+            UpdateAssetAssocations([FromBody] UpdatedAssetAssociationsModel update)
         {
+            if (!await HasContentManagementRightsAsync())
+            {
+                return Json(new UpdatedAssetAssociationsModel
+                {
+                    Success = false,
+                    Message = "You do not have permission to alter asset assocations."
+                });
+            }
+
             if (update == null)
             {
-                update = new UpdatedAssetAllocationsModel
+                update = new UpdatedAssetAssociationsModel
                 {
                     Success = false,
                     Message = "No update was submitted."
@@ -335,6 +380,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [HttpGet]
         [Route("[action]/{displayId}")]
         [SaveModelState]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> UpdateDisplay(int displayId)
         {
             return View(new UpdateDisplayViewModel
@@ -348,6 +394,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [HttpPost]
         [Route("[action]/{displayId}")]
         [RestoreModelState]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> UpdateDisplay(UpdateDisplayViewModel viewmodel)
         {
             if (viewmodel == null)
@@ -368,6 +415,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [HttpGet]
         [Route("[action]")]
         [SaveModelState]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> UpdateSet(int digitalDisplaySetId)
         {
             var digitalDisplaySet = await _digitalDisplayService.GetSetAsync(digitalDisplaySetId);
@@ -385,6 +433,12 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]")]
         public async Task<IActionResult> UploadAsset(IFormFile assetFile)
         {
+            if (!await HasContentManagementRightsAsync())
+            {
+                ShowAlertDanger("You do not have permission to add an asset.");
+                return RedirectToAction(nameof(Assets));
+            }
+
             if (assetFile == null)
             {
                 return RedirectToAction(nameof(UploadAsset));
@@ -397,6 +451,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         [HttpPost]
         [Route("[action]")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
             "CA1031:Do not catch general exception types",
             Justification = "Any error should return a valid JSON response")]
@@ -513,6 +568,13 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         {
             return sets.ToList().ConvertAll(_ =>
                 new SelectListItem(_.Name, _.Id.ToString(CultureInfo.InvariantCulture)));
+        }
+
+        private async Task<bool> HasContentManagementRightsAsync()
+        {
+            return !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
+                || await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.DigitalDisplayContentManagement);
         }
 
         private async Task<DigitalDisplayAsset> UploadAssetInternalAsync(IFormFile assetFile)

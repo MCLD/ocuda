@@ -9,7 +9,18 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDispla
     {
         public ICollection<DigitalDisplayAsset> DigitalDisplayAssets { get; set; }
         public IDictionary<int, int> DigitalDisplaySetAssets { get; set; }
+        public bool HasDigitalDisplayPermissions { get; set; }
+
+        public bool HasPermissions
+        {
+            get
+            {
+                return IsSiteManager || HasDigitalDisplayPermissions;
+            }
+        }
+
         public IDictionary<int, string> ImageUrls { get; set; }
+        public bool IsSiteManager { get; set; }
         public PaginateModel PaginateModel { get; set; }
 
         public string GetSetCount(int assetId)

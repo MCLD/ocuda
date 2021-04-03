@@ -10,10 +10,13 @@
         <a class="btn btn-outline-dark mt-2 mb-1 float-right"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
-        <a class="btn btn-outline-primary mt-2 mb-1 mr-4 float-right"
-           asp-action="@nameof(DigitalDisplaysController.Provision)">
-            @nameof(DigitalDisplaysController.Provision)
-        </a>
+        @if (Model.IsSiteManager)
+        {
+            <a class="btn btn-outline-primary mt-2 mb-1 mr-4 float-right"
+               asp-action="@nameof(DigitalDisplaysController.Provision)">
+                @nameof(DigitalDisplaysController.Provision)
+            </a>
+        }
     </div>
 </div>
 
@@ -67,19 +70,22 @@
                         }
                     </td>
                     <td class="align-middle">
-                        <a asp-action="@nameof(DigitalDisplaysController.UpdateDisplay)"
-                           asp-route-displayId="@display.Id"
-                           class="btn btn-outline-primary my-1"><span class="fas fa-edit"></span></a>
-                        @if (!Model.HasSets(display.Id))
+                        @if (Model.IsSiteManager)
                         {
-                            <button type="button"
-                                    data-toggle="modal"
-                                    data-target="#deleteDisplay"
-                                    data-id="@display.Id"
-                                    data-name="@display.Name"
-                                    class="btn btn-outline-danger my-1">
-                                <span class="fas fa-minus-circle"></span>
-                            </button>
+                            <a asp-action="@nameof(DigitalDisplaysController.UpdateDisplay)"
+                               asp-route-displayId="@display.Id"
+                               class="btn btn-outline-primary my-1"><span class="fas fa-edit"></span></a>
+                            @if (!Model.HasSets(display.Id))
+                            {
+                                <button type="button"
+                                        data-toggle="modal"
+                                        data-target="#deleteDisplay"
+                                        data-id="@display.Id"
+                                        data-name="@display.Name"
+                                        class="btn btn-outline-danger my-1">
+                                    <span class="fas fa-minus-circle"></span>
+                                </button>
+                            }
                         }
                     </td>
                 </tr>
