@@ -15,8 +15,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("ProductVersion", "5.0.4")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
@@ -51,12 +51,12 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Stub")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -82,8 +82,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.Property<string>("ClaimType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -93,8 +93,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.Property<string>("GroupName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -184,6 +184,199 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.ToTable("CoverIssueHeaders");
                 });
 
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.DigitalDisplay", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("BasicAuthentication")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("LastAttempt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastCommunication")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastContentVerification")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LocationDescription")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int?>("LocationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("RemoteAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SlideCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.ToTable("DigitalDisplays");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.DigitalDisplayAsset", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.ToTable("DigitalDisplayAssets");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.DigitalDisplayAssetSet", b =>
+                {
+                    b.Property<int>("DigitalDisplayAssetId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DigitalDisplaySetId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("DigitalDisplayAssetId", "DigitalDisplaySetId");
+
+                    b.HasIndex("DigitalDisplaySetId");
+
+                    b.ToTable("DigitalDisplayAssetSets");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.DigitalDisplayDisplaySet", b =>
+                {
+                    b.Property<int>("DigitalDisplayId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DigitalDisplaySetId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DigitalDisplayId", "DigitalDisplaySetId");
+
+                    b.HasIndex("DigitalDisplaySetId");
+
+                    b.ToTable("DigitalDisplayDisplaySets");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.DigitalDisplayItem", b =>
+                {
+                    b.Property<int>("DigitalDisplayAssetId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DigitalDisplayId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AssetId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("DigitalDisplayAssetId", "DigitalDisplayId");
+
+                    b.HasIndex("DigitalDisplayId");
+
+                    b.ToTable("DigitalDisplayItems");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.DigitalDisplaySet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LastContentUpdate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.ToTable("DigitalDisplaySets");
+                });
+
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmailRecord", b =>
                 {
                     b.Property<int>("Id")
@@ -248,21 +441,21 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("EmailTemplateId")
                         .HasColumnType("int");
 
                     b.Property<string>("FromEmailAddress")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("FromName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -277,8 +470,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("PromenadeLanguageName")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("BodyHtml")
                         .HasColumnType("nvarchar(max)");
@@ -287,16 +480,16 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Preview")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Subject")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("UrlParameters")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("EmailSetupId", "PromenadeLanguageName");
 
@@ -312,8 +505,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -326,8 +519,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("PromenadeLanguageName")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("TemplateHtml")
                         .IsRequired()
@@ -361,8 +554,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("SortOrder")
                         .HasColumnType("int");
@@ -378,8 +571,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -404,8 +597,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("FileLibraryId")
                         .HasColumnType("int");
@@ -415,8 +608,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -452,15 +645,15 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("SectionId")
                         .HasColumnType("int");
 
                     b.Property<string>("Stub")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -507,12 +700,12 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.Property<string>("Extension")
                         .IsRequired()
-                        .HasColumnType("nvarchar(16)")
-                        .HasMaxLength(16);
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
 
                     b.Property<string>("Icon")
-                        .HasColumnType("nvarchar(32)")
-                        .HasMaxLength(32);
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -543,16 +736,16 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Icon")
-                        .HasColumnType("nvarchar(32)")
-                        .HasMaxLength(32);
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.Property<int>("LinkLibraryId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -562,8 +755,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -594,15 +787,15 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("SectionId")
                         .HasColumnType("int");
 
                     b.Property<string>("Stub")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -634,13 +827,13 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.Property<string>("GroupName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("PermissionGroupName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -663,8 +856,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ApplicationPermission")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("PermissionGroupId", "ApplicationPermission");
 
@@ -725,13 +918,13 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.Property<string>("Stub")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -780,8 +973,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("EmailAddress")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
@@ -793,13 +986,13 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("JobTitle")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("PositionNum")
                         .HasColumnType("int");
@@ -902,8 +1095,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(1000)")
-                        .HasMaxLength(1000);
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<int?>("RelatedEmailId")
                         .HasColumnType("int");
@@ -933,8 +1126,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.Property<string>("Disposition")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -955,21 +1148,21 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("EmbedVideoUrl")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Icon")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Stub")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -1016,8 +1209,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.Property<string>("GroupName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("SectionId")
                         .HasColumnType("int");
@@ -1042,12 +1235,12 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.SiteSetting", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Category")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -1057,13 +1250,13 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
@@ -1075,8 +1268,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Value")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -1101,8 +1294,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int?>("EmployeeId")
                         .HasColumnType("int");
@@ -1132,16 +1325,16 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Nickname")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("ReauthenticateUser")
                         .HasColumnType("bit");
@@ -1153,8 +1346,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -1163,8 +1356,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Username")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -1206,8 +1399,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -1236,6 +1429,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ClaimGroup", b =>
@@ -1250,6 +1447,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.CoverIssueDetail", b =>
@@ -1270,6 +1471,12 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CoverIssueHeader");
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.CoverIssueHeader", b =>
@@ -1284,6 +1491,121 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.DigitalDisplay", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Ops.Models.Entities.User", "UpdatedByUser")
+                        .WithMany()
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.DigitalDisplayAsset", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Ops.Models.Entities.User", "UpdatedByUser")
+                        .WithMany()
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.DigitalDisplayAssetSet", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.DigitalDisplayAsset", "DigitalDisplayAsset")
+                        .WithMany()
+                        .HasForeignKey("DigitalDisplayAssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Ops.Models.Entities.DigitalDisplaySet", "DigitalDisplaySet")
+                        .WithMany()
+                        .HasForeignKey("DigitalDisplaySetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DigitalDisplayAsset");
+
+                    b.Navigation("DigitalDisplaySet");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.DigitalDisplayDisplaySet", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.DigitalDisplay", "DigitalDisplay")
+                        .WithMany()
+                        .HasForeignKey("DigitalDisplayId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Ops.Models.Entities.DigitalDisplaySet", "DigitalDisplaySet")
+                        .WithMany()
+                        .HasForeignKey("DigitalDisplaySetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DigitalDisplay");
+
+                    b.Navigation("DigitalDisplaySet");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.DigitalDisplayItem", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.DigitalDisplayAsset", "DigitalDisplayAsset")
+                        .WithMany()
+                        .HasForeignKey("DigitalDisplayAssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Ops.Models.Entities.DigitalDisplay", "DigitalDisplay")
+                        .WithMany()
+                        .HasForeignKey("DigitalDisplayId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DigitalDisplay");
+
+                    b.Navigation("DigitalDisplayAsset");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.DigitalDisplaySet", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Ops.Models.Entities.User", "UpdatedByUser")
+                        .WithMany()
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmailSetup", b =>
@@ -1293,6 +1615,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasForeignKey("EmailTemplateId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("EmailTemplate");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmailSetupText", b =>
@@ -1302,6 +1626,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasForeignKey("EmailSetupId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("EmailSetup");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.EmailTemplateText", b =>
@@ -1311,6 +1637,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasForeignKey("EmailTemplateId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("EmailTemplate");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ExternalResource", b =>
@@ -1325,6 +1653,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.File", b =>
@@ -1351,6 +1683,14 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("FileLibrary");
+
+                    b.Navigation("FileType");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.FileLibrary", b =>
@@ -1365,6 +1705,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.FileLibraryFileType", b =>
@@ -1380,6 +1724,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasForeignKey("FileTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("FileLibrary");
+
+                    b.Navigation("FileType");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.FileType", b =>
@@ -1394,6 +1742,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.Link", b =>
@@ -1414,6 +1766,12 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("LinkLibrary");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.LinkLibrary", b =>
@@ -1428,6 +1786,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroup", b =>
@@ -1442,6 +1804,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupApplication", b =>
@@ -1451,6 +1817,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasForeignKey("PermissionGroupId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("PermissionGroup");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.Post", b =>
@@ -1465,6 +1833,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.PostCategory", b =>
@@ -1480,6 +1852,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Post");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.RosterDetail", b =>
@@ -1500,6 +1876,12 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("RosterHeader");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.RosterHeader", b =>
@@ -1514,6 +1896,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ScheduleClaim", b =>
@@ -1523,6 +1909,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.ScheduleLog", b =>
@@ -1531,6 +1919,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("ScheduleLogCallDispositionId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ScheduleLogCallDisposition");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.Section", b =>
@@ -1545,6 +1935,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.SectionCategory", b =>
@@ -1560,6 +1954,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasForeignKey("SectionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Section");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.SectionManagerGroup", b =>
@@ -1580,6 +1978,12 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("Section");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.SiteSetting", b =>
@@ -1594,6 +1998,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.User", b =>
@@ -1602,6 +2010,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("SupervisorId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Supervisor");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.UserMetadata", b =>
@@ -1617,6 +2027,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasForeignKey("UserMetadataTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("UserMetadataType");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.UserMetadataType", b =>
@@ -1631,6 +2045,27 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.FileLibrary", b =>
+                {
+                    b.Navigation("Files");
+
+                    b.Navigation("FileTypes");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.LinkLibrary", b =>
+                {
+                    b.Navigation("Links");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.User", b =>
+                {
+                    b.Navigation("Metadata");
                 });
 #pragma warning restore 612, 618
         }

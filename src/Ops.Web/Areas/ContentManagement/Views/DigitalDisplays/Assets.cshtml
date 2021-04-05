@@ -1,0 +1,197 @@
+﻿@model AssetListViewModel
+
+@using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDisplays
+
+<div class="row">
+    <div class="col-sm-7">
+        <h1>Digital Display Assets</h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
+        @if (Model.HasPermissions)
+        {
+            <button class="btn btn-outline-primary mt-2 mb-1 mr-4 float-right"
+                    type="button"
+                    data-toggle="modal"
+                    data-target="#uploadAsset">
+                Upload asset
+            </button>
+        }
+    </div>
+</div>
+
+@await Html.PartialAsync("_DigitalDisplaysPartial")
+
+<table class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Image</th>
+            <th>Display Sets</th>
+            <th>
+                Info
+                <span class="fas fa-caret-down"></span>
+            </th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.DigitalDisplayAssets?.Count > 0)
+        {
+            @foreach (var asset in Model.DigitalDisplayAssets)
+            {
+                <tr>
+                    <td class="align-middle">@asset.Name</td>
+                    <td class="align-middle">
+                        <div style="height: 100px;">
+                            @if (Model.ImageUrls.ContainsKey(asset.Id))
+                            {
+                                <a href="@Model.ImageUrls[asset.Id]" target="_blank">
+                                    <img src="@Model.ImageUrls[asset.Id]" style="max-height: 100px;" />
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-danger">Missing asset</span>
+                            }
+                        </div>
+                    </td>
+                    <td class="align-middle">@Model.GetSetCount(asset.Id)</td>
+                    <td class="align-middle">
+                        Uploaded by:
+                        <a asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
+                           asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
+                           asp-route-id="@asset.CreatedByUser.Username"
+                           target="_blank">@asset.CreatedByUser.Name</a><br />
+                        Uploaded at: @asset.CreatedAt
+                    </td>
+                    <td class="align-middle">
+                        @if (Model.HasPermissions)
+                        {
+                            <a asp-action="@nameof(DigitalDisplaysController.AssetAssociations)"
+                               asp-route-digitalDisplayAssetId="@asset.Id"
+                               class="btn btn-outline-primary my-1"><span class="fas fa-paperclip"></span></a>
+                            @if (Model.GetSetCount(asset.Id) == "0")
+                            {
+                                <button type="button"
+                                        data-toggle="modal"
+                                        data-target="#deleteAsset"
+                                        data-id="@asset.Id"
+                                        data-name="@asset.Name"
+                                        class="btn btn-outline-danger my-1">
+                                    <span class="fas fa-minus-circle"></span>
+                                </button>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr class="table-warning">
+                <td colspan="5">
+                    No digital display assets found.
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.PaginateModel.MaxPage > 1)
+{
+    <paginate paginateModel="@Model.PaginateModel"></paginate>
+}
+
+<form asp-action="@(nameof(DigitalDisplaysController.DeleteAsset))">
+    <div class="modal fade"
+         id="deleteAsset"
+         data-backdrop="static"
+         data-keyboard="false"
+         tabindex="-1"
+         aria-labelledby="deleteAssetLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteAssetLabel">Delete digital display asset</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="digitalDisplayAssetId" id="digitalDisplayAssetId" />
+                    Are you sure you want to delete the digital display asset:
+                    <strong><span id="digitalDisplayAssetName"></span></strong>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-danger" button-spinner>Delete asset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form asp-action="@nameof(DigitalDisplaysController.UploadAsset)"
+      method="post"
+      role="form"
+      enctype="multipart/form-data">
+    <div class="modal fade"
+         id="uploadAsset"
+         data-backdrop="static"
+         data-keyboard="false"
+         tabindex="-1"
+         aria-labelledby="uploadAssetLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadAssetLabel">Upload asset</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <label class="btn btn-outline-secondary btn-file form-control">
+                                <span class="far fa-file"></span> Select a File
+                                <input type="file"
+                                       name="assetFile"
+                                       id="assetFile"
+                                       accept=".jpg,.png"
+                                       hidden />
+                            </label>
+                        </div>
+                        <div class="custom-file">
+                            <input type="text" class="form-control" readonly id="selectedFile" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-danger" button-spinner>
+                        Upload asset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        $('#deleteAsset').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget)
+            $(this).find('#digitalDisplayAssetName').text(button.data('name'))
+            $(this).find('#digitalDisplayAssetId').val(button.data('id'));
+        })
+    </script>
+}

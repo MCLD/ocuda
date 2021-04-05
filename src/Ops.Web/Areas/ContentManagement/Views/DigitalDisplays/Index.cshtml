@@ -1,0 +1,145 @@
+﻿@model DisplayListViewModel
+
+@using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDisplays
+
+<div class="row">
+    <div class="col-sm-7">
+        <h1>Digital Displays</h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
+        @if (Model.IsSiteManager)
+        {
+            <a class="btn btn-outline-primary mt-2 mb-1 mr-4 float-right"
+               asp-action="@nameof(DigitalDisplaysController.Provision)">
+                @nameof(DigitalDisplaysController.Provision)
+            </a>
+        }
+    </div>
+</div>
+
+@await Html.PartialAsync("_DigitalDisplaysPartial")
+
+<table class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Display Set</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.DigitalDisplays?.Count > 0)
+        {
+            @foreach (var display in Model.DigitalDisplays)
+            {
+                <tr class="@DisplayListViewModel.RowClass(display)" data-displayId="@display.Id">
+                    <td class="align-middle">@display.Name</td>
+                    <td class="align-middle">
+                        <a asp-action="AssignSets"
+                           asp-route-displayId="@display.Id">
+                            @Model.ShowSets(display.Id)
+                        </a>
+                    </td>
+                    <td class="align-middle">
+                        <span title="@display.LocationDescription">
+                            @Model.ShowLocation(display.LocationId)
+                        </span>
+                    </td>
+                    <td class="align-middle oc-display-cell">
+                        Last verification: @(display.LastContentVerification?.ToString() ?? "none")
+                        @if (!string.IsNullOrEmpty(display.Status.Message))
+                        {
+                            @:<br />Status:
+                            <span class="oc-status-message">@display.Status.Message</span>
+                            @if (display.Status.AsOf != default)
+                            {
+                                <small>
+                                    <em>
+                                        (as of
+                                        <span class="oc-status-asof">
+                                            @display.Status.AsOf)
+                                        </span>
+                                    </em>
+                                </small>
+                            }
+                        }
+                    </td>
+                    <td class="align-middle">
+                        @if (Model.IsSiteManager)
+                        {
+                            <a asp-action="@nameof(DigitalDisplaysController.UpdateDisplay)"
+                               asp-route-displayId="@display.Id"
+                               class="btn btn-outline-primary my-1"><span class="fas fa-edit"></span></a>
+                            @if (!Model.HasSets(display.Id))
+                            {
+                                <button type="button"
+                                        data-toggle="modal"
+                                        data-target="#deleteDisplay"
+                                        data-id="@display.Id"
+                                        data-name="@display.Name"
+                                        class="btn btn-outline-danger my-1">
+                                    <span class="fas fa-minus-circle"></span>
+                                </button>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr class="table-warning">
+                <td colspan="5">
+                    No digital displays found.
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<form asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.DeleteDisplay))">
+    <div class="modal fade"
+         id="deleteDisplay"
+         data-backdrop="static"
+         data-keyboard="false"
+         tabindex="-1"
+         aria-labelledby="deleteDisplayLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteDisplayLabel">Delete digital display</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="digitalDisplayId" id="digitalDisplayId" />
+                    Are you sure you want to delete the digital display:
+                    <strong><span id="digitalDisplayName"></span></strong>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-danger">Delete display</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        $('#deleteDisplay').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget)
+            $(this).find('#digitalDisplayName').text(button.data('name'))
+            $(this).find('#digitalDisplayId').val(button.data('id'));
+        })
+    </script>
+}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
@@ -48,27 +49,22 @@ namespace Ocuda.Ops.Web.JobScheduling
             }
         }
 
-        private async Task<bool> GetCancellationOrder(int seconds)
+        public override async Task StopAsync(CancellationToken cancellationToken)
         {
-            var cancellation = await _cache
-                .GetStringAsync(string.Format(Cache.OpsJobStop, InstanceName));
+            _logger.LogInformation("Stopping job service in instance {InstanceName}",
+                string.IsNullOrEmpty(_config[Configuration.OcudaInstance])
+                    ? "n/a"
+                    : _config[Configuration.OcudaInstance]);
 
-            if (cancellation == InstanceName)
-            {
-                await _cache.RemoveAsync(string.Format(Cache.OpsJobStop, InstanceName));
-                _logger.LogInformation("Cancellation received for job service {InstanceName}",
-                    InstanceName);
-                return true;
-            }
-
-            await _cache.SetStringAsync(Cache.OpsJobRunner,
+            await _cache.SetStringAsync(string.Format(CultureInfo.InvariantCulture,
+                    Cache.OpsJobStop,
+                    InstanceName),
                 InstanceName,
                 new DistributedCacheEntryOptions
                 {
-                    SlidingExpiration = TimeSpan.FromSeconds(seconds + 10)
-                });
-
-            return false;
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                },
+                cancellationToken);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -78,7 +74,10 @@ namespace Ocuda.Ops.Web.JobScheduling
                 return;
             }
 
-            await _cache.RemoveAsync(string.Format(Cache.OpsJobStop, InstanceName));
+            await _cache.RemoveAsync(string.Format(CultureInfo.InvariantCulture,
+                Cache.OpsJobStop,
+                InstanceName),
+                stoppingToken);
 
             _logger.LogDebug("Starting job service in instance {InstanceName} with a sleep value of {JobSleep} s",
                 InstanceName,
@@ -113,19 +112,31 @@ namespace Ocuda.Ops.Web.JobScheduling
                 InstanceName);
         }
 
-        public override async Task StopAsync(CancellationToken stoppingToken)
+        private async Task<bool> GetCancellationOrder(int seconds)
         {
-            _logger.LogInformation("Stopping job service in instance {InstanceName}",
-                string.IsNullOrEmpty(_config[Configuration.OcudaInstance])
-                    ? "n/a"
-                    : _config[Configuration.OcudaInstance]);
+            var cancellation = await _cache
+                .GetStringAsync(string.Format(CultureInfo.InvariantCulture,
+                    Cache.OpsJobStop,
+                    InstanceName));
 
-            await _cache.SetStringAsync(string.Format(Cache.OpsJobStop, InstanceName),
+            if (cancellation == InstanceName)
+            {
+                await _cache.RemoveAsync(string.Format(CultureInfo.InvariantCulture,
+                    Cache.OpsJobStop,
+                    InstanceName));
+                _logger.LogInformation("Cancellation received for job service {InstanceName}",
+                    InstanceName);
+                return true;
+            }
+
+            await _cache.SetStringAsync(Cache.OpsJobRunner,
                 InstanceName,
                 new DistributedCacheEntryOptions
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                    SlidingExpiration = TimeSpan.FromSeconds(seconds + 10)
                 });
+
+            return false;
         }
     }
 }

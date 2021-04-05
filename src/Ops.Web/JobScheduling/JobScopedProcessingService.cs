@@ -9,43 +9,41 @@ namespace Ocuda.Ops.Web.JobScheduling
     internal class JobScopedProcessingService
         : BaseScopedBackgroundService<JobScopedProcessingService>
     {
+        private readonly IDigitalDisplaySyncService _digitalDisplaySyncService;
         private readonly IScheduleNotificationService _scheduleNotificationService;
 
         public JobScopedProcessingService(ILogger<JobScopedProcessingService> logger,
+            IDigitalDisplaySyncService digitalDisplaySyncService,
             IScheduleNotificationService scheduleNotificationService)
             : base(logger)
         {
+            _digitalDisplaySyncService = digitalDisplaySyncService
+                ?? throw new ArgumentNullException(nameof(digitalDisplaySyncService));
             _scheduleNotificationService = scheduleNotificationService
                 ?? throw new ArgumentNullException(nameof(scheduleNotificationService));
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+            "CA1031:Do not catch general exception types",
+            Justification = "Catch all exceptions and log them as this runs headless")]
         public override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             StartProcessing();
 
-            int sent = 0;
-
             try
             {
-                sent = await _scheduleNotificationService.SendPendingNotificationsAsync();
+                await Task.WhenAll(
+                    _scheduleNotificationService.SendPendingNotificationsAsync(),
+                    _digitalDisplaySyncService.UpdateDigitalDisplaysAsync());
             }
             catch (Exception ex)
             {
-                _logger.LogCritical("Error sending pending notifications: {ErrorMessage}",
+                _logger.LogCritical("Error running scheduled task: {ErrorMessage}",
                     ex.Message);
             }
 
-            if (sent > 0)
-            {
-                _logger.LogDebug("Scheduled tasks sent {SentNotifications} email(s) in {Elapsed} ms",
-                    sent,
-                    StopProcessing().ElapsedMilliseconds);
-            }
-            else
-            {
-                _logger.LogDebug("Scheduled tasks complete in {Elapsed} ms",
-                    StopProcessing().ElapsedMilliseconds);
-            }
+            _logger.LogDebug("Scheduled tasks complete in {Elapsed} ms",
+                StopProcessing().ElapsedMilliseconds);
         }
     }
 }

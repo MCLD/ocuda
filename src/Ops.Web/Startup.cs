@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -17,6 +18,7 @@ using Ocuda.Ops.Controllers;
 using Ocuda.Ops.Controllers.Authorization;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Service;
+using Ocuda.Ops.Service.Clients;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Ops.Web.JobScheduling;
@@ -42,9 +44,99 @@ namespace Ocuda.Ops.Web
             _isDevelopment = env.IsDevelopment();
         }
 
+        public void Configure(IApplicationBuilder app,
+            Utility.Services.Interfaces.IPathResolverService pathResolver)
+        {
+            if (pathResolver == null)
+            {
+                throw new ArgumentNullException(nameof(pathResolver));
+            }
+
+            // configure error page handling and development IDE linking
+            if (_isDevelopment)
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider
+                    = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+                        Path.Combine(Path.GetFullPath("Styles"))),
+                    RequestPath = new PathString("/devstyles")
+                });
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider
+                    = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+                        Path.Combine(Path.GetFullPath("Scripts"))),
+                    RequestPath = new PathString("/devscripts")
+                });
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider
+                    = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+                        Path.Combine(Path.GetFullPath("node_modules"))),
+                    RequestPath = new PathString("/devmodules")
+                });
+            }
+            else
+            {
+                app.UseStatusCodePagesWithReExecute("/Error/Index/{0}");
+            }
+
+            // insert remote address into the log context for each request
+            app.Use(async (context, next) =>
+            {
+                using (Serilog.Context
+                    .LogContext
+                    .PushProperty("RemoteAddress", context.Connection.RemoteIpAddress))
+                {
+                    await next.Invoke();
+                }
+            });
+
+            // update databases to include latest migrations
+            app.InitialSetup();
+
+            // use the culture configured above in services
+            app.UseRequestLocalization();
+
+            app.UseStaticFiles();
+
+            // configure shared content directory
+            var contentFilePath = pathResolver.GetPublicContentFilePath();
+            var contentUrl = pathResolver.GetPublicContentUrl();
+            if (!contentUrl.StartsWith("/", StringComparison.OrdinalIgnoreCase))
+            {
+                contentUrl = $"/{contentUrl}";
+            }
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider
+                    = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(contentFilePath),
+                RequestPath = new PathString(contentUrl)
+            });
+
+            app.UseSession();
+
+            app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.UseEndpoints(_ =>
+            {
+                _.MapControllers();
+                _.MapHealthChecks("/health");
+            });
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability",
-            "CA1506:Avoid excessive class coupling",
+                    "CA1506:Avoid excessive class coupling",
             Justification = "Dependency injection")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Vulnerability",
+            "S4830:Server certificates should be verified during SSL/TLS connections",
+            Justification = "Screenly OSE uses self-signed certificates")]
         public void ConfigureServices(IServiceCollection services)
         {
             // set a default culture of en-US if none is specified
@@ -84,6 +176,7 @@ namespace Ocuda.Ops.Web
                         _.InstanceName = instanceName;
                     });
                     break;
+
                 default:
                     services.AddDistributedMemoryCache();
                     break;
@@ -106,6 +199,7 @@ namespace Ocuda.Ops.Web
                         .AddDbContextCheck<OpsContext>()
                         .AddDbContextCheck<PromenadeContext>();
                     break;
+
                 default:
                     throw new OcudaException("No Configuration.OpsDatabaseProvider configured.");
             }
@@ -159,6 +253,16 @@ namespace Ocuda.Ops.Web
                     .AddSessionStateTempDataProvider();
             }
 
+            services.AddHttpClient<Service.Abstract.IScreenlyClient, ScreenlyClient>()
+                .ConfigurePrimaryHttpMessageHandler(() =>
+                {
+                    return new HttpClientHandler
+                    {
+                        ServerCertificateCustomValidationCallback
+                            = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                    };
+                });
+
             services.AddScoped<IDateTimeProvider, CurrentDateTimeProvider>();
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -184,6 +288,18 @@ namespace Ocuda.Ops.Web
                 Data.Ops.CoverIssueDetailRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICoverIssueHeaderRepository,
                 Data.Ops.CoverIssueHeaderRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IDigitalDisplayAssetRepository,
+                Data.Ops.DigitalDisplayAssetRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IDigitalDisplayDisplaySetRepository,
+                Data.Ops.DigitalDisplayDisplaySetRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IDigitalDisplayAssetSetRepository,
+                Data.Ops.DigitalDisplayAssetSetRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IDigitalDisplayItemRepository,
+                Data.Ops.DigitalDisplayItemRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IDigitalDisplayRepository,
+                Data.Ops.DigitalDisplayRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IDigitalDisplaySetRepository,
+                Data.Ops.DigitalDisplaySetRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IEmailRecordRepository,
                 Data.Ops.EmailRecordRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IEmailSetupTextRepository,
@@ -312,6 +428,8 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ICarouselService, CarouselService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<ICoverIssueService, CoverIssueService>();
+            services.AddScoped<IDigitalDisplayService, DigitalDisplayService>();
+            services.AddScoped<IDigitalDisplaySyncService, DigitalDisplaySyncService>();
             services.AddScoped<IEmediaService, EmediaService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IExternalResourcePromService, ExternalResourcePromService>();
@@ -343,6 +461,7 @@ namespace Ocuda.Ops.Web
                 ScheduleRequestLimitService>();
             services.AddScoped<Service.Interfaces.Ops.Services.IScheduleRequestService,
                 ScheduleRequestService>();
+            services.AddScoped<IScreenlyService, ScreenlyService>();
             services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<ISegmentService, SegmentService>();
             services.AddScoped<ISiteSettingPromService, SiteSettingPromService>();
@@ -355,93 +474,6 @@ namespace Ocuda.Ops.Web
             // background process
             services.AddScoped<JobScopedProcessingService>();
             services.AddHostedService<JobBackgroundService>();
-        }
-
-        public void Configure(IApplicationBuilder app,
-            Utility.Services.Interfaces.IPathResolverService pathResolver)
-        {
-            if (pathResolver == null)
-            {
-                throw new ArgumentNullException(nameof(pathResolver));
-            }
-
-            // configure error page handling and development IDE linking
-            if (_isDevelopment)
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseStaticFiles(new StaticFileOptions
-                {
-                    FileProvider
-                    = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
-                        Path.Combine(Path.GetFullPath("Styles"))),
-                    RequestPath = new PathString("/devstyles")
-                });
-                app.UseStaticFiles(new StaticFileOptions
-                {
-                    FileProvider
-                    = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
-                        Path.Combine(Path.GetFullPath("Scripts"))),
-                    RequestPath = new PathString("/devscripts")
-                });
-                app.UseStaticFiles(new StaticFileOptions
-                {
-                    FileProvider
-                    = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
-                        Path.Combine(Path.GetFullPath("node_modules"))),
-                    RequestPath = new PathString("/devmodules")
-                });
-            }
-            else
-            {
-                app.UseStatusCodePagesWithReExecute("/Error/Index/{0}");
-            }
-
-            // insert remote address into the log context for each request
-            app.Use(async (context, next) =>
-            {
-                using (Serilog.Context
-                    .LogContext
-                    .PushProperty("RemoteAddress", context.Connection.RemoteIpAddress))
-                {
-                    await next.Invoke();
-                }
-            });
-
-            // update databases to include latest migrations
-            app.InitialSetup();
-
-            // use the culture configured above in services
-            app.UseRequestLocalization();
-
-            app.UseStaticFiles();
-
-            // configure shared content directory
-            var contentFilePath = pathResolver.GetPublicContentFilePath();
-            var contentUrl = pathResolver.GetPublicContentUrl();
-            if (!contentUrl.StartsWith("/", StringComparison.OrdinalIgnoreCase))
-            {
-                contentUrl = $"/{contentUrl}";
-            }
-
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider
-                    = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(contentFilePath),
-                RequestPath = new PathString(contentUrl)
-            });
-
-            app.UseSession();
-
-            app.UseRouting();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.UseEndpoints(_ =>
-            {
-                _.MapControllers();
-                _.MapHealthChecks("/health");
-            });
         }
     }
 }

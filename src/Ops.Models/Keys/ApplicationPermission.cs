@@ -1,7 +1,10 @@
 ﻿namespace Ocuda.Ops.Models.Keys
 {
-    public struct ApplicationPermission
+    public static class ApplicationPermission
     {
-        public const string CoverIssueManagement = "CoverIssueManagement";
+        public static readonly string CoverIssueManagement = "CoverIssueManagement";
+
+        public static readonly string DigitalDisplayContentManagement
+            = "DigitalDisplayContentManagement";
     }
 }
