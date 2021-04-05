@@ -51,7 +51,7 @@ namespace Ocuda.SlideUploader
             services.AddLogging(_ => _.AddSerilog());
             services.AddSingleton<Upload>();
             services.AddHttpClient<OpsClient>(_ => _.BaseAddress = new Uri(options.OpsBase))
-                .ConfigurePrimaryHttpMessageHandler(_ => new HttpClientHandler()
+                .ConfigurePrimaryHttpMessageHandler(_ => new HttpClientHandler
                 {
                     Credentials = new CredentialCache {
                         { authBaseUri, "NTLM", CredentialCache.DefaultNetworkCredentials }
@@ -118,10 +118,10 @@ namespace Ocuda.SlideUploader
 
             if (issues.Count > 0)
             {
-                Console.WriteLine("Fatal configuration errors:");
+                Console.Error.WriteLine("Fatal configuration errors:");
                 foreach (var issue in issues)
                 {
-                    Console.WriteLine(issue);
+                    Console.Error.WriteLine(issue);
                     Log.Fatal("Configuration error: {ConfigurationError}", issue);
                 }
             }

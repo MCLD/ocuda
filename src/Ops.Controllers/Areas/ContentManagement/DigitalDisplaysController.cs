@@ -105,8 +105,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]")]
         [Route("[action]/{page}")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        public async Task<IActionResult> Assets(int page = 1)
+        public async Task<IActionResult> Assets(int page)
         {
+            page = page == default ? 1 : page;
+
             var filter = new BaseFilter(page);
 
             var assets = await _digitalDisplayService.GetPaginatedAssetsAsync(filter);
@@ -182,7 +184,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         public async Task<IActionResult> AssignSets(int displayId)
         {
             var displaysSets = await _digitalDisplayService
-                .GetDisplaysSetsAsync(new int[] { displayId });
+                .GetDisplaysSetsAsync(new[] { displayId });
 
             return View(new AssignSetsViewModel
             {

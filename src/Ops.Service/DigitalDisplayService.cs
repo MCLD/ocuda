@@ -122,7 +122,7 @@ namespace Ocuda.Ops.Service
         public async Task<IEnumerable<int>> AssignSetAsync(int displayId, int setId)
         {
             var sets = await _digitalDisplayDisplaySetRepository
-                .GetByDisplayIdsAsync(new int[] { displayId });
+                .GetByDisplayIdsAsync(new [] { displayId });
             var hasValue = sets.SingleOrDefault(_ => _.DigitalDisplaySetId == setId);
             if (hasValue != null)
             {
@@ -139,7 +139,7 @@ namespace Ocuda.Ops.Service
             await _digitalDisplayDisplaySetRepository.SaveAsync();
 
             sets = await _digitalDisplayDisplaySetRepository
-                .GetByDisplayIdsAsync(new int[] { displayId });
+                .GetByDisplayIdsAsync(new [] { displayId });
 
             return sets.Select(_ => _.DigitalDisplaySetId);
         }

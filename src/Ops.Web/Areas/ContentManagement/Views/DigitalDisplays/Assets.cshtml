@@ -30,7 +30,10 @@
             <th>Name</th>
             <th>Image</th>
             <th>Display Sets</th>
-            <th>Info</th>
+            <th>
+                Info
+                <span class="fas fa-caret-down"></span>
+            </th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -42,16 +45,18 @@
                 <tr>
                     <td class="align-middle">@asset.Name</td>
                     <td class="align-middle">
-                        @if (Model.ImageUrls.ContainsKey(asset.Id))
-                        {
-                            <a href="@Model.ImageUrls[asset.Id]" target="_blank">
-                                <img src="@Model.ImageUrls[asset.Id]" style="max-height: 100px;" />
-                            </a>
-                        }
-                        else
-                        {
-                            <span class="text-danger">Missing asset</span>
-                        }
+                        <div style="height: 100px;">
+                            @if (Model.ImageUrls.ContainsKey(asset.Id))
+                            {
+                                <a href="@Model.ImageUrls[asset.Id]" target="_blank">
+                                    <img src="@Model.ImageUrls[asset.Id]" style="max-height: 100px;" />
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-danger">Missing asset</span>
+                            }
+                        </div>
                     </td>
                     <td class="align-middle">@Model.GetSetCount(asset.Id)</td>
                     <td class="align-middle">

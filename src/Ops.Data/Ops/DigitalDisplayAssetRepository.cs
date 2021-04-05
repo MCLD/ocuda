@@ -30,7 +30,8 @@ namespace Ocuda.Ops.Data.Ops
                 Count = await query.CountAsync(),
                 Data = await query
                     .Include(_ => _.CreatedByUser)
-                    .OrderBy(_ => _.Name)
+                    .OrderByDescending(_ => _.CreatedAt)
+                    .ThenBy(_ => _.Name)
                     .ApplyPagination(filter)
                     .ToListAsync()
             };

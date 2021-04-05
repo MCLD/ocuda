@@ -91,7 +91,7 @@ namespace Ocuda.Ops.Service
 
                 // get the sets that this display is associated with
                 var sets = await _digitalDisplayService
-                    .GetDisplaysSetsAsync(new int[] { display.Id });
+                    .GetDisplaysSetsAsync(new [] { display.Id });
 
                 if (sets.Count == 0)
                 {
