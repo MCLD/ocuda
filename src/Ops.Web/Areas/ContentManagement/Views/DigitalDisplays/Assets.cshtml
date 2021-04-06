@@ -7,16 +7,17 @@
         <h1>Digital Display Assets</h1>
     </div>
     <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
         @if (Model.HasPermissions)
         {
-            <button class="btn btn-outline-primary mt-2 mb-1 mr-4 float-right"
+            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
                     type="button"
                     data-toggle="modal"
                     data-target="#uploadAsset">
-                Upload asset
+                <span class="fas fa-file-upload" aria-hidden="true"></span>
+                Upload Image
             </button>
         }
     </div>
@@ -130,7 +131,10 @@
                     <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
                         Cancel
                     </button>
-                    <button type="submit" class="btn btn-danger" button-spinner>Delete asset</button>
+                    <button type="submit" class="btn btn-danger" button-spinner>
+                        <span class="fas fa-minus-circle"></span>
+                        Delete image
+                    </button>
                 </div>
             </div>
         </div>
@@ -151,7 +155,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="uploadAssetLabel">Upload asset</h5>
+                    <h5 class="modal-title" id="uploadAssetLabel">Upload image</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -177,8 +181,9 @@
                     <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
                         Cancel
                     </button>
-                    <button type="submit" class="btn btn-danger" button-spinner>
-                        Upload asset
+                    <button type="submit" class="btn btn-outline-success" button-spinner>
+                        <span class="fas fa-file-upload" aria-hidden="true"></span>
+                        Upload image
                     </button>
                 </div>
             </div>
