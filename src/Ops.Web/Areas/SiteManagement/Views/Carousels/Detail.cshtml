@@ -4,27 +4,29 @@
     <div class="col-sm-6">
         <h1>
             Carousel
+            <small class="text-muted">@Model.Carousel?.CarouselText?.Title</small>
         </h1>
     </div>
     <div class="col-sm-6">
-        <button class="btn btn-outline-success mt-2 mb-1 float-right"
-                data-toggle="modal"
-                data-target="#addItemModal">
-            <span class="fas fa-plus-circle" aria-hidden="true"></span>
-            Add Carousel Item
-        </button>
         @if (Model.PageLayoutId.HasValue)
         {
             <a asp-controller="@PagesController.Name"
                asp-action="@nameof(PagesController.LayoutDetail)"
                asp-route-id="@Model.PageLayoutId.Value"
-               class="btn btn-outline-dark mt-2 mb-1 mr-4 float-right">Back</a>
+               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
         }
         else
         {
             <a asp-action="@nameof(CarouselsController.Index)"
-               class="btn btn-outline-dark mt-2 mb-1 mr-4 float-right">Cancel</a>
+               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Cancel</a>
         }
+
+        <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+                data-toggle="modal"
+                data-target="#addItemModal">
+            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            Add Carousel Item
+        </button>
     </div>
 </div>
 
@@ -166,26 +168,26 @@
                                 @item.Name
                             </div>
                             <div>
-                                <button class="btn btn-sm btn-secondary changeSort decreaseSortButton"
+                                <button class="btn btn-sm btn-outline-primary changeSort decreaseSortButton"
                                         data-id="@item.Id"
                                         data-increase="false"
                                         data-item="true"
                                         disabled="@(item.Id == Model.Carousel.Items.First().Id ? "disabled" : null)">
                                     <span class="fas fa-arrow-up"></span>
                                 </button>
-                                <button class="btn btn-sm btn-secondary changeSort increaseSortButton"
+                                <button class="btn btn-sm btn-outline-primary changeSort increaseSortButton"
                                         data-id="@item.Id"
                                         data-increase="true"
                                         data-item="true"
                                         disabled="@(item.Id == Model.Carousel.Items.Last().Id ? "disabled" : null)">
                                     <span class="fas fa-arrow-down"></span>
                                 </button>
-                                <button class="btn btn-sm btn-danger"
+                                <button class="btn btn-sm btn-outline-danger"
                                         data-toggle="modal"
                                         data-target="#deleteItemModal"
                                         data-id="@item.Id"
                                         data-name="@item.Name">
-                                    <span class="fas fa-times"></span>
+                                    <span class="fas fa-minus-circle"></span>
                                 </button>
                             </div>
                         </div>
@@ -262,21 +264,21 @@
                                                         @button.Label.Name
                                                     </div>
                                                     <div>
-                                                        <button class="btn btn-sm btn-secondary changeSort decreaseSortButton"
+                                                        <button class="btn btn-sm btn-outline-info changeSort decreaseSortButton"
                                                                 data-id="@button.Id"
                                                                 data-increase="false"
                                                                 data-item="false"
                                                                 disabled="@(button.Id == item.Buttons.First().Id ? "disabled" : null)">
                                                             <span class="fas fa-arrow-up"></span>
                                                         </button>
-                                                        <button class="btn btn-sm btn-secondary changeSort increaseSortButton"
+                                                        <button class="btn btn-sm btn-outline-info changeSort increaseSortButton"
                                                                 data-id="@button.Id"
                                                                 data-increase="true"
                                                                 data-item="false"
                                                                 disabled="@(button.Id == item.Buttons.Last().Id ? "disabled" : null)">
                                                             <span class="fas fa-arrow-down"></span>
                                                         </button>
-                                                        <button class="btn btn-sm btn-primary"
+                                                        <button class="btn btn-sm btn-outline-info"
                                                                 data-toggle="modal"
                                                                 data-target="#editButtonModal"
                                                                 data-id="@button.Id"
@@ -284,13 +286,13 @@
                                                                 data-url="@button.Url">
                                                             <span class="fas fa-pencil-alt"></span>
                                                         </button>
-                                                        <button class="btn btn-sm btn-danger"
+                                                        <button class="btn btn-sm btn-outline-danger"
                                                                 data-toggle="modal"
                                                                 data-target="#deleteButtonModal"
                                                                 data-id="@button.Id"
                                                                 data-item="@button.CarouselItemId"
                                                                 data-name="@button.Label.Name">
-                                                            <span class="fas fa-times"></span>
+                                                            <span class="fas fa-minus-circle"></span>
                                                         </button>
                                                     </div>
                                                 </div>

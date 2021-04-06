@@ -152,5 +152,10 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException($"Group '{group.Stub}' already exists.");
             }
         }
+
+        public async Task<ICollection<Group>> GetGroupsByIdsAsync(IEnumerable<int> groupIds)
+        {
+            return await _groupRepository.GetByIdsAsync(groupIds);
+        }
     }
 }

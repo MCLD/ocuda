@@ -1,14 +1,18 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages.LayoutDetailViewModel
 
 <div class="row mb-2">
-    <div class="col-sm-6">
+    <div class="col-sm-8">
         <h1>
             Page Layout
             <small class="text-muted">@Model.PageLayout.Name</small>
         </h1>
     </div>
-    <div class="col-sm-6">
-        <button class="btn btn-outline-success mt-2 mb-1 float-right"
+    <div class="col-sm-4">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-action="@(nameof(PagesController.Layouts))"
+           asp-route-id="@Model.PageLayout.PageHeaderId">Back</a>
+
+        <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
                 data-toggle="modal"
                 data-target="#addModal">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
@@ -21,15 +25,12 @@
                   role="form"
                   target="_blank">
                 <input type="hidden" name="PreviewId" value="@Model.PageLayout.PreviewId" />
-                <button class="btn btn-outline-info mr-2 mt-2 mb-1 float-right">
+                <button class="btn btn-outline-info mt-2 mb-1 mr-2 float-right">
                     <span class="fas fa-file-alt"></span>
                     Preview
                 </button>
             </form>
         }
-        <a class="btn btn-outline-dark mt-2 mb-1 mr-4 float-right"
-           asp-action="@(nameof(PagesController.Layouts))"
-           asp-route-id="@Model.PageLayout.PageHeaderId">Back</a>
     </div>
 </div>
 
@@ -144,14 +145,14 @@
                     <th>Name</th>
                     <th>Type</th>
                     <th>Items</th>
-                    <th>&nbsp;</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 @if (Model.PageLayout.Items?.Count == 0)
                 {
                     <tr>
-                        <td colspan="4">
+                        <td colspan="4" class="align-middle">
                             <em style="font-size: larger; color: #666;">
                                 Layout has no items.
                                 <a href="#"
@@ -172,26 +173,26 @@
                         <tr>
                             @if (item.CarouselId.HasValue)
                             {
-                                <td>@item.Carousel.Name</td>
-                                <td>Carousel</td>
-                                <td>@item.Carousel.Items.Count</td>
+                                <td class="align-middle">@item.Carousel.Name</td>
+                                <td class="align-middle">Carousel</td>
+                                <td class="align-middle">@item.Carousel.Items.Count</td>
                             }
                             else
                             {
-                                <td>@item.Segment.Name</td>
-                                <td>Segment</td>
-                                <td>&nbsp;</td>
+                                <td class="align-middle">@item.Segment.Name</td>
+                                <td class="align-middle">Segment</td>
+                                <td class="align-middle">&nbsp;</td>
                             }
-                            <td align="center">
+                            <td class="align-middle">
                                 <button type="button"
-                                        class="btn btn-link changeSort decreaseSortButton"
+                                        class="btn btn-outline-primary changeSort decreaseSortButton"
                                         data-id="@item.Id"
                                         data-increase="false"
                                         data-item="true"
                                         disabled="@(item.Id == Model.PageLayout.Items.First().Id ? "disabled" : null)">
                                     <span class="fas fa-arrow-up" aria-hidden="true"></span>
                                 </button>
-                                <button class="btn btn-link changeSort increaseSortButton"
+                                <button class="btn btn-outline-primary changeSort increaseSortButton"
                                         data-id="@item.Id"
                                         data-increase="true"
                                         data-item="true"
@@ -200,13 +201,13 @@
                                 </button>
                                 @if (item.CarouselId.HasValue)
                                 {
-                                    <button type="button" class="btn btn-link invisible">
+                                    <button type="button" class="btn btn-outline-primary invisible">
                                         <span class="fas fa-cog" aria-hidden="true"></span>
                                     </button>
                                     <a asp-controller="@CarouselsController.Name"
                                        asp-action="@(nameof(CarouselsController.Detail))"
                                        asp-route-id="@item.CarouselId.Value"
-                                       class="btn btn-link"
+                                       class="btn btn-outline-primary"
                                        title="Edit carousel content">
                                         <span class="far fa-file-alt" aria-hidden="true"></span>
                                     </a>
@@ -214,24 +215,24 @@
                                 else if (item.SegmentId.HasValue)
                                 {
                                     <button type="button"
-                                            class="btn btn-link"
+                                            class="btn btn-outline-primary"
                                             data-toggle="modal"
                                             data-target="#editSegmentModal"
                                             data-id="@item.Id"
                                             data-name="@item.Segment.Name"
-                                            title="Edit segment">
+                                            title="Edit segment name">
                                         <span class="fas fa-cog" aria-hidden="true"></span>
                                     </button>
                                     <a asp-controller="@SegmentsController.Name"
                                        asp-action="@(nameof(SegmentsController.Detail))"
                                        asp-route-id="@item.SegmentId.Value"
-                                       class="btn btn-link"
+                                       class="btn btn-outline-primary"
                                        title="Edit segment content">
                                         <span class="far fa-file-alt" aria-hidden="true"></span>
                                     </a>
                                 }
                                 <button type="button"
-                                        class="btn btn-link text-danger"
+                                        class="btn btn-outline-danger"
                                         data-toggle="modal"
                                         data-target="#deleteModal"
                                         data-id="@item.Id"

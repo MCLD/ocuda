@@ -1,4 +1,6 @@
-﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages.LayoutsViewModel
+﻿@model LayoutsViewModel
+
+@using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages 
 
 @section Styles {
     <link rel="stylesheet" href="~/css/dt-picker.min.css" asp-append-version="true" />
@@ -12,15 +14,15 @@
         </h1>
     </div>
     <div class="col-sm-6">
-        <button class="btn btn-outline-success mt-2 mb-1 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-action="@(nameof(PagesController.Index))"
+           asp-route-Type="@Model.HeaderType">Back</a>
+        <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
                 data-toggle="modal"
                 data-target="#addModal">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
             Add Layout
         </button>
-        <a class="btn btn-outline-dark mt-2 mb-1 mr-4 float-right"
-           asp-action="@(nameof(PagesController.Index))"
-           asp-route-Type="@Model.HeaderType">Back</a>
     </div>
 </div>
 
@@ -85,9 +87,12 @@
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Start Date</th>
+                        <th>
+                            Start Date
+                            <span class="fas fa-caret-down"></span>
+                        </th>
                         <th>Items</th>
-                        <th>&nbsp;</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -112,7 +117,7 @@
                     {
                         @foreach (var layout in Model.PageLayouts)
                         {
-                            <tr>
+                            <tr class="@LayoutsViewModel.TableRow(layout)">
                                 <td class="align-middle">
                                     <a asp-action="@nameof(PagesController.LayoutDetail)"
                                        asp-route-id="@layout.Id">
@@ -123,23 +128,23 @@
                                 <td class="align-middle">@layout.Items.Count()</td>
                                 <td class="align-middle">
                                     <button type="button"
-                                            class="btn btn-link"
+                                            class="btn btn-outline-primary"
                                             data-toggle="modal"
                                             data-target="#editModal"
                                             data-id="@layout.Id"
                                             data-name="@layout.Name"
                                             data-startdate="@layout.StartDate"
-                                            title="Edit layout">
+                                            title="Edit layout name and start date">
                                         <span class="fas fa-cog" aria-hidden="true"></span>
                                     </button>
                                     <a asp-action="@(nameof(PagesController.LayoutDetail))"
                                        asp-route-id="@layout.Id"
-                                       class="btn btn-link"
-                                       title="Edit layout content">
+                                       class="btn btn-outline-primary"
+                                       title="Edit content">
                                         <span class="far fa-file-alt" aria-hidden="true"></span>
                                     </a>
                                     <button type="button"
-                                            class="btn btn-link text-danger"
+                                            class="btn btn-outline-danger"
                                             data-toggle="modal"
                                             data-target="#deleteModal"
                                             data-id="@layout.Id"

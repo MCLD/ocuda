@@ -406,7 +406,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
         [Route("[action]/{id}")]
         [RestoreModelState]
-        public async Task<IActionResult> Layouts(int id, int page = 1)
+        public async Task<IActionResult> Layouts(int id, int page)
         {
             if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService, id))
             {
@@ -419,6 +419,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 return RedirectToAction(nameof(Detail), new { id = header.Id });
             }
+
+            page = page == default ? 1 : page;
 
             var filter = new BaseFilter(page);
 

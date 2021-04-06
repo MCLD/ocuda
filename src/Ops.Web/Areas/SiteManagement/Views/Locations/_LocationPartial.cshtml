@@ -2,23 +2,24 @@
 
 <div class="row">
     <div class="col-12">
-        <h1>@Model.LocationName</h1>
         <ul class="nav nav-pills">
             <li class="nav-item">
-                <a asp-action="@nameof(LocationsController.Location)" asp-route-locationStub="@Model.LocationStub"
+                <a asp-action="@nameof(LocationsController.Location)"
+                   asp-route-locationStub="@Model.LocationStub"
                    class="nav-link"
                    ActiveBy routeKey="Action" value="@nameof(LocationsController.Location)">
                     Details
                 </a>
             </li>
             <li class="nav-item">
-                <a asp-action="@nameof(LocationsController.Hours)" asp-route-locationStub="@Model.LocationStub"
+                <a asp-action="@nameof(LocationsController.Hours)"
+                   asp-route-locationStub="@Model.LocationStub"
                    class="nav-link"
-                   ActiveBy routeKey="Action" value="@nameof(LocationsController.Hours)">
+                   ActiveBy routeKey="Action"
+                   value="@nameof(LocationsController.Hours)">
                     Hours
                 </a>
             </li>
         </ul>
-        <hr />
     </div>
 </div>

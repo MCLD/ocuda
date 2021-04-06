@@ -23,5 +23,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
         public PageType HeaderType { get; set; }
 
         public bool IsSiteManager { get; set; }
+
+        public static string TableRow(PageLayout layout)
+        {
+            return layout.StartDate == null
+                ? "table-warning"
+                : string.Empty;
+        }
     }
 }

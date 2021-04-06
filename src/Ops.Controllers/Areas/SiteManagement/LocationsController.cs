@@ -116,10 +116,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     LocationStub = location.Stub,
                     LocationFeatures = await _locationFeatureService.GetLocationFeaturesByLocationAsync(location),
                     LocationGroups = await _locationGroupService.GetLocationGroupsByLocationAsync(location),
-                    Groups = await _groupService.GetAllGroupsAsync(),
-                    Features = await _featureService.GetAllFeaturesAsync(),
                     Action = nameof(LocationsController.EditLocation)
                 };
+
+                viewModel.Features = await _featureService
+                    .GetFeaturesByIdsAsync(viewModel.LocationFeatures.Select(_ => _.FeatureId));
+
+                viewModel.Groups = await _groupService
+                    .GetGroupsByIdsAsync(viewModel.LocationGroups.Select(_ => _.GroupId));
+
                 var segments = await _segmentService.GetActiveSegmentsAsync();
                 viewModel.PostFeatSegments = new SelectList(segments, nameof(Segment.Id),
                     nameof(Segment.Name), viewModel.Location?.PostFeatureSegmentId);

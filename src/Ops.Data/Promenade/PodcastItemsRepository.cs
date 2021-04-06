@@ -53,7 +53,7 @@ namespace Ocuda.Ops.Data.Promenade
             {
                 Count = await query.CountAsync(),
                 Data = await query
-                    .OrderBy(_ => _.Episode)
+                    .OrderByDescending(_ => _.Episode)
                     .ApplyPagination(filter)
                     .ToListAsync()
             };
