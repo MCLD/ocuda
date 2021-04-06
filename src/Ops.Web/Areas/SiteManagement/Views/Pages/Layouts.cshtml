@@ -1,6 +1,6 @@
 ﻿@model LayoutsViewModel
 
-@using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages 
+@using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
 
 @section Styles {
     <link rel="stylesheet" href="~/css/dt-picker.min.css" asp-append-version="true" />
@@ -42,6 +42,51 @@
                asp-for="PageLayout.StartDate"
                formgroup
                datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
+    </div>
+</form>
+
+<form asp-controller="@PagesController.Name"
+      asp-action="@(nameof(PagesController.CloneLayout))">
+    <div class="modal fade"
+         id="cloneModal"
+         data-backdrop="static"
+         data-keyboard="false"
+         tabindex="-1"
+         aria-labelledby="cloneModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cloneModalLabel">Clone layout</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input id="cloneLayoutId" name="cloneLayoutId" type="hidden" />
+                    <input id="clonePageHeaderId"
+                           name="clonePageHeaderId"
+                           type="hidden"
+                           value="@Model.HeaderId" />
+                    <div class="form-group">
+                        <label for="clonedName">
+                            Enter a name for the clone of the
+                            <strong id="cloneLayoutName"></strong> layout:
+                        </label>
+                        <input id="clonedName" name="clonedName" class="form-control" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-outline-primary">
+                        <span class="far fa-copy" aria-hidden="true"></span>
+                        Clone layout
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </form>
 
@@ -143,6 +188,18 @@
                                        title="Edit content">
                                         <span class="far fa-file-alt" aria-hidden="true"></span>
                                     </a>
+                                    @if (LayoutsViewModel.IsClonable(layout))
+                                    {
+                                        <button type="button"
+                                                class="btn btn-outline-primary"
+                                                data-id="@layout.Id"
+                                                data-name="@layout.Name"
+                                                data-toggle="modal"
+                                                data-target="#cloneModal"
+                                                title="Clone layout">
+                                            <span class="far fa-copy" aria-hidden="true"></span>
+                                        </button>
+                                    }
                                     <button type="button"
                                             class="btn btn-outline-danger"
                                             data-toggle="modal"
@@ -227,6 +284,16 @@
             $("#deleteId").val(id);
             $("#deleteName").val(name);
             modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
+        });
+
+        $("#cloneModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+            console.log(id);
+            console.log(name);
+            $("#cloneLayoutId").val(id);
+            $("#cloneLayoutName").html(name);
         });
     </script>
 }

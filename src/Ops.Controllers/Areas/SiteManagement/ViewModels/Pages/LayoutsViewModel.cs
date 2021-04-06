@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Models;
 
@@ -26,9 +27,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
 
         public static string TableRow(PageLayout layout)
         {
-            return layout.StartDate == null
+            return layout?.StartDate == null
                 ? "table-warning"
                 : string.Empty;
+        }
+
+        public static bool IsClonable(PageLayout layout)
+        {
+            return layout?.Items?.Count > 0
+                && !layout.Items.Any(_ => _.SegmentId == null);
         }
     }
 }

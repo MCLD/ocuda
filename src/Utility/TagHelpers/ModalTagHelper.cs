@@ -32,11 +32,11 @@ namespace Ocuda.Utility.TagHelpers
         private const string footerClass = "modal-footer";
         private const string cancelButtonClass = "btn btn-outline-secondary";
         private const string confirmButtonClass = "modal-btn-confirm";
-        private const string deleteButtonClass = "btn btn-danger btn-spinner";
-        private const string saveButtonClass = "btn btn-success btn-spinner";
+        private const string deleteButtonClass = "btn btn-outline-danger btn-spinner";
+        private const string saveButtonClass = "btn btn-outline-success btn-spinner";
         private const string saveIconClass = "far fa-save mr-1";
-        private const string footerDeleteIconClass = "fa fa-times mr-1";
-        private const string buttonSpinnerClass = "fa fa-spinner fa-lg fa-pulse fa-fw ml-1 d-none";
+        private const string footerDeleteIconClass = "fas fa-minus-circle mr-1";
+        private const string buttonSpinnerClass = "fas fa-spinner fa-lg fa-pulse fa-fw ml-1 d-none";
 
         [HtmlAttributeName(idAttributeName)]
         public string Id { get; set; }
