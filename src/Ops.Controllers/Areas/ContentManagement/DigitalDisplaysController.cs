@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -448,7 +449,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             var asset = await UploadAssetInternalAsync(assetFile);
 
-            if(asset?.Id == null)
+            if (asset?.Id == null)
             {
                 ShowAlertDanger("An error occurred uploading that asset.");
                 return RedirectToAction(nameof(Assets));
@@ -604,10 +605,23 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             using var fileStream = new FileStream(fullFilePath, FileMode.Create);
             await assetFile.CopyToAsync(fileStream);
 
+            using var sha = new SHA256Managed();
+            byte[] checksum = await sha.ComputeHashAsync(assetFile.OpenReadStream());
+
+            var asset = await _digitalDisplayService.FindAssetByChecksumAsync(checksum);
+            if (asset != null)
+            {
+                ShowAlertWarning("That image is already present in digital display assets.");
+                fileStream.Close();
+                System.IO.File.Delete(fullFilePath);
+                return asset;
+            }
+
             return await _digitalDisplayService.AddAssetAsync(new DigitalDisplayAsset
             {
                 Name = assetFile.FileName,
-                Path = Path.GetFileName(fullFilePath)
+                Path = Path.GetFileName(fullFilePath),
+                Checksum = checksum
             });
         }
     }

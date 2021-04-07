@@ -25,6 +25,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         public Task DeleteSetAsync(int setId);
 
+        public Task<DigitalDisplayAsset> FindAssetByChecksumAsync(byte[] checksum);
+
         public Task<DigitalDisplayAsset> GetAssetAsync(int digitalDisplayAssetId);
 
         public string GetAssetPath(string fileName);

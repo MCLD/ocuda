@@ -20,6 +20,13 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
+        public async Task<DigitalDisplayAsset> FindByChecksumAsync(byte[] checksum)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .SingleOrDefaultAsync(_ => _.Checksum == checksum);
+        }
+
         public async Task<DataWithCount<ICollection<DigitalDisplayAsset>>>
             GetPaginatedListAsync(BaseFilter filter)
         {

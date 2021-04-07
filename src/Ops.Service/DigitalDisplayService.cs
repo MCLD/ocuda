@@ -122,7 +122,7 @@ namespace Ocuda.Ops.Service
         public async Task<IEnumerable<int>> AssignSetAsync(int displayId, int setId)
         {
             var sets = await _digitalDisplayDisplaySetRepository
-                .GetByDisplayIdsAsync(new [] { displayId });
+                .GetByDisplayIdsAsync(new[] { displayId });
             var hasValue = sets.SingleOrDefault(_ => _.DigitalDisplaySetId == setId);
             if (hasValue != null)
             {
@@ -139,7 +139,7 @@ namespace Ocuda.Ops.Service
             await _digitalDisplayDisplaySetRepository.SaveAsync();
 
             sets = await _digitalDisplayDisplaySetRepository
-                .GetByDisplayIdsAsync(new [] { displayId });
+                .GetByDisplayIdsAsync(new[] { displayId });
 
             return sets.Select(_ => _.DigitalDisplaySetId);
         }
@@ -185,6 +185,11 @@ namespace Ocuda.Ops.Service
             var set = await _digitalDisplaySetRepository.FindAsync(setId);
             _digitalDisplaySetRepository.Remove(set);
             await _digitalDisplaySetRepository.SaveAsync();
+        }
+
+        public async Task<DigitalDisplayAsset> FindAssetByChecksumAsync(byte[] checksum)
+        {
+            return await _digitalDisplayAssetRepository.FindByChecksumAsync(checksum);
         }
 
         public async Task<DigitalDisplayAsset> GetAssetAsync(int digitalDisplayAssetId)
