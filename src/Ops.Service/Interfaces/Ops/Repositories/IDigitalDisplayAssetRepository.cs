@@ -8,6 +8,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
     public interface IDigitalDisplayAssetRepository : IOpsRepository<DigitalDisplayAsset, int>
     {
+        public Task<DigitalDisplayAsset> FindByChecksumAsync(byte[] checksum);
+
         public Task<DataWithCount<ICollection<DigitalDisplayAsset>>>
             GetPaginatedListAsync(BaseFilter filter);
     }
