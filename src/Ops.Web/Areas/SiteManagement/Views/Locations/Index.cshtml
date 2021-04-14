@@ -1,124 +1,119 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location.LocationViewModel
-<div class="container">
+
+<div class="row">
+    <div class="col-sm-7">
+        <h1>Locations</h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
+        <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+           asp-action="@nameof(LocationsController.AddLocation)">
+            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            Add location
+        </a>
+    </div>
+</div>
+
+@if (!Model.AllLocations.Any())
+{
     <div class="row">
-        <div class="modal fade"
-             id="deleteModal"
-             tabindex="-1"
-             role="dialog"
-             aria-labelledby="deleteModalLabel">
-            <div class="modal-dialog" role="document">
-                <form asp-action="@nameof(LocationsController.DeleteLocation)"
-                      method="post"
-                      role="form"
-                      style="display:inline">
-                    <input asp-for="Location.Id" type="hidden" />
-                    <input asp-for="Location.Name" type="hidden" />
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" id="deleteModalLabel">Delete Location</h4>
-                            <button type="button"
-                                    class="close"
-                                    data-dismiss="modal"
-                                    aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
-                            <span id="modal-text"></span>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button"
-                                    class="btn btn-default"
-                                    data-dismiss="modal"
-                                    style="margin-right: 1em;">
-                                Cancel
-                            </button>
-                            <button type="submit"
-                                    class="btn btn-danger pull-right"
-                                    aria-label="Confirm"
-                                    button-spinner>
-                                <span class="fas fa-spinner fa-times" aria-hidden="true"></span>
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
+        <div class="col">
+            <div class="alert alert-warning">No locations found.</div>
         </div>
     </div>
+}
+else
+{
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var location in Model.AllLocations)
+            {
+                <tr>
+                    <td class="align-middle">
+                        <a asp-action="@nameof(LocationsController.Location)"
+                           asp-route-locationStub="@location.Stub">
+                            @location.Name
+                        </a>
+                    </td>
+                    <td class="align-middle">
+                        @location.Address
+                        <br />
+                        @location.City,
+                        @location.State
+                        @location.Zip
+                    </td>
+                    <td class="align-middle">@location.Phone</td>
+                    <td class="align-middle">
+                        <button type="button"
+                                class="btn btn-outline-danger"
+                                data-toggle="modal"
+                                data-target="#deleteModal"
+                                data-id="@location.Id"
+                                data-name="@location.Name">
+                            <span class="fas fa-minus-circle"
+                                  aria-hidden="true"></span>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <paginate paginateModel="@Model.PaginateModel"></paginate>
+}
 
-    <div class="row">
-        <div>
-            <div class="card">
-                <div class="card-header">
-                    <span class="h5">Locations</span>
-                    <a asp-action="@nameof(LocationsController.AddLocation)"
-                       class="text-success float-right">
-                        <span class="fas fa-plus-circle fa-lg"></span>
-                    </a>
+<div class="modal fade"
+     id="deleteModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="deleteModalLabel">
+    <div class="modal-dialog" role="document">
+        <form asp-action="@nameof(LocationsController.DeleteLocation)"
+              method="post"
+              role="form"
+              style="display:inline">
+            <input asp-for="Location.Id" type="hidden" />
+            <input asp-for="Location.Name" type="hidden" />
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="deleteModalLabel">Delete Location</h4>
+                    <button type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                @if (Model.AllLocations.Count() == 0)
-                {
-                    <div class="alert alert-warning">No Locations found.</div>
-                }
-                else
-                {
-
-                    <div class="card-body">
-                        <table class="table table-sm table-bordered link-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Address</th>
-                                    <th>Phone</th>
-                                    <th>&nbsp;</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var location in Model.AllLocations)
-                                {
-                                    <tr>
-                                        <td class="td-class">
-                                            <a asp-action="@nameof(LocationsController.Location)"
-                                               asp-route-locationStub="@location.Stub">
-                                                @location.Name
-                                            </a>
-                                        </td>
-                                        <td>
-                                            @location.Address
-                                            <br />
-                                            @location.City,
-                                            @location.State
-                                            @location.Zip
-                                        </td>
-                                        <td>@location.Phone</td>
-                                        <td class="on-top gra-mc-icon">
-                                            <button type="button"
-                                                    class="btn btn-link text-danger"
-                                                    data-toggle="modal"
-                                                    data-target="#deleteModal"
-                                                    data-id="@location.Id"
-                                                    data-name="@location.Name">
-                                                <span class="far fa-times-circle fa-lg"
-                                                      aria-hidden="true"></span>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                    @if (Model.PaginateModel.MaxPage > 1)
-                    {
-                        <div class="card-footer">
-                            <paginate paginateModel="@Model.PaginateModel"></paginate>
-                        </div>
-                    }
-
-                }
+                <div class="modal-body">
+                    <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+                    <span id="modal-text"></span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-default"
+                            data-dismiss="modal"
+                            style="margin-right: 1em;">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class="btn btn-danger pull-right"
+                            aria-label="Confirm"
+                            button-spinner>
+                        <span class="fas fa-spinner fa-times" aria-hidden="true"></span>
+                        Delete
+                    </button>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 

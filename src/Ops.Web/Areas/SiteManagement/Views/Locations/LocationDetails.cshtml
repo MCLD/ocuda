@@ -1,57 +1,89 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location.LocationViewModel
+
 @section styles{
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
-<div class="modal fade" id="listAddModal" tabindex="-1" role="dialog" aria-labelledby="listModalLabel">
+
+<div class="row">
+    <div class="col-sm-7">
+        <h1>
+            Details
+            <small class="text-muted">
+                @(Model.Location.IsNewLocation ? "Add Location" : Model.LocationName)
+            </small>
+        </h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Index))">Back</a>
+    </div>
+</div>
+
+<div class="modal fade"
+     id="listAddModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="listModalLabel">
     <div class="modal-dialog modal-lg" role="document">
-        <div class="row">
-            <div class="col-12 col-sm-10 col-sm-offset-1">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addModalTitle"></h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div id="modalItemList" class="col-12">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal" style="margin-right: 1em;">Close</button>
-                    </div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addModalTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="modalItemList">
                 </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-outline-dark mr-1"
+                        data-dismiss="modal">
+                    Close
+                </button>
             </div>
         </div>
     </div>
 </div>
-<div class="modal fade" id="itemEditModal" tabindex="-1" role="dialog" aria-labelledby="listModalLabel">
+<div class="modal fade"
+     id="itemEditModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="listModalLabel">
     <div class="modal-dialog modal-lg" role="document">
-        <div class="row">
-            <div class="col-12 col-sm-10 col-sm-offset-1">
-                <form method="post" role="form" id="updateItem" asp-controller="@LocationsController.Name" asp-action="@nameof(LocationsController.EditLocationFeature)" novalidate="novalidate">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="editModalTitle">Edit Feature</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div id="modalItemInfo" class="col-12 col">
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal" style="margin-right: 1em;">Cancel</button>
-                            <button type="submit" value="Submit" class="btn btn-primary" style="margin-right: 1em;">Save</button>
-                        </div>
+        <form method="post"
+              role="form"
+              id="updateItem"
+              asp-controller="@LocationsController.Name"
+              asp-action="@nameof(LocationsController.EditLocationFeature)"
+              novalidate="novalidate">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalTitle">Edit Feature</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="modalItemInfo">
                     </div>
-                </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-outline-dark mr-1"
+                            data-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            value="Submit"
+                            class="btn btn-outline-primary">
+                        Save
+                    </button>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="listModalLabel">
@@ -68,8 +100,8 @@
                     <div class="modal-body">
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal" style="margin-right: 1em;">Cancel</button>
-                        <button type="button" class="btn btn-danger" data-dismiss="modal" style="margin-right: 1em;">
+                        <button type="button" class="btn btn-outline-dark mr-1" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
                             <span class="buttonText">Delete</span>
                             <span class="fa fa-spinner fa-pulse fa-lg fa-fw d-none"></span>
                         </button>
@@ -84,327 +116,355 @@
     <div class="location-save-message"></div>
 </div>
 
-@if (Model.Location.IsNewLocation)
-{
-    <div class="row page-title">
-        <div class="col-12">
-            <h1>@(Model.Location.IsNewLocation ? "Add Location" : "Edit " + Model.Location.Name)</h1>
-        </div>
-    </div>
-}
-else
+@if (!Model.Location.IsNewLocation)
 {
     @await Html.PartialAsync("_LocationPartial")
 }
-
-
 <form method="post"
       asp-controller="@LocationsController.Name"
       asp-action="@Model.Action"
       role="form"
       display="inline">
-    <input asp-for="GroupList" type="hidden" />
-    <input asp-for="FeatureList" type="hidden" />
-    <input value="@Model.Location.Id"
-           asp-for="Location.Id"
-           id="location-id"
-           type="hidden" />
-    <input value="@Model.Location.Name"
-           asp-for="Location.Name"
-           formgroup
-           autocomplete="off" />
-    <input value="@Model.Location.Stub"
-           asp-for="Location.Stub"
-           info-tooltip="The stub is the nickname/URL for the location."
-           on-blur-js="FormatStub"
-           formgroup
-           autocomplete="off" />
-    <input value="@Model.Location.Code"
-           asp-for="Location.Code"
-           formgroup
-           autocomplete="off" />
-    <input value="@Model.Location.Address"
-           asp-for="Location.Address"
-           formgroup
-           autocomplete="off" />
-    <input value="@Model.Location.City"
-           asp-for="Location.City"
-           formgroup
-           autocomplete="off" />
-    <input value="@Model.Location.State"
-           asp-for="Location.State"
-           formgroup
-           autocomplete="off" />
-    <input value="@Model.Location.Zip"
-           asp-for="Location.Zip"
-           formgroup
-           autocomplete="off" />
-    <input value="@Model.Location.MapLink"
-           asp-for="Location.MapLink"
-           formgroup
-           autocomplete="off" />
-    <input type="tel"
-           value="@Model.Location.Phone"
-           asp-for="Location.Phone"
-           formgroup
-           autocomplete="off" />
-    <select asp-for="Location.DescriptionSegmentId"
-            asp-items="@Model.PostFeatSegments"
-            formgroup>
-        <option value="">None</option>
-    </select>
-    <select asp-for="Location.PreFeatureSegmentId"
-            asp-items="@Model.PreFeatSegments"
-            formgroup>
-        <option value="">None</option>
-    </select>
-    <select asp-for="Location.PostFeatureSegmentId"
-            asp-items="@Model.PostFeatSegments"
-            formgroup>
-        <option value="">None</option>
-    </select>
-    <input value="@Model.Location.Facebook"
-           asp-for="Location.Facebook"
-           formgroup
-           autocomplete="off" />
-    <input value="@Model.Location.EventLink"
-           asp-for="Location.EventLink"
-           formgroup
-           autocomplete="off" />
-    <input value="@Model.Location.SubscriptionLink"
-           asp-for="Location.SubscriptionLink"
-           formgroup
-           autocomplete="off" />
-    <h3>Stuctured Data</h3>
-    <input value="@Model.Location.AdministrativeArea"
-           asp-for="Location.AdministrativeArea"
-           formgroup
-           autocomplete="off" />
-    <input value="@Model.Location.Type"
-           asp-for="Location.Type"
-           formgroup
-           autocomplete="off" />
-    <input value="@Model.Location.AreaServedName"
-           asp-for="Location.AreaServedName"
-           formgroup
-           autocomplete="off" />
-    <input value="@Model.Location.AreaServedType"
-           asp-for="Location.AreaServedType"
-           formgroup
-           autocomplete="off" />
-    <input value="@Model.Location.Email"
-           asp-for="Location.Email"
-           formgroup
-           autocomplete="off" />
-    <input value="@Model.Location.AddressType"
-           asp-for="Location.AddressType"
-           formgroup
-           autocomplete="off" />
-    <input value="@Model.Location.ContactType"
-           asp-for="Location.ContactType"
-           formgroup
-           autocomplete="off" />
-    <input value="@Model.Location.ParentOrganization"
-           asp-for="Location.ParentOrganization"
-           formgroup
-           autocomplete="off" />
-    <div class="row form-group">
-        <label class="col-form-label text-md-right col-md-3">
-            Is Accessible For Free?
-        </label>
-        <div class="flex-md-grow-0">
-            <div class="custom-control custom-switch">
-                <input type="checkbox"
-                       class="custom-control-input switch"
-                       asp-for="Location.IsAccessibleForFree"
-                       value="@Model.Location.IsAccessibleForFree.ToString().ToLower()"
-                       id="isAccessibleForFree" />
-                <label class="col-form-label text-md-right col-md-3 custom-control-label text-hide" for="isAccessibleForFree"></label>
-            </div>
+    <div class="row mt-2">
+        <div class="col">
+            <input asp-for="GroupList" type="hidden" />
+            <input asp-for="FeatureList" type="hidden" />
+            <input value="@Model.Location.Id"
+                   asp-for="Location.Id"
+                   id="location-id"
+                   type="hidden" />
+            <input value="@Model.Location.Name"
+                   asp-for="Location.Name"
+                   formgroup
+                   autocomplete="off" />
+            <input value="@Model.Location.Stub"
+                   asp-for="Location.Stub"
+                   info-tooltip="The stub is the nickname/URL for the location."
+                   on-blur-js="FormatStub"
+                   formgroup
+                   autocomplete="off" />
+            <input value="@Model.Location.Code"
+                   asp-for="Location.Code"
+                   formgroup
+                   autocomplete="off" />
+            <input value="@Model.Location.Address"
+                   asp-for="Location.Address"
+                   formgroup
+                   autocomplete="off" />
+            <input value="@Model.Location.City"
+                   asp-for="Location.City"
+                   formgroup
+                   autocomplete="off" />
+            <input value="@Model.Location.State"
+                   asp-for="Location.State"
+                   formgroup
+                   autocomplete="off" />
+            <input value="@Model.Location.Zip"
+                   asp-for="Location.Zip"
+                   formgroup
+                   autocomplete="off" />
+            <input value="@Model.Location.MapLink"
+                   asp-for="Location.MapLink"
+                   formgroup
+                   autocomplete="off" />
+            <input type="tel"
+                   value="@Model.Location.Phone"
+                   asp-for="Location.Phone"
+                   formgroup
+                   autocomplete="off" />
+            <select asp-for="Location.DescriptionSegmentId"
+                    asp-items="@Model.PostFeatSegments"
+                    formgroup>
+                <option value="">None</option>
+            </select>
+            <select asp-for="Location.PreFeatureSegmentId"
+                    asp-items="@Model.PreFeatSegments"
+                    formgroup>
+                <option value="">None</option>
+            </select>
+            <select asp-for="Location.PostFeatureSegmentId"
+                    asp-items="@Model.PostFeatSegments"
+                    formgroup>
+                <option value="">None</option>
+            </select>
+            <input value="@Model.Location.Facebook"
+                   asp-for="Location.Facebook"
+                   formgroup
+                   autocomplete="off" />
+            <input value="@Model.Location.EventLink"
+                   asp-for="Location.EventLink"
+                   formgroup
+                   autocomplete="off" />
+            <input value="@Model.Location.SubscriptionLink"
+                   asp-for="Location.SubscriptionLink"
+                   formgroup
+                   autocomplete="off" />
         </div>
     </div>
-    <input value="@Model.Location.PriceRange"
-           asp-for="Location.PriceRange"
-           formgroup
-           autocomplete="off" />
-    <div class="row">
-        <div class="col-md-9 offset-md-3">
-            <a class="btn btn-secondary"
-               id="return-home"
-               asp-action="@nameof(LocationsController.Index)">Return to Locations</a>
-            @if (Model.Location.IsNewLocation)
-            {
-                <text>
+    <div class="row mt-2">
+        <div class="col">
+            <h3>Stuctured Data</h3>
+            <input value="@Model.Location.AdministrativeArea"
+                   asp-for="Location.AdministrativeArea"
+                   formgroup
+                   autocomplete="off" />
+            <input value="@Model.Location.Type"
+                   asp-for="Location.Type"
+                   formgroup
+                   autocomplete="off" />
+            <input value="@Model.Location.AreaServedName"
+                   asp-for="Location.AreaServedName"
+                   formgroup
+                   autocomplete="off" />
+            <input value="@Model.Location.AreaServedType"
+                   asp-for="Location.AreaServedType"
+                   formgroup
+                   autocomplete="off" />
+            <input value="@Model.Location.Email"
+                   asp-for="Location.Email"
+                   formgroup
+                   autocomplete="off" />
+            <input value="@Model.Location.AddressType"
+                   asp-for="Location.AddressType"
+                   formgroup
+                   autocomplete="off" />
+            <input value="@Model.Location.ContactType"
+                   asp-for="Location.ContactType"
+                   formgroup
+                   autocomplete="off" />
+            <input value="@Model.Location.ParentOrganization"
+                   asp-for="Location.ParentOrganization"
+                   formgroup
+                   autocomplete="off" />
+            <div class="row form-group">
+                <label class="col-form-label text-md-right col-md-3">
+                    Is Accessible For Free?
+                </label>
+                <div class="flex-md-grow-0">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox"
+                               class="custom-control-input switch"
+                               asp-for="Location.IsAccessibleForFree"
+                               value="@Model.Location.IsAccessibleForFree.ToString().ToLower()"
+                               id="isAccessibleForFree" />
+                        <label class="col-form-label text-md-right col-md-3 custom-control-label text-hide" for="isAccessibleForFree"></label>
+                    </div>
+                </div>
+            </div>
+            <input value="@Model.Location.PriceRange"
+                   asp-for="Location.PriceRange"
+                   formgroup
+                   autocomplete="off" />
+            <div class="row">
+                <div class="col-md-9 offset-md-3">
                     <button type="submit"
                             id="submit"
                             value="Submit"
-                            class="btn btn-success"
+                            class="btn btn-outline-success btn-lg"
                             button-spinner>
-                        <span class="buttonText">Add Location</span>
+                        <span class="buttonText">
+                            <span class="far fa-save"></span>
+                            Save Location
+                        </span>
                     </button>
-                </text>
-            }
-            else
-            {
-                <text>
-                    <button type="submit"
-                            id="submit"
-                            value="Submit"
-                            class="btn btn-success"
-                            button-spinner>
-                        <span class="buttonText">Update Location</span>
-                    </button>
-                </text>
-            }
+                </div>
+            </div>
         </div>
     </div>
     @if (!Model.Location.IsNewLocation)
     {
-        <div class="col-6 card">
-            <div class="card-header">
-                <h4 style="margin: 0; display: initial;">Features</h4>
-                <button type="button"
-                        class="btn btn-warning addItemButtonModal"
-                        data-itemType="Feature"
-                        style="float:right;">
-                    Add Feature
-                </button>
-            </div>
-            @if (Model.LocationFeatures.Any())
-            {
-                <table class="table table-sm table-bordered table-hover">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Custom Text</th>
-                            <th>Redirect URL</th>
-                            <th>Open in new tab</th>
-                            <th width="44px">&nbsp;</th>
-                        </tr>
-                    </thead>
-                    <tbody id="featureList">
-                        @foreach (var locationFeature in Model.LocationFeatures)
-                        {
-                            @foreach (var feature in Model.Features.Where(_ => _.Id == locationFeature.FeatureId))
+        <div class="row mt-2">
+            <div class="col">
+                <h3>Location features</h3>
+                @if (Model.LocationFeatures.Any())
+                {
+                    <table class="table table-sm table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th class="align-middle">Name</th>
+                                <th class="align-middle">Type</th>
+                                <th class="align-middle">Custom Text/Redirect URL</th>
+                                <th class="align-middle">
+                                    <button type="button"
+                                            class="btn btn-outline-success addItemButtonModal"
+                                            data-itemType="Feature">
+                                        <span class="fas fa-plus-circle"></span>
+                                    </button>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="featureList">
+                            @foreach (var locationFeature in Model.LocationFeatures)
                             {
-                                <tr>
-                                    <td class="td-class edit-item"
-                                        data-itemName="@feature.Name"
-                                        data-itemtype="Feature"
-                                        data-itemid="@locationFeature.FeatureId">
-                                        @feature.Name
-                                    </td>
-                                    <td style="vertical-align:middle;">
-                                        @if (!string.IsNullOrEmpty(locationFeature.Text))
-                                        {
-                                            @if (locationFeature.Text.Length > 200)
+                                @foreach (var feature in Model.Features.Where(_ => _.Id == locationFeature.FeatureId))
+                                {
+                                    <tr>
+                                        <td class="align-middle edit-item"
+                                            data-itemName="@feature.Name"
+                                            data-itemtype="Feature"
+                                            data-itemid="@locationFeature.FeatureId">
+                                            @feature.Name
+                                        </td>
+                                        <td class="align-middle text-center">
+                                            @if (!string.IsNullOrEmpty(locationFeature.Text))
                                             {
-                                                @(locationFeature.Text.Substring(0, 200) + "...")
+                                                <span class="fas fa-align-left" title="Custom Text"></span>
+                                            }
+                                            else
+                             if (!string.IsNullOrEmpty(locationFeature.RedirectUrl))
+                                            {
+                                                <span class="fas fa-link" title="Redirect URL"></span>
                                             }
                                             else
                                             {
-                                                @locationFeature.Text
+                                                <a class="btn btn-outline-dark"
+                                                   asp-area="@Ocuda.Ops.Controllers.Areas.SiteManagement.FeaturesController.Area"
+                                                   asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.FeaturesController.Name"
+                                                   asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.FeaturesController.Feature)"
+                                                   asp-route-featureName="@feature.Name?.Replace(" ", "")"
+                                                   target="_blank">
+                                                    <span class="fas fa-globe-americas" title="Multi-location feature"></span>
+                                                </a>
                                             }
-                                        }
-                                    </td>
-                                    <td style="vertical-align:middle;">@locationFeature.RedirectUrl</td>
-                                    <td style="vertical-align:middle">@(locationFeature.NewTab ? "Yes" : "No")</td>
-                                    <td>
-                                        <button type="button"
-                                                class="btn btn-link btn-xs deleteItemButton"
-                                                data-itemType="Feature"
-                                                data-itemId="@locationFeature.FeatureId"
-                                                data-itemName="@feature.Name">
-                                            <span class="fa fa-2x fas fa-minus-circle text-danger"
-                                                  aria-hidden="true"></span>
-                                        </button>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                @:<ul class="list-group" id="nofeatures"><li class="list-group-item">No Features</li></ul>
-            }
-        </div>
-        <div class="col-6 card">
-            <div class="card-header">
-                <h4 style="margin: 0; display: initial;">Groups</h4>
-                <button type="button"
-                        class="btn btn-warning addItemButtonModal"
-                        data-toggle="modal"
-                        style="float:right;"
-                        data-itemType="Group">
-                    Add Group
-                </button>
-            </div>
-            @if (Model.LocationGroups.Any())
-            {
-                <table class="table table-sm table-bordered table-hover">
-                    <thead>
-                        <tr>
-                            <th>Group Type</th>
-                            <th>Location Region?</th>
-                            <th>Location's Map Group</th>
-                            <th width="44px">&nbsp;</th>
-                        </tr>
-                    </thead>
-                    <tbody id="groupList">
-                        @foreach (var locationGroup in Model.LocationGroups)
-                        {
-                            @foreach (var group in Model.Groups.Where(_ => _.Id == locationGroup.GroupId))
-                            {
-                                <tr>
-                                    <td style="vertical-align:middle;"
-                                        class="edit-item"
-                                        data-itemName="@group.GroupType"
-                                        data-itemtype="Group"
-                                        data-itemid="@locationGroup.GroupId">
-                                        @group.GroupType
-                                    </td>
-                                    @if (group.IsLocationRegion)
-                                    {
-                                        <td class="text-center"
-                                            style="vertical-align:middle;">
-                                            <span class="fas fa-check"></span>
                                         </td>
-                                    }
-                                    else
-                                    {
-                                        <td></td>
-                                    }
-                                    <td class="text-center"
-                                        style="vertical-align:middle;">
-                                        @if (Model.Location.DisplayGroupId == group.Id)
-                                        {
-                                            <text>
-                                                <span class="fas fa-check"></span>
-                                            </text>
-                                        }
-                                    </td>
-                                    <td>
-                                        <button type="button"
-                                                class="btn btn-link btn-xs deleteItemButton"
-                                                data-itemType="Group"
-                                                data-itemId="@locationGroup.GroupId"
-                                                data-itemName="@group.GroupType">
-                                            <span class="fa fa-2x fas fa-minus-circle text-danger"
-                                                  aria-hidden="true"></span>
-                                        </button>
-                                    </td>
-                                </tr>
+                                        <td class="align-middle">
+                                            @if (!string.IsNullOrEmpty(locationFeature.Text))
+                                            {
+                                                @if (locationFeature.Text.Length > 200)
+                                                {
+                                                    @(locationFeature.Text.Substring(0, 200) + "...")
+                                                }
+                                                else
+                                                {
+                                                    @locationFeature.Text
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (string.IsNullOrEmpty(locationFeature.RedirectUrl))
+                                                {
+                                                    @if (feature.BodyText.Length > 200)
+                                                    {
+                                                        <em class="text-muted">@(feature.BodyText.Substring(0, 200) + "...")</em>
+                                                    }
+                                                    else
+                                                    {
+                                                        <em class="text-muted">@feature.BodyText</em>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (locationFeature.RedirectUrl?.StartsWith("http") == true)
+                                                    {
+                                                        <a href="@locationFeature.RedirectUrl"
+                                                           target="_blank">@locationFeature.RedirectUrl</a>
+                                                    }
+                                                    else
+                                                    {
+                                                        @locationFeature.RedirectUrl
+                                                    }
+                                                }
+                                                @if (locationFeature.NewTab)
+                                                {
+                                                    <br /><em>Opens in a new tab</em>
+                                                }
+                                            }
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button"
+                                                    class="btn btn-outline-danger deleteItemButton"
+                                                    data-itemType="Feature"
+                                                    data-itemId="@locationFeature.FeatureId"
+                                                    data-itemName="@feature.Name">
+                                                <span class="fas fa-minus-circle"
+                                                      aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
                             }
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                @:<ul class="list-group" id="noGroups"><li class="list-group-item">No Groups</li></ul>
-            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    @:<ul class="list-group" id="nofeatures"><li class="list-group-item">No Features</li></ul>
+                }
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col">
+                <h3>Location groups</h3>
+                @if (Model.LocationGroups.Any())
+                {
+                    <table class="table table-sm table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Group Type</th>
+                                <th>Location Region?</th>
+                                <th>Location's Map Group</th>
+                                <th>
+                                    <button type="button"
+                                            class="btn btn-outline-success addItemButtonModal"
+                                            data-toggle="modal"
+                                            data-itemType="Group">
+                                        <span class="fas fa-plus-circle"></span>
+                                    </button>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="groupList">
+                            @foreach (var locationGroup in Model.LocationGroups)
+                            {
+                                @foreach (var group in Model.Groups.Where(_ => _.Id == locationGroup.GroupId))
+                                {
+                                    <tr>
+                                        <td class="edit-item align-middle"
+                                            data-itemName="@group.GroupType"
+                                            data-itemtype="Group"
+                                            data-itemid="@locationGroup.GroupId">
+                                            @group.GroupType
+                                        </td>
+                                        @if (group.IsLocationRegion)
+                                        {
+                                            <td class="align-middle">
+                                                <span class="fas fa-check"></span>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+                                        <td class="align-middle"
+                                            style="vertical-align:middle;">
+                                            @if (Model.Location.DisplayGroupId == group.Id)
+                                            {
+                                                <text>
+                                                    <span class="fas fa-check"></span>
+                                                </text>
+                                            }
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button"
+                                                    class="btn btn-outline-danger deleteItemButton"
+                                                    data-itemType="Group"
+                                                    data-itemId="@locationGroup.GroupId"
+                                                    data-itemName="@group.GroupType">
+                                                <span class="fas fa-minus-circle"
+                                                      aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    @:<ul class="list-group" id="noGroups"><li class="list-group-item">No Groups</li></ul>
+                }
+            </div>
         </div>
     }
 </form>
@@ -437,7 +497,7 @@ else
         {
             <text>
         // Helpers
-            function GetItemList(objType) {
+        function GetItemList(objType) {
                 $("#listAddModal").modal("show");
                 $.get("@Url.Action(nameof(LocationsController.GetItemsList))",
                     {
@@ -461,6 +521,7 @@ else
             $(".addItemButtonModal").on('click', function (e) {
                 $("#addModalTitle").text("Add a " + $(this).data("itemtype"));
                 $("#addModalTitle").attr("data-objType", $(this).data("itemtype"));
+                $("#modalItemList").html('<div class="fa-3x text-center"><span class="fas fa-spinner fa-spin"></span></div>');
                 $("#listAddModal").modal("show");
                 GetItemList($(this).data("itemtype"));
             });
@@ -526,7 +587,7 @@ else
                     $("#editModalTitle").text("Edit Group: " + $(this).data("itemname"));
 
                 }
-
+                $("#modalItemInfo").html('<div class="fa-3x text-center"><span class="fas fa-spinner fa-spin"></span></div>');
                 $("#itemEditModal").modal("show");
                 $('#updateItem').attr('name', $(this).data("itemtype"));
                 $("#updateItem").attr("action",url);

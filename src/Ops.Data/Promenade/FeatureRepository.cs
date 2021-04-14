@@ -99,5 +99,13 @@ namespace Ocuda.Ops.Data.Promenade
                 .Where(_ => _.Id != feature.Id && _.Stub == feature.Stub)
                 .AnyAsync();
         }
+
+        public async Task<ICollection<Feature>> GetByIdsAsync(IEnumerable<int> featureIds)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => featureIds.Contains(_.Id))
+                .ToListAsync();
+        }
     }
 }

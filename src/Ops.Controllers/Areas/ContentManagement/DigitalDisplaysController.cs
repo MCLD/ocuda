@@ -415,7 +415,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         }
 
         [HttpGet]
-        [Route("[action]")]
+        [Route("[action]/{digitalDisplaySetId}")]
         [SaveModelState]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> UpdateSet(int digitalDisplaySetId)
@@ -443,12 +443,19 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             if (assetFile == null)
             {
-                return RedirectToAction(nameof(UploadAsset));
+                return RedirectToAction(nameof(Assets));
             }
 
-            await UploadAssetInternalAsync(assetFile);
+            var asset = await UploadAssetInternalAsync(assetFile);
 
-            return RedirectToAction(nameof(Assets));
+            if(asset?.Id == null)
+            {
+                ShowAlertDanger("An error occurred uploading that asset.");
+                return RedirectToAction(nameof(Assets));
+            }
+
+            return RedirectToAction(nameof(AssetAssociations),
+                new { digitalDisplayAssetId = asset.Id });
         }
 
         [HttpPost]

@@ -35,5 +35,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<PageLayout> GetLayoutForItemAsync(int itemId);
         Task<PageItem> GetItemByIdAsync(int id);
         Task DeleteItemNoSaveAsync(int pageItemId, bool ignoreSort = false);
+        Task<PageLayout> CloneLayoutAsync(int pageHeaderId, int layoutId, string clonedName);
     }
 }

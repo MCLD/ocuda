@@ -404,9 +404,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToAction("Index");
             }
         }
+
         [Route("[action]/{id}")]
         [RestoreModelState]
-        public async Task<IActionResult> Layouts(int id, int page = 1)
+        public async Task<IActionResult> Layouts(int id, int page)
         {
             if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService, id))
             {
@@ -419,6 +420,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 return RedirectToAction(nameof(Detail), new { id = header.Id });
             }
+
+            page = page == default ? 1 : page;
 
             var filter = new BaseFilter(page);
 
@@ -1010,6 +1013,53 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
 
             return RedirectToAction(nameof(ContentPermissions), new { id = headerId });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        public async Task<IActionResult> CloneLayout(int clonePageHeaderId,
+            int cloneLayoutId,
+            string clonedName)
+        {
+            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+                    clonePageHeaderId))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            if (string.IsNullOrEmpty(clonedName))
+            {
+                ShowAlertWarning("You must provide a name for a cloned layout.");
+                return RedirectToAction(nameof(Layouts), new { id = clonePageHeaderId });
+            }
+
+            try
+            {
+                var layout = await _pageService
+                    .CloneLayoutAsync(clonePageHeaderId, cloneLayoutId, clonedName);
+
+                if (layout != null)
+                {
+                    ShowAlertSuccess("Layout successfully cloned!");
+                    return RedirectToAction(nameof(LayoutDetail), new { id = layout.Id });
+                }
+                else
+                {
+                    _logger.LogError("Error cloning layout, null layout object returned.");
+                    ShowAlertDanger("Error cloning layout.");
+                }
+            }
+            catch (OcudaException oex)
+            {
+                _logger.LogError(oex,
+                    "Error cloning layout {LayoutId}: {ErrorMessage}",
+                    cloneLayoutId,
+                    oex.Message);
+                ShowAlertDanger($"Issue cloning layout: {oex.Message}");
+            }
+
+            return RedirectToAction(nameof(Layouts), new { id = clonePageHeaderId });
         }
     }
 }

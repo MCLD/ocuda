@@ -1,5 +1,25 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Carousels.IndexViewModel
 
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Carousels
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">Back</a>
+        <button data-toggle="modal"
+                data-target="#addModal"
+                class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
+            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            Add Carousel
+        </button>
+    </div>
+</div>
+
 <form id="addForm" role="form">
     <div modal id="addModal" isLarge="true" name="Carousel" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addTitle" asp-for="Carousel.CarouselText.Title" formgroup />
@@ -15,14 +35,6 @@
     <div modal id="deleteModal" name="Carousel" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
 </form>
 
-<div class="mb-2">
-    <button class="btn btn-outline-secondary text-dark"
-            data-toggle="modal"
-            data-target="#addModal">
-        Create Carousel
-    </button>
-</div>
-
 <div class="row">
     <div class="col-12">
         <div>
@@ -31,27 +43,27 @@
                     <tr>
                         <th>Name</th>
                         <th>Items</th>
-                        <th>&nbsp;</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var carousel in Model.Carousels)
                     {
                         <tr>
-                            <td>
-                                <a asp-action="@(nameof(CarouselsController.Detail))" asp-route-id="@carousel.Id" class="rowlink">
+                            <td class="align-middle">
+                                <a asp-action="@(nameof(CarouselsController.Detail))" asp-route-id="@carousel.Id">
                                     @carousel.Name
                                 </a>
                             </td>
-                            <td>@carousel.Items.Count</td>
-                            <td align="center" class="on-top">
+                            <td class="align-middle">@carousel.Items.Count</td>
+                            <td align="align-middle">
                                 <button type="button"
-                                        class="btn btn-danger btn-xs"
+                                        class="btn btn-outline-danger"
                                         data-toggle="modal"
                                         data-target="#deleteModal"
                                         data-id="@carousel.Id"
                                         data-name="@carousel.Name">
-                                    <span class="fas fa-times" aria-hidden="true"></span>
+                                    <span class="fas fa-minus-circle" aria-hidden="true"></span>
                                 </button>
                             </td>
                         </tr>
@@ -67,30 +79,8 @@
     <paginate paginateModel="@Model.PaginateModel"></paginate>
 }
 
-<div class="row">
-    <div class="col-12">
-        <a asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement))"
-           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))"
-           class="btn btn-outline-secondary text-dark">
-            Return to Site Management
-        </a>
-    </div>
-</div>
-
 @section scripts {
     <script>
-        $(window).on("load", function () {
-            $(".rowlink").each(function () {
-                $(this).height($(this).parent().height() + 11);
-            });
-        });
-        $(window).resize(function () {
-            $(".rowlink").each(function () {
-                $(this).height($(this).parent().height() + 11);
-            });
-        });
-
         $("#addForm").submit(function (e) {
             e.preventDefault();
             var form = $(this);

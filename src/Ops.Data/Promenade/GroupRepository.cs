@@ -107,5 +107,13 @@ namespace Ocuda.Ops.Data.Promenade
                 .Where(_ => _.Stub == groupStub)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<ICollection<Group>> GetByIdsAsync(IEnumerable<int> groupIds)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => groupIds.Contains(_.Id))
+                .ToListAsync();
+        }
     }
 }

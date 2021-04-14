@@ -23,9 +23,12 @@ namespace Ocuda.Ops.Service
         private readonly IPageLayoutRepository _pageLayoutRepository;
         private readonly IPageLayoutTextRepository _pageLayoutTextRepository;
         private readonly IPageRepository _pageRepository;
+
         private readonly IPermissionGroupPageContentRepository
             _permissionGroupPageContentRepository;
+
         private readonly ICarouselService _carouselService;
+        private readonly ILanguageService _languageService;
         private readonly ISegmentService _segmentService;
 
         public PageService(ILogger<PageService> logger,
@@ -37,6 +40,7 @@ namespace Ocuda.Ops.Service
             IPageRepository pageRepository,
             IPermissionGroupPageContentRepository permissionGroupPageContentRepository,
             ICarouselService carouselService,
+            ILanguageService languageService,
             ISegmentService segmentService)
             : base(logger, httpContextAccessor)
         {
@@ -54,6 +58,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(permissionGroupPageContentRepository));
             _carouselService = carouselService
                 ?? throw new ArgumentNullException(nameof(carouselService));
+            _languageService = languageService
+                ?? throw new ArgumentNullException(nameof(languageService));
             _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
         }
@@ -410,6 +416,80 @@ namespace Ocuda.Ops.Service
         public async Task<PageLayout> GetLayoutForItemAsync(int itemId)
         {
             return await _pageItemRepository.GetLayoutForItemAsync(itemId);
+        }
+
+        public async Task<PageLayout> CloneLayoutAsync(int pageHeaderId,
+            int layoutId,
+            string clonedName)
+        {
+            var layout = await GetLayoutDetailsAsync(layoutId);
+
+            if (layout.PageHeaderId != pageHeaderId)
+            {
+                throw new OcudaException("Requested layout does not match page header id.");
+            }
+
+            var newLayout = await CreateLayoutAsync(new PageLayout
+            {
+                Name = clonedName?.Trim(),
+                PageHeaderId = layout.PageHeaderId,
+                SocialCardId = layout.SocialCardId,
+            });
+
+            _logger.LogDebug("Layout {NewLayoutId}: created {ClonedName} based on id {LayoutId}",
+                newLayout.Id,
+                clonedName?.Trim(),
+                layoutId);
+
+            foreach (var item in layout.Items.OrderBy(_ => _.Order))
+            {
+                if (item.SegmentId != null)
+                {
+                    var newItem = await CreateItemAsync(new PageItem
+                    {
+                        Order = item.Order,
+                        PageLayoutId = newLayout.Id,
+                        Segment = new Segment
+                        {
+                            EndDate = item.Segment.EndDate,
+                            IsActive = item.Segment.IsActive,
+                            Name = item.Segment.Name,
+                            SegmentLanguages = item.Segment.SegmentLanguages,
+                            StartDate = item.Segment.StartDate
+                        }
+                    });
+
+                    var languageIds = new List<int>();
+
+                    foreach (var language in await _languageService.GetActiveAsync())
+                    {
+                        var segmentText = await _segmentService
+                            .GetBySegmentAndLanguageAsync(item.Segment.Id, language.Id);
+
+                        if (segmentText != null)
+                        {
+                            await _segmentService.CreateSegmentTextAsync(new SegmentText
+                            {
+                                Header = segmentText.Header,
+                                LanguageId = segmentText.LanguageId,
+                                SegmentId = (int)newItem.SegmentId,
+                                Text = segmentText.Text
+                            });
+
+                            languageIds.Add(language.Id);
+                        }
+                    }
+
+                    _logger.LogDebug("Layout {NewLayoutId}: created item id {ItemId}, segment id {NewSegmentId} (copy of {SegmentId}) for languages {LanguageIds}",
+                        newLayout.Id,
+                        newItem.Id,
+                        newItem.SegmentId,
+                        item.SegmentId,
+                        languageIds);
+                }
+            }
+
+            return newLayout;
         }
     }
 }

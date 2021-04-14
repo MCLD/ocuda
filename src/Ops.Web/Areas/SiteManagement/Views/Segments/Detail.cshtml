@@ -12,32 +12,32 @@
         </h1>
     </div>
     <div class="col-sm-6">
-        @if (!Model.NewSegmentText)
-        {
-            <button type="button"
-                    class="btn btn-danger mt-2 mb-1 float-right"
-                    data-toggle="modal"
-                    data-target="#deleteModal"
-                    data-segmentId="@Model.SegmentId"
-                    data-languageId="@Model.LanguageId"
-                    data-languageDescription="@Model.LanguageDescription">
-                <span class="fas fa-times-circle"></span>
-                Delete Segment
-            </button>
-        }
-
         @if (Model.PageLayoutId.HasValue)
         {
             <a asp-controller="@PagesController.Name"
                asp-action="@nameof(PagesController.LayoutDetail)"
                asp-route-id="@Model.PageLayoutId.Value"
-               class="btn btn-outline-dark mt-2 mb-1 mr-4 float-right">Back</a>
+               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
         }
         else
         {
             <a asp-action="Index"
-               class="btn btn-outline-dark mt-2 mb-1 mr-4 float-right">Cancel</a>
+               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Cancel</a>
         }
+        @if (!Model.NewSegmentText)
+        {
+            <button type="button"
+                    class="btn btn-outline-danger mt-2 mb-1 mr-2 float-right"
+                    data-toggle="modal"
+                    data-target="#deleteModal"
+                    data-segmentId="@Model.SegmentId"
+                    data-languageId="@Model.LanguageId"
+                    data-languageDescription="@Model.LanguageDescription">
+                <span class="fas fa-minus-circle"></span>
+                Delete Segment
+            </button>
+        }
+
     </div>
 </div>
 

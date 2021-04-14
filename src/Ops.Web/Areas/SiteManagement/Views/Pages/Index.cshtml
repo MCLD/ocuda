@@ -1,22 +1,22 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages.IndexViewModel
 
 <div class="row mb-2">
-    <div class="col-sm-6">
+    <div class="col-sm-7">
         <h1>Pages</h1>
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">Back</a>
         @if (Model.IsSiteManager)
         {
-            <button class="btn btn-outline-success mt-2 mb-1 float-right"
+            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
                     data-toggle="modal"
                     data-target="#addModal">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Add Page
             </button>
         }
-        <a class="btn btn-outline-dark mt-2 mb-1 mr-4 float-right"
-           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">Back</a>
     </div>
 </div>
 
@@ -155,7 +155,7 @@ else
                             <th>Stub</th>
                             <th>Type</th>
                             <th>Languages</th>
-                            <th>&nbsp;</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -184,11 +184,11 @@ else
                                         <a asp-action="@(nameof(PagesController.ContentPermissions))"
                                            asp-route-id="@header.Id"
                                            title="Page content permissions"
-                                           class="btn btn-link">
+                                           class="btn btn-outline-primary">
                                             <span class="fas fa-user-plus" aria-hidden="true"></span>
                                         </a>
                                         <button type="button"
-                                                class="btn btn-link"
+                                                class="btn btn-outline-primary"
                                                 data-toggle="modal"
                                                 data-target="#editModal"
                                                 data-id="@header.Id"
@@ -205,7 +205,7 @@ else
                                     {
                                         <a asp-action="@(nameof(PagesController.Detail))"
                                            asp-route-id="@header.Id"
-                                           class="btn btn-link"
+                                           class="btn btn-outline-primary"
                                            title="Edit page content">
                                             <span class="far fa-file-alt" aria-hidden="true"></span>
                                         </a>
@@ -213,7 +213,7 @@ else
                                     @if (Model.IsSiteManager)
                                     {
                                         <button type="button"
-                                                class="btn btn-link text-danger"
+                                                class="btn btn-outline-danger"
                                                 data-toggle="modal"
                                                 data-target="#deleteModal"
                                                 data-id="@header.Id"
