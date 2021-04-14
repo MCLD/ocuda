@@ -52,7 +52,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         [HttpGet]
         [Route("[action]")]
-        [SaveModelState]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public IActionResult AddSet()
         {
@@ -61,7 +60,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         [HttpPost]
         [Route("[action]")]
-        [RestoreModelState]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> AddUpdateSet(DigitalDisplaySet digitalDisplaySet)
         {
@@ -302,7 +300,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         [HttpGet]
         [Route("[action]")]
-        [SaveModelState]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> Sets()
         {
@@ -382,7 +379,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         [HttpGet]
         [Route("[action]/{displayId}")]
-        [SaveModelState]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> UpdateDisplay(int displayId)
         {
@@ -396,7 +392,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         [HttpPost]
         [Route("[action]/{displayId}")]
-        [RestoreModelState]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> UpdateDisplay(UpdateDisplayViewModel viewmodel)
         {
@@ -417,7 +412,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         [HttpGet]
         [Route("[action]/{digitalDisplaySetId}")]
-        [SaveModelState]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> UpdateSet(int digitalDisplaySetId)
         {
