@@ -103,7 +103,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [HttpGet]
         [Route("[action]")]
         [Route("[action]/{page}")]
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> Assets(int page)
         {
             page = page == default ? 1 : page;
