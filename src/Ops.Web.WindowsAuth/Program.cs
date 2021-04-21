@@ -1,74 +1,61 @@
 ﻿using System;
-using System.Reflection;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Ocuda.Utility.Keys;
 using Serilog;
-using Serilog.Events;
 
 namespace Ops.Web.WindowsAuth
 {
     public static class Program
     {
+        private const string Product = "Ocuda.Ops.Web.WindowsAuth";
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
+                .UseSerilog();
+
+
         public static int Main(string[] args)
         {
-            var applicationName = Assembly.GetExecutingAssembly().GetName().Name;
-            var version = Assembly.GetExecutingAssembly().GetName().Version;
-
-            string logPath = "logs";
-            const string logFile = "log-{Date}.txt";
-
-            // build a WebHost so that we can access configuration
-            IWebHost webHost = CreateWebHostBuilder(args).Build();
+            using var webHost = CreateHostBuilder(args).Build();
             var config = (IConfiguration)webHost.Services.GetService(typeof(IConfiguration));
 
-            if (!string.IsNullOrEmpty(config[Configuration.OcudaLoggingRollingFile]))
-            {
-                logPath = config[Configuration.OcudaLoggingRollingFile];
-                if (!System.IO.Directory.Exists(logPath))
-                {
-                    System.IO.Directory.CreateDirectory(logPath);
-                }
-            }
+            var instance = string.IsNullOrEmpty(config[Configuration.OcudaInstance])
+                ? "n/a"
+                : config[Configuration.OcudaInstance];
 
-            string fullLogPath = System.IO.Path.Combine(logPath, logFile);
+            var version = Ocuda.Utility.Helpers.VersionHelper.GetVersion();
 
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
-                .MinimumLevel.Override("System", LogEventLevel.Error)
-                .ReadFrom.Configuration(config)
-                .Enrich.WithProperty("Application", applicationName)
-                .Enrich.WithProperty("Version", version)
-                .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .WriteTo.RollingFile(fullLogPath)
-                .CreateLogger();
-
-            // rebuild WebHost now that we have logging configuration
-            webHost = CreateWebHostBuilder(args).Build();
+            Log.Logger = Ocuda.Utility.Logging.Configuration.Build(config).CreateLogger();
+            Log.Information("{Product} v{Version} instance {Instance} starting up",
+                Product,
+                version,
+                instance);
 
             try
             {
-                Log.Information($"{applicationName} v{version} starting up");
                 webHost.Run();
                 return 0;
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, $"{applicationName} v{version} exited unexpectedly: {ex.Message}");
-                return 1;
+                Log.Fatal(ex, "{Product} instance {Instance} v{Version} exited unexpectedly: {Message}",
+                    Product,
+                    instance,
+                    version,
+                    ex.Message);
+                throw;
             }
             finally
             {
+                Log.Information("{Product} instance {Instance} v{Version} shutting down",
+                   Product,
+                   instance,
+                   version);
                 Log.CloseAndFlush();
             }
         }
-
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .UseSerilog();
     }
 }
