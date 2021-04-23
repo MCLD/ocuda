@@ -7,7 +7,6 @@ using BranchLocator.Models;
 using BranchLocator.Models.PlaceDetails;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -37,6 +36,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly IGroupService _groupService;
         private readonly IConfiguration _config;
         private readonly ISegmentService _segmentService;
+        private readonly ISocialCardService _socialCardService;
 
         public static string Name { get { return "Locations"; } }
         public static string Area { get { return "SiteManagement"; } }
@@ -49,7 +49,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ILocationFeatureService locationFeatureService,
             ILocationHoursService locationHoursService,
             ILocationGroupService locationGroupService,
-            ISegmentService segmentService) : base(context)
+            ISegmentService segmentService,
+            ISocialCardService socialCardService) : base(context)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _locationService = locationService
@@ -66,6 +67,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(locationHoursService));
             _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
+            _socialCardService = socialCardService
+                ?? throw new ArgumentNullException(nameof(socialCardService));
         }
 
         [HttpGet("")]
@@ -125,13 +128,40 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 viewModel.Groups = await _groupService
                     .GetGroupsByIdsAsync(viewModel.LocationGroups.Select(_ => _.GroupId));
 
-                var segments = await _segmentService.GetActiveSegmentsAsync();
-                viewModel.PostFeatSegments = new SelectList(segments, nameof(Segment.Id),
-                    nameof(Segment.Name), viewModel.Location?.PostFeatureSegmentId);
-                viewModel.PreFeatSegments = new SelectList(segments, nameof(Segment.Id),
-                    nameof(Segment.Name), viewModel.Location?.PreFeatureSegmentId);
-                viewModel.FeatureList = string.Join(",", viewModel.LocationFeatures.Select(_ => _.FeatureId));
-                viewModel.GroupList = string.Join(",", viewModel.LocationGroups.Select(_ => _.GroupId));
+                var segments
+                    = await _segmentService.GetNamesByIdsAsync(GetAssociatedSegmentIds(location));
+
+                viewModel.DescriptionSegmentName = segments[location.DescriptionSegmentId];
+
+                if (location.HoursSegmentId.HasValue)
+                {
+                    viewModel.HoursSegmentName = segments[location.HoursSegmentId.Value];
+                }
+
+                if (location.PostFeatureSegmentId.HasValue)
+                {
+                    viewModel.PostFeatureSegmentName
+                        = segments[location.PostFeatureSegmentId.Value];
+                }
+
+                if (location.PreFeatureSegmentId.HasValue)
+                {
+                    viewModel.PreFeatureSegmentName
+                        = segments[location.PreFeatureSegmentId.Value];
+                }
+
+                viewModel.FeatureList
+                    = string.Join(",", viewModel.LocationFeatures.Select(_ => _.FeatureId));
+                viewModel.GroupList
+                    = string.Join(",", viewModel.LocationGroups.Select(_ => _.GroupId));
+
+                if (location.SocialCardId.HasValue)
+                {
+                    var socialCard
+                        = await _socialCardService.GetByIdAsync(location.SocialCardId.Value);
+                    viewModel.SocialCardName = socialCard.Title;
+                }
+
                 return View("LocationDetails", viewModel);
             }
             catch (OcudaException ex)
@@ -139,6 +169,24 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ShowAlertDanger($"Unable to find Location {locationStub}: {ex.Message}");
                 return RedirectToAction(nameof(LocationsController.Index));
             }
+        }
+
+        private static IEnumerable<int> GetAssociatedSegmentIds(Location location)
+        {
+            var segmentIds = new List<int> { location.DescriptionSegmentId };
+            if (location.HoursSegmentId.HasValue)
+            {
+                segmentIds.Add(location.HoursSegmentId.Value);
+            }
+            if (location.PreFeatureSegmentId.HasValue)
+            {
+                segmentIds.Add(location.PreFeatureSegmentId.Value);
+            }
+            if (location.PostFeatureSegmentId.HasValue)
+            {
+                segmentIds.Add(location.PostFeatureSegmentId.Value);
+            }
+            return segmentIds.AsEnumerable();
         }
 
         [HttpGet("[action]")]
@@ -154,11 +202,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 Location = location,
                 Action = nameof(LocationsController.CreateLocation)
             };
-            var segments = await _segmentService.GetActiveSegmentsAsync();
-            viewModel.PostFeatSegments = new SelectList(segments, nameof(Segment.Id),
-                nameof(Segment.Name), viewModel.Location?.PostFeatureSegmentId);
-            viewModel.PreFeatSegments = new SelectList(segments, nameof(Segment.Id),
-                nameof(Segment.Name), viewModel.Location?.PreFeatureSegmentId);
+
             return View("LocationDetails", viewModel);
         }
 

@@ -10,11 +10,14 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     {
         Task<Segment> FindAsync(int id);
 
-        Task<DataWithCount<ICollection<Segment>>> GetPaginatedListAsync(
-            BaseFilter filter);
-
         Task<ICollection<Segment>> GetAllActiveSegmentsAsync();
+
+        Task<IDictionary<int, string>> GetNamesByIdsAsync(IEnumerable<int> ids);
+
         Task<int?> GetPageHeaderIdForSegmentAsync(int id);
+
         Task<int?> GetPageLayoutIdForSegmentAsync(int id);
+
+        Task<DataWithCount<ICollection<Segment>>> GetPaginatedListAsync(BaseFilter filter);
     }
 }

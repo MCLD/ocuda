@@ -172,21 +172,6 @@
                    asp-for="Location.Phone"
                    formgroup
                    autocomplete="off" />
-            <select asp-for="Location.DescriptionSegmentId"
-                    asp-items="@Model.PostFeatSegments"
-                    formgroup>
-                <option value="">None</option>
-            </select>
-            <select asp-for="Location.PreFeatureSegmentId"
-                    asp-items="@Model.PreFeatSegments"
-                    formgroup>
-                <option value="">None</option>
-            </select>
-            <select asp-for="Location.PostFeatureSegmentId"
-                    asp-items="@Model.PostFeatSegments"
-                    formgroup>
-                <option value="">None</option>
-            </select>
             <input value="@Model.Location.Facebook"
                    asp-for="Location.Facebook"
                    formgroup
@@ -201,6 +186,214 @@
                    autocomplete="off" />
         </div>
     </div>
+    <div class="row form-group">
+        <div class="col-form-label text-md-right col-md-3">
+            <label asp-for="Location.DescriptionSegmentId">
+            </label><span class="fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker"></span>
+        </div>
+        <div class="col-md-9">
+            <div class="input-group">
+                <input type="text"
+                       class="form-control"
+                       disabled
+                       value="@Model.DescriptionSegmentName" />
+                <div class="input-group-append">
+                    @if (string.IsNullOrEmpty(Model.DescriptionSegmentName))
+                    {
+                        <button class="btn btn-outline-success">
+                            <span class="fas fa-plus-circle"
+                                  aria-hidden="true"
+                                  title="Add segment"></span>
+                        </button>
+                    }
+                    else
+                    {
+                        <a class="btn btn-outline-primary"
+                           asp-action="@nameof(SegmentsController.Detail)"
+                           asp-controller="@SegmentsController.Name"
+                           asp-route-id="@Model.Location.DescriptionSegmentId">
+                            <span class="far fa-file-alt"
+                                  aria-hidden="true"
+                                  title="Edit segment"></span>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+        <span class="validation-message text-danger"
+              asp-validation-for="Location.DescriptionSegmentId"></span>
+    </div>
+
+    <div class="row form-group">
+        <div class="col-form-label text-md-right col-md-3">
+            <label asp-for="Location.HoursSegmentId"></label>
+        </div>
+        <div class="col-md-9">
+            <div class="input-group">
+                <input type="text"
+                       class="form-control"
+                       disabled
+                       value="@Model.HoursSegmentName" />
+                <div class="input-group-append">
+                    @if (string.IsNullOrEmpty(Model.HoursSegmentName))
+                    {
+                        <button class="btn btn-outline-success">
+                            <span class="fas fa-plus-circle"
+                                  aria-hidden="true"
+                                  title="Add segment"></span>
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-outline-danger">
+                            <span class="fas fa-minus-circle"
+                                  aria-hidden="true"
+                                  title="Delete segment"></span>
+                        </button>
+                        <a class="btn btn-outline-primary"
+                           asp-action="@nameof(SegmentsController.Detail)"
+                           asp-controller="@SegmentsController.Name"
+                           asp-route-id="@Model.Location.HoursSegmentId">
+                            <span class="far fa-file-alt"
+                                  aria-hidden="true"
+                                  title="Edit segment"></span>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+        <span class="validation-message text-danger"
+              asp-validation-for="Location.HoursSegmentId"></span>
+    </div>
+
+    <div class="row form-group">
+        <div class="col-form-label text-md-right col-md-3">
+            <label asp-for="Location.PreFeatureSegmentId"></label>
+        </div>
+        <div class="col-md-9">
+            <div class="input-group">
+                <input type="text"
+                       class="form-control"
+                       disabled
+                       value="@Model.PreFeatureSegmentName" />
+                <div class="input-group-append">
+                    @if (string.IsNullOrEmpty(Model.PreFeatureSegmentName))
+                    {
+                        <button class="btn btn-outline-success">
+                            <span class="fas fa-plus-circle"
+                                  aria-hidden="true"
+                                  title="Add segment"></span>
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-outline-danger">
+                            <span class="fas fa-minus-circle"
+                                  aria-hidden="true"
+                                  title="Delete segment"></span>
+                        </button>
+                        <a class="btn btn-outline-primary"
+                           asp-action="@nameof(SegmentsController.Detail)"
+                           asp-controller="@SegmentsController.Name"
+                           asp-route-id="@Model.Location.PreFeatureSegmentId">
+                            <span class="far fa-file-alt"
+                                  aria-hidden="true"
+                                  title="Edit segment"></span>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+        <span class="validation-message text-danger"
+              asp-validation-for="Location.PreFeatureSegmentId"></span>
+    </div>
+
+    <div class="row form-group">
+        <div class="col-form-label text-md-right col-md-3">
+            <label asp-for="Location.PostFeatureSegmentId"></label>
+        </div>
+        <div class="col-md-9">
+            <div class="input-group">
+                <input type="text"
+                       class="form-control"
+                       disabled
+                       value="@Model.PostFeatureSegmentName" />
+                <div class="input-group-append">
+                    @if (string.IsNullOrEmpty(Model.PostFeatureSegmentName))
+                    {
+                        <button class="btn btn-outline-success">
+                            <span class="fas fa-plus-circle"
+                                  aria-hidden="true"
+                                  title="Add segment"></span>
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-outline-danger">
+                            <span class="fas fa-minus-circle"
+                                  aria-hidden="true"
+                                  title="Delete segment"></span>
+                        </button>
+                        <a class="btn btn-outline-primary"
+                           asp-action="@nameof(SegmentsController.Detail)"
+                           asp-controller="@SegmentsController.Name"
+                           asp-route-id="@Model.Location.PostFeatureSegmentId">
+                            <span class="far fa-file-alt"
+                                  aria-hidden="true"
+                                  title="Edit segment"></span>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+        <span class="validation-message text-danger"
+              asp-validation-for="Location.PostFeatureSegmentId"></span>
+    </div>
+
+    <div class="row form-group">
+        <div class="col-form-label text-md-right col-md-3">
+            <label asp-for="Location.SocialCardId"></label>
+        </div>
+        <div class="col-md-9">
+            <div class="input-group">
+                <input type="text"
+                       class="form-control"
+                       disabled
+                       value="@Model.SocialCardName" />
+                <div class="input-group-append">
+                    @if (string.IsNullOrEmpty(Model.SocialCardName))
+                    {
+                        <button class="btn btn-outline-success">
+                            <span class="fas fa-plus-circle"
+                                  aria-hidden="true"
+                                  title="Add social card"></span>
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-outline-danger">
+                            <span class="fas fa-minus-circle"
+                                  aria-hidden="true"
+                                  title="Delete social card"></span>
+                        </button>
+                        <a class="btn btn-outline-primary"
+                           asp-action="@nameof(SocialCardsController.Edit)"
+                           asp-controller="@SocialCardsController.Name"
+                           asp-route-id="@Model.Location.SocialCardId">
+                            <span class="far fa-file-alt"
+                                  aria-hidden="true"
+                                  title="Edit social card"></span>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+        <span class="validation-message text-danger"
+              asp-validation-for="Location.SocialCardId"></span>
+    </div>
+
+
+
     <div class="row mt-2">
         <div class="col">
             <h3>Stuctured Data</h3>
@@ -311,7 +504,7 @@
                                                 <span class="fas fa-align-left" title="Custom Text"></span>
                                             }
                                             else
-                             if (!string.IsNullOrEmpty(locationFeature.RedirectUrl))
+if (!string.IsNullOrEmpty(locationFeature.RedirectUrl))
                                             {
                                                 <span class="fas fa-link" title="Redirect URL"></span>
                                             }

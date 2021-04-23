@@ -150,12 +150,15 @@ namespace Ocuda.Promenade.Models.Entities
         [NotMapped]
         public bool IsNewLocation { get; set; }
 
+        [DisplayName("Social card")]
         public int? SocialCardId { get; set; }
 
         public SocialCard SocialCard { get; set; }
 
+        [DisplayName("Mark as closed, override hours")]
         public bool IsClosed { get; set; }
 
+        [DisplayName("Hours Override Segment")]
         public int? HoursSegmentId { get; set; }
     }
 }

@@ -184,5 +184,10 @@ namespace Ocuda.Ops.Service
         {
             return await _segmentRepository.GetPageLayoutIdForSegmentAsync(id);
         }
+
+        public async Task<IDictionary<int, string>> GetNamesByIdsAsync(IEnumerable<int> ids)
+        {
+            return await _segmentRepository.GetNamesByIdsAsync(ids);
+        }
     }
 }
