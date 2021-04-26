@@ -17,9 +17,10 @@ namespace Ocuda.Promenade.Controllers
             PageService pageService,
             RedirectService redirectService,
             SegmentService segmentService,
-            SocialCardService socialCardService)
+            SocialCardService socialCardService,
+            WebslideService webslideService)
             : base(context, carouselService, pageService, redirectService, segmentService,
-                  socialCardService)
+                  socialCardService, webslideService)
         {
         }
 

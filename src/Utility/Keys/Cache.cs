@@ -200,5 +200,15 @@
         /// Cached social card, {0} is the card id
         /// </summary>
         public static readonly string PromSocialCard = "socialcard.{0}";
+
+        /// <summary>
+        /// Cached webslide, {0} is the webslide id
+        /// </summary>
+        public static readonly string PromWebslide = "webslide.{0}";
+
+        /// <summary>
+        /// Cached webslide item text, {0} is the language id, {1} is the id
+        /// </summary>
+        public static readonly string PromWebslideItemText = "webslideitemtext.{0}.{1}";
     }
 }

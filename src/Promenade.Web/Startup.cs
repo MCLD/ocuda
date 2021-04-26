@@ -309,6 +309,12 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.UrlRedirectAccessRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IUrlRedirectRepository,
                 Data.Promenade.UrlRedirectRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IWebslideItemRepository,
+                Data.Promenade.WebslideItemRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IWebslideItemTextRepository,
+                Data.Promenade.WebslideItemTextRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IWebslideRepository,
+                Data.Promenade.WebslideRepository>();
 
             // services
             services.AddScoped<Utility.Services.Interfaces.IPathResolverService,
@@ -330,6 +336,7 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<SiteAlertService>();
             services.AddScoped<SiteSettingService>();
             services.AddScoped<SocialCardService>();
+            services.AddScoped<WebslideService>();
         }
 
         public void Configure(IApplicationBuilder app,

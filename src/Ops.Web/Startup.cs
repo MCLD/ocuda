@@ -421,6 +421,14 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.SiteSettingPromRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISocialCardRepository,
                 Data.Promenade.SocialCardRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IWebslideItemRepository,
+                Data.Promenade.WebslideItemRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IWebslideItemTextRepository,
+                Data.Promenade.WebslideItemTextRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IWebslideRepository,
+                Data.Promenade.WebslideRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IWebslideTemplateRepository,
+                Data.Promenade.WebslideTemplateRepository>();
 
             // services
             services.AddScoped<Service.Interfaces.Ops.Services.IAuthorizationService,
@@ -470,6 +478,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Abstract.IUserContextProvider, UserContextProvider>();
             services.AddScoped<IUserMetadataTypeService, UserMetadataTypeService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IWebslideService, WebslideService>();
 
             // background process
             services.AddScoped<JobScopedProcessingService>();

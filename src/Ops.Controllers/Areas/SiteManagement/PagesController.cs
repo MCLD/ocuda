@@ -33,6 +33,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly IPermissionGroupService _permissionGroupService;
         private readonly ISegmentService _segmentService;
         private readonly ISocialCardService _socialCardService;
+        private readonly IWebslideService _webslideService;
 
         public static string Name { get { return "Pages"; } }
         public static string Area { get { return "SiteManagement"; } }
@@ -43,7 +44,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             IPageService pageService,
             IPermissionGroupService permissionGroupService,
             ISegmentService segmentService,
-            ISocialCardService socialCardService) : base(context)
+            ISocialCardService socialCardService,
+            IWebslideService webslideService) : base(context)
         {
             _carouselService = carouselService
                 ?? throw new ArgumentNullException(nameof(carouselService));
@@ -56,6 +58,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(segmentService));
             _socialCardService = socialCardService
                 ?? throw new ArgumentNullException(nameof(socialCardService));
+            _webslideService = webslideService
+                ?? throw new ArgumentNullException(nameof(webslideService));
         }
 
         [Route("")]
@@ -98,7 +102,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
                 PermissionIds = UserClaims(ClaimType.PermissionId),
                 CarouselTemplates = new SelectList(await _carouselService.GetAllTemplatesAsync(),
-                    nameof(CarouselTemplate.Id), nameof(CarouselTemplate.Name))
+                    nameof(CarouselTemplate.Id), nameof(CarouselTemplate.Name)),
+                WebslideTemplates = new SelectList(await _webslideService.GetAllTemplatesAsync(),
+                    nameof(WebslideTemplate.Id), nameof(WebslideTemplate.Name))
             };
 
             return View(viewModel);
@@ -124,6 +130,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     if (!model.PageHeader.IsLayoutPage)
                     {
                         model.PageHeader.LayoutCarouselTemplateId = null;
+                        model.PageHeader.LayoutWebslideTemplateId = null;
                     }
 
                     var header = await _pageService.CreateHeaderAsync(model.PageHeader);
@@ -703,7 +710,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
                 layout.PageHeaderId))
             {
-                if (model.Carousel == null && model.Segment == null)
+                if (model.Carousel == null && model.Segment == null && model.Webslide == null)
                 {
                     ModelState.AddModelError("PageItem", "No content to add.");
                 }
@@ -723,6 +730,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             model.Segment.StartDate = null;
                             model.PageItem.Segment = model.Segment;
                         }
+                        else if (model.Webslide != null)
+                        {
+                            model.PageItem.Webslide = model.Webslide;
+                        }
 
                         var pageItem = await _pageService.CreateItemAsync(model.PageItem);
 
@@ -738,6 +749,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             url = Url.Action(nameof(SegmentsController.Detail),
                                 SegmentsController.Name,
                                 new { id = pageItem.Segment.Id });
+                        }
+                        else if (pageItem.Webslide != null)
+                        {
+                            url = Url.Action(nameof(WebslidesController.Detail),
+                                WebslidesController.Name,
+                                new { id = pageItem.Webslide.Id });
                         }
 
                         response = new JsonResponse
@@ -803,6 +820,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     ModelState.AddModelError("PageItem", "No segment submitted");
                 }
+                else if (pageItem.WebslideId.HasValue && model.Webslide == null)
+                {
+                    ModelState.AddModelError("PageItem", "No webslide submitted");
+                }
 
                 if (ModelState.IsValid)
                 {
@@ -815,6 +836,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             model.Segment.StartDate = null;
                             model.Segment.Id = pageItem.SegmentId.Value;
                             await _segmentService.EditAsync(model.Segment);
+                        }
+                        else if (pageItem.WebslideId.HasValue)
+                        {
+                            model.Webslide.Id = pageItem.WebslideId.Value;
+                            await _webslideService.EditAsync(model.Webslide);
                         }
 
                         var language = await _languageService.GetActiveByIdAsync(model.LanguageId);

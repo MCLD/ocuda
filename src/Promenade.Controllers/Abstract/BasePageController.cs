@@ -18,13 +18,15 @@ namespace Ocuda.Promenade.Controllers.Abstract
         protected RedirectService RedirectService { get; }
         protected SegmentService SegmentService { get; }
         protected SocialCardService SocialCardService { get; }
+        protected WebslideService WebslideService { get; }
 
         protected BasePageController(ServiceFacades.Controller<T> context,
             CarouselService carouselService,
             PageService pageService,
             RedirectService redirectService,
             SegmentService segmentService,
-            SocialCardService socialCardService) : base(context)
+            SocialCardService socialCardService,
+            WebslideService webslideService) : base(context)
         {
             CarouselService = carouselService
                 ?? throw new ArgumentNullException(nameof(carouselService));
@@ -35,6 +37,8 @@ namespace Ocuda.Promenade.Controllers.Abstract
                 ?? throw new ArgumentNullException(nameof(segmentService));
             SocialCardService = socialCardService
                 ?? throw new ArgumentNullException(nameof(socialCardService));
+            WebslideService = webslideService
+                ?? throw new ArgumentNullException(nameof(webslideService));
         }
 
         protected async Task<IActionResult> ReturnPageAsync(string stub)
@@ -156,6 +160,17 @@ namespace Ocuda.Promenade.Controllers.Abstract
                     {
                         item.SegmentText.Text = CommonMark.CommonMarkConverter.Convert(
                             item.SegmentText.Text);
+                    }
+                }
+                else if (item.WebslideId.HasValue)
+                {
+                    item.Webslide = await WebslideService.GetByIdAsync(item.WebslideId.Value,
+                        forceReload);
+
+                    foreach (var webslideItem in item.Webslide.Items)
+                    {
+                        webslideItem.WebslideItemText.Filename = WebslideService
+                            .GetWebslideFilePath(webslideItem.WebslideItemText.Filename);
                     }
                 }
             }

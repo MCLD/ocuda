@@ -68,6 +68,9 @@ namespace Ocuda.Ops.Data.Promenade
                         .ThenInclude(_ => _.Items)
                 .Include(_ => _.Items)
                     .ThenInclude(_ => _.Segment)
+                .Include(_ => _.Items)
+                    .ThenInclude(_ => _.Webslide)
+                        .ThenInclude(_ => _.Items)
                 .AsNoTracking()
                 .SingleOrDefaultAsync();
         }

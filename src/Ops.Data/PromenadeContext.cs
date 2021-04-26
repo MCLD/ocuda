@@ -53,6 +53,8 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.DayOfWeek, _.Hour });
             modelBuilder.Entity<SegmentText>()
                 .HasKey(_ => new { _.LanguageId, _.SegmentId });
+            modelBuilder.Entity<WebslideItemText>()
+                .HasKey(_ => new { _.LanguageId, _.WebslideItemId });
         }
 
         #region IMigratableContext
@@ -105,5 +107,9 @@ namespace Ocuda.Ops.Data
         public DbSet<SocialCard> SocialCards { get; set; }
         public DbSet<UrlRedirect> UrlRedirects { get; set; }
         public DbSet<UrlRedirectAccess> UrlRedirectAccesses { get; set; }
+        public DbSet<WebslideItem> WebslideItems { get; set; }
+        public DbSet<WebslideItemText> WebslideItemTexts { get; set; }
+        public DbSet<Webslide> Webslides { get; set; }
+        public DbSet<WebslideTemplate> WebslideTemplates { get; set; }
     }
 }

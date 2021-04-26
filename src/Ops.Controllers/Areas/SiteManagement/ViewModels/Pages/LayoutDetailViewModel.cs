@@ -22,6 +22,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
 
         public Carousel Carousel { get; set; }
         public Promenade.Models.Entities.Segment Segment { get; set; }
+        public Webslide Webslide { get; set; }
 
         public string PreviewLink { get; set; }
     }

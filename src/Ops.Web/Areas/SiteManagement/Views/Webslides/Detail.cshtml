@@ -1,0 +1,413 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Webslides.DetailViewModel
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/dt-picker.min.css" asp-append-version="true" />
+}
+
+@{
+    string imageAltText = string.Empty;
+
+    if (Model.WebslideTemplate.Height.HasValue || Model.WebslideTemplate.Width.HasValue)
+    {
+        imageAltText = "Webslide images need to have ";
+
+        if (Model.WebslideTemplate.Height.HasValue)
+        {
+            imageAltText += $"a height of {Model.WebslideTemplate.Height}px";
+
+            if (Model.WebslideTemplate.Width.HasValue)
+            {
+                imageAltText += " and ";
+            }
+        }
+        if (Model.WebslideTemplate.Width.HasValue)
+        {
+            imageAltText += $"a width of {Model.WebslideTemplate.Width}px";
+        }
+    }
+}
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Webslide
+            <small class="text-muted">@Model.Webslide.Name</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a asp-controller="@PagesController.Name"
+           asp-action="@nameof(PagesController.LayoutDetail)"
+           asp-route-id="@Model.PageLayoutId"
+           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+
+        <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+                data-toggle="modal"
+                data-target="#addItemModal">
+            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            Add Webslide Item
+        </button>
+    </div>
+</div>
+
+<form id="addItemForm" role="form">
+    <input id="addItemLanguage" asp-for="LanguageId" type="hidden" />
+    <input id="addItemWebslideId"
+           asp-for="WebslideItem.WebslideId"
+           value="@Model.WebslideId"
+           type="hidden" />
+    <div modal id="addItemModal"
+         isLarge="true"
+         name="Item"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+        <input id="addItemName" asp-for="WebslideItem.Name" formgroup />
+        <input id="addItemStartDate"
+               asp-for="WebslideItem.StartDate"
+               formgroup
+               datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
+        <input id="addItemEndDate"
+               asp-for="WebslideItem.EndDate"
+               formgroup
+               datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
+    </div>
+</form>
+
+<form id="editItemForm" role="form">
+    <input id="editWebslideItem" asp-for="WebslideItem.Id" type="hidden" />
+    <input id="editWebslideLanguage" asp-for="LanguageId" type="hidden" />
+
+    <div modal
+         id="editItemModal"
+         isLarge="true"
+         name="Segment"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <input id="editItemName" asp-for="WebslideItem.Name" formgroup />
+        <input id="editItemStartDate"
+               asp-for="WebslideItem.StartDate"
+               formgroup
+               datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
+        <input id="editItemEndDate"
+               asp-for="WebslideItem.EndDate"
+               formgroup
+               datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
+    </div>
+</form>
+
+<form asp-action="@(nameof(WebslidesController.DeleteWebslideItem))" method="post" role="form">
+    <input id="deleteItemWebslide" asp-for="WebslideId" type="hidden" />
+    <input id="deleteItemLanguage" asp-for="LanguageId" type="hidden" />
+    <input id="deleteItemId" asp-for="WebslideItem.Id" type="hidden" />
+    <input id="deleteItemName" asp-for="WebslideItem.Name" type="hidden" />
+    <div modal
+         id="deleteItemModal"
+         name="Item"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+</form>
+
+<div class="row pt-1">
+    <div class="col-12">
+        <select asp-for="SelectLanguage" asp-items="Model.LanguageList" formgroup></select>
+    </div>
+</div>
+
+<div class="row pb-1">
+    <div class="col-12 col-md-9 offset-md-3">
+        <hr />
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        @if (Model.Webslide.Items?.Count == 0)
+        {
+            <div class="alert alert-dark">
+                <em>This webslide has no items.</em>
+            </div>
+        }
+        else
+        {
+            foreach (var item in Model.Webslide.Items)
+            {
+                <div class="accordion mt-2" id="accordion@(item.Id)">
+                    <div class="card">
+                        <div class="card-header d-flex" id="heading@(item.Id)">
+                            <div class="card-title h5 mb-0 flex-grow-1"
+                                 data-toggle="collapse"
+                                 data-target="#collapse@(item.Id)"
+                                 aria-controls="collapse@(item.Id)"
+                                 aria-expanded="@(Model.FocusItemId == item.Id ? "true" : "false")">
+                                <span id="disclosure@(item.Id)"
+                                      class="fas fa-caret-right mr-1"></span>
+                                @item.Name &ndash;
+                                @if (!(item.StartDate < Model.CurrentDateTime) && !(item.EndDate > Model.CurrentDateTime))
+                                {
+                                    <span style="color:green;">Active</span>
+                                }
+                                else
+                                {
+                                    <span style="color:red;">Inactive</span>
+                                }
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-primary changeSort decreaseSortButton"
+                                        data-id="@item.Id"
+                                        data-increase="false"
+                                        disabled="@(item.Id == Model.Webslide.Items.First().Id ? "disabled" : null)">
+                                    <span class="fas fa-arrow-up"></span>
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary changeSort increaseSortButton"
+                                        data-id="@item.Id"
+                                        data-increase="true"
+                                        disabled="@(item.Id == Model.Webslide.Items.Last().Id ? "disabled" : null)">
+                                    <span class="fas fa-arrow-down"></span>
+                                </button>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary"
+                                        data-toggle="modal"
+                                        data-target="#editItemModal"
+                                        data-id="@item.Id"
+                                        data-name="@item.Name"
+                                        data-startdate="@item.StartDate"
+                                        data-enddate="@item.EndDate"
+                                        title="Edit item details">
+                                    <span class="fas fa-cog" aria-hidden="true"></span>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger"
+                                        data-toggle="modal"
+                                        data-target="#deleteItemModal"
+                                        data-id="@item.Id"
+                                        data-name="@item.Name">
+                                    <span class="fas fa-minus-circle"></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="collapse@(item.Id)"
+                             class="collapse @(Model.FocusItemId == item.Id ? "show" : null)"
+                             data-parent="#accordion@(item.Id)"
+                             aria-labelledby="heading@(item.Id)">
+                            <div class="card-body">
+                                @if (Model.FocusItemId == item.Id && !string.IsNullOrWhiteSpace(Model.ItemErrorMessage))
+                                {
+                                    <div class="row">
+                                        <div class="col-12 col-md-6 offset-md-3">
+                                            <div class="alert alert-danger">@Model.ItemErrorMessage</div>
+                                        </div>
+                                    </div>
+                                }
+                                <form asp-controller="@WebslidesController.Name"
+                                      asp-action="@nameof(WebslidesController.EditWebslideItemText)"
+                                      enctype="multipart/form-data">
+                                    <input id="weblsideItem@(item.Id)Webslide"
+                                           asp-for="WebslideId"
+                                           type="hidden" />
+                                    <input id="weblsideItem@(item.Id)Id"
+                                           asp-for="WebslideItemText.WebslideItemId"
+                                           value="@item.Id"
+                                           type="hidden" />
+                                    <input id="weblsideItem@(item.Id)Language"
+                                           asp-for="WebslideItemText.LanguageId"
+                                           value="@(item.WebslideItemText?.LanguageId ?? Model.LanguageId)"
+                                           type="hidden" />
+                                    <div class="row form-group">
+                                        <label class="col-form-label text-md-right col-md-3" asp-for="ItemImage">
+                                            Image
+                                            @if (!string.IsNullOrWhiteSpace(imageAltText))
+                                            {
+                                                <span class="fas fa-info-circle" data-toggle="tooltip" href="#" onclick="alert('@imageAltText');" title="@imageAltText"></span>
+                                            }
+                                            <span class="fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker"></span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <label class="btn btn-outline-secondary btn-file form-control">
+                                                        <span class="far fa-file"></span> Select a File
+                                                        <input type="file"
+                                                               asp-for="ItemImage"
+                                                               accept=".jpg,.png"
+                                                               hidden />
+                                                    </label>
+                                                </div>
+                                                <div class="custom-file">
+                                                    <input type="text" class="form-control" value="@item.WebslideItemText?.Filename" readonly id="selectedFile" />
+                                                </div>
+                                            </div>
+                                            <span asp-validation-for="ItemImage" class="validation-message text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <input id="weblsideItem@(item.Id)Url"
+                                           asp-for="WebslideItemText.Url"
+                                           value="@item.WebslideItemText?.Url"
+                                           formgroup />
+                                    <input id="weblsideItem@(item.Id)AltText"
+                                           asp-for="WebslideItemText.AltText"
+                                           value="@item.WebslideItemText?.AltText"
+                                           formgroup />
+                                    <div class="row">
+                                        <div class="offset-md-3 col-md-9">
+                                            <button type="submit"
+                                                    class="btn btn-outline-success"
+                                                    button-spinner>
+                                                <span class="far fa-save"></span>
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/dt-picker.min.js" asp-append-version="true"></script>
+    <script>
+        $(".datetimepicker").datetimepicker({
+            allowInputToggle: true,
+            sideBySide: true
+        });
+
+        @if (Model.FocusItemId.HasValue)
+        {
+            <text>
+            $(function () {
+                var focusAccordion = $("#accordion@(Model.FocusItemId.Value)");
+                if (focusAccordion.length > 0) {
+                    $("#accordion@(Model.FocusItemId.Value)")[0].scrollIntoView();
+                }
+            });
+            </text>
+        }
+
+        $("#SelectLanguage").on("change", function () {
+            window.location.href = "@Url.Action(nameof(WebslidesController.Detail), new { id = Model.WebslideId})" + "?language=" + $(this).val();
+        });
+
+        $("#addItemForm").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.post("@(Url.Action(nameof(WebslidesController.AddWebslideItem), WebslidesController.Name))",
+                form.serialize(),
+                function (response) {
+                if (response.success == true) {
+                    location.href = response.url;
+                }
+                else {
+                    alert(response.message);
+                    ResetSpinners(form.find(".btn-spinner"));
+                }
+            });
+        });
+
+        $("#editItemModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+            var startDate = button.data("startdate");
+            var endDate = button.data("enddate");
+
+            $("#editWebslideItem").val(id);
+            $("#editItemName").val(name);
+            $("#editItemStartDate").val(startDate);
+            $("#editItemEndDate").val(endDate);
+        });
+
+        $("#editItemForm").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.post("@(Url.Action(nameof(WebslidesController.EditWebslideItem), WebslidesController.Name))",
+                form.serialize(),
+                function (response) {
+                if (response.success == true) {
+                    location.href = response.url;
+                }
+                else {
+                    alert(response.message);
+                    ResetSpinners(form.find(".btn-spinner"));
+                }
+            });
+        });
+
+        $("#deleteItemModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+            var modal = $(this);
+            $("#deleteItemId").val(id);
+            $("#deleteItemName").val(name);
+            modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
+        });
+
+        $(".changeSort").on("click", function () {
+            var button = $(this);
+            var id = button.data("id");
+            var increase = button.data("increase");
+            var icon = button.children("span");
+            if (icon.hasClass("fa-spinner") == false) {
+                icon.removeClass("fa-arrow-up fa-arrow-down").addClass("fa-spinner fa-pulse");
+                $.post("@Url.Action(nameof(WebslidesController.ChangeSort))",
+                    { id, increase },
+                    function (response) {
+                        icon.removeClass("fa-spinner fa-pulse");
+                        if (increase) {
+                            icon.addClass("fa-arrow-down");
+                        }
+                        else {
+                            icon.addClass("fa-arrow-up");
+                        }
+                        if (response.success) {
+                            var row = button.parents(".accordion");
+
+                            if (increase) {
+                                var nextRow = row.next();
+                                row.insertAfter(nextRow);
+                                row.find(".decreaseSortButton").removeAttr("disabled");
+                                if (row.next().length == 0) {
+                                    row.find(".increaseSortButton").attr("disabled", "disabled");
+                                }
+                                nextRow.find(".increaseSortButton").removeAttr("disabled");
+                                if (nextRow.prev().length == 0) {
+                                    nextRow.find(".decreaseSortButton").attr("disabled", "disabled");
+                                }
+                            }
+                            else {
+
+                                var prevRow = row.prev();
+                                row.insertBefore(prevRow);
+                                row.find(".increaseSortButton").removeAttr("disabled");
+                                if (row.prev().length == 0) {
+                                    row.find(".decreaseSortButton").attr("disabled", "disabled");
+                                }
+                                prevRow.find(".decreaseSortButton").removeAttr("disabled");
+                                if (prevRow.next().length == 0) {
+                                    prevRow.find(".increaseSortButton").attr("disabled", "disabled");
+                                }
+                            }
+                        }
+                        else {
+                            alert(response.message);
+                        }
+                });
+            }
+        });
+
+        @foreach(var item in Model.Webslide.Items)
+        {
+            <text>
+            $('#collapse@(item.Id)').on('show.bs.collapse', function () {
+                $('#disclosure@(item.Id)').addClass('rotate90');
+            });
+            $('#collapse@(item.Id)').on('hide.bs.collapse', function() {
+                $('#disclosure@(item.Id)').removeClass('rotate90');
+            });
+            </text>
+            @if (Model.FocusItemId == item.Id)
+            {
+                @:$('#disclosure@(item.Id)').addClass('rotate90');
+            }
+        }
+    </script>
+}

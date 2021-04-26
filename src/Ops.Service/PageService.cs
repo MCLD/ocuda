@@ -30,6 +30,7 @@ namespace Ocuda.Ops.Service
         private readonly ICarouselService _carouselService;
         private readonly ILanguageService _languageService;
         private readonly ISegmentService _segmentService;
+        private readonly IWebslideService _webslideService;
 
         public PageService(ILogger<PageService> logger,
             IHttpContextAccessor httpContextAccessor,
@@ -41,7 +42,8 @@ namespace Ocuda.Ops.Service
             IPermissionGroupPageContentRepository permissionGroupPageContentRepository,
             ICarouselService carouselService,
             ILanguageService languageService,
-            ISegmentService segmentService)
+            ISegmentService segmentService,
+            IWebslideService webslideService)
             : base(logger, httpContextAccessor)
         {
             _pageHeaderRepository = pageHeaderRepository
@@ -62,6 +64,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(languageService));
             _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
+            _webslideService = webslideService
+                ?? throw new ArgumentNullException(nameof(webslideService));
         }
 
         public async Task<Page> GetByHeaderAndLanguageAsync(int headerId, int languageId)
@@ -289,18 +293,28 @@ namespace Ocuda.Ops.Service
         {
             pageItem.CarouselId = null;
             pageItem.SegmentId = null;
+            pageItem.WebslideId = null;
 
             if (pageItem.Carousel != null)
             {
                 pageItem.Segment = null;
+                pageItem.Webslide = null;
                 pageItem.Carousel = await _carouselService.CreateNoSaveAsync(pageItem.Carousel);
             }
             else if (pageItem.Segment != null)
             {
                 pageItem.Carousel = null;
+                pageItem.Webslide = null;
                 pageItem.Segment = await _segmentService.CreateNoSaveAsync(pageItem.Segment);
             }
-            if (pageItem.Carousel == null && pageItem.Segment == null)
+            else if (pageItem.Webslide != null)
+            {
+                pageItem.Carousel = null;
+                pageItem.Segment = null;
+                pageItem.Webslide = await _webslideService.CreateNoSaveAsync(pageItem.Webslide);
+            } 
+
+            if (pageItem.Carousel == null && pageItem.Segment == null && pageItem.Webslide == null)
             {
                 throw new OcudaException("No type selected");
             }

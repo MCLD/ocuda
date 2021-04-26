@@ -29,6 +29,10 @@ namespace Ocuda.Promenade.Models.Entities
         public int? LayoutCarouselTemplateId { get; set; }
         public CarouselTemplate LayoutCarouselTemplate { get; set; }
 
+        [DisplayName("Webslide Template")]
+        public int? LayoutWebslideTemplateId { get; set; }
+        public WebslideTemplate LayoutWebslideTemplate { get; set; }
+
         [NotMapped]
         public ICollection<string> PageLanguages { get; set; }
 

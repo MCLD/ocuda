@@ -42,6 +42,8 @@ namespace Ocuda.Promenade.Data
                 .HasKey(_ => new { _.DayOfWeek, _.Hour });
             modelBuilder.Entity<SegmentText>()
                 .HasKey(_ => new { _.LanguageId, _.SegmentId });
+            modelBuilder.Entity<WebslideItemText>()
+                .HasKey(_ => new { _.LanguageId, _.WebslideItemId });
         }
 
         // Read-Only
@@ -85,6 +87,10 @@ namespace Ocuda.Promenade.Data
         public DbSet<SiteSetting> SiteSettings { get; }
         public DbSet<SocialCard> SocialCards { get; }
         public DbSet<UrlRedirect> UrlRedirects { get; }
+        public DbSet<WebslideItem> WebslideItems { get; }
+        public DbSet<WebslideItemText> WebslideItemTexts { get; }
+        public DbSet<Webslide> Webslides { get; }
+        public DbSet<WebslideTemplate> WebslideTemplates { get; }
 
         // Read/Write 
         public DbSet<Language> Languages { get; set; }

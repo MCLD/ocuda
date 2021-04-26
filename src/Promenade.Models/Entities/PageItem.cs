@@ -23,6 +23,10 @@ namespace Ocuda.Promenade.Models.Entities
         public int? SegmentId { get; set; }
         public Segment Segment { get; set; }
 
+        [DisplayName("Webslide")]
+        public int? WebslideId { get; set; }
+        public Webslide Webslide { get; set; }
+
         [NotMapped]
         public SegmentText SegmentText { get; set; }
     }

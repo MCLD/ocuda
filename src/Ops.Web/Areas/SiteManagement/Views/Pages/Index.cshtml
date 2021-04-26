@@ -50,6 +50,13 @@
                     disabled>
                 <option></option>
             </select>
+            <select id="addWebslideTemplate"
+                    asp-for="PageHeader.LayoutWebslideTemplateId"
+                    asp-items="@Model.WebslideTemplates"
+                    formgroup
+                    disabled>
+                <option></option>
+            </select>
         </div>
     </div>
 </form>
@@ -77,6 +84,13 @@
             <select id="editCarouselTemplate"
                     asp-for="PageHeader.LayoutCarouselTemplateId"
                     asp-items="@Model.CarouselTemplates"
+                    formgroup
+                    disabled>
+                <option></option>
+            </select>
+            <select id="editWebslideTemplate"
+                    asp-for="PageHeader.LayoutWebslideTemplateId"
+                    asp-items="@Model.WebslideTemplates"
                     formgroup
                     disabled>
                 <option></option>
@@ -197,6 +211,7 @@ else
                                                 data-stub="@header.Stub"
                                                 data-type="@((int)header.Type)"
                                                 data-carouseltemplate="@header.LayoutCarouselTemplateId"
+                                                data-webslidetemplate="@header.LayoutWebslideTemplateId"
                                                 title="Edit page name">
                                             <span class="fas fa-cog" aria-hidden="true"></span>
                                         </button>
@@ -302,6 +317,7 @@ else
             var stub = button.data("stub");
             var type = button.data("type");
             var carouselTemplate = button.data("carouseltemplate");
+            var webslideTeplate = button.data("webslidetemplate");
 
             $("#editId").val(id);
             $("#editLayout").val(layout);
@@ -309,6 +325,7 @@ else
             $("#editStub").val(stub);
             $("#editType").val(type);
             $("#editCarouselTemplate").val(carouselTemplate);
+            $("#editWebslideTemplate").val(webslideTeplate);
 
             if (layout == "True") {
                 $("#editTemplateContainer").removeClass("d-none");
