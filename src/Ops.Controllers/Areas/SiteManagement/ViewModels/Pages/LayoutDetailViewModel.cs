@@ -21,6 +21,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
         public string SelectLanguage { get; set; }
 
         public Carousel Carousel { get; set; }
+        public PageFeature PageFeature { get; set; }
         public Promenade.Models.Entities.Segment Segment { get; set; }
         public Webslide Webslide { get; set; }
 

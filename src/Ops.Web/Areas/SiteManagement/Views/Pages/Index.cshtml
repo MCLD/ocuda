@@ -50,6 +50,13 @@
                     disabled>
                 <option></option>
             </select>
+            <select id="addFeatureTemplate"
+                    asp-for="PageHeader.LayoutFeatureTemplateId"
+                    asp-items="@Model.FeatureTemplates"
+                    formgroup
+                    disabled>
+                <option></option>
+            </select>
             <select id="addWebslideTemplate"
                     asp-for="PageHeader.LayoutWebslideTemplateId"
                     asp-items="@Model.WebslideTemplates"
@@ -84,6 +91,13 @@
             <select id="editCarouselTemplate"
                     asp-for="PageHeader.LayoutCarouselTemplateId"
                     asp-items="@Model.CarouselTemplates"
+                    formgroup
+                    disabled>
+                <option></option>
+            </select>
+            <select id="editFeatureTemplate"
+                    asp-for="PageHeader.LayoutFeatureTemplateId"
+                    asp-items="@Model.FeatureTemplates"
                     formgroup
                     disabled>
                 <option></option>
@@ -211,6 +225,7 @@ else
                                                 data-stub="@header.Stub"
                                                 data-type="@((int)header.Type)"
                                                 data-carouseltemplate="@header.LayoutCarouselTemplateId"
+                                                data-featuretemplate="@header.LayoutFeatureTemplateId"
                                                 data-webslidetemplate="@header.LayoutWebslideTemplateId"
                                                 title="Edit page name">
                                             <span class="fas fa-cog" aria-hidden="true"></span>
@@ -317,6 +332,7 @@ else
             var stub = button.data("stub");
             var type = button.data("type");
             var carouselTemplate = button.data("carouseltemplate");
+            var featureTemplate = button.data("featuretemplate");
             var webslideTeplate = button.data("webslidetemplate");
 
             $("#editId").val(id);
@@ -325,6 +341,7 @@ else
             $("#editStub").val(stub);
             $("#editType").val(type);
             $("#editCarouselTemplate").val(carouselTemplate);
+            $("#editFeatureTemplate").val(featureTemplate);
             $("#editWebslideTemplate").val(webslideTeplate);
 
             if (layout == "True") {

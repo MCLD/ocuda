@@ -8,5 +8,6 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Shared
         public string CanonicalUrl { get; set; }
         public bool HasCarousels { get; set; }
         public string Stub { get; set; }
+        public PageFeatureTemplate PageFeatureTemplate { get; set; }
     }
 }

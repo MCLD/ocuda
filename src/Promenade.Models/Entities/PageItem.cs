@@ -19,6 +19,10 @@ namespace Ocuda.Promenade.Models.Entities
         public int? CarouselId { get; set; }
         public Carousel Carousel { get; set; }
 
+        [DisplayName("Feature")]
+        public int? PageFeatureId { get; set; }
+        public PageFeature PageFeature { get; set; }
+
         [DisplayName("Segment")]
         public int? SegmentId { get; set; }
         public Segment Segment { get; set; }

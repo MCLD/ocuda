@@ -29,6 +29,7 @@ namespace Ocuda.Ops.Service
 
         private readonly ICarouselService _carouselService;
         private readonly ILanguageService _languageService;
+        private readonly IPageFeatureService _pageFeatureService;
         private readonly ISegmentService _segmentService;
         private readonly IWebslideService _webslideService;
 
@@ -42,6 +43,7 @@ namespace Ocuda.Ops.Service
             IPermissionGroupPageContentRepository permissionGroupPageContentRepository,
             ICarouselService carouselService,
             ILanguageService languageService,
+            IPageFeatureService pageFeatureService,
             ISegmentService segmentService,
             IWebslideService webslideService)
             : base(logger, httpContextAccessor)
@@ -62,6 +64,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(carouselService));
             _languageService = languageService
                 ?? throw new ArgumentNullException(nameof(languageService));
+            _pageFeatureService = pageFeatureService
+                ?? throw new ArgumentNullException(nameof(pageFeatureService));
             _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
             _webslideService = webslideService
@@ -292,29 +296,42 @@ namespace Ocuda.Ops.Service
         public async Task<PageItem> CreateItemAsync(PageItem pageItem)
         {
             pageItem.CarouselId = null;
+            pageItem.PageFeatureId = null;
             pageItem.SegmentId = null;
             pageItem.WebslideId = null;
 
             if (pageItem.Carousel != null)
             {
+                pageItem.PageFeature = null;
                 pageItem.Segment = null;
                 pageItem.Webslide = null;
                 pageItem.Carousel = await _carouselService.CreateNoSaveAsync(pageItem.Carousel);
             }
+            else if (pageItem.PageFeature != null)
+            {
+                pageItem.Carousel = null;
+                pageItem.Segment = null;
+                pageItem.Webslide = null;
+                pageItem.PageFeature = await _pageFeatureService
+                    .CreateNoSaveAsync(pageItem.PageFeature);
+            }
             else if (pageItem.Segment != null)
             {
                 pageItem.Carousel = null;
+                pageItem.PageFeature = null;
                 pageItem.Webslide = null;
                 pageItem.Segment = await _segmentService.CreateNoSaveAsync(pageItem.Segment);
             }
             else if (pageItem.Webslide != null)
             {
                 pageItem.Carousel = null;
+                pageItem.PageFeature = null;
                 pageItem.Segment = null;
                 pageItem.Webslide = await _webslideService.CreateNoSaveAsync(pageItem.Webslide);
-            } 
+            }
 
-            if (pageItem.Carousel == null && pageItem.Segment == null && pageItem.Webslide == null)
+            if (pageItem.Carousel == null && pageItem.PageFeature == null
+                && pageItem.Segment == null && pageItem.Webslide == null)
             {
                 throw new OcudaException("No type selected");
             }

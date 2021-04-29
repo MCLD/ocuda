@@ -14,6 +14,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
         protected abstract PageType PageType { get; }
 
         protected CarouselService CarouselService { get; }
+        protected PageFeatureService PageFeatureService { get; }
         protected PageService PageService { get; }
         protected RedirectService RedirectService { get; }
         protected SegmentService SegmentService { get; }
@@ -22,6 +23,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
         protected BasePageController(ServiceFacades.Controller<T> context,
             CarouselService carouselService,
+            PageFeatureService pageFeatureService,
             PageService pageService,
             RedirectService redirectService,
             SegmentService segmentService,
@@ -30,6 +32,8 @@ namespace Ocuda.Promenade.Controllers.Abstract
         {
             CarouselService = carouselService
                 ?? throw new ArgumentNullException(nameof(carouselService));
+            PageFeatureService = pageFeatureService
+                ?? throw new ArgumentNullException(nameof(pageFeatureService));
             PageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
             RedirectService = redirectService
                 ?? throw new ArgumentNullException(nameof(redirectService));
@@ -150,6 +154,18 @@ namespace Ocuda.Promenade.Controllers.Abstract
                     item.Carousel = await CarouselService.GetByIdAsync(item.CarouselId.Value,
                         forceReload);
                 }
+                else if (item.PageFeatureId.HasValue)
+                {
+                    item.PageFeature = await PageFeatureService.GetByIdAsync(
+                        item.PageFeatureId.Value,
+                        forceReload);
+
+                    foreach (var featureItem in item.PageFeature.Items)
+                    {
+                        featureItem.PageFeatureItemText.Filename = PageFeatureService
+                            .GetPageFeatureFilePath(featureItem.PageFeatureItemText.Filename);
+                    }
+                }
                 else if (item.SegmentId.HasValue)
                 {
                     item.SegmentText = await SegmentService.GetSegmentTextBySegmentIdAsync(
@@ -181,6 +197,12 @@ namespace Ocuda.Promenade.Controllers.Abstract
                 HasCarousels = pageLayout.Items.Any(_ => _.CarouselId.HasValue),
                 Stub = stub?.Trim()
             };
+
+            if (pageLayout.Items.Any(_ => _.PageFeatureId.HasValue))
+            {
+                viewModel.PageFeatureTemplate = await PageFeatureService
+                    .GetTemplateForPageLayoutAsync(pageLayout.Id);
+            }
 
             if (pageLayout.SocialCardId.HasValue)
             {

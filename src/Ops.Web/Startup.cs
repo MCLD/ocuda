@@ -393,6 +393,14 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.LocationHoursOverrideRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationHoursRepository,
                 Data.Promenade.LocationHoursRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageFeatureItemRepository,
+                Data.Promenade.PageFeatureItemRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageFeatureItemTextRepository,
+                Data.Promenade.PageFeatureItemTextRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageFeatureRepository,
+                Data.Promenade.PageFeatureRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageFeatureTemplateRepository,
+                Data.Promenade.PageFeatureTemplateRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageRepository,
                 Data.Promenade.PageRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageHeaderRepository,
@@ -455,6 +463,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ILocationGroupService, LocationGroupService>();
             services.AddScoped<ILocationFeatureService, LocationFeatureService>();
             services.AddScoped<ILinkService, LinkService>();
+            services.AddScoped<IPageFeatureService, PageFeatureService>();
             services.AddScoped<IPageService, PageService>();
             services.AddScoped<IPublicFilesService, PublicFilesService>();
             services.AddScoped<Utility.Services.Interfaces.IPathResolverService,

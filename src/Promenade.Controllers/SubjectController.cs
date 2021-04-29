@@ -14,13 +14,14 @@ namespace Ocuda.Promenade.Controllers
 
         public SubjectController(ServiceFacades.Controller<SubjectController> context,
             CarouselService carouselService,
+            PageFeatureService pageFeatureService,
             PageService pageService,
             RedirectService redirectService,
             SegmentService segmentService,
             SocialCardService socialCardService,
             WebslideService webslideService)
-            : base(context, carouselService, pageService, redirectService, segmentService,
-                  socialCardService, webslideService)
+            : base(context, carouselService, pageFeatureService, pageService, redirectService,
+                  segmentService, socialCardService, webslideService)
         {
         }
 

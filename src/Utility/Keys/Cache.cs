@@ -147,6 +147,16 @@
         public static readonly string PromPageCurrentLayoutId = "currentpagelayoutid.{0}";
 
         /// <summary>
+        /// Cached page feature, {0} is the page feature id
+        /// </summary>
+        public static readonly string PromPageFeature = "pagefeature.{0}";
+
+        /// <summary>
+        /// Cached page feature item text, {0} is the language id, {1} is the id
+        /// </summary>
+        public static readonly string PromPageFeatureItemText = "pagefeatureitemtext.{0}.{1}";
+
+        /// <summary>
         /// Cached page header info, {0} is the stub, {1} is the page type
         /// </summary>
         public static readonly string PromPageHeader = "pageheader.{0}.{1}";

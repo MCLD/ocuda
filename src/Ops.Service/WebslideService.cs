@@ -95,7 +95,7 @@ namespace Ocuda.Ops.Service
 
             _webslideRepository.Update(currentWebslide);
             await _webslideRepository.SaveAsync();
-            return webslide;
+            return currentWebslide;
         }
 
         public async Task<WebslideItem> EditItemAsync(WebslideItem webslideItem)

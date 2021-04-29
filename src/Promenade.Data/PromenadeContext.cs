@@ -34,6 +34,8 @@ namespace Ocuda.Promenade.Data
                 .HasKey(_ => new { _.Id, _.LanguageId });
             modelBuilder.Entity<Page>()
                 .HasKey(_ => new { _.LanguageId, _.PageHeaderId });
+            modelBuilder.Entity<PageFeatureItemText>()
+                .HasKey(_ => new { _.PageFeatureItemId, _.LanguageId });
             modelBuilder.Entity<PageLayoutText>()
                 .HasKey(_ => new { _.PageLayoutId, _.LanguageId });
             modelBuilder.Entity<PodcastDirectoryInfo>()
@@ -72,6 +74,10 @@ namespace Ocuda.Promenade.Data
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; }
         public DbSet<Navigation> Navigations { get; }
         public DbSet<NavigationText> NavigationTexts { get; }
+        public DbSet<PageFeatureItem> PageFeatureItems { get; }
+        public DbSet<PageFeatureItemText> PageFeatureItemTexts { get; }
+        public DbSet<PageFeature> PageFeatures { get; }
+        public DbSet<PageFeatureTemplate> PageFeatureTemplates { get; }
         public DbSet<PageItem> PageItems { get; set; }
         public DbSet<PageLayout> PageLayouts { get; set; }
         public DbSet<PageLayoutText> PageLayoutTexts { get; }

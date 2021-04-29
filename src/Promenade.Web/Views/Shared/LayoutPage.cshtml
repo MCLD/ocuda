@@ -85,6 +85,35 @@
             </div>
         </div>
     }
+    else if (item.PageFeatureId.HasValue)
+    {
+        <div class="row">
+            <div class="col-12">
+                <div style="max-width: 740px" class="mx-auto d-block mb-3">
+                    <div class="row">
+                        @{ int count = 0; }
+                        @foreach (var featureItem in item.PageFeature.Items)
+                        {
+                            <div class="col-6 col-sm-3 mb-2">
+                                <a href="@featureItem.PageFeatureItemText.Url">
+                                    <img src="@featureItem.PageFeatureItemText.Filename"
+                                         alt="@featureItem.PageFeatureItemText.AltText"
+                                         class="img-fluid mx-auto d-block"
+                                         style="width: 182px;" />
+                                </a>
+                            </div>
+
+                            count++;
+                            if (count >= Model.PageFeatureTemplate.ItemsToDisplay)
+                            {
+                                break;
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
     else if (item.SegmentId.HasValue && item.SegmentText != null)
     {
         <div class="row">

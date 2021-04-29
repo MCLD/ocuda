@@ -277,6 +277,14 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.NavigationTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IPageHeaderRepository,
                 Data.Promenade.PageHeaderRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IPageFeatureItemRepository,
+                Data.Promenade.PageFeatureItemRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IPageFeatureItemTextRepository,
+                Data.Promenade.PageFeatureItemTextRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IPageFeatureRepository,
+                Data.Promenade.PageFeatureRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IPageFeatureTemplateRepository,
+                Data.Promenade.PageFeatureTemplateRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IPageLayoutRepository,
                 Data.Promenade.PageLayoutRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IPageLayoutTextRepository,
@@ -328,6 +336,7 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<LanguageService>();
             services.AddScoped<LocationService>();
             services.AddScoped<NavigationService>();
+            services.AddScoped<PageFeatureService>();
             services.AddScoped<PageService>();
             services.AddScoped<RedirectService>();
             services.AddScoped<PodcastService>();

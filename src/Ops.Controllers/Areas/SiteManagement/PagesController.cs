@@ -29,6 +29,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     {
         private readonly ICarouselService _carouselService;
         private readonly ILanguageService _languageService;
+        private readonly IPageFeatureService _pageFeatureService;
         private readonly IPageService _pageService;
         private readonly IPermissionGroupService _permissionGroupService;
         private readonly ISegmentService _segmentService;
@@ -41,6 +42,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         public PagesController(ServiceFacades.Controller<PagesController> context,
             ICarouselService carouselService,
             ILanguageService languageService,
+            IPageFeatureService pageFeatureService,
             IPageService pageService,
             IPermissionGroupService permissionGroupService,
             ISegmentService segmentService,
@@ -51,6 +53,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(carouselService));
             _languageService = languageService
                 ?? throw new ArgumentNullException(nameof(languageService));
+            _pageFeatureService = pageFeatureService
+                ?? throw new ArgumentNullException(nameof(pageFeatureService));
             _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
             _permissionGroupService = permissionGroupService
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
@@ -103,6 +107,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 PermissionIds = UserClaims(ClaimType.PermissionId),
                 CarouselTemplates = new SelectList(await _carouselService.GetAllTemplatesAsync(),
                     nameof(CarouselTemplate.Id), nameof(CarouselTemplate.Name)),
+                FeatureTemplates = new SelectList(await _pageFeatureService.GetAllTemplatesAsync(),
+                    nameof(PageFeatureTemplate.Id), nameof(PageFeatureTemplate.Name)),
                 WebslideTemplates = new SelectList(await _webslideService.GetAllTemplatesAsync(),
                     nameof(WebslideTemplate.Id), nameof(WebslideTemplate.Name))
             };
@@ -130,6 +136,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     if (!model.PageHeader.IsLayoutPage)
                     {
                         model.PageHeader.LayoutCarouselTemplateId = null;
+                        model.PageHeader.LayoutFeatureTemplateId = null;
                         model.PageHeader.LayoutWebslideTemplateId = null;
                     }
 
@@ -710,7 +717,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
                 layout.PageHeaderId))
             {
-                if (model.Carousel == null && model.Segment == null && model.Webslide == null)
+                if (model.Carousel == null && model.PageFeature == null && model.Segment == null
+                    && model.Webslide == null)
                 {
                     ModelState.AddModelError("PageItem", "No content to add.");
                 }
@@ -722,6 +730,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         if (model.Carousel != null)
                         {
                             model.PageItem.Carousel = model.Carousel;
+                        }
+                        else if (model.PageFeature != null)
+                        {
+                            model.PageItem.PageFeature = model.PageFeature;
                         }
                         else if (model.Segment != null)
                         {
@@ -743,6 +755,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             url = Url.Action(nameof(CarouselsController.Detail),
                                 CarouselsController.Name,
                                 new { id = pageItem.Carousel.Id });
+                        }
+                        else if (pageItem.PageFeature != null)
+                        {
+                            url = Url.Action(nameof(PageFeaturesController.Detail),
+                                PageFeaturesController.Name,
+                                new { id = pageItem.PageFeature.Id });
                         }
                         else if (pageItem.Segment != null)
                         {
@@ -816,6 +834,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     ModelState.AddModelError("PageItem", "Carousels can only be edited from the carousel page");
                 }
+                else if (pageItem.PageFeatureId.HasValue && model.PageFeature == null)
+                {
+                    ModelState.AddModelError("PageItem", "No feature submitted");
+                }
                 else if (pageItem.SegmentId.HasValue && model.Segment == null)
                 {
                     ModelState.AddModelError("PageItem", "No segment submitted");
@@ -829,7 +851,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     try
                     {
-                        if (pageItem.SegmentId.HasValue)
+                        if (pageItem.PageFeatureId.HasValue)
+                        {
+                            model.PageFeature.Id = pageItem.PageFeatureId.Value;
+                            await _pageFeatureService.EditAsync(model.PageFeature);
+                        }
+                        else if (pageItem.SegmentId.HasValue)
                         {
                             model.Segment.IsActive = true;
                             model.Segment.EndDate = null;
