@@ -150,11 +150,11 @@ namespace Ocuda.Ops.Service.Clients
 
             if (!uploadFileResponse.IsSuccessStatusCode)
             {
-                _logger.LogError("Http upload of {FilePath} to Screenly failed: {StatusCode} - {RequestMessage}",
+                _logger.LogError("Http upload of {FilePath} to Screenly failed: {StatusCode} - {ReasonPhrase}",
                     filePath,
                     uploadFileResponse.StatusCode,
-                    uploadFileResponse.RequestMessage);
-                throw new OcudaException($"Unable to upload file to Screenly: {uploadFileResponse.StatusCode} - {uploadFileResponse.RequestMessage}");
+                    uploadFileResponse.ReasonPhrase);
+                throw new OcudaException($"Unable to upload file to Screenly: {uploadFileResponse.StatusCode} - {uploadFileResponse.ReasonPhrase}");
             }
 
             assetModel.Uri = await uploadFileResponse.Content.ReadAsStringAsync();
@@ -174,11 +174,11 @@ namespace Ocuda.Ops.Service.Clients
 
             if (!addAssetResponse.IsSuccessStatusCode)
             {
-                _logger.LogError("Http add of slide details for {FilePath} failed: {StatusCode} - {RequestMessage}",
+                _logger.LogError("Http add of slide details for {FilePath} failed: {StatusCode} - {ReasonPhrase}",
                     filePath,
                     uploadFileResponse.StatusCode,
-                    uploadFileResponse.RequestMessage);
-                throw new OcudaException($"Unable to add slide details to Screenly: {addAssetResponse.StatusCode} - {addAssetResponse.RequestMessage}");
+                    uploadFileResponse.ReasonPhrase);
+                throw new OcudaException($"Unable to add slide details to Screenly: {addAssetResponse.StatusCode} - {addAssetResponse.ReasonPhrase}");
             }
 
             using var addAssetStream = await addAssetResponse.Content.ReadAsStreamAsync();
@@ -225,14 +225,14 @@ namespace Ocuda.Ops.Service.Clients
                 throw new OcudaException(hrex.Message, hrex);
             }
 
-            if (getSlidesResponse?.IsSuccessStatusCode != false)
+            if (getSlidesResponse?.IsSuccessStatusCode != true)
             {
-                _logger.LogError("Issue fetching slides from display id {DisplayId} named {DisplayName}: {StatusCode} - {RequestMessage}",
+                _logger.LogError("Issue fetching slides from display id {DisplayId} named {DisplayName}: {StatusCode} - {ReasonPhrase}",
                     display.Id,
                     display.Name,
                     getSlidesResponse.StatusCode,
-                    getSlidesResponse.RequestMessage);
-                throw new OcudaException($"Screenly connection error: {getSlidesResponse.StatusCode} - {getSlidesResponse.RequestMessage}");
+                    getSlidesResponse.ReasonPhrase);
+                throw new OcudaException($"Screenly connection error: {getSlidesResponse.StatusCode} - {getSlidesResponse.ReasonPhrase}");
             }
 
             using var getSlidesStream = await getSlidesResponse.Content.ReadAsStreamAsync();
@@ -254,12 +254,12 @@ namespace Ocuda.Ops.Service.Clients
 
             if (!getSlideResponse.IsSuccessStatusCode)
             {
-                _logger.LogError("Http fetch of slide {AssetId} from {DisplayName} Screenly failed: {StatusCode} - {RequestMessage}",
+                _logger.LogError("Http fetch of slide {AssetId} from {DisplayName} Screenly failed: {StatusCode} - {ReasonPhrase}",
                     assetId,
                     display.Name,
                     getSlideResponse.StatusCode,
-                    getSlideResponse.RequestMessage);
-                throw new OcudaException($"Unable to find asset id {assetId} in Screenly: {getSlideResponse.StatusCode} - {getSlideResponse.RequestMessage}");
+                    getSlideResponse.ReasonPhrase);
+                throw new OcudaException($"Unable to find asset id {assetId} in Screenly: {getSlideResponse.StatusCode} - {getSlideResponse.ReasonPhrase}");
             }
 
             using var getSlideStream = await getSlideResponse.Content.ReadAsStreamAsync();
@@ -280,12 +280,12 @@ namespace Ocuda.Ops.Service.Clients
 
             if (!removeSlideResponse.IsSuccessStatusCode)
             {
-                _logger.LogError("Http remove of slide {AssetId} from {DisplayName} Screenly failed: {StatusCode} - {RequestMessage}",
+                _logger.LogError("Http remove of slide {AssetId} from {DisplayName} Screenly failed: {StatusCode} - {ReasonPhrase}",
                     assetId,
                     display.Name,
                     removeSlideResponse.StatusCode,
-                    removeSlideResponse.RequestMessage);
-                throw new OcudaException($"Unable to remove asset id {assetId} from Screenly: {removeSlideResponse.StatusCode} - {removeSlideResponse.RequestMessage}");
+                    removeSlideResponse.ReasonPhrase);
+                throw new OcudaException($"Unable to remove asset id {assetId} from Screenly: {removeSlideResponse.StatusCode} - {removeSlideResponse.ReasonPhrase}");
             }
 
             return removeSlideResponse.ReasonPhrase;
@@ -332,12 +332,12 @@ namespace Ocuda.Ops.Service.Clients
 
             if (!updateSlideResponse.IsSuccessStatusCode)
             {
-                _logger.LogError("Http update of slide {AssetId} from {DisplayName} Screenly failed: {StatusCode} - {RequestMessage}",
+                _logger.LogError("Http update of slide {AssetId} from {DisplayName} Screenly failed: {StatusCode} - {ReasonPhrase}",
                    assetId,
                    display.Name,
                    updateSlideResponse.StatusCode,
-                   updateSlideResponse.RequestMessage);
-                throw new OcudaException($"Unable to update asset id {assetId} in Screenly: {updateSlideResponse.StatusCode} - {updateSlideResponse.RequestMessage}");
+                   updateSlideResponse.ReasonPhrase);
+                throw new OcudaException($"Unable to update asset id {assetId} in Screenly: {updateSlideResponse.StatusCode} - {updateSlideResponse.ReasonPhrase}");
             }
         }
     }
