@@ -7,7 +7,7 @@
 @{
     string imageAltText = string.Empty;
 
-    if (Model.WebslideTemplate.Height.HasValue || Model.WebslideTemplate.Width.HasValue)
+    if (Model.WebslideTemplate?.Height.HasValue == true || Model.WebslideTemplate?.Width.HasValue == true)
     {
         imageAltText = "Webslide images need to have ";
 

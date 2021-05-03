@@ -7,7 +7,7 @@
 @{
     string imageAltText = string.Empty;
 
-    if (Model.PageFeatureTemplate.Height.HasValue || Model.PageFeatureTemplate.Width.HasValue)
+    if (Model.PageFeatureTemplate?.Height.HasValue == true || Model.PageFeatureTemplate?.Width.HasValue == true)
     {
         imageAltText = "Feature images need to have ";
 
