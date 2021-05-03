@@ -326,7 +326,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     var template = await _webslideService
                         .GetTemplateForWebslideAsync(webslideItem.WebslideId);
 
-                    if (template.Height.HasValue || template.Width.HasValue)
+                    if (template?.Height.HasValue == true || template?.Width.HasValue == true)
                     {
                         using (var image = Image.Load(imageBytes))
                         {
