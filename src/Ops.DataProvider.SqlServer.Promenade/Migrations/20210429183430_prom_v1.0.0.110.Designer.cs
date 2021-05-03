@@ -10,8 +10,8 @@ using Ocuda.Ops.DataProvider.SqlServer.Promenade;
 namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20210429183430_prom_v1.0.0.106")]
-    partial class prom_v100106
+    [Migration("20210429183430_prom_v1.0.0.110")]
+    partial class prom_v100110
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
