@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
