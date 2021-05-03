@@ -328,7 +328,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     var template = await _pageFeatureService
                         .GetTemplateForPageFeatureAsync(featureItem.PageFeatureId);
 
-                    if (template.Height.HasValue || template.Width.HasValue)
+                    if (template?.Height.HasValue == true || template?.Width.HasValue == true)
                     {
                         using (var image = Image.Load(imageBytes))
                         {
