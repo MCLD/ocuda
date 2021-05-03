@@ -207,19 +207,32 @@ namespace Ocuda.Ops.Service.Clients
                     throw new OcudaException($"Null response from Http request to {display.Name}");
                 }
             }
-            catch (HttpRequestException ex)
+            catch (TaskCanceledException tcex)
             {
-                throw new OcudaException($"Http request to {display.Name} failed: {ex.Message}",
-                    ex);
+                _logger.LogError(tcex, "Issue connecting to display id {DisplayId} named {DisplayName}: HTTP request timeout after {Timeout}s",
+                    display.Id,
+                    display.Name,
+                    _httpClient.Timeout.TotalSeconds);
+                throw new OcudaException("Http request timeout", tcex);
+            }
+            catch (HttpRequestException hrex)
+            {
+                _logger.LogError(hrex,
+                    "Issue connecting to display id {DisplayId} named {DisplayName}: {ErrorMessage}",
+                    display.Id,
+                    display.Name,
+                    hrex.Message);
+                throw new OcudaException(hrex.Message, hrex);
             }
 
             if (getSlidesResponse?.IsSuccessStatusCode != false)
             {
-                _logger.LogError("Http fetch of slides from {DisplayName} Screenly failed: {StatusCode} - {RequestMessage}",
+                _logger.LogError("Issue fetching slides from display id {DisplayId} named {DisplayName}: {StatusCode} - {RequestMessage}",
+                    display.Id,
                     display.Name,
                     getSlidesResponse.StatusCode,
                     getSlidesResponse.RequestMessage);
-                throw new OcudaException($"Unable to get slides from Screenly: {getSlidesResponse.StatusCode} - {getSlidesResponse.RequestMessage}");
+                throw new OcudaException($"Screenly connection error: {getSlidesResponse.StatusCode} - {getSlidesResponse.RequestMessage}");
             }
 
             using var getSlidesStream = await getSlidesResponse.Content.ReadAsStreamAsync();

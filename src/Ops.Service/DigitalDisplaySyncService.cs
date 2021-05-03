@@ -79,15 +79,10 @@ namespace Ocuda.Ops.Service
                     }
                     catch (OcudaException oex)
                     {
-                        _logger.LogError(oex,
-                            "Error connecting to display id {DisplayId} named {Name}: {ErrorMessage}",
-                            display.Id,
-                            display.Name,
-                            oex.Message);
                         await _digitalDisplayRepository
                             .UpdateLastCommunicationAsync(display.Id, DateTime.Now);
                         await _digitalDisplayService.SetDisplayStatusAsync(display.Id,
-                            $"Connection problem: {oex.Message}");
+                            oex.Message);
                         return;
                     }
 
@@ -299,13 +294,13 @@ namespace Ocuda.Ops.Service
             catch (OcudaException oex)
             {
                 _logger.LogError(oex,
-                    "Uncaught error sending notifications: {ErrorMessage}",
+                    "Uncaught error syncing displays: {ErrorMessage}",
                     oex.Message);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex,
-                    "Uncaught critical error sending notifications: {ErrorMessage}",
+                    "Uncaught critical error syncing displays: {ErrorMessage}",
                     ex.Message);
             }
         }
