@@ -32,13 +32,23 @@ namespace Ocuda.Ops.Web.JobScheduling
 
             try
             {
-                await Task.WhenAll(
-                    _scheduleNotificationService.SendPendingNotificationsAsync(),
-                    _digitalDisplaySyncService.UpdateDigitalDisplaysAsync());
+                await _scheduleNotificationService.SendPendingNotificationsAsync();
             }
             catch (Exception ex)
             {
-                _logger.LogCritical("Error running scheduled task: {ErrorMessage}",
+                _logger.LogCritical(ex,
+                    "Fatal uncaught error in scheduled task: {ErrorMessage}",
+                    ex.Message);
+            }
+
+            try
+            {
+                await _digitalDisplaySyncService.UpdateDigitalDisplaysAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex,
+                    "Fatal uncaught error in scheduled task: {ErrorMessage}",
                     ex.Message);
             }
 
