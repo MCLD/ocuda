@@ -53,144 +53,110 @@ namespace Ocuda.Ops.Service
             int uploaded = 0;
             int updated = 0;
 
-            if (display != null)
+            try
             {
-                await _digitalDisplayService.SetDisplayStatusAsync(display.Id,
-                    "Connecting to update slides...");
-
-                await _digitalDisplayRepository
-                    .UpdateLastAttemptAsync(display.Id, DateTime.Now);
-
-                ICollection<AssetModel> currentSlides;
-                try
+                if (display != null)
                 {
-                    // slides in the display based on an api request
-                    currentSlides = await _screenlyService.GetCurrentSlidesAsync(display);
-
-                    startingSlides = currentSlides.Count;
+                    await _digitalDisplayService.SetDisplayStatusAsync(display.Id,
+                        "Connecting to update slides...");
 
                     await _digitalDisplayRepository
-                        .UpdateLastCommunicationAsync(display.Id, DateTime.Now);
+                        .UpdateLastAttemptAsync(display.Id, DateTime.Now);
 
-                    await _digitalDisplayService.SetDisplayStatusAsync(display.Id,
-                        $"Connected, found {currentSlides.Count} slides");
-                }
-                catch (OcudaException oex)
-                {
-                    _logger.LogError(oex,
-                        "Error connecting to display id {DisplayId} named {Name}: {ErrorMessage}",
-                        display.Id,
-                        display.Name,
-                        oex.Message);
-                    await _digitalDisplayRepository
-                        .UpdateLastCommunicationAsync(display.Id, DateTime.Now);
-                    await _digitalDisplayService.SetDisplayStatusAsync(display.Id,
-                        $"Connection problem: {oex.Message}");
-                    return;
-                }
-
-                // get the sets that this display is associated with
-                var sets = await _digitalDisplayService
-                    .GetDisplaysSetsAsync(new [] { display.Id });
-
-                if (sets.Count == 0)
-                {
-                    // if the display is not associated with any sets, clear all the slides
-                    foreach (var currentSlide in currentSlides)
+                    ICollection<AssetModel> currentSlides;
+                    try
                     {
-                        try
-                        {
-                            _logger.LogInformation("Display {DisplayId} named {Name} deleting slide {SlideName}",
-                                display.Id,
-                                display.Name,
-                                currentSlide.Name);
-                            await _screenlyService
-                                .RemoveSlideAsync(display, currentSlide.AssetId);
-                            deleted++;
-                        }
-                        catch (OcudaException oex)
-                        {
-                            _logger.LogError("Unable to delete - display {DisplayId} named {Name} asset {AssetId}: {ErrorMessage}",
-                                display.Id,
-                                display.Name,
-                                currentSlide.AssetId,
-                                oex.Message);
-                        }
+                        // slides in the display based on an api request
+                        currentSlides = await _screenlyService.GetCurrentSlidesAsync(display);
+
+                        startingSlides = currentSlides.Count;
+
+                        await _digitalDisplayRepository
+                            .UpdateLastCommunicationAsync(display.Id, DateTime.Now);
+
+                        await _digitalDisplayService.SetDisplayStatusAsync(display.Id,
+                            $"Connected, found {currentSlides.Count} slides");
                     }
-                }
-                else
-                {
-                    // assets which should be in the display
-                    var assets = await _digitalDisplayAssetSetRepository
-                        .GetAssetsBySetsAsync(sets.Select(_ => _.DigitalDisplaySetId));
-
-                    // our record of assets in the display now
-                    var displayItems = await _digitalDisplayItemRepository
-                        .GetByDisplayAsync(display.Id);
-
-                    // loop through assets that should be in this display
-                    foreach (var asset in assets)
+                    catch (OcudaException oex)
                     {
-                        // look up asset id for if we think it's present (is in displayitems)
-                        var assetInDisplay = displayItems.SingleOrDefault(_ =>
-                            _.DigitalDisplayAssetId == asset.DigitalDisplayAssetId);
+                        _logger.LogError(oex,
+                            "Error connecting to display id {DisplayId} named {Name}: {ErrorMessage}",
+                            display.Id,
+                            display.Name,
+                            oex.Message);
+                        await _digitalDisplayRepository
+                            .UpdateLastCommunicationAsync(display.Id, DateTime.Now);
+                        await _digitalDisplayService.SetDisplayStatusAsync(display.Id,
+                            $"Connection problem: {oex.Message}");
+                        return;
+                    }
 
-                        if (assetInDisplay == null)
+                    // get the sets that this display is associated with
+                    var sets = await _digitalDisplayService
+                        .GetDisplaysSetsAsync(new[] { display.Id });
+
+                    if (sets.Count == 0)
+                    {
+                        // if the display is not associated with any sets, clear all the slides
+                        foreach (var currentSlide in currentSlides)
                         {
-                            // asset is not present, upload it, update displayItems
                             try
                             {
-                                string filePath = _digitalDisplayService
-                                    .GetAssetPath(asset.DigitalDisplayAsset.Path);
-                                _logger.LogInformation("Display {DisplayId} named {Name} uploading slide {AssetId}",
+                                _logger.LogInformation("Display {DisplayId} named {Name} deleting slide {SlideName}",
                                     display.Id,
                                     display.Name,
-                                    asset.DigitalDisplayAssetId);
-                                var newItem = new DigitalDisplayItem
-                                {
-                                    AssetId = await _screenlyService
-                                        .AddSlideAsync(display, filePath, asset),
-                                    DigitalDisplayAssetId = asset.DigitalDisplayAssetId,
-                                    DigitalDisplayId = display.Id
-                                };
-                                await _digitalDisplayItemRepository.AddAsync(newItem);
-                                displayItems.Add(newItem);
-                                uploaded++;
+                                    currentSlide.Name);
+                                await _screenlyService
+                                    .RemoveSlideAsync(display, currentSlide.AssetId);
+                                deleted++;
                             }
                             catch (OcudaException oex)
                             {
-                                _logger.LogError(oex,
-                                    "Unable to add - display {DisplayId} named {Name} asset {AssetId}: {ErrorMessage}",
+                                _logger.LogError("Unable to delete - display {DisplayId} named {Name} asset {AssetId}: {ErrorMessage}",
                                     display.Id,
                                     display.Name,
-                                    asset.DigitalDisplayAssetId,
+                                    currentSlide.AssetId,
                                     oex.Message);
                             }
                         }
-                        else
-                        {
-                            // asset is present in displayitems so we think it's in the display
-                            // check based on what we got from the api
-                            var currentSlide = currentSlides
-                                .SingleOrDefault(_ => _.AssetId == assetInDisplay.AssetId);
+                    }
+                    else
+                    {
+                        // assets which should be in the display
+                        var assets = await _digitalDisplayAssetSetRepository
+                            .GetAssetsBySetsAsync(sets.Select(_ => _.DigitalDisplaySetId));
 
-                            if (currentSlide == null)
+                        // our record of assets in the display now
+                        var displayItems = await _digitalDisplayItemRepository
+                            .GetByDisplayAsync(display.Id);
+
+                        // loop through assets that should be in this display
+                        foreach (var asset in assets)
+                        {
+                            // look up asset id for if we think it's present (is in displayitems)
+                            var assetInDisplay = displayItems.SingleOrDefault(_ =>
+                                _.DigitalDisplayAssetId == asset.DigitalDisplayAssetId);
+
+                            if (assetInDisplay == null)
                             {
-                                // we think it's there (in displayitems) but it's not
-                                // upload it and update the displayitem record with the new assetid
+                                // asset is not present, upload it, update displayItems
                                 try
                                 {
                                     string filePath = _digitalDisplayService
                                         .GetAssetPath(asset.DigitalDisplayAsset.Path);
-                                    _logger.LogInformation("Display {DisplayId} named {Name} uploading missing slide {AssetId}",
+                                    _logger.LogInformation("Display {DisplayId} named {Name} uploading slide {AssetId}",
                                         display.Id,
                                         display.Name,
                                         asset.DigitalDisplayAssetId);
-                                    displayItems.Remove(assetInDisplay);
-                                    assetInDisplay.AssetId = await _screenlyService
-                                        .AddSlideAsync(display, filePath, asset);
-                                    _digitalDisplayItemRepository.Update(assetInDisplay);
-                                    displayItems.Add(assetInDisplay);
+                                    var newItem = new DigitalDisplayItem
+                                    {
+                                        AssetId = await _screenlyService
+                                            .AddSlideAsync(display, filePath, asset),
+                                        DigitalDisplayAssetId = asset.DigitalDisplayAssetId,
+                                        DigitalDisplayId = display.Id
+                                    };
+                                    await _digitalDisplayItemRepository.AddAsync(newItem);
+                                    displayItems.Add(newItem);
                                     uploaded++;
                                 }
                                 catch (OcudaException oex)
@@ -205,93 +171,142 @@ namespace Ocuda.Ops.Service
                             }
                             else
                             {
-                                // in displayitems, in according to the api, verify the metadata
-                                var setCorrectly = asset.StartDate == currentSlide.StartDate
-                                    && asset.EndDate == currentSlide.EndDate
-                                    && asset.IsEnabled == (currentSlide.IsEnabled == 1);
+                                // asset is present in displayitems so we think it's in the display
+                                // check based on what we got from the api
+                                var currentSlide = currentSlides
+                                    .SingleOrDefault(_ => _.AssetId == assetInDisplay.AssetId);
 
-                                if (!setCorrectly)
+                                if (currentSlide == null)
                                 {
-                                    // if there's a metadata error, update metadata via the api
+                                    // we think it's there (in displayitems) but it's not
+                                    // upload it and update the displayitem record with the new assetid
                                     try
                                     {
-                                        _logger.LogInformation("Display {DisplayId} named {Name} updating asset {AssetId}",
+                                        string filePath = _digitalDisplayService
+                                            .GetAssetPath(asset.DigitalDisplayAsset.Path);
+                                        _logger.LogInformation("Display {DisplayId} named {Name} uploading missing slide {AssetId}",
                                             display.Id,
                                             display.Name,
                                             asset.DigitalDisplayAssetId);
-                                        await _screenlyService.UpdateSlideAsync(display,
-                                            currentSlide.AssetId,
-                                            asset);
-                                        updated++;
+                                        displayItems.Remove(assetInDisplay);
+                                        assetInDisplay.AssetId = await _screenlyService
+                                            .AddSlideAsync(display, filePath, asset);
+                                        _digitalDisplayItemRepository.Update(assetInDisplay);
+                                        displayItems.Add(assetInDisplay);
+                                        uploaded++;
                                     }
                                     catch (OcudaException oex)
                                     {
-                                        _logger.LogError("Unable to update - display {DisplayId} named {Name} asset {AssetId}: {ErrorMessage}",
+                                        _logger.LogError(oex,
+                                            "Unable to add - display {DisplayId} named {Name} asset {AssetId}: {ErrorMessage}",
                                             display.Id,
                                             display.Name,
-                                            currentSlide.AssetId,
+                                            asset.DigitalDisplayAssetId,
                                             oex.Message);
+                                    }
+                                }
+                                else
+                                {
+                                    // in displayitems, in according to the api, verify the metadata
+                                    var setCorrectly = asset.StartDate == currentSlide.StartDate
+                                        && asset.EndDate == currentSlide.EndDate
+                                        && asset.IsEnabled == (currentSlide.IsEnabled == 1);
+
+                                    if (!setCorrectly)
+                                    {
+                                        // if there's a metadata error, update metadata via the api
+                                        try
+                                        {
+                                            _logger.LogInformation("Display {DisplayId} named {Name} updating asset {AssetId}",
+                                                display.Id,
+                                                display.Name,
+                                                asset.DigitalDisplayAssetId);
+                                            await _screenlyService.UpdateSlideAsync(display,
+                                                currentSlide.AssetId,
+                                                asset);
+                                            updated++;
+                                        }
+                                        catch (OcudaException oex)
+                                        {
+                                            _logger.LogError("Unable to update - display {DisplayId} named {Name} asset {AssetId}: {ErrorMessage}",
+                                                display.Id,
+                                                display.Name,
+                                                currentSlide.AssetId,
+                                                oex.Message);
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    // now check for items in displayitems that are not in assets
-                    // i.e. we think they're on the screen but they aren't in an associated set
-                    var validAssetIds = assets.Select(_ => _.DigitalDisplayAssetId);
-                    var staleDisplayItems = displayItems
-                        .Where(_ => !validAssetIds.Contains(_.DigitalDisplayAssetId))
-                        .ToList();
+                        // now check for items in displayitems that are not in assets
+                        // i.e. we think they're on the screen but they aren't in an associated set
+                        var validAssetIds = assets.Select(_ => _.DigitalDisplayAssetId);
+                        var staleDisplayItems = displayItems
+                            .Where(_ => !validAssetIds.Contains(_.DigitalDisplayAssetId))
+                            .ToList();
 
-                    // remove those items from displayitems
-                    foreach (var staleDisplayItem in staleDisplayItems)
-                    {
-                        _digitalDisplayItemRepository
-                            .RemoveByAssetId(staleDisplayItem.DigitalDisplayAssetId);
-                        displayItems.Remove(staleDisplayItem);
-                    }
-
-                    // look for slides via the api that are not in the displayitems list
-                    var assetIdsToRemove = currentSlides.Select(_ => _.AssetId)
-                        .Except(displayItems.Select(_ => _.AssetId));
-
-                    // remove these slides from the display
-                    foreach (var assetId in assetIdsToRemove)
-                    {
-                        try
+                        // remove those items from displayitems
+                        foreach (var staleDisplayItem in staleDisplayItems)
                         {
-                            _logger.LogInformation("Display {DisplayId} named {Name} deleting slide {SlideName}",
-                                display.Id,
-                                display.Name,
-                                currentSlides.Single(_ => _.AssetId == assetId).Name);
-                            await _screenlyService.RemoveSlideAsync(display, assetId);
-                            deleted++;
+                            _digitalDisplayItemRepository
+                                .RemoveByAssetId(staleDisplayItem.DigitalDisplayAssetId);
+                            displayItems.Remove(staleDisplayItem);
                         }
-                        catch (OcudaException oex)
+
+                        // look for slides via the api that are not in the displayitems list
+                        var assetIdsToRemove = currentSlides.Select(_ => _.AssetId)
+                            .Except(displayItems.Select(_ => _.AssetId));
+
+                        // remove these slides from the display
+                        foreach (var assetId in assetIdsToRemove)
                         {
-                            _logger.LogError("Unable to delete - display {DisplayId} named {Name} asset {AssetId}: {ErrorMessage}",
-                                display.Id,
-                                display.Name,
-                                assetId,
-                                oex.Message);
+                            try
+                            {
+                                _logger.LogInformation("Display {DisplayId} named {Name} deleting slide {SlideName}",
+                                    display.Id,
+                                    display.Name,
+                                    currentSlides.Single(_ => _.AssetId == assetId).Name);
+                                await _screenlyService.RemoveSlideAsync(display, assetId);
+                                deleted++;
+                            }
+                            catch (OcudaException oex)
+                            {
+                                _logger.LogError("Unable to delete - display {DisplayId} named {Name} asset {AssetId}: {ErrorMessage}",
+                                    display.Id,
+                                    display.Name,
+                                    assetId,
+                                    oex.Message);
+                            }
                         }
                     }
+
+                    _logger.LogDebug("Updated display id {DisplayId} named {Name} slides: {StartedSlides} +{UploadedSlides}, -{DeletedSlides}, updated {UpdatedSlides}",
+                        display.Id,
+                        display.Name,
+                        startingSlides,
+                        uploaded,
+                        deleted,
+                        updated);
+
+                    await _digitalDisplayService.SetDisplayStatusAsync(display.Id,
+                        $"Updated: added {uploaded}, updated {updated}, deleted {deleted}");
+
+                    await _digitalDisplayRepository
+                        .UpdateLastVerificationAsync(display.Id, DateTime.Now);
                 }
-
-                _logger.LogDebug("Updated display id {DisplayId} named {Name} slides: {StartedSlides} +{UploadedSlides}, -{DeletedSlides}, updated {UpdatedSlides}",
-                    display.Id,
-                    display.Name,
-                    startingSlides,
-                    uploaded,
-                    deleted,
-                    updated);
-
-                await _digitalDisplayService.SetDisplayStatusAsync(display.Id,
-                    $"Updated: added {uploaded}, updated {updated}, deleted {deleted}");
-
-                await _digitalDisplayRepository
-                    .UpdateLastVerificationAsync(display.Id, DateTime.Now);
+            }
+            catch (OcudaException oex)
+            {
+                _logger.LogError(oex,
+                    "Uncaught error sending notifications: {ErrorMessage}",
+                    oex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "Uncaught critical error sending notifications: {ErrorMessage}",
+                    ex.Message);
             }
         }
 
