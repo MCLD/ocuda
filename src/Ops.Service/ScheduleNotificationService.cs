@@ -190,70 +190,86 @@ namespace Ocuda.Ops.Service
         public async Task<int> SendPendingNotificationsAsync()
         {
             int sentNotifications = 0;
-            var pendingNotifications
-                = await _scheduleRequestService.GetPendingNotificationsAsync();
 
-            if (pendingNotifications?.Count > 0)
+            try
             {
-                _logger.LogDebug("Found {PendingNotificationCount} pending notification(s)",
-                    pendingNotifications.Count);
+                var pendingNotifications
+                    = await _scheduleRequestService.GetPendingNotificationsAsync();
 
-                Configuration settings = null;
-                try
+                if (pendingNotifications?.Count > 0)
                 {
-                    settings = await GetEmailSettingsAsync();
-                }
-                catch (OcudaEmailException oex)
-                {
-                    _logger.LogError("Error finding email settings: {ErrorMessage}", oex.Message);
-                }
+                    _logger.LogDebug("Found {PendingNotificationCount} pending notification(s)",
+                        pendingNotifications.Count);
 
-                if (settings != null)
-                {
-                    foreach (var pending in pendingNotifications)
+                    Configuration settings = null;
+                    try
                     {
-                        try
+                        settings = await GetEmailSettingsAsync();
+                    }
+                    catch (OcudaEmailException oex)
+                    {
+                        _logger.LogError("Error finding email settings: {ErrorMessage}", oex.Message);
+                    }
+
+                    if (settings != null)
+                    {
+                        foreach (var pending in pendingNotifications)
                         {
-                            var lang = pending.Language
-                            .Equals("English", StringComparison.OrdinalIgnoreCase)
-                                ? DefaultLanguage
-                                : pending.Language;
-                            _logger.LogTrace("Using language: {Language}", pending.Language);
+                            try
+                            {
+                                var lang = pending.Language
+                                .Equals("English", StringComparison.OrdinalIgnoreCase)
+                                    ? DefaultLanguage
+                                    : pending.Language;
+                                _logger.LogTrace("Using language: {Language}", pending.Language);
 
-                            var culture = CultureInfo.GetCultureInfo(lang);
-                            _logger.LogTrace("Found culture: {Culture}", culture.DisplayName);
+                                var culture = CultureInfo.GetCultureInfo(lang);
+                                _logger.LogTrace("Found culture: {Culture}", culture.DisplayName);
 
-                            var sentEmail = await SendAsync(pending,
-                                settings,
-                                lang,
-                                new Dictionary<string, string>
-                                {
+                                var sentEmail = await SendAsync(pending,
+                                    settings,
+                                    lang,
+                                    new Dictionary<string, string>
+                                    {
                                     { "ScheduledDate",
                                         pending.RequestedTime.ToString("d", culture) },
                                     { "ScheduledTime",
                                         pending.RequestedTime.ToString("t", culture) },
                                     { "Scheduled", pending.RequestedTime.ToString("g", culture) },
                                     { "Subject", pending.ScheduleRequestSubject.Subject }
-                                },
-                                EmailType.ScheduleNotification);
+                                    },
+                                    EmailType.ScheduleNotification);
 
-                            if (sentEmail != null)
-                            {
-                                sentNotifications++;
+                                if (sentEmail != null)
+                                {
+                                    sentNotifications++;
 
-                                await _scheduleRequestService.SetNotificationSentAsync(pending);
+                                    await _scheduleRequestService.SetNotificationSentAsync(pending);
+                                }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError("Sending pending notification id {RequestId} failed: {ErrorMessage}",
-                                pending.Id,
-                                ex.Message);
-                        }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError("Sending pending notification id {RequestId} failed: {ErrorMessage}",
+                                    pending.Id,
+                                    ex.Message);
+                            }
 
-                        await Task.Delay(TimeSpan.FromSeconds(2));
+                            await Task.Delay(TimeSpan.FromSeconds(2));
+                        }
                     }
                 }
+            }
+            catch (OcudaException oex)
+            {
+                _logger.LogError(oex,
+                    "Uncaught error sending notifications: {ErrorMessage}",
+                    oex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "Uncaught critical error sending notifications: {ErrorMessage}",
+                    ex.Message);
             }
 
             if (sentNotifications > 0)

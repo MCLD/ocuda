@@ -196,10 +196,24 @@ namespace Ocuda.Ops.Service.Clients
                 RequestUri = UriAssetsv11(display.RemoteAddress),
             };
 
-            var getSlidesResponse = await _httpClient.SendAsync(getSlidesRequest,
-                HttpCompletionOption.ResponseHeadersRead);
+            HttpResponseMessage getSlidesResponse = null;
 
-            if (!getSlidesResponse.IsSuccessStatusCode)
+            try
+            {
+                getSlidesResponse = await _httpClient.SendAsync(getSlidesRequest,
+                    HttpCompletionOption.ResponseHeadersRead);
+                if (getSlidesResponse == null)
+                {
+                    throw new OcudaException($"Null response from Http request to {display.Name}");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new OcudaException($"Http request to {display.Name} failed: {ex.Message}",
+                    ex);
+            }
+
+            if (getSlidesResponse?.IsSuccessStatusCode != false)
             {
                 _logger.LogError("Http fetch of slides from {DisplayName} Screenly failed: {StatusCode} - {RequestMessage}",
                     display.Name,

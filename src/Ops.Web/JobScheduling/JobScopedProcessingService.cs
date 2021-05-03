@@ -38,8 +38,19 @@ namespace Ocuda.Ops.Web.JobScheduling
             }
             catch (Exception ex)
             {
-                _logger.LogCritical("Error running scheduled task: {ErrorMessage}",
-                    ex.Message);
+                if (ex.InnerException != null)
+                {
+                    _logger.LogCritical(ex,
+                        "Fatal uncaught error in scheduled task: {ErrorMessage} ({AdditionalErrorMessage})",
+                        ex.Message,
+                        ex.InnerException.Message);
+                }
+                else
+                {
+                    _logger.LogCritical(ex,
+                        "Fatal uncaught error in scheduled task: {ErrorMessage}",
+                        ex.Message);
+                }
             }
 
             _logger.LogDebug("Scheduled tasks complete in {Elapsed} ms",
