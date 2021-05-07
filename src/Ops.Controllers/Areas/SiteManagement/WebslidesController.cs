@@ -26,18 +26,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     public class WebslidesController : BaseController<WebslidesController>
     {
         private const string DetailModelStateKey = "Webslides.Detail";
-        private const string ItemErrorMessageKey = "Webslides.ItemErrorMessage";
-
         private const string ImagesFilePath = "images";
-        private const string WebslidesFilePath = "Webslides";
+        private const string ItemErrorMessageKey = "Webslides.ItemErrorMessage";
+        private const string WebslidesFilePath = "slides";
+
+        private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".png" };
 
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly ILanguageService _languageService;
         private readonly IPermissionGroupService _permissionGroupService;
         private readonly IWebslideService _webslideService;
-
-        public static string Area { get { return "SiteManagement"; } }
-        public static string Name { get { return "Webslides"; } }
 
         public WebslidesController(ServiceFacades.Controller<WebslidesController> context,
             IDateTimeProvider dateTimeProvider,
@@ -56,41 +54,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(webslideService));
         }
 
-        [Route("[action]/{id}")]
-        [RestoreModelState(Key = DetailModelStateKey)]
-        public async Task<IActionResult> Detail(int id, string language, int? item)
-        {
-            if (!await HasWebslidePermissionAsync(id))
-            {
-                return RedirectToUnauthorized();
-            }
-
-            var languages = await _languageService.GetActiveAsync();
-
-            var selectedLanguage = languages
-                .FirstOrDefault(_ => _.Name.Equals(language, StringComparison.OrdinalIgnoreCase))
-                ?? languages.Single(_ => _.IsDefault);
-
-            var webslide = await _webslideService.GetWebslideDetailsAsync(id, selectedLanguage.Id);
-
-            var viewModel = new DetailViewModel
-            {
-                Webslide = webslide,
-                WebslideId = webslide.Id,
-                FocusItemId = item,
-                ItemErrorMessage = TempData[ItemErrorMessageKey] as string,
-                LanguageId = selectedLanguage.Id,
-                LanguageList = new SelectList(languages, nameof(Language.Name),
-                    nameof(Language.Description), selectedLanguage.Name),
-                PageLayoutId = await _webslideService.GetPageLayoutIdForWebslideAsync(webslide.Id),
-                CurrentDateTime = _dateTimeProvider.Now
-            };
-
-            viewModel.WebslideTemplate = await _webslideService
-                .GetTemplateForPageLayoutAsync(viewModel.PageLayoutId);
-
-            return View(viewModel);
-        }
+        public static string Area { get { return "SiteManagement"; } }
+        public static string Name { get { return "Webslides"; } }
 
         [HttpPost]
         [Route("[action]")]
@@ -98,159 +63,73 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            if (await HasWebslidePermissionAsync(model.WebslideItem.WebslideId))
+            if (model == null)
             {
-                if (ModelState.IsValid)
+                response = new JsonResponse
                 {
-                    try
+                    Message = "Invalid request",
+                    Success = false
+                };
+            }
+            else
+            {
+                if (await HasWebslidePermissionAsync(model.WebslideItem.WebslideId))
+                {
+                    if (ModelState.IsValid)
                     {
-                        var webslideItem = await _webslideService.CreateItemAsync(
-                            model.WebslideItem);
-
-                        var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
-
-                        response = new JsonResponse
+                        try
                         {
-                            Success = true,
-                            Url = Url.Action(nameof(Detail), new
-                            {
-                                id = webslideItem.WebslideId,
-                                language = language.IsDefault ? null : language.Name,
-                                item = webslideItem.Id
-                            })
-                        };
+                            var webslideItem
+                                = await _webslideService.CreateItemAsync(model.WebslideItem);
 
-                        ShowAlertSuccess($"Created item: {webslideItem.Name}");
+                            var language
+                                = await _languageService.GetActiveByIdAsync(model.LanguageId);
+
+                            response = new JsonResponse
+                            {
+                                Success = true,
+                                Url = Url.Action(nameof(Detail), new
+                                {
+                                    id = webslideItem.WebslideId,
+                                    language = language.IsDefault ? null : language.Name,
+                                    item = webslideItem.Id
+                                })
+                            };
+
+                            ShowAlertSuccess($"Created item: {webslideItem.Name}");
+                        }
+                        catch (OcudaException ex)
+                        {
+                            response = new JsonResponse
+                            {
+                                Success = false,
+                                Message = ex.Message
+                            };
+                        }
                     }
-                    catch (OcudaException ex)
+                    else
                     {
+                        var errors = ModelState.Values
+                            .SelectMany(_ => _.Errors)
+                            .Select(_ => _.ErrorMessage);
+
                         response = new JsonResponse
                         {
                             Success = false,
-                            Message = ex.Message
+                            Message = string.Join(Environment.NewLine, errors)
                         };
                     }
                 }
                 else
                 {
-                    var errors = ModelState.Values
-                        .SelectMany(_ => _.Errors)
-                        .Select(_ => _.ErrorMessage);
-
                     response = new JsonResponse
                     {
-                        Success = false,
-                        Message = string.Join(Environment.NewLine, errors)
+                        Message = "Unauthorized",
+                        Success = false
                     };
                 }
             }
-            else
-            {
-                response = new JsonResponse
-                {
-                    Message = "Unauthorized",
-                    Success = false
-                };
-            }
-
             return Json(response);
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> EditWebslideItem(DetailViewModel model)
-        {
-            JsonResponse response;
-
-            var webslideItem = await _webslideService.GetItemByIdAsync(model.WebslideItem.Id);
-
-            if (await HasWebslidePermissionAsync(webslideItem.WebslideId))
-            {
-                if (ModelState.IsValid)
-                {
-                    try
-                    {
-                        webslideItem = await _webslideService.EditItemAsync(
-                            model.WebslideItem);
-
-                        var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
-
-                        response = new JsonResponse
-                        {
-                            Success = true,
-                            Url = Url.Action(nameof(Detail), new
-                            {
-                                id = webslideItem.WebslideId,
-                                language = language.IsDefault ? null : language.Name,
-                                item = webslideItem.Id
-                            })
-                        };
-
-                        ShowAlertSuccess($"Created item: {webslideItem.Name}");
-                    }
-                    catch (OcudaException ex)
-                    {
-                        response = new JsonResponse
-                        {
-                            Success = false,
-                            Message = ex.Message
-                        };
-                    }
-                }
-                else
-                {
-                    var errors = ModelState.Values
-                        .SelectMany(_ => _.Errors)
-                        .Select(_ => _.ErrorMessage);
-
-                    response = new JsonResponse
-                    {
-                        Success = false,
-                        Message = string.Join(Environment.NewLine, errors)
-                    };
-                }
-            }
-            else
-            {
-                response = new JsonResponse
-                {
-                    Message = "Unauthorized",
-                    Success = false
-                };
-            }
-
-            return Json(response);
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> DeleteWebslideItem(DetailViewModel model)
-        {
-            var webslideItem = await _webslideService.GetItemByIdAsync(model.WebslideItem.Id);
-
-            if (!await HasWebslidePermissionAsync(webslideItem.WebslideId))
-            {
-                return RedirectToUnauthorized();
-            }
-
-            try
-            {
-                await _webslideService.DeleteItemAsync(model.WebslideItem.Id);
-                ShowAlertSuccess($"Deleted item: {model.WebslideItem.Name}");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting webslide item: {Message}", ex.Message);
-                ShowAlertDanger($"Error deleting item: {model.WebslideItem.Name}");
-            }
-
-            var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
-
-            return RedirectToAction(nameof(Detail), new
-            {
-                id = model.WebslideId,
-                language = language.IsDefault ? null : language.Name
-            });
         }
 
         [HttpPost]
@@ -295,6 +174,158 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
+        public async Task<IActionResult> DeleteWebslideItem(DetailViewModel model)
+        {
+            var webslideItem = await _webslideService.GetItemByIdAsync(model.WebslideItem.Id);
+            var webslideItemText = await _webslideService
+                .GetItemTextByIdsAsync(model.WebslideItem.Id, model.LanguageId);
+
+            if (!await HasWebslidePermissionAsync(webslideItem.WebslideId))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
+
+            try
+            {
+                var filePath = await GetSlidePathAsync(language.Name);
+
+                await _webslideService.DeleteItemAsync(model.WebslideItem.Id);
+
+                System.IO.File.Delete(Path.Combine(filePath, webslideItemText.Filename));
+
+                ShowAlertSuccess($"Deleted item: {model.WebslideItem.Name}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting webslide item: {Message}", ex.Message);
+                ShowAlertDanger($"Error deleting item: {model.WebslideItem.Name}");
+            }
+
+            return RedirectToAction(nameof(Detail), new
+            {
+                id = model.WebslideId,
+                language = language.IsDefault ? null : language.Name
+            });
+        }
+
+        [Route("[action]/{id}")]
+        [RestoreModelState(Key = DetailModelStateKey)]
+        public async Task<IActionResult> Detail(int id, string language, int? item)
+        {
+            if (!await HasWebslidePermissionAsync(id))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var languages = await _languageService.GetActiveAsync();
+
+            var selectedLanguage = languages
+                .FirstOrDefault(_ => _.Name.Equals(language, StringComparison.OrdinalIgnoreCase))
+                ?? languages.Single(_ => _.IsDefault);
+
+            var webslide = await _webslideService.GetWebslideDetailsAsync(id, selectedLanguage.Id);
+
+            var viewModel = new DetailViewModel
+            {
+                Webslide = webslide,
+                WebslideId = webslide.Id,
+                FocusItemId = item,
+                ItemErrorMessage = TempData[ItemErrorMessageKey] as string,
+                LanguageId = selectedLanguage.Id,
+                LanguageList = new SelectList(languages,
+                    nameof(Language.Name),
+                    nameof(Language.Description), selectedLanguage.Name),
+                PageLayoutId = await _webslideService.GetPageLayoutIdForWebslideAsync(webslide.Id),
+                CurrentDateTime = _dateTimeProvider.Now
+            };
+
+            viewModel.WebslideTemplate = await _webslideService
+                .GetTemplateForPageLayoutAsync(viewModel.PageLayoutId);
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> EditWebslideItem(DetailViewModel model)
+        {
+            JsonResponse response;
+
+            if (model == null)
+            {
+                response = new JsonResponse
+                {
+                    Message = "Invalid request",
+                    Success = false
+                };
+            }
+            else
+            {
+                var webslideItem = await _webslideService.GetItemByIdAsync(model.WebslideItem.Id);
+
+                if (await HasWebslidePermissionAsync(webslideItem.WebslideId))
+                {
+                    if (ModelState.IsValid)
+                    {
+                        try
+                        {
+                            webslideItem
+                                = await _webslideService.EditItemAsync(model.WebslideItem);
+
+                            var language
+                                = await _languageService.GetActiveByIdAsync(model.LanguageId);
+
+                            response = new JsonResponse
+                            {
+                                Success = true,
+                                Url = Url.Action(nameof(Detail), new
+                                {
+                                    id = webslideItem.WebslideId,
+                                    language = language.IsDefault ? null : language.Name,
+                                    item = webslideItem.Id
+                                })
+                            };
+
+                            ShowAlertSuccess($"Created item: {webslideItem.Name}");
+                        }
+                        catch (OcudaException ex)
+                        {
+                            response = new JsonResponse
+                            {
+                                Success = false,
+                                Message = ex.Message
+                            };
+                        }
+                    }
+                    else
+                    {
+                        var errors = ModelState.Values
+                            .SelectMany(_ => _.Errors)
+                            .Select(_ => _.ErrorMessage);
+
+                        response = new JsonResponse
+                        {
+                            Success = false,
+                            Message = string.Join(Environment.NewLine, errors)
+                        };
+                    }
+                }
+                else
+                {
+                    response = new JsonResponse
+                    {
+                        Message = "Unauthorized",
+                        Success = false
+                    };
+                }
+            }
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
         [SaveModelState(Key = DetailModelStateKey)]
         public async Task<IActionResult> EditWebslideItemText(DetailViewModel model)
         {
@@ -311,35 +342,32 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (model.ItemImage != null)
             {
                 var extension = Path.GetExtension(model.ItemImage.FileName);
-                if (extension != ".jpg" && extension != ".png")
+                if (!ValidImageExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
                 {
-                    ModelState.AddModelError("ItemImage", "Image must be a .jpg or .png file");
+                    ModelState.AddModelError("ItemImage",
+                        $"Image type must be one of: {ValidImageExtensions}");
                 }
                 else
                 {
-                    using (var ms = new MemoryStream())
-                    {
-                        await model.ItemImage.CopyToAsync(ms);
-                        imageBytes = ms.ToArray();
-                    }
+                    using var ms = new MemoryStream();
+                    await model.ItemImage.CopyToAsync(ms);
+                    imageBytes = ms.ToArray();
 
                     var template = await _webslideService
                         .GetTemplateForWebslideAsync(webslideItem.WebslideId);
 
                     if (template?.Height.HasValue == true || template?.Width.HasValue == true)
                     {
-                        using (var image = Image.Load(imageBytes))
+                        using var image = Image.Load(imageBytes);
+                        if (template.Height.HasValue && image.Height != template.Height)
                         {
-                            if (template.Height.HasValue && image.Height != template.Height)
-                            {
-                                ModelState.AddModelError("ItemImage",
-                                    $"Image height needs to be {template.Height}px");
-                            }
-                            if (template.Width.HasValue && image.Width != template.Width)
-                            {
-                                ModelState.AddModelError("ItemImage",
-                                    $"Image width needs to be {template.Width}px");
-                            }
+                            ModelState.AddModelError("ItemImage",
+                                $"Image height needs to be {template.Height}px");
+                        }
+                        if (template.Width.HasValue && image.Width != template.Width)
+                        {
+                            ModelState.AddModelError("ItemImage",
+                                $"Image width needs to be {template.Width}px");
                         }
                     }
                 }
@@ -355,6 +383,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 }
             }
 
+            var language = await _languageService
+                .GetActiveByIdAsync(model.WebslideItemText.LanguageId);
+
             if (ModelState.IsValid)
             {
                 try
@@ -363,9 +394,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                     if (model.ItemImage != null)
                     {
-                        string basePath = await _siteSettingService.GetSettingStringAsync(
-                            Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
-                        var filePath = Path.Combine(basePath, ImagesFilePath, WebslidesFilePath);
+                        var filePath = await GetSlidePathAsync(language.Name);
 
                         if (!Directory.Exists(filePath))
                         {
@@ -373,24 +402,29 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             Directory.CreateDirectory(filePath);
                         }
 
-                        var filename = string.Format(CultureInfo.InvariantCulture,
-                            "{0}-{1}{2}",
-                            itemText.WebslideItemId,
-                            itemText.LanguageId,
-                            Path.GetExtension(model.ItemImage.FileName));
+                        var fullFilePath = Path.Combine(filePath, model.ItemImage.FileName);
 
-                        filePath = Path.Combine(filePath, filename);
-
-                        if (System.IO.File.Exists(filePath))
+                        int renameCounter = 1;
+                        while (System.IO.File.Exists(fullFilePath))
                         {
-                            System.IO.File.Delete(filePath);
+                            fullFilePath = Path.Combine(filePath, string.Format(
+                                CultureInfo.InvariantCulture,
+                                "{0}-{1}{2}",
+                                Path.GetFileNameWithoutExtension(model.ItemImage.FileName),
+                                renameCounter++,
+                                Path.GetExtension(model.ItemImage.FileName)));
                         }
 
-                        await System.IO.File.WriteAllBytesAsync(filePath, imageBytes);
+                        if (System.IO.File.Exists(fullFilePath))
+                        {
+                            System.IO.File.Delete(fullFilePath);
+                        }
+
+                        await System.IO.File.WriteAllBytesAsync(fullFilePath, imageBytes);
 
                         if (string.IsNullOrWhiteSpace(itemText.Filename))
                         {
-                            itemText.Filename = filename;
+                            itemText.Filename = Path.GetFileName(fullFilePath);
 
                             await _webslideService.SetItemTextAsync(itemText);
                         }
@@ -404,15 +438,23 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 }
             }
 
-            var language = await _languageService.GetActiveByIdAsync(
-                model.WebslideItemText.LanguageId);
-
             return RedirectToAction(nameof(Detail), new
             {
                 id = model.WebslideId,
                 language = language.IsDefault ? null : language.Name,
                 item = model.WebslideItemText.WebslideItemId
             });
+        }
+
+        private async Task<string> GetSlidePathAsync(string languageName)
+        {
+            string basePath = await _siteSettingService.GetSettingStringAsync(
+                Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+            return Path.Combine(basePath,
+                ImagesFilePath,
+                languageName,
+                WebslidesFilePath);
         }
 
         private async Task<bool> HasWebslidePermissionAsync(int webslideId)

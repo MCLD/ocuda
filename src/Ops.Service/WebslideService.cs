@@ -87,6 +87,24 @@ namespace Ocuda.Ops.Service
             await _webslideItemRepository.SaveAsync();
         }
 
+        public async Task DeleteNoSaveAsync(int id)
+        {
+            var webslide = await _webslideRepository.FindAsync(id);
+            if (webslide == null)
+            {
+                throw new OcudaException("Could not find that Web Slide");
+            }
+            var items = await _webslideItemRepository.GetByWebslideAsync(id);
+            foreach (var item in items)
+            {
+                var itemTexts = await _webslideItemTextRepository
+                    .GetAllForWebslideItemAsync(item.Id);
+                _webslideItemTextRepository.RemoveRange(itemTexts);
+            }
+            _webslideItemRepository.RemoveRange(items);
+            _webslideRepository.Remove(webslide);
+        }
+
         public async Task<Webslide> EditAsync(Webslide webslide)
         {
             var currentWebslide = await _webslideRepository.FindAsync(webslide.Id);
@@ -121,7 +139,7 @@ namespace Ocuda.Ops.Service
             return await _webslideItemRepository.FindAsync(id);
         }
 
-        public async Task<WebslideItemText> GetItemTextByIdsAsync(int webslideItemId, 
+        public async Task<WebslideItemText> GetItemTextByIdsAsync(int webslideItemId,
             int languageId)
         {
             return await _webslideItemTextRepository.GetByWebslideItemAndLanguageAsync(
@@ -170,7 +188,7 @@ namespace Ocuda.Ops.Service
             if (currentText == null)
             {
                 itemText.AltText = itemText.AltText?.Trim();
-                itemText.Url = itemText.Url?.Trim();
+                itemText.Link = itemText.Link?.Trim();
 
                 await _webslideItemTextRepository.AddAsync(itemText);
                 await _webslideItemTextRepository.SaveAsync();
@@ -181,7 +199,7 @@ namespace Ocuda.Ops.Service
             else
             {
                 currentText.AltText = itemText.AltText?.Trim();
-                currentText.Url = itemText.Url?.Trim();
+                currentText.Link = itemText.Link?.Trim();
 
                 if (!string.IsNullOrWhiteSpace(itemText.Filename))
                 {

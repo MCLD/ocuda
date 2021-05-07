@@ -166,7 +166,7 @@ namespace Ocuda.Ops.Service
             if (currentText == null)
             {
                 itemText.AltText = itemText.AltText?.Trim();
-                itemText.Url = itemText.Url?.Trim();
+                itemText.Link = itemText.Link?.Trim();
 
                 await _pageFeatureItemTextRepository.AddAsync(itemText);
                 await _pageFeatureItemTextRepository.SaveAsync();
@@ -177,7 +177,7 @@ namespace Ocuda.Ops.Service
             else
             {
                 currentText.AltText = itemText.AltText?.Trim();
-                currentText.Url = itemText.Url?.Trim();
+                currentText.Link = itemText.Link?.Trim();
 
                 if (!string.IsNullOrWhiteSpace(itemText.Filename))
                 {

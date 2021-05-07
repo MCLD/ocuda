@@ -95,7 +95,7 @@
                         @foreach (var featureItem in item.PageFeature.Items)
                         {
                             <div class="col-6 col-sm-3 mb-2">
-                                <a href="@featureItem.PageFeatureItemText.Url">
+                                <a href="@featureItem.PageFeatureItemText.Link">
                                     <img src="@featureItem.PageFeatureItemText.Filename"
                                          alt="@featureItem.PageFeatureItemText.AltText"
                                          class="img-fluid mx-auto d-block"
@@ -135,7 +135,7 @@
                         @foreach (var webslideItem in item.Webslide.Items)
                         {
                             <div class="carousel-item @(webslideItem == item.Webslide.Items.First() ? "active" : null)">
-                                <a href="@webslideItem.WebslideItemText.Url">
+                                <a href="@webslideItem.WebslideItemText.Link">
                                     <img class="d-block w-100" src="@webslideItem.WebslideItemText.Filename" alt="@webslideItem.WebslideItemText.AltText" />
                                 </a>
                             </div>

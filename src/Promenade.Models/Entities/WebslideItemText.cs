@@ -5,21 +5,23 @@ namespace Ocuda.Promenade.Models.Entities
 {
     public class WebslideItemText
     {
-        public int WebslideItemId { get; set; }
-        public WebslideItem WebslideItem { get; set; }
-
-        public int LanguageId { get; set; }
-        public Language Language { get; set; }
+        [DisplayName("Image alternative text")]
+        [Description("How should this image be described to someone who can't see it?")]
+        [MaxLength(255)]
+        [Required]
+        public string AltText { get; set; }
 
         [MaxLength(255)]
         public string Filename { get; set; }
 
+        public Language Language { get; set; }
+        public int LanguageId { get; set; }
+
         [MaxLength(255)]
         [Required]
-        public string Url { get; set; }
+        public string Link { get; set; }
 
-        [DisplayName("Alt Text")]
-        [MaxLength(255)]
-        public string AltText { get; set; }
+        public WebslideItem WebslideItem { get; set; }
+        public int WebslideItemId { get; set; }
     }
 }

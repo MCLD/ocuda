@@ -26,20 +26,28 @@ namespace Ocuda.Ops.Data.Promenade
             return entity;
         }
 
-        public async Task<int?> GetMaxSortOrderForWebslideAsync(int webslideId)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.WebslideId == webslideId)
-                .MaxAsync(_ => (int?)_.Order);
-        }
-
         public async Task<WebslideItem> GetByWebslideAndOrderAsync(int webslideId, int order)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.WebslideId == webslideId && _.Order == order)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<ICollection<WebslideItem>> GetByWebslideAsync(int webslideId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.WebslideId == webslideId)
+                .ToListAsync();
+        }
+
+        public async Task<int?> GetMaxSortOrderForWebslideAsync(int webslideId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.WebslideId == webslideId)
+                .MaxAsync(_ => (int?)_.Order);
         }
 
         public async Task<List<WebslideItem>> GetWebslideSubsequentAsync(int webslideId, int order)

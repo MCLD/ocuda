@@ -243,9 +243,9 @@
                                             <span asp-validation-for="ItemImage" class="validation-message text-danger"></span>
                                         </div>
                                     </div>
-                                    <input id="featureItem@(item.Id)Url"
-                                           asp-for="PageFeatureItemText.Url"
-                                           value="@item.PageFeatureItemText?.Url"
+                                    <input id="featureItem@(item.Id)Link"
+                                           asp-for="PageFeatureItemText.Link"
+                                           value="@item.PageFeatureItemText?.Link"
                                            formgroup />
                                     <input id="featureItem@(item.Id)AltText"
                                            asp-for="PageFeatureItemText.AltText"

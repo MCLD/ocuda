@@ -7,7 +7,9 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     public interface IWebslideItemTextRepository : IGenericRepository<WebslideItemText>
     {
         void DetachEntity(WebslideItemText itemText);
+
         Task<ICollection<WebslideItemText>> GetAllForWebslideItemAsync(int itemId);
+
         Task<WebslideItemText> GetByWebslideItemAndLanguageAsync(int webslideItemId, int languageId);
     }
 }
