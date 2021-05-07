@@ -851,107 +851,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.ToTable("Pages");
                 });
 
-            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageFeature", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PageFeatures");
-                });
-
-            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageFeatureItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PageFeatureId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PageFeatureId");
-
-                    b.ToTable("PageFeatureItems");
-                });
-
-            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageFeatureItemText", b =>
-                {
-                    b.Property<int>("PageFeatureItemId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LanguageId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("AltText")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Filename")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.HasKey("PageFeatureItemId", "LanguageId");
-
-                    b.HasIndex("LanguageId");
-
-                    b.ToTable("PageFeatureItemTexts");
-                });
-
-            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageFeatureTemplate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("Height")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ItemsToDisplay")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int?>("Width")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PageFeatureTemplates");
-                });
-
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageHeader", b =>
                 {
                     b.Property<int>("Id")
@@ -963,12 +862,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("bit");
 
                     b.Property<int?>("LayoutCarouselTemplateId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("LayoutFeatureTemplateId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("LayoutWebslideTemplateId")
                         .HasColumnType("int");
 
                     b.Property<string>("PageName")
@@ -988,10 +881,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.HasIndex("LayoutCarouselTemplateId");
 
-                    b.HasIndex("LayoutFeatureTemplateId");
-
-                    b.HasIndex("LayoutWebslideTemplateId");
-
                     b.ToTable("PageHeaders");
                 });
 
@@ -1008,29 +897,19 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PageFeatureId")
-                        .HasColumnType("int");
-
                     b.Property<int>("PageLayoutId")
                         .HasColumnType("int");
 
                     b.Property<int?>("SegmentId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("WebslideId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CarouselId");
 
-                    b.HasIndex("PageFeatureId");
-
                     b.HasIndex("PageLayoutId");
 
                     b.HasIndex("SegmentId");
-
-                    b.HasIndex("WebslideId");
 
                     b.ToTable("PageItems");
                 });
@@ -1592,104 +1471,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.ToTable("UrlRedirectAccesses");
                 });
 
-            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Webslide", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Webslides");
-                });
-
-            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.WebslideItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("WebslideId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WebslideId");
-
-                    b.ToTable("WebslideItems");
-                });
-
-            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.WebslideItemText", b =>
-                {
-                    b.Property<int>("LanguageId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WebslideItemId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("AltText")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Filename")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.HasKey("LanguageId", "WebslideItemId");
-
-                    b.HasIndex("WebslideItemId");
-
-                    b.ToTable("WebslideItemTexts");
-                });
-
-            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.WebslideTemplate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("Height")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int?>("Width")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("WebslideTemplates");
-                });
-
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselButton", b =>
                 {
                     b.HasOne("Ocuda.Promenade.Models.Entities.CarouselItem", "CarouselItem")
@@ -1965,36 +1746,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Navigation("SocialCard");
                 });
 
-            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageFeatureItem", b =>
-                {
-                    b.HasOne("Ocuda.Promenade.Models.Entities.PageFeature", "PageFeature")
-                        .WithMany("Items")
-                        .HasForeignKey("PageFeatureId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("PageFeature");
-                });
-
-            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageFeatureItemText", b =>
-                {
-                    b.HasOne("Ocuda.Promenade.Models.Entities.Language", "Language")
-                        .WithMany()
-                        .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Ocuda.Promenade.Models.Entities.PageFeatureItem", "PageFeatureItem")
-                        .WithMany()
-                        .HasForeignKey("PageFeatureItemId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Language");
-
-                    b.Navigation("PageFeatureItem");
-                });
-
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageHeader", b =>
                 {
                     b.HasOne("Ocuda.Promenade.Models.Entities.CarouselTemplate", "LayoutCarouselTemplate")
@@ -2002,21 +1753,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("LayoutCarouselTemplateId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Ocuda.Promenade.Models.Entities.PageFeatureTemplate", "LayoutFeatureTemplate")
-                        .WithMany()
-                        .HasForeignKey("LayoutFeatureTemplateId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Ocuda.Promenade.Models.Entities.WebslideTemplate", "LayoutWebslideTemplate")
-                        .WithMany()
-                        .HasForeignKey("LayoutWebslideTemplateId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("LayoutCarouselTemplate");
-
-                    b.Navigation("LayoutFeatureTemplate");
-
-                    b.Navigation("LayoutWebslideTemplate");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageItem", b =>
@@ -2024,11 +1761,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.HasOne("Ocuda.Promenade.Models.Entities.Carousel", "Carousel")
                         .WithMany()
                         .HasForeignKey("CarouselId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Ocuda.Promenade.Models.Entities.PageFeature", "PageFeature")
-                        .WithMany()
-                        .HasForeignKey("PageFeatureId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Ocuda.Promenade.Models.Entities.PageLayout", "PageLayout")
@@ -2042,20 +1774,11 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("SegmentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Ocuda.Promenade.Models.Entities.Webslide", "Webslide")
-                        .WithMany()
-                        .HasForeignKey("WebslideId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("Carousel");
-
-                    b.Navigation("PageFeature");
 
                     b.Navigation("PageLayout");
 
                     b.Navigation("Segment");
-
-                    b.Navigation("Webslide");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageLayout", b =>
@@ -2174,36 +1897,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Navigation("UrlRedirect");
                 });
 
-            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.WebslideItem", b =>
-                {
-                    b.HasOne("Ocuda.Promenade.Models.Entities.Webslide", "Webslide")
-                        .WithMany("Items")
-                        .HasForeignKey("WebslideId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Webslide");
-                });
-
-            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.WebslideItemText", b =>
-                {
-                    b.HasOne("Ocuda.Promenade.Models.Entities.Language", "Language")
-                        .WithMany()
-                        .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Ocuda.Promenade.Models.Entities.WebslideItem", "WebslideItem")
-                        .WithMany()
-                        .HasForeignKey("WebslideItemId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Language");
-
-                    b.Navigation("WebslideItem");
-                });
-
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Carousel", b =>
                 {
                     b.Navigation("Items");
@@ -2224,11 +1917,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Navigation("Navigations");
                 });
 
-            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageFeature", b =>
-                {
-                    b.Navigation("Items");
-                });
-
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageLayout", b =>
                 {
                     b.Navigation("Items");
@@ -2237,11 +1925,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Podcast", b =>
                 {
                     b.Navigation("PodcastItems");
-                });
-
-            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Webslide", b =>
-                {
-                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }
