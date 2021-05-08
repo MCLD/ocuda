@@ -9,8 +9,6 @@ namespace Ocuda.Promenade.Service.Abstract
     {
         protected readonly IDateTimeProvider _dateTimeProvider;
 
-        protected TimeSpan CacheSlidingExpiration { get; set; }
-
         protected BaseService(ILogger<TService> logger,
             IDateTimeProvider dateTimeProvider)
             : base(logger)
@@ -21,11 +19,13 @@ namespace Ocuda.Promenade.Service.Abstract
             CacheSlidingExpiration = new TimeSpan(1, 0, 0);
         }
 
-        protected static int? GetPageCacheDuration(IConfiguration config)
+        protected TimeSpan CacheSlidingExpiration { get; set; }
+
+        protected static int GetPageCacheDuration(IConfiguration config)
         {
             if (config == null)
             {
-                return null;
+                return 0;
             }
 
             var cachePagesHoursString
@@ -39,19 +39,19 @@ namespace Ocuda.Promenade.Service.Abstract
                 cachePagesInHours = cacheInHours;
             }
 
-            return cachePagesInHours;
+            return cachePagesInHours ?? 0;
         }
 
         protected static TimeSpan? GetPageCacheSpan(IConfiguration config)
         {
             var duration = GetPageCacheDuration(config);
 
-            if (!duration.HasValue)
+            if (duration < 1)
             {
                 return null;
             }
 
-            return TimeSpan.FromHours(duration.Value);
+            return TimeSpan.FromHours(duration);
         }
 
         protected TimeSpan? GetCacheDuration(TimeSpan cacheSpan, DateTime nextItemStart)

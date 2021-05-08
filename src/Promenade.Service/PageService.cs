@@ -17,14 +17,14 @@ namespace Ocuda.Promenade.Service
 {
     public class PageService : BaseService<PageService>
     {
-        private readonly IConfiguration _config;
         private readonly IDistributedCache _cache;
+        private readonly IConfiguration _config;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly LanguageService _languageService;
         private readonly IPageHeaderRepository _pageHeaderRepository;
         private readonly IPageLayoutRepository _pageLayoutRepository;
         private readonly IPageLayoutTextRepository _pageLayoutTextRepository;
         private readonly IPageRepository _pageRepository;
-        private readonly LanguageService _languageService;
 
         public PageService(ILogger<PageService> logger,
             IConfiguration config,
@@ -86,7 +86,7 @@ namespace Ocuda.Promenade.Service
                 int currentLanguageId
                     = await _languageService.GetLanguageIdAsync(currentCultureName);
 
-                if (cachePagesInHours != null && !forceReload)
+                if (cachePagesInHours > 0 && !forceReload)
                 {
                     page = await GetPageFromCacheAsync(currentLanguageId, type, fixedStub);
                 }
@@ -97,7 +97,7 @@ namespace Ocuda.Promenade.Service
                         type,
                         currentLanguageId);
 
-                    if (page != null && cachePagesInHours != null)
+                    if (page != null && cachePagesInHours > 0)
                     {
                         await SavePageToCacheAsync(cachePagesInHours ?? 1,
                             currentLanguageId,
@@ -113,7 +113,7 @@ namespace Ocuda.Promenade.Service
             {
                 int defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync();
 
-                if (cachePagesInHours != null && !forceReload)
+                if (cachePagesInHours > 0 && !forceReload)
                 {
                     page = await GetPageFromCacheAsync(defaultLanguageId, type, fixedStub);
                 }
@@ -124,7 +124,7 @@ namespace Ocuda.Promenade.Service
                         type,
                         defaultLanguageId);
 
-                    if (page != null && cachePagesInHours != null)
+                    if (page != null && cachePagesInHours > 0)
                     {
                         await SavePageToCacheAsync(cachePagesInHours ?? 1,
                             defaultLanguageId,
@@ -133,11 +133,216 @@ namespace Ocuda.Promenade.Service
                             page,
                             forceReload);
                     }
-
                 }
             }
 
             return page;
+        }
+
+        public async Task<PageHeader> GetHeaderByStubAndTypeAsync(string stub,
+            PageType type,
+            bool forceReload)
+        {
+            var cachePagesInHours = GetPageCacheDuration(_config);
+            string headerCacheKey = string.Format(CultureInfo.InvariantCulture,
+                Utility.Keys.Cache.PromPageHeader,
+                stub,
+                type);
+
+            PageHeader pageHeader = null;
+
+            if (cachePagesInHours > 0 && !forceReload)
+            {
+                pageHeader = await GetFromCacheAsync<PageHeader>(_cache, headerCacheKey);
+            }
+
+            if (pageHeader == null)
+            {
+                pageHeader = await _pageHeaderRepository.GetByStubAndTypeAsync(stub?.Trim(), type);
+
+                if (cachePagesInHours > 0 && pageHeader != null)
+                {
+                    await SaveToCacheAsync(_cache,
+                        headerCacheKey,
+                        pageHeader,
+                        cachePagesInHours);
+                }
+            }
+
+            return pageHeader;
+        }
+
+        public async Task<PageLayout> GetLayoutPageByHeaderAsync(int headerId,
+            bool forceReloadRequested,
+            string previewIdString)
+        {
+            bool forceReload = forceReloadRequested;
+            bool isPreview = false;
+            int? layoutId = null;
+
+            if (!string.IsNullOrEmpty(previewIdString) &&
+                Guid.TryParse(previewIdString, out Guid previewIdGuid))
+            {
+                layoutId = await _pageLayoutRepository
+                    .GetPreviewLayoutIdAsync(headerId, previewIdGuid);
+            }
+
+            var cacheSpan = GetPageCacheSpan(_config);
+
+            if (layoutId.HasValue)
+            {
+                isPreview = true;
+                forceReload = true;
+            }
+            else
+            {
+                string currentLayoutIdCacheKey = string.Format(CultureInfo.InvariantCulture,
+                    Utility.Keys.Cache.PromPageCurrentLayoutId,
+                    headerId);
+
+                if (cacheSpan.HasValue && !forceReload)
+                {
+                    layoutId = await GetIntFromCacheAsync(_cache, currentLayoutIdCacheKey);
+                }
+
+                if (!layoutId.HasValue)
+                {
+                    layoutId = await _pageLayoutRepository
+                        .GetCurrentLayoutIdForHeaderAsync(headerId);
+
+                    if (layoutId.HasValue && cacheSpan.HasValue)
+                    {
+                        var nextUp = await _pageLayoutRepository.GetNextStartDate(headerId);
+                        if (nextUp.HasValue)
+                        {
+                            var earliestSpan = GetCacheDuration(cacheSpan.Value, nextUp.Value);
+                            if (earliestSpan.HasValue && earliestSpan.Value != cacheSpan.Value)
+                            {
+                                _logger.LogInformation("Shortening layout id {LayoutId} cache to {CacheForTime}, next layout activates at {StartDate}",
+                                    layoutId,
+                                    earliestSpan,
+                                    nextUp.Value);
+                                cacheSpan = earliestSpan.Value;
+                            }
+                        }
+
+                        if (cacheSpan.HasValue)
+                        {
+                            await SaveIntToCacheAsync(_cache,
+                                currentLayoutIdCacheKey,
+                                layoutId.Value,
+                                cacheSpan.Value);
+                        }
+                    }
+                }
+            }
+
+            if (!layoutId.HasValue)
+            {
+                return null;
+            }
+
+            PageLayout pageLayout = null;
+
+            string layoutCacheKey = string.Format(CultureInfo.InvariantCulture,
+                Utility.Keys.Cache.PromPageLayout,
+                layoutId.Value);
+
+            if (cacheSpan.HasValue && !forceReload)
+            {
+                pageLayout = await GetFromCacheAsync<PageLayout>(_cache, layoutCacheKey);
+            }
+
+            if (pageLayout == null)
+            {
+                pageLayout = await _pageLayoutRepository.GetIncludingChildrenAsync(layoutId.Value);
+                if (pageLayout != null)
+                {
+                    pageLayout.Items = pageLayout.Items?.OrderBy(_ => _.Order).ToList();
+                    foreach (var item in pageLayout.Items)
+                    {
+                        item.PageLayout = null;
+                    }
+                }
+
+                await SaveToCacheAsync(_cache, layoutCacheKey, pageLayout, cacheSpan.Value);
+            }
+
+            if (pageLayout != null)
+            {
+                var currentCultureName = _httpContextAccessor
+                    .HttpContext
+                    .Features
+                    .Get<IRequestCultureFeature>()
+                    .RequestCulture
+                    .UICulture?
+                    .Name;
+
+                if (!string.IsNullOrWhiteSpace(currentCultureName))
+                {
+                    var currentLangaugeId = await _languageService
+                        .GetLanguageIdAsync(currentCultureName);
+
+                    var layoutTextCacheKey = string.Format(CultureInfo.InvariantCulture,
+                        Utility.Keys.Cache.PromPageLayoutText,
+                        currentLangaugeId,
+                        pageLayout.Id);
+
+                    if (cacheSpan.HasValue && !forceReload)
+                    {
+                        pageLayout.PageLayoutText = await GetFromCacheAsync<PageLayoutText>(_cache,
+                            layoutTextCacheKey);
+                    }
+
+                    if (pageLayout.PageLayoutText == null)
+                    {
+                        pageLayout.PageLayoutText = await _pageLayoutTextRepository
+                            .GetByIdsAsync(pageLayout.Id, currentLangaugeId);
+
+                        if (cacheSpan.HasValue)
+                        {
+                            await SaveToCacheAsync(_cache,
+                                layoutTextCacheKey,
+                                pageLayout.PageLayoutText,
+                                cacheSpan.Value);
+                        }
+                    }
+                }
+
+                if (pageLayout.PageLayoutText == null)
+                {
+                    var defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync();
+
+                    var layoutTextCacheKey = string.Format(CultureInfo.InvariantCulture,
+                        Utility.Keys.Cache.PromPageLayoutText,
+                        defaultLanguageId,
+                        pageLayout.Id);
+
+                    if (cacheSpan.HasValue && !forceReload)
+                    {
+                        pageLayout.PageLayoutText = await GetFromCacheAsync<PageLayoutText>(_cache,
+                            layoutTextCacheKey);
+                    }
+
+                    if (pageLayout.PageLayoutText == null)
+                    {
+                        pageLayout.PageLayoutText = await _pageLayoutTextRepository
+                            .GetByIdsAsync(pageLayout.Id, defaultLanguageId);
+
+                        if (cacheSpan.HasValue)
+                        {
+                            await SaveToCacheAsync(_cache,
+                                layoutTextCacheKey,
+                                pageLayout.PageLayoutText,
+                                cacheSpan.Value);
+                        }
+                    }
+                }
+
+                pageLayout.IsPreview = isPreview;
+            }
+
+            return pageLayout;
         }
 
         private async Task<Page> GetPageFromCacheAsync(int languageId, PageType type, string stub)
@@ -206,203 +411,6 @@ namespace Ocuda.Promenade.Service
                     cacheKey,
                     pageToCache.Length);
             }
-        }
-
-        public async Task<PageHeader> GetHeaderByStubAndTypeAsync(string stub,
-            PageType type,
-            bool forceReload)
-        {
-            var cachePagesInHours = GetPageCacheDuration(_config);
-            string headerCacheKey = string.Format(CultureInfo.InvariantCulture,
-                Utility.Keys.Cache.PromPageHeader,
-                stub,
-                type);
-
-            PageHeader pageHeader = null;
-
-            if (cachePagesInHours.HasValue && !forceReload)
-            {
-                pageHeader = await GetFromCacheAsync<PageHeader>(_cache, headerCacheKey);
-            }
-
-            if (pageHeader == null)
-            {
-                pageHeader = await _pageHeaderRepository.GetByStubAndTypeAsync(stub?.Trim(), type);
-
-                if (cachePagesInHours.HasValue && pageHeader != null)
-                {
-                    await SaveToCacheAsync(_cache,
-                        headerCacheKey,
-                        pageHeader,
-                        cachePagesInHours);
-                }
-            }
-
-            return pageHeader;
-        }
-
-        public async Task<PageLayout> GetLayoutPageByHeaderAsync(int headerId,
-            bool forceReloadRequested,
-            string previewIdString)
-        {
-            bool forceReload = forceReloadRequested;
-            bool isPreview = false;
-            int? layoutId = null;
-
-            if (!string.IsNullOrEmpty(previewIdString) &&
-                Guid.TryParse(previewIdString, out Guid previewIdGuid))
-            {
-                layoutId = await _pageLayoutRepository
-                    .GetPreviewLayoutIdAsync(headerId, previewIdGuid);
-            }
-
-            var cacheSpan = GetPageCacheSpan(_config);
-
-            if (layoutId.HasValue)
-            {
-                isPreview = true;
-                forceReload = true;
-            }
-            else
-            {
-                string currentLayoutIdCacheKey = string.Format(CultureInfo.InvariantCulture,
-                    Utility.Keys.Cache.PromPageCurrentLayoutId,
-                    headerId);
-
-                if (cacheSpan.HasValue && !forceReload)
-                {
-                    layoutId = await GetIntFromCacheAsync(_cache, currentLayoutIdCacheKey);
-                }
-
-                if (!layoutId.HasValue)
-                {
-                    layoutId = await _pageLayoutRepository
-                        .GetCurrentLayoutIdForHeaderAsync(headerId);
-
-                    if (layoutId.HasValue && cacheSpan.HasValue)
-                    {
-                        var nextUp = await _pageLayoutRepository.GetNextStartDate(headerId);
-                        if (nextUp.HasValue)
-                        {
-                            var earliestSpan = GetCacheDuration(cacheSpan.Value, nextUp.Value);
-                            if (earliestSpan.HasValue && earliestSpan.Value != cacheSpan.Value)
-                            {
-                                _logger.LogInformation("Shortening layout id {LayoutId} cache to {CacheForTime}, next layout activates at {StartDate}",
-                                    layoutId,
-                                    earliestSpan,
-                                    nextUp.Value);
-                                cacheSpan = earliestSpan.Value;
-                            }
-                        }
-
-                        await SaveIntToCacheAsync(_cache,
-                            currentLayoutIdCacheKey,
-                            layoutId.Value,
-                            cacheSpan);
-                    }
-                }
-            }
-
-            if (!layoutId.HasValue)
-            {
-                return null;
-            }
-
-            PageLayout pageLayout = null;
-
-            string layoutCacheKey = string.Format(CultureInfo.InvariantCulture,
-                Utility.Keys.Cache.PromPageLayout,
-                layoutId.Value);
-
-            if (cacheSpan.HasValue && !forceReload)
-            {
-                pageLayout = await GetFromCacheAsync<PageLayout>(_cache, layoutCacheKey);
-            }
-
-            if (pageLayout == null)
-            {
-                pageLayout = await _pageLayoutRepository.GetIncludingChildrenAsync(layoutId.Value);
-                if (pageLayout != null)
-                {
-                    pageLayout.Items = pageLayout.Items?.OrderBy(_ => _.Order).ToList();
-                    foreach (var item in pageLayout.Items)
-                    {
-                        item.PageLayout = null;
-                    }
-                }
-
-                await SaveToCacheAsync(_cache, layoutCacheKey, pageLayout, cacheSpan);
-            }
-
-            if (pageLayout != null)
-            {
-                var currentCultureName = _httpContextAccessor
-                    .HttpContext
-                    .Features
-                    .Get<IRequestCultureFeature>()
-                    .RequestCulture
-                    .UICulture?
-                    .Name;
-
-                if (!string.IsNullOrWhiteSpace(currentCultureName))
-                {
-                    var currentLangaugeId = await _languageService
-                        .GetLanguageIdAsync(currentCultureName);
-
-                    var layoutTextCacheKey = string.Format(CultureInfo.InvariantCulture,
-                        Utility.Keys.Cache.PromPageLayoutText,
-                        currentLangaugeId,
-                        pageLayout.Id);
-
-                    if (cacheSpan.HasValue && !forceReload)
-                    {
-                        pageLayout.PageLayoutText = await GetFromCacheAsync<PageLayoutText>(_cache,
-                            layoutTextCacheKey);
-                    }
-
-                    if (pageLayout.PageLayoutText == null)
-                    {
-                        pageLayout.PageLayoutText = await _pageLayoutTextRepository
-                            .GetByIdsAsync(pageLayout.Id, currentLangaugeId);
-
-                        await SaveToCacheAsync(_cache,
-                            layoutTextCacheKey,
-                            pageLayout.PageLayoutText,
-                            cacheSpan);
-                    }
-                }
-
-                if (pageLayout.PageLayoutText == null)
-                {
-                    var defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync();
-
-                    var layoutTextCacheKey = string.Format(CultureInfo.InvariantCulture,
-                        Utility.Keys.Cache.PromPageLayoutText,
-                        defaultLanguageId,
-                        pageLayout.Id);
-
-                    if (cacheSpan.HasValue && !forceReload)
-                    {
-                        pageLayout.PageLayoutText = await GetFromCacheAsync<PageLayoutText>(_cache,
-                            layoutTextCacheKey);
-                    }
-
-                    if (pageLayout.PageLayoutText == null)
-                    {
-                        pageLayout.PageLayoutText = await _pageLayoutTextRepository
-                            .GetByIdsAsync(pageLayout.Id, defaultLanguageId);
-
-                        await SaveToCacheAsync(_cache,
-                            layoutTextCacheKey,
-                            pageLayout.PageLayoutText,
-                            cacheSpan);
-                    }
-                }
-
-                pageLayout.IsPreview = isPreview;
-            }
-
-            return pageLayout;
         }
     }
 }

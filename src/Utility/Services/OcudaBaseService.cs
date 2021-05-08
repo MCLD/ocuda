@@ -18,12 +18,7 @@ namespace Ocuda.Utility.Services
         protected async Task<T> GetFromCacheAsync<T>(IDistributedCache cache, string cacheKey)
             where T : class
         {
-            if (cache == null || string.IsNullOrEmpty(cacheKey))
-            {
-                return null;
-            }
-
-            string cachedJson = await cache.GetStringAsync(cacheKey);
+            var cachedJson = await GetStringFromCache(cache, cacheKey);
 
             if (!string.IsNullOrEmpty(cachedJson))
             {
@@ -40,7 +35,7 @@ namespace Ocuda.Utility.Services
                         typeof(T),
                         cacheKey,
                         ex.Message);
-                    await cache.RemoveAsync(cacheKey);
+                    await cache?.RemoveAsync(cacheKey);
                 }
             }
             return null;
@@ -75,33 +70,63 @@ namespace Ocuda.Utility.Services
             return null;
         }
 
-        protected async Task SaveToCacheAsync<T>(IDistributedCache cache,
-            string cacheKey,
-            T item,
-            int? cacheDurationHours) where T : class
+        protected async Task<string> GetStringFromCache(IDistributedCache cache, string cacheKey)
         {
-            if (cacheDurationHours == null
-                || cacheDurationHours < 1
-                || string.IsNullOrEmpty(cacheKey)
-                || item == null)
+            if (cache == null || string.IsNullOrEmpty(cacheKey))
             {
-                return;
+                return null;
             }
 
-            await SaveToCacheAsync<T>(cache,
+            return await cache.GetStringAsync(cacheKey);
+        }
+
+        protected async Task SaveIntToCacheAsync(IDistributedCache cache,
+            string cacheKey,
+            int item,
+            TimeSpan expireIn)
+        {
+            await SaveIntToCacheInternalAsync(cache, cacheKey, item, expireIn);
+        }
+
+        protected async Task SaveStringToCacheAsync(IDistributedCache cache,
+            string cacheKey,
+            string item,
+            int cacheForHours)
+        {
+            await SaveStringToCacheAsync(cache,
                 cacheKey,
                 item,
-                TimeSpan.FromHours((int)cacheDurationHours));
+                TimeSpan.FromHours(cacheForHours));
+        }
+
+        protected async Task SaveStringToCacheAsync(IDistributedCache cache,
+            string cacheKey,
+            string item,
+            TimeSpan expireIn)
+        {
+            await SaveStringToCacheInternalAsync(cache, cacheKey, item, expireIn);
         }
 
         protected async Task SaveToCacheAsync<T>(IDistributedCache cache,
             string cacheKey,
             T item,
-            TimeSpan? expireIn) where T : class
+            int cacheForHours) where T : class
         {
-            if (!expireIn.HasValue
-                || string.IsNullOrEmpty(cacheKey)
-                || item == null)
+            if (cacheForHours > 0)
+            {
+                await SaveToCacheAsync<T>(cache,
+                    cacheKey,
+                    item,
+                    TimeSpan.FromHours(cacheForHours));
+            }
+        }
+
+        protected async Task SaveToCacheAsync<T>(IDistributedCache cache,
+            string cacheKey,
+            T item,
+            TimeSpan expireIn) where T : class
+        {
+            if (string.IsNullOrEmpty(cacheKey) || item == null)
             {
                 return;
             }
@@ -122,12 +147,12 @@ namespace Ocuda.Utility.Services
                 expireIn);
         }
 
-        protected async Task SaveIntToCacheAsync(IDistributedCache cache,
+        private async Task SaveIntToCacheInternalAsync(IDistributedCache cache,
             string cacheKey,
             int item,
-            TimeSpan? expireIn)
+            TimeSpan expireIn)
         {
-            if (cache == null || !expireIn.HasValue || string.IsNullOrEmpty(cacheKey))
+            if (cache == null || string.IsNullOrEmpty(cacheKey))
             {
                 return;
             }
@@ -148,5 +173,28 @@ namespace Ocuda.Utility.Services
                 expireIn);
         }
 
+        private async Task SaveStringToCacheInternalAsync(IDistributedCache cache,
+            string cacheKey,
+            string item,
+            TimeSpan expireIn)
+        {
+            if (string.IsNullOrEmpty(cacheKey) || item == null)
+            {
+                return;
+            }
+
+            await cache.SetStringAsync(cacheKey,
+                item,
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = expireIn
+                });
+
+            _logger.LogDebug("Cache miss for {CacheKey}, caching {Type}: {Length} characters for {CacheTimeSpan}",
+                cacheKey,
+                "string",
+                item.Length,
+                expireIn);
+        }
     }
 }

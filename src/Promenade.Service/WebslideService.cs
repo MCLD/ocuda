@@ -18,16 +18,16 @@ namespace Ocuda.Promenade.Service
     public class WebslideService : BaseService<WebslideService>
     {
         private const string ImagesFilePath = "images";
-        private const string WebslidesFilePath = "Webslides";
+        private const string WebslidesFilePath = "slides";
 
         private readonly IDistributedCache _cache;
         private readonly IConfiguration _config;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly LanguageService _languageService;
         private readonly IPathResolverService _pathResolver;
         private readonly IWebslideItemRepository _webslideItemRepository;
         private readonly IWebslideItemTextRepository _webslideItemTextRepository;
         private readonly IWebslideRepository _webslideRepository;
-        private readonly LanguageService _languageService;
 
         public WebslideService(ILogger<WebslideService> logger,
             IDateTimeProvider dateTimeProvider,
@@ -66,7 +66,7 @@ namespace Ocuda.Promenade.Service
                 Utility.Keys.Cache.PromWebslide,
                 webslideId);
 
-            if (cachePagesInHours != null && !forceReload)
+            if (cachePagesInHours > 0 && !forceReload)
             {
                 webslide = await GetFromCacheAsync<Webslide>(_cache, webslideCacheKey);
             }
@@ -86,7 +86,10 @@ namespace Ocuda.Promenade.Service
                     }
                 }
 
-                await SaveToCacheAsync(_cache, webslideCacheKey, webslide, cachePagesInHours);
+                await SaveToCacheAsync(_cache,
+                    webslideCacheKey,
+                    webslide,
+                    cachePagesInHours);
             }
 
             if (webslide != null)
@@ -109,6 +112,9 @@ namespace Ocuda.Promenade.Service
 
                 var invalidItems = new List<WebslideItem>();
 
+                string languageName = await _languageService
+                    .GetNameAsync(currentLanguageId ?? defaultLanguageId, forceReload);
+
                 foreach (var item in webslide.Items)
                 {
                     if (currentLanguageId.HasValue)
@@ -118,7 +124,7 @@ namespace Ocuda.Promenade.Service
                         currentLanguageId,
                         item.Id);
 
-                        if (cachePagesInHours != null && !forceReload)
+                        if (cachePagesInHours > 0 && !forceReload)
                         {
                             item.WebslideItemText = await GetFromCacheAsync<WebslideItemText>(
                                 _cache,
@@ -129,6 +135,12 @@ namespace Ocuda.Promenade.Service
                         {
                             item.WebslideItemText = await _webslideItemTextRepository
                                 .GetByIdsAsync(item.Id, currentLanguageId.Value);
+
+                            item.WebslideItemText.Filepath = _pathResolver
+                                .GetPublicContentUrl(ImagesFilePath,
+                                    languageName,
+                                    WebslidesFilePath,
+                                    item.WebslideItemText.Filename);
 
                             await SaveToCacheAsync(_cache,
                                 webslideItemTextCacheKey,
@@ -144,7 +156,7 @@ namespace Ocuda.Promenade.Service
                             defaultLanguageId,
                             item.Id);
 
-                        if (cachePagesInHours != null && !forceReload)
+                        if (cachePagesInHours > 0 && !forceReload)
                         {
                             item.WebslideItemText = await GetFromCacheAsync<WebslideItemText>(
                                 _cache,
@@ -155,6 +167,12 @@ namespace Ocuda.Promenade.Service
                         {
                             item.WebslideItemText = await _webslideItemTextRepository
                                 .GetByIdsAsync(item.Id, defaultLanguageId);
+
+                            item.WebslideItemText.Filepath = _pathResolver
+                                .GetPublicContentUrl(ImagesFilePath,
+                                    languageName,
+                                    WebslidesFilePath,
+                                    item.WebslideItemText.Filename);
 
                             await SaveToCacheAsync(_cache,
                                 webslideItemTextCacheKey,
@@ -175,11 +193,6 @@ namespace Ocuda.Promenade.Service
                 }
             }
             return webslide;
-        }
-
-        public string GetWebslideFilePath(string filename)
-        {
-            return _pathResolver.GetPublicContentUrl(ImagesFilePath, WebslidesFilePath, filename);
         }
     }
 }

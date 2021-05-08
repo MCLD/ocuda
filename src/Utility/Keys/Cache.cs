@@ -132,6 +132,11 @@
         public static readonly string PromLanguageId = "langid.{0}";
 
         /// <summary>
+        /// Language name, {0} is the language id
+        /// </summary>
+        public static readonly string PromLanguageName = "langname.{0}";
+
+        /// <summary>
         /// Cached navigation element, {0} is the id of the element, {1} is the language id
         /// </summary>
         public static readonly string PromNavLang = "nav.{0}.{1}";

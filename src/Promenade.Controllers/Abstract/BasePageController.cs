@@ -11,16 +11,6 @@ namespace Ocuda.Promenade.Controllers.Abstract
 {
     public abstract class BasePageController<T> : BaseController<T>
     {
-        protected abstract PageType PageType { get; }
-
-        protected CarouselService CarouselService { get; }
-        protected PageFeatureService PageFeatureService { get; }
-        protected PageService PageService { get; }
-        protected RedirectService RedirectService { get; }
-        protected SegmentService SegmentService { get; }
-        protected SocialCardService SocialCardService { get; }
-        protected WebslideService WebslideService { get; }
-
         protected BasePageController(ServiceFacades.Controller<T> context,
             CarouselService carouselService,
             PageFeatureService pageFeatureService,
@@ -43,6 +33,45 @@ namespace Ocuda.Promenade.Controllers.Abstract
                 ?? throw new ArgumentNullException(nameof(socialCardService));
             WebslideService = webslideService
                 ?? throw new ArgumentNullException(nameof(webslideService));
+        }
+
+        protected CarouselService CarouselService { get; }
+        protected PageFeatureService PageFeatureService { get; }
+        protected PageService PageService { get; }
+        protected abstract PageType PageType { get; }
+        protected RedirectService RedirectService { get; }
+        protected SegmentService SegmentService { get; }
+        protected SocialCardService SocialCardService { get; }
+        protected WebslideService WebslideService { get; }
+
+        protected async Task<IActionResult> ReturnCarouselItemAsync(string stub, int id)
+        {
+            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
+            var pageHeader = await PageService.GetHeaderByStubAndTypeAsync(stub,
+                PageType,
+                forceReload);
+
+            if (pageHeader?.IsLayoutPage != true)
+            {
+                return NotFound();
+            }
+
+            var carouselItem = await CarouselService.GetItemForHeaderAsync(pageHeader.Id, id,
+                forceReload);
+
+            if (carouselItem == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new CarouselItemViewModel
+            {
+                Item = carouselItem,
+                ReturnUrl = Url.Action(nameof(Page), PageTitle, new { stub })
+            };
+
+            return View("CarouselItem", viewModel);
         }
 
         protected async Task<IActionResult> ReturnPageAsync(string stub)
@@ -182,12 +211,6 @@ namespace Ocuda.Promenade.Controllers.Abstract
                 {
                     item.Webslide = await WebslideService.GetByIdAsync(item.WebslideId.Value,
                         forceReload);
-
-                    foreach (var webslideItem in item.Webslide.Items)
-                    {
-                        webslideItem.WebslideItemText.Filename = WebslideService
-                            .GetWebslideFilePath(webslideItem.WebslideItemText.Filename);
-                    }
                 }
             }
 
@@ -217,36 +240,6 @@ namespace Ocuda.Promenade.Controllers.Abstract
             PageTitle = pageLayout.PageLayoutText?.Title;
 
             return View("LayoutPage", viewModel);
-        }
-
-        protected async Task<IActionResult> ReturnCarouselItemAsync(string stub, int id)
-        {
-            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
-
-            var pageHeader = await PageService.GetHeaderByStubAndTypeAsync(stub,
-                PageType,
-                forceReload);
-
-            if (pageHeader?.IsLayoutPage != true)
-            {
-                return NotFound();
-            }
-
-            var carouselItem = await CarouselService.GetItemForHeaderAsync(pageHeader.Id, id,
-                forceReload);
-
-            if (carouselItem == null)
-            {
-                return NotFound();
-            }
-
-            var viewModel = new CarouselItemViewModel
-            {
-                Item = carouselItem,
-                ReturnUrl = Url.Action(nameof(Page), PageTitle, new { stub })
-            };
-
-            return View("CarouselItem", viewModel);
         }
     }
 }

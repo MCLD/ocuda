@@ -23,12 +23,12 @@ namespace Ocuda.Promenade.Service
         private readonly IDistributedCache _cache;
         private readonly IConfiguration _config;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IPathResolverService _pathResolver;
+        private readonly LanguageService _languageService;
         private readonly IPageFeatureItemRepository _pageFeatureItemRepository;
         private readonly IPageFeatureItemTextRepository _pageFeatureItemTextRepository;
         private readonly IPageFeatureRepository _pageFeatureRepository;
         private readonly IPageFeatureTemplateRepository _pageFeatureTemplateRepository;
-        private readonly LanguageService _languageService;
+        private readonly IPathResolverService _pathResolver;
 
         public PageFeatureService(ILogger<PageFeatureService> logger,
             IDateTimeProvider dateTimeProvider,
@@ -70,7 +70,7 @@ namespace Ocuda.Promenade.Service
                 Utility.Keys.Cache.PromPageFeature,
                 featureId);
 
-            if (cachePagesInHours != null && !forceReload)
+            if (cachePagesInHours > 0 && !forceReload)
             {
                 feature = await GetFromCacheAsync<PageFeature>(_cache, featureCacheKey);
             }
@@ -122,7 +122,7 @@ namespace Ocuda.Promenade.Service
                         currentLanguageId,
                         item.Id);
 
-                        if (cachePagesInHours != null && !forceReload)
+                        if (cachePagesInHours > 0 && !forceReload)
                         {
                             item.PageFeatureItemText = await GetFromCacheAsync<PageFeatureItemText>(
                                 _cache,
@@ -148,7 +148,7 @@ namespace Ocuda.Promenade.Service
                             defaultLanguageId,
                             item.Id);
 
-                        if (cachePagesInHours != null && !forceReload)
+                        if (cachePagesInHours > 0 && !forceReload)
                         {
                             item.PageFeatureItemText = await GetFromCacheAsync<PageFeatureItemText>(
                                 _cache,

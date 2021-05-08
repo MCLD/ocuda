@@ -18,9 +18,9 @@ namespace Ocuda.Promenade.Service
         private readonly IDistributedCache _cache;
         private readonly IConfiguration _config;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly LanguageService _languageService;
         private readonly ISegmentRepository _segmentRepository;
         private readonly ISegmentTextRepository _segmentTextRepository;
-        private readonly LanguageService _languageService;
 
         public SegmentService(ILogger<SegmentService> logger,
             IDateTimeProvider dateTimeProvider,
@@ -55,7 +55,7 @@ namespace Ocuda.Promenade.Service
                 Utility.Keys.Cache.PromSegment,
                 segmentId);
 
-            if (cachePagesInHours != null && !forceReload)
+            if (cachePagesInHours > 0 && !forceReload)
             {
                 segment = await GetFromCacheAsync<Segment>(_cache, segmentCacheKey);
             }
@@ -88,7 +88,7 @@ namespace Ocuda.Promenade.Service
                         currentLangaugeId,
                         segmentId);
 
-                    if (cachePagesInHours != null && !forceReload)
+                    if (cachePagesInHours > 0 && !forceReload)
                     {
                         segmentText = await GetFromCacheAsync<SegmentText>(
                             _cache,
@@ -116,7 +116,7 @@ namespace Ocuda.Promenade.Service
                         defaultLanguageId,
                         segmentId);
 
-                    if (cachePagesInHours != null && !forceReload)
+                    if (cachePagesInHours > 0 && !forceReload)
                     {
                         segmentText = await GetFromCacheAsync<SegmentText>(
                             _cache,

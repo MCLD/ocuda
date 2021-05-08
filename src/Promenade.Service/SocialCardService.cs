@@ -13,10 +13,10 @@ namespace Ocuda.Promenade.Service
 {
     public class SocialCardService : BaseService<SocialCardService>
     {
-        private readonly IConfiguration _config;
         private readonly IDistributedCache _cache;
-        private readonly ISocialCardRepository _socialCardRepository;
+        private readonly IConfiguration _config;
         private readonly SiteSettingService _siteSettingService;
+        private readonly ISocialCardRepository _socialCardRepository;
 
         public SocialCardService(ILogger<SocialCardService> logger,
             IDateTimeProvider dateTimeProvider,
@@ -43,7 +43,7 @@ namespace Ocuda.Promenade.Service
                 Utility.Keys.Cache.PromSocialCard,
                 id);
 
-            if (cachePagesInHours != null && !forceReload)
+            if (cachePagesInHours > 0 && !forceReload)
             {
                 card = await GetFromCacheAsync<SocialCard>(_cache, cacheKey);
             }

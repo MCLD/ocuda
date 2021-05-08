@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -13,6 +14,9 @@ namespace Ocuda.Promenade.Models.Entities
 
         [MaxLength(255)]
         public string Filename { get; set; }
+
+        [NotMapped]
+        public string Filepath { get; set; }
 
         public Language Language { get; set; }
         public int LanguageId { get; set; }

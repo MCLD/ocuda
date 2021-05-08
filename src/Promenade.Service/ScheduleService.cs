@@ -18,10 +18,10 @@ namespace Ocuda.Promenade.Service
         private const int HoursInADay = 24;
         private const int SuggestedTimesTake = 3;
 
-        private readonly IConfiguration _config;
         private readonly IDistributedCache _cache;
-        private readonly IScheduleRequestRepository _scheduleRequestRepository;
+        private readonly IConfiguration _config;
         private readonly IScheduleRequestLimitRepository _scheduleRequestLimitRepository;
+        private readonly IScheduleRequestRepository _scheduleRequestRepository;
         private readonly IScheduleRequestSubjectRepository _scheduleRequestSubjectRepository;
         private readonly IScheduleRequestTelephoneRepository _scheduleRequestTelephoneRepository;
 
@@ -47,29 +47,6 @@ namespace Ocuda.Promenade.Service
                 ?? throw new ArgumentNullException(nameof(scheduleRequestTelephoneRepository));
         }
 
-        public async Task<IEnumerable<ScheduleRequestSubject>> GetSubjectsAsync(bool forceReload)
-        {
-            IEnumerable<ScheduleRequestSubject> subjects = null;
-            var pageCacheDuration = GetPageCacheDuration(_config);
-
-            if (pageCacheDuration.HasValue && !forceReload)
-            {
-                subjects = await GetFromCacheAsync<IEnumerable<ScheduleRequestSubject>>(_cache,
-                    Utility.Keys.Cache.PromScheduleSubjects);
-            }
-
-            if (subjects?.Any() != true)
-            {
-                subjects = await _scheduleRequestSubjectRepository.GetAllAsync();
-                await SaveToCacheAsync(_cache,
-                    Utility.Keys.Cache.PromScheduleSubjects,
-                    subjects,
-                    pageCacheDuration);
-            }
-
-            return subjects;
-        }
-
         public Task<ScheduleRequest> AddAsync(ScheduleRequest scheduleRequest,
             string phone)
         {
@@ -84,39 +61,6 @@ namespace Ocuda.Promenade.Service
             }
 
             return AddAsyncInternal(scheduleRequest, phone);
-        }
-
-        private async Task<ScheduleRequest> AddAsyncInternal(ScheduleRequest scheduleRequest,
-            string phone)
-        {
-            var fixedPhone = Regex.Replace(phone, "[^0-9.]", "").Trim();
-
-            var requestTelephone = await _scheduleRequestTelephoneRepository.GetAsync(fixedPhone)
-                ?? await _scheduleRequestTelephoneRepository.AddSaveAsync(fixedPhone);
-
-            scheduleRequest.CreatedAt = _dateTimeProvider.Now;
-            scheduleRequest.ScheduleRequestTelephoneId = requestTelephone.Id;
-            var addedRequest = await _scheduleRequestRepository.AddSaveAsync(scheduleRequest);
-
-            addedRequest.ScheduleRequestTelephone = requestTelephone;
-
-            return addedRequest;
-        }
-
-        public async Task<bool> IsRequestOverLimitAsync(DateTime requestTime)
-        {
-            var limit = await _scheduleRequestLimitRepository.GetTimeSlotLimitAsync(requestTime);
-            if (limit.HasValue)
-            {
-                var requestCount = await _scheduleRequestRepository
-                    .GetTimeSlotCountAsync(requestTime);
-                if (requestCount >= limit.Value)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         public async Task<ICollection<DateTime>> GetDaySuggestedTimesAsync(DateTime requestTime,
@@ -213,6 +157,62 @@ namespace Ocuda.Promenade.Service
                 .Take(SuggestedTimesTake)
                 .OrderBy(_ => _.Date)
                 .ToList();
+        }
+
+        public async Task<IEnumerable<ScheduleRequestSubject>> GetSubjectsAsync(bool forceReload)
+        {
+            IEnumerable<ScheduleRequestSubject> subjects = null;
+            var pageCacheDuration = GetPageCacheDuration(_config);
+
+            if (pageCacheDuration > 0 && !forceReload)
+            {
+                subjects = await GetFromCacheAsync<IEnumerable<ScheduleRequestSubject>>(_cache,
+                    Utility.Keys.Cache.PromScheduleSubjects);
+            }
+
+            if (subjects?.Any() != true)
+            {
+                subjects = await _scheduleRequestSubjectRepository.GetAllAsync();
+                await SaveToCacheAsync(_cache,
+                    Utility.Keys.Cache.PromScheduleSubjects,
+                    subjects,
+                    pageCacheDuration);
+            }
+
+            return subjects;
+        }
+
+        public async Task<bool> IsRequestOverLimitAsync(DateTime requestTime)
+        {
+            var limit = await _scheduleRequestLimitRepository.GetTimeSlotLimitAsync(requestTime);
+            if (limit.HasValue)
+            {
+                var requestCount = await _scheduleRequestRepository
+                    .GetTimeSlotCountAsync(requestTime);
+                if (requestCount >= limit.Value)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private async Task<ScheduleRequest> AddAsyncInternal(ScheduleRequest scheduleRequest,
+                    string phone)
+        {
+            var fixedPhone = Regex.Replace(phone, "[^0-9.]", "").Trim();
+
+            var requestTelephone = await _scheduleRequestTelephoneRepository.GetAsync(fixedPhone)
+                ?? await _scheduleRequestTelephoneRepository.AddSaveAsync(fixedPhone);
+
+            scheduleRequest.CreatedAt = _dateTimeProvider.Now;
+            scheduleRequest.ScheduleRequestTelephoneId = requestTelephone.Id;
+            var addedRequest = await _scheduleRequestRepository.AddSaveAsync(scheduleRequest);
+
+            addedRequest.ScheduleRequestTelephone = requestTelephone;
+
+            return addedRequest;
         }
     }
 }

@@ -33,6 +33,92 @@ namespace Ocuda.Promenade.Service
                 ?? throw new ArgumentNullException(nameof(languageRepository));
         }
 
+        public async Task<int> GetDefaultLanguageIdAsync()
+        {
+            return await GetDefaultLanguageIdAsync(false);
+        }
+
+        public async Task<int> GetDefaultLanguageIdAsync(bool forceReload)
+        {
+            var cacheKey = Utility.Keys.Cache.PromDefaultLanguageId;
+
+            if (!forceReload)
+            {
+                var cachedLanguageId = await GetIntFromCacheAsync(_cache, cacheKey);
+                if (cachedLanguageId.HasValue)
+                {
+                    return cachedLanguageId.Value;
+                }
+            }
+
+            int languageId = await _languageRepository.GetDefaultLanguageId();
+
+            await SaveIntToCacheAsync(_cache, cacheKey, languageId, TimeSpan.FromHours(12));
+
+            _logger.LogDebug("Cache miss for {CacheKey}, caching {Length} characters",
+                cacheKey,
+                languageId.ToString(CultureInfo.InvariantCulture));
+
+            return languageId;
+        }
+
+        public async Task<int> GetLanguageIdAsync(string culture)
+        {
+            return await GetLanguageIdAsync(culture, false);
+        }
+
+        public async Task<int> GetLanguageIdAsync(string culture, bool forceReload)
+        {
+            var cacheKey = string.Format(CultureInfo.InvariantCulture,
+                Utility.Keys.Cache.PromLanguageId,
+                culture);
+
+            if (!forceReload)
+            {
+                var cachedLanguageId = await GetIntFromCacheAsync(_cache, cacheKey);
+
+                if (cachedLanguageId.HasValue)
+                {
+                    return cachedLanguageId.Value;
+                }
+            }
+
+            int languageId = await _languageRepository.GetLanguageId(culture);
+
+            await SaveIntToCacheAsync(_cache, cacheKey, languageId, TimeSpan.FromHours(12));
+
+            return languageId;
+        }
+
+        public async Task<string> GetNameAsync(int id, bool forceReload)
+        {
+            var cacheKey = string.Format(CultureInfo.InvariantCulture,
+                Utility.Keys.Cache.PromLanguageName,
+                id);
+
+            if (!forceReload)
+            {
+                var cachedLanguageName = await GetStringFromCache(_cache, cacheKey);
+
+                if (!string.IsNullOrEmpty(cachedLanguageName))
+                {
+                    return cachedLanguageName;
+                }
+            }
+
+            var language = await _languageRepository.GetActiveByIdAsync(id);
+
+            if (language != null)
+            {
+                await SaveStringToCacheAsync(_cache,
+                    cacheKey,
+                    language.Name,
+                    TimeSpan.FromHours(12));
+            }
+
+            return language?.Name;
+        }
+
         public async Task SyncLanguagesAsync()
         {
             var siteCultures = _l10nOptions
@@ -40,6 +126,8 @@ namespace Ocuda.Promenade.Service
                 .SupportedCultures;
 
             var databaseCultures = await _languageRepository.GetAllAsync();
+
+            await _cache.RemoveAsync(Utility.Keys.Cache.PromDefaultLanguageId);
 
             foreach (var dbCulture in databaseCultures)
             {
@@ -85,6 +173,14 @@ namespace Ocuda.Promenade.Service
                         _languageRepository.Update(dbCulture);
                     }
                 }
+
+                await _cache.RemoveAsync(string.Format(CultureInfo.InvariantCulture,
+                    Utility.Keys.Cache.PromLanguageName,
+                    dbCulture.Id));
+
+                await _cache.RemoveAsync(string.Format(CultureInfo.InvariantCulture,
+                    Utility.Keys.Cache.PromLanguageId,
+                    dbCulture.Name));
             }
 
             var namesMissingFromDb = siteCultures
@@ -104,80 +200,6 @@ namespace Ocuda.Promenade.Service
             }
 
             await _languageRepository.SaveAsync();
-        }
-
-        public async Task<int> GetDefaultLanguageIdAsync()
-        {
-            return await GetDefaultLanguageIdAsync(false);
-        }
-
-        public async Task<int> GetDefaultLanguageIdAsync(bool forceReload)
-        {
-            var cacheKey = Utility.Keys.Cache.PromDefaultLanguageId;
-
-            if (!forceReload)
-            {
-                string cachedLanguageIdText = await _cache.GetStringAsync(cacheKey);
-
-                if (!string.IsNullOrEmpty(cachedLanguageIdText)
-                    && int.TryParse(cachedLanguageIdText, out int cachedLanguageId))
-                {
-                    return cachedLanguageId;
-                }
-            }
-
-            int languageId = await _languageRepository.GetDefaultLanguageId();
-
-            await _cache.SetStringAsync(cacheKey,
-                languageId.ToString(CultureInfo.InvariantCulture),
-                new DistributedCacheEntryOptions
-                {
-                    SlidingExpiration = CacheSlidingExpiration
-                });
-
-            _logger.LogDebug("Cache miss for {CacheKey}, caching {Length} characters",
-                cacheKey,
-                languageId.ToString(CultureInfo.InvariantCulture));
-
-            return languageId;
-        }
-
-        public async Task<int> GetLanguageIdAsync(string culture)
-        {
-            return await GetLanguageIdAsync(culture, false);
-        }
-
-        public async Task<int> GetLanguageIdAsync(string culture, bool forceReload)
-        {
-            var cacheKey = string.Format(CultureInfo.InvariantCulture,
-                Utility.Keys.Cache.PromLanguageId,
-                culture);
-
-            if (!forceReload)
-            {
-                string cachedLanguageIdText = await _cache.GetStringAsync(cacheKey);
-
-                if (!string.IsNullOrEmpty(cachedLanguageIdText)
-                    && int.TryParse(cachedLanguageIdText, out int cachedLanguageId))
-                {
-                    return cachedLanguageId;
-                }
-            }
-
-            int languageId = await _languageRepository.GetLanguageId(culture);
-
-            await _cache.SetStringAsync(cacheKey,
-                languageId.ToString(CultureInfo.InvariantCulture),
-                new DistributedCacheEntryOptions
-                {
-                    SlidingExpiration = CacheSlidingExpiration
-                });
-
-            _logger.LogDebug("Cache miss for {CacheKey}, caching {Length} characters",
-                cacheKey,
-                languageId.ToString(CultureInfo.InvariantCulture));
-
-            return languageId;
         }
     }
 }

@@ -17,17 +17,17 @@ namespace Ocuda.Promenade.Service
 {
     public class EmediaService : BaseService<EmediaService>
     {
-        private readonly SegmentService _segmentService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IDistributedCache _cache;
         private readonly ICategoryRepository _categoryRepository;
         private readonly ICategoryTextRepository _categoryTextRepository;
-        private readonly IDistributedCache _cache;
         private readonly IConfiguration _config;
-        private readonly IEmediaRepository _emediaRepository;
         private readonly IEmediaCategoryRepository _emediaCategoryRepository;
         private readonly IEmediaGroupRepository _emediaGroupRepository;
+        private readonly IEmediaRepository _emediaRepository;
         private readonly IEmediaTextRepository _emediaTextRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly LanguageService _languageService;
+        private readonly SegmentService _segmentService;
 
         public EmediaService(ILogger<EmediaService> logger,
             IDateTimeProvider dateTimeProvider,
@@ -65,7 +65,7 @@ namespace Ocuda.Promenade.Service
                 ?? throw new ArgumentNullException(nameof(languageService));
         }
 
-        private int? CachePagesInHours
+        private int CachePagesInHours
         {
             get
             {
@@ -93,7 +93,7 @@ namespace Ocuda.Promenade.Service
 
             ICollection<EmediaGroup> groups = null;
 
-            if (CachePagesInHours.HasValue && !forceReload)
+            if (CachePagesInHours > 0 && !forceReload)
             {
                 groups = await GetFromCacheAsync<ICollection<EmediaGroup>>(_cache,
                     Utility.Keys.Cache.PromEmediaGroups);
@@ -110,7 +110,7 @@ namespace Ocuda.Promenade.Service
 
             ICollection<Emedia> emedias = null;
 
-            if (CachePagesInHours.HasValue && !forceReload)
+            if (CachePagesInHours > 0 && !forceReload)
             {
                 emedias = await GetFromCacheAsync<ICollection<Emedia>>(_cache,
                     Utility.Keys.Cache.PromEmedias);
@@ -127,7 +127,7 @@ namespace Ocuda.Promenade.Service
 
             ICollection<Category> categories = null;
 
-            if (CachePagesInHours.HasValue && !forceReload)
+            if (CachePagesInHours > 0 && !forceReload)
             {
                 categories = await GetFromCacheAsync<ICollection<Category>>(_cache,
                     Utility.Keys.Cache.PromCategories);
@@ -160,7 +160,7 @@ namespace Ocuda.Promenade.Service
 
             ICollection<EmediaCategory> emediaCategories = null;
 
-            if (CachePagesInHours.HasValue && !forceReload)
+            if (CachePagesInHours > 0 && !forceReload)
             {
                 emediaCategories = await GetFromCacheAsync<ICollection<EmediaCategory>>(_cache,
                     Utility.Keys.Cache.PromEmediaCategories);
@@ -181,7 +181,6 @@ namespace Ocuda.Promenade.Service
                     .Where(_ => _.GroupId == group.Id)
                     .OrderBy(_ => _.Name)
                     .ToList();
-
 
                 if (group.SegmentId.HasValue && group.Segment == null)
                 {
@@ -221,8 +220,42 @@ namespace Ocuda.Promenade.Service
             return groups;
         }
 
-        private async Task<EmediaText> GetEmediaTextAsync(bool forceReload,
+        private async Task<CategoryText> GetCategoryTextAsync(bool forceReload,
             int languageId,
+            int categoryId)
+        {
+            string cacheKey = string.Format(CultureInfo.InvariantCulture,
+                Utility.Keys.Cache.PromCategoryText,
+                languageId,
+                categoryId);
+
+            CategoryText categoryText = null;
+
+            if (CachePagesInHours > 0 && !forceReload)
+            {
+                categoryText = await GetFromCacheAsync<CategoryText>(_cache, cacheKey);
+            }
+
+            if (categoryText == null)
+            {
+                categoryText = await _categoryTextRepository.GetByIdsAsync(
+                    categoryId,
+                    languageId);
+
+                if (categoryText != null)
+                {
+                    await SaveToCacheAsync(_cache,
+                        cacheKey,
+                        categoryText,
+                        CachePagesInHours);
+                }
+            }
+
+            return categoryText;
+        }
+
+        private async Task<EmediaText> GetEmediaTextAsync(bool forceReload,
+                    int languageId,
             int emediaId)
         {
             string cacheKey = string.Format(CultureInfo.InvariantCulture,
@@ -232,7 +265,7 @@ namespace Ocuda.Promenade.Service
 
             EmediaText emediaText = null;
 
-            if (CachePagesInHours.HasValue && !forceReload)
+            if (CachePagesInHours > 0 && !forceReload)
             {
                 emediaText = await GetFromCacheAsync<EmediaText>(_cache,
                     cacheKey);
@@ -254,40 +287,6 @@ namespace Ocuda.Promenade.Service
             }
 
             return emediaText;
-        }
-
-        private async Task<CategoryText> GetCategoryTextAsync(bool forceReload,
-            int languageId,
-            int categoryId)
-        {
-            string cacheKey = string.Format(CultureInfo.InvariantCulture,
-                Utility.Keys.Cache.PromCategoryText,
-                languageId,
-                categoryId);
-
-            CategoryText categoryText = null;
-
-            if (CachePagesInHours.HasValue && !forceReload)
-            {
-                categoryText = await GetFromCacheAsync<CategoryText>(_cache, cacheKey);
-            }
-
-            if (categoryText == null)
-            {
-                categoryText = await _categoryTextRepository.GetByIdsAsync(
-                    categoryId,
-                    languageId);
-
-                if (categoryText != null)
-                {
-                    await SaveToCacheAsync(_cache,
-                        cacheKey,
-                        categoryText,
-                        CachePagesInHours);
-                }
-            }
-
-            return categoryText;
         }
     }
 }
