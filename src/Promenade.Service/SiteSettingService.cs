@@ -6,23 +6,26 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Promenade.Service.Abstract;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
+using Ocuda.Utility.Abstract;
 
 namespace Ocuda.Promenade.Service
 {
-    public class SiteSettingService
+    public class SiteSettingService : BaseService<SiteSettingService>
     {
         private const string NoValue = "null";
 
-        private readonly ILogger _logger;
+        //private readonly ILogger _logger;
         private readonly IDistributedCache _cache;
         private readonly ISiteSettingRepository _siteSettingRepository;
 
         public SiteSettingService(ILogger<SiteSettingService> logger,
+            IDateTimeProvider dateTimeProvider,
             IDistributedCache cache,
-            ISiteSettingRepository siteSettingRepository)
+            ISiteSettingRepository siteSettingRepository) : base(logger, dateTimeProvider)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            //_logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _cache = cache ?? throw new ArgumentNullException(nameof(logger));
             _siteSettingRepository = siteSettingRepository
                 ?? throw new ArgumentNullException(nameof(siteSettingRepository));
@@ -163,7 +166,7 @@ namespace Ocuda.Promenade.Service
 
             if (!forceReload)
             {
-                setting = await _cache.GetStringAsync(cacheKey);
+                setting = await GetStringFromCache(_cache, cacheKey);
                 if (setting?.Equals(NoValue, StringComparison.OrdinalIgnoreCase) == true)
                 {
                     return null;
@@ -175,16 +178,7 @@ namespace Ocuda.Promenade.Service
                 var siteSetting = await _siteSettingRepository.FindAsync(key)
                     ?? GetDefaultSetting(key);
                 setting = siteSetting?.Value ?? NoValue;
-                _logger.LogDebug("Cache miss for {CacheKey}, caching {Length} characters in {Elapsed} ms",
-                    cacheKey,
-                    setting?.Length,
-                    (Stopwatch.GetTimestamp() - start) * 1000 / (double)Stopwatch.Frequency);
-                await _cache.SetStringAsync(cacheKey,
-                    setting,
-                    new DistributedCacheEntryOptions
-                    {
-                        SlidingExpiration = new TimeSpan(1, 0, 0)
-                    });
+                await SaveToCacheAsync(_cache, cacheKey, setting, null, CacheSlidingExpiration);
             }
             return setting;
         }

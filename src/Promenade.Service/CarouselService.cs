@@ -77,7 +77,7 @@ namespace Ocuda.Promenade.Service
 
             if (cachePagesInHours > 0 && !forceReload)
             {
-                carousel = await GetFromCacheAsync<Carousel>(_cache, carouselCacheKey);
+                carousel = await GetObjectFromCacheAsync<Carousel>(_cache, carouselCacheKey);
             }
 
             if (carousel == null)
@@ -139,7 +139,7 @@ namespace Ocuda.Promenade.Service
 
                     if (cachePagesInHours > 0 && !forceReload)
                     {
-                        carousel.CarouselText = await GetFromCacheAsync<CarouselText>(_cache,
+                        carousel.CarouselText = await GetObjectFromCacheAsync<CarouselText>(_cache,
                             carouselTextCacheKey);
                     }
 
@@ -164,7 +164,7 @@ namespace Ocuda.Promenade.Service
 
                     if (cachePagesInHours > 0 && !forceReload)
                     {
-                        carousel.CarouselText = await GetFromCacheAsync<CarouselText>(_cache,
+                        carousel.CarouselText = await GetObjectFromCacheAsync<CarouselText>(_cache,
                             carouselTextCacheKey);
                     }
 
@@ -236,7 +236,7 @@ namespace Ocuda.Promenade.Service
 
             if (cachePagesInHours > 0 && !forceReload)
             {
-                carouselItem = await GetFromCacheAsync<CarouselItem>(_cache, carouselItemCacheKey);
+                carouselItem = await GetObjectFromCacheAsync<CarouselItem>(_cache, carouselItemCacheKey);
             }
 
             if (carouselItem == null)
@@ -328,7 +328,7 @@ namespace Ocuda.Promenade.Service
 
                 if (cachePagesInHours > 0 && !forceReload)
                 {
-                    labelText = await GetFromCacheAsync<CarouselButtonLabelText>(
+                    labelText = await GetObjectFromCacheAsync<CarouselButtonLabelText>(
                         _cache,
                         carouselButtonLabelTextCacheKey);
                 }
@@ -355,7 +355,7 @@ namespace Ocuda.Promenade.Service
 
                 if (cachePagesInHours > 0 && !forceReload)
                 {
-                    labelText = await GetFromCacheAsync<CarouselButtonLabelText>(
+                    labelText = await GetObjectFromCacheAsync<CarouselButtonLabelText>(
                         _cache,
                         carouselButtonLabelTextCacheKey);
                 }
@@ -392,7 +392,7 @@ namespace Ocuda.Promenade.Service
 
                 if (cachePagesInHours > 0 && !forceReload)
                 {
-                    itemText = await GetFromCacheAsync<CarouselItemText>(
+                    itemText = await GetObjectFromCacheAsync<CarouselItemText>(
                         _cache,
                         carouselItemTextCacheKey);
                 }
@@ -418,7 +418,7 @@ namespace Ocuda.Promenade.Service
 
                 if (cachePagesInHours > 0 && !forceReload)
                 {
-                    itemText = await GetFromCacheAsync<CarouselItemText>(
+                    itemText = await GetObjectFromCacheAsync<CarouselItemText>(
                         _cache,
                         carouselItemTextCacheKey);
                 }

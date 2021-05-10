@@ -72,7 +72,7 @@ namespace Ocuda.Promenade.Service
 
             if (cachePagesInHours > 0 && !forceReload)
             {
-                feature = await GetFromCacheAsync<PageFeature>(_cache, featureCacheKey);
+                feature = await GetObjectFromCacheAsync<PageFeature>(_cache, featureCacheKey);
             }
 
             if (feature == null)
@@ -124,7 +124,7 @@ namespace Ocuda.Promenade.Service
 
                         if (cachePagesInHours > 0 && !forceReload)
                         {
-                            item.PageFeatureItemText = await GetFromCacheAsync<PageFeatureItemText>(
+                            item.PageFeatureItemText = await GetObjectFromCacheAsync<PageFeatureItemText>(
                                 _cache,
                                 featureItemTextCacheKey);
                         }
@@ -150,7 +150,7 @@ namespace Ocuda.Promenade.Service
 
                         if (cachePagesInHours > 0 && !forceReload)
                         {
-                            item.PageFeatureItemText = await GetFromCacheAsync<PageFeatureItemText>(
+                            item.PageFeatureItemText = await GetObjectFromCacheAsync<PageFeatureItemText>(
                                 _cache,
                                 featureItemTextCacheKey);
                         }

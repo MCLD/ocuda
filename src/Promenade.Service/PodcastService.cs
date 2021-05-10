@@ -40,7 +40,7 @@ namespace Ocuda.Promenade.Service
                 stub,
                 showBlocked);
 
-            var podcast = await GetFromCacheAsync<Podcast>(_cache, cacheKey);
+            var podcast = await GetObjectFromCacheAsync<Podcast>(_cache, cacheKey);
 
             if (podcast == null)
             {
@@ -76,7 +76,7 @@ namespace Ocuda.Promenade.Service
                 id,
                 showBlocked);
 
-            var podcastItems = await GetFromCacheAsync<ICollection<PodcastItem>>(_cache, cacheKey);
+            var podcastItems = await GetObjectFromCacheAsync<ICollection<PodcastItem>>(_cache, cacheKey);
 
             if (podcastItems == null)
             {

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
@@ -37,44 +35,19 @@ namespace Ocuda.Promenade.Service
         public async Task<ICollection<ExternalResource>> GetAllAsync(ExternalResourceType? type,
             bool forceReload)
         {
-            long start = Stopwatch.GetTimestamp();
             var cacheKey = Utility.Keys.Cache.PromExternalResources;
             ICollection<ExternalResource> resources = null;
             if (!forceReload)
             {
-                string cachedResources = await _cache.GetStringAsync(cacheKey);
-                if (!string.IsNullOrEmpty(cachedResources))
-                {
-                    try
-                    {
-                        resources = JsonSerializer
-                            .Deserialize<ICollection<ExternalResource>>(cachedResources);
-                    }
-                    catch (JsonException ex)
-                    {
-                        _logger.LogWarning(ex,
-                            "Error deserializing external resources from cache: {ErrorMessage}",
-                            ex.Message);
-                    }
-                }
+                resources = await GetObjectFromCacheAsync<ICollection<ExternalResource>>(_cache,
+                    cacheKey);
             }
 
             if (resources == null)
             {
                 resources = await _externalResourceRepository.GetAllAsync(type);
 
-                string resToCache = JsonSerializer.Serialize(resources);
-
-                await _cache.SetStringAsync(cacheKey,
-                    resToCache,
-                    new DistributedCacheEntryOptions
-                    {
-                        SlidingExpiration = CacheSlidingExpiration
-                    });
-                _logger.LogDebug("Cache miss for {CacheKey}, caching {Length} characters in {Elapsed} ms",
-                    cacheKey,
-                    resToCache.Length,
-                    (Stopwatch.GetTimestamp() - start) * 1000 / (double)Stopwatch.Frequency);
+                await SaveToCacheAsync(_cache, cacheKey, resources, null, CacheSlidingExpiration);
             }
 
             return resources;

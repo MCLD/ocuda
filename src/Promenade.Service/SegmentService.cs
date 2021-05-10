@@ -57,7 +57,7 @@ namespace Ocuda.Promenade.Service
 
             if (cachePagesInHours > 0 && !forceReload)
             {
-                segment = await GetFromCacheAsync<Segment>(_cache, segmentCacheKey);
+                segment = await GetObjectFromCacheAsync<Segment>(_cache, segmentCacheKey);
             }
 
             if (segment == null)
@@ -90,7 +90,7 @@ namespace Ocuda.Promenade.Service
 
                     if (cachePagesInHours > 0 && !forceReload)
                     {
-                        segmentText = await GetFromCacheAsync<SegmentText>(
+                        segmentText = await GetObjectFromCacheAsync<SegmentText>(
                             _cache,
                             segmentTextCacheKey);
                     }
@@ -118,7 +118,7 @@ namespace Ocuda.Promenade.Service
 
                     if (cachePagesInHours > 0 && !forceReload)
                     {
-                        segmentText = await GetFromCacheAsync<SegmentText>(
+                        segmentText = await GetObjectFromCacheAsync<SegmentText>(
                             _cache,
                             segmentTextCacheKey);
                     }

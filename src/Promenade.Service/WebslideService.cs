@@ -68,7 +68,7 @@ namespace Ocuda.Promenade.Service
 
             if (cachePagesInHours > 0 && !forceReload)
             {
-                webslide = await GetFromCacheAsync<Webslide>(_cache, webslideCacheKey);
+                webslide = await GetObjectFromCacheAsync<Webslide>(_cache, webslideCacheKey);
             }
 
             if (webslide == null)
@@ -126,7 +126,7 @@ namespace Ocuda.Promenade.Service
 
                         if (cachePagesInHours > 0 && !forceReload)
                         {
-                            item.WebslideItemText = await GetFromCacheAsync<WebslideItemText>(
+                            item.WebslideItemText = await GetObjectFromCacheAsync<WebslideItemText>(
                                 _cache,
                                 webslideItemTextCacheKey);
                         }
@@ -158,7 +158,7 @@ namespace Ocuda.Promenade.Service
 
                         if (cachePagesInHours > 0 && !forceReload)
                         {
-                            item.WebslideItemText = await GetFromCacheAsync<WebslideItemText>(
+                            item.WebslideItemText = await GetObjectFromCacheAsync<WebslideItemText>(
                                 _cache,
                                 webslideItemTextCacheKey);
                         }

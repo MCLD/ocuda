@@ -53,11 +53,11 @@ namespace Ocuda.Promenade.Service
 
             int languageId = await _languageRepository.GetDefaultLanguageId();
 
-            await SaveIntToCacheAsync(_cache, cacheKey, languageId, TimeSpan.FromHours(12));
-
-            _logger.LogDebug("Cache miss for {CacheKey}, caching {Length} characters",
+            await SaveToCacheAsync(_cache,
                 cacheKey,
-                languageId.ToString(CultureInfo.InvariantCulture));
+                languageId,
+                TimeSpan.FromHours(12),
+                CacheSlidingExpiration);
 
             return languageId;
         }
@@ -85,7 +85,11 @@ namespace Ocuda.Promenade.Service
 
             int languageId = await _languageRepository.GetLanguageId(culture);
 
-            await SaveIntToCacheAsync(_cache, cacheKey, languageId, TimeSpan.FromHours(12));
+            await SaveToCacheAsync(_cache,
+                cacheKey,
+                languageId,
+                TimeSpan.FromHours(12),
+                CacheSlidingExpiration);
 
             return languageId;
         }
@@ -110,10 +114,11 @@ namespace Ocuda.Promenade.Service
 
             if (language != null)
             {
-                await SaveStringToCacheAsync(_cache,
+                await SaveToCacheAsync(_cache,
                     cacheKey,
                     language.Name,
-                    TimeSpan.FromHours(12));
+                    TimeSpan.FromHours(12),
+                    CacheSlidingExpiration);
             }
 
             return language?.Name;
@@ -127,6 +132,8 @@ namespace Ocuda.Promenade.Service
 
             var databaseCultures = await _languageRepository.GetAllAsync();
 
+            _logger.LogDebug("Removing {DefaultLanguageCacheKey} from cache on startup",
+                Utility.Keys.Cache.PromDefaultLanguageId);
             await _cache.RemoveAsync(Utility.Keys.Cache.PromDefaultLanguageId);
 
             foreach (var dbCulture in databaseCultures)
@@ -174,13 +181,19 @@ namespace Ocuda.Promenade.Service
                     }
                 }
 
-                await _cache.RemoveAsync(string.Format(CultureInfo.InvariantCulture,
+                var langNameCacheKey = string.Format(CultureInfo.InvariantCulture,
                     Utility.Keys.Cache.PromLanguageName,
-                    dbCulture.Id));
-
-                await _cache.RemoveAsync(string.Format(CultureInfo.InvariantCulture,
+                    dbCulture.Id);
+                var langIdCacheKey = string.Format(CultureInfo.InvariantCulture,
                     Utility.Keys.Cache.PromLanguageId,
-                    dbCulture.Name));
+                    dbCulture.Name);
+
+                _logger.LogDebug("Removing {LanguageNameCacheKey} and {LanguageIdCacheKey} from cache on startup",
+                    langNameCacheKey,
+                    langIdCacheKey);
+
+                await _cache.RemoveAsync(langNameCacheKey);
+                await _cache.RemoveAsync(langIdCacheKey);
             }
 
             var namesMissingFromDb = siteCultures

@@ -320,7 +320,7 @@ namespace Ocuda.Ops.Service
                 setupId,
                 lang);
             var emailSetupText
-                = await GetFromCacheAsync<EmailSetupText>(_cache, emailSetupCacheKey);
+                = await GetObjectFromCacheAsync<EmailSetupText>(_cache, emailSetupCacheKey);
             var emailSetupFromCache = emailSetupText != null;
 
             if (!emailSetupFromCache)
@@ -362,7 +362,7 @@ namespace Ocuda.Ops.Service
                 emailSetupText.EmailSetup.EmailTemplateId,
                 lang);
             var emailTemplateText
-                = await GetFromCacheAsync<EmailTemplateText>(_cache, emailTemplateCacheKey);
+                = await GetObjectFromCacheAsync<EmailTemplateText>(_cache, emailTemplateCacheKey);
             var emailTemplateFromCache = emailTemplateText != null;
 
             if (!emailTemplateFromCache)

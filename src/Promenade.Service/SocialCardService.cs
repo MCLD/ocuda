@@ -45,7 +45,7 @@ namespace Ocuda.Promenade.Service
 
             if (cachePagesInHours > 0 && !forceReload)
             {
-                card = await GetFromCacheAsync<SocialCard>(_cache, cacheKey);
+                card = await GetObjectFromCacheAsync<SocialCard>(_cache, cacheKey);
             }
 
             if (card == null)

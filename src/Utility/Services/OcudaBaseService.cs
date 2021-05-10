@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
@@ -15,8 +16,34 @@ namespace Ocuda.Utility.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        protected async Task<T> GetFromCacheAsync<T>(IDistributedCache cache, string cacheKey)
-            where T : class
+        protected Task<bool?> GetBoolFromCacheAsync(IDistributedCache cache, string cacheKey)
+        {
+            if (cache == null)
+            {
+                throw new ArgumentNullException(nameof(cache));
+            }
+            if (string.IsNullOrEmpty(cacheKey))
+            {
+                throw new ArgumentNullException(nameof(cacheKey));
+            }
+            return GetBoolFromCacheInternalAsync(cache, cacheKey);
+        }
+
+        protected Task<int?> GetIntFromCacheAsync(IDistributedCache cache, string cacheKey)
+        {
+            if (cache == null)
+            {
+                throw new ArgumentNullException(nameof(cache));
+            }
+            if (string.IsNullOrEmpty(cacheKey))
+            {
+                throw new ArgumentNullException(nameof(cacheKey));
+            }
+            return GetIntFromCacheInternalAsync(cache, cacheKey);
+        }
+
+        protected async Task<T> GetObjectFromCacheAsync<T>(IDistributedCache cache,
+            string cacheKey) where T : class
         {
             var cachedJson = await GetStringFromCache(cache, cacheKey);
 
@@ -41,13 +68,100 @@ namespace Ocuda.Utility.Services
             return null;
         }
 
-        protected async Task<int?> GetIntFromCacheAsync(IDistributedCache cache, string cacheKey)
+        protected Task<string> GetStringFromCache(IDistributedCache cache, string cacheKey)
         {
-            if (cache == null || string.IsNullOrEmpty(cacheKey))
+            if (cache == null)
             {
-                return null;
+                throw new ArgumentNullException(nameof(cache));
             }
+            if (string.IsNullOrEmpty(cacheKey))
+            {
+                throw new ArgumentNullException(nameof(cacheKey));
+            }
+            return GetStringFromCacheInternalAsync(cache, cacheKey);
+        }
 
+        protected async Task SaveToCacheAsync<T>(IDistributedCache cache,
+            string cacheKey,
+            T item,
+            int cacheForHours)
+        {
+            if (cacheForHours > 0)
+            {
+                await SaveToCacheInternalAsync(cache,
+                    cacheKey,
+                    item,
+                    new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(cacheForHours)
+                    });
+            }
+            else
+            {
+                _logger.LogWarning("Refusing to cache item {CacheKey} for less than {CacheForHours} hour(s)",
+                    cacheKey,
+                    cacheForHours);
+            }
+        }
+
+        protected async Task SaveToCacheAsync<T>(IDistributedCache cache,
+            string cacheKey,
+            T item,
+            TimeSpan absoluteExpiration)
+        {
+            await SaveToCacheInternalAsync(cache, cacheKey, item, new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = absoluteExpiration
+            });
+        }
+
+        protected async Task SaveToCacheAsync<T>(IDistributedCache cache,
+                    string cacheKey,
+            T item,
+            TimeSpan? absoluteExpiration,
+            TimeSpan slidingExpiration)
+        {
+            await SaveToCacheInternalAsync(cache, cacheKey, item, new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = absoluteExpiration,
+                SlidingExpiration = slidingExpiration
+            });
+        }
+
+        private static async Task<string> GetStringFromCacheInternalAsync(IDistributedCache cache,
+            string cacheKey)
+        {
+            return await cache.GetStringAsync(cacheKey);
+        }
+
+        private async Task<bool?> GetBoolFromCacheInternalAsync(IDistributedCache cache,
+            string cacheKey)
+        {
+            var cachedValue = await cache.GetAsync(cacheKey);
+
+            if (cachedValue?.Length > 0)
+            {
+                _logger.LogTrace("Cache hit for {CacheKey}", cacheKey);
+
+                try
+                {
+                    return BitConverter.ToBoolean(cachedValue);
+                }
+                catch (ArgumentOutOfRangeException ex)
+                {
+                    _logger.LogWarning(ex,
+                        "Error converting bool with key {CacheKey} from cache: {ErrorMessage}",
+                        cacheKey,
+                        ex.Message);
+                    await cache.RemoveAsync(cacheKey);
+                }
+            }
+            return null;
+        }
+
+        private async Task<int?> GetIntFromCacheInternalAsync(IDistributedCache cache,
+                    string cacheKey)
+        {
             var cachedValue = await cache.GetAsync(cacheKey);
 
             if (cachedValue?.Length > 0)
@@ -70,131 +184,85 @@ namespace Ocuda.Utility.Services
             return null;
         }
 
-        protected async Task<string> GetStringFromCache(IDistributedCache cache, string cacheKey)
-        {
-            if (cache == null || string.IsNullOrEmpty(cacheKey))
-            {
-                return null;
-            }
-
-            return await cache.GetStringAsync(cacheKey);
-        }
-
-        protected async Task SaveIntToCacheAsync(IDistributedCache cache,
-            string cacheKey,
-            int item,
-            TimeSpan expireIn)
-        {
-            await SaveIntToCacheInternalAsync(cache, cacheKey, item, expireIn);
-        }
-
-        protected async Task SaveStringToCacheAsync(IDistributedCache cache,
-            string cacheKey,
-            string item,
-            int cacheForHours)
-        {
-            await SaveStringToCacheAsync(cache,
-                cacheKey,
-                item,
-                TimeSpan.FromHours(cacheForHours));
-        }
-
-        protected async Task SaveStringToCacheAsync(IDistributedCache cache,
-            string cacheKey,
-            string item,
-            TimeSpan expireIn)
-        {
-            await SaveStringToCacheInternalAsync(cache, cacheKey, item, expireIn);
-        }
-
-        protected async Task SaveToCacheAsync<T>(IDistributedCache cache,
+        private Task SaveToCacheInternalAsync<T>(IDistributedCache cache,
             string cacheKey,
             T item,
-            int cacheForHours) where T : class
+            DistributedCacheEntryOptions cacheEntryOptions)
         {
-            if (cacheForHours > 0)
+            if (cache == null)
             {
-                await SaveToCacheAsync<T>(cache,
-                    cacheKey,
-                    item,
-                    TimeSpan.FromHours(cacheForHours));
+                throw new ArgumentNullException(nameof(cache));
             }
+            if (string.IsNullOrEmpty(cacheKey))
+            {
+                throw new ArgumentNullException(nameof(cacheKey));
+            }
+            if (item == null)
+            {
+                _logger.LogError("Ignoring attempt to cache null object with key {CacheKey}", cacheKey);
+                return Task.CompletedTask;
+            }
+            if (cacheEntryOptions == null)
+            {
+                throw new ArgumentNullException(nameof(cacheEntryOptions));
+            }
+            return SaveToCacheInternalExecuteAsync(cache, cacheKey, item, cacheEntryOptions);
         }
 
-        protected async Task SaveToCacheAsync<T>(IDistributedCache cache,
+        private async Task SaveToCacheInternalExecuteAsync<T>(IDistributedCache cache,
             string cacheKey,
             T item,
-            TimeSpan expireIn) where T : class
+            DistributedCacheEntryOptions cacheEntryOptions)
         {
-            if (string.IsNullOrEmpty(cacheKey) || item == null)
+            int length;
+            string description;
+
+            if (item is bool boolValue)
             {
-                return;
+                var bytes = BitConverter.GetBytes(boolValue);
+                await cache.SetAsync(cacheKey, bytes, cacheEntryOptions);
+                description = bytes.ToString();
+                length = bytes.Length;
+            }
+            else if (item is int intValue)
+            {
+                var bytes = BitConverter.GetBytes(intValue);
+                await cache.SetAsync(cacheKey, bytes, cacheEntryOptions);
+                description = "bytes " + BitConverter.ToString(bytes);
+                length = bytes.Length;
+            }
+            else
+            {
+                string cacheValue;
+                if (item is string stringValue)
+                {
+                    cacheValue = stringValue;
+                    description = "string";
+                }
+                else
+                {
+                    cacheValue = JsonSerializer.Serialize(item);
+                    description = typeof(T).Name;
+                }
+                length = cacheValue.Length;
+                await cache.SetStringAsync(cacheKey, cacheValue, cacheEntryOptions);
             }
 
-            string itemJson = JsonSerializer.Serialize(item);
+            string timeSpan
+                = cacheEntryOptions.AbsoluteExpirationRelativeToNow?.ToString()
+                ?? cacheEntryOptions.AbsoluteExpiration?.ToString(CultureInfo.InvariantCulture)
+                ?? "unspecified timespan";
 
-            await cache.SetStringAsync(cacheKey,
-                itemJson,
-                new DistributedCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = expireIn
-                });
+            string timespanExpiration = cacheEntryOptions.SlidingExpiration.HasValue
+                ? cacheEntryOptions.SlidingExpiration.Value + " sliding"
+                : "absolute";
 
-            _logger.LogDebug("Cache miss for {CacheKey}, caching {Type}: {Length} characters for {CacheTimeSpan}",
+            _logger.LogDebug("Cache miss for {CacheKey}: caching {Description} (length {Length}) expires {CacheTimeSpan} ({ExpirationType})",
                 cacheKey,
-                typeof(T),
-                itemJson.Length,
-                expireIn);
-        }
-
-        private async Task SaveIntToCacheInternalAsync(IDistributedCache cache,
-            string cacheKey,
-            int item,
-            TimeSpan expireIn)
-        {
-            if (cache == null || string.IsNullOrEmpty(cacheKey))
-            {
-                return;
-            }
-
-            var bytes = BitConverter.GetBytes(item);
-
-            await cache.SetAsync(cacheKey,
-                BitConverter.GetBytes(item),
-                new DistributedCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = expireIn
-                });
-
-            _logger.LogDebug("Cache miss for {CacheKey}, caching int: {Value} as {Bytes} for {CacheTimeSpan}",
-                cacheKey,
-                item,
-                bytes,
-                expireIn);
-        }
-
-        private async Task SaveStringToCacheInternalAsync(IDistributedCache cache,
-            string cacheKey,
-            string item,
-            TimeSpan expireIn)
-        {
-            if (string.IsNullOrEmpty(cacheKey) || item == null)
-            {
-                return;
-            }
-
-            await cache.SetStringAsync(cacheKey,
-                item,
-                new DistributedCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = expireIn
-                });
-
-            _logger.LogDebug("Cache miss for {CacheKey}, caching {Type}: {Length} characters for {CacheTimeSpan}",
-                cacheKey,
-                "string",
-                item.Length,
-                expireIn);
+                description,
+                length,
+                timeSpan,
+                timespanExpiration);
         }
     }
 }

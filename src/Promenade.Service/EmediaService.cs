@@ -95,7 +95,7 @@ namespace Ocuda.Promenade.Service
 
             if (CachePagesInHours > 0 && !forceReload)
             {
-                groups = await GetFromCacheAsync<ICollection<EmediaGroup>>(_cache,
+                groups = await GetObjectFromCacheAsync<ICollection<EmediaGroup>>(_cache,
                     Utility.Keys.Cache.PromEmediaGroups);
             }
 
@@ -112,7 +112,7 @@ namespace Ocuda.Promenade.Service
 
             if (CachePagesInHours > 0 && !forceReload)
             {
-                emedias = await GetFromCacheAsync<ICollection<Emedia>>(_cache,
+                emedias = await GetObjectFromCacheAsync<ICollection<Emedia>>(_cache,
                     Utility.Keys.Cache.PromEmedias);
             }
 
@@ -129,7 +129,7 @@ namespace Ocuda.Promenade.Service
 
             if (CachePagesInHours > 0 && !forceReload)
             {
-                categories = await GetFromCacheAsync<ICollection<Category>>(_cache,
+                categories = await GetObjectFromCacheAsync<ICollection<Category>>(_cache,
                     Utility.Keys.Cache.PromCategories);
             }
 
@@ -162,7 +162,7 @@ namespace Ocuda.Promenade.Service
 
             if (CachePagesInHours > 0 && !forceReload)
             {
-                emediaCategories = await GetFromCacheAsync<ICollection<EmediaCategory>>(_cache,
+                emediaCategories = await GetObjectFromCacheAsync<ICollection<EmediaCategory>>(_cache,
                     Utility.Keys.Cache.PromEmediaCategories);
             }
 
@@ -233,7 +233,7 @@ namespace Ocuda.Promenade.Service
 
             if (CachePagesInHours > 0 && !forceReload)
             {
-                categoryText = await GetFromCacheAsync<CategoryText>(_cache, cacheKey);
+                categoryText = await GetObjectFromCacheAsync<CategoryText>(_cache, cacheKey);
             }
 
             if (categoryText == null)
@@ -267,7 +267,7 @@ namespace Ocuda.Promenade.Service
 
             if (CachePagesInHours > 0 && !forceReload)
             {
-                emediaText = await GetFromCacheAsync<EmediaText>(_cache,
+                emediaText = await GetObjectFromCacheAsync<EmediaText>(_cache,
                     cacheKey);
             }
 

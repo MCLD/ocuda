@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
@@ -103,8 +102,7 @@ namespace Ocuda.Promenade.Service
                             currentLanguageId,
                             type,
                             fixedStub,
-                            page,
-                            forceReload);
+                            page);
                     }
                 }
             }
@@ -130,8 +128,7 @@ namespace Ocuda.Promenade.Service
                             defaultLanguageId,
                             type,
                             fixedStub,
-                            page,
-                            forceReload);
+                            page);
                     }
                 }
             }
@@ -153,7 +150,7 @@ namespace Ocuda.Promenade.Service
 
             if (cachePagesInHours > 0 && !forceReload)
             {
-                pageHeader = await GetFromCacheAsync<PageHeader>(_cache, headerCacheKey);
+                pageHeader = await GetObjectFromCacheAsync<PageHeader>(_cache, headerCacheKey);
             }
 
             if (pageHeader == null)
@@ -228,7 +225,7 @@ namespace Ocuda.Promenade.Service
 
                         if (cacheSpan.HasValue)
                         {
-                            await SaveIntToCacheAsync(_cache,
+                            await SaveToCacheAsync(_cache,
                                 currentLayoutIdCacheKey,
                                 layoutId.Value,
                                 cacheSpan.Value);
@@ -250,7 +247,7 @@ namespace Ocuda.Promenade.Service
 
             if (cacheSpan.HasValue && !forceReload)
             {
-                pageLayout = await GetFromCacheAsync<PageLayout>(_cache, layoutCacheKey);
+                pageLayout = await GetObjectFromCacheAsync<PageLayout>(_cache, layoutCacheKey);
             }
 
             if (pageLayout == null)
@@ -290,7 +287,7 @@ namespace Ocuda.Promenade.Service
 
                     if (cacheSpan.HasValue && !forceReload)
                     {
-                        pageLayout.PageLayoutText = await GetFromCacheAsync<PageLayoutText>(_cache,
+                        pageLayout.PageLayoutText = await GetObjectFromCacheAsync<PageLayoutText>(_cache,
                             layoutTextCacheKey);
                     }
 
@@ -320,7 +317,7 @@ namespace Ocuda.Promenade.Service
 
                     if (cacheSpan.HasValue && !forceReload)
                     {
-                        pageLayout.PageLayoutText = await GetFromCacheAsync<PageLayoutText>(_cache,
+                        pageLayout.PageLayoutText = await GetObjectFromCacheAsync<PageLayoutText>(_cache,
                             layoutTextCacheKey);
                     }
 
@@ -354,35 +351,14 @@ namespace Ocuda.Promenade.Service
                     type,
                     stub);
 
-            string cachedPage = await _cache.GetStringAsync(cacheKey);
-
-            if (!string.IsNullOrEmpty(cachedPage))
-            {
-                _logger.LogTrace("Cache hit for {CacheKey}", cacheKey);
-
-                try
-                {
-                    return JsonSerializer.Deserialize<Page>(cachedPage);
-                }
-                catch (JsonException ex)
-                {
-                    _logger.LogWarning(ex,
-                        "Error deserializing page {Stub} language {LanguageId} type {PageType} from cache: {ErrorMessage}",
-                        stub,
-                        languageId,
-                        type,
-                        ex.Message);
-                }
-            }
-            return null;
+            return await GetObjectFromCacheAsync<Page>(_cache, cacheKey);
         }
 
         private async Task SavePageToCacheAsync(int cachePagesInHours,
             int languageId,
             PageType type,
             string stub,
-            Page page,
-            bool forceReload)
+            Page page)
         {
             string cacheKey = string.Format(CultureInfo.InvariantCulture,
                     Utility.Keys.Cache.PromPage,
@@ -390,27 +366,7 @@ namespace Ocuda.Promenade.Service
                     type,
                     stub);
 
-            string pageToCache = JsonSerializer.Serialize(page);
-
-            await _cache.SetStringAsync(cacheKey,
-                pageToCache,
-                new DistributedCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(cachePagesInHours)
-                });
-
-            if (forceReload)
-            {
-                _logger.LogDebug("Forced cache reload for {CacheKey}, caching {Length} characters",
-                    cacheKey,
-                    pageToCache.Length);
-            }
-            else
-            {
-                _logger.LogDebug("Cache miss for {CacheKey}, caching {Length} characters",
-                    cacheKey,
-                    pageToCache.Length);
-            }
+            await SaveToCacheAsync(_cache, cacheKey, page, cachePagesInHours);
         }
     }
 }

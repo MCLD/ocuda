@@ -166,7 +166,7 @@ namespace Ocuda.Promenade.Service
 
             if (pageCacheDuration > 0 && !forceReload)
             {
-                subjects = await GetFromCacheAsync<IEnumerable<ScheduleRequestSubject>>(_cache,
+                subjects = await GetObjectFromCacheAsync<IEnumerable<ScheduleRequestSubject>>(_cache,
                     Utility.Keys.Cache.PromScheduleSubjects);
             }
 
