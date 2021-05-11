@@ -463,6 +463,8 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ILocationGroupService, LocationGroupService>();
             services.AddScoped<ILocationFeatureService, LocationFeatureService>();
             services.AddScoped<ILinkService, LinkService>();
+            services.AddScoped<Utility.Services.Interfaces.IOcudaCache,
+                Utility.Services.OcudaCache>();
             services.AddScoped<IPageFeatureService, PageFeatureService>();
             services.AddScoped<IPageService, PageService>();
             services.AddScoped<IPublicFilesService, PublicFilesService>();

@@ -212,13 +212,13 @@ namespace Ocuda.Promenade.Service
                         if (nextUp.HasValue)
                         {
                             var earliestSpan = GetCacheDuration(cacheSpan.Value, nextUp.Value);
-                            if (earliestSpan.HasValue && earliestSpan.Value != cacheSpan.Value)
+                            if (earliestSpan != cacheSpan.Value)
                             {
                                 _logger.LogInformation("Shortening layout id {LayoutId} cache to {CacheForTime}, next layout activates at {StartDate}",
                                     layoutId,
                                     earliestSpan,
                                     nextUp.Value);
-                                cacheSpan = earliestSpan.Value;
+                                cacheSpan = earliestSpan;
                             }
                         }
 

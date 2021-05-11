@@ -54,11 +54,17 @@ namespace Ocuda.Promenade.Service.Abstract
             return TimeSpan.FromHours(duration);
         }
 
-        protected TimeSpan? GetCacheDuration(TimeSpan cacheSpan, DateTime nextItemStart)
+        /// <summary>
+        /// Get an adjusted cache duration for items that have an end date or a replacement item
+        /// </summary>
+        /// <param name="cacheSpan">The default cache span for this type of item</param>
+        /// <param name="nextItemStart">The end date of this item or next item's start date</param>
+        /// <returns>The lower of the two values</returns>
+        protected TimeSpan GetCacheDuration(TimeSpan cacheSpan, DateTime nextItemStart)
         {
-            if (cacheSpan.TotalSeconds < 60 || nextItemStart == default)
+            if (nextItemStart == default)
             {
-                return null;
+                return cacheSpan;
             }
 
             var nextUpIn = nextItemStart - _dateTimeProvider.Now;
