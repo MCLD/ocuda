@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ocuda.i18n;
@@ -11,18 +10,19 @@ using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Abstract;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Service
 {
     public class LanguageService : BaseService<LanguageService>
     {
-        private readonly IDistributedCache _cache;
+        private readonly IOcudaCache _cache;
         private readonly IOptions<RequestLocalizationOptions> _l10nOptions;
         private readonly ILanguageRepository _languageRepository;
 
         public LanguageService(ILogger<LanguageService> logger,
             IDateTimeProvider dateTimeProvider,
-            IDistributedCache cache,
+            IOcudaCache cache,
             IOptions<RequestLocalizationOptions> l10nOptions,
             ILanguageRepository languageRepository)
             : base(logger, dateTimeProvider)
@@ -44,7 +44,7 @@ namespace Ocuda.Promenade.Service
 
             if (!forceReload)
             {
-                var cachedLanguageId = await GetIntFromCacheAsync(_cache, cacheKey);
+                var cachedLanguageId = await _cache.GetIntFromCacheAsync( cacheKey);
                 if (cachedLanguageId.HasValue)
                 {
                     return cachedLanguageId.Value;
@@ -53,8 +53,7 @@ namespace Ocuda.Promenade.Service
 
             int languageId = await _languageRepository.GetDefaultLanguageId();
 
-            await SaveToCacheAsync(_cache,
-                cacheKey,
+            await _cache.SaveToCacheAsync(cacheKey,
                 languageId,
                 TimeSpan.FromHours(12),
                 CacheSlidingExpiration);
@@ -75,7 +74,7 @@ namespace Ocuda.Promenade.Service
 
             if (!forceReload)
             {
-                var cachedLanguageId = await GetIntFromCacheAsync(_cache, cacheKey);
+                var cachedLanguageId = await _cache.GetIntFromCacheAsync( cacheKey);
 
                 if (cachedLanguageId.HasValue)
                 {
@@ -85,8 +84,7 @@ namespace Ocuda.Promenade.Service
 
             int languageId = await _languageRepository.GetLanguageId(culture);
 
-            await SaveToCacheAsync(_cache,
-                cacheKey,
+            await _cache.SaveToCacheAsync(cacheKey,
                 languageId,
                 TimeSpan.FromHours(12),
                 CacheSlidingExpiration);
@@ -102,7 +100,7 @@ namespace Ocuda.Promenade.Service
 
             if (!forceReload)
             {
-                var cachedLanguageName = await GetStringFromCache(_cache, cacheKey);
+                var cachedLanguageName = await _cache.GetStringFromCache( cacheKey);
 
                 if (!string.IsNullOrEmpty(cachedLanguageName))
                 {
@@ -114,8 +112,7 @@ namespace Ocuda.Promenade.Service
 
             if (language != null)
             {
-                await SaveToCacheAsync(_cache,
-                    cacheKey,
+                await _cache.SaveToCacheAsync(cacheKey,
                     language.Name,
                     TimeSpan.FromHours(12),
                     CacheSlidingExpiration);

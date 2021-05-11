@@ -3,25 +3,25 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Abstract;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Service
 {
     public class NavigationService : BaseService<NavigationService>
     {
-        private readonly IDistributedCache _cache;
+        private readonly IOcudaCache _cache;
         private readonly LanguageService _languageService;
         private readonly INavigationRepository _navigationRepository;
         private readonly INavigationTextRepository _navigationTextRepository;
 
         public NavigationService(ILogger<NavigationService> logger,
             IDateTimeProvider dateTimeProvider,
-            IDistributedCache cache,
+            IOcudaCache cache,
             LanguageService languageService,
             INavigationRepository navigationRepository,
             INavigationTextRepository navigationTextRepository) : base(logger, dateTimeProvider)
@@ -54,7 +54,7 @@ namespace Ocuda.Promenade.Service
 
             if (!forceReload)
             {
-                nav = await GetObjectFromCacheAsync<Navigation>(_cache, cacheKey);
+                nav = await _cache.GetObjectFromCacheAsync<Navigation>(cacheKey);
             }
 
             if (nav == null)
@@ -67,7 +67,7 @@ namespace Ocuda.Promenade.Service
                 }
                 nav.Navigations = await GetNavigationChildren(navigationId, defaultLanguageId);
 
-                await SaveToCacheAsync(_cache, cacheKey, nav, null, CacheSlidingExpiration);
+                await _cache.SaveToCacheAsync(cacheKey, nav, null, CacheSlidingExpiration);
             }
 
             return nav;

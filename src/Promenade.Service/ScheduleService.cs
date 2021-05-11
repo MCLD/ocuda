@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Abstract;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Service
 {
@@ -18,7 +18,7 @@ namespace Ocuda.Promenade.Service
         private const int HoursInADay = 24;
         private const int SuggestedTimesTake = 3;
 
-        private readonly IDistributedCache _cache;
+        private readonly IOcudaCache _cache;
         private readonly IConfiguration _config;
         private readonly IScheduleRequestLimitRepository _scheduleRequestLimitRepository;
         private readonly IScheduleRequestRepository _scheduleRequestRepository;
@@ -28,7 +28,7 @@ namespace Ocuda.Promenade.Service
         public ScheduleService(ILogger<ScheduleService> logger,
             IDateTimeProvider dateTimeProvider,
             IConfiguration config,
-            IDistributedCache cache,
+            IOcudaCache cache,
             IScheduleRequestRepository scheduleRequestRepository,
             IScheduleRequestLimitRepository scheduleRequestLimitRepository,
             IScheduleRequestSubjectRepository scheduleRequestSubjectRepository,
@@ -166,15 +166,15 @@ namespace Ocuda.Promenade.Service
 
             if (pageCacheDuration > 0 && !forceReload)
             {
-                subjects = await GetObjectFromCacheAsync<IEnumerable<ScheduleRequestSubject>>(_cache,
-                    Utility.Keys.Cache.PromScheduleSubjects);
+                subjects = await _cache
+                    .GetObjectFromCacheAsync<IEnumerable<ScheduleRequestSubject>>(
+                        Utility.Keys.Cache.PromScheduleSubjects);
             }
 
             if (subjects?.Any() != true)
             {
                 subjects = await _scheduleRequestSubjectRepository.GetAllAsync();
-                await SaveToCacheAsync(_cache,
-                    Utility.Keys.Cache.PromScheduleSubjects,
+                await _cache.SaveToCacheAsync(Utility.Keys.Cache.PromScheduleSubjects,
                     subjects,
                     pageCacheDuration);
             }

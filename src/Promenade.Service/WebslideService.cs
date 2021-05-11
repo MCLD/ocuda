@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
@@ -20,7 +19,7 @@ namespace Ocuda.Promenade.Service
         private const string ImagesFilePath = "images";
         private const string WebslidesFilePath = "slides";
 
-        private readonly IDistributedCache _cache;
+        private readonly IOcudaCache _cache;
         private readonly IConfiguration _config;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly LanguageService _languageService;
@@ -31,7 +30,7 @@ namespace Ocuda.Promenade.Service
 
         public WebslideService(ILogger<WebslideService> logger,
             IDateTimeProvider dateTimeProvider,
-            IDistributedCache cache,
+            IOcudaCache cache,
             IConfiguration config,
             IHttpContextAccessor httpContextAccessor,
             IPathResolverService pathResolver,
@@ -68,7 +67,7 @@ namespace Ocuda.Promenade.Service
 
             if (cachePagesInHours > 0 && !forceReload)
             {
-                webslide = await GetObjectFromCacheAsync<Webslide>(_cache, webslideCacheKey);
+                webslide = await _cache.GetObjectFromCacheAsync<Webslide>( webslideCacheKey);
             }
 
             if (webslide == null)
@@ -86,8 +85,7 @@ namespace Ocuda.Promenade.Service
                     }
                 }
 
-                await SaveToCacheAsync(_cache,
-                    webslideCacheKey,
+                await _cache.SaveToCacheAsync(webslideCacheKey,
                     webslide,
                     cachePagesInHours);
             }
@@ -119,16 +117,15 @@ namespace Ocuda.Promenade.Service
                 {
                     if (currentLanguageId.HasValue)
                     {
-                        var webslideItemTextCacheKey = string.Format(CultureInfo.InvariantCulture,
+                        var itemTextCacheKey = string.Format(CultureInfo.InvariantCulture,
                         Utility.Keys.Cache.PromWebslideItemText,
                         currentLanguageId,
                         item.Id);
 
                         if (cachePagesInHours > 0 && !forceReload)
                         {
-                            item.WebslideItemText = await GetObjectFromCacheAsync<WebslideItemText>(
-                                _cache,
-                                webslideItemTextCacheKey);
+                            item.WebslideItemText = await _cache
+                                .GetObjectFromCacheAsync<WebslideItemText>(itemTextCacheKey);
                         }
 
                         if (item.WebslideItemText == null)
@@ -142,8 +139,7 @@ namespace Ocuda.Promenade.Service
                                     WebslidesFilePath,
                                     item.WebslideItemText.Filename);
 
-                            await SaveToCacheAsync(_cache,
-                                webslideItemTextCacheKey,
+                            await _cache.SaveToCacheAsync(itemTextCacheKey,
                                 item.WebslideItemText,
                                 cachePagesInHours);
                         }
@@ -151,16 +147,15 @@ namespace Ocuda.Promenade.Service
 
                     if (item.WebslideItemText == null)
                     {
-                        var webslideItemTextCacheKey = string.Format(CultureInfo.InvariantCulture,
+                        var itemTextCacheKey = string.Format(CultureInfo.InvariantCulture,
                             Utility.Keys.Cache.PromWebslideItemText,
                             defaultLanguageId,
                             item.Id);
 
                         if (cachePagesInHours > 0 && !forceReload)
                         {
-                            item.WebslideItemText = await GetObjectFromCacheAsync<WebslideItemText>(
-                                _cache,
-                                webslideItemTextCacheKey);
+                            item.WebslideItemText = await _cache
+                                .GetObjectFromCacheAsync<WebslideItemText>(itemTextCacheKey);
                         }
 
                         if (item.WebslideItemText == null)
@@ -174,8 +169,7 @@ namespace Ocuda.Promenade.Service
                                     WebslidesFilePath,
                                     item.WebslideItemText.Filename);
 
-                            await SaveToCacheAsync(_cache,
-                                webslideItemTextCacheKey,
+                            await _cache.SaveToCacheAsync(itemTextCacheKey,
                                 item.WebslideItemText,
                                 cachePagesInHours);
                         }

@@ -1,24 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Abstract;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Models;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Service
 {
     public class ExternalResourceService : BaseService<ExternalResourceService>
     {
-        private readonly IDistributedCache _cache;
+        private readonly IOcudaCache _cache;
         private readonly IExternalResourceRepository _externalResourceRepository;
 
         public ExternalResourceService(ILogger<ExternalResourceService> logger,
             IDateTimeProvider dateTimeProvider,
-            IDistributedCache cache,
+            IOcudaCache cache,
             IExternalResourceRepository externalResourceRepository)
             : base(logger, dateTimeProvider)
         {
@@ -39,15 +39,15 @@ namespace Ocuda.Promenade.Service
             ICollection<ExternalResource> resources = null;
             if (!forceReload)
             {
-                resources = await GetObjectFromCacheAsync<ICollection<ExternalResource>>(_cache,
-                    cacheKey);
+                resources = await _cache
+                    .GetObjectFromCacheAsync<ICollection<ExternalResource>>(cacheKey);
             }
 
             if (resources == null)
             {
                 resources = await _externalResourceRepository.GetAllAsync(type);
 
-                await SaveToCacheAsync(_cache, cacheKey, resources, null, CacheSlidingExpiration);
+                await _cache.SaveToCacheAsync(cacheKey, resources, null, CacheSlidingExpiration);
             }
 
             return resources;

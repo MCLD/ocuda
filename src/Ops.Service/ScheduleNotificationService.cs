@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
@@ -12,6 +11,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Email;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Ops.Service
 {
@@ -20,7 +20,7 @@ namespace Ocuda.Ops.Service
     {
         private const int CacheEmailHours = 1;
         private const string DefaultLanguage = "en-US";
-        private readonly IDistributedCache _cache;
+        private readonly IOcudaCache _cache;
         private readonly IEmailService _emailService;
         private readonly IScheduleLogRepository _scheduleLogRepository;
         private readonly IScheduleRequestService _scheduleRequestService;
@@ -28,7 +28,7 @@ namespace Ocuda.Ops.Service
 
         public ScheduleNotificationService(ILogger<ScheduleNotificationService> logger,
             IHttpContextAccessor httpContextAccessor,
-            IDistributedCache cache,
+            IOcudaCache cache,
             IEmailService emailService,
             IScheduleLogRepository scheduleLogRepsitory,
             IScheduleRequestService scheduleRequestService,
@@ -320,7 +320,7 @@ namespace Ocuda.Ops.Service
                 setupId,
                 lang);
             var emailSetupText
-                = await GetObjectFromCacheAsync<EmailSetupText>(_cache, emailSetupCacheKey);
+                = await _cache.GetObjectFromCacheAsync<EmailSetupText>(emailSetupCacheKey);
             var emailSetupFromCache = emailSetupText != null;
 
             if (!emailSetupFromCache)
@@ -344,8 +344,7 @@ namespace Ocuda.Ops.Service
                     throw new OcudaException($"Missing email setup ID {setupId}");
                 }
 
-                await SaveToCacheAsync(_cache,
-                    emailSetupCacheKey,
+                await _cache.SaveToCacheAsync(emailSetupCacheKey,
                     emailSetupText,
                     CacheEmailHours);
             }
@@ -362,7 +361,7 @@ namespace Ocuda.Ops.Service
                 emailSetupText.EmailSetup.EmailTemplateId,
                 lang);
             var emailTemplateText
-                = await GetObjectFromCacheAsync<EmailTemplateText>(_cache, emailTemplateCacheKey);
+                = await _cache.GetObjectFromCacheAsync<EmailTemplateText>(emailTemplateCacheKey);
             var emailTemplateFromCache = emailTemplateText != null;
 
             if (!emailTemplateFromCache)
@@ -389,8 +388,7 @@ namespace Ocuda.Ops.Service
                     throw new OcudaException($"Missing email template ID {emailSetupText.EmailSetup.EmailTemplateId}");
                 }
 
-                await SaveToCacheAsync(_cache,
-                    emailTemplateCacheKey,
+                await _cache.SaveToCacheAsync(emailTemplateCacheKey,
                     emailTemplateText,
                     CacheEmailHours);
             }

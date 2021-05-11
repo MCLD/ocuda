@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
@@ -20,7 +19,7 @@ namespace Ocuda.Promenade.Service
         private const string ImagesFilePath = "images";
         private const string PageFeaturesFilePath = "PageFeatures";
 
-        private readonly IDistributedCache _cache;
+        private readonly IOcudaCache _cache;
         private readonly IConfiguration _config;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly LanguageService _languageService;
@@ -32,7 +31,7 @@ namespace Ocuda.Promenade.Service
 
         public PageFeatureService(ILogger<PageFeatureService> logger,
             IDateTimeProvider dateTimeProvider,
-            IDistributedCache cache,
+            IOcudaCache cache,
             IConfiguration config,
             IHttpContextAccessor httpContextAccessor,
             IPathResolverService pathResolver,
@@ -72,7 +71,7 @@ namespace Ocuda.Promenade.Service
 
             if (cachePagesInHours > 0 && !forceReload)
             {
-                feature = await GetObjectFromCacheAsync<PageFeature>(_cache, featureCacheKey);
+                feature = await _cache.GetObjectFromCacheAsync<PageFeature>(featureCacheKey);
             }
 
             if (feature == null)
@@ -90,7 +89,7 @@ namespace Ocuda.Promenade.Service
                     }
                 }
 
-                await SaveToCacheAsync(_cache, featureCacheKey, feature, cachePagesInHours);
+                await _cache.SaveToCacheAsync(featureCacheKey, feature, cachePagesInHours);
             }
 
             if (feature != null)
@@ -124,8 +123,7 @@ namespace Ocuda.Promenade.Service
 
                         if (cachePagesInHours > 0 && !forceReload)
                         {
-                            item.PageFeatureItemText = await GetObjectFromCacheAsync<PageFeatureItemText>(
-                                _cache,
+                            item.PageFeatureItemText = await _cache.GetObjectFromCacheAsync<PageFeatureItemText>(
                                 featureItemTextCacheKey);
                         }
 
@@ -134,8 +132,7 @@ namespace Ocuda.Promenade.Service
                             item.PageFeatureItemText = await _pageFeatureItemTextRepository
                                 .GetByIdsAsync(item.Id, currentLanguageId.Value);
 
-                            await SaveToCacheAsync(_cache,
-                                featureItemTextCacheKey,
+                            await _cache.SaveToCacheAsync(featureItemTextCacheKey,
                                 item.PageFeatureItemText,
                                 cachePagesInHours);
                         }
@@ -150,8 +147,7 @@ namespace Ocuda.Promenade.Service
 
                         if (cachePagesInHours > 0 && !forceReload)
                         {
-                            item.PageFeatureItemText = await GetObjectFromCacheAsync<PageFeatureItemText>(
-                                _cache,
+                            item.PageFeatureItemText = await _cache.GetObjectFromCacheAsync<PageFeatureItemText>(
                                 featureItemTextCacheKey);
                         }
 
@@ -160,8 +156,7 @@ namespace Ocuda.Promenade.Service
                             item.PageFeatureItemText = await _pageFeatureItemTextRepository
                                 .GetByIdsAsync(item.Id, defaultLanguageId);
 
-                            await SaveToCacheAsync(_cache,
-                                featureItemTextCacheKey,
+                            await _cache.SaveToCacheAsync(featureItemTextCacheKey,
                                 item.PageFeatureItemText,
                                 cachePagesInHours);
                         }

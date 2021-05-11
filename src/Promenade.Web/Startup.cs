@@ -46,8 +46,108 @@ namespace Ocuda.Promenade.Web
             _isDevelopment = env.IsDevelopment();
         }
 
+        public void Configure(IApplicationBuilder app,
+            Utility.Services.Interfaces.IPathResolverService pathResolver)
+        {
+            if (app == null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
+
+            if (pathResolver == null)
+            {
+                throw new ArgumentNullException(nameof(pathResolver));
+            }
+
+            app.UseResponseCompression();
+
+            if (!string.IsNullOrEmpty(_config[Configuration.OcudaProxyAddress]))
+            {
+                app.UseForwardedHeaders(new ForwardedHeadersOptions
+                {
+                    ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.All,
+                    RequireHeaderSymmetry = false,
+                    ForwardLimit = null,
+                    KnownProxies = {
+                        System.Net.IPAddress.Parse(_config[Configuration.OcudaProxyAddress])
+                    }
+                });
+            }
+
+            // configure error page handling and development IDE linking
+            if (_isDevelopment)
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseBrowserLink();
+            }
+            else
+            {
+                app.UseStatusCodePagesWithReExecute("/Error/{0}");
+            }
+
+            var requestLocalizationOptions = new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture(Culture.DefaultCulture),
+                SupportedCultures = Culture.SupportedCultures,
+                SupportedUICultures = Culture.SupportedCultures
+            };
+
+            app.UseRequestLocalization(requestLocalizationOptions);
+
+            // insert remote address into the log context for each request
+            app.Use(async (context, next) =>
+            {
+                using (LogContext.PushProperty(Utility.Logging.Enrichment.RemoteAddress,
+                    context.Connection.RemoteIpAddress))
+                using (LogContext.PushProperty(HeaderNames.UserAgent,
+                    context.Request.Headers[HeaderNames.UserAgent].ToString()))
+                using (LogContext.PushProperty(HeaderNames.Referer,
+                    context.Request.Headers[HeaderNames.Referer].ToString()))
+                {
+                    await next.Invoke();
+                }
+            });
+
+            app.UseStaticFiles();
+
+            // configure shared content directory
+            var contentFilePath = pathResolver.GetPublicContentFilePath();
+            var contentUrl = pathResolver.GetPublicContentUrl();
+            if (!contentUrl.StartsWith("/", StringComparison.OrdinalIgnoreCase))
+            {
+                contentUrl = $"/{contentUrl}";
+            }
+
+            // https://github.com/aspnet/AspNetCore/issues/2442
+            var extensionContentTypeProvider = new FileExtensionContentTypeProvider();
+            extensionContentTypeProvider.Mappings[".webmanifest"] = "application/manifest+json";
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider
+                    = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(contentFilePath),
+                RequestPath = new PathString(contentUrl),
+                ContentTypeProvider = extensionContentTypeProvider
+            });
+
+            if (!string.IsNullOrEmpty(_config[Configuration.PromenadeRequestLogging]))
+            {
+                app.UseSerilogRequestLogging();
+            }
+
+            app.UseRouting();
+
+            app.UseSession();
+
+            app.UseEndpoints(_ =>
+            {
+                _.MapControllers();
+                _.MapHealthChecks("/health");
+            });
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability",
-            "CA1506:Avoid excessive class coupling",
+                    "CA1506:Avoid excessive class coupling",
             Justification = "Dependency injection")]
         public void ConfigureServices(IServiceCollection services)
         {
@@ -223,6 +323,8 @@ namespace Ocuda.Promenade.Web
             // utilities
             services.AddScoped<CultureContextProvider>();
             services.AddScoped<IDateTimeProvider, CurrentDateTimeProvider>();
+            services.AddScoped<Utility.Services.Interfaces.IOcudaCache,
+                Utility.Services.OcudaCache>();
 
             // filters
             services.AddScoped<i18n.Filter.LocalizationFilterAttribute>();
@@ -346,106 +448,6 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<SiteSettingService>();
             services.AddScoped<SocialCardService>();
             services.AddScoped<WebslideService>();
-        }
-
-        public void Configure(IApplicationBuilder app,
-            Utility.Services.Interfaces.IPathResolverService pathResolver)
-        {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-
-            if (pathResolver == null)
-            {
-                throw new ArgumentNullException(nameof(pathResolver));
-            }
-
-            app.UseResponseCompression();
-
-            if (!string.IsNullOrEmpty(_config[Configuration.OcudaProxyAddress]))
-            {
-                app.UseForwardedHeaders(new ForwardedHeadersOptions
-                {
-                    ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.All,
-                    RequireHeaderSymmetry = false,
-                    ForwardLimit = null,
-                    KnownProxies = {
-                        System.Net.IPAddress.Parse(_config[Configuration.OcudaProxyAddress])
-                    }
-                });
-            }
-
-            // configure error page handling and development IDE linking
-            if (_isDevelopment)
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
-            }
-            else
-            {
-                app.UseStatusCodePagesWithReExecute("/Error/{0}");
-            }
-
-            var requestLocalizationOptions = new RequestLocalizationOptions
-            {
-                DefaultRequestCulture = new RequestCulture(Culture.DefaultCulture),
-                SupportedCultures = Culture.SupportedCultures,
-                SupportedUICultures = Culture.SupportedCultures
-            };
-
-            app.UseRequestLocalization(requestLocalizationOptions);
-
-            // insert remote address into the log context for each request
-            app.Use(async (context, next) =>
-            {
-                using (LogContext.PushProperty(Utility.Logging.Enrichment.RemoteAddress,
-                    context.Connection.RemoteIpAddress))
-                using (LogContext.PushProperty(HeaderNames.UserAgent,
-                    context.Request.Headers[HeaderNames.UserAgent].ToString()))
-                using (LogContext.PushProperty(HeaderNames.Referer,
-                    context.Request.Headers[HeaderNames.Referer].ToString()))
-                {
-                    await next.Invoke();
-                }
-            });
-
-            app.UseStaticFiles();
-
-            // configure shared content directory
-            var contentFilePath = pathResolver.GetPublicContentFilePath();
-            var contentUrl = pathResolver.GetPublicContentUrl();
-            if (!contentUrl.StartsWith("/", StringComparison.OrdinalIgnoreCase))
-            {
-                contentUrl = $"/{contentUrl}";
-            }
-
-            // https://github.com/aspnet/AspNetCore/issues/2442
-            var extensionContentTypeProvider = new FileExtensionContentTypeProvider();
-            extensionContentTypeProvider.Mappings[".webmanifest"] = "application/manifest+json";
-
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider
-                    = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(contentFilePath),
-                RequestPath = new PathString(contentUrl),
-                ContentTypeProvider = extensionContentTypeProvider
-            });
-
-            if (!string.IsNullOrEmpty(_config[Configuration.PromenadeRequestLogging]))
-            {
-                app.UseSerilogRequestLogging();
-            }
-
-            app.UseRouting();
-
-            app.UseSession();
-
-            app.UseEndpoints(_ =>
-            {
-                _.MapControllers();
-                _.MapHealthChecks("/health");
-            });
         }
     }
 }

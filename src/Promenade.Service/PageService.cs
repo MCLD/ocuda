@@ -4,19 +4,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Abstract;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Service
 {
     public class PageService : BaseService<PageService>
     {
-        private readonly IDistributedCache _cache;
+        private readonly IOcudaCache _cache;
         private readonly IConfiguration _config;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly LanguageService _languageService;
@@ -28,7 +28,7 @@ namespace Ocuda.Promenade.Service
         public PageService(ILogger<PageService> logger,
             IConfiguration config,
             IDateTimeProvider dateTimeProvider,
-            IDistributedCache cache,
+            IOcudaCache cache,
             IHttpContextAccessor httpContextAccessor,
             IPageHeaderRepository pageHeaderRepository,
             IPageLayoutRepository pageLayoutRepository,
@@ -150,7 +150,7 @@ namespace Ocuda.Promenade.Service
 
             if (cachePagesInHours > 0 && !forceReload)
             {
-                pageHeader = await GetObjectFromCacheAsync<PageHeader>(_cache, headerCacheKey);
+                pageHeader = await _cache.GetObjectFromCacheAsync<PageHeader>(headerCacheKey);
             }
 
             if (pageHeader == null)
@@ -159,8 +159,7 @@ namespace Ocuda.Promenade.Service
 
                 if (cachePagesInHours > 0 && pageHeader != null)
                 {
-                    await SaveToCacheAsync(_cache,
-                        headerCacheKey,
+                    await _cache.SaveToCacheAsync(headerCacheKey,
                         pageHeader,
                         cachePagesInHours);
                 }
@@ -199,7 +198,7 @@ namespace Ocuda.Promenade.Service
 
                 if (cacheSpan.HasValue && !forceReload)
                 {
-                    layoutId = await GetIntFromCacheAsync(_cache, currentLayoutIdCacheKey);
+                    layoutId = await _cache.GetIntFromCacheAsync(currentLayoutIdCacheKey);
                 }
 
                 if (!layoutId.HasValue)
@@ -225,8 +224,7 @@ namespace Ocuda.Promenade.Service
 
                         if (cacheSpan.HasValue)
                         {
-                            await SaveToCacheAsync(_cache,
-                                currentLayoutIdCacheKey,
+                            await _cache.SaveToCacheAsync(currentLayoutIdCacheKey,
                                 layoutId.Value,
                                 cacheSpan.Value);
                         }
@@ -247,7 +245,7 @@ namespace Ocuda.Promenade.Service
 
             if (cacheSpan.HasValue && !forceReload)
             {
-                pageLayout = await GetObjectFromCacheAsync<PageLayout>(_cache, layoutCacheKey);
+                pageLayout = await _cache.GetObjectFromCacheAsync<PageLayout>(layoutCacheKey);
             }
 
             if (pageLayout == null)
@@ -262,7 +260,7 @@ namespace Ocuda.Promenade.Service
                     }
                 }
 
-                await SaveToCacheAsync(_cache, layoutCacheKey, pageLayout, cacheSpan.Value);
+                await _cache.SaveToCacheAsync(layoutCacheKey, pageLayout, cacheSpan.Value);
             }
 
             if (pageLayout != null)
@@ -287,8 +285,8 @@ namespace Ocuda.Promenade.Service
 
                     if (cacheSpan.HasValue && !forceReload)
                     {
-                        pageLayout.PageLayoutText = await GetObjectFromCacheAsync<PageLayoutText>(_cache,
-                            layoutTextCacheKey);
+                        pageLayout.PageLayoutText = await _cache
+                            .GetObjectFromCacheAsync<PageLayoutText>(layoutTextCacheKey);
                     }
 
                     if (pageLayout.PageLayoutText == null)
@@ -298,8 +296,7 @@ namespace Ocuda.Promenade.Service
 
                         if (cacheSpan.HasValue)
                         {
-                            await SaveToCacheAsync(_cache,
-                                layoutTextCacheKey,
+                            await _cache.SaveToCacheAsync(layoutTextCacheKey,
                                 pageLayout.PageLayoutText,
                                 cacheSpan.Value);
                         }
@@ -317,8 +314,8 @@ namespace Ocuda.Promenade.Service
 
                     if (cacheSpan.HasValue && !forceReload)
                     {
-                        pageLayout.PageLayoutText = await GetObjectFromCacheAsync<PageLayoutText>(_cache,
-                            layoutTextCacheKey);
+                        pageLayout.PageLayoutText = await _cache
+                            .GetObjectFromCacheAsync<PageLayoutText>(layoutTextCacheKey);
                     }
 
                     if (pageLayout.PageLayoutText == null)
@@ -328,8 +325,7 @@ namespace Ocuda.Promenade.Service
 
                         if (cacheSpan.HasValue)
                         {
-                            await SaveToCacheAsync(_cache,
-                                layoutTextCacheKey,
+                            await _cache.SaveToCacheAsync(layoutTextCacheKey,
                                 pageLayout.PageLayoutText,
                                 cacheSpan.Value);
                         }
@@ -351,7 +347,7 @@ namespace Ocuda.Promenade.Service
                     type,
                     stub);
 
-            return await GetObjectFromCacheAsync<Page>(_cache, cacheKey);
+            return await _cache.GetObjectFromCacheAsync<Page>(cacheKey);
         }
 
         private async Task SavePageToCacheAsync(int cachePagesInHours,
@@ -366,7 +362,7 @@ namespace Ocuda.Promenade.Service
                     type,
                     stub);
 
-            await SaveToCacheAsync(_cache, cacheKey, page, cachePagesInHours);
+            await _cache.SaveToCacheAsync(cacheKey, page, cachePagesInHours);
         }
     }
 }

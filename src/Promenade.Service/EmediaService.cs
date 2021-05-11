@@ -5,19 +5,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Abstract;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Service
 {
     public class EmediaService : BaseService<EmediaService>
     {
-        private readonly IDistributedCache _cache;
+        private readonly IOcudaCache _cache;
         private readonly ICategoryRepository _categoryRepository;
         private readonly ICategoryTextRepository _categoryTextRepository;
         private readonly IConfiguration _config;
@@ -36,7 +36,7 @@ namespace Ocuda.Promenade.Service
             ICategoryRepository categoryRepository,
             ICategoryTextRepository categoryTextRepository,
             IConfiguration config,
-            IDistributedCache cache,
+            IOcudaCache cache,
             IEmediaRepository emediaRepository,
             IEmediaCategoryRepository emediaCategoryRepository,
             IEmediaGroupRepository emediaGroupRepository,
@@ -95,15 +95,14 @@ namespace Ocuda.Promenade.Service
 
             if (CachePagesInHours > 0 && !forceReload)
             {
-                groups = await GetObjectFromCacheAsync<ICollection<EmediaGroup>>(_cache,
+                groups = await _cache.GetObjectFromCacheAsync<ICollection<EmediaGroup>>(
                     Utility.Keys.Cache.PromEmediaGroups);
             }
 
             if (groups == null || groups.Count == 0)
             {
                 groups = await _emediaGroupRepository.GetAllAsync();
-                await SaveToCacheAsync(_cache,
-                    Utility.Keys.Cache.PromEmediaGroups,
+                await _cache.SaveToCacheAsync(Utility.Keys.Cache.PromEmediaGroups,
                     groups,
                     CachePagesInHours);
             }
@@ -112,15 +111,14 @@ namespace Ocuda.Promenade.Service
 
             if (CachePagesInHours > 0 && !forceReload)
             {
-                emedias = await GetObjectFromCacheAsync<ICollection<Emedia>>(_cache,
+                emedias = await _cache.GetObjectFromCacheAsync<ICollection<Emedia>>(
                     Utility.Keys.Cache.PromEmedias);
             }
 
             if (emedias == null || emedias.Count == 0)
             {
                 emedias = await _emediaRepository.GetAllAsync();
-                await SaveToCacheAsync(_cache,
-                    Utility.Keys.Cache.PromEmedias,
+                await _cache.SaveToCacheAsync(Utility.Keys.Cache.PromEmedias,
                     emedias,
                     CachePagesInHours);
             }
@@ -129,15 +127,14 @@ namespace Ocuda.Promenade.Service
 
             if (CachePagesInHours > 0 && !forceReload)
             {
-                categories = await GetObjectFromCacheAsync<ICollection<Category>>(_cache,
+                categories = await _cache.GetObjectFromCacheAsync<ICollection<Category>>(
                     Utility.Keys.Cache.PromCategories);
             }
 
             if (categories == null || categories.Count == 0)
             {
                 categories = await _categoryRepository.GetAllCategories();
-                await SaveToCacheAsync(_cache,
-                    Utility.Keys.Cache.PromCategories,
+                await _cache.SaveToCacheAsync(Utility.Keys.Cache.PromCategories,
                     categories,
                     CachePagesInHours);
             }
@@ -162,15 +159,15 @@ namespace Ocuda.Promenade.Service
 
             if (CachePagesInHours > 0 && !forceReload)
             {
-                emediaCategories = await GetObjectFromCacheAsync<ICollection<EmediaCategory>>(_cache,
-                    Utility.Keys.Cache.PromEmediaCategories);
+                emediaCategories = await _cache
+                    .GetObjectFromCacheAsync<ICollection<EmediaCategory>>(
+                        Utility.Keys.Cache.PromEmediaCategories);
             }
 
             if (emediaCategories == null || emediaCategories.Count == 0)
             {
                 emediaCategories = await _emediaCategoryRepository.GetAllAsync();
-                await SaveToCacheAsync(_cache,
-                    Utility.Keys.Cache.PromEmediaCategories,
+                await _cache.SaveToCacheAsync(Utility.Keys.Cache.PromEmediaCategories,
                     emediaCategories,
                     CachePagesInHours);
             }
@@ -233,7 +230,7 @@ namespace Ocuda.Promenade.Service
 
             if (CachePagesInHours > 0 && !forceReload)
             {
-                categoryText = await GetObjectFromCacheAsync<CategoryText>(_cache, cacheKey);
+                categoryText = await _cache.GetObjectFromCacheAsync<CategoryText>(cacheKey);
             }
 
             if (categoryText == null)
@@ -244,8 +241,7 @@ namespace Ocuda.Promenade.Service
 
                 if (categoryText != null)
                 {
-                    await SaveToCacheAsync(_cache,
-                        cacheKey,
+                    await _cache.SaveToCacheAsync(cacheKey,
                         categoryText,
                         CachePagesInHours);
                 }
@@ -267,8 +263,7 @@ namespace Ocuda.Promenade.Service
 
             if (CachePagesInHours > 0 && !forceReload)
             {
-                emediaText = await GetObjectFromCacheAsync<EmediaText>(_cache,
-                    cacheKey);
+                emediaText = await _cache.GetObjectFromCacheAsync<EmediaText>(cacheKey);
             }
 
             if (emediaText == null)
@@ -279,10 +274,7 @@ namespace Ocuda.Promenade.Service
 
                 if (emediaText != null)
                 {
-                    await SaveToCacheAsync(_cache,
-                        cacheKey,
-                        emediaText,
-                        CachePagesInHours);
+                    await _cache.SaveToCacheAsync(cacheKey, emediaText, CachePagesInHours);
                 }
             }
 

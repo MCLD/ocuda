@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Globalization;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Abstract;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Service
 {
     public class SocialCardService : BaseService<SocialCardService>
     {
-        private readonly IDistributedCache _cache;
+        private readonly IOcudaCache _cache;
         private readonly IConfiguration _config;
         private readonly SiteSettingService _siteSettingService;
         private readonly ISocialCardRepository _socialCardRepository;
@@ -21,7 +21,7 @@ namespace Ocuda.Promenade.Service
         public SocialCardService(ILogger<SocialCardService> logger,
             IDateTimeProvider dateTimeProvider,
             IConfiguration config,
-            IDistributedCache cache,
+            IOcudaCache cache,
             ISocialCardRepository socialCardRepository,
             SiteSettingService siteSettingService)
             : base(logger, dateTimeProvider)
@@ -45,7 +45,7 @@ namespace Ocuda.Promenade.Service
 
             if (cachePagesInHours > 0 && !forceReload)
             {
-                card = await GetObjectFromCacheAsync<SocialCard>(_cache, cacheKey);
+                card = await _cache.GetObjectFromCacheAsync<SocialCard>(cacheKey);
             }
 
             if (card == null)
@@ -55,8 +55,7 @@ namespace Ocuda.Promenade.Service
                 card.TwitterSite = await _siteSettingService.GetSettingStringAsync(
                         Models.Keys.SiteSetting.Social.TwitterUsername);
 
-                await SaveToCacheAsync(_cache,
-                    cacheKey,
+                await _cache.SaveToCacheAsync(cacheKey,
                     card,
                     cachePagesInHours);
             }
