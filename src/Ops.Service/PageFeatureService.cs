@@ -87,6 +87,24 @@ namespace Ocuda.Ops.Service
             await _pageFeatureItemRepository.SaveAsync();
         }
 
+        public async Task DeleteNoSaveAsync(int id)
+        {
+            var currentFeature = await _pageFeatureRepository.FindAsync(id);
+            if (currentFeature == null)
+            {
+                throw new OcudaException("Could not find that Page Feature");
+            }
+            var items = await _pageFeatureItemRepository.GetByPageFeatureAsync(id);
+            foreach (var item in items)
+            {
+                var itemTexts = await _pageFeatureItemTextRepository
+                    .GetAllForPageFeatureItemAsync(item.Id);
+                _pageFeatureItemTextRepository.RemoveRange(itemTexts);
+            }
+            _pageFeatureItemRepository.RemoveRange(items);
+            _pageFeatureRepository.Remove(currentFeature);
+        }
+
         public async Task<PageFeature> EditAsync(PageFeature feature)
         {
             var currentFeature = await _pageFeatureRepository.FindAsync(feature.Id);

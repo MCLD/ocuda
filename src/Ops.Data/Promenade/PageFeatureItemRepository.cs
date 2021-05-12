@@ -35,6 +35,14 @@ namespace Ocuda.Ops.Data.Promenade
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<ICollection<PageFeatureItem>> GetByPageFeatureAsync(int featureId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.PageFeatureId == featureId)
+                .ToListAsync();
+        }
+
         public async Task<int?> GetMaxSortOrderForPageFeatureAsync(int featureId)
         {
             return await DbSet
