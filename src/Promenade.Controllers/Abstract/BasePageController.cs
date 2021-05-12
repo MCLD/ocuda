@@ -13,17 +13,14 @@ namespace Ocuda.Promenade.Controllers.Abstract
     {
         protected BasePageController(ServiceFacades.Controller<T> context,
             CarouselService carouselService,
-            PageFeatureService pageFeatureService,
             PageService pageService,
             RedirectService redirectService,
             SegmentService segmentService,
             SocialCardService socialCardService,
-            WebslideService webslideService) : base(context)
+            ImageFeatureService imageFeatureService) : base(context)
         {
             CarouselService = carouselService
                 ?? throw new ArgumentNullException(nameof(carouselService));
-            PageFeatureService = pageFeatureService
-                ?? throw new ArgumentNullException(nameof(pageFeatureService));
             PageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
             RedirectService = redirectService
                 ?? throw new ArgumentNullException(nameof(redirectService));
@@ -31,18 +28,17 @@ namespace Ocuda.Promenade.Controllers.Abstract
                 ?? throw new ArgumentNullException(nameof(segmentService));
             SocialCardService = socialCardService
                 ?? throw new ArgumentNullException(nameof(socialCardService));
-            WebslideService = webslideService
-                ?? throw new ArgumentNullException(nameof(webslideService));
+            ImageFeatureService = imageFeatureService
+                ?? throw new ArgumentNullException(nameof(imageFeatureService));
         }
 
         protected CarouselService CarouselService { get; }
-        protected PageFeatureService PageFeatureService { get; }
+        protected ImageFeatureService ImageFeatureService { get; }
         protected PageService PageService { get; }
         protected abstract PageType PageType { get; }
         protected RedirectService RedirectService { get; }
         protected SegmentService SegmentService { get; }
         protected SocialCardService SocialCardService { get; }
-        protected WebslideService WebslideService { get; }
 
         protected async Task<IActionResult> ReturnCarouselItemAsync(string stub, int id)
         {
@@ -185,15 +181,9 @@ namespace Ocuda.Promenade.Controllers.Abstract
                 }
                 else if (item.PageFeatureId.HasValue)
                 {
-                    item.PageFeature = await PageFeatureService.GetByIdAsync(
+                    item.PageFeature = await ImageFeatureService.GetByIdAsync(
                         item.PageFeatureId.Value,
                         forceReload);
-
-                    foreach (var featureItem in item.PageFeature.Items)
-                    {
-                        featureItem.PageFeatureItemText.Filename = PageFeatureService
-                            .GetPageFeatureFilePath(featureItem.PageFeatureItemText.Filename);
-                    }
                 }
                 else if (item.SegmentId.HasValue)
                 {
@@ -209,7 +199,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
                 }
                 else if (item.WebslideId.HasValue)
                 {
-                    item.Webslide = await WebslideService.GetByIdAsync(item.WebslideId.Value,
+                    item.Webslide = await ImageFeatureService.GetByIdAsync(item.WebslideId.Value,
                         forceReload);
                 }
             }
@@ -223,7 +213,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
             if (pageLayout.Items.Any(_ => _.PageFeatureId.HasValue))
             {
-                viewModel.PageFeatureTemplate = await PageFeatureService
+                viewModel.PageFeatureTemplate = await ImageFeatureService
                     .GetTemplateForPageLayoutAsync(pageLayout.Id);
             }
 

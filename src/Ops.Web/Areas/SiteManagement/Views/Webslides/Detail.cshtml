@@ -52,7 +52,7 @@
 <form id="addItemForm" role="form">
     <input id="addItemLanguage" asp-for="LanguageId" type="hidden" />
     <input id="addItemWebslideId"
-           asp-for="WebslideItem.WebslideId"
+           asp-for="WebslideItem.ImageFeatureId"
            value="@Model.WebslideId"
            type="hidden" />
     <div modal id="addItemModal"
@@ -200,7 +200,7 @@
                                            asp-for="WebslideId"
                                            type="hidden" />
                                     <input id="webslideItem@(item.Id)Id"
-                                           asp-for="WebslideItemText.WebslideItemId"
+                                           asp-for="WebslideItemText.ImageFeatureItemId"
                                            value="@item.Id"
                                            type="hidden" />
                                     <input id="webslideItem@(item.Id)Language"

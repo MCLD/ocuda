@@ -13,13 +13,12 @@ namespace Ocuda.Promenade.Controllers
 
         public NewsController(ServiceFacades.Controller<NewsController> context,
             CarouselService carouselService,
-            PageFeatureService pageFeatureService,
             PageService pageService,
             RedirectService redirectService,
             SegmentService segmentService,
             SocialCardService socialCardService,
-            WebslideService webslideService)
-            : base(context, carouselService, pageFeatureService, pageService, redirectService,
+            ImageFeatureService webslideService)
+            : base(context, carouselService, pageService, redirectService,
                   segmentService, socialCardService, webslideService)
         {
         }

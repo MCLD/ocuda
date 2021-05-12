@@ -8,16 +8,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Webslides
 {
     public class DetailViewModel
     {
-        public Webslide Webslide { get; set; }
+        public ImageFeature Webslide { get; set; }
         public int WebslideId { get; set; }
 
-        public WebslideItem WebslideItem { get; set; }
-        public WebslideItemText WebslideItemText { get; set; }
+        public ImageFeatureItem WebslideItem { get; set; }
+        public ImageFeatureItemText WebslideItemText { get; set; }
 
         [DisplayName("Image")]
         public IFormFile ItemImage { get; set; }
 
-        public WebslideTemplate WebslideTemplate { get; set; }
+        public ImageFeatureTemplate WebslideTemplate { get; set; }
 
         public int LanguageId { get; set; }
 

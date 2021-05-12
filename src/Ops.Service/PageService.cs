@@ -29,9 +29,8 @@ namespace Ocuda.Ops.Service
 
         private readonly ICarouselService _carouselService;
         private readonly ILanguageService _languageService;
-        private readonly IPageFeatureService _pageFeatureService;
         private readonly ISegmentService _segmentService;
-        private readonly IWebslideService _webslideService;
+        private readonly IImageFeatureService _imageFeatureService;
 
         public PageService(ILogger<PageService> logger,
             IHttpContextAccessor httpContextAccessor,
@@ -43,9 +42,8 @@ namespace Ocuda.Ops.Service
             IPermissionGroupPageContentRepository permissionGroupPageContentRepository,
             ICarouselService carouselService,
             ILanguageService languageService,
-            IPageFeatureService pageFeatureService,
             ISegmentService segmentService,
-            IWebslideService webslideService)
+            IImageFeatureService imageFeatureService)
             : base(logger, httpContextAccessor)
         {
             _pageHeaderRepository = pageHeaderRepository
@@ -64,12 +62,10 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(carouselService));
             _languageService = languageService
                 ?? throw new ArgumentNullException(nameof(languageService));
-            _pageFeatureService = pageFeatureService
-                ?? throw new ArgumentNullException(nameof(pageFeatureService));
             _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
-            _webslideService = webslideService
-                ?? throw new ArgumentNullException(nameof(webslideService));
+            _imageFeatureService = imageFeatureService
+                ?? throw new ArgumentNullException(nameof(imageFeatureService));
         }
 
         public async Task<Page> GetByHeaderAndLanguageAsync(int headerId, int languageId)
@@ -312,7 +308,7 @@ namespace Ocuda.Ops.Service
                 pageItem.Carousel = null;
                 pageItem.Segment = null;
                 pageItem.Webslide = null;
-                pageItem.PageFeature = await _pageFeatureService
+                pageItem.PageFeature = await _imageFeatureService
                     .CreateNoSaveAsync(pageItem.PageFeature);
             }
             else if (pageItem.Segment != null)
@@ -327,7 +323,7 @@ namespace Ocuda.Ops.Service
                 pageItem.Carousel = null;
                 pageItem.PageFeature = null;
                 pageItem.Segment = null;
-                pageItem.Webslide = await _webslideService.CreateNoSaveAsync(pageItem.Webslide);
+                pageItem.Webslide = await _imageFeatureService.CreateNoSaveAsync(pageItem.Webslide);
             }
 
             if (pageItem.Carousel == null && pageItem.PageFeature == null
@@ -396,7 +392,7 @@ namespace Ocuda.Ops.Service
             }
             if (pageItem.WebslideId.HasValue)
             {
-                await _webslideService.DeleteNoSaveAsync(pageItem.WebslideId.Value);
+                await _imageFeatureService.DeleteNoSaveAsync(pageItem.WebslideId.Value);
             }
 
             if (!ignoreSort)

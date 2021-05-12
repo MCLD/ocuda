@@ -32,11 +32,11 @@ namespace Ocuda.Promenade.Models.Entities
 
         [DisplayName("Feature Template")]
         public int? LayoutFeatureTemplateId { get; set; }
-        public PageFeatureTemplate LayoutFeatureTemplate { get; set; }
+        public ImageFeatureTemplate LayoutFeatureTemplate { get; set; }
 
         [DisplayName("Webslide Template")]
         public int? LayoutWebslideTemplateId { get; set; }
-        public WebslideTemplate LayoutWebslideTemplate { get; set; }
+        public ImageFeatureTemplate LayoutWebslideTemplate { get; set; }
 
         [NotMapped]
         public ICollection<string> PageLanguages { get; set; }

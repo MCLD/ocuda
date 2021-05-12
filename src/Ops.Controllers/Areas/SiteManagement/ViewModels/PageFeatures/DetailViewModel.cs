@@ -8,16 +8,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.PageFeatures
 {
     public class DetailViewModel
     {
-        public PageFeature PageFeature { get; set; }
+        public ImageFeature PageFeature { get; set; }
         public int PageFeatureId { get; set; }
 
-        public PageFeatureItem PageFeatureItem { get; set; }
-        public PageFeatureItemText PageFeatureItemText { get; set; }
+        public ImageFeatureItem PageFeatureItem { get; set; }
+        public ImageFeatureItemText PageFeatureItemText { get; set; }
 
         [DisplayName("Image")]
         public IFormFile ItemImage { get; set; }
 
-        public PageFeatureTemplate PageFeatureTemplate { get; set; }
+        public ImageFeatureTemplate PageFeatureTemplate { get; set; }
 
         public int LanguageId { get; set; }
 

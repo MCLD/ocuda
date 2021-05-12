@@ -21,7 +21,7 @@ namespace Ocuda.Promenade.Models.Entities
 
         [DisplayName("Feature")]
         public int? PageFeatureId { get; set; }
-        public PageFeature PageFeature { get; set; }
+        public ImageFeature PageFeature { get; set; }
 
         [DisplayName("Segment")]
         public int? SegmentId { get; set; }
@@ -29,7 +29,7 @@ namespace Ocuda.Promenade.Models.Entities
 
         [DisplayName("Webslide")]
         public int? WebslideId { get; set; }
-        public Webslide Webslide { get; set; }
+        public ImageFeature Webslide { get; set; }
 
         [NotMapped]
         public SegmentText SegmentText { get; set; }

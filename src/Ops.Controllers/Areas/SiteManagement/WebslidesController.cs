@@ -35,13 +35,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly ILanguageService _languageService;
         private readonly IPermissionGroupService _permissionGroupService;
-        private readonly IWebslideService _webslideService;
+        private readonly IImageFeatureService _webslideService;
 
         public WebslidesController(ServiceFacades.Controller<WebslidesController> context,
             IDateTimeProvider dateTimeProvider,
             ILanguageService languageService,
             IPermissionGroupService permissionGroupService,
-            IWebslideService webslideService)
+            IImageFeatureService webslideService)
             : base(context)
         {
             _dateTimeProvider = dateTimeProvider
@@ -73,7 +73,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             else
             {
-                if (await HasWebslidePermissionAsync(model.WebslideItem.WebslideId))
+                if (await HasWebslidePermissionAsync(model.WebslideItem.ImageFeatureId))
                 {
                     if (ModelState.IsValid)
                     {
@@ -90,7 +90,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                                 Success = true,
                                 Url = Url.Action(nameof(Detail), new
                                 {
-                                    id = webslideItem.WebslideId,
+                                    id = webslideItem.ImageFeatureId,
                                     language = language.IsDefault ? null : language.Name,
                                     item = webslideItem.Id
                                 })
@@ -138,7 +138,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            var webslideId = (await _webslideService.GetItemByIdAsync(id)).WebslideId;
+            var webslideId = (await _webslideService.GetItemByIdAsync(id)).ImageFeatureId;
 
             if (await HasWebslidePermissionAsync(webslideId))
             {
@@ -180,7 +180,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var webslideItemText = await _webslideService
                 .GetItemTextByIdsAsync(model.WebslideItem.Id, model.LanguageId);
 
-            if (!await HasWebslidePermissionAsync(webslideItem.WebslideId))
+            if (!await HasWebslidePermissionAsync(webslideItem.ImageFeatureId))
             {
                 return RedirectToUnauthorized();
             }
@@ -225,7 +225,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 .FirstOrDefault(_ => _.Name.Equals(language, StringComparison.OrdinalIgnoreCase))
                 ?? languages.Single(_ => _.IsDefault);
 
-            var webslide = await _webslideService.GetWebslideDetailsAsync(id, selectedLanguage.Id);
+            var webslide = await _webslideService.GetImageFeatureDetailsAsync(id, selectedLanguage.Id);
 
             var viewModel = new DetailViewModel
             {
@@ -237,7 +237,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 LanguageList = new SelectList(languages,
                     nameof(Language.Name),
                     nameof(Language.Description), selectedLanguage.Name),
-                PageLayoutId = await _webslideService.GetPageLayoutIdForWebslideAsync(webslide.Id),
+                PageLayoutId = await _webslideService.GetPageLayoutIdForImageFeatureAsync(webslide.Id),
                 CurrentDateTime = _dateTimeProvider.Now
             };
 
@@ -265,7 +265,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 var webslideItem = await _webslideService.GetItemByIdAsync(model.WebslideItem.Id);
 
-                if (await HasWebslidePermissionAsync(webslideItem.WebslideId))
+                if (await HasWebslidePermissionAsync(webslideItem.ImageFeatureId))
                 {
                     if (ModelState.IsValid)
                     {
@@ -282,7 +282,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                                 Success = true,
                                 Url = Url.Action(nameof(Detail), new
                                 {
-                                    id = webslideItem.WebslideId,
+                                    id = webslideItem.ImageFeatureId,
                                     language = language.IsDefault ? null : language.Name,
                                     item = webslideItem.Id
                                 })
@@ -330,9 +330,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         public async Task<IActionResult> EditWebslideItemText(DetailViewModel model)
         {
             var webslideItem = await _webslideService
-                .GetItemByIdAsync(model.WebslideItemText.WebslideItemId);
+                .GetItemByIdAsync(model.WebslideItemText.ImageFeatureItemId);
 
-            if (!await HasWebslidePermissionAsync(webslideItem.WebslideId))
+            if (!await HasWebslidePermissionAsync(webslideItem.ImageFeatureId))
             {
                 return RedirectToUnauthorized();
             }
@@ -354,7 +354,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     imageBytes = ms.ToArray();
 
                     var template = await _webslideService
-                        .GetTemplateForWebslideAsync(webslideItem.WebslideId);
+                        .GetTemplateForImageFeatureAsync(webslideItem.ImageFeatureId);
 
                     if (template?.Height.HasValue == true || template?.Width.HasValue == true)
                     {
@@ -442,7 +442,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 id = model.WebslideId,
                 language = language.IsDefault ? null : language.Name,
-                item = model.WebslideItemText.WebslideItemId
+                item = model.WebslideItemText.ImageFeatureItemId
             });
         }
 
@@ -468,7 +468,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 var permissionClaims = UserClaims(ClaimType.PermissionId);
                 if (permissionClaims.Count > 0)
                 {
-                    var pageHeaderId = await _webslideService.GetPageHeaderIdForWebslideAsync(
+                    var pageHeaderId = await _webslideService.GetPageHeaderIdForImageFeatureAsync(
                         webslideId);
                     if (!pageHeaderId.HasValue)
                     {

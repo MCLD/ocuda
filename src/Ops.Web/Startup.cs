@@ -380,6 +380,14 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.FeatureRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IGroupRepository,
                 Data.Promenade.GroupRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IImageFeatureItemRepository,
+                Data.Promenade.ImageFeatureItemRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IImageFeatureItemTextRepository,
+                Data.Promenade.ImageFeatureItemTextRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IImageFeatureRepository,
+                Data.Promenade.ImageFeatureRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IImageFeatureTemplateRepository,
+                Data.Promenade.ImageFeatureTemplateRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILanguageRepository,
                 Data.Promenade.LanguageRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationRepository,
@@ -393,14 +401,6 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.LocationHoursOverrideRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationHoursRepository,
                 Data.Promenade.LocationHoursRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageFeatureItemRepository,
-                Data.Promenade.PageFeatureItemRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageFeatureItemTextRepository,
-                Data.Promenade.PageFeatureItemTextRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageFeatureRepository,
-                Data.Promenade.PageFeatureRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageFeatureTemplateRepository,
-                Data.Promenade.PageFeatureTemplateRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageRepository,
                 Data.Promenade.PageRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageHeaderRepository,
@@ -429,14 +429,6 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.SiteSettingPromRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ISocialCardRepository,
                 Data.Promenade.SocialCardRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.IWebslideItemRepository,
-                Data.Promenade.WebslideItemRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.IWebslideItemTextRepository,
-                Data.Promenade.WebslideItemTextRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.IWebslideRepository,
-                Data.Promenade.WebslideRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.IWebslideTemplateRepository,
-                Data.Promenade.WebslideTemplateRepository>();
 
             // services
             services.AddScoped<Service.Interfaces.Ops.Services.IAuthorizationService,
@@ -454,6 +446,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IFileTypeService, FileTypeService>();
             services.AddScoped<IGroupService, GroupService>();
+            services.AddScoped<IImageFeatureService, ImageFeatureService>();
             services.AddScoped<IInitialSetupService, InitialSetupService>();
             services.AddScoped<IInsertSampleDataService, InsertSampleDataService>();
             services.AddScoped<ILanguageService, LanguageService>();
@@ -465,7 +458,6 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ILinkService, LinkService>();
             services.AddScoped<Utility.Services.Interfaces.IOcudaCache,
                 Utility.Services.OcudaCache>();
-            services.AddScoped<IPageFeatureService, PageFeatureService>();
             services.AddScoped<IPageService, PageService>();
             services.AddScoped<IPublicFilesService, PublicFilesService>();
             services.AddScoped<Utility.Services.Interfaces.IPathResolverService,
@@ -489,7 +481,6 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Abstract.IUserContextProvider, UserContextProvider>();
             services.AddScoped<IUserMetadataTypeService, UserMetadataTypeService>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IWebslideService, WebslideService>();
 
             // background process
             services.AddScoped<JobScopedProcessingService>();

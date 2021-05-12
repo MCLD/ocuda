@@ -34,8 +34,6 @@ namespace Ocuda.Promenade.Data
                 .HasKey(_ => new { _.Id, _.LanguageId });
             modelBuilder.Entity<Page>()
                 .HasKey(_ => new { _.LanguageId, _.PageHeaderId });
-            modelBuilder.Entity<PageFeatureItemText>()
-                .HasKey(_ => new { _.PageFeatureItemId, _.LanguageId });
             modelBuilder.Entity<PageLayoutText>()
                 .HasKey(_ => new { _.PageLayoutId, _.LanguageId });
             modelBuilder.Entity<PodcastDirectoryInfo>()
@@ -44,8 +42,8 @@ namespace Ocuda.Promenade.Data
                 .HasKey(_ => new { _.DayOfWeek, _.Hour });
             modelBuilder.Entity<SegmentText>()
                 .HasKey(_ => new { _.LanguageId, _.SegmentId });
-            modelBuilder.Entity<WebslideItemText>()
-                .HasKey(_ => new { _.LanguageId, _.WebslideItemId });
+            modelBuilder.Entity<ImageFeatureItemText>()
+                .HasKey(_ => new { _.LanguageId, _.ImageFeatureItemId });
         }
 
         // Read-Only
@@ -74,10 +72,10 @@ namespace Ocuda.Promenade.Data
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; }
         public DbSet<Navigation> Navigations { get; }
         public DbSet<NavigationText> NavigationTexts { get; }
-        public DbSet<PageFeatureItem> PageFeatureItems { get; }
-        public DbSet<PageFeatureItemText> PageFeatureItemTexts { get; }
-        public DbSet<PageFeature> PageFeatures { get; }
-        public DbSet<PageFeatureTemplate> PageFeatureTemplates { get; }
+        public DbSet<ImageFeatureItem> PageFeatureItems { get; }
+        public DbSet<ImageFeatureItemText> PageFeatureItemTexts { get; }
+        public DbSet<ImageFeature> PageFeatures { get; }
+        public DbSet<ImageFeatureTemplate> PageFeatureTemplates { get; }
         public DbSet<PageItem> PageItems { get; set; }
         public DbSet<PageLayout> PageLayouts { get; set; }
         public DbSet<PageLayoutText> PageLayoutTexts { get; }
@@ -93,10 +91,10 @@ namespace Ocuda.Promenade.Data
         public DbSet<SiteSetting> SiteSettings { get; }
         public DbSet<SocialCard> SocialCards { get; }
         public DbSet<UrlRedirect> UrlRedirects { get; }
-        public DbSet<WebslideItem> WebslideItems { get; }
-        public DbSet<WebslideItemText> WebslideItemTexts { get; }
-        public DbSet<Webslide> Webslides { get; }
-        public DbSet<WebslideTemplate> WebslideTemplates { get; }
+        public DbSet<ImageFeatureItem> WebslideItems { get; }
+        public DbSet<ImageFeatureItemText> WebslideItemTexts { get; }
+        public DbSet<ImageFeature> Webslides { get; }
+        public DbSet<ImageFeatureTemplate> WebslideTemplates { get; }
 
         // Read/Write 
         public DbSet<Language> Languages { get; set; }

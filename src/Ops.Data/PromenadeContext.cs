@@ -45,8 +45,6 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.Id, _.LanguageId });
             modelBuilder.Entity<Page>()
                 .HasKey(_ => new { _.LanguageId, _.PageHeaderId });
-            modelBuilder.Entity<PageFeatureItemText>()
-                .HasKey(_ => new { _.PageFeatureItemId, _.LanguageId });
             modelBuilder.Entity<PageLayoutText>()
                 .HasKey(_ => new { _.PageLayoutId, _.LanguageId });
             modelBuilder.Entity<PodcastDirectoryInfo>()
@@ -55,8 +53,8 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.DayOfWeek, _.Hour });
             modelBuilder.Entity<SegmentText>()
                 .HasKey(_ => new { _.LanguageId, _.SegmentId });
-            modelBuilder.Entity<WebslideItemText>()
-                .HasKey(_ => new { _.LanguageId, _.WebslideItemId });
+            modelBuilder.Entity<ImageFeatureItemText>()
+                .HasKey(_ => new { _.LanguageId, _.ImageFeatureItemId });
         }
 
         #region IMigratableContext
@@ -91,10 +89,10 @@ namespace Ocuda.Ops.Data
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; set; }
         public DbSet<Navigation> Navigations { get; set; }
         public DbSet<NavigationText> NavigationTexts { get; set; }
-        public DbSet<PageFeatureItem> PageFeatureItems { get; set; }
-        public DbSet<PageFeatureItemText> PageFeatureItemTexts { get; set; }
-        public DbSet<PageFeature> PageFeatures { get; set; }
-        public DbSet<PageFeatureTemplate> PageFeatureTemplates { get; set; }
+        public DbSet<ImageFeatureItem> PageFeatureItems { get; set; }
+        public DbSet<ImageFeatureItemText> PageFeatureItemTexts { get; set; }
+        public DbSet<ImageFeature> PageFeatures { get; set; }
+        public DbSet<ImageFeatureTemplate> PageFeatureTemplates { get; set; }
         public DbSet<PageItem> PageItems { get; set; }
         public DbSet<PageLayout> PageLayouts { get; set; }
         public DbSet<PageLayoutText> PageLayoutTexts { get; set; }
@@ -113,9 +111,9 @@ namespace Ocuda.Ops.Data
         public DbSet<SocialCard> SocialCards { get; set; }
         public DbSet<UrlRedirect> UrlRedirects { get; set; }
         public DbSet<UrlRedirectAccess> UrlRedirectAccesses { get; set; }
-        public DbSet<WebslideItem> WebslideItems { get; set; }
-        public DbSet<WebslideItemText> WebslideItemTexts { get; set; }
-        public DbSet<Webslide> Webslides { get; set; }
-        public DbSet<WebslideTemplate> WebslideTemplates { get; set; }
+        public DbSet<ImageFeatureItem> WebslideItems { get; set; }
+        public DbSet<ImageFeatureItemText> WebslideItemTexts { get; set; }
+        public DbSet<ImageFeature> Webslides { get; set; }
+        public DbSet<ImageFeatureTemplate> WebslideTemplates { get; set; }
     }
 }
