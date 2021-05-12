@@ -124,9 +124,9 @@ namespace Ocuda.SlideUploader
                     Console.Error.WriteLine(issue);
                     Log.Fatal("Configuration error: {ConfigurationError}", issue);
                 }
-            }
 
-            throw new OcudaException("Aboring run: fatal configuration errors.");
+                throw new OcudaException("Aboring run: fatal configuration errors.");
+            }
         }
     }
 }
