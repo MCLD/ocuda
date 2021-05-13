@@ -72,10 +72,10 @@ namespace Ocuda.Promenade.Data
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; }
         public DbSet<Navigation> Navigations { get; }
         public DbSet<NavigationText> NavigationTexts { get; }
-        public DbSet<ImageFeatureItem> PageFeatureItems { get; }
-        public DbSet<ImageFeatureItemText> PageFeatureItemTexts { get; }
-        public DbSet<ImageFeature> PageFeatures { get; }
-        public DbSet<ImageFeatureTemplate> PageFeatureTemplates { get; }
+        public DbSet<ImageFeatureItem> ImageFeatureItems { get; }
+        public DbSet<ImageFeatureItemText> ImageFeatureItemTexts { get; }
+        public DbSet<ImageFeature> ImageFeatures { get; }
+        public DbSet<ImageFeatureTemplate> ImageFeatureTemplates { get; }
         public DbSet<PageItem> PageItems { get; set; }
         public DbSet<PageLayout> PageLayouts { get; set; }
         public DbSet<PageLayoutText> PageLayoutTexts { get; }
@@ -91,10 +91,6 @@ namespace Ocuda.Promenade.Data
         public DbSet<SiteSetting> SiteSettings { get; }
         public DbSet<SocialCard> SocialCards { get; }
         public DbSet<UrlRedirect> UrlRedirects { get; }
-        public DbSet<ImageFeatureItem> WebslideItems { get; }
-        public DbSet<ImageFeatureItemText> WebslideItemTexts { get; }
-        public DbSet<ImageFeature> Webslides { get; }
-        public DbSet<ImageFeatureTemplate> WebslideTemplates { get; }
 
         // Read/Write 
         public DbSet<Language> Languages { get; set; }

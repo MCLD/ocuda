@@ -142,7 +142,7 @@ namespace Ocuda.Ops.Service
             foreach (var item in webslide.Items)
             {
                 item.ImageFeatureItemText = await _webslideItemTextRepository
-                    .GetByWebslideItemAndLanguageAsync(item.Id, languageId);
+                    .GetByImageFeatureItemAndLanguageAsync(item.Id, languageId);
             }
 
             return webslide;
@@ -156,7 +156,7 @@ namespace Ocuda.Ops.Service
         public async Task<ImageFeatureItemText> GetItemTextByIdsAsync(int webslideItemId,
             int languageId)
         {
-            return await _webslideItemTextRepository.GetByWebslideItemAndLanguageAsync(
+            return await _webslideItemTextRepository.GetByImageFeatureItemAndLanguageAsync(
                 webslideItemId, languageId);
         }
 
@@ -182,7 +182,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<ImageFeatureItemText> SetItemTextAsync(ImageFeatureItemText itemText)
         {
-            var currentText = await _webslideItemTextRepository.GetByWebslideItemAndLanguageAsync(
+            var currentText = await _webslideItemTextRepository.GetByImageFeatureItemAndLanguageAsync(
                 itemText.ImageFeatureItemId, itemText.LanguageId);
 
             if (currentText == null)

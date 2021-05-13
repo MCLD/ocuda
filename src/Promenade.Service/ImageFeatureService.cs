@@ -18,7 +18,7 @@ namespace Ocuda.Promenade.Service
     public class ImageFeatureService : BaseService<ImageFeatureService>
     {
         private const string ImagesFilePath = "images";
-        private const string WebslidesFilePath = "slides";
+        private const string FeaturesFilePath = "features";
 
         private readonly IOcudaCache _cache;
         private readonly IConfiguration _config;
@@ -69,7 +69,7 @@ namespace Ocuda.Promenade.Service
             var cachePageSpan = GetPageCacheSpan(_config);
 
             string webslideCacheKey = string.Format(CultureInfo.InvariantCulture,
-                Utility.Keys.Cache.PromWebslide,
+                Utility.Keys.Cache.PromImageFeature,
                 webslideId);
 
             if (cachePageSpan.HasValue && !forceReload)
@@ -132,7 +132,7 @@ namespace Ocuda.Promenade.Service
                     if (currentLanguageId.HasValue)
                     {
                         var itemTextCacheKey = string.Format(CultureInfo.InvariantCulture,
-                            Utility.Keys.Cache.PromWebslideItemText,
+                            Utility.Keys.Cache.PromImageFeatureItemText,
                             currentLanguageId,
                             item.Id);
 
@@ -150,7 +150,7 @@ namespace Ocuda.Promenade.Service
                             item.ImageFeatureItemText.Filepath = _pathResolver
                                 .GetPublicContentUrl(ImagesFilePath,
                                     languageName,
-                                    WebslidesFilePath,
+                                    FeaturesFilePath,
                                     item.ImageFeatureItemText.Filename);
 
                             if (expire.HasValue)
@@ -165,7 +165,7 @@ namespace Ocuda.Promenade.Service
                     if (item.ImageFeatureItemText == null)
                     {
                         var itemTextCacheKey = string.Format(CultureInfo.InvariantCulture,
-                            Utility.Keys.Cache.PromWebslideItemText,
+                            Utility.Keys.Cache.PromImageFeatureItemText,
                             defaultLanguageId,
                             item.Id);
 
@@ -183,7 +183,7 @@ namespace Ocuda.Promenade.Service
                             item.ImageFeatureItemText.Filepath = _pathResolver
                                 .GetPublicContentUrl(ImagesFilePath,
                                     languageName,
-                                    WebslidesFilePath,
+                                    FeaturesFilePath,
                                     item.ImageFeatureItemText.Filename);
 
                             if (expire.HasValue)

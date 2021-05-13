@@ -152,16 +152,6 @@
         public static readonly string PromPageCurrentLayoutId = "currentpagelayoutid.{0}";
 
         /// <summary>
-        /// Cached page feature, {0} is the page feature id
-        /// </summary>
-        public static readonly string PromPageFeature = "pagefeature.{0}";
-
-        /// <summary>
-        /// Cached page feature item text, {0} is the language id, {1} is the id
-        /// </summary>
-        public static readonly string PromPageFeatureItemText = "pagefeatureitemtext.{0}.{1}";
-
-        /// <summary>
         /// Cached page header info, {0} is the stub, {1} is the page type
         /// </summary>
         public static readonly string PromPageHeader = "pageheader.{0}.{1}";
@@ -217,13 +207,13 @@
         public static readonly string PromSocialCard = "socialcard.{0}";
 
         /// <summary>
-        /// Cached webslide, {0} is the webslide id
+        /// Cached image feature, {0} is the image feature id
         /// </summary>
-        public static readonly string PromWebslide = "webslide.{0}";
+        public static readonly string PromImageFeature = "imagefeature.{0}";
 
         /// <summary>
-        /// Cached webslide item text, {0} is the language id, {1} is the id
+        /// Cached image feature item text, {0} is the language id, {1} is the id
         /// </summary>
-        public static readonly string PromWebslideItemText = "webslideitemtext.{0}.{1}";
+        public static readonly string PromImageFeatureItemText = "imagefeatureitemtext.{0}.{1}";
     }
 }

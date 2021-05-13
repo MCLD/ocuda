@@ -89,10 +89,10 @@ namespace Ocuda.Ops.Data
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; set; }
         public DbSet<Navigation> Navigations { get; set; }
         public DbSet<NavigationText> NavigationTexts { get; set; }
-        public DbSet<ImageFeatureItem> PageFeatureItems { get; set; }
-        public DbSet<ImageFeatureItemText> PageFeatureItemTexts { get; set; }
-        public DbSet<ImageFeature> PageFeatures { get; set; }
-        public DbSet<ImageFeatureTemplate> PageFeatureTemplates { get; set; }
+        public DbSet<ImageFeatureItem> ImageFeatureItems { get; set; }
+        public DbSet<ImageFeatureItemText> ImageFeatureItemTexts { get; set; }
+        public DbSet<ImageFeature> ImageFeatures { get; set; }
+        public DbSet<ImageFeatureTemplate> ImageFeatureTemplates { get; set; }
         public DbSet<PageItem> PageItems { get; set; }
         public DbSet<PageLayout> PageLayouts { get; set; }
         public DbSet<PageLayoutText> PageLayoutTexts { get; set; }
@@ -111,9 +111,5 @@ namespace Ocuda.Ops.Data
         public DbSet<SocialCard> SocialCards { get; set; }
         public DbSet<UrlRedirect> UrlRedirects { get; set; }
         public DbSet<UrlRedirectAccess> UrlRedirectAccesses { get; set; }
-        public DbSet<ImageFeatureItem> WebslideItems { get; set; }
-        public DbSet<ImageFeatureItemText> WebslideItemTexts { get; set; }
-        public DbSet<ImageFeature> Webslides { get; set; }
-        public DbSet<ImageFeatureTemplate> WebslideTemplates { get; set; }
     }
 }

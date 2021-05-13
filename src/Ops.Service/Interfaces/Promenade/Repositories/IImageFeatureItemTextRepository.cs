@@ -10,7 +10,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 
         Task<ICollection<ImageFeatureItemText>> GetAllForImageFeatureItemAsync(int itemId);
 
-        Task<ImageFeatureItemText> GetByWebslideItemAndLanguageAsync(int imageFeatureItemId,
+        Task<ImageFeatureItemText> GetByImageFeatureItemAndLanguageAsync(int imageFeatureItemId,
             int languageId);
     }
 }

@@ -31,7 +31,7 @@ namespace Ocuda.Ops.Data.Promenade
         }
 
         public async Task<ImageFeatureItemText>
-                    GetByWebslideItemAndLanguageAsync(int imageFeatureItemId, int languageId)
+                    GetByImageFeatureItemAndLanguageAsync(int imageFeatureItemId, int languageId)
         {
             return await DbSet
                 .AsNoTracking()
