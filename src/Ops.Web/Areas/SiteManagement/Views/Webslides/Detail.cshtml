@@ -205,7 +205,7 @@
                                            type="hidden" />
                                     <input id="webslideItem@(item.Id)Language"
                                            asp-for="WebslideItemText.LanguageId"
-                                           value="@(item.WebslideItemText?.LanguageId ?? Model.LanguageId)"
+                                           value="@(item.ImageFeatureItemText?.LanguageId ?? Model.LanguageId)"
                                            type="hidden" />
                                     <div class="row form-group">
                                         <label class="col-form-label text-md-right col-md-3" asp-for="ItemImage">
@@ -228,7 +228,7 @@
                                                     </label>
                                                 </div>
                                                 <div class="custom-file">
-                                                    <input type="text" class="form-control" value="@item.WebslideItemText?.Filename" readonly id="selectedFile" />
+                                                    <input type="text" class="form-control" value="@item.ImageFeatureItemText?.Filename" readonly id="selectedFile" />
                                                 </div>
                                             </div>
                                             <span asp-validation-for="ItemImage" class="validation-message text-danger"></span>
@@ -236,11 +236,11 @@
                                     </div>
                                     <input id="webslideItem@(item.Id)Link"
                                            asp-for="WebslideItemText.Link"
-                                           value="@item.WebslideItemText?.Link"
+                                           value="@item.ImageFeatureItemText?.Link"
                                            formgroup />
                                     <input id="webslideItem@(item.Id)AltText"
                                            asp-for="WebslideItemText.AltText"
-                                           value="@item.WebslideItemText?.AltText"
+                                           value="@item.ImageFeatureItemText?.AltText"
                                            formgroup />
                                     <div class="row">
                                         <div class="offset-md-3 col-md-9">

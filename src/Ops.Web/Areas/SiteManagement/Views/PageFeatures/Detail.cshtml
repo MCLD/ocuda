@@ -209,12 +209,12 @@
                                            asp-for="PageFeatureId"
                                            type="hidden" />
                                     <input id="featureItem@(item.Id)Id"
-                                           asp-for="PageFeatureItemText.PageFeatureItemId"
+                                           asp-for="PageFeatureItemText.ImageFeatureItemId"
                                            value="@item.Id"
                                            type="hidden" />
                                     <input id="featureItem@(item.Id)Language"
                                            asp-for="PageFeatureItemText.LanguageId"
-                                           value="@(item.PageFeatureItemText?.LanguageId ?? Model.LanguageId)"
+                                           value="@(item.ImageFeatureItemText?.LanguageId ?? Model.LanguageId)"
                                            type="hidden" />
                                     <div class="row form-group">
                                         <label class="col-form-label text-md-right col-md-3" asp-for="ItemImage">
@@ -237,7 +237,7 @@
                                                     </label>
                                                 </div>
                                                 <div class="custom-file">
-                                                    <input type="text" class="form-control" value="@item.PageFeatureItemText?.Filename" readonly id="selectedFile" />
+                                                    <input type="text" class="form-control" value="@item.ImageFeatureItemText?.Filename" readonly id="selectedFile" />
                                                 </div>
                                             </div>
                                             <span asp-validation-for="ItemImage" class="validation-message text-danger"></span>
@@ -245,11 +245,11 @@
                                     </div>
                                     <input id="featureItem@(item.Id)Link"
                                            asp-for="PageFeatureItemText.Link"
-                                           value="@item.PageFeatureItemText?.Link"
+                                           value="@item.ImageFeatureItemText?.Link"
                                            formgroup />
                                     <input id="featureItem@(item.Id)AltText"
                                            asp-for="PageFeatureItemText.AltText"
-                                           value="@item.PageFeatureItemText?.AltText"
+                                           value="@item.ImageFeatureItemText?.AltText"
                                            formgroup />
                                     <div class="row">
                                         <div class="offset-md-3 col-md-9">
