@@ -289,6 +289,26 @@ namespace Ocuda.Ops.Service
             return await _pageItemRepository.FindAsync(id);
         }
 
+        public async Task<PageItem> ConnectImageFeatureAsync(PageItem pageItem)
+        {
+            if (pageItem == null)
+            {
+                throw new OcudaException("Cannot connect empty object");
+            }
+
+            var maxSortOrder = await _pageItemRepository
+                .GetMaxSortOrderForLayoutAsync(pageItem.PageLayoutId);
+            if (maxSortOrder.HasValue)
+            {
+                pageItem.Order = maxSortOrder.Value + 1;
+            }
+
+            await _pageItemRepository.AddAsync(pageItem);
+            await _pageItemRepository.SaveAsync();
+            return pageItem;
+
+        }
+
         public async Task<PageItem> CreateItemAsync(PageItem pageItem)
         {
             pageItem.CarouselId = null;
@@ -326,8 +346,10 @@ namespace Ocuda.Ops.Service
                 pageItem.Webslide = await _imageFeatureService.CreateNoSaveAsync(pageItem.Webslide);
             }
 
-            if (pageItem.Carousel == null && pageItem.PageFeature == null
-                && pageItem.Segment == null && pageItem.Webslide == null)
+            if (pageItem.Carousel == null
+                && pageItem.PageFeature == null
+                && pageItem.Segment == null
+                && pageItem.Webslide == null)
             {
                 throw new OcudaException("No type selected");
             }
@@ -390,19 +412,22 @@ namespace Ocuda.Ops.Service
             {
                 await _segmentService.DeleteNoSaveAsync(pageItem.SegmentId.Value);
             }
-            if (pageItem.PageFeatureId.HasValue)
+            if (pageItem.PageFeatureId.HasValue || pageItem.WebslideId.HasValue)
             {
-                await _imageFeatureService.DeleteNoSaveAsync(pageItem.PageFeatureId.Value);
-            }
-            if (pageItem.WebslideId.HasValue)
-            {
-                await _imageFeatureService.DeleteNoSaveAsync(pageItem.WebslideId.Value);
+                var imageFeatureId = pageItem.PageFeatureId ?? pageItem.WebslideId;
+                var usage = await _pageItemRepository
+                    .GetImageFeatureUseCountAsync(imageFeatureId.Value);
+                if (usage <= 1)
+                {
+                    await _imageFeatureService.DeleteNoSaveAsync(imageFeatureId.Value);
+                }
             }
 
             if (!ignoreSort)
             {
                 var subsequentItems = await _pageItemRepository.GetLayoutSubsequentAsync(
-                    pageItem.PageLayoutId, pageItem.Order);
+                    pageItem.PageLayoutId,
+                    pageItem.Order);
 
                 if (subsequentItems.Count > 0)
                 {
@@ -478,7 +503,7 @@ namespace Ocuda.Ops.Service
 
             foreach (var item in layout.Items.OrderBy(_ => _.Order))
             {
-                if (item.SegmentId != null)
+                if (item.SegmentId.HasValue)
                 {
                     var newItem = await CreateItemAsync(new PageItem
                     {
@@ -521,6 +546,22 @@ namespace Ocuda.Ops.Service
                         newItem.SegmentId,
                         item.SegmentId,
                         languageIds);
+                }
+                else if (item.PageFeatureId.HasValue || item.WebslideId.HasValue)
+                {
+                    var newItem = await ConnectImageFeatureAsync(new PageItem
+                    {
+                        Order = item.Order,
+                        PageLayoutId = newLayout.Id,
+                        PageFeatureId = item.PageFeatureId,
+                        WebslideId = item.WebslideId
+                    });
+
+                    _logger.LogDebug("Layout {NewLayoutId}: created item id {ItemId}, linked to {ImageFeatureType} {ImageFeatureId}",
+                        newLayout.Id,
+                        newItem.Id,
+                        newItem.PageFeatureId.HasValue ? "page feature" : "Web slide",
+                        newItem.PageFeatureId ?? newItem.WebslideId.Value);
                 }
             }
 

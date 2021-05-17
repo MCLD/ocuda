@@ -45,6 +45,7 @@ namespace Ocuda.Ops.Data.Promenade
             {
                 Count = await query.CountAsync(),
                 Data = await query
+                    .OrderBy(_ => _.Id)
                     .ApplyPagination(filter)
                     .Include(_ => _.Items)
                     .ToListAsync()

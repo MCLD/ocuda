@@ -7,7 +7,8 @@
 @{
     string imageAltText = string.Empty;
 
-    if (Model.ImageFeatureTemplate?.Height.HasValue == true || Model.ImageFeatureTemplate?.Width.HasValue == true)
+    if (Model.ImageFeatureTemplate?.Height.HasValue == true
+        || Model.ImageFeatureTemplate?.Width.HasValue == true)
     {
         imageAltText = "Feature images need to have ";
 
@@ -55,7 +56,10 @@
            asp-for="ImageFeatureItem.ImageFeatureId"
            value="@Model.ImageFeatureId"
            type="hidden" />
-    <div modal id="addItemModal"
+    <div modal
+         data-backdrop="static"
+         data-keyboard="false"
+         id="addItemModal"
          isLarge="true"
          name="Item"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
@@ -76,6 +80,8 @@
     <input id="editFeatureLanguage" asp-for="LanguageId" type="hidden" />
 
     <div modal
+         data-backdrop="static"
+         data-keyboard="false"
          id="editItemModal"
          isLarge="true"
          name="Segment"
@@ -98,6 +104,8 @@
     <input id="deleteItemId" asp-for="ImageFeatureItem.Id" type="hidden" />
     <input id="deleteItemName" asp-for="ImageFeatureItem.Name" type="hidden" />
     <div modal
+         data-backdrop="static"
+         data-keyboard="false"
          id="deleteItemModal"
          name="Item"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>

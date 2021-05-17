@@ -58,5 +58,13 @@ namespace Ocuda.Ops.Data.Promenade
                 .Select(_ => _.PageLayout)
                 .SingleOrDefaultAsync();
         }
+
+        public async Task<int> GetImageFeatureUseCountAsync(int imageFeatureId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.PageFeatureId == imageFeatureId || _.WebslideId == imageFeatureId)
+                .CountAsync();
+        }
     }
 }
