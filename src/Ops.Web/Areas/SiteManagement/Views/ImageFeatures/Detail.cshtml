@@ -1,4 +1,4 @@
-﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Webslides.DetailViewModel
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.ImageFeatures.DetailViewModel
 
 @section Styles {
     <link rel="stylesheet" href="~/css/dt-picker.min.css" asp-append-version="true" />
@@ -7,22 +7,22 @@
 @{
     string imageAltText = string.Empty;
 
-    if (Model.WebslideTemplate?.Height.HasValue == true || Model.WebslideTemplate?.Width.HasValue == true)
+    if (Model.ImageFeatureTemplate?.Height.HasValue == true || Model.ImageFeatureTemplate?.Width.HasValue == true)
     {
-        imageAltText = "Webslide images need to have ";
+        imageAltText = "Feature images need to have ";
 
-        if (Model.WebslideTemplate.Height.HasValue)
+        if (Model.ImageFeatureTemplate.Height.HasValue)
         {
-            imageAltText += $"a height of {Model.WebslideTemplate.Height}px";
+            imageAltText += $"a height of {Model.ImageFeatureTemplate.Height}px";
 
-            if (Model.WebslideTemplate.Width.HasValue)
+            if (Model.ImageFeatureTemplate.Width.HasValue)
             {
                 imageAltText += " and ";
             }
         }
-        if (Model.WebslideTemplate.Width.HasValue)
+        if (Model.ImageFeatureTemplate.Width.HasValue)
         {
-            imageAltText += $"a width of {Model.WebslideTemplate.Width}px";
+            imageAltText += $"a width of {Model.ImageFeatureTemplate.Width}px";
         }
     }
 }
@@ -30,8 +30,8 @@
 <div class="row mb-2">
     <div class="col-sm-6">
         <h1>
-            Webslide
-            <small class="text-muted">@Model.Webslide.Name</small>
+            Feature
+            <small class="text-muted">@Model.ImageFeature.Name</small>
         </h1>
     </div>
     <div class="col-sm-6">
@@ -44,59 +44,59 @@
                 data-toggle="modal"
                 data-target="#addItemModal">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
-            Add Webslide Item
+            Add Item
         </button>
     </div>
 </div>
 
 <form id="addItemForm" role="form">
     <input id="addItemLanguage" asp-for="LanguageId" type="hidden" />
-    <input id="addItemWebslideId"
-           asp-for="WebslideItem.ImageFeatureId"
-           value="@Model.WebslideId"
+    <input id="addItemFeatureId"
+           asp-for="ImageFeatureItem.ImageFeatureId"
+           value="@Model.ImageFeatureId"
            type="hidden" />
     <div modal id="addItemModal"
          isLarge="true"
          name="Item"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
-        <input id="addItemName" asp-for="WebslideItem.Name" formgroup />
+        <input id="addItemName" asp-for="ImageFeatureItem.Name" formgroup />
         <input id="addItemStartDate"
-               asp-for="WebslideItem.StartDate"
+               asp-for="ImageFeatureItem.StartDate"
                formgroup
                datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
         <input id="addItemEndDate"
-               asp-for="WebslideItem.EndDate"
+               asp-for="ImageFeatureItem.EndDate"
                formgroup
                datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
     </div>
 </form>
 
 <form id="editItemForm" role="form">
-    <input id="editWebslideItem" asp-for="WebslideItem.Id" type="hidden" />
-    <input id="editWebslideLanguage" asp-for="LanguageId" type="hidden" />
+    <input id="editFeatureItem" asp-for="ImageFeatureItem.Id" type="hidden" />
+    <input id="editFeatureLanguage" asp-for="LanguageId" type="hidden" />
 
     <div modal
          id="editItemModal"
          isLarge="true"
          name="Segment"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
-        <input id="editItemName" asp-for="WebslideItem.Name" formgroup />
+        <input id="editItemName" asp-for="ImageFeatureItem.Name" formgroup />
         <input id="editItemStartDate"
-               asp-for="WebslideItem.StartDate"
+               asp-for="ImageFeatureItem.StartDate"
                formgroup
                datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
         <input id="editItemEndDate"
-               asp-for="WebslideItem.EndDate"
+               asp-for="ImageFeatureItem.EndDate"
                formgroup
                datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
     </div>
 </form>
 
-<form asp-action="@(nameof(WebslidesController.DeleteWebslideItem))" method="post" role="form">
-    <input id="deleteItemWebslide" asp-for="WebslideId" type="hidden" />
+<form asp-action="@(nameof(ImageFeaturesController.DeleteImageFeatureItem))" method="post" role="form">
+    <input id="deleteItemFeature" asp-for="ImageFeatureId" type="hidden" />
     <input id="deleteItemLanguage" asp-for="LanguageId" type="hidden" />
-    <input id="deleteItemId" asp-for="WebslideItem.Id" type="hidden" />
-    <input id="deleteItemName" asp-for="WebslideItem.Name" type="hidden" />
+    <input id="deleteItemId" asp-for="ImageFeatureItem.Id" type="hidden" />
+    <input id="deleteItemName" asp-for="ImageFeatureItem.Name" type="hidden" />
     <div modal
          id="deleteItemModal"
          name="Item"
@@ -115,17 +115,26 @@
     </div>
 </div>
 
+@if (Model.ImageFeatureTemplate?.ItemsToDisplay.HasValue == true)
+{
+    <div class="row">
+        <div class="col-12 col-md-9 offset-md-3">
+            <em>Only the first @Model.ImageFeatureTemplate?.ItemsToDisplay items will be displayed.</em>
+        </div>
+    </div>
+}
+
 <div class="row mt-4">
     <div class="col-12">
-        @if (Model.Webslide.Items?.Count == 0)
+        @if (Model.ImageFeature.Items?.Count == 0)
         {
             <div class="alert alert-dark">
-                <em>This webslide has no items.</em>
+                <em>This feature has no items.</em>
             </div>
         }
         else
         {
-            foreach (var item in Model.Webslide.Items)
+            foreach (var item in Model.ImageFeature.Items)
             {
                 <div class="accordion mt-2" id="accordion@(item.Id)">
                     <div class="card">
@@ -151,13 +160,13 @@
                                 <button class="btn btn-sm btn-outline-primary changeSort decreaseSortButton"
                                         data-id="@item.Id"
                                         data-increase="false"
-                                        disabled="@(item.Id == Model.Webslide.Items.First().Id ? "disabled" : null)">
+                                        disabled="@(item.Id == Model.ImageFeature.Items.First().Id ? "disabled" : null)">
                                     <span class="fas fa-arrow-up"></span>
                                 </button>
                                 <button class="btn btn-sm btn-outline-primary changeSort increaseSortButton"
                                         data-id="@item.Id"
                                         data-increase="true"
-                                        disabled="@(item.Id == Model.Webslide.Items.Last().Id ? "disabled" : null)">
+                                        disabled="@(item.Id == Model.ImageFeature.Items.Last().Id ? "disabled" : null)">
                                     <span class="fas fa-arrow-down"></span>
                                 </button>
                                 <button type="button"
@@ -193,18 +202,18 @@
                                         </div>
                                     </div>
                                 }
-                                <form asp-controller="@WebslidesController.Name"
-                                      asp-action="@nameof(WebslidesController.EditWebslideItemText)"
+                                <form asp-controller="@ImageFeaturesController.Name"
+                                      asp-action="@nameof(ImageFeaturesController.EditImageFeatureItemText)"
                                       enctype="multipart/form-data">
-                                    <input id="webslideItem@(item.Id)Webslide"
-                                           asp-for="WebslideId"
+                                    <input id="featureItem@(item.Id)Feature"
+                                           asp-for="ImageFeatureId"
                                            type="hidden" />
-                                    <input id="webslideItem@(item.Id)Id"
-                                           asp-for="WebslideItemText.ImageFeatureItemId"
+                                    <input id="featureItem@(item.Id)Id"
+                                           asp-for="ImageFeatureItemText.ImageFeatureItemId"
                                            value="@item.Id"
                                            type="hidden" />
-                                    <input id="webslideItem@(item.Id)Language"
-                                           asp-for="WebslideItemText.LanguageId"
+                                    <input id="featureItem@(item.Id)Language"
+                                           asp-for="ImageFeatureItemText.LanguageId"
                                            value="@(item.ImageFeatureItemText?.LanguageId ?? Model.LanguageId)"
                                            type="hidden" />
                                     <div class="row form-group">
@@ -234,12 +243,12 @@
                                             <span asp-validation-for="ItemImage" class="validation-message text-danger"></span>
                                         </div>
                                     </div>
-                                    <input id="webslideItem@(item.Id)Link"
-                                           asp-for="WebslideItemText.Link"
+                                    <input id="featureItem@(item.Id)Link"
+                                           asp-for="ImageFeatureItemText.Link"
                                            value="@item.ImageFeatureItemText?.Link"
                                            formgroup />
-                                    <input id="webslideItem@(item.Id)AltText"
-                                           asp-for="WebslideItemText.AltText"
+                                    <input id="featureItem@(item.Id)AltText"
+                                           asp-for="ImageFeatureItemText.AltText"
                                            value="@item.ImageFeatureItemText?.AltText"
                                            formgroup />
                                     <div class="row">
@@ -283,13 +292,13 @@
         }
 
         $("#SelectLanguage").on("change", function () {
-            window.location.href = "@Url.Action(nameof(WebslidesController.Detail), new { id = Model.WebslideId})" + "?language=" + $(this).val();
+            window.location.href = "@Url.Action(nameof(ImageFeaturesController.Detail), new { id = Model.ImageFeatureId})" + "?language=" + $(this).val();
         });
 
         $("#addItemForm").submit(function (e) {
             e.preventDefault();
             var form = $(this);
-            $.post("@(Url.Action(nameof(WebslidesController.AddWebslideItem), WebslidesController.Name))",
+            $.post("@(Url.Action(nameof(ImageFeaturesController.AddImageFeatureItem), ImageFeaturesController.Name))",
                 form.serialize(),
                 function (response) {
                 if (response.success == true) {
@@ -309,7 +318,7 @@
             var startDate = button.data("startdate");
             var endDate = button.data("enddate");
 
-            $("#editWebslideItem").val(id);
+            $("#editFeatureItem").val(id);
             $("#editItemName").val(name);
             $("#editItemStartDate").val(startDate);
             $("#editItemEndDate").val(endDate);
@@ -318,7 +327,7 @@
         $("#editItemForm").submit(function (e) {
             e.preventDefault();
             var form = $(this);
-            $.post("@(Url.Action(nameof(WebslidesController.EditWebslideItem), WebslidesController.Name))",
+            $.post("@(Url.Action(nameof(ImageFeaturesController.EditImageFeatureItem), ImageFeaturesController.Name))",
                 form.serialize(),
                 function (response) {
                 if (response.success == true) {
@@ -348,7 +357,7 @@
             var icon = button.children("span");
             if (icon.hasClass("fa-spinner") == false) {
                 icon.removeClass("fa-arrow-up fa-arrow-down").addClass("fa-spinner fa-pulse");
-                $.post("@Url.Action(nameof(WebslidesController.ChangeSort))",
+                $.post("@Url.Action(nameof(ImageFeaturesController.ChangeSort))",
                     { id, increase },
                     function (response) {
                         icon.removeClass("fa-spinner fa-pulse");
@@ -394,7 +403,7 @@
             }
         });
 
-        @foreach(var item in Model.Webslide.Items)
+        @foreach(var item in Model.ImageFeature.Items)
         {
             <text>
             $('#collapse@(item.Id)').on('show.bs.collapse', function () {

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
-using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.PageFeatures;
+using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.ImageFeatures;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
@@ -23,21 +23,19 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 {
     [Area("SiteManagement")]
     [Route("[area]/[controller]")]
-    public class PageFeaturesController : BaseController<PageFeaturesController>
+    public class ImageFeaturesController : BaseController<ImageFeaturesController>
     {
-        private const string DetailModelStateKey = "PageFeatures.Detail";
-        private const string ImagesFilePath = "images";
-        private const string ItemErrorMessageKey = "PageFeatures.ItemErrorMessage";
-        private const string PageFeaturesFilePath = "features";
+        private const string DetailModelStateKey = "ImageFeatures.Detail";
+        private const string ItemErrorMessageKey = "ImageFeatures.ItemErrorMessage";
 
         private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".png" };
 
         private readonly IDateTimeProvider _dateTimeProvider;
-        private readonly ILanguageService _languageService;
         private readonly IImageFeatureService _imageFeatureService;
+        private readonly ILanguageService _languageService;
         private readonly IPermissionGroupService _permissionGroupService;
 
-        public PageFeaturesController(ServiceFacades.Controller<PageFeaturesController> context,
+        public ImageFeaturesController(ServiceFacades.Controller<ImageFeaturesController> context,
             IDateTimeProvider dateTimeProvider,
             ILanguageService languageService,
             IImageFeatureService imageFeatureService,
@@ -55,11 +53,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         public static string Area { get { return "SiteManagement"; } }
-        public static string Name { get { return "PageFeatures"; } }
+        public static string Name { get { return "ImageFeatures"; } }
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> AddPageFeatureItem(DetailViewModel model)
+        public async Task<IActionResult> AddImageFeatureItem(DetailViewModel model)
         {
             JsonResponse response;
 
@@ -73,14 +71,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             else
             {
-                if (await HasPageFeaturePermissionAsync(model.PageFeatureItem.ImageFeatureId))
+                if (await HasPageContentPermissionAsync(model.ImageFeatureItem.ImageFeatureId))
                 {
                     if (ModelState.IsValid)
                     {
                         try
                         {
                             var featureItem = await _imageFeatureService.CreateItemAsync(
-                                model.PageFeatureItem);
+                                model.ImageFeatureItem);
 
                             var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
 
@@ -140,7 +138,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var featureId = (await _imageFeatureService.GetItemByIdAsync(id)).ImageFeatureId;
 
-            if (await HasPageFeaturePermissionAsync(featureId))
+            if (await HasPageContentPermissionAsync(featureId))
             {
                 try
                 {
@@ -174,13 +172,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> DeletePageFeatureItem(DetailViewModel model)
+        public async Task<IActionResult> DeleteImageFeatureItem(DetailViewModel model)
         {
-            var featureItem = await _imageFeatureService.GetItemByIdAsync(model.PageFeatureItem.Id);
+            var featureItem = await _imageFeatureService
+                .GetItemByIdAsync(model.ImageFeatureItem.Id);
             var featureItemText = await _imageFeatureService
-                .GetItemTextByIdsAsync(model.PageFeatureItem.Id, model.LanguageId);
+                .GetItemTextByIdsAsync(model.ImageFeatureItem.Id, model.LanguageId);
 
-            if (!await HasPageFeaturePermissionAsync(featureItem.ImageFeatureId))
+            if (!await HasPageContentPermissionAsync(featureItem.ImageFeatureId))
             {
                 return RedirectToUnauthorized();
             }
@@ -189,24 +188,18 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             try
             {
-                var filePath = await GetPageFeaturePathAsync(language.Name);
-
-                await _imageFeatureService.DeleteItemAsync(model.PageFeatureItem.Id);
-
-                System.IO.File.Delete(Path.Combine(filePath, featureItemText.Filename));
-
-                ShowAlertSuccess($"Deleted item: {model.PageFeatureItem.Name}");
+                await _imageFeatureService.DeleteItemAsync(model.ImageFeatureItem.Id);
+                ShowAlertSuccess($"Deleted item: {model.ImageFeatureItem.Name}");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting feature item: {Message}", ex.Message);
-                ShowAlertDanger($"Error deleting item: {model.PageFeatureItem.Name}");
+                ShowAlertDanger($"Error deleting item: {model.ImageFeatureItem.Name}");
             }
-
 
             return RedirectToAction(nameof(Detail), new
             {
-                id = model.PageFeatureId,
+                id = model.ImageFeatureId,
                 language = language.IsDefault ? null : language.Name
             });
         }
@@ -215,7 +208,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [RestoreModelState(Key = DetailModelStateKey)]
         public async Task<IActionResult> Detail(int id, string language, int? item)
         {
-            if (!await HasPageFeaturePermissionAsync(id))
+            if (!await HasPageContentPermissionAsync(id))
             {
                 return RedirectToUnauthorized();
             }
@@ -231,8 +224,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var viewModel = new DetailViewModel
             {
-                PageFeature = feature,
-                PageFeatureId = feature.Id,
+                ImageFeature = feature,
+                ImageFeatureId = feature.Id,
                 FocusItemId = item,
                 ItemErrorMessage = TempData[ItemErrorMessageKey] as string,
                 LanguageId = selectedLanguage.Id,
@@ -243,7 +236,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 CurrentDateTime = _dateTimeProvider.Now
             };
 
-            viewModel.PageFeatureTemplate = await _imageFeatureService
+            viewModel.ImageFeatureTemplate = await _imageFeatureService
                 .GetTemplateForImageFeatureAsync(feature.Id);
 
             return View(viewModel);
@@ -251,7 +244,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> EditPageFeatureItem(DetailViewModel model)
+        public async Task<IActionResult> EditImageFeatureItem(DetailViewModel model)
         {
             JsonResponse response;
 
@@ -265,18 +258,20 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             else
             {
-                var featureItem = await _imageFeatureService.GetItemByIdAsync(model.PageFeatureItem.Id);
+                var featureItem = await _imageFeatureService
+                    .GetItemByIdAsync(model.ImageFeatureItem.Id);
 
-                if (await HasPageFeaturePermissionAsync(featureItem.ImageFeatureId))
+                if (await HasPageContentPermissionAsync(featureItem.ImageFeatureId))
                 {
                     if (ModelState.IsValid)
                     {
                         try
                         {
                             featureItem = await _imageFeatureService.EditItemAsync(
-                                model.PageFeatureItem);
+                                model.ImageFeatureItem);
 
-                            var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
+                            var language = await _languageService
+                                .GetActiveByIdAsync(model.LanguageId);
 
                             response = new JsonResponse
                             {
@@ -329,12 +324,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpPost]
         [Route("[action]")]
         [SaveModelState(Key = DetailModelStateKey)]
-        public async Task<IActionResult> EditPageFeatureItemText(DetailViewModel model)
+        public async Task<IActionResult> EditImageFeatureItemText(DetailViewModel model)
         {
             var featureItem = await _imageFeatureService
-                .GetItemByIdAsync(model.PageFeatureItemText.ImageFeatureItemId);
+                .GetItemByIdAsync(model.ImageFeatureItemText.ImageFeatureItemId);
 
-            if (!await HasPageFeaturePermissionAsync(featureItem.ImageFeatureId))
+            if (!await HasPageContentPermissionAsync(featureItem.ImageFeatureId))
             {
                 return RedirectToUnauthorized();
             }
@@ -378,7 +373,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 var currentItemText = await _imageFeatureService.GetItemTextByIdsAsync(
                     featureItem.Id,
-                    model.PageFeatureItemText.LanguageId);
+                    model.ImageFeatureItemText.LanguageId);
 
                 if (currentItemText == null)
                 {
@@ -387,53 +382,57 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
 
             var language = await _languageService
-                .GetActiveByIdAsync(model.PageFeatureItemText.LanguageId);
+                .GetActiveByIdAsync(model.ImageFeatureItemText.LanguageId);
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var itemText = await _imageFeatureService.SetItemTextAsync(
-                        model.PageFeatureItemText);
-
                     if (model.ItemImage != null)
                     {
-                        var filePath = await GetPageFeaturePathAsync(language.Name);
+                        var filePath = await _imageFeatureService
+                            .GetImageFeaturePathAsync(language.Name);
 
                         if (!Directory.Exists(filePath))
                         {
-                            _logger.LogInformation("Creating page feature directory: {Path}",
+                            _logger.LogInformation("Creating image feature directory: {Path}",
                                 filePath);
                             Directory.CreateDirectory(filePath);
                         }
 
+                        // check if it's the same filename and if os, allow it
+                        var currentItem = await _imageFeatureService.GetItemTextByIdsAsync(
+                            model.ImageFeatureItemText.ImageFeatureItemId,
+                            model.ImageFeatureItemText.LanguageId);
+
                         var fullFilePath = Path.Combine(filePath, model.ItemImage.FileName);
 
-                        int renameCounter = 1;
-                        while (System.IO.File.Exists(fullFilePath))
+
+                        if (currentItem?.Filename != model.ItemImage.FileName)
                         {
-                            fullFilePath = Path.Combine(filePath, string.Format(
-                                CultureInfo.InvariantCulture,
-                                "{0}-{1}{2}",
-                                Path.GetFileNameWithoutExtension(model.ItemImage.FileName),
-                                renameCounter++,
-                                Path.GetExtension(model.ItemImage.FileName)));
+                            int renameCounter = 1;
+                            while (System.IO.File.Exists(fullFilePath))
+                            {
+                                fullFilePath = Path.Combine(filePath, string.Format(
+                                    CultureInfo.InvariantCulture,
+                                    "{0}-{1}{2}",
+                                    Path.GetFileNameWithoutExtension(model.ItemImage.FileName),
+                                    renameCounter++,
+                                    Path.GetExtension(model.ItemImage.FileName)));
+                            }
                         }
 
-                        if (System.IO.File.Exists(filePath))
+                        if (System.IO.File.Exists(fullFilePath))
                         {
-                            System.IO.File.Delete(filePath);
+                            System.IO.File.Delete(fullFilePath);
                         }
 
-                        await System.IO.File.WriteAllBytesAsync(filePath, imageBytes);
+                        await System.IO.File.WriteAllBytesAsync(fullFilePath, imageBytes);
 
-                        if (string.IsNullOrWhiteSpace(itemText.Filename))
-                        {
-                            itemText.Filename = Path.GetFileName(fullFilePath);
-
-                            await _imageFeatureService.SetItemTextAsync(itemText);
-                        }
+                        model.ImageFeatureItemText.Filename = Path.GetFileName(fullFilePath);
                     }
+
+                    await _imageFeatureService.SetItemTextAsync(model.ImageFeatureItemText);
 
                     ShowAlertSuccess("Updated item text");
                 }
@@ -445,24 +444,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             return RedirectToAction(nameof(Detail), new
             {
-                id = model.PageFeatureId,
+                id = model.ImageFeatureId,
                 language = language.IsDefault ? null : language.Name,
-                item = model.PageFeatureItemText.ImageFeatureItemId
+                item = model.ImageFeatureItemText.ImageFeatureItemId
             });
         }
 
-        private async Task<string> GetPageFeaturePathAsync(string languageName)
-        {
-            string basePath = await _siteSettingService.GetSettingStringAsync(
-                Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
-
-            return Path.Combine(basePath,
-                ImagesFilePath,
-                languageName,
-                PageFeaturesFilePath);
-        }
-
-        private async Task<bool> HasPageFeaturePermissionAsync(int featureId)
+        private async Task<bool> HasPageContentPermissionAsync(int featureId)
         {
             if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
             {

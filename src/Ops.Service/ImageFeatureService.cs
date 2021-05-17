@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
@@ -14,185 +16,241 @@ namespace Ocuda.Ops.Service
 {
     public class ImageFeatureService : BaseService<ImageFeatureService>, IImageFeatureService
     {
-        private readonly IImageFeatureItemRepository _webslideItemRepository;
-        private readonly IImageFeatureItemTextRepository _webslideItemTextRepository;
-        private readonly IImageFeatureRepository _webslideRepository;
-        private readonly IImageFeatureTemplateRepository _webslideTemplateRepository;
+        private const string FeaturesFilePath = "features";
+        private const string ImagesFilePath = "images";
+        private readonly IImageFeatureItemRepository _imageFeatureItemRepository;
+        private readonly IImageFeatureItemTextRepository _imageFeatureItemTextRepository;
+        private readonly IImageFeatureRepository _imageFeatureRepository;
+        private readonly IImageFeatureTemplateRepository _imageFeatureTemplateRepository;
+        private readonly ILanguageService _languageService;
+        private readonly ISiteSettingService _siteSettingService;
 
         public ImageFeatureService(ILogger<ImageFeatureService> logger,
             IHttpContextAccessor httpContextAccessor,
-            IImageFeatureItemRepository webslideItemRepository,
-            IImageFeatureItemTextRepository webslideItemTextRepository,
-            IImageFeatureRepository webslideRepository,
-            IImageFeatureTemplateRepository webslideTemplateRepository)
+            IImageFeatureItemRepository imageFeatureItemRepository,
+            IImageFeatureItemTextRepository imageFeatureItemTextRepository,
+            IImageFeatureRepository imageFeatureRepository,
+            IImageFeatureTemplateRepository imageFeatureTemplateRepository,
+            ILanguageService languageService,
+            ISiteSettingService siteSettingService)
             : base(logger, httpContextAccessor)
         {
-            _webslideItemRepository = webslideItemRepository
-                ?? throw new ArgumentNullException(nameof(webslideItemRepository));
-            _webslideItemTextRepository = webslideItemTextRepository
-                ?? throw new ArgumentNullException(nameof(webslideItemTextRepository));
-            _webslideRepository = webslideRepository
-                ?? throw new ArgumentNullException(nameof(webslideRepository));
-            _webslideTemplateRepository = webslideTemplateRepository
-                ?? throw new ArgumentNullException(nameof(webslideTemplateRepository));
+            _imageFeatureItemRepository = imageFeatureItemRepository
+                ?? throw new ArgumentNullException(nameof(imageFeatureItemRepository));
+            _imageFeatureItemTextRepository = imageFeatureItemTextRepository
+                ?? throw new ArgumentNullException(nameof(imageFeatureItemTextRepository));
+            _imageFeatureRepository = imageFeatureRepository
+                ?? throw new ArgumentNullException(nameof(imageFeatureRepository));
+            _imageFeatureTemplateRepository = imageFeatureTemplateRepository
+                ?? throw new ArgumentNullException(nameof(imageFeatureTemplateRepository));
+            _languageService = languageService
+                ?? throw new ArgumentNullException(nameof(languageService));
+            _siteSettingService = siteSettingService
+                ?? throw new ArgumentNullException(nameof(siteSettingService));
         }
 
-        public async Task<ImageFeatureItem> CreateItemAsync(ImageFeatureItem webslideItem)
+        public async Task<ImageFeatureItem> CreateItemAsync(ImageFeatureItem imageFeatureItem)
         {
-            webslideItem.Name = webslideItem.Name?.Trim();
+            imageFeatureItem.Name = imageFeatureItem.Name?.Trim();
 
-            var maxSortOrder = await _webslideItemRepository
-                .GetMaxSortOrderForImageFeatureAsync(webslideItem.ImageFeatureId);
+            var maxSortOrder = await _imageFeatureItemRepository
+                .GetMaxSortOrderForImageFeatureAsync(imageFeatureItem.ImageFeatureId);
             if (maxSortOrder.HasValue)
             {
-                webslideItem.Order = maxSortOrder.Value + 1;
+                imageFeatureItem.Order = maxSortOrder.Value + 1;
             }
 
-            await _webslideItemRepository.AddAsync(webslideItem);
-            await _webslideItemRepository.SaveAsync();
-            return webslideItem;
+            await _imageFeatureItemRepository.AddAsync(imageFeatureItem);
+            await _imageFeatureItemRepository.SaveAsync();
+            return imageFeatureItem;
         }
 
-        public async Task<ImageFeature> CreateNoSaveAsync(ImageFeature webslide)
+        public async Task<ImageFeature> CreateNoSaveAsync(ImageFeature imageFeature)
         {
-            webslide.Name = webslide.Name?.Trim();
+            imageFeature.Name = imageFeature.Name?.Trim();
 
-            await _webslideRepository.AddAsync(webslide);
-            return webslide;
+            await _imageFeatureRepository.AddAsync(imageFeature);
+            return imageFeature;
         }
 
-        public async Task DeleteItemAsync(int webslideItemId)
+        public async Task DeleteItemAsync(int imageFeatureItemId)
         {
-            var webslideItem = await _webslideItemRepository.FindAsync(webslideItemId);
+            var imageFeatureItem = await _imageFeatureItemRepository.FindAsync(imageFeatureItemId);
 
-            if (webslideItem == null)
+            if (imageFeatureItem == null)
             {
-                throw new OcudaException("Webslide item does not exist.");
+                throw new OcudaException("Image feature item does not exist.");
             }
 
-            var subsequentItems = await _webslideItemRepository.GetImageFeatureSubsequentAsync(
-                webslideItem.ImageFeatureId, webslideItem.Order);
+            var subsequentItems = await _imageFeatureItemRepository.GetImageFeatureSubsequentAsync(
+                imageFeatureItem.ImageFeatureId,
+                imageFeatureItem.Order);
 
             if (subsequentItems.Count > 0)
             {
                 subsequentItems.ForEach(_ => _.Order--);
-                _webslideItemRepository.UpdateRange(subsequentItems);
+                _imageFeatureItemRepository.UpdateRange(subsequentItems);
             }
 
-            var webslideItemTexts = await _webslideItemTextRepository
-                .GetAllForImageFeatureItemAsync(webslideItem.Id);
-            _webslideItemTextRepository.RemoveRange(webslideItemTexts);
+            var imageFeatureItemTexts = await _imageFeatureItemTextRepository
+                .GetAllForImageFeatureItemAsync(imageFeatureItem.Id);
 
-            _webslideItemRepository.Remove(webslideItem);
-            await _webslideItemRepository.SaveAsync();
+            IDictionary<string, string> issues = null;
+
+            if (imageFeatureItemTexts.Count > 0)
+            {
+                issues = await DeleteImages(imageFeatureItemTexts);
+                _imageFeatureItemTextRepository.RemoveRange(imageFeatureItemTexts);
+            }
+
+            _imageFeatureItemRepository.Remove(imageFeatureItem);
+            await _imageFeatureItemRepository.SaveAsync();
+
+            if (issues?.Count > 0)
+            {
+                string issueTexts = string.Join(',', issues);
+                var oex = new OcudaException($"File deletion error(s): {issueTexts}");
+                foreach (var key in issues.Keys)
+                {
+                    oex.Data[key] = issues[key];
+                }
+                throw oex;
+            }
         }
 
-        public async Task DeleteNoSaveAsync(int id)
+        public async Task DeleteNoSaveAsync(int imageFeatureId)
         {
-            var webslide = await _webslideRepository.FindAsync(id);
-            if (webslide == null)
+            var imageFeature = await _imageFeatureRepository.FindAsync(imageFeatureId);
+            if (imageFeature == null)
             {
-                throw new OcudaException("Could not find that Web Slide");
+                throw new OcudaException("Could not find that image feature");
             }
-            var items = await _webslideItemRepository.GetByImageFeatureAsync(id);
+            var items = await _imageFeatureItemRepository.GetByImageFeatureAsync(imageFeatureId);
+
+            IDictionary<string, string> issues = null;
+
             foreach (var item in items)
             {
-                var itemTexts = await _webslideItemTextRepository
+                var itemTexts = await _imageFeatureItemTextRepository
                     .GetAllForImageFeatureItemAsync(item.Id);
-                _webslideItemTextRepository.RemoveRange(itemTexts);
+                issues = await DeleteImages(itemTexts);
+                _imageFeatureItemTextRepository.RemoveRange(itemTexts);
             }
-            _webslideItemRepository.RemoveRange(items);
-            _webslideRepository.Remove(webslide);
+            _imageFeatureItemRepository.RemoveRange(items);
+            _imageFeatureRepository.Remove(imageFeature);
+
+            if (issues?.Count > 0)
+            {
+                string issueTexts = string.Join(',', issues);
+                var oex = new OcudaException($"File deletion error(s): {issueTexts}");
+                foreach (var key in issues.Keys)
+                {
+                    oex.Data[key] = issues[key];
+                }
+                throw oex;
+            }
         }
 
-        public async Task<ImageFeature> EditAsync(ImageFeature webslide)
+        public async Task<ImageFeature> EditAsync(ImageFeature imageFeature)
         {
-            var currentWebslide = await _webslideRepository.FindAsync(webslide.Id);
+            var currentImageFeature = await _imageFeatureRepository.FindAsync(imageFeature.Id);
 
-            currentWebslide.Name = webslide.Name?.Trim();
+            currentImageFeature.Name = imageFeature.Name?.Trim();
 
-            _webslideRepository.Update(currentWebslide);
-            await _webslideRepository.SaveAsync();
-            return currentWebslide;
+            _imageFeatureRepository.Update(currentImageFeature);
+            await _imageFeatureRepository.SaveAsync();
+            return currentImageFeature;
         }
 
-        public async Task<ImageFeatureItem> EditItemAsync(ImageFeatureItem webslideItem)
+        public async Task<ImageFeatureItem> EditItemAsync(ImageFeatureItem imageFeatureItem)
         {
-            var currentWebslideItem = await _webslideItemRepository.FindAsync(webslideItem.Id);
+            var currentItem = await _imageFeatureItemRepository.FindAsync(imageFeatureItem.Id);
 
-            currentWebslideItem.Name = webslideItem.Name?.Trim();
-            currentWebslideItem.StartDate = webslideItem.StartDate;
-            currentWebslideItem.EndDate = webslideItem.EndDate;
+            currentItem.Name = imageFeatureItem.Name?.Trim();
+            currentItem.StartDate = imageFeatureItem.StartDate;
+            currentItem.EndDate = imageFeatureItem.EndDate;
 
-            _webslideItemRepository.Update(currentWebslideItem);
-            await _webslideItemRepository.SaveAsync();
-            return currentWebslideItem;
+            _imageFeatureItemRepository.Update(currentItem);
+            await _imageFeatureItemRepository.SaveAsync();
+            return currentItem;
         }
 
         public async Task<ICollection<ImageFeatureTemplate>> GetAllTemplatesAsync()
         {
-            return await _webslideTemplateRepository.GetAllAsync();
+            return await _imageFeatureTemplateRepository.GetAllAsync();
         }
 
         public async Task<ImageFeature> GetImageFeatureDetailsAsync(int id, int languageId)
         {
-            var webslide = await _webslideRepository.GetIncludingChildrenAsync(id);
+            var imageFeature = await _imageFeatureRepository.GetIncludingChildrenAsync(id);
 
-            webslide.Items = webslide.Items.OrderBy(_ => _.Order).ToList();
-            foreach (var item in webslide.Items)
+            imageFeature.Items = imageFeature.Items.OrderBy(_ => _.Order).ToList();
+            foreach (var item in imageFeature.Items)
             {
-                item.ImageFeatureItemText = await _webslideItemTextRepository
+                item.ImageFeatureItemText = await _imageFeatureItemTextRepository
                     .GetByImageFeatureItemAndLanguageAsync(item.Id, languageId);
             }
 
-            return webslide;
+            return imageFeature;
+        }
+
+        public async Task<string> GetImageFeaturePathAsync(string languageName)
+        {
+            string basePath = await _siteSettingService.GetSettingStringAsync(
+                Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+            return Path.Combine(basePath,
+                ImagesFilePath,
+                languageName,
+                FeaturesFilePath);
         }
 
         public async Task<ImageFeatureItem> GetItemByIdAsync(int id)
         {
-            return await _webslideItemRepository.FindAsync(id);
+            return await _imageFeatureItemRepository.FindAsync(id);
         }
 
-        public async Task<ImageFeatureItemText> GetItemTextByIdsAsync(int webslideItemId,
+        public async Task<ImageFeatureItemText> GetItemTextByIdsAsync(int imageFeatureItemId,
             int languageId)
         {
-            return await _webslideItemTextRepository.GetByImageFeatureItemAndLanguageAsync(
-                webslideItemId, languageId);
+            return await _imageFeatureItemTextRepository.GetByImageFeatureItemAndLanguageAsync(
+                imageFeatureItemId, languageId);
         }
 
         public async Task<int?> GetPageHeaderIdForImageFeatureAsync(int id)
         {
-            return await _webslideRepository.GetPageHeaderIdForImageFeatureAsync(id);
+            return await _imageFeatureRepository.GetPageHeaderIdForImageFeatureAsync(id);
         }
 
         public async Task<int> GetPageLayoutIdForImageFeatureAsync(int id)
         {
-            return await _webslideRepository.GetPageLayoutIdForImageFeatureAsync(id);
+            return await _imageFeatureRepository.GetPageLayoutIdForImageFeatureAsync(id);
         }
 
         public async Task<ImageFeatureTemplate> GetTemplateForImageFeatureAsync(int id)
         {
-            return await _webslideTemplateRepository.GetForImageFeatureAsync(id);
+            return await _imageFeatureTemplateRepository.GetForImageFeatureAsync(id);
         }
 
         public async Task<ImageFeatureTemplate> GetTemplateForPageLayoutAsync(int id)
         {
-            return await _webslideTemplateRepository.GetForPageLayoutAsync(id);
+            return await _imageFeatureTemplateRepository.GetForPageLayoutAsync(id);
         }
 
         public async Task<ImageFeatureItemText> SetItemTextAsync(ImageFeatureItemText itemText)
         {
-            var currentText = await _webslideItemTextRepository.GetByImageFeatureItemAndLanguageAsync(
-                itemText.ImageFeatureItemId, itemText.LanguageId);
+            var currentText = await _imageFeatureItemTextRepository
+                .GetByImageFeatureItemAndLanguageAsync(itemText.ImageFeatureItemId,
+                    itemText.LanguageId);
 
             if (currentText == null)
             {
                 itemText.AltText = itemText.AltText?.Trim();
                 itemText.Link = itemText.Link?.Trim();
 
-                await _webslideItemTextRepository.AddAsync(itemText);
-                await _webslideItemTextRepository.SaveAsync();
-                _webslideItemTextRepository.DetachEntity(itemText);
+                await _imageFeatureItemTextRepository.AddAsync(itemText);
+                await _imageFeatureItemTextRepository.SaveAsync();
+                _imageFeatureItemTextRepository.DetachEntity(itemText);
 
                 return itemText;
             }
@@ -201,14 +259,20 @@ namespace Ocuda.Ops.Service
                 currentText.AltText = itemText.AltText?.Trim();
                 currentText.Link = itemText.Link?.Trim();
 
+
                 if (!string.IsNullOrWhiteSpace(itemText.Filename))
                 {
+                    if (currentText.Filename != itemText.Filename)
+                    {
+                        // new filename means delete the old file
+                        await DeleteImage(currentText);
+                    }
                     currentText.Filename = itemText.Filename?.Trim();
                 }
 
-                _webslideItemTextRepository.Update(currentText);
-                await _webslideItemTextRepository.SaveAsync();
-                _webslideItemTextRepository.DetachEntity(currentText);
+                _imageFeatureItemTextRepository.Update(currentText);
+                await _imageFeatureItemTextRepository.SaveAsync();
+                _imageFeatureItemTextRepository.DetachEntity(currentText);
 
                 return currentText;
             }
@@ -216,7 +280,7 @@ namespace Ocuda.Ops.Service
 
         public async Task UpdateItemSortOrder(int id, bool increase)
         {
-            var item = await _webslideItemRepository.FindAsync(id);
+            var item = await _imageFeatureItemRepository.FindAsync(id);
 
             int newSortOrder;
             if (increase)
@@ -232,7 +296,7 @@ namespace Ocuda.Ops.Service
                 newSortOrder = item.Order - 1;
             }
 
-            var itemInPosition = await _webslideItemRepository.GetByImageFeatureAndOrderAsync(
+            var itemInPosition = await _imageFeatureItemRepository.GetByImageFeatureAndOrderAsync(
                 item.ImageFeatureId, newSortOrder);
 
             if (itemInPosition == null)
@@ -243,9 +307,47 @@ namespace Ocuda.Ops.Service
             itemInPosition.Order = item.Order;
             item.Order = newSortOrder;
 
-            _webslideItemRepository.Update(item);
-            _webslideItemRepository.Update(itemInPosition);
-            await _webslideItemRepository.SaveAsync();
+            _imageFeatureItemRepository.Update(item);
+            _imageFeatureItemRepository.Update(itemInPosition);
+            await _imageFeatureItemRepository.SaveAsync();
+        }
+        private async Task<IDictionary<string, string>> DeleteImage(ImageFeatureItemText itemTexts)
+        {
+            return await DeleteImages(new[] { itemTexts });
+        }
+
+        private async Task<IDictionary<string, string>>
+            DeleteImages(ICollection<ImageFeatureItemText> itemTexts)
+        {
+            var issues = new Dictionary<string, string>();
+            if (itemTexts.Count > 0)
+            {
+                var languages = await _languageService.GetActiveAsync();
+
+                foreach (var itemText in itemTexts)
+                {
+                    var languageName = languages.SingleOrDefault(_ => _.Id == itemText.LanguageId);
+
+                    if (languageName != null)
+                    {
+                        var path = await GetImageFeaturePathAsync(languageName.Name);
+
+                        try
+                        {
+                            File.Delete(Path.Combine(path, itemText.Filename));
+                        }
+                        catch (IOException ioex)
+                        {
+                            _logger.LogError(ioex,
+                                "Problem deleting file {FilePath}: {ErrorMessage}",
+                                path,
+                                ioex.Message);
+                            issues.Add(path, ioex.Message);
+                        }
+                    }
+                }
+            }
+            return issues;
         }
     }
 }

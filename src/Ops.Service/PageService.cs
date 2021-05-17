@@ -390,6 +390,10 @@ namespace Ocuda.Ops.Service
             {
                 await _segmentService.DeleteNoSaveAsync(pageItem.SegmentId.Value);
             }
+            if (pageItem.PageFeatureId.HasValue)
+            {
+                await _imageFeatureService.DeleteNoSaveAsync(pageItem.PageFeatureId.Value);
+            }
             if (pageItem.WebslideId.HasValue)
             {
                 await _imageFeatureService.DeleteNoSaveAsync(pageItem.WebslideId.Value);

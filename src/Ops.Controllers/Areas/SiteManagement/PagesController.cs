@@ -754,8 +754,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         }
                         else if (pageItem.PageFeature != null)
                         {
-                            url = Url.Action(nameof(PageFeaturesController.Detail),
-                                PageFeaturesController.Name,
+                            url = Url.Action(nameof(ImageFeaturesController.Detail),
+                                ImageFeaturesController.Name,
                                 new { id = pageItem.PageFeature.Id });
                         }
                         else if (pageItem.Segment != null)
@@ -766,8 +766,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         }
                         else if (pageItem.Webslide != null)
                         {
-                            url = Url.Action(nameof(WebslidesController.Detail),
-                                WebslidesController.Name,
+                            url = Url.Action(nameof(ImageFeaturesController.Detail),
+                                ImageFeaturesController.Name,
                                 new { id = pageItem.Webslide.Id });
                         }
 

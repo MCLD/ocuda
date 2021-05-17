@@ -61,32 +61,32 @@ namespace Ocuda.Promenade.Service
                 ?? throw new ArgumentNullException(nameof(languageService));
         }
 
-        public async Task<ImageFeature> GetByIdAsync(int webslideId, bool forceReload)
+        public async Task<ImageFeature> GetByIdAsync(int imageFeatureId, bool forceReload)
         {
-            ImageFeature webslide = null;
+            ImageFeature imageFeature = null;
 
-            bool cacheWebSlide = false;
+            bool cacheImageFeature = false;
             var cachePageSpan = GetPageCacheSpan(_config);
 
-            string webslideCacheKey = string.Format(CultureInfo.InvariantCulture,
+            string imageFeatureCacheKey = string.Format(CultureInfo.InvariantCulture,
                 Utility.Keys.Cache.PromImageFeature,
-                webslideId);
+                imageFeatureId);
 
             if (cachePageSpan.HasValue && !forceReload)
             {
-                webslide = await _cache.GetObjectFromCacheAsync<ImageFeature>(webslideCacheKey);
+                imageFeature = await _cache.GetObjectFromCacheAsync<ImageFeature>(imageFeatureCacheKey);
             }
 
-            if (webslide == null)
+            if (imageFeature == null)
             {
-                webslide = await _imageFeatureRepository.FindAsync(webslideId);
+                imageFeature = await _imageFeatureRepository.FindAsync(imageFeatureId);
 
-                if (webslide != null)
+                if (imageFeature != null)
                 {
-                    webslide.Items = await _imageFeatureItemRepository
-                        .GetActiveForImageFeatureAsync(webslide.Id);
+                    imageFeature.Items = await _imageFeatureItemRepository
+                        .GetActiveForImageFeatureAsync(imageFeature.Id);
 
-                    foreach (var item in webslide.Items)
+                    foreach (var item in imageFeature.Items)
                     {
                         item.ImageFeature = null;
                     }
@@ -94,11 +94,11 @@ namespace Ocuda.Promenade.Service
 
                 if (cachePageSpan.HasValue)
                 {
-                    cacheWebSlide = true;
+                    cacheImageFeature = true;
                 }
             }
 
-            if (webslide != null)
+            if (imageFeature != null)
             {
                 var currentCultureName = _httpContextAccessor
                     .HttpContext
@@ -121,7 +121,7 @@ namespace Ocuda.Promenade.Service
                 string languageName = await _languageService
                     .GetNameAsync(currentLanguageId ?? defaultLanguageId, forceReload);
 
-                foreach (var item in webslide.Items)
+                foreach (var item in imageFeature.Items)
                 {
                     var expire = cachePageSpan;
                     if (cachePageSpan.HasValue && item.EndDate.HasValue)
@@ -203,13 +203,13 @@ namespace Ocuda.Promenade.Service
 
                 foreach (var item in invalidItems)
                 {
-                    webslide.Items.Remove(item);
+                    imageFeature.Items.Remove(item);
                 }
 
-                if (cachePageSpan.HasValue && cacheWebSlide)
+                if (cachePageSpan.HasValue && cacheImageFeature)
                 {
                     var expire = cachePageSpan.Value;
-                    var earliestExpiration = webslide.Items.Where(_ => _.EndDate != null
+                    var earliestExpiration = imageFeature.Items.Where(_ => _.EndDate != null
                             && _.EndDate != default
                             && _.EndDate > _dateTimeProvider.Now)
                         .Min(_ => _.EndDate);
@@ -220,17 +220,17 @@ namespace Ocuda.Promenade.Service
                         if (expire != cachePageSpan.Value)
                         {
                             _logger.LogInformation("Shortening webslide {Name} ({ItemId}) cache to {CacheForTime}, due to item expiration at {EndDate}",
-                                webslide.Name,
-                                webslide.Id,
+                                imageFeature.Name,
+                                imageFeature.Id,
                                 expire,
                                 earliestExpiration.Value);
                         }
                     }
 
-                    await _cache.SaveToCacheAsync(webslideCacheKey, webslide, expire);
+                    await _cache.SaveToCacheAsync(imageFeatureCacheKey, imageFeature, expire);
                 }
             }
-            return webslide;
+            return imageFeature;
         }
 
         public async Task<ImageFeatureTemplate> GetTemplateForPageLayoutAsync(int id)

@@ -22,6 +22,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         Task<ImageFeature> GetImageFeatureDetailsAsync(int id, int languageId);
 
+        Task<string> GetImageFeaturePathAsync(string languageName);
+
         Task<ImageFeatureItem> GetItemByIdAsync(int id);
 
         Task<ImageFeatureItemText> GetItemTextByIdsAsync(int imageFeatureItemId, int languageId);
