@@ -102,11 +102,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
                 PermissionIds = UserClaims(ClaimType.PermissionId),
                 CarouselTemplates = new SelectList(await _carouselService.GetAllTemplatesAsync(),
-                    nameof(CarouselTemplate.Id), nameof(CarouselTemplate.Name)),
-                FeatureTemplates = new SelectList(await _imageFeatureService.GetAllTemplatesAsync(),
-                    nameof(ImageFeatureTemplate.Id), nameof(ImageFeatureTemplate.Name)),
-                WebslideTemplates = new SelectList(await _imageFeatureService.GetAllTemplatesAsync(),
-                    nameof(ImageFeatureTemplate.Id), nameof(ImageFeatureTemplate.Name))
+                    nameof(CarouselTemplate.Id),
+                    nameof(CarouselTemplate.Name)),
+                ImageFeatureTemplates
+                    = new SelectList(await _imageFeatureService.GetAllTemplatesAsync(),
+                        nameof(ImageFeatureTemplate.Id),
+                        nameof(ImageFeatureTemplate.Name)),
             };
 
             return View(viewModel);
@@ -190,10 +191,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 try
                 {
                     var header = await _pageService.EditHeaderAsync(model.PageHeader);
-                    response = new JsonResponse
-                    {
-                        Success = true
-                    };
+                    response = new JsonResponse { Success = true };
                     ShowAlertSuccess($"Updated page: {header.PageName}");
                 }
                 catch (OcudaException ex)
@@ -713,7 +711,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
                 layout.PageHeaderId))
             {
-                if (model.Carousel == null && model.PageFeature == null && model.Segment == null
+                if (model.Carousel == null
+                    && model.PageFeature == null
+                    && model.Segment == null
                     && model.Webslide == null)
                 {
                     ModelState.AddModelError("PageItem", "No content to add.");

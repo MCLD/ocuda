@@ -7,7 +7,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     public interface IImageFeatureTemplateRepository : IGenericRepository<ImageFeatureTemplate>
     {
         Task<ICollection<ImageFeatureTemplate>> GetAllAsync();
-        Task<ImageFeatureTemplate> GetForPageLayoutAsync(int pageLayoutId);
-        Task<ImageFeatureTemplate> GetForImageFeatureAsync(int webslideId);
+        Task<ImageFeatureTemplate> GetForImageFeatureAsync(int imageFeatureId);
     }
 }

@@ -232,11 +232,6 @@ namespace Ocuda.Ops.Service
             return await _imageFeatureTemplateRepository.GetForImageFeatureAsync(id);
         }
 
-        public async Task<ImageFeatureTemplate> GetTemplateForPageLayoutAsync(int id)
-        {
-            return await _imageFeatureTemplateRepository.GetForPageLayoutAsync(id);
-        }
-
         public async Task<ImageFeatureItemText> SetItemTextAsync(ImageFeatureItemText itemText)
         {
             var currentText = await _imageFeatureItemTextRepository

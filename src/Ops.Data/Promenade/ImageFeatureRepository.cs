@@ -40,7 +40,7 @@ namespace Ocuda.Ops.Data.Promenade
                 .AsNoTracking()
                 .Where(_ => _.WebslideId == id || _.PageFeatureId == id)
                 .Select(_ => _.PageLayout.PageHeaderId)
-                .SingleOrDefaultAsync();
+                .FirstOrDefaultAsync();
         }
 
         public async Task<int> GetPageLayoutIdForImageFeatureAsync(int id)
@@ -49,7 +49,7 @@ namespace Ocuda.Ops.Data.Promenade
                 .AsNoTracking()
                 .Where(_ => _.WebslideId == id || _.PageFeatureId == id)
                 .Select(_ => _.PageLayoutId)
-                .SingleOrDefaultAsync();
+                .FirstOrDefaultAsync();
         }
     }
 }

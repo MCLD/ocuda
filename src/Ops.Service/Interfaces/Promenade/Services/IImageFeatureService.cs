@@ -34,8 +34,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         Task<ImageFeatureTemplate> GetTemplateForImageFeatureAsync(int id);
 
-        Task<ImageFeatureTemplate> GetTemplateForPageLayoutAsync(int id);
-
         Task<ImageFeatureItemText> SetItemTextAsync(ImageFeatureItemText itemText);
 
         Task UpdateItemSortOrder(int id, bool increase);

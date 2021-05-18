@@ -25,22 +25,19 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
-        public async Task<ImageFeatureTemplate> GetForPageLayoutAsync(int pageLayoutId)
-        {
-            return await _context.PageLayouts
-                .AsNoTracking()
-                .Where(_ => _.Id == pageLayoutId)
-                .Select(_ => _.PageHeader.LayoutWebslideTemplate)
-                .SingleOrDefaultAsync();
-        }
-
         public async Task<ImageFeatureTemplate> GetForImageFeatureAsync(int imageFeatureId)
         {
-            return await _context.PageLayouts
+            var webslideTemplate = await _context.PageLayouts
                 .AsNoTracking()
                 .Where(_ => _.Items.Any(_ => _.WebslideId == imageFeatureId))
                 .Select(_ => _.PageHeader.LayoutWebslideTemplate)
-                .SingleOrDefaultAsync();
+                .FirstOrDefaultAsync();
+
+            return webslideTemplate ?? await _context.PageLayouts
+                .AsNoTracking()
+                .Where(_ => _.Items.Any(_ => _.PageFeatureId == imageFeatureId))
+                .Select(_ => _.PageHeader.LayoutFeatureTemplate)
+                .FirstOrDefaultAsync();
         }
     }
 }

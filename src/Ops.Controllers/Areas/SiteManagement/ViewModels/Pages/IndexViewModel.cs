@@ -15,7 +15,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
         public IList<string> PermissionIds { get; set; }
 
         public SelectList CarouselTemplates { get; set; }
-        public SelectList FeatureTemplates { get; set; }
-        public SelectList WebslideTemplates { get; set; }
+        public SelectList ImageFeatureTemplates { get; set; }
     }
 }
