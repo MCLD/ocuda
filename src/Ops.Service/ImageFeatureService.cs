@@ -254,7 +254,6 @@ namespace Ocuda.Ops.Service
                 currentText.AltText = itemText.AltText?.Trim();
                 currentText.Link = itemText.Link?.Trim();
 
-
                 if (!string.IsNullOrWhiteSpace(itemText.Filename))
                 {
                     if (currentText.Filename != itemText.Filename)
@@ -306,6 +305,7 @@ namespace Ocuda.Ops.Service
             _imageFeatureItemRepository.Update(itemInPosition);
             await _imageFeatureItemRepository.SaveAsync();
         }
+
         private async Task<IDictionary<string, string>> DeleteImage(ImageFeatureItemText itemTexts)
         {
             return await DeleteImages(new[] { itemTexts });

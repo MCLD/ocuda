@@ -27,15 +27,17 @@ namespace Ocuda.Promenade.Models.Entities
 
         [DisplayName("Carousel Template")]
         public int? LayoutCarouselTemplateId { get; set; }
-        public CarouselTemplate LayoutCarouselTemplate { get; set; }
 
+        public CarouselTemplate LayoutCarouselTemplate { get; set; }
 
         [DisplayName("Feature Template")]
         public int? LayoutFeatureTemplateId { get; set; }
+
         public ImageFeatureTemplate LayoutFeatureTemplate { get; set; }
 
         [DisplayName("Webslide Template")]
         public int? LayoutWebslideTemplateId { get; set; }
+
         public ImageFeatureTemplate LayoutWebslideTemplate { get; set; }
 
         [NotMapped]

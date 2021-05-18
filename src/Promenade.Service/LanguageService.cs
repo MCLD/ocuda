@@ -44,7 +44,7 @@ namespace Ocuda.Promenade.Service
 
             if (!forceReload)
             {
-                var cachedLanguageId = await _cache.GetIntFromCacheAsync( cacheKey);
+                var cachedLanguageId = await _cache.GetIntFromCacheAsync(cacheKey);
                 if (cachedLanguageId.HasValue)
                 {
                     return cachedLanguageId.Value;
@@ -74,7 +74,7 @@ namespace Ocuda.Promenade.Service
 
             if (!forceReload)
             {
-                var cachedLanguageId = await _cache.GetIntFromCacheAsync( cacheKey);
+                var cachedLanguageId = await _cache.GetIntFromCacheAsync(cacheKey);
 
                 if (cachedLanguageId.HasValue)
                 {
@@ -100,7 +100,7 @@ namespace Ocuda.Promenade.Service
 
             if (!forceReload)
             {
-                var cachedLanguageName = await _cache.GetStringFromCache( cacheKey);
+                var cachedLanguageName = await _cache.GetStringFromCache(cacheKey);
 
                 if (!string.IsNullOrEmpty(cachedLanguageName))
                 {

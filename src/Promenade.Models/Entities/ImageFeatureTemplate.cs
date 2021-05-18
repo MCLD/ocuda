@@ -16,6 +16,5 @@ namespace Ocuda.Promenade.Models.Entities
 
         public int? Width { get; set; }
         public int? ItemsToDisplay { get; set; }
-
     }
 }

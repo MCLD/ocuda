@@ -6,7 +6,9 @@ namespace Ocuda.Promenade.Data
 {
     public abstract class PromenadeContext : Utility.Data.DbContextBase, IDataProtectionKeyContext
     {
-        protected PromenadeContext(DbContextOptions options) : base(options) { }
+        protected PromenadeContext(DbContextOptions options) : base(options)
+        {
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -48,6 +50,7 @@ namespace Ocuda.Promenade.Data
 
         // Read-Only
         public DbSet<CarouselButtonLabel> CarouselButtonLabels { get; }
+
         public DbSet<CarouselButton> CarouselButtons { get; }
         public DbSet<CarouselButtonLabelText> CarouselButtonLabelTexts { get; }
         public DbSet<CarouselItem> CarouselItems { get; }
@@ -92,8 +95,9 @@ namespace Ocuda.Promenade.Data
         public DbSet<SocialCard> SocialCards { get; }
         public DbSet<UrlRedirect> UrlRedirects { get; }
 
-        // Read/Write 
+        // Read/Write
         public DbSet<Language> Languages { get; set; }
+
         public DbSet<ScheduleRequest> ScheduleRequest { get; set; }
         public DbSet<UrlRedirectAccess> UrlRedirectAccesses { get; set; }
         public DbSet<PageHeader> PageHeaders { get; set; }

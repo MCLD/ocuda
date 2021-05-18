@@ -152,6 +152,7 @@ namespace Ocuda.Promenade.Service
         {
             return await GetSettingValueAsync(key, forceReload);
         }
+
         private static SiteSetting GetDefaultSetting(string key)
             => Models.Defaults.SiteSettings.Get.Single(_ => _.Id == key);
 

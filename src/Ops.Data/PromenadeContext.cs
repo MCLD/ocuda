@@ -9,7 +9,9 @@ namespace Ocuda.Ops.Data
     public abstract class PromenadeContext
         : Utility.Data.DbContextBase, IMigratableContext, IDataProtectionKeyContext
     {
-        protected PromenadeContext(DbContextOptions options) : base(options) { }
+        protected PromenadeContext(DbContextOptions options) : base(options)
+        {
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -58,9 +60,13 @@ namespace Ocuda.Ops.Data
         }
 
         #region IMigratableContext
+
         public new void Migrate() => Database.Migrate();
+
         public new IEnumerable<string> GetPendingMigrationList() => Database.GetPendingMigrations();
+
         public new string GetCurrentMigration() => Database.GetAppliedMigrations().Last();
+
         #endregion IMigratableContext
 
         public DbSet<CarouselButtonLabel> CarouselButtonLabels { get; set; }

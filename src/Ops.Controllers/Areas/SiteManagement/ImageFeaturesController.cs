@@ -407,7 +407,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                         var fullFilePath = Path.Combine(filePath, model.ItemImage.FileName);
 
-
                         if (currentItem?.Filename != model.ItemImage.FileName)
                         {
                             int renameCounter = 1;

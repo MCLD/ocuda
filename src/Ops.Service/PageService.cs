@@ -306,7 +306,6 @@ namespace Ocuda.Ops.Service
             await _pageItemRepository.AddAsync(pageItem);
             await _pageItemRepository.SaveAsync();
             return pageItem;
-
         }
 
         public async Task<PageItem> CreateItemAsync(PageItem pageItem)
