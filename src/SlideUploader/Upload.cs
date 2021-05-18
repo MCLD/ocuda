@@ -25,10 +25,14 @@ namespace Ocuda.SlideUploader
 
         internal async Task JobAsync(string jobFile, string jobResultFile)
         {
-            if (!System.IO.File.Exists(jobFile))
+            var jobFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, jobFile);
+            var jobResultFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+                jobResultFile);
+
+            if (!System.IO.File.Exists(jobFilePath))
             {
                 _logger.LogCritical("No {JobFile} job file found.", jobFile);
-                await JobFailureAsync(jobResultFile, $"No {jobFile} job file found.");
+                await JobFailureAsync(jobResultFilePath, $"No {jobFile} job file found.");
                 return;
             }
 
@@ -37,7 +41,7 @@ namespace Ocuda.SlideUploader
             if (string.IsNullOrEmpty(checkAuth))
             {
                 _logger.LogCritical("Unable to continue upload, cannot authenticate");
-                await JobFailureAsync(jobResultFile, "Unable to upload: cannot authenticate.");
+                await JobFailureAsync(jobResultFilePath, "Unable to upload: cannot authenticate.");
                 return;
             }
 
@@ -45,7 +49,7 @@ namespace Ocuda.SlideUploader
 
             try
             {
-                job = ParseJobFile(jobFile);
+                job = ParseJobFile(jobFilePath);
             }
             catch (OcudaException oex)
             {
@@ -54,7 +58,7 @@ namespace Ocuda.SlideUploader
                     "Unable read job file {JobFile}: {ErrorMessage}",
                     jobFile,
                     ex.Message);
-                await JobFailureAsync(jobResultFile, $"Critical job error: {ex.Message}.");
+                await JobFailureAsync(jobResultFilePath, $"Critical job error: {ex.Message}.");
                 return;
             }
 
@@ -78,17 +82,18 @@ namespace Ocuda.SlideUploader
                     jobResult.Message);
             }
 
-            await System.IO.File.WriteAllTextAsync(jobResultFile,
+            await System.IO.File.WriteAllTextAsync(jobResultFilePath,
                 JsonSerializer.Serialize(jobResult));
         }
 
-        private static async Task JobFailureAsync(string jobResultFile, string message)
+        private static async Task JobFailureAsync(string jobResultFilePath, string message)
         {
-            await File.WriteAllTextAsync(jobResultFile, JsonSerializer.Serialize(new JsonResponse
-            {
-                Success = false,
-                Message = message
-            }));
+            await File.WriteAllTextAsync(jobResultFilePath,
+                JsonSerializer.Serialize(new JsonResponse
+                {
+                    Success = false,
+                    Message = message
+                }));
         }
 
         private static SlideUploadJob ParseJobFile(string jobFile)
