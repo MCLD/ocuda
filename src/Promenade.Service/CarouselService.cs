@@ -5,33 +5,33 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Abstract;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Service
 {
     public class CarouselService : BaseService<CarouselService>
     {
-        private readonly IDistributedCache _cache;
-        private readonly IConfiguration _config;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IOcudaCache _cache;
         private readonly ICarouselButtonLabelTextRepository _carouselButtonLabelTextRepository;
         private readonly ICarouselItemRepository _carouselItemRepository;
         private readonly ICarouselItemTextRepository _carouselItemTextRepository;
         private readonly ICarouselRepository _carouselRepository;
         private readonly ICarouselTemplateRepository _carouselTemplateRepository;
         private readonly ICarouselTextRepository _carouselTextRepository;
-        private readonly IPageLayoutRepository _pageLayoutRepository;
+        private readonly IConfiguration _config;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly LanguageService _languageService;
+        private readonly IPageLayoutRepository _pageLayoutRepository;
 
         public CarouselService(ILogger<CarouselService> logger,
             IDateTimeProvider dateTimeProvider,
-            IDistributedCache cache,
+            IOcudaCache cache,
             IConfiguration config,
             IHttpContextAccessor httpContextAccessor,
             ICarouselButtonLabelTextRepository carouselButtonLabelTextRepository,
@@ -75,9 +75,9 @@ namespace Ocuda.Promenade.Service
                 Utility.Keys.Cache.PromCarousel,
                 carouselId);
 
-            if (cachePagesInHours != null && !forceReload)
+            if (cachePagesInHours > 0 && !forceReload)
             {
-                carousel = await GetFromCacheAsync<Carousel>(_cache, carouselCacheKey);
+                carousel = await _cache.GetObjectFromCacheAsync<Carousel>(carouselCacheKey);
             }
 
             if (carousel == null)
@@ -109,7 +109,7 @@ namespace Ocuda.Promenade.Service
                     }
                 }
 
-                await SaveToCacheAsync(_cache, carouselCacheKey, carousel, cachePagesInHours);
+                await _cache.SaveToCacheAsync(carouselCacheKey, carousel, cachePagesInHours);
             }
 
             if (carousel != null)
@@ -137,9 +137,9 @@ namespace Ocuda.Promenade.Service
                         currentLanguageId,
                         carousel.Id);
 
-                    if (cachePagesInHours != null && !forceReload)
+                    if (cachePagesInHours > 0 && !forceReload)
                     {
-                        carousel.CarouselText = await GetFromCacheAsync<CarouselText>(_cache,
+                        carousel.CarouselText = await _cache.GetObjectFromCacheAsync<CarouselText>(
                             carouselTextCacheKey);
                     }
 
@@ -148,8 +148,7 @@ namespace Ocuda.Promenade.Service
                         carousel.CarouselText = await _carouselTextRepository.GetByIdsAsync(
                             carousel.Id, currentLanguageId.Value);
 
-                        await SaveToCacheAsync(_cache,
-                            carouselTextCacheKey,
+                        await _cache.SaveToCacheAsync(carouselTextCacheKey,
                             carousel.CarouselText,
                             cachePagesInHours);
                     }
@@ -162,9 +161,9 @@ namespace Ocuda.Promenade.Service
                         defaultLanguageId,
                         carousel.Id);
 
-                    if (cachePagesInHours != null && !forceReload)
+                    if (cachePagesInHours > 0 && !forceReload)
                     {
-                        carousel.CarouselText = await GetFromCacheAsync<CarouselText>(_cache,
+                        carousel.CarouselText = await _cache.GetObjectFromCacheAsync<CarouselText>(
                             carouselTextCacheKey);
                     }
 
@@ -173,8 +172,7 @@ namespace Ocuda.Promenade.Service
                         carousel.CarouselText = await _carouselTextRepository.GetByIdsAsync(
                             carousel.Id, defaultLanguageId);
 
-                        await SaveToCacheAsync(_cache,
-                            carouselTextCacheKey,
+                        await _cache.SaveToCacheAsync(carouselTextCacheKey,
                             carousel.CarouselText,
                             cachePagesInHours);
                     }
@@ -234,9 +232,10 @@ namespace Ocuda.Promenade.Service
                 itemId,
                 currentPageLayout.Value);
 
-            if (cachePagesInHours != null && !forceReload)
+            if (cachePagesInHours > 0 && !forceReload)
             {
-                carouselItem = await GetFromCacheAsync<CarouselItem>(_cache, carouselItemCacheKey);
+                carouselItem = await _cache
+                    .GetObjectFromCacheAsync<CarouselItem>(carouselItemCacheKey);
             }
 
             if (carouselItem == null)
@@ -264,7 +263,8 @@ namespace Ocuda.Promenade.Service
                     }
                 }
 
-                await SaveToCacheAsync(_cache, carouselItemCacheKey, carouselItem,
+                await _cache.SaveToCacheAsync(carouselItemCacheKey,
+                    carouselItem,
                     cachePagesInHours);
             }
 
@@ -310,73 +310,10 @@ namespace Ocuda.Promenade.Service
             return carouselItem;
         }
 
-        private async Task<CarouselItemText> GetItemTextAsync(int itemId,
-            int defaultLanguageId,
-            int? currentLanguageId,
-            int? cachePagesInHours,
-            bool forceReload)
-        {
-            CarouselItemText itemText = null;
-
-            if (currentLanguageId.HasValue)
-            {
-                var carouselItemTextCacheKey = string.Format(CultureInfo.InvariantCulture,
-                    Utility.Keys.Cache.PromCarouselItemText,
-                    currentLanguageId,
-                    itemId);
-
-                if (cachePagesInHours != null && !forceReload)
-                {
-                    itemText = await GetFromCacheAsync<CarouselItemText>(
-                        _cache,
-                        carouselItemTextCacheKey);
-                }
-
-                if (itemText == null)
-                {
-                    itemText = await _carouselItemTextRepository.GetByIdsAsync(
-                        itemId, currentLanguageId.Value);
-
-                    await SaveToCacheAsync(_cache,
-                        carouselItemTextCacheKey,
-                        itemText,
-                        cachePagesInHours);
-                }
-            }
-
-            if (itemText == null)
-            {
-                var carouselItemTextCacheKey = string.Format(CultureInfo.InvariantCulture,
-                    Utility.Keys.Cache.PromCarouselItemText,
-                    defaultLanguageId,
-                    itemId);
-
-                if (cachePagesInHours != null && !forceReload)
-                {
-                    itemText = await GetFromCacheAsync<CarouselItemText>(
-                        _cache,
-                        carouselItemTextCacheKey);
-                }
-
-                if (itemText == null)
-                {
-                    itemText = await _carouselItemTextRepository.GetByIdsAsync(
-                        itemId, defaultLanguageId);
-
-                    await SaveToCacheAsync(_cache,
-                        carouselItemTextCacheKey,
-                        itemText,
-                        cachePagesInHours);
-                }
-            }
-
-            return itemText;
-        }
-
         private async Task<CarouselButtonLabelText> GetButtonLabelTextAsync(int labelId,
             int defaultLanguageId,
             int? currentLanguageId,
-            int? cachePagesInHours,
+            int cachePagesInHours,
             bool forceReload)
         {
             CarouselButtonLabelText labelText = null;
@@ -389,10 +326,9 @@ namespace Ocuda.Promenade.Service
                     currentLanguageId,
                     labelId);
 
-                if (cachePagesInHours != null && !forceReload)
+                if (cachePagesInHours > 0 && !forceReload)
                 {
-                    labelText = await GetFromCacheAsync<CarouselButtonLabelText>(
-                        _cache,
+                    labelText = await _cache.GetObjectFromCacheAsync<CarouselButtonLabelText>(
                         carouselButtonLabelTextCacheKey);
                 }
 
@@ -401,8 +337,7 @@ namespace Ocuda.Promenade.Service
                     labelText = await _carouselButtonLabelTextRepository
                         .GetByIdsAsync(labelId, currentLanguageId.Value);
 
-                    await SaveToCacheAsync(_cache,
-                        carouselButtonLabelTextCacheKey,
+                    await _cache.SaveToCacheAsync(carouselButtonLabelTextCacheKey,
                         labelText,
                         cachePagesInHours);
                 }
@@ -416,10 +351,9 @@ namespace Ocuda.Promenade.Service
                     defaultLanguageId,
                     labelId);
 
-                if (cachePagesInHours != null && !forceReload)
+                if (cachePagesInHours > 0 && !forceReload)
                 {
-                    labelText = await GetFromCacheAsync<CarouselButtonLabelText>(
-                        _cache,
+                    labelText = await _cache.GetObjectFromCacheAsync<CarouselButtonLabelText>(
                         carouselButtonLabelTextCacheKey);
                 }
 
@@ -428,14 +362,72 @@ namespace Ocuda.Promenade.Service
                     labelText = (await _carouselButtonLabelTextRepository
                         .GetByIdsAsync(labelId, defaultLanguageId));
 
-                    await SaveToCacheAsync(_cache,
-                        carouselButtonLabelTextCacheKey,
+                    await _cache.SaveToCacheAsync(carouselButtonLabelTextCacheKey,
                         labelText,
                         cachePagesInHours);
                 }
             }
 
             return labelText;
+        }
+
+        private async Task<CarouselItemText> GetItemTextAsync(int itemId,
+                    int defaultLanguageId,
+            int? currentLanguageId,
+            int cachePagesInHours,
+            bool forceReload)
+        {
+            CarouselItemText itemText = null;
+
+            if (currentLanguageId.HasValue)
+            {
+                var carouselItemTextCacheKey = string.Format(CultureInfo.InvariantCulture,
+                    Utility.Keys.Cache.PromCarouselItemText,
+                    currentLanguageId,
+                    itemId);
+
+                if (cachePagesInHours > 0 && !forceReload)
+                {
+                    itemText = await _cache.GetObjectFromCacheAsync<CarouselItemText>(
+                        carouselItemTextCacheKey);
+                }
+
+                if (itemText == null)
+                {
+                    itemText = await _carouselItemTextRepository.GetByIdsAsync(
+                        itemId, currentLanguageId.Value);
+
+                    await _cache.SaveToCacheAsync(carouselItemTextCacheKey,
+                        itemText,
+                        cachePagesInHours);
+                }
+            }
+
+            if (itemText == null)
+            {
+                var carouselItemTextCacheKey = string.Format(CultureInfo.InvariantCulture,
+                    Utility.Keys.Cache.PromCarouselItemText,
+                    defaultLanguageId,
+                    itemId);
+
+                if (cachePagesInHours > 0 && !forceReload)
+                {
+                    itemText = await _cache.GetObjectFromCacheAsync<CarouselItemText>(
+                        carouselItemTextCacheKey);
+                }
+
+                if (itemText == null)
+                {
+                    itemText = await _carouselItemTextRepository.GetByIdsAsync(
+                        itemId, defaultLanguageId);
+
+                    await _cache.SaveToCacheAsync(carouselItemTextCacheKey,
+                        itemText,
+                        cachePagesInHours);
+                }
+            }
+
+            return itemText;
         }
     }
 }

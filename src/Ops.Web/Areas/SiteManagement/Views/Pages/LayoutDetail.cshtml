@@ -48,15 +48,23 @@
             <div class="form-group-inner col-md-9">
                 <select id="addType" class="form-control">
                     <option value="carousel">Carousel</option>
+                    <option value="feature">Feature</option>
                     <option value="segment">Segment</option>
+                    <option value="webslide">Webslide</option>
                 </select>
             </div>
         </div>
         <div id="addCarouselFields">
             <input id="addCarouselTitle" asp-for="Carousel.CarouselText.Title" formgroup />
         </div>
+        <div id="addFeatureFields" class="d-none">
+            <input id="addFeatureName" asp-for="PageFeature.Name" formgroup disabled />
+        </div>
         <div id="addSegmentFields" class="d-none">
             <input id="addSegmentName" asp-for="Segment.Name" formgroup disabled />
+        </div>
+        <div id="addWebslideFields" class="d-none">
+            <input id="addWebslideName" asp-for="Webslide.Name" formgroup disabled />
         </div>
     </div>
 </form>
@@ -73,6 +81,19 @@
          type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
 </form>
 
+<form id="editFeatureForm" role="form">
+    <input id="editFeatureLanguage" asp-for="LanguageId" type="hidden" />
+    <input id="editFeatureItem" asp-for="PageItem.Id" type="hidden" />
+
+    <div modal
+         id="editFeatureModal"
+         isLarge="true"
+         name="Feature"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <input id="editFeatureName" asp-for="PageFeature.Name" formgroup />
+    </div>
+</form>
+
 <form id="editSegmentForm" role="form">
     <input id="editSegmentLanguage" asp-for="LanguageId" type="hidden" />
     <input id="editSegmentItem" asp-for="PageItem.Id" type="hidden" />
@@ -83,6 +104,19 @@
          name="Segment"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
         <input id="editSegmentName" asp-for="Segment.Name" formgroup />
+    </div>
+</form>
+
+<form id="editWebslideForm" role="form">
+    <input id="editWebslideLanguage" asp-for="LanguageId" type="hidden" />
+    <input id="editWebslideItem" asp-for="PageItem.Id" type="hidden" />
+
+    <div modal
+         id="editWebslideModal"
+         isLarge="true"
+         name="Webslide"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <input id="editWebslideName" asp-for="Webslide.Name" formgroup />
     </div>
 </form>
 
@@ -177,11 +211,23 @@
                                 <td class="align-middle">Carousel</td>
                                 <td class="align-middle">@item.Carousel.Items.Count</td>
                             }
-                            else
+                            else if (item.PageFeatureId.HasValue)
+                            {
+                                <td class="align-middle">@item.PageFeature.Name</td>
+                                <td class="align-middle">Feature</td>
+                                <td class="align-middle">@item.PageFeature.Items.Count</td>
+                            }
+                            else if (item.SegmentId.HasValue)
                             {
                                 <td class="align-middle">@item.Segment.Name</td>
                                 <td class="align-middle">Segment</td>
                                 <td class="align-middle">&nbsp;</td>
+                            }
+                            else
+                            {
+                                <td class="align-middle">@item.Webslide.Name</td>
+                                <td class="align-middle">Webslide</td>
+                                <td class="align-middle">@item.Webslide.Items.Count</td>
                             }
                             <td class="align-middle">
                                 <button type="button"
@@ -212,6 +258,25 @@
                                         <span class="far fa-file-alt" aria-hidden="true"></span>
                                     </a>
                                 }
+                                else if (item.PageFeatureId.HasValue)
+                                {
+                                    <button type="button"
+                                            class="btn btn-outline-primary"
+                                            data-toggle="modal"
+                                            data-target="#editFeatureModal"
+                                            data-id="@item.Id"
+                                            data-name="@item.PageFeature.Name"
+                                            title="Edit feature">
+                                        <span class="fas fa-cog" aria-hidden="true"></span>
+                                    </button>
+                                    <a asp-controller="@ImageFeaturesController.Name"
+                                       asp-action="@(nameof(ImageFeaturesController.Detail))"
+                                       asp-route-id="@item.PageFeatureId.Value"
+                                       class="btn btn-outline-primary"
+                                       title="Edit feature content">
+                                        <span class="far fa-file-alt" aria-hidden="true"></span>
+                                    </a>
+                                }
                                 else if (item.SegmentId.HasValue)
                                 {
                                     <button type="button"
@@ -231,14 +296,35 @@
                                         <span class="far fa-file-alt" aria-hidden="true"></span>
                                     </a>
                                 }
+                                else if (item.WebslideId.HasValue)
+                                {
+                                    <button type="button"
+                                            class="btn btn-outline-primary"
+                                            data-toggle="modal"
+                                            data-target="#editWebslideModal"
+                                            data-id="@item.Id"
+                                            data-name="@item.Webslide.Name"
+                                            title="Edit webslide">
+                                        <span class="fas fa-cog" aria-hidden="true"></span>
+                                    </button>
+                                    <a asp-controller="@ImageFeaturesController.Name"
+                                       asp-action="@(nameof(ImageFeaturesController.Detail))"
+                                       asp-route-id="@item.WebslideId.Value"
+                                       class="btn btn-outline-primary"
+                                       title="Edit webslide content">
+                                        <span class="far fa-file-alt" aria-hidden="true"></span>
+                                    </a>
+                                }
                                 <button type="button"
                                         class="btn btn-outline-danger"
                                         data-toggle="modal"
                                         data-target="#deleteModal"
                                         data-id="@item.Id"
-                                        data-name="@(item.Carousel?.Name?? item.Segment?.Name)"
+                                        data-name="@(item.Carousel?.Name ?? item.PageFeature?.Name ?? item.Segment?.Name ?? item.Webslide?.Name)"
                                         data-carousel="@item.CarouselId"
+                                        data-feature="@item.PageFeatureId"
                                         data-segment="@item.SegmentId"
+                                        data-webslide="@item.WebslideId"
                                         title="Delete layout item">
                                     <span class="fas fa-times-circle" aria-hidden="true"></span>
                                 </button>
@@ -261,12 +347,28 @@
             var type = $(this).val();
 
             if (type == "carousel") {
+                $("#addFeatureFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
                 $("#addSegmentFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
+                $("#addWebslideFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
                 $("#addCarouselFields").removeClass("d-none").find("input").removeAttr("disabled");
             }
-            else {
-                $("#addCarouselFields").addClass("d-none").find("input").attr("disabled", "disabled")
+            else if (type == "feature") {
+                $("#addCarouselFields").addClass("d-none").find("input").attr("disabled", "disabled");
+                $("#addSegmentFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
+                $("#addWebslideFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
+                $("#addFeatureFields").removeClass("d-none").find("input, select").removeAttr("disabled");
+            }
+            else if (type == "segment") {
+                $("#addCarouselFields").addClass("d-none").find("input").attr("disabled", "disabled");
+                $("#addFeatureFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
+                $("#addWebslideFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
                 $("#addSegmentFields").removeClass("d-none").find("input, select").removeAttr("disabled");
+            }
+            else {
+                $("#addCarouselFields").addClass("d-none").find("input").attr("disabled", "disabled");
+                $("#addFeatureFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
+                $("#addSegmentFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
+                $("#addWebslideFields").removeClass("d-none").find("input").removeAttr("disabled");
             }
         });
 
@@ -291,20 +393,53 @@
             var id = button.data("id");
             var name = button.data("name");
             var carousel = button.data("carousel");
+            var feature = button.data("feature");
             var segment = button.data("segment");
+            var webslide = button.data("webslide");
             var modal = $(this);
 
             var type;
             if (carousel) {
                 type = "carousel";
             }
+            else if (feature) {
+                type = "feature";
+            }
             else if (segment) {
                 type = "segment";
+            }
+            else if (webslide) {
+                type = "webslide";
             }
 
             $("#deleteId").val(id);
             $("#deleteName").val(name);
             modal.find(".modal-text").text("Are you sure you want to delete the " + type +  " \"" + name + "\"?");
+        });
+
+        $("#editFeatureModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+
+            $("#editFeatureItem").val(id);
+            $("#editFeatureName").val(name);
+        });
+
+        $("#editFeatureForm").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.post("@(Url.Action(nameof(PagesController.EditPageItem), PagesController.Name))",
+                form.serialize(),
+                function (response) {
+                if (response.success == true) {
+                    location.href = response.url;
+                }
+                else {
+                    alert(response.message);
+                    ResetSpinners(form.find(".btn-spinner"));
+                }
+            });
         });
 
         $("#editSegmentModal").on("show.bs.modal", function (e) {
@@ -317,6 +452,31 @@
         });
 
         $("#editSegmentForm").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.post("@(Url.Action(nameof(PagesController.EditPageItem), PagesController.Name))",
+                form.serialize(),
+                function (response) {
+                if (response.success == true) {
+                    location.href = response.url;
+                }
+                else {
+                    alert(response.message);
+                    ResetSpinners(form.find(".btn-spinner"));
+                }
+            });
+        });
+
+        $("#editWebslideModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+
+            $("#editWebslideItem").val(id);
+            $("#editWebslideName").val(name);
+        });
+
+        $("#editWebslideForm").submit(function (e) {
             e.preventDefault();
             var form = $(this);
             $.post("@(Url.Action(nameof(PagesController.EditPageItem), PagesController.Name))",

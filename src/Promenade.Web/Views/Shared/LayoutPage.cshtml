@@ -39,8 +39,8 @@
         <div class="col-12 col-md-6 offset-md-3">
             <div class="alert alert-info">
                 You are viewing a preview of how this page will
-                @(Model.PageLayout.StartDate == null 
-                    ? "appear." 
+                @(Model.PageLayout.StartDate == null
+                    ? "appear."
                     : $"appear as of {Model.PageLayout.StartDate}.")
             </div>
         </div>
@@ -85,6 +85,35 @@
             </div>
         </div>
     }
+    else if (item.PageFeatureId.HasValue)
+    {
+        <div class="row">
+            <div class="col-12">
+                <div style="max-width: 740px" class="mx-auto d-block mb-3">
+                    <div class="row">
+                        @{ int count = 0; }
+                        @foreach (var featureItem in item.PageFeature.Items)
+                        {
+                            <div class="col-6 col-sm-3 mb-2">
+                                <a href="@featureItem.ImageFeatureItemText.Link">
+                                    <img src="@featureItem.ImageFeatureItemText.Filepath"
+                                         alt="@featureItem.ImageFeatureItemText.AltText"
+                                         class="img-fluid mx-auto d-block"
+                                         style="width: 182px;" />
+                                </a>
+                            </div>
+
+                            count++;
+                            if (count >= Model.PageFeatureTemplate?.ItemsToDisplay)
+                            {
+                                break;
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
     else if (item.SegmentId.HasValue && item.SegmentText != null)
     {
         <div class="row">
@@ -94,6 +123,40 @@
                     <h2>@item.SegmentText.Header</h2>
                 }
                 @Html.Raw(item.SegmentText.Text)
+            </div>
+        </div>
+    }
+    else if (item.WebslideId.HasValue)
+    {
+        <div class="row">
+            <div class="col-12">
+                <div id="carouselControls"
+                     style="max-width: 740px"
+                     class="carousel slide mx-auto d-block mb-4"
+                     data-ride="carousel">
+                    <div class="carousel-inner">
+                        @foreach (var webslideItem in item.Webslide.Items)
+                        {
+                            <div class="carousel-item @(webslideItem == item.Webslide.Items.First() ? "active" : null)">
+                                <a href="@webslideItem.ImageFeatureItemText.Link">
+                                    <img class="d-block w-100"
+                                         src="@webslideItem.ImageFeatureItemText.Filepath"
+                                         alt="@webslideItem.ImageFeatureItemText.AltText" />
+                                </a>
+                            </div>
+                        }
+                    </div>
+                    <a class="carousel-control-prev"
+                       style="left: -1.5rem"
+                       href="#carouselControls"
+                       role="button"
+                       data-slide="prev"><span class="carousel-control-prev-icon text-left" aria-hidden="true"></span><span class="sr-only">Previous</span></a>
+                    <a class="carousel-control-next"
+                       style="right: -1.5rem"
+                       href="#carouselControls"
+                       role="button"
+                       data-slide="next"><span class="carousel-control-next-icon text-right" aria-hidden="true"></span><span class="sr-only">Next</span></a>
+                </div>
             </div>
         </div>
     }

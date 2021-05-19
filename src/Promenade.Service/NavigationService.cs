@@ -1,28 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Abstract;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Service
 {
     public class NavigationService : BaseService<NavigationService>
     {
-        private readonly IDistributedCache _cache;
+        private readonly IOcudaCache _cache;
         private readonly LanguageService _languageService;
         private readonly INavigationRepository _navigationRepository;
         private readonly INavigationTextRepository _navigationTextRepository;
 
         public NavigationService(ILogger<NavigationService> logger,
             IDateTimeProvider dateTimeProvider,
-            IDistributedCache cache,
+            IOcudaCache cache,
             LanguageService languageService,
             INavigationRepository navigationRepository,
             INavigationTextRepository navigationTextRepository) : base(logger, dateTimeProvider)
@@ -43,7 +41,6 @@ namespace Ocuda.Promenade.Service
 
         public async Task<Navigation> GetNavigation(int navigationId, bool forceReload)
         {
-            long start = Stopwatch.GetTimestamp();
             var defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync(forceReload);
 
             Navigation nav = null;
@@ -55,23 +52,7 @@ namespace Ocuda.Promenade.Service
 
             if (!forceReload)
             {
-                string cachedNav = await _cache.GetStringAsync(cacheKey);
-
-                if (!string.IsNullOrEmpty(cachedNav))
-                {
-                    try
-                    {
-                        nav = JsonSerializer.Deserialize<Navigation>(cachedNav);
-                    }
-                    catch (JsonException ex)
-                    {
-                        _logger.LogWarning(ex,
-                            "Error deserializing navigation {NavigationId} language {LanguageId} from cache: {ErrorMessage}",
-                            navigationId,
-                            defaultLanguageId,
-                            ex.Message);
-                    }
-                }
+                nav = await _cache.GetObjectFromCacheAsync<Navigation>(cacheKey);
             }
 
             if (nav == null)
@@ -84,17 +65,7 @@ namespace Ocuda.Promenade.Service
                 }
                 nav.Navigations = await GetNavigationChildren(navigationId, defaultLanguageId);
 
-                string navToCache = JsonSerializer.Serialize(nav);
-                await _cache.SetStringAsync(cacheKey,
-                    navToCache,
-                    new DistributedCacheEntryOptions
-                    {
-                        SlidingExpiration = CacheSlidingExpiration
-                    });
-                _logger.LogDebug("Cache miss for {CacheKey}, caching {Length} characters in {Elapsed} ms",
-                    cacheKey,
-                    navToCache.Length,
-                    (Stopwatch.GetTimestamp() - start) * 1000 / (double)Stopwatch.Frequency);
+                await _cache.SaveToCacheAsync(cacheKey, nav, null, CacheSlidingExpiration);
             }
 
             return nav;

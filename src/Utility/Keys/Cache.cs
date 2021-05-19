@@ -1,6 +1,9 @@
 ﻿namespace Ocuda.Utility.Keys
 {
-    public struct Cache
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
+        "CA1815:Override equals and operator equals on value types",
+        Justification = "No instance value for this static type")]
+    public readonly struct Cache
     {
         /// <summary>
         /// Status of a digital display, {0} is the digital display id
@@ -127,9 +130,24 @@
         public static readonly string PromExternalResources = "externalresources";
 
         /// <summary>
+        /// Cached image feature, {0} is the image feature id
+        /// </summary>
+        public static readonly string PromImageFeature = "imagefeature.{0}";
+
+        /// <summary>
+        /// Cached image feature item text, {0} is the language id, {1} is the id
+        /// </summary>
+        public static readonly string PromImageFeatureItemText = "imagefeatureitemtext.{0}.{1}";
+
+        /// <summary>
         /// Language id, {0} is the culture
         /// </summary>
         public static readonly string PromLanguageId = "langid.{0}";
+
+        /// <summary>
+        /// Language name, {0} is the language id
+        /// </summary>
+        public static readonly string PromLanguageName = "langname.{0}";
 
         /// <summary>
         /// Cached navigation element, {0} is the id of the element, {1} is the language id

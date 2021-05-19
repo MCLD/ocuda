@@ -9,17 +9,23 @@ namespace Ocuda.Promenade.Controllers
     [Route("[Controller]")]
     public class AboutController : BasePageController<AboutController>
     {
-        protected override PageType PageType { get { return PageType.About; } }
-
         public AboutController(ServiceFacades.Controller<AboutController> context,
             CarouselService carouselService,
             PageService pageService,
             RedirectService redirectService,
             SegmentService segmentService,
-            SocialCardService socialCardService)
-            : base(context, carouselService, pageService, redirectService, segmentService,
-                  socialCardService)
+            SocialCardService socialCardService,
+            ImageFeatureService webslideService)
+            : base(context, carouselService, pageService, redirectService,
+                  segmentService, socialCardService, webslideService)
         {
+        }
+
+        protected override PageType PageType { get { return PageType.About; } }
+        [HttpGet("{stub?}/item/{id}")]
+        public async Task<IActionResult> CarouselItem(string stub, int id)
+        {
+            return await ReturnCarouselItemAsync(stub, id);
         }
 
         [HttpGet("{stub?}")]
@@ -35,12 +41,6 @@ namespace Ocuda.Promenade.Controllers
                 HttpContext.Request.Query["PreviewId"]);
 
             return pagePreview;
-        }
-
-        [HttpGet("{stub?}/item/{id}")]
-        public async Task<IActionResult> CarouselItem(string stub, int id)
-        {
-            return await ReturnCarouselItemAsync(stub, id);
         }
     }
 }

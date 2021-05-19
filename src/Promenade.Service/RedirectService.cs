@@ -1,28 +1,27 @@
 ﻿using System;
 using System.Globalization;
-using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Abstract;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Service
 {
     public class RedirectService : BaseService<RedirectService>
     {
+        private readonly IOcudaCache _cache;
         private readonly IConfiguration _config;
-        private readonly IDistributedCache _cache;
         private readonly IUrlRedirectAccessRepository _urlRedirectAccessRepository;
         private readonly IUrlRedirectRepository _urlRedirectRepository;
 
         public RedirectService(ILogger<RedirectService> logger,
             IDateTimeProvider dateTimeProvider,
             IConfiguration config,
-            IDistributedCache cache,
+            IOcudaCache cache,
             IUrlRedirectAccessRepository urlRedirectAccessRepository,
             IUrlRedirectRepository urlRedirectRepository)
             : base(logger, dateTimeProvider)
@@ -54,23 +53,7 @@ namespace Ocuda.Promenade.Service
 
             if (cacheKey != null)
             {
-                string cachedRedirect = await _cache.GetStringAsync(cacheKey);
-
-                if (!string.IsNullOrEmpty(cachedRedirect))
-                {
-                    try
-                    {
-                        redirect = JsonSerializer.Deserialize<UrlRedirect>(cachedRedirect);
-                    }
-                    catch (JsonException ex)
-                    {
-                        _logger.LogWarning(ex,
-                            "Error deserializing redirect path {path} from cache ({CacheKey}): {ErrorMessage}",
-                            path,
-                            cacheKey,
-                            ex.Message);
-                    }
-                }
+                redirect = await _cache.GetObjectFromCacheAsync<UrlRedirect>(cacheKey);
             }
 
             if (redirect == null)
@@ -84,13 +67,7 @@ namespace Ocuda.Promenade.Service
                         cacheTime = 1;
                     }
 
-                    string redirectToCache = JsonSerializer.Serialize(redirect);
-                    await _cache.SetStringAsync(cacheKey,
-                        redirectToCache,
-                        new DistributedCacheEntryOptions
-                        {
-                            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(cacheTime)
-                        });
+                    await _cache.SaveToCacheAsync(cacheKey, redirect, cacheTime);
                 }
             }
 

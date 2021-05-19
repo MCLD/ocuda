@@ -380,6 +380,14 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.FeatureRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IGroupRepository,
                 Data.Promenade.GroupRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IImageFeatureItemRepository,
+                Data.Promenade.ImageFeatureItemRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IImageFeatureItemTextRepository,
+                Data.Promenade.ImageFeatureItemTextRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IImageFeatureRepository,
+                Data.Promenade.ImageFeatureRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IImageFeatureTemplateRepository,
+                Data.Promenade.ImageFeatureTemplateRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILanguageRepository,
                 Data.Promenade.LanguageRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationRepository,
@@ -438,6 +446,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IFileTypeService, FileTypeService>();
             services.AddScoped<IGroupService, GroupService>();
+            services.AddScoped<IImageFeatureService, ImageFeatureService>();
             services.AddScoped<IInitialSetupService, InitialSetupService>();
             services.AddScoped<IInsertSampleDataService, InsertSampleDataService>();
             services.AddScoped<ILanguageService, LanguageService>();
@@ -447,6 +456,8 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ILocationGroupService, LocationGroupService>();
             services.AddScoped<ILocationFeatureService, LocationFeatureService>();
             services.AddScoped<ILinkService, LinkService>();
+            services.AddScoped<Utility.Services.Interfaces.IOcudaCache,
+                Utility.Services.OcudaCache>();
             services.AddScoped<IPageService, PageService>();
             services.AddScoped<IPublicFilesService, PublicFilesService>();
             services.AddScoped<Utility.Services.Interfaces.IPathResolverService,
