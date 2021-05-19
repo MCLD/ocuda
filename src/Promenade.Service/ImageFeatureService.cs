@@ -17,9 +17,8 @@ namespace Ocuda.Promenade.Service
 {
     public class ImageFeatureService : BaseService<ImageFeatureService>
     {
-        private const string ImagesFilePath = "images";
         private const string FeaturesFilePath = "features";
-
+        private const string ImagesFilePath = "images";
         private readonly IOcudaCache _cache;
         private readonly IConfiguration _config;
         private readonly IHttpContextAccessor _httpContextAccessor;

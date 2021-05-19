@@ -7,12 +7,17 @@ namespace Ocuda.Promenade.Models.Entities
 {
     public class ImageFeatureItem
     {
+        [DisplayName("End Date")]
+        public DateTime? EndDate { get; set; }
+
         [Key]
         [Required]
         public int Id { get; set; }
 
-        public int ImageFeatureId { get; set; }
         public ImageFeature ImageFeature { get; set; }
+        public int ImageFeatureId { get; set; }
+        [NotMapped]
+        public ImageFeatureItemText ImageFeatureItemText { get; set; }
 
         [MaxLength(255)]
         [Required]
@@ -22,11 +27,5 @@ namespace Ocuda.Promenade.Models.Entities
 
         [DisplayName("Start Date")]
         public DateTime? StartDate { get; set; }
-
-        [DisplayName("End Date")]
-        public DateTime? EndDate { get; set; }
-
-        [NotMapped]
-        public ImageFeatureItemText ImageFeatureItemText { get; set; }
     }
 }

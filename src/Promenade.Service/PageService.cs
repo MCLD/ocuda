@@ -260,7 +260,10 @@ namespace Ocuda.Promenade.Service
                     }
                 }
 
-                await _cache.SaveToCacheAsync(layoutCacheKey, pageLayout, cacheSpan.Value);
+                if (cacheSpan.HasValue)
+                {
+                    await _cache.SaveToCacheAsync(layoutCacheKey, pageLayout, cacheSpan.Value);
+                }
             }
 
             if (pageLayout != null)

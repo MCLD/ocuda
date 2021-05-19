@@ -18,14 +18,13 @@ namespace Ocuda.Promenade.Models.Entities
         [NotMapped]
         public string Filepath { get; set; }
 
+        public ImageFeatureItem ImageFeatureItem { get; set; }
+        public int ImageFeatureItemId { get; set; }
         public Language Language { get; set; }
         public int LanguageId { get; set; }
 
         [MaxLength(255)]
         [Required]
         public string Link { get; set; }
-
-        public ImageFeatureItem ImageFeatureItem { get; set; }
-        public int ImageFeatureItemId { get; set; }
     }
 }

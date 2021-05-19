@@ -26,14 +26,6 @@ namespace Ocuda.Ops.Data.Promenade
             return entity;
         }
 
-        public async Task<int?> GetMaxSortOrderForLayoutAsync(int layoutId)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.PageLayoutId == layoutId)
-                .MaxAsync(_ => (int?)_.Order);
-        }
-
         public async Task<PageItem> GetByLayoutAndOrderAsync(int layoutId, int order)
         {
             return await DbSet
@@ -42,12 +34,12 @@ namespace Ocuda.Ops.Data.Promenade
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<List<PageItem>> GetLayoutSubsequentAsync(int layoutId, int order)
+        public async Task<int> GetImageFeatureUseCountAsync(int imageFeatureId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.PageLayoutId == layoutId && _.Order > order)
-                .ToListAsync();
+                .Where(_ => _.PageFeatureId == imageFeatureId || _.WebslideId == imageFeatureId)
+                .CountAsync();
         }
 
         public async Task<PageLayout> GetLayoutForItemAsync(int itemId)
@@ -59,12 +51,20 @@ namespace Ocuda.Ops.Data.Promenade
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<int> GetImageFeatureUseCountAsync(int imageFeatureId)
+        public async Task<List<PageItem>> GetLayoutSubsequentAsync(int layoutId, int order)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.PageFeatureId == imageFeatureId || _.WebslideId == imageFeatureId)
-                .CountAsync();
+                .Where(_ => _.PageLayoutId == layoutId && _.Order > order)
+                .ToListAsync();
+        }
+
+        public async Task<int?> GetMaxSortOrderForLayoutAsync(int layoutId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.PageLayoutId == layoutId)
+                .MaxAsync(_ => (int?)_.Order);
         }
     }
 }

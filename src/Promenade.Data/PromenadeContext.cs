@@ -10,6 +10,104 @@ namespace Ocuda.Promenade.Data
         {
         }
 
+        // Read-Only
+        public DbSet<CarouselButtonLabel> CarouselButtonLabels { get; }
+
+        public DbSet<CarouselButtonLabelText> CarouselButtonLabelTexts { get; }
+
+        public DbSet<CarouselButton> CarouselButtons { get; }
+
+        public DbSet<CarouselItem> CarouselItems { get; }
+
+        public DbSet<CarouselItemText> CarouselItemTexts { get; }
+
+        public DbSet<Carousel> Carousels { get; }
+
+        public DbSet<CarouselTemplate> CarouselTemplates { get; }
+
+        public DbSet<CarouselText> CarouselTexts { get; }
+
+        public DbSet<Category> Categories { get; }
+
+        public DbSet<CategoryText> CategoryTexts { get; }
+
+        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
+
+        public DbSet<Emedia> Emedia { get; set; }
+
+        public DbSet<EmediaCategory> EmediaCategories { get; set; }
+
+        public DbSet<EmediaGroup> EmediaGroups { get; }
+
+        public DbSet<EmediaText> EmediaTexts { get; }
+
+        public DbSet<ExternalResource> ExternalResources { get; set; }
+
+        public DbSet<Feature> Features { get; }
+
+        public DbSet<Group> Groups { get; }
+
+        public DbSet<ImageFeatureItem> ImageFeatureItems { get; }
+
+        public DbSet<ImageFeatureItemText> ImageFeatureItemTexts { get; }
+
+        public DbSet<ImageFeature> ImageFeatures { get; }
+
+        public DbSet<ImageFeatureTemplate> ImageFeatureTemplates { get; }
+
+        // Read/Write
+        public DbSet<Language> Languages { get; set; }
+
+        public DbSet<LocationFeature> LocationFeatures { get; }
+
+        public DbSet<LocationGroup> LocationGroups { get; }
+
+        public DbSet<LocationHours> LocationHours { get; }
+
+        public DbSet<LocationHoursOverride> LocationHoursOverrides { get; }
+
+        public DbSet<Location> Locations { get; }
+
+        public DbSet<Navigation> Navigations { get; }
+
+        public DbSet<NavigationText> NavigationTexts { get; }
+
+        public DbSet<PageHeader> PageHeaders { get; set; }
+
+        public DbSet<PageItem> PageItems { get; set; }
+
+        public DbSet<PageLayout> PageLayouts { get; set; }
+
+        public DbSet<PageLayoutText> PageLayoutTexts { get; }
+
+        public DbSet<Page> Pages { get; }
+
+        public DbSet<PodcastDirectory> PodcastDirectories { get; }
+
+        public DbSet<PodcastDirectoryInfo> PodcastDirectoryInfos { get; set; }
+
+        public DbSet<PodcastItem> PodcastItems { get; }
+
+        public DbSet<Podcast> Podcasts { get; }
+
+        public DbSet<ScheduleRequest> ScheduleRequest { get; set; }
+
+        public DbSet<ScheduleRequestLimit> ScheduleRequestLimits { get; }
+
+        public DbSet<ScheduleRequestSubject> ScheduleRequestSubject { get; }
+
+        public DbSet<Segment> Segments { get; }
+
+        public DbSet<SegmentText> SegmentTexts { get; }
+
+        public DbSet<SiteSetting> SiteSettings { get; }
+
+        public DbSet<SocialCard> SocialCards { get; }
+
+        public DbSet<UrlRedirectAccess> UrlRedirectAccesses { get; set; }
+
+        public DbSet<UrlRedirect> UrlRedirects { get; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // configure composite keys
@@ -47,59 +145,5 @@ namespace Ocuda.Promenade.Data
             modelBuilder.Entity<ImageFeatureItemText>()
                 .HasKey(_ => new { _.LanguageId, _.ImageFeatureItemId });
         }
-
-        // Read-Only
-        public DbSet<CarouselButtonLabel> CarouselButtonLabels { get; }
-
-        public DbSet<CarouselButton> CarouselButtons { get; }
-        public DbSet<CarouselButtonLabelText> CarouselButtonLabelTexts { get; }
-        public DbSet<CarouselItem> CarouselItems { get; }
-        public DbSet<CarouselItemText> CarouselItemTexts { get; }
-        public DbSet<Carousel> Carousels { get; }
-        public DbSet<CarouselTemplate> CarouselTemplates { get; }
-        public DbSet<CarouselText> CarouselTexts { get; }
-        public DbSet<Category> Categories { get; }
-        public DbSet<CategoryText> CategoryTexts { get; }
-        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
-        public DbSet<Emedia> Emedia { get; set; }
-        public DbSet<EmediaCategory> EmediaCategories { get; set; }
-        public DbSet<EmediaGroup> EmediaGroups { get; }
-        public DbSet<EmediaText> EmediaTexts { get; }
-        public DbSet<ExternalResource> ExternalResources { get; set; }
-        public DbSet<Feature> Features { get; }
-        public DbSet<Group> Groups { get; }
-        public DbSet<Location> Locations { get; }
-        public DbSet<LocationFeature> LocationFeatures { get; }
-        public DbSet<LocationGroup> LocationGroups { get; }
-        public DbSet<LocationHours> LocationHours { get; }
-        public DbSet<LocationHoursOverride> LocationHoursOverrides { get; }
-        public DbSet<Navigation> Navigations { get; }
-        public DbSet<NavigationText> NavigationTexts { get; }
-        public DbSet<ImageFeatureItem> ImageFeatureItems { get; }
-        public DbSet<ImageFeatureItemText> ImageFeatureItemTexts { get; }
-        public DbSet<ImageFeature> ImageFeatures { get; }
-        public DbSet<ImageFeatureTemplate> ImageFeatureTemplates { get; }
-        public DbSet<PageItem> PageItems { get; set; }
-        public DbSet<PageLayout> PageLayouts { get; set; }
-        public DbSet<PageLayoutText> PageLayoutTexts { get; }
-        public DbSet<Page> Pages { get; }
-        public DbSet<PodcastDirectory> PodcastDirectories { get; }
-        public DbSet<PodcastDirectoryInfo> PodcastDirectoryInfos { get; set; }
-        public DbSet<PodcastItem> PodcastItems { get; }
-        public DbSet<Podcast> Podcasts { get; }
-        public DbSet<ScheduleRequestLimit> ScheduleRequestLimits { get; }
-        public DbSet<ScheduleRequestSubject> ScheduleRequestSubject { get; }
-        public DbSet<Segment> Segments { get; }
-        public DbSet<SegmentText> SegmentTexts { get; }
-        public DbSet<SiteSetting> SiteSettings { get; }
-        public DbSet<SocialCard> SocialCards { get; }
-        public DbSet<UrlRedirect> UrlRedirects { get; }
-
-        // Read/Write
-        public DbSet<Language> Languages { get; set; }
-
-        public DbSet<ScheduleRequest> ScheduleRequest { get; set; }
-        public DbSet<UrlRedirectAccess> UrlRedirectAccesses { get; set; }
-        public DbSet<PageHeader> PageHeaders { get; set; }
     }
 }

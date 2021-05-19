@@ -10,12 +10,12 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 
         Task<PageItem> GetByLayoutAndOrderAsync(int layoutId, int order);
 
+        Task<int> GetImageFeatureUseCountAsync(int imageFeatureId);
+
         Task<PageLayout> GetLayoutForItemAsync(int itemId);
 
         Task<List<PageItem>> GetLayoutSubsequentAsync(int layoutId, int order);
 
         Task<int?> GetMaxSortOrderForLayoutAsync(int layoutId);
-
-        Task<int> GetImageFeatureUseCountAsync(int imageFeatureId);
     }
 }

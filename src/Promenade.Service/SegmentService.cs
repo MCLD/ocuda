@@ -76,8 +76,7 @@ namespace Ocuda.Promenade.Service
                     .UICulture?
                     .Name;
 
-                string segmentTextCacheKey = null;
-
+                string segmentTextCacheKey;
                 if (!string.IsNullOrWhiteSpace(currentCultureName))
                 {
                     var currentLangaugeId = await _languageService

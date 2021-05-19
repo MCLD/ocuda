@@ -43,14 +43,6 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
-        public async Task<int?> GetMaxSortOrderForImageFeatureAsync(int imageFeatureId)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.ImageFeatureId == imageFeatureId)
-                .MaxAsync(_ => (int?)_.Order);
-        }
-
         public async Task<List<ImageFeatureItem>> GetImageFeatureSubsequentAsync(int imageFeatureId,
             int order)
         {
@@ -58,6 +50,14 @@ namespace Ocuda.Ops.Data.Promenade
                 .AsNoTracking()
                 .Where(_ => _.ImageFeatureId == imageFeatureId && _.Order > order)
                 .ToListAsync();
+        }
+
+        public async Task<int?> GetMaxSortOrderForImageFeatureAsync(int imageFeatureId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.ImageFeatureId == imageFeatureId)
+                .MaxAsync(_ => (int?)_.Order);
         }
     }
 }

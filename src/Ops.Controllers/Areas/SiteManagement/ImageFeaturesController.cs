@@ -176,8 +176,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             var featureItem = await _imageFeatureService
                 .GetItemByIdAsync(model.ImageFeatureItem.Id);
-            var featureItemText = await _imageFeatureService
-                .GetItemTextByIdsAsync(model.ImageFeatureItem.Id, model.LanguageId);
 
             if (!await HasPageContentPermissionAsync(featureItem.ImageFeatureId))
             {

@@ -118,14 +118,14 @@ namespace Ocuda.Ops.Service
             }
         }
 
-        public async Task DeleteNoSaveAsync(int imageFeatureId)
+        public async Task DeleteNoSaveAsync(int id)
         {
-            var imageFeature = await _imageFeatureRepository.FindAsync(imageFeatureId);
+            var imageFeature = await _imageFeatureRepository.FindAsync(id);
             if (imageFeature == null)
             {
                 throw new OcudaException("Could not find that image feature");
             }
-            var items = await _imageFeatureItemRepository.GetByImageFeatureAsync(imageFeatureId);
+            var items = await _imageFeatureItemRepository.GetByImageFeatureAsync(id);
 
             IDictionary<string, string> issues = null;
 

@@ -6,6 +6,6 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
     public interface IImageFeatureItemRepository : IGenericRepository<ImageFeatureItem>
     {
-        Task<ICollection<ImageFeatureItem>> GetActiveForImageFeatureAsync(int imageFeatureIds);
+        Task<ICollection<ImageFeatureItem>> GetActiveForImageFeatureAsync(int imageFeatureId);
     }
 }

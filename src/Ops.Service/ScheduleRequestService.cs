@@ -24,6 +24,20 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(scheduleRequestRepository));
         }
 
+        public Task CancelAsync(ScheduleRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+            return CancelInternalAsync(request);
+        }
+
+        public async Task<ICollection<ScheduleRequest>> GetPendingNotificationsAsync()
+        {
+            return await _scheduleRequestRepository.GetPendingNotificationsAsync();
+        }
+
         public async Task<ScheduleRequest> GetRequestAsync(int requestId)
         {
             return await _scheduleRequestRepository.GetRequestAsync(requestId);
@@ -39,52 +53,6 @@ namespace Ocuda.Ops.Service
             return await _scheduleRequestRepository.GetUnclaimedRequestsAsync();
         }
 
-        public async Task<ICollection<ScheduleRequest>> GetPendingNotificationsAsync()
-        {
-            return await _scheduleRequestRepository.GetPendingNotificationsAsync();
-        }
-
-        public async Task SetNotificationSentAsync(ScheduleRequest request)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
-            request.NotificationSentAt = DateTime.Now;
-            _scheduleRequestRepository.Update(request);
-            await _scheduleRequestRepository.SaveAsync();
-        }
-
-        public async Task SetFollowupSentAsync(ScheduleRequest request)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
-            request.FollowupSentAt = DateTime.Now;
-            _scheduleRequestRepository.Update(request);
-            await _scheduleRequestRepository.SaveAsync();
-        }
-
-        public async Task CancelAsync(ScheduleRequest request)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
-            request.IsCancelled = true;
-            _scheduleRequestRepository.Update(request);
-            await _scheduleRequestRepository.SaveAsync();
-        }
-
-        public async Task UnclaimAsync(int scheduleRequestId)
-        {
-            var request = await _scheduleRequestRepository.GetRequestAsync(scheduleRequestId);
-            request.IsClaimed = false;
-            _scheduleRequestRepository.Update(request);
-            await _scheduleRequestRepository.SaveAsync();
-        }
-
         public async Task<ScheduleRequest> SetClaimedAsync(int scheduleRequestId)
         {
             var request = await _scheduleRequestRepository.GetRequestAsync(scheduleRequestId);
@@ -97,10 +65,57 @@ namespace Ocuda.Ops.Service
             return request;
         }
 
+        public Task SetFollowupSentAsync(ScheduleRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+            return SetFollowupSentInternalAsync(request);
+        }
+
+        public Task SetNotificationSentAsync(ScheduleRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+            return SetNotificationSentInternalAsync(request);
+        }
+
         public async Task SetUnderwayAsync(int scheduleRequestId)
         {
             var request = await GetRequestAsync(scheduleRequestId);
             request.IsUnderway = true;
+            _scheduleRequestRepository.Update(request);
+            await _scheduleRequestRepository.SaveAsync();
+        }
+
+        public async Task UnclaimAsync(int scheduleRequestId)
+        {
+            var request = await _scheduleRequestRepository.GetRequestAsync(scheduleRequestId);
+            request.IsClaimed = false;
+            _scheduleRequestRepository.Update(request);
+            await _scheduleRequestRepository.SaveAsync();
+        }
+
+        private async Task CancelInternalAsync(ScheduleRequest request)
+        {
+            request.IsCancelled = true;
+            _scheduleRequestRepository.Update(request);
+            await _scheduleRequestRepository.SaveAsync();
+        }
+
+        private async Task SetFollowupSentInternalAsync(ScheduleRequest request)
+        {
+            request.FollowupSentAt = DateTime.Now;
+            _scheduleRequestRepository.Update(request);
+            await _scheduleRequestRepository.SaveAsync();
+        }
+
+        private async Task SetNotificationSentInternalAsync(ScheduleRequest request)
+        {
+            request.NotificationSentAt = DateTime.Now;
             _scheduleRequestRepository.Update(request);
             await _scheduleRequestRepository.SaveAsync();
         }

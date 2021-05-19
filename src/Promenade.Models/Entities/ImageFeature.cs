@@ -9,9 +9,9 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public int Id { get; set; }
 
+        public ICollection<ImageFeatureItem> Items { get; set; }
+
         [MaxLength(255)]
         public string Name { get; set; }
-
-        public ICollection<ImageFeatureItem> Items { get; set; }
     }
 }

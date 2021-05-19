@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -158,7 +157,6 @@ namespace Ocuda.Promenade.Service
 
         private async Task<string> GetSettingValueAsync(string key, bool forceReload)
         {
-            long start = Stopwatch.GetTimestamp();
             string setting = null;
 
             var cacheKey = string.Format(CultureInfo.InvariantCulture,

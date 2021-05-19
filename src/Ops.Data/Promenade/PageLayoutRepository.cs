@@ -29,25 +29,14 @@ namespace Ocuda.Ops.Data.Promenade
             return entity;
         }
 
-        public async Task<DataWithCount<ICollection<PageLayout>>> GetPaginatedListForHeaderAsync(
-            int headerId,
-            BaseFilter filter)
+        public async Task<ICollection<PageLayout>> GetAllForHeaderIncludingChildrenAsync(
+            int headerId)
         {
-            var query = DbSet
+            return await DbSet
+                .Where(_ => _.PageHeaderId == headerId)
+                .Include(_ => _.Items)
                 .AsNoTracking()
-                .Where(_ => _.PageHeaderId == headerId);
-
-            return new DataWithCount<ICollection<PageLayout>>
-            {
-                Count = await query.CountAsync(),
-                Data = await query
-                    .OrderBy(_ => _.StartDate.HasValue)
-                    .ThenByDescending(_ => _.StartDate.Value)
-                    .ThenBy(_ => _.Name)
-                    .ApplyPagination(filter)
-                    .Include(_ => _.Items)
-                    .ToListAsync()
-            };
+                .ToListAsync();
         }
 
         public async Task<PageLayout> GetIncludingChildrenAsync(int id)
@@ -78,14 +67,25 @@ namespace Ocuda.Ops.Data.Promenade
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<ICollection<PageLayout>> GetAllForHeaderIncludingChildrenAsync(
-            int headerId)
+        public async Task<DataWithCount<ICollection<PageLayout>>> GetPaginatedListForHeaderAsync(
+                                    int headerId,
+            BaseFilter filter)
         {
-            return await DbSet
-                .Where(_ => _.PageHeaderId == headerId)
-                .Include(_ => _.Items)
+            var query = DbSet
                 .AsNoTracking()
-                .ToListAsync();
+                .Where(_ => _.PageHeaderId == headerId);
+
+            return new DataWithCount<ICollection<PageLayout>>
+            {
+                Count = await query.CountAsync(),
+                Data = await query
+                    .OrderBy(_ => _.StartDate.HasValue)
+                    .ThenByDescending(_ => _.StartDate.Value)
+                    .ThenBy(_ => _.Name)
+                    .ApplyPagination(filter)
+                    .Include(_ => _.Items)
+                    .ToListAsync()
+            };
         }
     }
 }

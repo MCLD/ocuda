@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -42,7 +41,6 @@ namespace Ocuda.Promenade.Service
 
         public async Task<Navigation> GetNavigation(int navigationId, bool forceReload)
         {
-            long start = Stopwatch.GetTimestamp();
             var defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync(forceReload);
 
             Navigation nav = null;

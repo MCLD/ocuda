@@ -18,6 +18,9 @@ namespace Ocuda.Ops.Service
 {
     public class PageService : BaseService<PageService>, IPageService
     {
+        private readonly ICarouselService _carouselService;
+        private readonly IImageFeatureService _imageFeatureService;
+        private readonly ILanguageService _languageService;
         private readonly IPageHeaderRepository _pageHeaderRepository;
         private readonly IPageItemRepository _pageItemRepository;
         private readonly IPageLayoutRepository _pageLayoutRepository;
@@ -27,10 +30,7 @@ namespace Ocuda.Ops.Service
         private readonly IPermissionGroupPageContentRepository
             _permissionGroupPageContentRepository;
 
-        private readonly ICarouselService _carouselService;
-        private readonly ILanguageService _languageService;
         private readonly ISegmentService _segmentService;
-        private readonly IImageFeatureService _imageFeatureService;
 
         public PageService(ILogger<PageService> logger,
             IHttpContextAccessor httpContextAccessor,
@@ -66,415 +66,6 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(segmentService));
             _imageFeatureService = imageFeatureService
                 ?? throw new ArgumentNullException(nameof(imageFeatureService));
-        }
-
-        public async Task<Page> GetByHeaderAndLanguageAsync(int headerId, int languageId)
-        {
-            return await _pageRepository.GetByHeaderAndLanguageAsync(headerId, languageId);
-        }
-
-        public async Task<Page> CreateAsync(Page page)
-        {
-            page.Title = page.Title?.Trim();
-            page.Content = page.Content?.Trim();
-
-            await _pageRepository.AddAsync(page);
-            await _pageRepository.SaveAsync();
-            return page;
-        }
-
-        public async Task<Page> EditAsync(Page page)
-        {
-            var currentPage = await _pageRepository.GetByHeaderAndLanguageAsync(
-                page.PageHeaderId, page.LanguageId);
-            currentPage.Title = page.Title?.Trim();
-            currentPage.Content = page.Content?.Trim();
-            currentPage.IsPublished = page.IsPublished;
-            currentPage.SocialCardId = page.SocialCardId;
-
-            _pageRepository.Update(currentPage);
-            await _pageRepository.SaveAsync();
-            return currentPage;
-        }
-
-        public async Task DeleteAsync(Page page)
-        {
-            _pageRepository.Remove(page);
-            await _pageRepository.SaveAsync();
-        }
-
-        public async Task<DataWithCount<ICollection<PageHeader>>> GetPaginatedHeaderListAsync(
-            PageFilter filter)
-        {
-            var headerList = await _pageHeaderRepository.GetPaginatedListAsync(filter);
-            foreach (var header in headerList.Data)
-            {
-                var perms
-                    = await _permissionGroupPageContentRepository.GetByPageHeaderId(header.Id);
-                header.PermissionGroupIds = perms.Select(_ => _.PermissionGroupId
-                    .ToString(CultureInfo.InvariantCulture));
-            }
-            return headerList;
-        }
-
-        public async Task<PageHeader> GetHeaderByIdAsync(int id)
-        {
-            return await _pageHeaderRepository.FindAsync(id);
-        }
-
-        public async Task<ICollection<string>> GetHeaderLanguagesByIdAsync(int id)
-        {
-            return await _pageHeaderRepository.GetLanguagesByIdAsync(id);
-        }
-
-        public async Task<PageHeader> CreateHeaderAsync(PageHeader header)
-        {
-            header.Stub = header.Stub?.Trim().ToLower();
-
-            if (await _pageHeaderRepository.StubInUseAsync(header))
-            {
-                throw new OcudaException($"The stub \"{header.Stub}\" is already in use for that page type. Please choose a different stub.");
-            }
-
-            header.PageName = header.PageName?.Trim();
-
-            await _pageHeaderRepository.AddAsync(header);
-            await _pageHeaderRepository.SaveAsync();
-
-            return header;
-        }
-
-        public async Task<PageHeader> EditHeaderAsync(PageHeader header)
-        {
-            var currentHeader = await _pageHeaderRepository.FindAsync(header.Id);
-
-            currentHeader.PageName = header.PageName?.Trim();
-
-            _pageHeaderRepository.Update(currentHeader);
-            await _pageHeaderRepository.SaveAsync();
-
-            return header;
-        }
-
-        public async Task DeleteHeaderAsync(int id)
-        {
-            var header = await _pageHeaderRepository.FindAsync(id);
-
-            if (header.IsLayoutPage)
-            {
-                var layoutTexts = await _pageLayoutTextRepository.GetAllForHeaderAsync(header.Id);
-                _pageLayoutTextRepository.RemoveRange(layoutTexts);
-
-                var layouts = await _pageLayoutRepository.GetAllForHeaderIncludingChildrenAsync(
-                    header.Id);
-
-                foreach (var layout in layouts)
-                {
-                    foreach (var item in layout.Items)
-                    {
-                        await DeleteItemNoSaveAsync(item.Id, true);
-                    }
-                    layout.Items = null;
-                }
-
-                _pageLayoutRepository.RemoveRange(layouts);
-            }
-            else
-            {
-                var pages = await _pageRepository.GetByHeaderIdAsync(header.Id);
-                _pageRepository.RemoveRange(pages);
-            }
-
-            _pageHeaderRepository.Remove(header);
-            await _pageHeaderRepository.SaveAsync();
-        }
-
-        public async Task<bool> StubInUseAsync(PageHeader header)
-        {
-            header.Stub = header.Stub?.Trim().ToLower();
-            return await _pageHeaderRepository.StubInUseAsync(header);
-        }
-
-        public async Task<PageLayout> GetLayoutByIdAsync(int id)
-        {
-            return await _pageLayoutRepository.FindAsync(id);
-        }
-
-        public async Task<PageLayout> GetLayoutDetailsAsync(int id)
-        {
-            var layout = await _pageLayoutRepository.GetIncludingChildrenWithItemContent(id);
-            layout.Items = layout.Items?.OrderBy(_ => _.Order).ToList();
-
-            return layout;
-        }
-
-        public async Task<DataWithCount<ICollection<PageLayout>>>
-            GetPaginatedLayoutListForHeaderAsync(int headerId, BaseFilter filter)
-        {
-            return await _pageLayoutRepository.GetPaginatedListForHeaderAsync(headerId, filter);
-        }
-
-        public async Task<PageLayout> CreateLayoutAsync(PageLayout layout)
-        {
-            layout.Name = layout.Name.Trim();
-            layout.PreviewId = Guid.NewGuid();
-
-            await _pageLayoutRepository.AddAsync(layout);
-            await _pageLayoutRepository.SaveAsync();
-
-            return layout;
-        }
-
-        public async Task<PageLayout> EditLayoutAsync(PageLayout layout)
-        {
-            var currentlayout = await _pageLayoutRepository.FindAsync(layout.Id);
-            currentlayout.Name = layout.Name?.Trim();
-            currentlayout.SocialCardId = layout.SocialCardId;
-            currentlayout.StartDate = layout.StartDate;
-
-            _pageLayoutRepository.Update(currentlayout);
-            await _pageLayoutRepository.SaveAsync();
-            return currentlayout;
-        }
-
-        public async Task DeleteLayoutAsync(int id)
-        {
-            var layout = await _pageLayoutRepository.GetIncludingChildrenAsync(id);
-
-            var texts = await _pageLayoutTextRepository.GetAllForLayoutAsync(layout.Id);
-            _pageLayoutTextRepository.RemoveRange(texts);
-
-            foreach (var item in layout.Items)
-            {
-                await DeleteItemNoSaveAsync(item.Id, true);
-            }
-            layout.Items = null;
-
-            _pageLayoutRepository.Remove(layout);
-            await _pageLayoutRepository.SaveAsync();
-        }
-
-        public async Task<PageLayoutText> GetTextByLayoutAndLanguageAsync(int layoutId,
-            int languageId)
-        {
-            return await _pageLayoutTextRepository.GetByPageLayoutAndLanguageAsync(
-                layoutId, languageId);
-        }
-
-        public async Task<PageLayoutText> SetLayoutTextAsync(PageLayoutText layoutText)
-        {
-            var currentText = await _pageLayoutTextRepository.GetByPageLayoutAndLanguageAsync(
-                layoutText.PageLayoutId, layoutText.LanguageId);
-
-            if (currentText == null)
-            {
-                layoutText.Title = layoutText.Title?.Trim();
-
-                await _pageLayoutTextRepository.AddAsync(layoutText);
-                await _pageLayoutTextRepository.SaveAsync();
-                return layoutText;
-            }
-            else
-            {
-                currentText.Title = layoutText.Title?.Trim();
-
-                _pageLayoutTextRepository.Update(currentText);
-                await _pageLayoutTextRepository.SaveAsync();
-                return currentText;
-            }
-        }
-
-        public async Task<PageItem> GetItemByIdAsync(int id)
-        {
-            return await _pageItemRepository.FindAsync(id);
-        }
-
-        public async Task<PageItem> ConnectImageFeatureAsync(PageItem pageItem)
-        {
-            if (pageItem == null)
-            {
-                throw new OcudaException("Cannot connect empty object");
-            }
-
-            var maxSortOrder = await _pageItemRepository
-                .GetMaxSortOrderForLayoutAsync(pageItem.PageLayoutId);
-            if (maxSortOrder.HasValue)
-            {
-                pageItem.Order = maxSortOrder.Value + 1;
-            }
-
-            await _pageItemRepository.AddAsync(pageItem);
-            await _pageItemRepository.SaveAsync();
-            return pageItem;
-        }
-
-        public async Task<PageItem> CreateItemAsync(PageItem pageItem)
-        {
-            pageItem.CarouselId = null;
-            pageItem.PageFeatureId = null;
-            pageItem.SegmentId = null;
-            pageItem.WebslideId = null;
-
-            if (pageItem.Carousel != null)
-            {
-                pageItem.PageFeature = null;
-                pageItem.Segment = null;
-                pageItem.Webslide = null;
-                pageItem.Carousel = await _carouselService.CreateNoSaveAsync(pageItem.Carousel);
-            }
-            else if (pageItem.PageFeature != null)
-            {
-                pageItem.Carousel = null;
-                pageItem.Segment = null;
-                pageItem.Webslide = null;
-                pageItem.PageFeature = await _imageFeatureService
-                    .CreateNoSaveAsync(pageItem.PageFeature);
-            }
-            else if (pageItem.Segment != null)
-            {
-                pageItem.Carousel = null;
-                pageItem.PageFeature = null;
-                pageItem.Webslide = null;
-                pageItem.Segment = await _segmentService.CreateNoSaveAsync(pageItem.Segment);
-            }
-            else if (pageItem.Webslide != null)
-            {
-                pageItem.Carousel = null;
-                pageItem.PageFeature = null;
-                pageItem.Segment = null;
-                pageItem.Webslide = await _imageFeatureService.CreateNoSaveAsync(pageItem.Webslide);
-            }
-
-            if (pageItem.Carousel == null
-                && pageItem.PageFeature == null
-                && pageItem.Segment == null
-                && pageItem.Webslide == null)
-            {
-                throw new OcudaException("No type selected");
-            }
-
-            var maxSortOrder = await _pageItemRepository.GetMaxSortOrderForLayoutAsync(
-                pageItem.PageLayoutId);
-            if (maxSortOrder.HasValue)
-            {
-                pageItem.Order = maxSortOrder.Value + 1;
-            }
-
-            await _pageItemRepository.AddAsync(pageItem);
-            await _pageItemRepository.SaveAsync();
-            return pageItem;
-        }
-
-        public async Task<PageItem> EditItemAsync(PageItem pageItem)
-        {
-            if (!pageItem.CarouselId.HasValue && !pageItem.SegmentId.HasValue)
-            {
-                throw new OcudaException("No content selected");
-            }
-
-            var currentPageItem = await _pageItemRepository.FindAsync(pageItem.Id);
-            if (pageItem.CarouselId.HasValue)
-            {
-                currentPageItem.CarouselId = pageItem.CarouselId;
-                currentPageItem.SegmentId = null;
-            }
-            else
-            {
-                currentPageItem.SegmentId = pageItem.SegmentId;
-            }
-
-            _pageItemRepository.Update(currentPageItem);
-            await _pageItemRepository.SaveAsync();
-            return currentPageItem;
-        }
-
-        public async Task DeleteItemAsync(int pageItemId)
-        {
-            await DeleteItemNoSaveAsync(pageItemId);
-            await _pageItemRepository.SaveAsync();
-        }
-
-        public async Task DeleteItemNoSaveAsync(int pageItemId, bool ignoreSort = false)
-        {
-            var pageItem = await _pageItemRepository.FindAsync(pageItemId);
-
-            if (pageItem == null)
-            {
-                throw new OcudaException("Page item does not exist.");
-            }
-
-            if (pageItem.CarouselId.HasValue)
-            {
-                await _carouselService.DeleteNoSaveAsync(pageItem.CarouselId.Value);
-            }
-            if (pageItem.SegmentId.HasValue)
-            {
-                await _segmentService.DeleteNoSaveAsync(pageItem.SegmentId.Value);
-            }
-            if (pageItem.PageFeatureId.HasValue || pageItem.WebslideId.HasValue)
-            {
-                var imageFeatureId = pageItem.PageFeatureId ?? pageItem.WebslideId;
-                var usage = await _pageItemRepository
-                    .GetImageFeatureUseCountAsync(imageFeatureId.Value);
-                if (usage <= 1)
-                {
-                    await _imageFeatureService.DeleteNoSaveAsync(imageFeatureId.Value);
-                }
-            }
-
-            if (!ignoreSort)
-            {
-                var subsequentItems = await _pageItemRepository.GetLayoutSubsequentAsync(
-                    pageItem.PageLayoutId,
-                    pageItem.Order);
-
-                if (subsequentItems.Count > 0)
-                {
-                    subsequentItems.ForEach(_ => _.Order--);
-                    _pageItemRepository.UpdateRange(subsequentItems);
-                }
-            }
-
-            _pageItemRepository.Remove(pageItem);
-        }
-
-        public async Task UpdateItemSortOrder(int id, bool increase)
-        {
-            var item = await _pageItemRepository.FindAsync(id);
-
-            int newSortOrder;
-            if (increase)
-            {
-                newSortOrder = item.Order + 1;
-            }
-            else
-            {
-                if (item.Order == 0)
-                {
-                    throw new OcudaException("Item is already in the first position.");
-                }
-                newSortOrder = item.Order - 1;
-            }
-
-            var itemInPosition = await _pageItemRepository.GetByLayoutAndOrderAsync(
-                item.PageLayoutId, newSortOrder);
-
-            if (itemInPosition == null)
-            {
-                throw new OcudaException("Item is already in the last position.");
-            }
-
-            itemInPosition.Order = item.Order;
-            item.Order = newSortOrder;
-
-            _pageItemRepository.Update(item);
-            _pageItemRepository.Update(itemInPosition);
-            await _pageItemRepository.SaveAsync();
-        }
-
-        public async Task<PageLayout> GetLayoutForItemAsync(int itemId)
-        {
-            return await _pageItemRepository.GetLayoutForItemAsync(itemId);
         }
 
         public async Task<PageLayout> CloneLayoutAsync(int pageHeaderId,
@@ -565,6 +156,421 @@ namespace Ocuda.Ops.Service
             }
 
             return newLayout;
+        }
+
+        public async Task<PageItem> ConnectImageFeatureAsync(PageItem pageItem)
+        {
+            if (pageItem == null)
+            {
+                throw new OcudaException("Cannot connect empty object");
+            }
+
+            var maxSortOrder = await _pageItemRepository
+                .GetMaxSortOrderForLayoutAsync(pageItem.PageLayoutId);
+            if (maxSortOrder.HasValue)
+            {
+                pageItem.Order = maxSortOrder.Value + 1;
+            }
+
+            await _pageItemRepository.AddAsync(pageItem);
+            await _pageItemRepository.SaveAsync();
+            return pageItem;
+        }
+
+        public async Task<Page> CreateAsync(Page page)
+        {
+            page.Title = page.Title?.Trim();
+            page.Content = page.Content?.Trim();
+
+            await _pageRepository.AddAsync(page);
+            await _pageRepository.SaveAsync();
+            return page;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
+            "CA1308:Normalize strings to uppercase",
+            Justification = "Stubs are part of a URI and are normalized to lowercase")]
+        public async Task<PageHeader> CreateHeaderAsync(PageHeader header)
+        {
+            header.Stub = header.Stub?.Trim().ToLowerInvariant();
+
+            if (await _pageHeaderRepository.StubInUseAsync(header))
+            {
+                throw new OcudaException($"The stub \"{header.Stub}\" is already in use for that page type. Please choose a different stub.");
+            }
+
+            header.PageName = header.PageName?.Trim();
+
+            await _pageHeaderRepository.AddAsync(header);
+            await _pageHeaderRepository.SaveAsync();
+
+            return header;
+        }
+
+        public async Task<PageItem> CreateItemAsync(PageItem pageItem)
+        {
+            pageItem.CarouselId = null;
+            pageItem.PageFeatureId = null;
+            pageItem.SegmentId = null;
+            pageItem.WebslideId = null;
+
+            if (pageItem.Carousel != null)
+            {
+                pageItem.PageFeature = null;
+                pageItem.Segment = null;
+                pageItem.Webslide = null;
+                pageItem.Carousel = await _carouselService.CreateNoSaveAsync(pageItem.Carousel);
+            }
+            else if (pageItem.PageFeature != null)
+            {
+                pageItem.Carousel = null;
+                pageItem.Segment = null;
+                pageItem.Webslide = null;
+                pageItem.PageFeature = await _imageFeatureService
+                    .CreateNoSaveAsync(pageItem.PageFeature);
+            }
+            else if (pageItem.Segment != null)
+            {
+                pageItem.Carousel = null;
+                pageItem.PageFeature = null;
+                pageItem.Webslide = null;
+                pageItem.Segment = await _segmentService.CreateNoSaveAsync(pageItem.Segment);
+            }
+            else if (pageItem.Webslide != null)
+            {
+                pageItem.Carousel = null;
+                pageItem.PageFeature = null;
+                pageItem.Segment = null;
+                pageItem.Webslide = await _imageFeatureService.CreateNoSaveAsync(pageItem.Webslide);
+            }
+
+            if (pageItem.Carousel == null
+                && pageItem.PageFeature == null
+                && pageItem.Segment == null
+                && pageItem.Webslide == null)
+            {
+                throw new OcudaException("No type selected");
+            }
+
+            var maxSortOrder = await _pageItemRepository.GetMaxSortOrderForLayoutAsync(
+                pageItem.PageLayoutId);
+            if (maxSortOrder.HasValue)
+            {
+                pageItem.Order = maxSortOrder.Value + 1;
+            }
+
+            await _pageItemRepository.AddAsync(pageItem);
+            await _pageItemRepository.SaveAsync();
+            return pageItem;
+        }
+
+        public async Task<PageLayout> CreateLayoutAsync(PageLayout layout)
+        {
+            layout.Name = layout.Name.Trim();
+            layout.PreviewId = Guid.NewGuid();
+
+            await _pageLayoutRepository.AddAsync(layout);
+            await _pageLayoutRepository.SaveAsync();
+
+            return layout;
+        }
+
+        public async Task DeleteAsync(Page page)
+        {
+            _pageRepository.Remove(page);
+            await _pageRepository.SaveAsync();
+        }
+
+        public async Task DeleteHeaderAsync(int id)
+        {
+            var header = await _pageHeaderRepository.FindAsync(id);
+
+            if (header.IsLayoutPage)
+            {
+                var layoutTexts = await _pageLayoutTextRepository.GetAllForHeaderAsync(header.Id);
+                _pageLayoutTextRepository.RemoveRange(layoutTexts);
+
+                var layouts = await _pageLayoutRepository.GetAllForHeaderIncludingChildrenAsync(
+                    header.Id);
+
+                foreach (var layout in layouts)
+                {
+                    foreach (var item in layout.Items)
+                    {
+                        await DeleteItemNoSaveAsync(item.Id, true);
+                    }
+                    layout.Items = null;
+                }
+
+                _pageLayoutRepository.RemoveRange(layouts);
+            }
+            else
+            {
+                var pages = await _pageRepository.GetByHeaderIdAsync(header.Id);
+                _pageRepository.RemoveRange(pages);
+            }
+
+            _pageHeaderRepository.Remove(header);
+            await _pageHeaderRepository.SaveAsync();
+        }
+
+        public async Task DeleteItemAsync(int pageItemId)
+        {
+            await DeleteItemNoSaveAsync(pageItemId);
+            await _pageItemRepository.SaveAsync();
+        }
+
+        public async Task DeleteItemNoSaveAsync(int pageItemId, bool ignoreSort = false)
+        {
+            var pageItem = await _pageItemRepository.FindAsync(pageItemId);
+
+            if (pageItem == null)
+            {
+                throw new OcudaException("Page item does not exist.");
+            }
+
+            if (pageItem.CarouselId.HasValue)
+            {
+                await _carouselService.DeleteNoSaveAsync(pageItem.CarouselId.Value);
+            }
+            if (pageItem.SegmentId.HasValue)
+            {
+                await _segmentService.DeleteNoSaveAsync(pageItem.SegmentId.Value);
+            }
+            if (pageItem.PageFeatureId.HasValue || pageItem.WebslideId.HasValue)
+            {
+                var imageFeatureId = pageItem.PageFeatureId ?? pageItem.WebslideId;
+                var usage = await _pageItemRepository
+                    .GetImageFeatureUseCountAsync(imageFeatureId.Value);
+                if (usage <= 1)
+                {
+                    await _imageFeatureService.DeleteNoSaveAsync(imageFeatureId.Value);
+                }
+            }
+
+            if (!ignoreSort)
+            {
+                var subsequentItems = await _pageItemRepository.GetLayoutSubsequentAsync(
+                    pageItem.PageLayoutId,
+                    pageItem.Order);
+
+                if (subsequentItems.Count > 0)
+                {
+                    subsequentItems.ForEach(_ => _.Order--);
+                    _pageItemRepository.UpdateRange(subsequentItems);
+                }
+            }
+
+            _pageItemRepository.Remove(pageItem);
+        }
+
+        public async Task DeleteLayoutAsync(int id)
+        {
+            var layout = await _pageLayoutRepository.GetIncludingChildrenAsync(id);
+
+            var texts = await _pageLayoutTextRepository.GetAllForLayoutAsync(layout.Id);
+            _pageLayoutTextRepository.RemoveRange(texts);
+
+            foreach (var item in layout.Items)
+            {
+                await DeleteItemNoSaveAsync(item.Id, true);
+            }
+            layout.Items = null;
+
+            _pageLayoutRepository.Remove(layout);
+            await _pageLayoutRepository.SaveAsync();
+        }
+
+        public async Task<Page> EditAsync(Page page)
+        {
+            var currentPage = await _pageRepository.GetByHeaderAndLanguageAsync(
+                page.PageHeaderId, page.LanguageId);
+            currentPage.Title = page.Title?.Trim();
+            currentPage.Content = page.Content?.Trim();
+            currentPage.IsPublished = page.IsPublished;
+            currentPage.SocialCardId = page.SocialCardId;
+
+            _pageRepository.Update(currentPage);
+            await _pageRepository.SaveAsync();
+            return currentPage;
+        }
+
+        public async Task<PageHeader> EditHeaderAsync(PageHeader header)
+        {
+            var currentHeader = await _pageHeaderRepository.FindAsync(header.Id);
+
+            currentHeader.PageName = header.PageName?.Trim();
+
+            _pageHeaderRepository.Update(currentHeader);
+            await _pageHeaderRepository.SaveAsync();
+
+            return header;
+        }
+
+        public async Task<PageItem> EditItemAsync(PageItem pageItem)
+        {
+            if (!pageItem.CarouselId.HasValue && !pageItem.SegmentId.HasValue)
+            {
+                throw new OcudaException("No content selected");
+            }
+
+            var currentPageItem = await _pageItemRepository.FindAsync(pageItem.Id);
+            if (pageItem.CarouselId.HasValue)
+            {
+                currentPageItem.CarouselId = pageItem.CarouselId;
+                currentPageItem.SegmentId = null;
+            }
+            else
+            {
+                currentPageItem.SegmentId = pageItem.SegmentId;
+            }
+
+            _pageItemRepository.Update(currentPageItem);
+            await _pageItemRepository.SaveAsync();
+            return currentPageItem;
+        }
+
+        public async Task<PageLayout> EditLayoutAsync(PageLayout layout)
+        {
+            var currentlayout = await _pageLayoutRepository.FindAsync(layout.Id);
+            currentlayout.Name = layout.Name?.Trim();
+            currentlayout.SocialCardId = layout.SocialCardId;
+            currentlayout.StartDate = layout.StartDate;
+
+            _pageLayoutRepository.Update(currentlayout);
+            await _pageLayoutRepository.SaveAsync();
+            return currentlayout;
+        }
+
+        public async Task<Page> GetByHeaderAndLanguageAsync(int headerId, int languageId)
+        {
+            return await _pageRepository.GetByHeaderAndLanguageAsync(headerId, languageId);
+        }
+
+        public async Task<PageHeader> GetHeaderByIdAsync(int id)
+        {
+            return await _pageHeaderRepository.FindAsync(id);
+        }
+
+        public async Task<ICollection<string>> GetHeaderLanguagesByIdAsync(int id)
+        {
+            return await _pageHeaderRepository.GetLanguagesByIdAsync(id);
+        }
+
+        public async Task<PageItem> GetItemByIdAsync(int id)
+        {
+            return await _pageItemRepository.FindAsync(id);
+        }
+
+        public async Task<PageLayout> GetLayoutByIdAsync(int id)
+        {
+            return await _pageLayoutRepository.FindAsync(id);
+        }
+
+        public async Task<PageLayout> GetLayoutDetailsAsync(int id)
+        {
+            var layout = await _pageLayoutRepository.GetIncludingChildrenWithItemContent(id);
+            layout.Items = layout.Items?.OrderBy(_ => _.Order).ToList();
+
+            return layout;
+        }
+
+        public async Task<PageLayout> GetLayoutForItemAsync(int itemId)
+        {
+            return await _pageItemRepository.GetLayoutForItemAsync(itemId);
+        }
+
+        public async Task<DataWithCount<ICollection<PageHeader>>> GetPaginatedHeaderListAsync(
+                                                            PageFilter filter)
+        {
+            var headerList = await _pageHeaderRepository.GetPaginatedListAsync(filter);
+            foreach (var header in headerList.Data)
+            {
+                var perms
+                    = await _permissionGroupPageContentRepository.GetByPageHeaderId(header.Id);
+                header.PermissionGroupIds = perms.Select(_ => _.PermissionGroupId
+                    .ToString(CultureInfo.InvariantCulture));
+            }
+            return headerList;
+        }
+
+        public async Task<DataWithCount<ICollection<PageLayout>>>
+            GetPaginatedLayoutListForHeaderAsync(int headerId, BaseFilter filter)
+        {
+            return await _pageLayoutRepository.GetPaginatedListForHeaderAsync(headerId, filter);
+        }
+
+        public async Task<PageLayoutText> GetTextByLayoutAndLanguageAsync(int layoutId,
+            int languageId)
+        {
+            return await _pageLayoutTextRepository.GetByPageLayoutAndLanguageAsync(
+                layoutId, languageId);
+        }
+
+        public async Task<PageLayoutText> SetLayoutTextAsync(PageLayoutText layoutText)
+        {
+            var currentText = await _pageLayoutTextRepository.GetByPageLayoutAndLanguageAsync(
+                layoutText.PageLayoutId, layoutText.LanguageId);
+
+            if (currentText == null)
+            {
+                layoutText.Title = layoutText.Title?.Trim();
+
+                await _pageLayoutTextRepository.AddAsync(layoutText);
+                await _pageLayoutTextRepository.SaveAsync();
+                return layoutText;
+            }
+            else
+            {
+                currentText.Title = layoutText.Title?.Trim();
+
+                _pageLayoutTextRepository.Update(currentText);
+                await _pageLayoutTextRepository.SaveAsync();
+                return currentText;
+            }
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
+            "CA1308:Normalize strings to uppercase",
+            Justification = "Stubs are part of a URI and are normalized to lowercase")]
+        public async Task<bool> StubInUseAsync(PageHeader header)
+        {
+            header.Stub = header.Stub?.Trim().ToLowerInvariant();
+            return await _pageHeaderRepository.StubInUseAsync(header);
+        }
+
+        public async Task UpdateItemSortOrder(int id, bool increase)
+        {
+            var item = await _pageItemRepository.FindAsync(id);
+
+            int newSortOrder;
+            if (increase)
+            {
+                newSortOrder = item.Order + 1;
+            }
+            else
+            {
+                if (item.Order == 0)
+                {
+                    throw new OcudaException("Item is already in the first position.");
+                }
+                newSortOrder = item.Order - 1;
+            }
+
+            var itemInPosition = await _pageItemRepository.GetByLayoutAndOrderAsync(
+                item.PageLayoutId, newSortOrder);
+
+            if (itemInPosition == null)
+            {
+                throw new OcudaException("Item is already in the last position.");
+            }
+
+            itemInPosition.Order = item.Order;
+            item.Order = newSortOrder;
+
+            _pageItemRepository.Update(item);
+            _pageItemRepository.Update(itemInPosition);
+            await _pageItemRepository.SaveAsync();
         }
     }
 }

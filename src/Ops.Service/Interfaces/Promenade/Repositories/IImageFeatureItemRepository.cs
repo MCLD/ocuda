@@ -12,8 +12,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 
         Task<ICollection<ImageFeatureItem>> GetByImageFeatureAsync(int imageFeatureId);
 
-        Task<int?> GetMaxSortOrderForImageFeatureAsync(int imageFeatureId);
-
         Task<List<ImageFeatureItem>> GetImageFeatureSubsequentAsync(int imageFeatureId, int order);
+
+        Task<int?> GetMaxSortOrderForImageFeatureAsync(int imageFeatureId);
     }
 }

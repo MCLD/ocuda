@@ -6,36 +6,32 @@ namespace Ocuda.Promenade.Models.Entities
 {
     public class PageItem
     {
-        [Key]
-        [Required]
-        public int Id { get; set; }
-
-        public int PageLayoutId { get; set; }
-        public PageLayout PageLayout { get; set; }
-
-        public int Order { get; set; }
+        public Carousel Carousel { get; set; }
 
         [DisplayName("Carousel")]
         public int? CarouselId { get; set; }
 
-        public Carousel Carousel { get; set; }
+        [Key]
+        [Required]
+        public int Id { get; set; }
 
+        public int Order { get; set; }
+        public ImageFeature PageFeature { get; set; }
         [DisplayName("Feature")]
         public int? PageFeatureId { get; set; }
 
-        public ImageFeature PageFeature { get; set; }
+        public PageLayout PageLayout { get; set; }
+        public int PageLayoutId { get; set; }
+        public Segment Segment { get; set; }
 
         [DisplayName("Segment")]
         public int? SegmentId { get; set; }
-
-        public Segment Segment { get; set; }
-
-        [DisplayName("Webslide")]
-        public int? WebslideId { get; set; }
+        [NotMapped]
+        public SegmentText SegmentText { get; set; }
 
         public ImageFeature Webslide { get; set; }
 
-        [NotMapped]
-        public SegmentText SegmentText { get; set; }
+        [DisplayName("Webslide")]
+        public int? WebslideId { get; set; }
     }
 }
