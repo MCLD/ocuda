@@ -6,7 +6,7 @@
     <CodeAnalysisRuleSet>../../OcudaRuleSet.ruleset</CodeAnalysisRuleSet>
     <Company>Maricopa County Library District</Company>
     <Copyright>Copyright 2018 Maricopa County Library District</Copyright>
-    <FileVersion>1.0.0</FileVersion>
+    <FileVersion>1.0.1</FileVersion>
     <LangVersion>Latest</LangVersion>
     <OutputType>Exe</OutputType>
     <PackageLicenseUrl>https://github.com/MCLD/ocuda/blob/develop/LICENSE</PackageLicenseUrl>
@@ -37,6 +37,7 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="5.0.1" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="5.0.1" />
   </ItemGroup>
 
   <ItemGroup>
