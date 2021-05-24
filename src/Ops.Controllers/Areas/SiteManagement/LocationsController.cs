@@ -139,72 +139,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpPost]
         [Route("[action]/{locationStub}")]
-        public async Task<IActionResult> RemoveSegment(string locationStub, string whichSegment)
-        {
-            if (string.IsNullOrEmpty(locationStub))
-            {
-                ShowAlertDanger("Invalid remove segment request: no location specified.");
-                return RedirectToAction(nameof(Index));
-            }
-
-            if (string.IsNullOrEmpty(whichSegment))
-            {
-                ShowAlertDanger("Invalid remove segment request: no segment specified.");
-                return RedirectToAction(nameof(Location), new { locationStub });
-            }
-            var location = await _locationService.GetLocationByStubAsync(locationStub);
-
-            if (location == null)
-            {
-                ShowAlertDanger($"Location not found for stub {locationStub}.");
-                return RedirectToAction(nameof(Index));
-            }
-
-            int segmentId;
-            switch (whichSegment.Trim().ToUpperInvariant())
-            {
-                case "HOURSOVERRIDE":
-                    segmentId = location.HoursSegmentId.Value;
-                    location.HoursSegmentId = null;
-                    break;
-                case "PREFEATURE":
-                    segmentId = location.PreFeatureSegmentId.Value;
-                    location.PreFeatureSegmentId = null;
-                    break;
-                case "POSTFEATURE":
-                    segmentId = location.PostFeatureSegmentId.Value;
-                    location.PostFeatureSegmentId = null;
-                    break;
-                default:
-                    ShowAlertDanger($"Invalid remove segment request: unknown segment {whichSegment}.");
-                    return RedirectToAction(nameof(Location), new { locationStub });
-            }
-
-            await _locationService.EditAsync(location);
-
-            try
-            {
-                await _segmentService.DeleteAsync(segmentId);
-                ShowAlertSuccess("Segment removed and deleted.");
-            }
-            catch (OcudaException oex)
-            {
-                string message = oex.Message;
-                var inUseList = oex.Data[OcudaExceptionData.SegmentInUseBy] as ICollection<string>;
-                if (inUseList != null)
-                {
-                    message = $"in use by {inUseList.Count} other locations";
-                }
-                ShowAlertWarning($"Segment removed from this location but not deleted: {message}");
-            }
-
-            return RedirectToAction(nameof(Location), new { locationStub });
-        }
-
-
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        [HttpPost]
-        [Route("[action]/{locationStub}")]
         public async Task<IActionResult> AddSegment(string locationStub,
                     string whichSegment,
                     string segmentText)
@@ -1140,6 +1074,106 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ShowAlertDanger($"Unable to find Location {locationStub}: {ex.Message}");
                 return RedirectToAction(nameof(LocationsController.Index));
             }
+        }
+
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpPost]
+        [Route("[action]/{locationStub}")]
+        public async Task<IActionResult> RemoveSegment(string locationStub, string whichSegment)
+        {
+            if (string.IsNullOrEmpty(locationStub))
+            {
+                ShowAlertDanger("Invalid remove segment request: no location specified.");
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (string.IsNullOrEmpty(whichSegment))
+            {
+                ShowAlertDanger("Invalid remove segment request: no segment specified.");
+                return RedirectToAction(nameof(Location), new { locationStub });
+            }
+            var location = await _locationService.GetLocationByStubAsync(locationStub);
+
+            if (location == null)
+            {
+                ShowAlertDanger($"Location not found for stub {locationStub}.");
+                return RedirectToAction(nameof(Index));
+            }
+
+            int segmentId;
+            switch (whichSegment.Trim().ToUpperInvariant())
+            {
+                case "HOURSOVERRIDE":
+                    segmentId = location.HoursSegmentId.Value;
+                    location.HoursSegmentId = null;
+                    break;
+
+                case "PREFEATURE":
+                    segmentId = location.PreFeatureSegmentId.Value;
+                    location.PreFeatureSegmentId = null;
+                    break;
+
+                case "POSTFEATURE":
+                    segmentId = location.PostFeatureSegmentId.Value;
+                    location.PostFeatureSegmentId = null;
+                    break;
+
+                default:
+                    ShowAlertDanger($"Invalid remove segment request: unknown segment {whichSegment}.");
+                    return RedirectToAction(nameof(Location), new { locationStub });
+            }
+
+            await _locationService.EditAsync(location);
+
+            try
+            {
+                await _segmentService.DeleteAsync(segmentId);
+                ShowAlertSuccess("Segment removed and deleted.");
+            }
+            catch (OcudaException oex)
+            {
+                string message = oex.Message;
+                var inUseList = oex.Data[OcudaExceptionData.SegmentInUseBy] as ICollection<string>;
+                if (inUseList != null)
+                {
+                    message = $"in use by {inUseList.Count} other locations";
+                }
+                ShowAlertWarning($"Segment removed from this location but not deleted: {message}");
+            }
+
+            return RedirectToAction(nameof(Location), new { locationStub });
+        }
+
+        [HttpPost]
+        [Route("[action]/{locationStub}")]
+        public async Task<IActionResult> RemoveSocial(string locationStub)
+        {
+            try
+            {
+                var location = await _locationService.GetLocationByStubAsync(locationStub);
+                int? id = location.SocialCardId;
+                location.SocialCardId = null;
+                await _locationService.EditAsync(location);
+
+                if (id.HasValue)
+                {
+                    try
+                    {
+                        await _socialCardService.DeleteAsync(id.Value);
+                        ShowAlertSuccess("Social card deleted.");
+                    }
+                    catch (OcudaException oex)
+                    {
+                        ShowAlertWarning($"Social card unlinked from this location but could not be deleted: {oex.Message}");
+                    }
+                }
+            }
+            catch (OcudaException oex)
+            {
+                ShowAlertDanger($"Social card could not be removed: {oex.Message}");
+            }
+
+            return RedirectToAction(nameof(Location), new { locationStub });
         }
 
         [HttpGet]
