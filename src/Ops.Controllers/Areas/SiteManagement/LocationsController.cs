@@ -203,10 +203,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             // get location, create segment
             switch (whichSegment.Trim().ToUpperInvariant())
             {
-                case "DESCRIPTION":
-                    location.DescriptionSegmentId = segment.Id;
-                    break;
-
                 case "HOURSOVERRIDE":
                     location.HoursSegmentId = segment.Id;
                     break;
@@ -218,19 +214,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 case "POSTFEATURE":
                     location.PostFeatureSegmentId = segment.Id;
                     break;
+
+                default:
+                    location.DescriptionSegmentId = segment.Id;
+                    break;
             }
 
             await _locationService.EditAsync(location);
 
             return RedirectToAction(nameof(Location), new { locationStub });
-        }
-
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        [HttpPost]
-        [Route("[action]/{locationStub}")]
-        public async Task<IActionResult> AddSocial(string locationStub, string whichSegment)
-        {
-            throw new NotImplementedException();
         }
 
         [HttpPost]
@@ -703,9 +695,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpGet]
         [Route("[action]")]
+        public async Task<IActionResult> GetItemsList(string itemIds, string objectType)
+        {
+            return await GetItemsList(itemIds, objectType, 1);
+        }
+
+        [HttpGet]
+        [Route("[action]")]
         public async Task<IActionResult> GetItemsList(string itemIds,
             string objectType,
-            int page = 1)
+            int page)
         {
             if (objectType == "Group")
             {
