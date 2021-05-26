@@ -109,7 +109,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     if (!model.AddOverride.CloseTime.HasValue)
                     {
                         ModelState.AddModelError("AddOverride.CloseTime",
-                            "Please select an Close Time.");
+                            "Please select a Close Time.");
                     }
                 }
                 else if (model.AddOverride.OpenTime > model.AddOverride.CloseTime)
@@ -637,7 +637,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     if (!model.EditOverride.CloseTime.HasValue)
                     {
                         ModelState.AddModelError("EditOverride.CloseTime",
-                            "Please select an Close Time.");
+                            "Please select a Close Time.");
                     }
                 }
                 else if (model.EditOverride.OpenTime > model.EditOverride.CloseTime)
@@ -783,7 +783,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         stringResult);
                 }
 
-                if (geoResult?.Results?.Count() > 0)
+                if (geoResult?.Results?.Length > 0)
                 {
                     var lat = geoResult?
                         .Results?

@@ -816,10 +816,10 @@
 @section scripts{
     <script src="~/js/md.min.js" asp-append-version="true"></script>
     <script>
-
         function FormatStub(object) {
             updateStub($(object), $(object).val());
         }
+
         $(function () {
             $('[data-toggle="tooltip"]').tooltip();
             var ulMapList = document.createElement("ul");
@@ -840,8 +840,8 @@
         @if (!Model.Location.IsNewLocation)
         {
             <text>
-        // Helpers
-        function GetItemList(objType) {
+            // Helpers
+            function GetItemList(objType) {
                 $("#listAddModal").modal("show");
                 $.get("@Url.Action(nameof(LocationsController.GetItemsList))",
                     {
@@ -851,6 +851,7 @@
                         $("#modalItemList").html(response);
                 });
             }
+
             $(document).on('click', "button.page-link", function (e) {
                 $.get("@Url.Action(nameof(LocationsController.GetItemsList))",
                 {
@@ -919,6 +920,7 @@
                     $("#group-isLocationRegion").val("False");
                 }
             });
+
             $(".edit-item").on('click', function (e) {
                 var url = "";
                 if ($(this).data("itemtype") == "Feature") {
@@ -950,6 +952,7 @@
             $(document).on('click', "#confirmDeleteGroup", function () {
                 DeleteLocationObject($(this).data('itemid'), "@Url.Action(nameof(LocationsController.DeleteLocationGroup))")
             });
+
             $(document).on('click', "#confirmDeleteFeature", function () {
                 DeleteLocationObject($(this).data('itemid'), "@Url.Action(nameof(LocationsController.DeleteLocationFeature))")
             });
@@ -965,102 +968,105 @@
                     });
             }
 
-        $('#addSegmentModal').on('show.bs.modal', function (event) {
-            let button = $(event.relatedTarget)
-            let segment = button.data('segment')
-            let segmentDisplay = button.data('segment-display')
-            $('#oc-segment-type').val(segment)
-            $('#oc-show-segment-type').text(segmentDisplay)
-        });
-        var segmentEditor = new Markdown.Editor($("#oc-segment-text"), { allowUploads: true });
-        segmentEditor.run();
+            $('#addSegmentModal').on('show.bs.modal', function (event) {
+                let button = $(event.relatedTarget)
+                let segment = button.data('segment')
+                let segmentDisplay = button.data('segment-display')
+                $('#oc-segment-type').val(segment)
+                $('#oc-show-segment-type').text(segmentDisplay)
+            });
+            
+            var segmentEditor = new Markdown.Editor($("#oc-segment-text"), { allowUploads: true });
+            segmentEditor.run();
 
-        $('#removeSegmentModal').on('show.bs.modal', function (event) {
-            let button = $(event.relatedTarget)
-            let segment = button.data('segment')
-            let segmentDisplay = button.data('segment-display')
-            $('#oc-remove-segment').val(segment)
-            $('#oc-show-remove-segment').text(segmentDisplay)
-        });
-</text>
-}
-    // For Google Maps
-    $(document).on('click','#maplink-suggestions li', function () {
-        var urlstring = $(this).find("a").data("maps-url");
-        var address = $(this).find("span.format-addr").text().split(", ");
-        if (address.length == 5) {
-            $("#Location_Address").val(address[1]);
-            $("#Location_City").val(address[2]);
-            $("#Location_Country").val(address[4]);
-            var stateZip = address[3].split(" ");
-            $($("input#Location_MapLink")[0]).val(urlstring);
-            $("#Location_State").val(stateZip[0]);
-            $("#Location_Zip").val(stateZip[1]);
-            $("#maplink-suggestions").html("");
+            $('#removeSegmentModal').on('show.bs.modal', function (event) {
+                let button = $(event.relatedTarget)
+                let segment = button.data('segment')
+                let segmentDisplay = button.data('segment-display')
+                $('#oc-remove-segment').val(segment)
+                $('#oc-show-remove-segment').text(segmentDisplay)
+            });
+            </text>
         }
-        else {
-            $("#Location_Address").val(address[0]);
-            $("#Location_City").val(address[1]);
-            $("#Location_Country").val(address[3]);
-            var stateZip = address[2].split(" ");
-            $($("input#Location_MapLink")[0]).val(urlstring);
-            $("#Location_State").val(stateZip[0]);
-            $("#Location_Zip").val(stateZip[1]);
-            $("#maplink-suggestions").html("");
-        }
-    });
-    $("input#Location_Address").blur(function () {
-        if ($('#Location_Address').val() && !$('#Location_MapLink').val())
-        {
-            $("#maplink-suggestions").html("");
-            var data = {};
-            data["Address"] = $("#Location_Address").val();
-            data["City"] = $("#Location_City").val();
-            data["State"] = $("#Location_State").val();
-            data["Zip"] = $("#Location_Zip").val();
-            data["Country"] = $("#Location_Country").val();
-            var addressdata = JSON.stringify(data);
 
-            $.get("@Url.Action(nameof(LocationsController.GetUrlLocations))", { addressJson: addressdata }, function (response) {
-            if (response.success == true) {
-            var locations = $.parseJSON(response.data);
-            HandleGoogleLocations(locations);
-            }});
+        // For Google Maps
+        $(document).on('click','#maplink-suggestions li', function () {
+            var urlstring = $(this).find("a").data("maps-url");
+            var address = $(this).find("span.format-addr").text().split(", ");
+            if (address.length == 5) {
+                $("#Location_Address").val(address[1]);
+                $("#Location_City").val(address[2]);
+                $("#Location_Country").val(address[4]);
+                var stateZip = address[3].split(" ");
+                $($("input#Location_MapLink")[0]).val(urlstring);
+                $("#Location_State").val(stateZip[0]);
+                $("#Location_Zip").val(stateZip[1]);
+                $("#maplink-suggestions").html("");
+            } else {
+                $("#Location_Address").val(address[0]);
+                $("#Location_City").val(address[1]);
+                $("#Location_Country").val(address[3]);
+                var stateZip = address[2].split(" ");
+                $($("input#Location_MapLink")[0]).val(urlstring);
+                $("#Location_State").val(stateZip[0]);
+                $("#Location_Zip").val(stateZip[1]);
+                $("#maplink-suggestions").html("");
+            }
+        });
+        
+        $("input#Location_Address").blur(function () {
+            if ($('#Location_Address').val() && !$('#Location_MapLink').val())
+            {
+                $("#maplink-suggestions").html("");
+                var data = {};
+                data["Address"] = $("#Location_Address").val();
+                data["City"] = $("#Location_City").val();
+                data["State"] = $("#Location_State").val();
+                data["Zip"] = $("#Location_Zip").val();
+                data["Country"] = $("#Location_Country").val();
+                var addressdata = JSON.stringify(data);
+
+                $.get("@Url.Action(nameof(LocationsController.GetUrlLocations))", { addressJson: addressdata }, function (response) {
+                    if (response.success == true) {
+                        var locations = $.parseJSON(response.data);
+                        HandleGoogleLocations(locations);
+                }});
             }
             else
             {
-            $("#maplink-suggestions").html("");
+                $("#maplink-suggestions").html("");
             }
-            });
-            function HandleGoogleLocations(locations) {
+        });
+
+        function HandleGoogleLocations(locations) {
             for (var index = 0; index < locations.length; index++)
             {
-            var link = document.createElement('a');
-            link.setAttribute("data-maps-url", locations[index].url);
-            link.setAttribute("data-address", locations[index].url);
-            link.setAttribute("data-city", locations[index].url);
-            link.setAttribute("data-state", locations[index].url);
-            link.setAttribute("data-zip",locations[index].url);
-            link.innerHTML = " <strong>" + locations[index].name + "</strong>";
-            link.classList.add("url-suggestion");
-            link.setAttribute("id", "list-item-" + index.toString());
-            link.setAttribute("role", "button");
+                var link = document.createElement('a');
+                link.setAttribute("data-maps-url", locations[index].url);
+                link.setAttribute("data-address", locations[index].url);
+                link.setAttribute("data-city", locations[index].url);
+                link.setAttribute("data-state", locations[index].url);
+                link.setAttribute("data-zip",locations[index].url);
+                link.innerHTML = " <strong>" + locations[index].name + "</strong>";
+                link.classList.add("url-suggestion");
+                link.setAttribute("id", "list-item-" + index.toString());
+                link.setAttribute("role", "button");
 
-            var listitem = document.createElement("li");
-            listitem.classList.add("list-group-item");
-            listitem.classList.add("list-group-item-action");
-            listitem.classList.add("map-item");
-            var icon = document.createElement("span");
-            var formatAddr = document.createElement("span");
-            formatAddr.innerHTML = " "+locations[index].formatted_address;
-            formatAddr.setAttribute("class", "format-addr");
-            icon.classList.add("fas");
-            icon.classList.add("fa-map-marker-alt");
-            listitem.appendChild(icon);
-            listitem.appendChild(link);
-            listitem.appendChild(formatAddr);
-            document.getElementById("maplink-suggestions").appendChild(listitem);
+                var listitem = document.createElement("li");
+                listitem.classList.add("list-group-item");
+                listitem.classList.add("list-group-item-action");
+                listitem.classList.add("map-item");
+                var icon = document.createElement("span");
+                var formatAddr = document.createElement("span");
+                formatAddr.innerHTML = " "+locations[index].formatted_address;
+                formatAddr.setAttribute("class", "format-addr");
+                icon.classList.add("fas");
+                icon.classList.add("fa-map-marker-alt");
+                listitem.appendChild(icon);
+                listitem.appendChild(link);
+                listitem.appendChild(formatAddr);
+                document.getElementById("maplink-suggestions").appendChild(listitem);
             }
-            }
+        }
     </script>
 }
