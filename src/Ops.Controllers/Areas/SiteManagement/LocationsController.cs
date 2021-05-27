@@ -465,15 +465,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             if (ModelState.IsValid)
             {
+                bool noGeo = false;
                 try
                 {
                     var currentLocation = await _locationService.GetLocationByIdAsync(location.Id);
-
-                    var locationHasChanged = currentLocation.Address != location.Address
-                        || currentLocation.City != location.City
-                        || currentLocation.State != location.State
-                        || currentLocation.Zip != location.Zip
-                        || currentLocation.Country != location.Country;
 
                     var hasLocation = !(string.IsNullOrEmpty(location.Address)
                         && string.IsNullOrEmpty(location.City)
@@ -481,28 +476,41 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         && string.IsNullOrEmpty(location.Zip)
                         && string.IsNullOrEmpty(location.Country));
 
-                    if (locationHasChanged && hasLocation)
+                    if (hasLocation)
                     {
-                        try
+
+                        var needsGeocode = currentLocation.Address != location.Address
+                            || currentLocation.City != location.City
+                            || currentLocation.State != location.State
+                            || currentLocation.Zip != location.Zip
+                            || currentLocation.Country != location.Country;
+
+                        if (needsGeocode)
                         {
-                            location = await GetLatLng(location);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex,
-                                "Problem looking up postal code for coordinates {Address}: {Message}",
-                                location.Address,
-                                ex.Message);
-                            ShowAlertDanger($"Unable to find Location's address: {location.Address}");
-                            location.IsNewLocation = true;
-                            location.LocationHours = await _locationService
-                                .GetFormattedWeeklyHoursAsync(location.Id);
-                            return View("LocationDetails", new LocationViewModel
+                            try
                             {
-                                Location = location,
-                                Action = nameof(LocationsController.EditLocation)
-                            });
+                                location = await GetLatLng(location);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex,
+                                    "Problem looking up postal code for coordinates {Address}: {Message}",
+                                    location.Address,
+                                    ex.Message);
+                                ShowAlertDanger($"Unable to find Location's address: {location.Address}");
+                                location.IsNewLocation = true;
+                                return View("LocationDetails", new LocationViewModel
+                                {
+                                    Location = location,
+                                    Action = nameof(LocationsController.EditLocation)
+                                });
+                            }
                         }
+                    }
+                    else
+                    {
+                        noGeo = true;
+                        location.GeoLocation = null;
                     }
 
                     currentLocation.Address = location.Address?.Trim();
@@ -510,6 +518,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     currentLocation.Code = location.Code?.Trim();
                     currentLocation.EventLink = location.EventLink?.Trim();
                     currentLocation.Facebook = location.Facebook?.Trim();
+                    currentLocation.GeoLocation = location.GeoLocation?.Trim();
                     currentLocation.MapLink = location.MapLink?.Trim();
                     currentLocation.Name = location.Name?.Trim();
                     currentLocation.Phone = location.Phone?.Trim();
@@ -517,23 +526,29 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     currentLocation.Stub = location.Stub?.Trim();
                     currentLocation.SubscriptionLink = location.SubscriptionLink?.Trim();
                     currentLocation.Zip = location.Zip?.Trim();
+                    currentLocation.IsNewLocation = false;
 
-                    await _locationService.EditAsync(location);
-                    ShowAlertSuccess($"Updated Location: {location.Name}");
-                    location.IsNewLocation = false;
+                    var updatedLocation = await _locationService.EditAsync(currentLocation);
+
+                    if (noGeo)
+                    {
+                        ShowAlertWarning($"Updated location with no geographic coordinates: {updatedLocation.Name}");
+                    }
+                    else
+                    {
+                        ShowAlertSuccess($"Updated location: {updatedLocation.Name}");
+                    }
                     return RedirectToAction(nameof(LocationsController.Location),
-                        new { locationStub = location.Stub });
+                        new { locationStub = updatedLocation.Stub });
                 }
                 catch (OcudaException ex)
                 {
-                    ShowAlertDanger($"Unable to Update Location {location.Name}: {ex.Message}");
+                    ShowAlertDanger($"Unable to update location {location.Name}: {ex.Message}");
                     _logger.LogError(ex,
                         "Problem updating location {LocationName}: {Message}",
                         location.Name,
                         ex.Message);
-                    location.IsNewLocation = false;
-                    location.LocationHours = await _locationService
-                        .GetFormattedWeeklyHoursAsync(location.Id);
+                    location.IsNewLocation = true;
                     var viewModel = new LocationViewModel
                     {
                         Location = location,

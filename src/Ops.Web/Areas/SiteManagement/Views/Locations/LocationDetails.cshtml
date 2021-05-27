@@ -828,15 +828,6 @@
             $($("#Location_Address").parent()).append(ulMapList);
         });
 
-        $(document).on("click", ".switch", function(e){
-            if ($(this).val().toLowerCase() == "true") {
-                $(this).val("false");
-            }
-            else {
-                $(this).val("true");
-            }
-        });
-
         @if (!Model.Location.IsNewLocation)
         {
             <text>

@@ -17,6 +17,7 @@ namespace Ocuda.Promenade.Models.Entities
         public string Name { get; set; }
 
         [MaxLength(5)]
+        [DisplayName("Short code")]
         public string Code { get; set; }
 
         [MaxLength(255)]
@@ -30,6 +31,7 @@ namespace Ocuda.Promenade.Models.Entities
         public SegmentText DescriptionSegment { get; set; }
 
         [MaxLength(255)]
+        [DisplayName("Link to map")]
         public string MapLink { get; set; }
 
         [MaxLength(100)]
@@ -61,12 +63,15 @@ namespace Ocuda.Promenade.Models.Entities
         public int? PreFeatureSegmentId { get; set; }
 
         [MaxLength(50)]
+        [DisplayName("Link to Facebook page")]
         public string Facebook { get; set; }
 
         [MaxLength(100)]
+        [DisplayName("Email subscription link")]
         public string SubscriptionLink { get; set; }
 
         [MaxLength(255)]
+        [DisplayName("Link to events")]
         public string EventLink { get; set; }
 
         public bool HasEvents { get; set; }
