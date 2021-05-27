@@ -12,11 +12,9 @@
         </h1>
     </div>
     <div class="col-sm-6">
-        @if (Model.PageLayoutId.HasValue)
+        @if (!string.IsNullOrEmpty(Model.BackLink))
         {
-            <a asp-controller="@PagesController.Name"
-               asp-action="@nameof(PagesController.LayoutDetail)"
-               asp-route-id="@Model.PageLayoutId.Value"
+            <a href="@Model.BackLink"
                class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
         }
         else
@@ -24,7 +22,7 @@
             <a asp-action="Index"
                class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Cancel</a>
         }
-        @if (!Model.NewSegmentText)
+        @if (!Model.NewSegmentText && string.IsNullOrEmpty(Model.BackLink))
         {
             <button type="button"
                     class="btn btn-outline-danger mt-2 mb-1 mr-2 float-right"
@@ -53,6 +51,18 @@
          name="Segment"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
 </form>
+
+@if (!string.IsNullOrEmpty(Model.Relationship))
+{
+    <div class="row" style="padding-top: 1rem;">
+        <div class="col-12 col-md-3 text-right">
+            Relationship(s)
+        </div>
+        <div class="col-12 col-md-9">
+            @Model.Relationship
+        </div>
+    </div>
+}
 
 <div class="row" style="padding-top: 1rem;">
     <div class="col-12">

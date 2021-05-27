@@ -30,64 +30,28 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     public class SegmentsController : BaseController<SegmentsController>
     {
         private readonly ILanguageService _languageService;
+        private readonly ILocationService _locationService;
         private readonly IPermissionGroupService _permissionGroupService;
         private readonly ISegmentService _segmentService;
 
-        public static string Name { get { return "Segments"; } }
-        public static string Area { get { return "SiteManagement"; } }
-
         public SegmentsController(ServiceFacades.Controller<SegmentsController> context,
             ILanguageService languageService,
+            ILocationService locationService,
             IPermissionGroupService permissionGroupService,
             ISegmentService segmentService) : base(context)
         {
             _languageService = languageService
                 ?? throw new ArgumentNullException(nameof(languageService));
+            _locationService = locationService
+                ?? throw new ArgumentNullException(nameof(locationService));
             _permissionGroupService = permissionGroupService
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
             _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
         }
 
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        [Route("")]
-        [Route("[action]/{page}")]
-        public async Task<IActionResult> Index(int page = 1)
-        {
-            var filter = new BaseFilter(page);
-            var segmentList = await _segmentService.GetPaginatedListAsync(filter);
-
-            var paginateModel = new PaginateModel
-            {
-                ItemCount = segmentList.Count,
-                CurrentPage = page,
-                ItemsPerPage = filter.Take.Value
-            };
-            if (paginateModel.PastMaxPage)
-            {
-                return RedirectToRoute(
-                    new
-                    {
-                        page = paginateModel.LastPage ?? 1
-                    });
-            }
-
-            foreach (var segment in segmentList.Data.ToList())
-            {
-                segment.SegmentLanguages = await _segmentService.GetSegmentLanguagesByIdAsync(segment.Id);
-            }
-            var languages = await _languageService.GetActiveAsync();
-            var selectedLanguage = languages.Single(_ => _.IsDefault);
-            var viewModel = new IndexViewModel
-            {
-                Segments = segmentList.Data,
-                PaginateModel = paginateModel,
-                LanguageList = new SelectList(languages, nameof(Language.Id),
-                    nameof(Language.Description), selectedLanguage.Id),
-                AvailableLanguages = languages.Select(_ => _.Name).ToList()
-            };
-            return View(viewModel);
-        }
+        public static string Area { get { return "SiteManagement"; } }
+        public static string Name { get { return "Segments"; } }
 
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpPost]
@@ -114,56 +78,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     };
 
                     ShowAlertSuccess($"Created segment: {segment.Name}");
-                }
-                catch (OcudaException ex)
-                {
-                    response = new JsonResponse
-                    {
-                        Success = false,
-                        Message = ex.Message
-                    };
-                }
-            }
-            else
-            {
-                var errors = ModelState.Values
-                    .SelectMany(_ => _.Errors)
-                    .Select(_ => _.ErrorMessage);
-
-                response = new JsonResponse
-                {
-                    Success = false,
-                    Message = string.Join(Environment.NewLine, errors)
-                };
-            }
-
-            return Json(response);
-        }
-
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        [HttpPost]
-        [Route("[action]")]
-        [SaveModelState]
-        public async Task<IActionResult> Edit(IndexViewModel model)
-        {
-            JsonResponse response;
-
-            if (model.Segment.StartDate.HasValue && model.Segment.EndDate.HasValue
-                && model.Segment.StartDate > model.Segment.EndDate)
-            {
-                ModelState.AddModelError("Segment.StartDate", "Start Date cannot be after the End Date.");
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    var segment = await _segmentService.EditAsync(model.Segment);
-                    response = new JsonResponse
-                    {
-                        Success = true
-                    };
-                    ShowAlertSuccess($"Updated segment: {segment.Name}");
                 }
                 catch (OcudaException ex)
                 {
@@ -233,6 +147,32 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
         }
 
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeleteText(DetailViewModel model)
+        {
+            if (!await HasSegmentPermissionAsync(model.SegmentId))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var segmentText = await _segmentService.GetBySegmentAndLanguageAsync(model.SegmentId,
+                model.LanguageId);
+
+            await _segmentService.DeleteSegmentTextAsync(segmentText);
+
+            var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
+
+            ShowAlertSuccess($"Deleted Segment {language.Description} text!");
+
+            return RedirectToAction(nameof(Detail),
+                new
+                {
+                    id = model.SegmentId,
+                    language = language.Name
+                });
+        }
+
         [Route("[action]/{id}")]
         [RestoreModelState]
         public async Task<IActionResult> Detail(int id, string language)
@@ -258,19 +198,60 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var segmentText = await _segmentService
                 .GetBySegmentAndLanguageAsync(id, selectedLanguage.Id);
 
+            string backLink = null;
+            string relationship = null;
+
+            var pageLayoutId
+                = await _segmentService.GetPageLayoutIdForSegmentAsync(segment.Id);
+
+            if (pageLayoutId.HasValue)
+            {
+                backLink = Url.Action(nameof(PagesController.LayoutDetail),
+                    PagesController.Name,
+                    new
+                    {
+                        id = pageLayoutId.Value
+                    });
+                relationship = "This segment is used page layout ID: " + pageLayoutId.Value;
+            }
+            else
+            {
+                var locations = await _locationService.GetLocationsBySegment(segment.Id);
+
+                if (locations?.Count == 1)
+                {
+                    backLink = Url.Action(nameof(LocationsController.Location),
+                        LocationsController.Name,
+                        new
+                        {
+                            locationStub = locations.First().Stub
+                        });
+                    relationship = "This segment is used for location: " + locations.First().Name;
+                }
+                if (locations?.Count > 1)
+                {
+                    relationship = string.Format(CultureInfo.InvariantCulture,
+                        "This segment is used for multiple locations: {0}",
+                        string.Join(", ", locations.Select(_ => _.Name)));
+                }
+            }
+
             var viewModel = new DetailViewModel
             {
-                SegmentText = segmentText,
+                BackLink = backLink,
+                LanguageDescription = selectedLanguage.Description,
+                LanguageId = selectedLanguage.Id,
+                LanguageList = new SelectList(languages,
+                    nameof(Language.Name),
+                    nameof(Language.Description),
+                    selectedLanguage.Name),
+                NewSegmentText = segmentText == null,
+                Relationship = relationship,
+                SegmentEndDate = segment.EndDate,
                 SegmentId = segment.Id,
                 SegmentName = segment.Name,
                 SegmentStartDate = segment.StartDate,
-                SegmentEndDate = segment.EndDate,
-                NewSegmentText = segmentText == null,
-                LanguageId = selectedLanguage.Id,
-                LanguageDescription = selectedLanguage.Description,
-                LanguageList = new SelectList(languages, nameof(Language.Name),
-                    nameof(Language.Description), selectedLanguage.Name),
-                PageLayoutId = await _segmentService.GetPageLayoutIdForSegmentAsync(segment.Id)
+                SegmentText = segmentText
             };
 
             return View(viewModel);
@@ -318,30 +299,94 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             });
         }
 
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> DeleteText(DetailViewModel model)
+        [SaveModelState]
+        public async Task<IActionResult> Edit(IndexViewModel model)
         {
-            if (!await HasSegmentPermissionAsync(model.SegmentId))
+            JsonResponse response;
+
+            if (model.Segment.StartDate.HasValue && model.Segment.EndDate.HasValue
+                && model.Segment.StartDate > model.Segment.EndDate)
             {
-                return RedirectToUnauthorized();
+                ModelState.AddModelError("Segment.StartDate", "Start Date cannot be after the End Date.");
             }
 
-            var segmentText = await _segmentService.GetBySegmentAndLanguageAsync(model.SegmentId,
-                model.LanguageId);
-
-            await _segmentService.DeleteSegmentTextAsync(segmentText);
-
-            var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
-
-            ShowAlertSuccess($"Deleted Segment {language.Description} text!");
-
-            return RedirectToAction(nameof(Detail),
-                new
+            if (ModelState.IsValid)
+            {
+                try
                 {
-                    id = model.SegmentId,
-                    language = language.Name
-                });
+                    var segment = await _segmentService.EditAsync(model.Segment);
+                    response = new JsonResponse
+                    {
+                        Success = true
+                    };
+                    ShowAlertSuccess($"Updated segment: {segment.Name}");
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
+            }
+            else
+            {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
+                };
+            }
+
+            return Json(response);
+        }
+
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [Route("")]
+        [Route("[action]/{page}")]
+        public async Task<IActionResult> Index(int page = 1)
+        {
+            var filter = new BaseFilter(page);
+            var segmentList = await _segmentService.GetPaginatedListAsync(filter);
+
+            var paginateModel = new PaginateModel
+            {
+                ItemCount = segmentList.Count,
+                CurrentPage = page,
+                ItemsPerPage = filter.Take.Value
+            };
+            if (paginateModel.PastMaxPage)
+            {
+                return RedirectToRoute(
+                    new
+                    {
+                        page = paginateModel.LastPage ?? 1
+                    });
+            }
+
+            foreach (var segment in segmentList.Data.ToList())
+            {
+                segment.SegmentLanguages = await _segmentService.GetSegmentLanguagesByIdAsync(segment.Id);
+            }
+            var languages = await _languageService.GetActiveAsync();
+            var selectedLanguage = languages.Single(_ => _.IsDefault);
+            var viewModel = new IndexViewModel
+            {
+                Segments = segmentList.Data,
+                PaginateModel = paginateModel,
+                LanguageList = new SelectList(languages, nameof(Language.Id),
+                    nameof(Language.Description), selectedLanguage.Id),
+                AvailableLanguages = languages.Select(_ => _.Name).ToList()
+            };
+            return View(viewModel);
         }
 
         private async Task<bool> HasSegmentPermissionAsync(int segmentId)

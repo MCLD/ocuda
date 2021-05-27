@@ -21,8 +21,8 @@ namespace Ocuda.Ops.Service
     {
         private const string ndash = "\u2013";
 
-        private readonly ILocationRepository _locationRepository;
         private readonly ILocationHoursRepository _locationHoursRepository;
+        private readonly ILocationRepository _locationRepository;
 
         public LocationService(ILogger<LocationService> logger,
             IHttpContextAccessor httpContextAccessor,
@@ -36,35 +36,6 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(locationHoursRepository));
         }
 
-        public async Task<List<Location>> GetAllLocationsAsync()
-        {
-            return await _locationRepository.GeAllLocationsAsync();
-        }
-
-        public async Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(
-            BaseFilter filter)
-        {
-            return await _locationRepository.GetPaginatedListAsync(filter);
-        }
-
-        public async Task<Location> GetLocationByStubAsync(string locationStub)
-        {
-            var location = await _locationRepository.GetLocationByStub(locationStub);
-            if (location == null)
-            {
-                throw new OcudaException("Location not found.");
-            }
-            else
-            {
-                return location;
-            }
-        }
-
-        public async Task<Location> GetLocationByIdAsync(int locationId)
-        {
-            return await _locationRepository.FindAsync(locationId);
-        }
-
         public async Task<Location> AddLocationAsync(Location location)
         {
             if (location == null)
@@ -72,16 +43,16 @@ namespace Ocuda.Ops.Service
                 throw new ArgumentNullException(nameof(location));
             }
 
-            location.AddressType = location.AddressType.Trim();
-            location.AdministrativeArea = location.AdministrativeArea.Trim();
-            location.AreaServedName = location.AreaServedName.Trim();
-            location.AreaServedType = location.AreaServedType.Trim();
-            location.ContactType = location.ContactType.Trim();
-            location.Email = location.Email.Trim();
+            location.AddressType = location.AddressType?.Trim();
+            location.AdministrativeArea = location.AdministrativeArea?.Trim();
+            location.AreaServedName = location.AreaServedName?.Trim();
+            location.AreaServedType = location.AreaServedType?.Trim();
+            location.ContactType = location.ContactType?.Trim();
+            location.Email = location.Email?.Trim();
             location.Name = location.Name?.Trim();
-            location.ParentOrganization = location.ParentOrganization.Trim();
-            location.PriceRange = location.PriceRange.Trim();
-            location.Type = location.Type.Trim();
+            location.ParentOrganization = location.ParentOrganization?.Trim();
+            location.PriceRange = location.PriceRange?.Trim();
+            location.Type = location.Type?.Trim();
             await ValidateAsync(location);
 
             await _locationRepository.AddAsync(location);
@@ -90,47 +61,14 @@ namespace Ocuda.Ops.Service
             return location;
         }
 
-        public async Task<Location> EditAsync(Location location)
+        public async Task DeleteAsync(int id)
         {
-            if (location == null)
-            {
-                throw new ArgumentNullException(nameof(location));
-            }
+            var locationHours = await _locationHoursRepository.GetLocationHoursByLocationId(id);
+            _locationHoursRepository.RemoveRange(locationHours);
 
-            var currentLocation = await _locationRepository.FindAsync(location.Id);
-            currentLocation.Address = location.Address;
-            currentLocation.AddressType = location.AddressType.Trim();
-            currentLocation.AdministrativeArea = location.AdministrativeArea.Trim();
-            currentLocation.AreaServedName = location.AreaServedName.Trim();
-            currentLocation.AreaServedType = location.AreaServedType.Trim();
-            currentLocation.City = location.City;
-            currentLocation.Code = location.Code;
-            currentLocation.ContactType = location.ContactType.Trim();
-            currentLocation.Country = location.Country;
-            currentLocation.DescriptionSegmentId = location.DescriptionSegmentId;
-            currentLocation.DisplayGroupId = location.DisplayGroupId;
-            currentLocation.Email = location.Email.Trim();
-            currentLocation.EventLink = location.EventLink;
-            currentLocation.Facebook = location.Facebook;
-            currentLocation.IsAccessibleForFree = location.IsAccessibleForFree;
-            currentLocation.MapLink = location.MapLink;
-            currentLocation.Name = location.Name;
-            currentLocation.ParentOrganization = location.ParentOrganization.Trim();
-            currentLocation.Phone = location.Phone;
-            currentLocation.PostFeatureSegmentId = location.PostFeatureSegmentId;
-            currentLocation.PreFeatureSegmentId = location.PreFeatureSegmentId;
-            currentLocation.PriceRange = location.PriceRange.Trim();
-            currentLocation.State = location.State;
-            currentLocation.Stub = location.Stub;
-            currentLocation.SubscriptionLink = location.SubscriptionLink;
-            currentLocation.Type = location.Type.Trim();
-            currentLocation.Zip = location.Zip;
-
-            await ValidateAsync(currentLocation);
-
-            _locationRepository.Update(currentLocation);
+            var location = await _locationRepository.FindAsync(id);
+            _locationRepository.Remove(location);
             await _locationRepository.SaveAsync();
-            return currentLocation;
         }
 
         public async Task<Location> EditAlwaysOpenAsync(Location location)
@@ -148,6 +86,25 @@ namespace Ocuda.Ops.Service
             _locationRepository.Update(currentLocation);
             await _locationRepository.SaveAsync();
             return currentLocation;
+        }
+
+        public async Task<Location> EditAsync(Location location)
+        {
+            if (location == null)
+            {
+                throw new ArgumentNullException(nameof(location));
+            }
+
+            await ValidateAsync(location);
+
+            _locationRepository.Update(location);
+            await _locationRepository.SaveAsync();
+            return location;
+        }
+
+        public async Task<List<Location>> GetAllLocationsAsync()
+        {
+            return await _locationRepository.GeAllLocationsAsync();
         }
 
         public async Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId)
@@ -238,14 +195,33 @@ namespace Ocuda.Ops.Service
             return formattedDayGroupings;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<Location> GetLocationByIdAsync(int locationId)
         {
-            var locationHours = await _locationHoursRepository.GetLocationHoursByLocationId(id);
-            _locationHoursRepository.RemoveRange(locationHours);
+            return await _locationRepository.FindAsync(locationId);
+        }
 
-            var location = await _locationRepository.FindAsync(id);
-            _locationRepository.Remove(location);
-            await _locationRepository.SaveAsync();
+        public async Task<Location> GetLocationByStubAsync(string locationStub)
+        {
+            var location = await _locationRepository.GetLocationByStub(locationStub);
+            if (location == null)
+            {
+                throw new OcudaException("Location not found.");
+            }
+            else
+            {
+                return location;
+            }
+        }
+
+        public async Task<ICollection<Location>> GetLocationsBySegment(int segmentId)
+        {
+            return await _locationRepository.GetUsingSegmentAsync(segmentId);
+        }
+
+        public async Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(
+                                            BaseFilter filter)
+        {
+            return await _locationRepository.GetPaginatedListAsync(filter);
         }
 
         private string GetFormattedDayGroupings(List<DayOfWeek> days)

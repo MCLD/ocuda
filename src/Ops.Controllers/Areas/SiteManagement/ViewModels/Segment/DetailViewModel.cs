@@ -7,7 +7,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment
 {
     public class DetailViewModel
     {
-        public SegmentText SegmentText { get; set; }
+        public string BackLink { get; set; }
+        public string LanguageDescription { get; set; }
+        public int LanguageId { get; set; }
+        public SelectList LanguageList { get; set; }
+        public bool NewSegmentText { get; set; }
+        public string Relationship { get; set; }
+
+        [DisplayName("End Date")]
+        public DateTime? SegmentEndDate { get; set; }
+
         public int SegmentId { get; set; }
 
         [DisplayName("Segment Name")]
@@ -16,19 +25,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment
         [DisplayName("Start Date")]
         public DateTime? SegmentStartDate { get; set; }
 
-        [DisplayName("End Date")]
-        public DateTime? SegmentEndDate { get; set; }
-
-        public bool NewSegmentText { get; set; }
-
-        public int LanguageId { get; set; }
-        public string LanguageDescription { get; set; }
-
-        public SelectList LanguageList { get; set; }
+        public SegmentText SegmentText { get; set; }
 
         [DisplayName("Language")]
         public Language SelectedLanguage { get; set; }
-
-        public int? PageLayoutId { get; set; }
     }
 }

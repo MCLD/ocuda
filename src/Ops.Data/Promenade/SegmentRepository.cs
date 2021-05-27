@@ -66,5 +66,13 @@ namespace Ocuda.Ops.Data.Promenade
                 .Select(_ => (int?)_.PageLayoutId)
                 .SingleOrDefaultAsync();
         }
+
+        public async Task<IDictionary<int, string>> GetNamesByIdsAsync(IEnumerable<int> ids)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => ids.Contains(_.Id))
+                .ToDictionaryAsync(k => k.Id, v => v.Name);
+        }
     }
 }

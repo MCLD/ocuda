@@ -8,22 +8,35 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 {
     public interface ISegmentService
     {
-        Task<DataWithCount<ICollection<Segment>>> GetPaginatedListAsync(
-            BaseFilter filter);
+        Task<Segment> CreateAsync(Segment segment);
+
+        Task<Segment> CreateNoSaveAsync(Segment segment);
+
+        Task CreateSegmentTextAsync(SegmentText segmentText);
+
+        Task DeleteAsync(int id);
+
+        Task DeleteNoSaveAsync(int id);
+
+        Task DeleteSegmentTextAsync(SegmentText segmentText);
+
+        Task<Segment> EditAsync(Segment segment);
+
+        Task EditSegmentTextAsync(SegmentText segmentText);
 
         Task<ICollection<Segment>> GetActiveSegmentsAsync();
-        Task<ICollection<string>> GetSegmentLanguagesByIdAsync(int id);
+
         Task<Segment> GetByIdAsync(int segmentId);
+
         Task<SegmentText> GetBySegmentAndLanguageAsync(int segmentId, int languageId);
-        Task<Segment> CreateAsync(Segment segment);
-        Task<Segment> EditAsync(Segment segment);
-        Task DeleteAsync(int id);
-        Task CreateSegmentTextAsync(SegmentText segmentText);
-        Task EditSegmentTextAsync(SegmentText segmentText);
-        Task DeleteSegmentTextAsync(SegmentText segmentText);
-        Task<Segment> CreateNoSaveAsync(Segment segment);
-        Task DeleteNoSaveAsync(int id);
+
+        Task<IDictionary<int, string>> GetNamesByIdsAsync(IEnumerable<int> ids);
+
         Task<int?> GetPageHeaderIdForSegmentAsync(int id);
+
         Task<int?> GetPageLayoutIdForSegmentAsync(int id);
+
+        Task<DataWithCount<ICollection<Segment>>> GetPaginatedListAsync(BaseFilter filter);
+        Task<ICollection<string>> GetSegmentLanguagesByIdAsync(int id);
     }
 }

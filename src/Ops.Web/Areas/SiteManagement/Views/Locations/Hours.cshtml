@@ -114,12 +114,6 @@
     <div class="col-12">
         <h2>
             Overrides
-            <button type="button"
-                    class="btn btn-outline-secondary"
-                    data-toggle="modal"
-                    data-target="#addModal">
-                Add override
-            </button>
         </h2>
         <hr />
     </div>
@@ -131,11 +125,18 @@
         <table class="table table-sm table-bordered table-hover">
             <thead>
                 <tr>
-                    <th>Reason</th>
-                    <th>Date</th>
-                    <th>Location</th>
-                    <th>Hours</th>
-                    <th>&nbsp;</th>
+                    <th class="align-middle">Reason</th>
+                    <th class="align-middle">Date</th>
+                    <th class="align-middle">Location</th>
+                    <th class="align-middle">Hours</th>
+                    <th class="align-middle text-right">
+                        <button type="button"
+                                class="btn btn-outline-success"
+                                data-toggle="modal"
+                                data-target="#addModal">
+                            <span class="fas fa-plus-circle"></span>
+                        </button>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -149,11 +150,11 @@
                         data-open="@hoursOverride.Open"
                         data-opentime="@hoursOverride.OpenTime"
                         data-closetime="@hoursOverride.CloseTime">
-                        <td>@hoursOverride.Reason</td>
-                        <td>@hoursOverride.Date.ToShortDateString() &ndash; @hoursOverride.Date.DayOfWeek.ToString()</td>
-                        <td>@(hoursOverride.LocationId.HasValue ? Model.LocationName : "All Locations")</td>
-                        <td>@(hoursOverride.Open ? $"{hoursOverride.OpenTime.Value.ToShortTimeString()} {System.Net.WebUtility.HtmlDecode("&ndash;")} {hoursOverride.CloseTime.Value.ToShortTimeString()}" : "Closed")</td>
-                        <td class="on-top cursor-default">
+                        <td class="align-middle">@hoursOverride.Reason</td>
+                        <td class="align-middle">@hoursOverride.Date.ToShortDateString() &ndash; @hoursOverride.Date.DayOfWeek.ToString()</td>
+                        <td class="align-middle">@(hoursOverride.LocationId.HasValue ? Model.LocationName : "All Locations")</td>
+                        <td class="align-middle">@(hoursOverride.Open ? $"{hoursOverride.OpenTime.Value.ToShortTimeString()} {System.Net.WebUtility.HtmlDecode("&ndash;")} {hoursOverride.CloseTime.Value.ToShortTimeString()}" : "Closed")</td>
+                        <td class="on-top cursor-default align-middle text-right">
                             <button type="button"
                                     class="btn btn-outline-danger"
                                     data-toggle="modal"
