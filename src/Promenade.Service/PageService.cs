@@ -297,7 +297,7 @@ namespace Ocuda.Promenade.Service
                         pageLayout.PageLayoutText = await _pageLayoutTextRepository
                             .GetByIdsAsync(pageLayout.Id, currentLangaugeId);
 
-                        if (cacheSpan.HasValue)
+                        if (cacheSpan.HasValue && pageLayout?.PageLayoutText != null)
                         {
                             await _cache.SaveToCacheAsync(layoutTextCacheKey,
                                 pageLayout.PageLayoutText,
@@ -326,7 +326,7 @@ namespace Ocuda.Promenade.Service
                         pageLayout.PageLayoutText = await _pageLayoutTextRepository
                             .GetByIdsAsync(pageLayout.Id, defaultLanguageId);
 
-                        if (cacheSpan.HasValue)
+                        if (cacheSpan.HasValue && pageLayout?.PageLayoutText != null)
                         {
                             await _cache.SaveToCacheAsync(layoutTextCacheKey,
                                 pageLayout.PageLayoutText,
