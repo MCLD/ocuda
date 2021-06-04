@@ -6,7 +6,7 @@
     <CodeAnalysisRuleSet>../../OcudaRuleSet.ruleset</CodeAnalysisRuleSet>
     <Company>Maricopa County Library District</Company>
     <Copyright>Copyright 2018 Maricopa County Library District</Copyright>
-    <FileVersion>1.0.0.112</FileVersion>
+    <FileVersion>1.0.0.113</FileVersion>
     <LangVersion>Latest</LangVersion>
     <PackageLicenseUrl>https://github.com/MCLD/ocuda/blob/develop/LICENSE</PackageLicenseUrl>
     <Product>Ocuda</Product>
@@ -49,8 +49,6 @@
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="5.0.6" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.2.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" PrivateAssets="All" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
     <PackageReference Include="System.Text.Encodings.Web" Version="5.0.1" />
   </ItemGroup>
