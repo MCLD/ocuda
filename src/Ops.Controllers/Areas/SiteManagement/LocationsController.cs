@@ -691,17 +691,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> GetItemsList(string itemIds, string objectType)
-        {
-            return await GetItemsList(itemIds, objectType, 1);
-        }
-
-        [HttpGet]
-        [Route("[action]")]
         public async Task<IActionResult> GetItemsList(string itemIds,
             string objectType,
             int page)
         {
+            if(page == 0)
+            {
+                page = 1;
+            }
+
             if (objectType == "Group")
             {
                 var filter = new GroupFilter(page, 10);
