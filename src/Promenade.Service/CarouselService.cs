@@ -263,9 +263,12 @@ namespace Ocuda.Promenade.Service
                     }
                 }
 
-                await _cache.SaveToCacheAsync(carouselItemCacheKey,
-                    carouselItem,
-                    cachePagesInHours);
+                if (carouselItem != null)
+                {
+                    await _cache.SaveToCacheAsync(carouselItemCacheKey,
+                        carouselItem,
+                        cachePagesInHours);
+                }
             }
 
             if (carouselItem != null)

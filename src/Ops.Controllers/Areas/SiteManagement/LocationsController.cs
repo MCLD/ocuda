@@ -232,7 +232,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             if (ModelState.IsValid)
             {
-                if (location.Phone?.Length == 10)
+                if (location?.Phone?.Length == 10)
                 {
                     location.Phone = $"+1 {Convert.ToInt64(location.Phone):###-###-####}";
                 }
@@ -240,19 +240,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     location = await GetLatLng(location);
                 }
-                catch (Exception ex)
+                catch (OcudaException ex)
                 {
-                    _logger.LogError(ex,
-                        "Problem looking up postal code for coordinates {Address}: {Message}",
-                        location.Address,
-                        ex.Message);
-                    ShowAlertDanger($"Unable to find Location's address: {location.Address}");
-                    location.IsNewLocation = true;
-                    return View("LocationDetails", new LocationViewModel
-                    {
-                        Location = location,
-                        Action = nameof(LocationsController.CreateLocation)
-                    });
+                    ShowAlertWarning($"{ex.Message}, setting to: {location.GeoLocation}");
                 }
 
                 try
@@ -491,19 +481,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             {
                                 location = await GetLatLng(location);
                             }
-                            catch (Exception ex)
+                            catch (OcudaException ex)
                             {
-                                _logger.LogError(ex,
-                                    "Problem looking up postal code for coordinates {Address}: {Message}",
-                                    location.Address,
-                                    ex.Message);
-                                ShowAlertDanger($"Unable to find Location's address: {location.Address}");
-                                location.IsNewLocation = true;
-                                return View("LocationDetails", new LocationViewModel
-                                {
-                                    Location = location,
-                                    Action = nameof(LocationsController.EditLocation)
-                                });
+                                noGeo = true;
+                                ShowAlertWarning($"{ex.Message}, setting to: {location.GeoLocation}");
                             }
                         }
                     }
@@ -782,20 +763,29 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                 GeocodeResult geoResult = null;
                 string stringResult = null;
+                HttpResponseMessage response = null;
                 try
                 {
-                    var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/geocode/json?address={location.Address},{location.City},{location.State}&key={apikey}");
+                    response = await client.GetAsync(new Uri($"https://maps.googleapis.com/maps/api/geocode/json?address={location.Address},{location.City},{location.State}&key={apikey}"));
                     response.EnsureSuccessStatusCode();
 
                     stringResult = await response.Content.ReadAsStringAsync();
 
                     geoResult = JsonConvert.DeserializeObject<GeocodeResult>(stringResult);
                 }
-                catch (Exception ex)
+                catch (HttpRequestException ex)
                 {
-                    _logger.LogError(ex, "Error parsing Geocode API JSON: {Message} - {Result}",
-                        ex.Message,
-                        stringResult);
+                    using (_logger.BeginScope(new Dictionary<string, object>
+                    {
+                        ["HttpStatusCode"] = response?.StatusCode,
+                        ["HttpResponse"] = stringResult ?? await response?.Content.ReadAsStringAsync() ?? "no response"
+                    }))
+                    {
+                        _logger.LogError(ex, "Error parsing Geocode API JSON: {Message}",
+                            ex.Message);
+                    }
+
+                    throw new OcudaException("Unable to Geocode address", ex);
                 }
 
                 if (geoResult?.Results?.Length > 0)
@@ -830,6 +820,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     "Problem looking up postal code for {LocationAddress}: {Message}",
                     location.Address,
                     ex.Message);
+                throw new OcudaException("Problem looking up postal code", ex);
             }
             return location;
         }
@@ -864,9 +855,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 using var client = new HttpClient();
                 GeocodePlace geoPlace = null;
                 string stringResult = null;
+                HttpResponseMessage response = null;
                 try
                 {
-                    var response = await client.GetAsync($"https://maps.googleapis.com/maps/api/place/textsearch/json?query=establishment+in+{addrstr}&key={apikey}");
+                    response = await client.GetAsync(new Uri($"https://maps.googleapis.com/maps/api/place/textsearch/json?query=establishment+in+{addrstr}&key={apikey}"));
                     response.EnsureSuccessStatusCode();
 
                     stringResult = await response.Content.ReadAsStringAsync();
@@ -897,9 +889,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error parsing Geocode API JSON: {Message} - {Result}",
-                        ex.Message,
-                        stringResult);
+                    using (_logger.BeginScope(new Dictionary<string, object>
+                    {
+                        ["HttpStatusCode"] = response?.StatusCode,
+                        ["HttpResponse"] = stringResult ?? await response?.Content.ReadAsStringAsync() ?? "no response"
+                    }))
+                    {
+                        _logger.LogError(ex, "Error parsing Geocode API JSON: {Message}",
+                            ex.Message);
+                    }
                     return Json(new
                     {
                         success
