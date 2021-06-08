@@ -25,8 +25,6 @@ namespace Ocuda.Promenade.Controllers
         private readonly IPathResolverService _pathResolverService;
         private readonly PodcastService _podcastService;
 
-        public static string Name { get { return "Podcasts"; } }
-
         public PodcastsController(ServiceFacades.Controller<PodcastsController> context,
             IPathResolverService pathResolverService,
             PodcastService podcastService)
@@ -36,6 +34,51 @@ namespace Ocuda.Promenade.Controllers
                 ?? throw new ArgumentNullException(nameof(pathResolverService));
             _podcastService = podcastService
                 ?? throw new ArgumentNullException(nameof(podcastService));
+        }
+
+        public static string Name { get { return "Podcasts"; } }
+
+        [Route("{podcastStub}/{episodeStub}")]
+        public async Task<IActionResult> Episode(string podcastStub, string episodeStub)
+        {
+            var podcast = await _podcastService.GetByStubAsync(podcastStub?.Trim());
+
+            if (podcast == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            var podcastItem = await _podcastService
+                .GetItemByStubAsync(podcast.Id, episodeStub?.Trim());
+
+            if (podcastItem == null)
+            {
+                return RedirectToAction(nameof(Podcast), new { stub = podcastStub });
+            }
+
+            podcast.ImageUrl = _pathResolverService.GetPublicContentUrl(podcast.ImageUrl);
+            if (!string.IsNullOrEmpty(podcast.ImageThumbnailUrl))
+            {
+                podcast.ImageThumbnailUrl
+                    = _pathResolverService.GetPublicContentUrl(podcast.ImageThumbnailUrl);
+            }
+
+            podcastItem.MediaUrl = _pathResolverService.GetPublicContentUrl(podcastItem.MediaUrl);
+            if (!string.IsNullOrWhiteSpace(podcastItem.ImageUrl))
+            {
+                podcastItem.ImageUrl = _pathResolverService
+                    .GetPublicContentUrl(podcastItem.ImageUrl);
+            }
+
+            var viewModel = new EpisodeViewModel
+            {
+                Podcast = podcast,
+                PodcastItem = podcastItem
+            };
+
+            PageTitle = $"{podcastItem.Title} - {podcast.Title}";
+
+            return View(viewModel);
         }
 
         [Route("")]
@@ -162,48 +205,6 @@ namespace Ocuda.Promenade.Controllers
             }
 
             PageTitle = podcast.Title;
-
-            return View(viewModel);
-        }
-
-        [Route("{podcastStub}/{episodeStub}")]
-        public async Task<IActionResult> Episode(string podcastStub, string episodeStub)
-        {
-            var podcast = await _podcastService.GetByStubAsync(podcastStub?.Trim());
-
-            if (podcast == null)
-            {
-                return RedirectToAction(nameof(Index));
-            }
-
-            var podcastItem = await _podcastService.GetItemByStubAsync(episodeStub?.Trim());
-
-            if (podcastItem == null)
-            {
-                return RedirectToAction(nameof(Podcast), new { stub = podcastStub });
-            }
-
-            podcast.ImageUrl = _pathResolverService.GetPublicContentUrl(podcast.ImageUrl);
-            if (!string.IsNullOrEmpty(podcast.ImageThumbnailUrl))
-            {
-                podcast.ImageThumbnailUrl
-                    = _pathResolverService.GetPublicContentUrl(podcast.ImageThumbnailUrl);
-            }
-
-            podcastItem.MediaUrl = _pathResolverService.GetPublicContentUrl(podcastItem.MediaUrl);
-            if (!string.IsNullOrWhiteSpace(podcastItem.ImageUrl))
-            {
-                podcastItem.ImageUrl = _pathResolverService
-                    .GetPublicContentUrl(podcastItem.ImageUrl);
-            }
-
-            var viewModel = new EpisodeViewModel
-            {
-                Podcast = podcast,
-                PodcastItem = podcastItem
-            };
-
-            PageTitle = $"{podcastItem.Title} - {podcast.Title}";
 
             return View(viewModel);
         }

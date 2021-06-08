@@ -58,9 +58,9 @@ namespace Ocuda.Promenade.Service
             return await _podcastRepository.GetDirectoryInfosByPodcastIdAsync(id);
         }
 
-        public async Task<PodcastItem> GetItemByStubAsync(string stub)
+        public async Task<PodcastItem> GetItemByStubAsync(int podcastId, string stub)
         {
-            return await _podcastItemRepository.GetByStubAsync(stub?.Trim());
+            return await _podcastItemRepository.GetByStubAsync(podcastId, stub?.Trim());
         }
 
         public async Task<ICollection<PodcastItem>> GetItemsByPodcastIdAsync(int id,
