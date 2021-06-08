@@ -8,7 +8,7 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
     public interface IPodcastItemRepository : IGenericRepository<PodcastItem>
     {
-        Task<PodcastItem> GetByStubAsync(string stub);
+        Task<PodcastItem> GetByStubAsync(int podcastId, string stub);
         Task<ICollection<PodcastItem>> GetByPodcastIdAsync(int podcastId, bool showBlocked);
         Task<DataWithCount<ICollection<PodcastItem>>> GetPaginatedListByPodcastIdAsync(
             int podcastId, PodcastFilter filter);

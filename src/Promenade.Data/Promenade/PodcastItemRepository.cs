@@ -20,23 +20,28 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<PodcastItem> GetByStubAsync(string stub)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => !_.IsDeleted && _.Stub == stub && !_.IsBlocked
-                    && _.PublishDate <= _dateTimeProvider.Now)
-                .SingleOrDefaultAsync();
-        }
-
         public async Task<ICollection<PodcastItem>> GetByPodcastIdAsync(int podcastId,
             bool showBlocked)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => !_.IsDeleted && _.PodcastId == podcastId && (!_.IsBlocked || showBlocked)
+                .Where(_ => !_.IsDeleted
+                    && _.PodcastId == podcastId
+                    && (!_.IsBlocked || showBlocked)
                     && _.PublishDate <= _dateTimeProvider.Now)
                 .ToListAsync();
+        }
+
+        public async Task<PodcastItem> GetByStubAsync(int podcastId, string stub)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => !_.IsDeleted
+                    && !_.IsBlocked
+                    && _.PublishDate <= _dateTimeProvider.Now
+                    && _.PodcastId == podcastId
+                    && _.Stub == stub)
+                .SingleOrDefaultAsync();
         }
 
         public async Task<DataWithCount<ICollection<PodcastItem>>> GetPaginatedListByPodcastIdAsync(
@@ -45,15 +50,16 @@ namespace Ocuda.Promenade.Data.Promenade
         {
             var query = DbSet
                 .AsNoTracking()
-                .Where(_ => _.PodcastId == podcastId && !_.IsDeleted && !_.IsBlocked
+                .Where(_ => _.PodcastId == podcastId
+                    && !_.IsDeleted
+                    && !_.IsBlocked
                     && _.PublishDate <= _dateTimeProvider.Now);
 
             var data = query;
 
-            if (filter.SerialOrdering)
+            if (filter?.SerialOrdering == true)
             {
-                data = data.OrderBy(_ => _.Season)
-                    .ThenBy(_ => _.Episode);
+                data = data.OrderBy(_ => _.Season).ThenBy(_ => _.Episode);
             }
             else
             {

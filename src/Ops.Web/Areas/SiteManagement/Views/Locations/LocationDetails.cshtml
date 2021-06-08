@@ -121,7 +121,7 @@
                             Cancel
                         </button>
                         <button type="button"
-                                class="btn btn-outline-danger" 
+                                class="btn btn-outline-danger"
                                 id="deleteModalConfirm"
                                 data-dismiss="modal">
                             <span class="buttonText">Delete</span>
@@ -648,10 +648,11 @@
                             {
                                 <tr>
                                     <td class="align-middle edit-item"
+                                        style="cursor: pointer;"
                                         data-itemName="@feature.Name"
                                         data-itemtype="Feature"
                                         data-itemid="@locationFeature.FeatureId">
-                                        @feature.Name
+                                        <span class="btn-link">@feature.Name</span>
                                     </td>
                                     <td class="align-middle text-center">
                                         @if (!string.IsNullOrEmpty(locationFeature.Text))
@@ -676,7 +677,7 @@
                                         }
                                     </td>
                                     <td class="align-middle">
-                                        @if (!string.IsNullOrEmpty(locationFeature.Text))
+                                        @if (!string.IsNullOrEmpty(locationFeature?.Text))
                                         {
                                             @if (locationFeature.Text.Length > 200)
                                             {
@@ -691,7 +692,7 @@
                                         {
                                             if (string.IsNullOrEmpty(locationFeature.RedirectUrl))
                                             {
-                                                @if (feature.BodyText.Length > 200)
+                                                @if (feature.BodyText?.Length > 200)
                                                 {
                                                     <em class="text-muted">@(feature.BodyText.Substring(0, 200) + "...")</em>
                                                 }
@@ -736,7 +737,6 @@
                     {
                         <tr><td colspan="4"><em class="text-muted">No features.</em></td></tr>
                     }
-
                 </tbody>
             </table>
         </div>
@@ -809,7 +809,6 @@
                             <td colspan="4"><em class="text-muted">No groups.</em></td>
                         </tr>
                     }
-
                 </tbody>
             </table>
         </div>
@@ -920,12 +919,10 @@
                 if ($(this).data("itemtype") == "Feature") {
                     url = "@Url.Action(nameof(LocationsController.EditLocationFeature),LocationsController.Name)";
                     $("#editModalTitle").text("Edit Feature: " + $(this).data("itemname"));
-
                 }
                 else {
                     url = "@Url.Action(nameof(LocationsController.EditLocationGroup),LocationsController.Name)"
                     $("#editModalTitle").text("Edit Group: " + $(this).data("itemname"));
-
                 }
                 $("#modalItemInfo").html('<div class="fa-3x text-center"><span class="fas fa-spinner fa-spin"></span></div>');
                 $("#itemEditModal").modal("show");
@@ -969,7 +966,7 @@
                 $('#oc-segment-type').val(segment)
                 $('#oc-show-segment-type').text(segmentDisplay)
             });
-            
+
             var segmentEditor = new Markdown.Editor($("#oc-segment-text"), { allowUploads: true });
             segmentEditor.run();
 
@@ -1007,7 +1004,7 @@
                 $("#maplink-suggestions").html("");
             }
         });
-        
+
         $("input#Location_Address").blur(function () {
             if ($('#Location_Address').val() && !$('#Location_MapLink').val())
             {
