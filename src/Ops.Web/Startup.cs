@@ -253,6 +253,7 @@ namespace Ocuda.Ops.Web
                     .AddSessionStateTempDataProvider();
             }
 
+            services.AddHttpClient<Utility.Abstract.IGoogleClient, Utility.Clients.GoogleClient>();
             services.AddHttpClient<Service.Abstract.IScreenlyClient, ScreenlyClient>()
                 .ConfigurePrimaryHttpMessageHandler(() =>
                 {

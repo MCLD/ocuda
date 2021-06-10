@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
-using BranchLocator.Models;
-using BranchLocator.Models.PlaceDetails;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location;
 using Ocuda.Ops.Controllers.Filters;
@@ -28,7 +24,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class LocationsController : BaseController<LocationsController>
     {
-        private readonly IConfiguration _config;
+        private readonly string _apiKey;
         private readonly IFeatureService _featureService;
         private readonly IGroupService _groupService;
         private readonly ILanguageService _languageService;
@@ -51,7 +47,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ISegmentService segmentService,
             ISocialCardService socialCardService) : base(context)
         {
-            _config = config ?? throw new ArgumentNullException(nameof(config));
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
             _featureService = featureService
                 ?? throw new ArgumentNullException(nameof(featureService));
             _groupService = groupService
@@ -70,6 +69,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(segmentService));
             _socialCardService = socialCardService
                 ?? throw new ArgumentNullException(nameof(socialCardService));
+
+            _apiKey = config[Configuration.OcudaGoogleAPI];
         }
 
         public static string Area { get { return "SiteManagement"; } }
@@ -140,8 +141,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpPost]
         [Route("[action]/{locationStub}")]
         public async Task<IActionResult> AddSegment(string locationStub,
-                    string whichSegment,
-                    string segmentText)
+            string whichSegment,
+            string segmentText)
         {
             if (string.IsNullOrEmpty(locationStub))
             {
@@ -230,19 +231,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> CreateLocation(Location location)
         {
-            if (ModelState.IsValid)
+            if (location != null && ModelState.IsValid)
             {
                 if (location?.Phone?.Length == 10)
                 {
                     location.Phone = $"+1 {Convert.ToInt64(location.Phone):###-###-####}";
-                }
-                try
-                {
-                    location = await GetLatLng(location);
-                }
-                catch (OcudaException ex)
-                {
-                    ShowAlertWarning($"{ex.Message}, setting to: {location.GeoLocation}");
                 }
 
                 try
@@ -455,47 +448,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             if (ModelState.IsValid)
             {
-                bool noGeo = false;
                 try
                 {
                     var currentLocation = await _locationService.GetLocationByIdAsync(location.Id);
-
-                    var hasLocation = !(string.IsNullOrEmpty(location.Address)
-                        && string.IsNullOrEmpty(location.City)
-                        && string.IsNullOrEmpty(location.State)
-                        && string.IsNullOrEmpty(location.Zip)
-                        && string.IsNullOrEmpty(location.Country));
-
-                    if (hasLocation)
-                    {
-
-                        var needsGeocode = currentLocation.Address != location.Address
-                            || currentLocation.City != location.City
-                            || currentLocation.State != location.State
-                            || currentLocation.Zip != location.Zip
-                            || currentLocation.Country != location.Country;
-
-                        if (needsGeocode)
-                        {
-                            try
-                            {
-                                location = await GetLatLng(location);
-                            }
-                            catch (OcudaException ex)
-                            {
-                                noGeo = true;
-                                ShowAlertWarning($"{ex.Message}, setting to: {location.GeoLocation}");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        noGeo = true;
-                        location.GeoLocation = null;
-                    }
-
                     currentLocation.Address = location.Address?.Trim();
                     currentLocation.City = location.City?.Trim();
+                    currentLocation.Country = location.Country?.Trim();
                     currentLocation.Code = location.Code?.Trim();
                     currentLocation.EventLink = location.EventLink?.Trim();
                     currentLocation.Facebook = location.Facebook?.Trim();
@@ -511,14 +469,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                     var updatedLocation = await _locationService.EditAsync(currentLocation);
 
-                    if (noGeo)
-                    {
-                        ShowAlertWarning($"Updated location with no geographic coordinates: {updatedLocation.Name}");
-                    }
-                    else
-                    {
-                        ShowAlertSuccess($"Updated location: {updatedLocation.Name}");
-                    }
+                    ShowAlertSuccess($"Updated location: {updatedLocation.Name}");
+
                     return RedirectToAction(nameof(LocationsController.Location),
                         new { locationStub = updatedLocation.Stub });
                 }
@@ -662,6 +614,45 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpGet]
         [Route("[action]")]
+        public async Task<IActionResult> GetCoordinates(string address)
+        {
+            string message;
+            if (string.IsNullOrEmpty(_apiKey))
+            {
+                message = $"Please configure a Google API key with maps access in setting: {Configuration.OcudaGoogleAPI}";
+            }
+            else if (string.IsNullOrEmpty(address))
+            {
+                message = "You must supply an address to geocode.";
+            }
+            else
+            {
+                var (latitude, longitude) = await _locationService.GetCoordinatesAsync(address);
+
+                if (latitude.HasValue && longitude.HasValue)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        latitude = latitude.Value,
+                        longitude = longitude.Value
+                    });
+                }
+                else
+                {
+                    message = $"Unable to geocode address: {address}";
+                }
+            }
+
+            return Json(new
+            {
+                success = false,
+                message
+            });
+        }
+
+        [HttpGet]
+        [Route("[action]")]
         public async Task<IActionResult> GetItemInfo(int itemId, string objectType,
             string locationStub)
         {
@@ -695,7 +686,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             string objectType,
             int page)
         {
-            if(page == 0)
+            if (page == 0)
             {
                 page = 1;
             }
@@ -752,167 +743,92 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
         }
 
-        public async Task<Location> GetLatLng(Location location)
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> GetLocationLink(string placeId)
         {
-            try
+            string message;
+            if (string.IsNullOrEmpty(_apiKey))
             {
-                using var client = new HttpClient();
-                var apikey = _config[Configuration.OpsAPIGoogleMaps];
+                message = $"Please configure a Google API key with maps access in setting: {Configuration.OcudaGoogleAPI}";
+            }
+            else if (string.IsNullOrEmpty(placeId))
+            {
+                message = "Place id is required to get details.";
+            }
+            else
+            {
+                var link = await _locationService.GetLocationLinkAsync(placeId);
 
-                GeocodeResult geoResult = null;
-                string stringResult = null;
-                HttpResponseMessage response = null;
-                try
+                if (!string.IsNullOrEmpty(link))
                 {
-                    response = await client.GetAsync(new Uri($"https://maps.googleapis.com/maps/api/geocode/json?address={location.Address},{location.City},{location.State}&key={apikey}"));
-                    response.EnsureSuccessStatusCode();
-
-                    stringResult = await response.Content.ReadAsStringAsync();
-
-                    geoResult = JsonConvert.DeserializeObject<GeocodeResult>(stringResult);
+                    return Json(new
+                    {
+                        success = true,
+                        link
+                    });
                 }
-                catch (HttpRequestException ex)
+                else
                 {
-                    using (_logger.BeginScope(new Dictionary<string, object>
-                    {
-                        ["HttpStatusCode"] = response?.StatusCode,
-                        ["HttpResponse"] = stringResult ?? await response?.Content.ReadAsStringAsync() ?? "no response"
-                    }))
-                    {
-                        _logger.LogError(ex, "Error parsing Geocode API JSON: {Message}",
-                            ex.Message);
-                    }
-
-                    throw new OcudaException("Unable to Geocode address", ex);
-                }
-
-                if (geoResult?.Results?.Length > 0)
-                {
-                    var lat = geoResult?
-                        .Results?
-                        .FirstOrDefault(_ => _.Types.Any(__ => __ == "premise"))?
-                        .Geometry?
-                        .Location?
-                        .Lat;
-                    var lng = geoResult?
-                        .Results?
-                        .FirstOrDefault(_ => _.Types.Any(__ => __ == "premise"))?
-                        .Geometry?
-                        .Location?
-                        .Lng;
-
-                    if (lat != null && lng != null)
-                    {
-                        location.GeoLocation = lat.ToString() + "," + lng.ToString();
-                    }
-                    else
-                    {
-                        _logger.LogInformation("Could not find latitude and longitude when geocoding {LocationAddress}",
-                            location.Address);
-                    }
+                    message = $"Unable to find link for place id: {placeId}";
                 }
             }
-            catch (Exception ex)
+
+            return Json(new
             {
-                _logger.LogError(ex,
-                    "Problem looking up postal code for {LocationAddress}: {Message}",
-                    location.Address,
-                    ex.Message);
-                throw new OcudaException("Problem looking up postal code", ex);
-            }
-            return location;
+                success = false,
+                message
+            });
         }
 
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> GetUrlLocations(string addressJson)
+        public async Task<IActionResult> GetLocations(string name, string address)
         {
-            bool success = false;
-            var apikey = _config[Configuration.OpsAPIGoogleMaps];
-            var location = JsonConvert
-                .DeserializeObject<Location>(addressJson);
-            string addrstr = "";
-            if (!string.IsNullOrEmpty(location.Address))
+            string message;
+            if (string.IsNullOrEmpty(_apiKey))
             {
-                addrstr += location.Address;
+                message = $"Please configure a Google API key with maps access in setting: {Configuration.OcudaGoogleAPI}";
             }
-            if (!string.IsNullOrEmpty(location.City))
+            else if (string.IsNullOrEmpty(address))
             {
-                addrstr += "," + location.City;
+                message = "You must supply an address to search locations.";
             }
-            if (!string.IsNullOrEmpty(location.State))
+            else
             {
-                addrstr += "," + location.State;
-            }
-            if (!string.IsNullOrEmpty(location.Zip))
-            {
-                addrstr += "," + location.Zip;
-            }
-            try
-            {
-                using var client = new HttpClient();
-                GeocodePlace geoPlace = null;
-                string stringResult = null;
-                HttpResponseMessage response = null;
+                if (!string.IsNullOrEmpty(name))
+                {
+                    address = $"{name} {address.Trim(',').Replace(',', ' ')}";
+                }
+
                 try
                 {
-                    response = await client.GetAsync(new Uri($"https://maps.googleapis.com/maps/api/place/textsearch/json?query=establishment+in+{addrstr}&key={apikey}"));
-                    response.EnsureSuccessStatusCode();
+                    var locations = await _locationService.GetLocationSummariesAsync(address);
 
-                    stringResult = await response.Content.ReadAsStringAsync();
-
-                    geoPlace = JsonConvert.DeserializeObject<GeocodePlace>(stringResult);
-                    var results = new List<PlaceDetailsResult>();
-                    foreach (var result in geoPlace.Results.Where(_ => !_.PlaceId.Equals("") || _.PlaceId != null))
+                    if (locations != null)
                     {
-                        string stringDetailResult = null;
-
-                        var detailResponse = await client.GetAsync($"https://maps.googleapis.com/maps/api/place/details/json?placeid={result.PlaceId}&key={apikey}");
-                        detailResponse.EnsureSuccessStatusCode();
-
-                        stringDetailResult = await detailResponse.Content.ReadAsStringAsync();
-                        var geoDetailPlace = JsonConvert.DeserializeObject<GeocodePlaceDetails>(stringDetailResult);
-                        if (geoDetailPlace != null)
+                        return Json(new
                         {
-                            results.Add(geoDetailPlace.Results);
-                        }
+                            success = true,
+                            locations
+                        });
                     }
-                    string data = JsonConvert.SerializeObject(results);
-                    success = true;
-                    return Json(new
+                    else
                     {
-                        success,
-                        data
-                    });
+                        message = $"Unable to find locations for: {address}";
+                    }
                 }
-                catch (Exception ex)
+                catch (OcudaException oex)
                 {
-                    using (_logger.BeginScope(new Dictionary<string, object>
-                    {
-                        ["HttpStatusCode"] = response?.StatusCode,
-                        ["HttpResponse"] = stringResult ?? await response?.Content.ReadAsStringAsync() ?? "no response"
-                    }))
-                    {
-                        _logger.LogError(ex, "Error parsing Geocode API JSON: {Message}",
-                            ex.Message);
-                    }
-                    return Json(new
-                    {
-                        success
-                    });
+                    message = oex.Message;
                 }
             }
-            catch (Exception ex)
+
+            return Json(new
             {
-                _logger.LogError(ex,
-                    "Problem looking up postal code for {LocationAddress}: {Message}",
-                    location.Address,
-                    ex.Message);
-                return Json(new
-                {
-                    success
-                });
-            }
+                success = false,
+                message
+            });
         }
 
         [HttpGet]

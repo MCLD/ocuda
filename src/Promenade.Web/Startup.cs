@@ -21,6 +21,7 @@ using Ocuda.i18n;
 using Ocuda.Promenade.Data;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Clients;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Providers;
@@ -325,6 +326,8 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<IDateTimeProvider, CurrentDateTimeProvider>();
             services.AddScoped<Utility.Services.Interfaces.IOcudaCache,
                 Utility.Services.OcudaCache>();
+
+            services.AddHttpClient<IGoogleClient, GoogleClient>();
 
             // filters
             services.AddScoped<i18n.Filter.LocalizationFilterAttribute>();

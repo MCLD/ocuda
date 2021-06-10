@@ -19,13 +19,19 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<List<Location>> GetAllLocationsAsync();
 
+        Task<(double? Latitude, double? Longitude)> GetCoordinatesAsync(string address);
+
         Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId);
 
         Task<Location> GetLocationByIdAsync(int locationId);
 
         Task<Location> GetLocationByStubAsync(string locationStub);
 
+        Task<string> GetLocationLinkAsync(string placeId);
+
         Task<ICollection<Location>> GetLocationsBySegment(int segmentId);
+
+        Task<ICollection<LocationSummary>> GetLocationSummariesAsync(string address);
 
         Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(BaseFilter filter);
     }

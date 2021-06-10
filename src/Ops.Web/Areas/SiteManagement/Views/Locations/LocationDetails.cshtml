@@ -292,6 +292,12 @@
     <div class="location-save-message"></div>
 </div>
 
+<div class="row d-none" id="pageAlertRow">
+    <div class="col-12 col-sm-6 offset-sm-3">
+        <div class="alert" id="pageAlert"></div>
+    </div>
+</div>
+
 @if (!Model.Location.IsNewLocation)
 {
     @await Html.PartialAsync("_LocationPartial")
@@ -339,6 +345,40 @@
                    asp-for="Location.Zip"
                    formgroup
                    autocomplete="off" />
+            <input value="@Model.Location.Country"
+                   asp-for="Location.Country"
+                   formgroup
+                   autocomplete="off" />
+            <div class="row form-group mt-4">
+                <div class="col-form-label text-md-right col-md-3">
+                    <label asp-for="Location.GeoLocation"></label>
+                </div>
+                <div class="col-md-9">
+                    <div class="input-group">
+                        <input type="text"
+                               class="form-control"
+                               id="geolocation"
+                               asp-for="Location.GeoLocation" />
+                        <div class="input-group-append">
+                            <a class="btn btn-outline-info"
+                               id="oc-map"
+                               title="Display these coordinates on a map"
+                               href="#">
+                                <span class="far fa-map" aria-hidden="true"></span>
+                            </a>
+                            <a class="btn btn-outline-primary"
+                               id="oc-geocode"
+                               title="Use address to look up coordinates"
+                               href="#">
+                                <span class="fas fa-redo-alt"
+                                      aria-hidden="true"></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <span class="validation-message text-danger"
+                      asp-validation-for="Location.GeoLocation"></span>
+            </div>
             <input value="@Model.Location.MapLink"
                    asp-for="Location.MapLink"
                    formgroup
@@ -982,14 +1022,25 @@
 
         // For Google Maps
         $(document).on('click','#maplink-suggestions li', function () {
-            var urlstring = $(this).find("a").data("maps-url");
-            var address = $(this).find("span.format-addr").text().split(", ");
+            let data = { placeId: $(this).find("a").data("placeid") };
+            console.info("Place id:", data)
+            $.get("@Url.Action(nameof(LocationsController.GetLocationLink))",
+                data,
+                function (response) {
+                    if (response.success === true) {
+                        $($("input#Location_MapLink")[0]).val(response.link);
+                    } else {
+                        alert(response.message);
+                    }
+                }
+            );
+
+            let address = $(this).find("span.format-addr").text().split(", ");
             if (address.length == 5) {
                 $("#Location_Address").val(address[1]);
                 $("#Location_City").val(address[2]);
                 $("#Location_Country").val(address[4]);
-                var stateZip = address[3].split(" ");
-                $($("input#Location_MapLink")[0]).val(urlstring);
+                let stateZip = address[3].split(" ");
                 $("#Location_State").val(stateZip[0]);
                 $("#Location_Zip").val(stateZip[1]);
                 $("#maplink-suggestions").html("");
@@ -997,31 +1048,83 @@
                 $("#Location_Address").val(address[0]);
                 $("#Location_City").val(address[1]);
                 $("#Location_Country").val(address[3]);
-                var stateZip = address[2].split(" ");
-                $($("input#Location_MapLink")[0]).val(urlstring);
+                let stateZip = address[2].split(" ");
                 $("#Location_State").val(stateZip[0]);
                 $("#Location_Zip").val(stateZip[1]);
                 $("#maplink-suggestions").html("");
             }
         });
 
+        function CollectAddress() {
+            let address = [];
+            if ($("#Location_Address").val()) {
+                address.push($("#Location_Address").val());
+            }
+            if ($("#Location_City").val()) {
+                address.push($("#Location_City").val());
+            }
+            if ($("#Location_State").val()) {
+                address.push($("#Location_State").val());
+            }
+            if ($("#Location_Zip").val()) {
+                address.push($("#Location_Zip").val());
+            }
+            if ($("#Location_Country").val()) {
+                address.push($("#Location_Country").val());
+            }
+
+            return address.join(' ').trim();
+        }
+
+        $(document).on('click', '#oc-geocode', function (e) {
+            $('#pageAlertRow').addClass('d-none');
+            let data = { address: CollectAddress() };
+
+            $.get("@Url.Action(nameof(LocationsController.GetCoordinates))",
+                data,
+                function (response) {
+                    if (response.success === true) {
+                        $('#geolocation').val(response.latitude + ',' + response.longitude);
+                        $('#pageAlert').addClass('alert-success');
+                        $('#pageAlert').html('Successfully updated coordinates.');
+                        $('#pageAlertRow').removeClass('d-none');
+                    } else {
+                        alert(response.message);
+                    }
+                }
+            );
+            return false;
+        });
+
+        $(document).on('click', '#oc-map', function (e) {
+            let coords = $('#geolocation').val()
+            if (coords === '') {
+                alert("Coordinates must be specified to open on a map.")
+            } else {
+                window.open('https://maps.google.com/?q=' + coords)
+            }
+            return false;
+        });
+
         $("input#Location_Address").blur(function () {
             if ($('#Location_Address').val() && !$('#Location_MapLink').val())
             {
                 $("#maplink-suggestions").html("");
-                var data = {};
-                data["Address"] = $("#Location_Address").val();
-                data["City"] = $("#Location_City").val();
-                data["State"] = $("#Location_State").val();
-                data["Zip"] = $("#Location_Zip").val();
-                data["Country"] = $("#Location_Country").val();
-                var addressdata = JSON.stringify(data);
-
-                $.get("@Url.Action(nameof(LocationsController.GetUrlLocations))", { addressJson: addressdata }, function (response) {
-                    if (response.success == true) {
-                        var locations = $.parseJSON(response.data);
-                        HandleGoogleLocations(locations);
-                }});
+                let data = {
+                    name: $("#Location_Name").val(),
+                    address: CollectAddress()
+                };
+                $.get("@Url.Action(nameof(LocationsController.GetLocations))",
+                    data,
+                    function (response) {
+                        if (response.success == true) {
+                            ShowLocationAutocomplete(response.locations);
+                        }
+                        else
+                        {
+                            alert(response.message);
+                        }
+                    });
             }
             else
             {
@@ -1029,30 +1132,29 @@
             }
         });
 
-        function HandleGoogleLocations(locations) {
+        function ShowLocationAutocomplete(locations) {
             for (var index = 0; index < locations.length; index++)
             {
+                console.info(locations[index]);
+                var icon = document.createElement("span");
+                icon.classList.add("fas");
+                icon.classList.add("fa-map-marker-alt");
+
+                var formatAddr = document.createElement("span");
+                formatAddr.innerHTML = " " + locations[index].address;
+                formatAddr.setAttribute("class", "format-addr");
+
                 var link = document.createElement('a');
-                link.setAttribute("data-maps-url", locations[index].url);
-                link.setAttribute("data-address", locations[index].url);
-                link.setAttribute("data-city", locations[index].url);
-                link.setAttribute("data-state", locations[index].url);
-                link.setAttribute("data-zip",locations[index].url);
                 link.innerHTML = " <strong>" + locations[index].name + "</strong>";
                 link.classList.add("url-suggestion");
                 link.setAttribute("id", "list-item-" + index.toString());
                 link.setAttribute("role", "button");
+                link.setAttribute("data-placeid", locations[index].placeId);
 
                 var listitem = document.createElement("li");
                 listitem.classList.add("list-group-item");
                 listitem.classList.add("list-group-item-action");
                 listitem.classList.add("map-item");
-                var icon = document.createElement("span");
-                var formatAddr = document.createElement("span");
-                formatAddr.innerHTML = " "+locations[index].formatted_address;
-                formatAddr.setAttribute("class", "format-addr");
-                icon.classList.add("fas");
-                icon.classList.add("fa-map-marker-alt");
                 listitem.appendChild(icon);
                 listitem.appendChild(link);
                 listitem.appendChild(formatAddr);
