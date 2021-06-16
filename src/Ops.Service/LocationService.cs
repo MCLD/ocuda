@@ -12,6 +12,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Promenade.Models;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
 
@@ -21,15 +22,18 @@ namespace Ocuda.Ops.Service
     {
         private const string ndash = "\u2013";
 
+        private readonly IGoogleClient _googleClient;
         private readonly ILocationHoursRepository _locationHoursRepository;
         private readonly ILocationRepository _locationRepository;
 
         public LocationService(ILogger<LocationService> logger,
+            IGoogleClient googleClient,
             IHttpContextAccessor httpContextAccessor,
             ILocationRepository locationRepository,
             ILocationHoursRepository locationHoursRepository)
             : base(logger, httpContextAccessor)
         {
+            _googleClient = googleClient ?? throw new ArgumentNullException(nameof(googleClient));
             _locationRepository = locationRepository
                 ?? throw new ArgumentNullException(nameof(locationRepository));
             _locationHoursRepository = locationHoursRepository
@@ -105,6 +109,12 @@ namespace Ocuda.Ops.Service
         public async Task<List<Location>> GetAllLocationsAsync()
         {
             return await _locationRepository.GeAllLocationsAsync();
+        }
+
+        public async Task<(double? Latitude, double? Longitude)>
+            GetCoordinatesAsync(string address)
+        {
+            return await _googleClient.GeocodeAsync(address);
         }
 
         public async Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId)
@@ -213,9 +223,19 @@ namespace Ocuda.Ops.Service
             }
         }
 
+        public async Task<string> GetLocationLinkAsync(string placeId)
+        {
+            return await _googleClient.GetLocationLinkAsync(placeId);
+        }
+
         public async Task<ICollection<Location>> GetLocationsBySegment(int segmentId)
         {
             return await _locationRepository.GetUsingSegmentAsync(segmentId);
+        }
+
+        public async Task<ICollection<LocationSummary>> GetLocationSummariesAsync(string address)
+        {
+            return await _googleClient.GetLocationSummariesAsync(address);
         }
 
         public async Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(

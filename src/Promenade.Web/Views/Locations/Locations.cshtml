@@ -4,6 +4,23 @@
 
 @if (Model.CanSearchAddress)
 {
+    @if (!string.IsNullOrEmpty(Model.Warning))
+    {
+        <div class="row">
+            <div class="col-12 col-sm-6 offset-sm-3">
+                <div class="alert alert-warning">@Model.Warning</div>
+            </div>
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(Model.Info))
+    {
+        <div class="row">
+            <div class="col-12 col-sm-6 offset-sm-3">
+                <div class="alert alert-info">@Model.Info</div>
+            </div>
+        </div>
+    }
+
     <div class="row">
         <div class="col-12 mb-2">
             <form asp-action="@nameof(LocationsController.Find)"
@@ -11,10 +28,10 @@
                   role="form">
                 <div class="input-group">
                     <input asp-for="Zip"
-                           placeholder="Enter your ZIP Code to find your closest library"
+                           placeholder="Enter a 5 digit ZIP code"
                            class="form-control default-text" />
                     <div class="input-group-append">
-                        <button class="btn btn-primary">
+                        <button class="btn btn-outline-primary" id="GoButton">
                             Go
                         </button>
                     </div>
@@ -46,7 +63,7 @@
             <div class="col-12 col-md-6 col-lg-4 mt-2 mb-3 d-flex">
                 <div class="prom-location-tile flex-fill w-100">
                     @if (!string.IsNullOrEmpty(location.MapLink)
-                && !string.IsNullOrEmpty(location.MapImagePath))
+                        && !string.IsNullOrEmpty(location.MapImagePath))
                     {
                         <a href="@location.MapLink">
                             <img src="@location.MapImagePath"
@@ -88,7 +105,6 @@
                                    class="btn btn-outline-dark">
                                     Details
                                 </a>
-
                             </div>
                             <div class="col-6 text-right">
                                 @if (location.HasEvents)
@@ -102,7 +118,6 @@
                                 {
                                     <em class="text-dark align-middle">@location.LocatorNotes</em>
                                 }
-
                             </div>
                         </div>
                     </div>
@@ -152,6 +167,12 @@
                 timeout: 27000
             };
             navigator.geolocation.getCurrentPosition(geoSuccess, geoFailure, geoOptions);
+        });
+
+        $('#GoButton').on('click', function () {
+            $('#GoButton').html('<span class="fa fa-spinner fa-spin"></span> Go');
+            $('#GoButton').prop('disabled', true);
+            return true;
         });
     </script>
 }
