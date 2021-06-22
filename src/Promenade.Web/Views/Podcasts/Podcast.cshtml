@@ -32,7 +32,7 @@
     </div>
 
 </div>
-<hr />
+<hr aria-hidden="true" />
 
 @foreach (var item in Model.PodcastItems)
 {
@@ -59,7 +59,7 @@
             <p>@item.Description</p>
         </div>
     </div>
-    <hr />
+    <hr aria-hidden="true" />
 }
 
 @if (Model.PaginateModel.MaxPage > 1)
