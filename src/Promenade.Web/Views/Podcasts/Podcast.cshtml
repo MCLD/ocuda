@@ -18,6 +18,7 @@
         <p>@Model.Podcast.Description</p>
         <div class="row">
             <div class="col-12">
+                <span class="sr-only">You can listen to our podcast on:</span>
                 @foreach (var directoryInfo in Model.PodcastDirectoryInfos)
                 {
                     <a href="@directoryInfo.Url"
