@@ -14,7 +14,7 @@
              alt="Logo for @Model.Podcast.Title" />
     </div>
     <div class="col-12 col-md-9">
-        <div class="h5">@Model.Podcast.Title</div>
+        <h1 class="h2 podcast-title">Podcast - @Model.Podcast.Title</h1>
         <p>@Model.Podcast.Description</p>
         <div class="row">
             <div class="col-12">
@@ -40,7 +40,12 @@
         <div class="col-12">
             <div class="row">
                 <div class="col-12 col-md-5 col-lg-6 col-xl-7">
-                    <div class="mb-2 lead"><a href="@Url.Action(nameof(PodcastsController.Episode), new { podcastStub = Model.Podcast.Stub, episodeStub = item.Stub})"><strong>@item.Title</strong></a></div>
+                    <h2 class="mb-2">
+                        <a class ="lead"
+                           href="@Url.Action(nameof(PodcastsController.Episode), new { podcastStub = Model.Podcast.Stub, episodeStub = item.Stub})">
+                           <strong>@item.Title</strong>
+                        </a>
+                    </h2>
                     <div class="mb-2"><em>Episode @item.Episode, published @item.PublishDate.Value.ToLongDateString().</em></div>
                 </div>
                 <div class="col-12 col-md-7 col-lg-6 col-xl-5 text-right">

@@ -2,8 +2,13 @@
 
 <div class="row">
     <div class="col-12">
-        <div class="mb-2"><a href="@Url.Action(nameof(PodcastsController.Podcast), new { stub = Model.Podcast.Stub})">@Model.Podcast.Title</a></div>
-        <div class="mb-2 lead"><strong>@Model.PodcastItem.Title</strong></div>
+            <h1 class="h1-link">
+                <a href="@Url.Action(nameof(PodcastsController.Podcast), new { stub = Model.Podcast.Stub})"
+                    class="h6">
+                    Podcast - @Model.Podcast.Title
+                </a>
+            </h1>
+        <h2 class="mb-2 lead h2 podcast-title"><strong>@Model.PodcastItem.Title</strong></h2>
         <div class="mb-2">
             <em>
                 Episode @Model.PodcastItem.Episode,
