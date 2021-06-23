@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -12,6 +13,7 @@ namespace Ocuda.Promenade.Models.Entities
 
         [Required]
         [MaxLength(255)]
+        [DisplayName("Page title")]
         public string Title { get; set; }
     }
 }

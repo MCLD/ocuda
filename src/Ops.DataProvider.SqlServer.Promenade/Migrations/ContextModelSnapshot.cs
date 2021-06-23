@@ -15,8 +15,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("ProductVersion", "5.0.5")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
@@ -67,8 +67,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -88,8 +88,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -106,8 +106,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasColumnType("nvarchar(32)")
-                        .HasMaxLength(32);
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.HasKey("CarouselButtonLabelId", "LanguageId");
 
@@ -145,22 +145,22 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(2000)")
-                        .HasMaxLength(2000);
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Label")
                         .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Title")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("CarouselItemId", "LanguageId");
 
@@ -177,21 +177,21 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ButtonUrlInfo")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("ButtonUrlLabel")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ButtonUrlTemplate")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -208,8 +208,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("CarouselId", "LanguageId");
 
@@ -227,13 +227,13 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Class")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -250,8 +250,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("CategoryId", "LanguageId");
 
@@ -272,18 +272,18 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("RedirectUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Stub")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -316,8 +316,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int?>("SegmentId")
                         .HasColumnType("int");
@@ -342,12 +342,12 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Details")
-                        .HasColumnType("nvarchar(1000)")
-                        .HasMaxLength(1000);
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.HasKey("EmediaId", "LanguageId");
 
@@ -365,8 +365,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("SortOrder")
                         .HasColumnType("int");
@@ -376,8 +376,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -392,33 +392,33 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("BodyText")
-                        .HasColumnType("nvarchar(2000)")
-                        .HasMaxLength(2000);
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("Icon")
                         .IsRequired()
-                        .HasColumnType("nvarchar(48)")
-                        .HasMaxLength(48);
+                        .HasMaxLength(48)
+                        .HasColumnType("nvarchar(48)");
 
                     b.Property<string>("IconText")
-                        .HasColumnType("nvarchar(5)")
-                        .HasMaxLength(5);
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
 
                     b.Property<string>("ImagePath")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int?>("SortOrder")
                         .HasColumnType("int");
 
                     b.Property<string>("Stub")
-                        .HasColumnType("nvarchar(80)")
-                        .HasMaxLength(80);
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
 
                     b.HasKey("Id");
 
@@ -433,32 +433,134 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("GroupType")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("IsLocationRegion")
                         .HasColumnType("bit");
 
                     b.Property<string>("MapImage")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Stub")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("SubscriptionUrl")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.ImageFeature", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ImageFeatures");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.ImageFeatureItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ImageFeatureId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ImageFeatureId");
+
+                    b.ToTable("ImageFeatureItems");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.ImageFeatureItemText", b =>
+                {
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ImageFeatureItemId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AltText")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Filename")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Link")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("LanguageId", "ImageFeatureItemId");
+
+                    b.HasIndex("ImageFeatureItemId");
+
+                    b.ToTable("ImageFeatureItemTexts");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.ImageFeatureTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("Height")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ItemsToDisplay")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int?>("Width")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ImageFeatureTemplates");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Language", b =>
@@ -469,8 +571,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -479,8 +581,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -495,40 +597,40 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Address")
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("AddressType")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("AdministrativeArea")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("AreaServedName")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("AreaServedType")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("City")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Code")
-                        .HasColumnType("nvarchar(5)")
-                        .HasMaxLength(5);
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
 
                     b.Property<string>("ContactType")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Country")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("DescriptionSegmentId")
                         .HasColumnType("int");
@@ -537,20 +639,20 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("EventLink")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Facebook")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("GeoLocation")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("HasEvents")
                         .HasColumnType("bit");
@@ -559,8 +661,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ImagePath")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("IsAccessibleForFree")
                         .HasColumnType("bit");
@@ -572,37 +674,37 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("LocatorName")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("LocatorNotes")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("MapImagePath")
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("MapLink")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("PAbbreviation")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ParentOrganization")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(15)")
-                        .HasMaxLength(15);
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<int?>("PostFeatureSegmentId")
                         .HasColumnType("int");
@@ -611,32 +713,32 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("PriceRange")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int?>("SocialCardId")
                         .HasColumnType("int");
 
                     b.Property<string>("State")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Stub")
                         .IsRequired()
-                        .HasColumnType("nvarchar(80)")
-                        .HasMaxLength(80);
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
 
                     b.Property<string>("SubscriptionLink")
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Type")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Zip")
-                        .HasColumnType("nvarchar(10)")
-                        .HasMaxLength(10);
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.HasKey("Id");
 
@@ -659,8 +761,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("RedirectUrl")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Text")
                         .HasColumnType("nvarchar(max)");
@@ -741,8 +843,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Reason")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -765,16 +867,16 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Icon")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Link")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int?>("NavigationId")
                         .HasColumnType("int");
@@ -804,16 +906,16 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("AriaLabel")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Label")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Title")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id", "LanguageId");
 
@@ -839,8 +941,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("LanguageId", "PageHeaderId");
 
@@ -864,15 +966,21 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Property<int?>("LayoutCarouselTemplateId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("LayoutFeatureTemplateId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("LayoutWebslideTemplateId")
+                        .HasColumnType("int");
+
                     b.Property<string>("PageName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Stub")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
@@ -880,6 +988,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("LayoutCarouselTemplateId");
+
+                    b.HasIndex("LayoutFeatureTemplateId");
+
+                    b.HasIndex("LayoutWebslideTemplateId");
 
                     b.ToTable("PageHeaders");
                 });
@@ -897,19 +1009,29 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PageFeatureId")
+                        .HasColumnType("int");
+
                     b.Property<int>("PageLayoutId")
                         .HasColumnType("int");
 
                     b.Property<int?>("SegmentId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("WebslideId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CarouselId");
 
+                    b.HasIndex("PageFeatureId");
+
                     b.HasIndex("PageLayoutId");
 
                     b.HasIndex("SegmentId");
+
+                    b.HasIndex("WebslideId");
 
                     b.ToTable("PageItems");
                 });
@@ -923,11 +1045,14 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("PageHeaderId")
                         .HasColumnType("int");
+
+                    b.Property<Guid>("PreviewId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("SocialCardId")
                         .HasColumnType("int");
@@ -954,8 +1079,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("PageLayoutId", "LanguageId");
 
@@ -972,31 +1097,31 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Author")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Category")
                         .IsRequired()
-                        .HasColumnType("nvarchar(1000)")
-                        .HasMaxLength(1000);
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("Copyright")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(1000)")
-                        .HasMaxLength(1000);
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("ImageThumbnailUrl")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("IsBlocked")
                         .HasColumnType("bit");
@@ -1015,32 +1140,32 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Language")
                         .IsRequired()
-                        .HasColumnType("nvarchar(8)")
-                        .HasMaxLength(8);
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
 
                     b.Property<string>("OwnerEmail")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("OwnerName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Stub")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Subtitle")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -1059,8 +1184,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -1076,8 +1201,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Url")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("PodcastId", "PodcastDirectoryId");
 
@@ -1095,8 +1220,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(1000)")
-                        .HasMaxLength(1000);
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<int>("Duration")
                         .HasColumnType("int");
@@ -1106,15 +1231,15 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Guid")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("GuidPermaLink")
                         .HasColumnType("bit");
 
                     b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("IsBlocked")
                         .HasColumnType("bit");
@@ -1126,21 +1251,21 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Keywords")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("MediaSize")
                         .HasColumnType("int");
 
                     b.Property<string>("MediaType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(32)")
-                        .HasMaxLength(32);
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.Property<string>("MediaUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("PodcastId")
                         .HasColumnType("int");
@@ -1153,17 +1278,17 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Stub")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Subtitle")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -1189,8 +1314,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime?>("FollowupSentAt")
                         .HasColumnType("datetime2");
@@ -1206,17 +1331,17 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Language")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime?>("NotificationSentAt")
                         .HasColumnType("datetime2");
@@ -1237,6 +1362,22 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.HasIndex("ScheduleRequestTelephoneId");
 
                     b.ToTable("ScheduleRequest");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.ScheduleRequestLimit", b =>
+                {
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Hour")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Limit")
+                        .HasColumnType("int");
+
+                    b.HasKey("DayOfWeek", "Hour");
+
+                    b.ToTable("ScheduleRequestLimits");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.ScheduleRequestSubject", b =>
@@ -1266,8 +1407,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Subject")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -1283,8 +1424,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Phone")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -1305,8 +1446,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
@@ -1325,12 +1466,12 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Header")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Text")
-                        .HasColumnType("nvarchar(2000)")
-                        .HasMaxLength(2000);
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
 
                     b.HasKey("LanguageId", "SegmentId");
 
@@ -1342,29 +1483,29 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.SiteSetting", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Category")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.Property<string>("Value")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -1380,22 +1521,22 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(200)")
-                        .HasMaxLength(200);
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Image")
                         .IsRequired()
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("ImageAlt")
-                        .HasColumnType("nvarchar(420)")
-                        .HasMaxLength(420);
+                        .HasMaxLength(420)
+                        .HasColumnType("nvarchar(420)");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(70)")
-                        .HasMaxLength(70);
+                        .HasMaxLength(70)
+                        .HasColumnType("nvarchar(70)");
 
                     b.HasKey("Id");
 
@@ -1410,8 +1551,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -1420,12 +1561,12 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("RequestPath")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Url")
-                        .HasColumnType("nvarchar(500)")
-                        .HasMaxLength(500);
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.HasKey("Id");
 
@@ -1465,6 +1606,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("LabelId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("CarouselItem");
+
+                    b.Navigation("Label");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselButtonLabelText", b =>
@@ -1480,6 +1625,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("LanguageId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("CarouselButtonLabel");
+
+                    b.Navigation("Language");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselItem", b =>
@@ -1489,6 +1638,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("CarouselId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Carousel");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselItemText", b =>
@@ -1504,6 +1655,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("LanguageId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("CarouselItem");
+
+                    b.Navigation("Language");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselText", b =>
@@ -1519,6 +1674,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("LanguageId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Carousel");
+
+                    b.Navigation("Language");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CategoryText", b =>
@@ -1534,6 +1693,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("LanguageId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Language");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Emedia", b =>
@@ -1543,6 +1706,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.EmediaCategory", b =>
@@ -1558,6 +1723,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("EmediaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Emedia");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.EmediaGroup", b =>
@@ -1566,6 +1735,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .WithMany()
                         .HasForeignKey("SegmentId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Segment");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.EmediaText", b =>
@@ -1581,6 +1752,40 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("LanguageId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Emedia");
+
+                    b.Navigation("Language");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.ImageFeatureItem", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.ImageFeature", "ImageFeature")
+                        .WithMany("Items")
+                        .HasForeignKey("ImageFeatureId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ImageFeature");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.ImageFeatureItemText", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.ImageFeatureItem", "ImageFeatureItem")
+                        .WithMany()
+                        .HasForeignKey("ImageFeatureItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ImageFeatureItem");
+
+                    b.Navigation("Language");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Location", b =>
@@ -1594,6 +1799,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .WithMany()
                         .HasForeignKey("SocialCardId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("DisplayGroup");
+
+                    b.Navigation("SocialCard");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.LocationFeature", b =>
@@ -1609,6 +1818,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Feature");
+
+                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.LocationGroup", b =>
@@ -1624,6 +1837,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.LocationHours", b =>
@@ -1633,6 +1850,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.LocationHoursOverride", b =>
@@ -1641,6 +1860,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .WithMany()
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Navigation", b =>
@@ -1669,6 +1890,12 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .WithMany()
                         .HasForeignKey("SocialCardId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Language");
+
+                    b.Navigation("PageHeader");
+
+                    b.Navigation("SocialCard");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageHeader", b =>
@@ -1677,6 +1904,22 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .WithMany()
                         .HasForeignKey("LayoutCarouselTemplateId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.ImageFeatureTemplate", "LayoutFeatureTemplate")
+                        .WithMany()
+                        .HasForeignKey("LayoutFeatureTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.ImageFeatureTemplate", "LayoutWebslideTemplate")
+                        .WithMany()
+                        .HasForeignKey("LayoutWebslideTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("LayoutCarouselTemplate");
+
+                    b.Navigation("LayoutFeatureTemplate");
+
+                    b.Navigation("LayoutWebslideTemplate");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageItem", b =>
@@ -1684,6 +1927,11 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.HasOne("Ocuda.Promenade.Models.Entities.Carousel", "Carousel")
                         .WithMany()
                         .HasForeignKey("CarouselId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.ImageFeature", "PageFeature")
+                        .WithMany()
+                        .HasForeignKey("PageFeatureId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Ocuda.Promenade.Models.Entities.PageLayout", "PageLayout")
@@ -1696,6 +1944,21 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .WithMany()
                         .HasForeignKey("SegmentId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.ImageFeature", "Webslide")
+                        .WithMany()
+                        .HasForeignKey("WebslideId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Carousel");
+
+                    b.Navigation("PageFeature");
+
+                    b.Navigation("PageLayout");
+
+                    b.Navigation("Segment");
+
+                    b.Navigation("Webslide");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageLayout", b =>
@@ -1710,6 +1973,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .WithMany()
                         .HasForeignKey("SocialCardId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("PageHeader");
+
+                    b.Navigation("SocialCard");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageLayoutText", b =>
@@ -1725,6 +1992,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("PageLayoutId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Language");
+
+                    b.Navigation("PageLayout");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PodcastDirectoryInfo", b =>
@@ -1740,6 +2011,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("PodcastId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Podcast");
+
+                    b.Navigation("PodcastDirectory");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PodcastItem", b =>
@@ -1749,6 +2024,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("PodcastId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Podcast");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.ScheduleRequest", b =>
@@ -1764,6 +2041,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("ScheduleRequestTelephoneId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("ScheduleRequestSubject");
+
+                    b.Navigation("ScheduleRequestTelephone");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.SegmentText", b =>
@@ -1779,6 +2060,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("SegmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Language");
+
+                    b.Navigation("Segment");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.UrlRedirectAccess", b =>
@@ -1788,6 +2073,43 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("UrlRedirectId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("UrlRedirect");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Carousel", b =>
+                {
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselItem", b =>
+                {
+                    b.Navigation("Buttons");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.EmediaGroup", b =>
+                {
+                    b.Navigation("Emedias");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.ImageFeature", b =>
+                {
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Navigation", b =>
+                {
+                    b.Navigation("Navigations");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageLayout", b =>
+                {
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Podcast", b =>
+                {
+                    b.Navigation("PodcastItems");
                 });
 #pragma warning restore 612, 618
         }

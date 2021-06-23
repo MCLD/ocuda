@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 
 namespace Ocuda.Utility.Services
@@ -13,62 +10,6 @@ namespace Ocuda.Utility.Services
         protected OcudaBaseService(ILogger<TService> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        protected async Task<T> GetFromCacheAsync<T>(IDistributedCache cache, string cacheKey)
-            where T : class
-        {
-            if (cache == null || string.IsNullOrEmpty(cacheKey))
-            {
-                return null;
-            }
-
-            string cachedJson = await cache.GetStringAsync(cacheKey);
-
-            if (!string.IsNullOrEmpty(cachedJson))
-            {
-                _logger.LogTrace("Cache hit for {CacheKey}", cacheKey);
-
-                try
-                {
-                    return JsonSerializer.Deserialize<T>(cachedJson);
-                }
-                catch (JsonException ex)
-                {
-                    _logger.LogWarning(ex,
-                        "Error deserializing {Type} with key {CacheKey} from cache: {ErrorMessage}",
-                        typeof(T),
-                        cacheKey,
-                        ex.Message);
-                    await cache.RemoveAsync(cacheKey);
-                }
-            }
-            return null;
-        }
-
-        protected async Task SaveToCacheAsync<T>(IDistributedCache cache,
-            string cacheKey,
-            T item,
-            int? cacheDurationHours) where T : class
-        {
-            if (cacheDurationHours == null || string.IsNullOrEmpty(cacheKey) || item == null)
-            {
-                return;
-            }
-
-            string itemJson = JsonSerializer.Serialize(item);
-
-            await cache.SetStringAsync(cacheKey,
-                itemJson,
-                new DistributedCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromHours((int)cacheDurationHours)
-                });
-
-            _logger.LogDebug("Cache miss for {CacheKey}, caching {Type}: {Length} characters",
-                cacheKey,
-                typeof(T),
-                itemJson.Length);
         }
     }
 }

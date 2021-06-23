@@ -134,5 +134,10 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException($"A feature with stub '{feature.Stub}' already exists.");
             }
         }
+
+        public async Task<ICollection<Feature>> GetFeaturesByIdsAsync(IEnumerable<int> featureIds)
+        {
+            return await _featureRepository.GetByIdsAsync(featureIds);
+        }
     }
 }

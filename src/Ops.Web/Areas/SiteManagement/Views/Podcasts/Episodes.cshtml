@@ -8,26 +8,26 @@
         </h1>
     </div>
     <div class="col-sm-6">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.PodcastsController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.PodcastsController.Index))">Back</a>
         @if (Model.IsSiteManager || Model.HasPermission)
         {
             <a asp-action="@(nameof(PodcastsController.AddEpisode))"
                asp-route-podcastId="@Model.PodcastId"
-               class="btn btn-outline-success mt-2 mb-1 mr-1 float-right">
+               class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Add Episode
             </a>
         }
-        <a class="btn btn-outline-dark mt-2 mb-1 mr-4 float-right"
-           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.PodcastsController.Name"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.PodcastsController.Index))">Back</a>
     </div>
 </div>
 
-@if (Model.Episodes.Count() == 0)
+@if (!Model.Episodes.Any())
 {
     <div class="alert alert-warning">No episodes found.</div>
 }
-@if (Model.Episodes.Count() > 0)
+else
 {
     <div class="row">
         <div class="col-12">
@@ -36,8 +36,11 @@
                     <tr>
                         <th>Episode</th>
                         <th>Title</th>
-                        <th>Publish Date</th>
-                        <th>&nbsp;</th>
+                        <th>
+                            Publish Date
+                            <span class="fas fa-caret-down"></span>
+                        </th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,7 +55,7 @@
                                 {
                                     <a asp-action="@(nameof(PodcastsController.EditEpisode))"
                                        asp-route-episodeId="@episode.Id"
-                                       class="btn btn-link"
+                                       class="btn btn-outline-primary"
                                        title="Edit">
                                         <span class="fas fa-edit" aria-hidden="true"></span>
                                     </a>

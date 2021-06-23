@@ -22,9 +22,9 @@ namespace Ocuda.Ops.Service
         public GroupService(ILogger<GroupService> logger,
             IHttpContextAccessor httpContextAccessor,
             IGroupRepository groupRepository
-            ,ILocationGroupRepository locationGroupRepository,
+            , ILocationGroupRepository locationGroupRepository,
             ILocationService locationService)
-            : base (logger, httpContextAccessor)
+            : base(logger, httpContextAccessor)
         {
             _groupRepository = groupRepository
                 ?? throw new ArgumentNullException(nameof(groupRepository));
@@ -151,6 +151,11 @@ namespace Ocuda.Ops.Service
             {
                 throw new OcudaException($"Group '{group.Stub}' already exists.");
             }
+        }
+
+        public async Task<ICollection<Group>> GetGroupsByIdsAsync(IEnumerable<int> groupIds)
+        {
+            return await _groupRepository.GetByIdsAsync(groupIds);
         }
     }
 }

@@ -2,44 +2,50 @@
 
 @if (Model.Groups.Count() == 0)
 {
-    <div class="alert alert-warning">No Items found</div>
+    <div class="row">
+        <div class="col">
+            <div class="alert alert-warning">No Items found</div>
+        </div>
+    </div>
 }
 else
 {
-    <div>
-        <table class="table table-sm table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>Group Type</th>
-                    <th>Is Location Region</th>
-                    <th>&nbsp;</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var group in Model.Groups)
-                {
-                    <tr class="itemRow">
-                        <td>
-                            @group.GroupType
-                        </td>
-                        <td class="text-center">
-                            @if (group.IsLocationRegion)
-                            {
-                                <span class="fas fa-check"></span>
-                            }
-                        </td>
-                        <td>
-                            <button type="button"
-                                    class="btn btn-link btn-xs additemButton"
-                                data-itemtype="Group"
-                                data-itemid="@group.Id">
-                                <span class="fa fa-2x fa-plus-circle text-success" aria-hidden="true"></span>
-                            </button>
-                        </td>
+    <div class="row">
+        <div class="col">
+            <table class="table table-sm table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Group Type</th>
+                        <th>Is Location Region</th>
+                        <th>Action</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var group in Model.Groups)
+                    {
+                        <tr class="itemRow">
+                            <td class="align-middle">
+                                @group.GroupType
+                            </td>
+                            <td class="align-middle text-center">
+                                @if (group.IsLocationRegion)
+                                {
+                                    <span class="fas fa-check"></span>
+                                }
+                            </td>
+                            <td class="align-middle">
+                                <button type="button"
+                                        class="btn btn-outline-primary additemButton"
+                                        data-itemtype="Group"
+                                        data-itemid="@group.Id">
+                                    <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
     @if (Model.PaginateModel.MaxPage > 1)
     {

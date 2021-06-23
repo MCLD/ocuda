@@ -26,20 +26,29 @@ namespace Ocuda.Ops.Data.Promenade
             return entity;
         }
 
-        public async Task<int?> GetMaxSortOrderForLayoutAsync(int layoutId)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.PageLayoutId == layoutId)
-                .MaxAsync(_ => (int?)_.Order);
-        }
-
         public async Task<PageItem> GetByLayoutAndOrderAsync(int layoutId, int order)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.PageLayoutId == layoutId && _.Order == order)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<int> GetImageFeatureUseCountAsync(int imageFeatureId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.PageFeatureId == imageFeatureId || _.WebslideId == imageFeatureId)
+                .CountAsync();
+        }
+
+        public async Task<PageLayout> GetLayoutForItemAsync(int itemId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Id == itemId)
+                .Select(_ => _.PageLayout)
+                .SingleOrDefaultAsync();
         }
 
         public async Task<List<PageItem>> GetLayoutSubsequentAsync(int layoutId, int order)
@@ -50,13 +59,12 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
-        public async Task<PageLayout> GetLayoutForItemAsync(int itemId)
+        public async Task<int?> GetMaxSortOrderForLayoutAsync(int layoutId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id == itemId)
-                .Select(_ => _.PageLayout)
-                .SingleOrDefaultAsync();
+                .Where(_ => _.PageLayoutId == layoutId)
+                .MaxAsync(_ => (int?)_.Order);
         }
     }
 }

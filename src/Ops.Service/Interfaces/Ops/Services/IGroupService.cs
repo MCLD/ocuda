@@ -8,16 +8,28 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IGroupService
     {
-        Task<List<Group>> GetAllGroupsAsync();
-        Task<List<Group>> GetGroupRegions();
         Task<Group> AddGroupAsync(Group group);
-        Task<Group> EditAsync(Group group);
+
         Task DeleteAsync(int id);
-        Task<List<Group>> GetMissingGroups(List<int> locationGroupIds);
-        Task<DataWithCount<ICollection<Group>>> GetPaginatedListAsync(BaseFilter filter);
-        Task<DataWithCount<ICollection<Group>>> PageItemsAsync(GroupFilter filter);
+
+        Task<Group> EditAsync(Group group);
+
+        Task<List<Group>> GetAllGroupsAsync();
+
         Task<Group> GetGroupByIdAsync(int groupId);
+
         Task<Group> GetGroupByStubAsync(string groupType);
+
+        Task<List<Group>> GetGroupRegions();
+
+        Task<ICollection<Group>> GetGroupsByIdsAsync(IEnumerable<int> groupIds);
+
         Task<List<LocationGroup>> GetLocationGroupsByGroupId(int groupId);
+
+        Task<List<Group>> GetMissingGroups(List<int> locationGroupIds);
+
+        Task<DataWithCount<ICollection<Group>>> GetPaginatedListAsync(BaseFilter filter);
+
+        Task<DataWithCount<ICollection<Group>>> PageItemsAsync(GroupFilter filter);
     }
 }

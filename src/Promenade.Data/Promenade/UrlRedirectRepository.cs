@@ -17,7 +17,7 @@ namespace Ocuda.Promenade.Data.Promenade
 
         public async Task<UrlRedirect> GetRedirectIdPathAsync(string path)
         {
-            var redirect = await DbSet
+            var redirects = await DbSet
                 .AsNoTracking()
                 .Where(_ => _.IsActive && _.RequestPath == path)
                 .Select(_ => new
@@ -25,17 +25,25 @@ namespace Ocuda.Promenade.Data.Promenade
                     _.Id,
                     _.Url,
                 })
-                .SingleOrDefaultAsync();
+                .ToListAsync();
 
-            if (redirect == null)
+            if (redirects == null || redirects.Count == 0)
             {
                 return null;
             }
 
+            if (redirects.Count > 1)
+            {
+                _logger.LogError("Found {RedirectsCount} redirect matches for path {Path}, returning id {Id}",
+                    redirects.Count,
+                    path,
+                    redirects[0].Id);
+            }
+
             return new UrlRedirect
             {
-                Id = redirect.Id,
-                Url = redirect.Url
+                Id = redirects[0].Id,
+                Url = redirects[0].Url
             };
         }
     }

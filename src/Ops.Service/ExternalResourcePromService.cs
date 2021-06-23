@@ -13,7 +13,7 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service
 {
-    public class ExternalResourcePromService 
+    public class ExternalResourcePromService
         : BaseService<ExternalResourcePromService>, IExternalResourcePromService
     {
         private readonly IExternalResourcePromRepository _externalResourcePromRepository;

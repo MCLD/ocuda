@@ -1,251 +1,108 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
-using BranchLocator.Helpers;
-using BranchLocator.Models;
 using CommonMark;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.ViewModels.Locations;
 using Ocuda.Promenade.Service;
-using Serilog.Context;
 
 namespace Ocuda.Promenade.Controllers
 {
     [Route("[Controller]")]
     public class LocationsController : BaseController<LocationsController>
     {
-        private const string MapQuery
-            = "https://maps.googleapis.com/maps/api/geocode/json?{0}={1}&key={2}";
-
+        private readonly string _apiKey;
         private readonly LocationService _locationService;
         private readonly SegmentService _segmentService;
 
-        private readonly string ApiKey;
-
-        public static string Name { get { return "Locations"; } }
-
-        public IFormatProvider CurrentCulture { get; private set; }
-
         public LocationsController(ServiceFacades.Controller<LocationsController> context,
-            LocationService locationService, SegmentService segmentService) : base(context)
+            LocationService locationService,
+            SegmentService segmentService) : base(context)
         {
             _locationService = locationService
                 ?? throw new ArgumentNullException(nameof(locationService));
             _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
 
-            ApiKey = _config[Utility.Keys.Configuration.PromenadeAPIGoogleMaps];
+            _apiKey = _config[Utility.Keys.Configuration.OcudaGoogleAPI];
+        }
+
+        public static string Name { get { return "Locations"; } }
+
+        public IFormatProvider CurrentCulture { get; }
+
+        [HttpGet("{locationStub}/[action]/{featureStub}")]
+        public async Task<IActionResult> FeatureInfo(string locationStub, string featureStub)
+        {
+            var locationFeature
+                 = await _locationService.GetLocationFullFeatureAsync(locationStub, featureStub);
+
+            if (locationFeature != null)
+            {
+                var viewModel = new FeatureInfoViewModel
+                {
+                    BodyText = CommonMarkConverter.Convert(locationFeature.Feature.BodyText),
+                    Text = CommonMarkConverter.Convert(locationFeature.Text)
+                };
+
+                return Json(viewModel);
+            }
+            else
+            {
+                _logger.LogWarning("Location Feature not found for location {locationStub} and feature {featureStub}",
+                        locationStub,
+                        featureStub);
+                return NotFound();
+            }
         }
 
         [HttpGet("")]
         [HttpGet("[action]")]
         [HttpGet("[action]/{Zip}")]
         [HttpGet("[action]/{latitude}/{longitude}")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+            "CA1031:Do not catch general exception types",
+            Justification = "Show end user error message rather than exception")]
         public async Task<IActionResult> Find(string zip, double? latitude, double? longitude)
         {
+            string issue = null;
+
             if (!string.IsNullOrEmpty(zip))
             {
-                return await FindAsync(zip);
+                if (!long.TryParse(zip, out long _) || zip.Length != 5)
+                {
+                    issue = "Please enter a 5 digit numeric ZIP code.";
+                }
+                else
+                {
+                    try
+                    {
+                        return await FindAsync(zip);
+                    }
+                    catch (Exception)
+                    {
+                        issue = $"Problem finding ZIP code: {zip}";
+                    }
+                }
             }
             else if (latitude.HasValue && longitude.HasValue)
             {
-                return await FindAsync(latitude, longitude);
-            }
-            else
-            {
-                var viewModel = await CreateLocationViewModelAsync();
-                return await ShowNearestAsync(viewModel);
-            }
-        }
-
-        private async Task<string> PeformMapQueryAsync(string query)
-        {
-            try
-            {
-                using var client = new HttpClient();
-                using var response = await client.GetAsync(new Uri(query));
-                response.EnsureSuccessStatusCode();
-                return await response.Content.ReadAsStringAsync();
-            }
-#pragma warning disable CA1031 // Do not catch general exception types
-            catch (Exception ex)
-            {
-                using (LogContext.PushProperty(Utility.Logging.Enrichment.APIQuery, query))
+                try
                 {
-                    _logger.LogWarning(ex,
-                        "Error with map API query: {ErrorMessage}",
-                        ex.Message);
+                    return await FindAsync(latitude, longitude);
                 }
-                TempData["AlertDanger"] = "An error occured, please try again later.";
-            }
-#pragma warning restore CA1031 // Do not catch general exception types
-            return null;
-        }
-
-        private async Task<LocationViewModel> CreateLocationViewModelAsync()
-        {
-            var viewModel = new LocationViewModel
-            {
-                Locations = await _locationService.GetAllLocationsAsync(),
-                CanSearchAddress = !string.IsNullOrWhiteSpace(ApiKey)
-            };
-
-            foreach (var location in viewModel.Locations)
-            {
-                location.CurrentStatus
-                    = await _locationService.GetCurrentStatusAsync(location.Id);
-            }
-
-            return viewModel;
-        }
-
-        private async Task<IActionResult> FindAsync(string zip)
-        {
-            var viewModel = await CreateLocationViewModelAsync();
-
-            if (viewModel.CanSearchAddress && !string.IsNullOrEmpty(zip))
-            {
-                var mapQueryResult
-                    = await PeformMapQueryAsync(string.Format(CultureInfo.InvariantCulture,
-                    MapQuery,
-                    "address",
-                    zip.Trim(),
-                    ApiKey));
-
-                if (!string.IsNullOrEmpty(mapQueryResult))
+                catch (Exception)
                 {
-                    try
-                    {
-                        dynamic jsonResult = JsonConvert.DeserializeObject(mapQueryResult);
-
-                        if (jsonResult.results.Count > 0)
-                        {
-                            viewModel.Latitude = jsonResult.results[0].geometry.location.lat;
-                            viewModel.Longitude = jsonResult.results[0].geometry.location.lng;
-                            viewModel.Zip = zip.Trim();
-                        }
-                    }
-#pragma warning disable CA1031 // Do not catch general exception types
-                    catch (Exception ex)
-                    {
-                        using (LogContext.PushProperty(Utility.Logging.Enrichment.APIResult,
-                            mapQueryResult))
-                        {
-                            _logger.LogWarning(ex,
-                                "Could not parse address API result into JSON: {ErrorMessage}",
-                                ex.Message);
-                        }
-                    }
-#pragma warning restore CA1031 // Do not catch general exception types
+                    issue = $"Problem finding coordinates: {latitude}, {longitude}";
                 }
             }
 
+            var viewModel = await CreateLocationViewModelAsync(default, default);
+            viewModel.Warning = issue;
             return await ShowNearestAsync(viewModel);
-        }
-
-        private async Task<IActionResult> FindAsync(double? latitude, double? longitude)
-        {
-            var viewModel = await CreateLocationViewModelAsync();
-
-            if (viewModel.CanSearchAddress
-                && latitude.HasValue
-                && longitude.HasValue)
-            {
-                viewModel.Latitude = latitude;
-                viewModel.Longitude = longitude;
-
-                var mapQueryResult
-                    = await PeformMapQueryAsync(string.Format(CultureInfo.InvariantCulture,
-                        MapQuery,
-                        "latlng",
-                        $"{viewModel.Latitude},{viewModel.Longitude}",
-                        ApiKey));
-
-                if (!string.IsNullOrEmpty(mapQueryResult))
-                {
-                    try
-                    {
-                        var geoResult = JsonConvert.DeserializeObject<GeocodeResult>(mapQueryResult);
-
-                        if (geoResult?.Results?.Count() > 0)
-                        {
-                            var zipCode = geoResult?
-                                .Results?
-                                .FirstOrDefault(_ => _.Types.Any(__ => __ == "postal_code"))?
-                                .AddressComponents?
-                                .FirstOrDefault()?
-                                .ShortName;
-
-                            if (string.IsNullOrEmpty(zipCode))
-                            {
-                                _logger.LogWarning("Could not find postal code when reverse geocoding {Coordinates}",
-                                    $"{viewModel.Latitude},{viewModel.Longitude}");
-                            }
-                            else
-                            {
-                                viewModel.Zip = zipCode;
-                            }
-                        }
-                    }
-#pragma warning disable CA1031 // Do not catch general exception types
-                    catch (Exception ex)
-                    {
-                        using (LogContext.PushProperty(Utility.Logging.Enrichment.APIResult,
-                            mapQueryResult))
-                        {
-                            _logger.LogWarning(ex,
-                                "Could not parse latlng API result into JSON: {ErrorMessage}",
-                                ex.Message);
-                        }
-                    }
-#pragma warning restore CA1031 // Do not catch general exception types
-                }
-            }
-
-            return await ShowNearestAsync(viewModel);
-        }
-
-        private async Task<IActionResult> ShowNearestAsync(LocationViewModel viewModel)
-        {
-            if (viewModel == null)
-            {
-                viewModel = await CreateLocationViewModelAsync();
-            }
-
-            if (viewModel.Latitude.HasValue && viewModel.Longitude.HasValue)
-            {
-                foreach (var location in viewModel.Locations)
-                {
-                    var geolocation = location.GeoLocation
-                        .Split(',')
-                        .Select(Convert.ToDouble).ToList();
-                    location.Distance = HaversineHelper.Calculate(
-                        geolocation[0],
-                        geolocation[1],
-                        (double)viewModel.Latitude,
-                        (double)viewModel.Longitude);
-                }
-
-                viewModel.Locations = viewModel
-                    .Locations
-                    .OrderBy(_ => _.Distance)
-                    .Select(_ =>
-                    {
-                        _.Distance = Math.Ceiling(_.Distance);
-                        return _;
-                    })
-                    .ToList();
-            }
-
-            PageTitle = "Find my library";
-
-            return View("Locations", viewModel);
         }
 
         [HttpGet("{locationStub}")]
@@ -384,29 +241,75 @@ namespace Ocuda.Promenade.Controllers
             }
         }
 
-        [HttpGet("{locationStub}/[action]/{featureStub}")]
-        public async Task<IActionResult> FeatureInfo(string locationStub, string featureStub)
+        private async Task<LocationViewModel> CreateLocationViewModelAsync()
         {
-            var locationFeature
-                 = await _locationService.GetLocationFullFeatureAsync(locationStub, featureStub);
+            return await CreateLocationViewModelAsync(null, null);
+        }
 
-            if (locationFeature != null)
+        private async Task<LocationViewModel> CreateLocationViewModelAsync(double? latitude,
+            double? longitude)
+        {
+            return new LocationViewModel
             {
-                var viewModel = new FeatureInfoViewModel
+                Locations = await _locationService.GetLocationsStatusAsync(latitude, longitude),
+                CanSearchAddress = !string.IsNullOrWhiteSpace(_apiKey),
+                Latitude = latitude,
+                Longitude = longitude
+            };
+        }
+
+        private async Task<IActionResult> FindAsync(string zip)
+        {
+            LocationViewModel viewModel = null;
+
+            if (!string.IsNullOrWhiteSpace(_apiKey) && !string.IsNullOrEmpty(zip))
+            {
+                var (latitude, longitude) = await _locationService.GeocodeAddressAsync(zip);
+
+                if (longitude.HasValue && latitude.HasValue)
                 {
-                    BodyText = CommonMarkConverter.Convert(locationFeature.Feature.BodyText),
-                    Text = CommonMarkConverter.Convert(locationFeature.Text)
-                };
+                    viewModel = await CreateLocationViewModelAsync(latitude, longitude);
+                    viewModel.Zip = zip.Trim();
+                }
+                else
+                {
+                    viewModel = await CreateLocationViewModelAsync();
+                }
+            }
 
-                return Json(viewModel);
-            }
-            else
+            return await ShowNearestAsync(viewModel);
+        }
+
+        private async Task<IActionResult> FindAsync(double? latitude, double? longitude)
+        {
+            LocationViewModel viewModel = null;
+
+            if (!string.IsNullOrWhiteSpace(_apiKey) && latitude.HasValue && longitude.HasValue)
             {
-                _logger.LogWarning("Location Feature not found for location {locationStub} and feature {featureStub}",
-                        locationStub,
-                        featureStub);
-                return NotFound();
+                viewModel = await CreateLocationViewModelAsync(latitude.Value, longitude.Value);
+
+                viewModel.Zip = await _locationService
+                    .GetZipCodeAsync(latitude.Value, longitude.Value);
             }
+
+            return await ShowNearestAsync(viewModel);
+        }
+
+        private async Task<IActionResult> ShowNearestAsync(LocationViewModel viewModel)
+        {
+            if (viewModel == null)
+            {
+                viewModel = await CreateLocationViewModelAsync();
+            }
+
+            PageTitle = "Find my library";
+
+            if (!string.IsNullOrWhiteSpace(viewModel.Zip))
+            {
+                viewModel.Info = $"Libraries closest to ZIP code: {viewModel.Zip.Trim()}";
+            }
+
+            return View("Locations", viewModel);
         }
     }
 }

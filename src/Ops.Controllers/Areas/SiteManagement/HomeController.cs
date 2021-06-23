@@ -48,7 +48,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     .HasPermissionAsync<PermissionGroupPodcastItem>(numericPermissionIds);
             }
 
-            if(!viewModel.HasPermissions)
+            if (!viewModel.HasPermissions)
             {
                 AlertWarning = "It appears that you do not have any Site Administration permissions. Please contact your system administrator for more information.";
             }

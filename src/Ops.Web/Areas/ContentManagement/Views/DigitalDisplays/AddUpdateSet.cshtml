@@ -1,0 +1,46 @@
+﻿@model DigitalDisplaySet
+
+<div class="row">
+    <div class="col-sm-7">
+        <h1>Digital Display Set</h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Sets))">Back</a>
+    </div>
+</div>
+
+@await Html.PartialAsync("_DigitalDisplaysPartial")
+
+<div class="row py-2">
+    <div class="col">
+        <p>
+            Create a new set of digital display assets.
+        </p>
+    </div>
+</div>
+
+<form asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.AddUpdateSet))">
+    @if (Model?.Id != default)
+    {
+        <input asp-for="Id" type="hidden" />
+        <span class="validation-message text-danger" asp-validation-for="Id"></span>
+    }
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span class="validation-message text-danger" asp-validation-for="Name"></span>
+    </div>
+    @if (Model != null && Model?.Id != default)
+    {
+        <button type="submit" class="btn btn-outline-primary">Update set</button>
+    }
+    else
+    {
+        <button type="submit" class="btn btn-outline-success">
+            <span class="fas fa-plus-circle"></span>
+            Create set
+        </button>
+    }
+</form>

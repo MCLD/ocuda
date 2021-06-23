@@ -4,6 +4,22 @@
     <link rel="stylesheet" href="~/css/dt-picker.min.css" asp-append-version="true" />
 }
 
+<div class="row">
+    <div class="col-sm-7">
+        <h1>
+            Hours
+            <small class="text-muted">
+                @Model.LocationName
+            </small>
+        </h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Index))">Back</a>
+    </div>
+</div>
+
 @await Html.PartialAsync("_LocationPartial")
 
 <form id="addForm" asp-action="@nameof(LocationsController.AddOverride)" method="post" role="form">
@@ -83,8 +99,10 @@
                 <tr>
                     <td>&nbsp;</td>
                     <td colspan="4">
-                        <a asp-action="@nameof(LocationsController.Index)" class="btn btn-secondary">Return to Locations</a>
-                        <button type="submit" class="btn btn-success" button-spinner>Update Hours</button>
+                        <button type="submit" class="btn btn-outline-success btn-lg" button-spinner>
+                            <span class="far fa-save"></span>
+                            Save Hours
+                        </button>
                     </td>
                 </tr>
             </table>
@@ -96,12 +114,6 @@
     <div class="col-12">
         <h2>
             Overrides
-            <button type="button"
-                    class="btn btn-outline-secondary"
-                    data-toggle="modal"
-                    data-target="#addModal">
-                Add override
-            </button>
         </h2>
         <hr />
     </div>
@@ -113,11 +125,18 @@
         <table class="table table-sm table-bordered table-hover">
             <thead>
                 <tr>
-                    <th>Reason</th>
-                    <th>Date</th>
-                    <th>Location</th>
-                    <th>Hours</th>
-                    <th>&nbsp;</th>
+                    <th class="align-middle">Reason</th>
+                    <th class="align-middle">Date</th>
+                    <th class="align-middle">Location</th>
+                    <th class="align-middle">Hours</th>
+                    <th class="align-middle text-right">
+                        <button type="button"
+                                class="btn btn-outline-success"
+                                data-toggle="modal"
+                                data-target="#addModal">
+                            <span class="fas fa-plus-circle"></span>
+                        </button>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -131,16 +150,16 @@
                         data-open="@hoursOverride.Open"
                         data-opentime="@hoursOverride.OpenTime"
                         data-closetime="@hoursOverride.CloseTime">
-                        <td>@hoursOverride.Reason</td>
-                        <td>@hoursOverride.Date.ToShortDateString() &ndash; @hoursOverride.Date.DayOfWeek.ToString()</td>
-                        <td>@(hoursOverride.LocationId.HasValue ? Model.LocationName : "All Locations")</td>
-                        <td>@(hoursOverride.Open ? $"{hoursOverride.OpenTime.Value.ToShortTimeString()} {System.Net.WebUtility.HtmlDecode("&ndash;")} {hoursOverride.CloseTime.Value.ToShortTimeString()}" : "Closed")</td>
-                        <td class="on-top cursor-default">
+                        <td class="align-middle">@hoursOverride.Reason</td>
+                        <td class="align-middle">@hoursOverride.Date.ToShortDateString() &ndash; @hoursOverride.Date.DayOfWeek.ToString()</td>
+                        <td class="align-middle">@(hoursOverride.LocationId.HasValue ? Model.LocationName : "All Locations")</td>
+                        <td class="align-middle">@(hoursOverride.Open ? $"{hoursOverride.OpenTime.Value.ToShortTimeString()} {System.Net.WebUtility.HtmlDecode("&ndash;")} {hoursOverride.CloseTime.Value.ToShortTimeString()}" : "Closed")</td>
+                        <td class="on-top cursor-default align-middle text-right">
                             <button type="button"
-                                    class="btn btn-sm btn-danger"
+                                    class="btn btn-outline-danger"
                                     data-toggle="modal"
                                     data-target="#deleteModal">
-                                <span class="fas fa-times"></span>
+                                <span class="fas fa-minus-circle"></span>
                             </button>
                         </td>
                     </tr>

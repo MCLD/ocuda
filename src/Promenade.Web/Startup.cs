@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Localization.Routing;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Routing;
@@ -17,10 +18,10 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using Ocuda.i18n;
-using Ocuda.i18n.RouteConstraint;
 using Ocuda.Promenade.Data;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Clients;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Providers;
@@ -46,8 +47,108 @@ namespace Ocuda.Promenade.Web
             _isDevelopment = env.IsDevelopment();
         }
 
+        public void Configure(IApplicationBuilder app,
+            Utility.Services.Interfaces.IPathResolverService pathResolver)
+        {
+            if (app == null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
+
+            if (pathResolver == null)
+            {
+                throw new ArgumentNullException(nameof(pathResolver));
+            }
+
+            app.UseResponseCompression();
+
+            if (!string.IsNullOrEmpty(_config[Configuration.OcudaProxyAddress]))
+            {
+                app.UseForwardedHeaders(new ForwardedHeadersOptions
+                {
+                    ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.All,
+                    RequireHeaderSymmetry = false,
+                    ForwardLimit = null,
+                    KnownProxies = {
+                        System.Net.IPAddress.Parse(_config[Configuration.OcudaProxyAddress])
+                    }
+                });
+            }
+
+            // configure error page handling and development IDE linking
+            if (_isDevelopment)
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseBrowserLink();
+            }
+            else
+            {
+                app.UseStatusCodePagesWithReExecute("/Error/{0}");
+            }
+
+            var requestLocalizationOptions = new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture(Culture.DefaultCulture),
+                SupportedCultures = Culture.SupportedCultures,
+                SupportedUICultures = Culture.SupportedCultures
+            };
+
+            app.UseRequestLocalization(requestLocalizationOptions);
+
+            // insert remote address into the log context for each request
+            app.Use(async (context, next) =>
+            {
+                using (LogContext.PushProperty(Utility.Logging.Enrichment.RemoteAddress,
+                    context.Connection.RemoteIpAddress))
+                using (LogContext.PushProperty(HeaderNames.UserAgent,
+                    context.Request.Headers[HeaderNames.UserAgent].ToString()))
+                using (LogContext.PushProperty(HeaderNames.Referer,
+                    context.Request.Headers[HeaderNames.Referer].ToString()))
+                {
+                    await next.Invoke();
+                }
+            });
+
+            app.UseStaticFiles();
+
+            // configure shared content directory
+            var contentFilePath = pathResolver.GetPublicContentFilePath();
+            var contentUrl = pathResolver.GetPublicContentUrl();
+            if (!contentUrl.StartsWith("/", StringComparison.OrdinalIgnoreCase))
+            {
+                contentUrl = $"/{contentUrl}";
+            }
+
+            // https://github.com/aspnet/AspNetCore/issues/2442
+            var extensionContentTypeProvider = new FileExtensionContentTypeProvider();
+            extensionContentTypeProvider.Mappings[".webmanifest"] = "application/manifest+json";
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider
+                    = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(contentFilePath),
+                RequestPath = new PathString(contentUrl),
+                ContentTypeProvider = extensionContentTypeProvider
+            });
+
+            if (!string.IsNullOrEmpty(_config[Configuration.PromenadeRequestLogging]))
+            {
+                app.UseSerilogRequestLogging();
+            }
+
+            app.UseRouting();
+
+            app.UseSession();
+
+            app.UseEndpoints(_ =>
+            {
+                _.MapControllers();
+                _.MapHealthChecks("/health");
+            });
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability",
-            "CA1506:Avoid excessive class coupling",
+                    "CA1506:Avoid excessive class coupling",
             Justification = "Dependency injection")]
         public void ConfigureServices(IServiceCollection services)
         {
@@ -67,8 +168,6 @@ namespace Ocuda.Promenade.Web
                         new[] { "application/rss+xml" });
             });
 
-            services.AddResponseCaching();
-
             services.AddLocalization();
 
             services.Configure<RequestLocalizationOptions>(_ =>
@@ -76,14 +175,11 @@ namespace Ocuda.Promenade.Web
                 _.DefaultRequestCulture = new RequestCulture(Culture.DefaultCulture);
                 _.SupportedCultures = Culture.SupportedCultures;
                 _.SupportedUICultures = Culture.SupportedCultures;
-                _.RequestCultureProviders.Insert(0,
-                    new RouteDataRequestCultureProvider { Options = _ });
-                _.RequestCultureProviders
-                    .Remove(_.RequestCultureProviders
-                        .Single(p => p.GetType() == typeof(QueryStringRequestCultureProvider)));
             });
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            services.AddHealthChecks();
 
             // configure distributed cache
             if (_config[Configuration.PromenadeDistributedCache]?.ToUpperInvariant() == "REDIS")
@@ -106,7 +202,7 @@ namespace Ocuda.Promenade.Web
                 _config[Configuration.OcudaRuntimeRedisCacheConfiguration]
                     = redisConfiguration;
                 _config[Configuration.OcudaRuntimeRedisCacheInstance] = instanceName;
-                services.AddDistributedRedisCache(_ =>
+                services.AddStackExchangeRedisCache(_ =>
                 {
                     _.Configuration = redisConfiguration;
                     _.InstanceName = instanceName;
@@ -154,6 +250,8 @@ namespace Ocuda.Promenade.Web
                                 .UseSqlServer(promCs)
                                 .AddInterceptors(new DbLoggingInterceptor()),
                                 poolSize);
+                        services.AddHealthChecks()
+                            .AddDbContextCheck<DataProvider.SqlServer.Promenade.Context>();
                     }
                     else
                     {
@@ -170,6 +268,8 @@ namespace Ocuda.Promenade.Web
                             DataProvider.SqlServer.Promenade.Context>(_ => _
                                 .UseSqlServer(promCs)
                                 .AddInterceptors(new DbLoggingInterceptor()));
+                        services.AddHealthChecks()
+                            .AddDbContextCheck<DataProvider.SqlServer.Promenade.Context>();
                     }
                     else
                     {
@@ -185,12 +285,10 @@ namespace Ocuda.Promenade.Web
 
             services.AddDataProtection().PersistKeysToDbContext<PromenadeContext>();
 
-            services.Configure<RouteOptions>(_ =>
-                _.ConstraintMap.Add("cultureConstraint", typeof(CultureRouteConstraint)));
-
             if (_isDevelopment)
             {
-                services.AddControllersWithViews()
+                services.AddControllersWithViews(_ =>
+                        _.ModelBinderProviders.RemoveType<DateTimeModelBinderProvider>())
                     .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                     .AddDataAnnotationsLocalization(_ =>
                     {
@@ -202,7 +300,8 @@ namespace Ocuda.Promenade.Web
             }
             else
             {
-                services.AddControllersWithViews()
+                services.AddControllersWithViews(_ =>
+                        _.ModelBinderProviders.RemoveType<DateTimeModelBinderProvider>())
                     .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                     .AddDataAnnotationsLocalization(_ =>
                     {
@@ -225,6 +324,10 @@ namespace Ocuda.Promenade.Web
             // utilities
             services.AddScoped<CultureContextProvider>();
             services.AddScoped<IDateTimeProvider, CurrentDateTimeProvider>();
+            services.AddScoped<Utility.Services.Interfaces.IOcudaCache,
+                Utility.Services.OcudaCache>();
+
+            services.AddHttpClient<IGoogleClient, GoogleClient>();
 
             // filters
             services.AddScoped<i18n.Filter.LocalizationFilterAttribute>();
@@ -279,6 +382,14 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.NavigationTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IPageHeaderRepository,
                 Data.Promenade.PageHeaderRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IImageFeatureItemRepository,
+                Data.Promenade.ImageFeatureItemRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IImageFeatureItemTextRepository,
+                Data.Promenade.ImageFeatureItemTextRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IImageFeatureRepository,
+                Data.Promenade.ImageFeatureRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IImageFeatureTemplateRepository,
+                Data.Promenade.ImageFeatureTemplateRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IPageLayoutRepository,
                 Data.Promenade.PageLayoutRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IPageLayoutTextRepository,
@@ -289,6 +400,8 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.PodcastItemRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IPodcastRepository,
                 Data.Promenade.PodcastRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IScheduleRequestLimitRepository,
+                Data.Promenade.ScheduleRequestLimitRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IScheduleRequestRepository,
                 Data.Promenade.ScheduleRequestRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IScheduleRequestSubjectRepository,
@@ -309,6 +422,12 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.UrlRedirectAccessRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IUrlRedirectRepository,
                 Data.Promenade.UrlRedirectRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IImageFeatureItemRepository,
+                Data.Promenade.ImageFeatureItemRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IImageFeatureItemTextRepository,
+                Data.Promenade.ImageFeatureItemTextRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IImageFeatureRepository,
+                Data.Promenade.ImageFeatureRepository>();
 
             // services
             services.AddScoped<Utility.Services.Interfaces.IPathResolverService,
@@ -322,6 +441,7 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<LanguageService>();
             services.AddScoped<LocationService>();
             services.AddScoped<NavigationService>();
+            services.AddScoped<ImageFeatureService>();
             services.AddScoped<PageService>();
             services.AddScoped<RedirectService>();
             services.AddScoped<PodcastService>();
@@ -330,123 +450,7 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<SiteAlertService>();
             services.AddScoped<SiteSettingService>();
             services.AddScoped<SocialCardService>();
-        }
-
-        public void Configure(IApplicationBuilder app,
-            Utility.Services.Interfaces.IPathResolverService pathResolver)
-        {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-
-            if (pathResolver == null)
-            {
-                throw new ArgumentNullException(nameof(pathResolver));
-            }
-
-            app.UseResponseCompression();
-
-            if (!string.IsNullOrEmpty(_config[Configuration.OcudaProxyAddress]))
-            {
-                app.UseForwardedHeaders(new ForwardedHeadersOptions
-                {
-                    ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.All,
-                    RequireHeaderSymmetry = false,
-                    ForwardLimit = null,
-                    KnownProxies = {
-                        System.Net.IPAddress.Parse(_config[Configuration.OcudaProxyAddress])
-                    }
-                });
-            }
-
-            // configure error page handling and development IDE linking
-            if (_isDevelopment)
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
-            }
-            else
-            {
-                app.UseStatusCodePagesWithReExecute("/Error/{0}");
-            }
-
-            var requestLocalizationOptions = new RequestLocalizationOptions
-            {
-                DefaultRequestCulture = new RequestCulture(Culture.DefaultCulture),
-                SupportedCultures = Culture.SupportedCultures,
-                SupportedUICultures = Culture.SupportedCultures
-            };
-            requestLocalizationOptions.RequestCultureProviders.Insert(0,
-                new RouteDataRequestCultureProvider { Options = requestLocalizationOptions });
-
-            requestLocalizationOptions
-                .RequestCultureProviders
-                .Remove(requestLocalizationOptions
-                    .RequestCultureProviders
-                    .Single(_ => _.GetType() == typeof(QueryStringRequestCultureProvider)));
-
-            app.UseRequestLocalization(requestLocalizationOptions);
-
-            // insert remote address into the log context for each request
-            app.Use(async (context, next) =>
-            {
-                using (LogContext.PushProperty(Utility.Logging.Enrichment.RemoteAddress,
-                    context.Connection.RemoteIpAddress))
-                using (LogContext.PushProperty(HeaderNames.UserAgent,
-                    context.Request.Headers[HeaderNames.UserAgent].ToString()))
-                using (LogContext.PushProperty(HeaderNames.Referer,
-                    context.Request.Headers[HeaderNames.Referer].ToString()))
-                {
-                    await next.Invoke();
-                }
-            });
-
-            app.UseStaticFiles();
-
-            // configure shared content directory
-            var contentFilePath = pathResolver.GetPublicContentFilePath();
-            var contentUrl = pathResolver.GetPublicContentUrl();
-            if (!contentUrl.StartsWith("/", StringComparison.OrdinalIgnoreCase))
-            {
-                contentUrl = $"/{contentUrl}";
-            }
-
-            // https://github.com/aspnet/AspNetCore/issues/2442
-            var extensionContentTypeProvider = new FileExtensionContentTypeProvider();
-            extensionContentTypeProvider.Mappings[".webmanifest"] = "application/manifest+json";
-
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider
-                    = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(contentFilePath),
-                RequestPath = new PathString(contentUrl),
-                ContentTypeProvider = extensionContentTypeProvider
-            });
-
-            if (!string.IsNullOrEmpty(_config[Configuration.PromenadeRequestLogging]))
-            {
-                app.UseSerilogRequestLogging();
-            }
-
-            app.UseRouting();
-
-            app.UseResponseCaching();
-
-            app.Use(async (context, next) =>
-            {
-                context.Response.GetTypedHeaders().CacheControl = new CacheControlHeaderValue
-                {
-                    Public = true,
-                    MaxAge = TimeSpan.FromMinutes(2)
-                };
-
-                await next();
-            });
-
-            app.UseSession();
-
-            app.UseEndpoints(endpoints => endpoints.MapControllers());
+            services.AddScoped<ImageFeatureService>();
         }
     }
 }

@@ -4,6 +4,23 @@
     <link rel="stylesheet" href="~/css/dt-picker.min.css" asp-append-version="true" />
 }
 
+<div class="row">
+    <div class="col-sm-7">
+        <h1>Segments</h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
+        <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+                data-toggle="modal"
+                data-target="#addModal">
+            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            Create Segment
+        </button>
+    </div>
+</div>
+
 <form id="addForm" role="form">
     <div modal id="addModal" name="Segment" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addName" asp-for="Segment.Name" formgroup />
@@ -36,14 +53,6 @@
     <div modal id="deleteModal" name="Segment" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
 </form>
 
-<div class="mb-2">
-    <button class="btn btn-outline-secondary text-dark"
-            data-toggle="modal"
-            data-target="#addModal">
-        Create Segment
-    </button>
-</div>
-
 @if (Model.Segments.Count() == 0)
 {
     <div class="alert alert-warning">No Segmets Found</div>
@@ -59,23 +68,23 @@ else
                             <th>Name</th>
                             <th>Languages</th>
                             <th>Is Active</th>
-                            <th>&nbsp;</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var segment in Model.Segments)
                         {
                             <tr>
-                                <td class="td-class">
-                                    <a asp-action="@(nameof(SegmentsController.Detail))" asp-route-id="@segment.Id" class="rowlink">
+                                <td class="td-class align-middle">
+                                    <a asp-action="@(nameof(SegmentsController.Detail))" asp-route-id="@segment.Id">
                                         @segment.Name
                                     </a>
                                 </td>
-                                <td>@string.Join(", ", segment.SegmentLanguages)</td>
-                                <td><span class="colored-icon fas @(segment.IsActive ? "fa-check" : "fa-times")"></span></td>
-                                <td align="center" class="on-top">
+                                <td class="align-middle">@string.Join(", ", segment.SegmentLanguages)</td>
+                                <td class="align-middle text-center"><span class="colored-icon fas @(segment.IsActive ? "fa-check" : "fa-times")"></span></td>
+                                <td class="align-middle text-center on-top">
                                     <button type="button"
-                                            class="btn btn-primary btn-xs"
+                                            class="btn btn-outline-primary"
                                             data-toggle="modal"
                                             data-target="#editModal"
                                             data-id="@segment.Id"
@@ -86,12 +95,12 @@ else
                                         <span class="fas fa-edit" aria-hidden="true"></span>
                                     </button>
                                     <button type="button"
-                                            class="btn btn-danger btn-xs"
+                                            class="btn btn-outline-danger"
                                             data-toggle="modal"
                                             data-target="#deleteModal"
                                             data-id="@segment.Id"
                                             data-name="@segment.Name">
-                                        <span class="fas fa-times" aria-hidden="true"></span>
+                                        <span class="fas fa-minus-circle" aria-hidden="true"></span>
                                     </button>
                                 </td>
                             </tr>
@@ -108,31 +117,9 @@ else
     }
 }
 
-<div class="row">
-    <div class="col-12">
-        <a asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement))"
-           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))"
-           class="btn btn-outline-secondary text-dark">
-            Return to Site Management
-        </a>
-    </div>
-</div>
-
 @section scripts {
     <script src="~/js/dt-picker.min.js" asp-append-version="true"></script>
     <script>
-        $(window).on("load", function () {
-            $('.td-class').each(function () {
-                $(this).children('a.rowlink').height($(this).height() + 11);
-            });
-        });
-        $(window).resize(function () {
-            $('.td-class').each(function () {
-                $(this).children('a.rowlink').height($(this).height() + 11);
-            });
-        });
-
         $(".datetimepicker").datetimepicker({
             allowInputToggle: true,
             sideBySide: true
@@ -167,7 +154,7 @@ else
             $("#editName").val(name);
             $("#editStartDate").datetimepicker("date", startDate);
             $("#editEndDate").datetimepicker("date", endDate);
-            $("#editActive").val(active);
+            $("#editIsActive").val(active.toLowerCase());
         });
 
         $("#editForm").submit(function (e) {

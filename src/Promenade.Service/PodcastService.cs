@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Abstract;
@@ -10,18 +9,19 @@ using Ocuda.Promenade.Service.Filters;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Models;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Service
 {
     public class PodcastService : BaseService<PodcastService>
     {
-        private readonly IDistributedCache _cache;
+        private readonly IOcudaCache _cache;
         private readonly IPodcastItemRepository _podcastItemRepository;
         private readonly IPodcastRepository _podcastRepository;
 
         public PodcastService(ILogger<PodcastService> logger,
             IDateTimeProvider dateTimeProvider,
-            IDistributedCache cache,
+            IOcudaCache cache,
             IPodcastItemRepository podcastItemRepository,
             IPodcastRepository podcastRepository)
             : base(logger, dateTimeProvider)
@@ -40,21 +40,16 @@ namespace Ocuda.Promenade.Service
                 stub,
                 showBlocked);
 
-            var podcast = await GetFromCacheAsync<Podcast>(_cache, cacheKey);
+            var podcast = await _cache.GetObjectFromCacheAsync<Podcast>(cacheKey);
 
             if (podcast == null)
             {
                 podcast = await _podcastRepository.GetByStubAsync(stub?.Trim(), showBlocked);
 
-                await SaveToCacheAsync(_cache, cacheKey, podcast, 1);
+                await _cache.SaveToCacheAsync(cacheKey, podcast, 1);
             }
 
             return podcast;
-        }
-
-        public async Task<DataWithCount<ICollection<Podcast>>> GetPaginatedListAsync(BaseFilter filter)
-        {
-            return await _podcastRepository.GetPaginatedListAsync(filter);
         }
 
         public async Task<ICollection<PodcastDirectoryInfo>> GetDirectoryInfosByPodcastIdAsync(
@@ -63,9 +58,9 @@ namespace Ocuda.Promenade.Service
             return await _podcastRepository.GetDirectoryInfosByPodcastIdAsync(id);
         }
 
-        public async Task<PodcastItem> GetItemByStubAsync(string stub)
+        public async Task<PodcastItem> GetItemByStubAsync(int podcastId, string stub)
         {
-            return await _podcastItemRepository.GetByStubAsync(stub?.Trim());
+            return await _podcastItemRepository.GetByStubAsync(podcastId, stub?.Trim());
         }
 
         public async Task<ICollection<PodcastItem>> GetItemsByPodcastIdAsync(int id,
@@ -76,13 +71,14 @@ namespace Ocuda.Promenade.Service
                 id,
                 showBlocked);
 
-            var podcastItems = await GetFromCacheAsync<ICollection<PodcastItem>>(_cache, cacheKey);
+            var podcastItems = await _cache
+                .GetObjectFromCacheAsync<ICollection<PodcastItem>>(cacheKey);
 
             if (podcastItems == null)
             {
                 podcastItems = await _podcastItemRepository.GetByPodcastIdAsync(id, showBlocked);
 
-                await SaveToCacheAsync(_cache, cacheKey, podcastItems, 1);
+                await _cache.SaveToCacheAsync(cacheKey, podcastItems, 1);
             }
 
             return podcastItems;
@@ -93,6 +89,11 @@ namespace Ocuda.Promenade.Service
             PodcastFilter filter)
         {
             return await _podcastItemRepository.GetPaginatedListByPodcastIdAsync(id, filter);
+        }
+
+        public async Task<DataWithCount<ICollection<Podcast>>> GetPaginatedListAsync(BaseFilter filter)
+        {
+            return await _podcastRepository.GetPaginatedListAsync(filter);
         }
     }
 }

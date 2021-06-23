@@ -7,6 +7,7 @@ using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.SocialCards;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
@@ -19,49 +20,21 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class SocialCardsController : BaseController<SocialCardsController>
     {
+        private readonly ILocationService _locationService;
         private readonly ISocialCardService _socialCardService;
 
-        public static string Name { get { return "SocialCards"; } }
-        public static string Area { get { return "SiteManagement"; } }
-
         public SocialCardsController(ServiceFacades.Controller<SocialCardsController> context,
+            ILocationService locationService,
             ISocialCardService socialCardService) : base(context)
         {
+            _locationService = locationService
+                ?? throw new ArgumentNullException(nameof(locationService));
             _socialCardService = socialCardService
                 ?? throw new ArgumentNullException(nameof(socialCardService));
         }
 
-        [Route("")]
-        [Route("{page}")]
-        public async Task<IActionResult> Index(int page = 1)
-        {
-            var filter = new BaseFilter(page);
-
-            var socialCardList = await _socialCardService.GetPaginatedListAsync(filter);
-
-            var paginateModel = new PaginateModel
-            {
-                ItemCount = socialCardList.Count,
-                CurrentPage = page,
-                ItemsPerPage = filter.Take.Value
-            };
-            if (paginateModel.PastMaxPage)
-            {
-                return RedirectToRoute(
-                    new
-                    {
-                        page = paginateModel.LastPage ?? 1
-                    });
-            }
-
-            var viewModel = new IndexViewModel
-            {
-                PaginateModel = paginateModel,
-                SocialCards = socialCardList.Data
-            };
-
-            return View(viewModel);
-        }
+        public static string Area { get { return "SiteManagement"; } }
+        public static string Name { get { return "SocialCards"; } }
 
         [Route("[action]")]
         [RestoreModelState]
@@ -80,13 +53,35 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> Create(DetailViewModel model)
         {
-            if (ModelState.IsValid)
+            if (model != null && ModelState.IsValid)
             {
                 try
                 {
                     var card = await _socialCardService.CreateAsync(model.SocialCard);
-                    ShowAlertSuccess($"Added social card: {card.Title}");
-                    return RedirectToAction(nameof(Edit), new { id = card.Id });
+                    if (!string.IsNullOrEmpty(model.LocationStub))
+                    {
+                        var location
+                            = await _locationService.GetLocationByStubAsync(model.LocationStub);
+                        if (location != null)
+                        {
+                            location.SocialCardId = card.Id;
+                            await _locationService.EditAsync(location);
+                            ShowAlertSuccess($"Added social card: {card.Title} and linked to location: {model.LocationStub}");
+                            return RedirectToAction(nameof(LocationsController.Location),
+                                LocationsController.Name,
+                                new { locationStub = model.LocationStub });
+                        }
+                        else
+                        {
+                            ShowAlertWarning($"Added social card: {card.Title}, unable to link it to location: {model.LocationStub}");
+                            return RedirectToAction(nameof(Edit), new { id = card.Id });
+                        }
+                    }
+                    else
+                    {
+                        ShowAlertSuccess($"Added social card: {card.Title}");
+                        return RedirectToAction(nameof(Edit), new { id = card.Id });
+                    }
                 }
                 catch (OcudaException ex)
                 {
@@ -95,7 +90,28 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 }
             }
 
-            return RedirectToAction(nameof(Create));
+            return string.IsNullOrEmpty(model?.LocationStub)
+                ? RedirectToAction(nameof(Create))
+                : RedirectToAction(nameof(EditForLocation),
+                    new { locationStub = model.LocationStub });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> Delete(IndexViewModel model)
+        {
+            try
+            {
+                await _socialCardService.DeleteAsync(model.SocialCard.Id);
+                ShowAlertSuccess($"Deleted social card: {model.SocialCard.Title}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting social card: {Message}", ex.Message);
+                ShowAlertDanger("Unable to delete social card: ", ex.Message);
+            }
+
+            return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
         }
 
         [Route("[action]/{id}")]
@@ -132,25 +148,86 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 }
             }
 
-            return RedirectToAction(nameof(Edit), new { id = model.SocialCard.Id });
+            return string.IsNullOrEmpty(model.LocationStub)
+                ? RedirectToAction(nameof(Edit), new { id = model.SocialCard.Id })
+                : RedirectToAction(nameof(LocationsController.Location),
+                    LocationsController.Name,
+                    new { locationStub = model.LocationStub });
         }
 
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> Delete(IndexViewModel model)
+        [Route("[action]/{locationStub}")]
+        [RestoreModelState]
+        public async Task<IActionResult> EditForLocation(string locationStub)
         {
-            try
+            Promenade.Models.Entities.Location location = null;
+
+            if (!string.IsNullOrEmpty(locationStub))
             {
-                await _socialCardService.DeleteAsync(model.SocialCard.Id);
-                ShowAlertSuccess($"Deleted social card: {model.SocialCard.Title}");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting social card: {Message}", ex.Message);
-                ShowAlertDanger("Unable to delete social card: ", ex.Message);
+                location = await _locationService.GetLocationByStubAsync(locationStub);
             }
 
-            return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
+            if (location == null)
+            {
+                ShowAlertDanger($"Unknown location: {locationStub}");
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (!location.SocialCardId.HasValue)
+            {
+                return View("Detail", new DetailViewModel
+                {
+                    Action = nameof(Create),
+                    LocationStub = locationStub
+                });
+            }
+
+            var card = await _socialCardService.GetByIdAsync(location.SocialCardId.Value);
+
+            if (card == null)
+            {
+                return View("Detail", new DetailViewModel
+                {
+                    Action = nameof(Create),
+                    LocationStub = locationStub
+                });
+            }
+
+            var viewModel = new DetailViewModel
+            {
+                Action = nameof(Edit),
+                LocationStub = locationStub,
+                SocialCard = card,
+            };
+
+            return View("Detail", viewModel);
+        }
+
+        [Route("")]
+        [Route("{page}")]
+        public async Task<IActionResult> Index(int page = 1)
+        {
+            var filter = new BaseFilter(page);
+
+            var socialCardList = await _socialCardService.GetPaginatedListAsync(filter);
+
+            var paginateModel = new PaginateModel
+            {
+                ItemCount = socialCardList.Count,
+                CurrentPage = page,
+                ItemsPerPage = filter.Take.Value
+            };
+            if (paginateModel.PastMaxPage)
+            {
+                return RedirectToRoute(new { page = paginateModel.LastPage ?? 1 });
+            }
+
+            var viewModel = new IndexViewModel
+            {
+                PaginateModel = paginateModel,
+                SocialCards = socialCardList.Data
+            };
+
+            return View(viewModel);
         }
     }
 }

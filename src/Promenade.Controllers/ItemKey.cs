@@ -4,6 +4,7 @@
     {
         public const string BannerImage = "BannerImage";
         public const string BannerImageAlt = "BannerImageAlt";
+        public const string CurrentUiCulture = "CurrentCulture";
         public const string ExternalCSS = "ExternalCSS";
         public const string ExternalJS = "ExternalJS";
         public const string FooterNavigation = "FooterNavigation";

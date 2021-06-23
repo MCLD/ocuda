@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.CoverIssue.ViewModels.Management;
+using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.CoverIssue
@@ -24,7 +22,7 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
         private readonly IPermissionGroupService _permissionGroupService;
 
         public static string Name { get { return "Home"; } }
-        
+
         private const string BookmarkletFilePath = "js/coverissue-bookmarklet.min.js";
 
         public HomeController(ServiceFacades.Controller<HomeController> context,
@@ -93,7 +91,8 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
             {
                 Header = header,
                 Details = await _coverIssueService.GetDetailsByHeaderIdAsync(header.Id),
-                CanEdit = await HasCoverIssueManagementPermissionAsync()
+                CanEdit = await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.CoverIssueManagement)
             };
 
             var leapBibUrl = await _siteSettingService.GetSettingStringAsync(Models
@@ -135,7 +134,8 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
         [Route("[action]")]
         public async Task<IActionResult> ResolveIssue(DetailViewModel model)
         {
-            if (!await HasCoverIssueManagementPermissionAsync())
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.CoverIssueManagement))
             {
                 return RedirectToUnauthorized();
             }
@@ -178,29 +178,6 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
             catch
             {
                 return Json(new { success = false, message = "Could not retrieve bookmarklet, contact an administrator." });
-            }
-        }
-
-        private async Task<bool> HasCoverIssueManagementPermissionAsync()
-        {
-            if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
-            {
-                return true;
-            }
-            else
-            {
-                var permissionClaims = UserClaims(ClaimType.PermissionId);
-                if (permissionClaims.Count > 0)
-                {
-                    var permissionGroups = await _permissionGroupService
-                        .GetApplicationPermissionGroupsAsync(
-                            ApplicationPermission.CoverIssueManagement);
-                    var permissionGroupsStrings = permissionGroups
-                        .Select(_ => _.Id.ToString(CultureInfo.InvariantCulture));
-
-                    return permissionClaims.Any(_ => permissionGroupsStrings.Contains(_));
-                }
-                return false;
             }
         }
     }

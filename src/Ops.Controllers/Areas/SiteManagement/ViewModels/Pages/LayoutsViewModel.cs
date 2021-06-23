@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Linq;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Models;
 
@@ -8,10 +8,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
 {
     public class LayoutsViewModel
     {
-        public ICollection<PageLayout> PageLayouts { get; set; }
-        public PaginateModel PaginateModel { get; set; }
-        public PageLayout PageLayout { get; set; }
-
         public int HeaderId { get; set; }
 
         [DisplayName("Page Name")]
@@ -24,5 +20,21 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
         public PageType HeaderType { get; set; }
 
         public bool IsSiteManager { get; set; }
+        public PageLayout PageLayout { get; set; }
+        public ICollection<PageLayout> PageLayouts { get; set; }
+        public PaginateModel PaginateModel { get; set; }
+
+        public static bool IsClonable(PageLayout layout)
+        {
+            return layout?.Items?.Count > 0
+                && !layout.Items.Any(_ => _.CarouselId.HasValue);
+        }
+
+        public static string TableRow(PageLayout layout)
+        {
+            return layout?.StartDate == null
+                ? "table-warning"
+                : string.Empty;
+        }
     }
 }

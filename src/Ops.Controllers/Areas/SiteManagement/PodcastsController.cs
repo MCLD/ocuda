@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Podcasts;
 using Ocuda.Ops.Models.Entities;
@@ -25,7 +26,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class PodcastsController : BaseController<PodcastsController>
     {
+        private const string PodcastContentType = "audio/mpeg";
         private const long MaximumFileSizeBytes = 75 * 1024 * 1024;
+
+        private static readonly string[] AcceptedContentTypes = {
+            PodcastContentType,
+            "audio/mp3",
+            "audio/mpeg3",
+            "audio/x-mpeg-3"
+        };
 
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IPermissionGroupService _permissionGroupService;
@@ -289,7 +298,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     podcast.Stub,
                     viewModel.Episode.Episode);
                 viewModel.Episode.GuidPermaLink = true;
-                viewModel.Episode.MediaType = "audio/mpeg";
+                viewModel.Episode.MediaType = PodcastContentType;
                 viewModel.Episode.Season = 1;
 
                 ModelState.Clear();
@@ -379,41 +388,83 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             if (!Directory.Exists(path))
             {
+                _logger.LogInformation("Creating podcast directory: {Path}", path);
                 Directory.CreateDirectory(path);
             }
 
-            path = Path.Combine(path, FilenameOfEpisode(podcast.Stub, podcastItem.Episode));
+            string episodeFilename = FilenameOfEpisode(podcast.Stub, podcastItem.Episode);
+
+            path = Path.Combine(path, episodeFilename);
 
             ModelState.Clear();
 
-            if (viewModel.UploadedFile.ContentType == "audio/mpeg")
+            if (AcceptedContentTypes.Contains(viewModel.UploadedFile.ContentType))
             {
                 try
                 {
                     if (System.IO.File.Exists(path))
                     {
+                        _logger.LogInformation("Removing existing podcast file at: {Path}", path);
                         System.IO.File.Delete(path);
                     }
 
-                    using var outputFile = new FileStream(path, FileMode.CreateNew);
-                    await viewModel.UploadedFile.CopyToAsync(outputFile);
-                    outputFile.Close();
+                    _logger.LogInformation("Creating new podcast file, size {Size}: {Path}",
+                        viewModel.UploadedFile.Length,
+                        path);
+                    bool uploadSuccess = false;
 
-                    PodcastItem podcastFileInfo = _podcastService.GetFileInfo(path);
+                    try
+                    {
+                        using var outputFile = new FileStream(path, FileMode.Create);
+                        if (outputFile.CanWrite)
+                        {
+                            await viewModel.UploadedFile.CopyToAsync(outputFile);
+                            await outputFile.FlushAsync();
+                            uploadSuccess = true;
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Cannot write to podcast file: {Path}",
+                                path);
+                        }
+                        outputFile.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("Podcast file upload failure for {Path}: {ErrorMessage}",
+                            path,
+                            ex.Message);
+                        ModelState.AddModelError(nameof(EpisodeDetailsViewModel.UploadedFile),
+                            $"Unable to save file: {ex.Message}");
+                    }
 
-                    podcastItem.MediaType = viewModel.UploadedFile.ContentType;
-                    podcastItem.Duration = podcastFileInfo.Duration;
-                    podcastItem.MediaSize = podcastFileInfo.MediaSize;
-                    podcastItem.UpdatedAt = _dateTimeProvider.Now;
-                    await _podcastService.UpdatePodcastItemAsync(podcastItem);
+                    if (uploadSuccess)
+                    {
+                        _logger.LogInformation("Podcast uploaded successfully, updating database");
 
-                    AlertSuccess = "Podcast file updated successfully.";
+                        PodcastItem podcastFileInfo = _podcastService.GetFileInfo(path);
 
-                    return RedirectToAction(nameof(EditEpisode),
-                        new { episodeId = viewModel.Episode.Id });
+                        podcastItem.MediaType = PodcastContentType;
+                        podcastItem.Duration = podcastFileInfo.Duration;
+                        podcastItem.MediaSize = podcastFileInfo.MediaSize;
+                        podcastItem.UpdatedAt = _dateTimeProvider.Now;
+                        await _podcastService.UpdatePodcastItemAsync(podcastItem);
+
+                        _logger.LogInformation("Podcast uploaded for id {Id}: {Filename} - {MediaSize} bytes",
+                            viewModel.Episode.Id,
+                            episodeFilename,
+                            podcastFileInfo.MediaSize);
+                        AlertSuccess = "Podcast file updated successfully.";
+
+                        return RedirectToAction(nameof(EditEpisode),
+                            new { episodeId = viewModel.Episode.Id });
+                    }
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError("An error occured on podcast upload: {ErrorMessage}",
+                        ex.Message);
+
                     ModelState.AddModelError(nameof(EpisodeDetailsViewModel.UploadedFile),
                         $"Unable to save file: {ex.Message}");
 
@@ -431,11 +482,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             else
             {
+                _logger.LogInformation("Uploaded file {Path} was not a valid content type, it was {UploadedContentType}",
+                    path,
+                    viewModel.UploadedFile.ContentType);
+                AlertDanger = $"Please upload a valid file of type: {PodcastContentType}.";
                 ModelState.AddModelError(nameof(EpisodeDetailsViewModel.UploadedFile),
                     "Please upload an .mp3 file.");
             }
 
-            return View("EpisodeDetails", viewModel);
+            return RedirectToAction(nameof(EditEpisode), new { episodeId = viewModel.Episode.Id });
         }
 
         [Route("[action]/{podcastId}")]

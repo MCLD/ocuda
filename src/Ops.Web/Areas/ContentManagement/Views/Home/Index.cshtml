@@ -1,62 +1,84 @@
-﻿@using Ocuda.Ops.Controllers.Areas.ContentManagement
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Home.IndexViewModel
+@using Ocuda.Ops.Controllers.Areas.ContentManagement
 
-<h1>Intranet management</h1>
+<h1>Content management</h1>
 
-<div class="justify-content-center d-flex align-items-center flex-wrap">
-    <div class="col-xs-12 col-sm-4 mt-2">
-        <div class="card">
-            <div class="card-header">
-                <h3>Sections</h3>
-            </div>
-            <div class="card-body mx-auto">
-                <a asp-area="@SectionController.Area"
-                   asp-controller="@SectionController.Name"
-                   asp-action="@nameof(SectionController.Index)"
-                   class="btn btn-outline-primary mt-1">View @SectionController.Name</a>
+<div class="justify-content-left d-flex flex-wrap">
+    @if (Model.IsSiteManager || Model.HasDigitalDisplayPermissions)
+    {
+
+        <div class="col-12 col-md-4 my-2">
+            <div class="card">
+                <div class="card-header lead font-weight-bold">
+                    Digital Displays
+                </div>
+                <div class="card-body">
+                    <a asp-area="@SectionController.Area"
+                       asp-controller="@DigitalDisplaysController.Name"
+                       asp-action="@nameof(DigitalDisplaysController.Index)"
+                       class="btn btn-outline-primary mt-1">View Digital Displays</a>
+                </div>
             </div>
         </div>
-    </div>
+    }
+    @if (Model.IsSiteManager)
+    {
 
-    <div class="col-xs-12 col-sm-4 mt-2">
-        <div class="card">
-            <div class="card-header">
-                <h3>Site configuration</h3>
-            </div>
-            <div class="card-body mx-auto">
-                <a asp-area="@ApplicationPermissionsController.Area"
-                   asp-controller="@ApplicationPermissionsController.Name"
-                   asp-action="@nameof(ApplicationPermissionsController.Index)"
-                   class="btn btn-outline-primary mt-1">Application Permissions</a>
-                <a asp-area="@ExternalResourcesController.Area"
-                   asp-controller="@ExternalResourcesController.Name"
-                   asp-action="@nameof(ExternalResourcesController.Index)"
-                   class="btn btn-outline-primary mt-1">External Resources</a>
-                <a asp-area="@SiteSettingsController.Area"
-                   asp-controller="@SiteSettingsController.Name"
-                   asp-action="@nameof(SiteSettingsController.Index)"
-                   class="btn btn-outline-primary mt-1">Site Settings</a>
+        <div class="col-12 col-md-4 my-2">
+            <div class="card">
+                <div class="card-header lead font-weight-bold">
+                    Sections
+                </div>
+                <div class="card-body">
+                    <a asp-area="@SectionController.Area"
+                       asp-controller="@SectionController.Name"
+                       asp-action="@nameof(SectionController.Index)"
+                       class="btn btn-outline-primary mt-1">View @SectionController.Name</a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-xs-12 col-sm-4 mt-2">
-        <div class="card">
-            <div class="card-header">
-                <h3>User Management</h3>
-            </div>
-            <div class="card-body mx-auto">
-                <a asp-area="@UsersController.Area"
-                   asp-controller="@UsersController.Name"
-                   asp-action="@nameof(UsersController.Metadata)"
-                   class="btn btn-outline-primary mt-1">User Metadata Types</a>
-                <a asp-area="@UsersController.Area"
-                   asp-controller="@UsersController.Name"
-                   asp-action="@nameof(UsersController.Permissions)"
-                   class="btn btn-outline-primary mt-1">Permission Groups</a>
-                <a asp-area="@RosterController.Area"
-                   asp-controller="@RosterController.Name"
-                   asp-action="@nameof(RosterController.Upload)"
-                   class="btn btn-outline-primary mt-1">Upload Roster</a>
+
+        <div class="col-12 col-md-4 my-2">
+            <div class="card">
+                <div class="card-header lead font-weight-bold">
+                    Site configuration
+                </div>
+                <div class="card-body">
+                    <a asp-area="@ApplicationPermissionsController.Area"
+                       asp-controller="@ApplicationPermissionsController.Name"
+                       asp-action="@nameof(ApplicationPermissionsController.Index)"
+                       class="btn btn-outline-primary mt-1">Application Permissions</a>
+                    <a asp-area="@ExternalResourcesController.Area"
+                       asp-controller="@ExternalResourcesController.Name"
+                       asp-action="@nameof(ExternalResourcesController.Index)"
+                       class="btn btn-outline-primary mt-1">External Resources</a>
+                    <a asp-area="@SiteSettingsController.Area"
+                       asp-controller="@SiteSettingsController.Name"
+                       asp-action="@nameof(SiteSettingsController.Index)"
+                       class="btn btn-outline-primary mt-1">Site Settings</a>
+                </div>
             </div>
         </div>
-    </div>
+        <div class="col-12 col-md-4 my-2">
+            <div class="card">
+                <div class="card-header lead font-weight-bold">
+                    User Management
+                </div>
+                <div class="card-body">
+                    <a asp-area="@UsersController.Area"
+                       asp-controller="@UsersController.Name"
+                       asp-action="@nameof(UsersController.Metadata)"
+                       class="btn btn-outline-primary mt-1">User Metadata Types</a>
+                    <a asp-area="@UsersController.Area"
+                       asp-controller="@UsersController.Name"
+                       asp-action="@nameof(UsersController.Permissions)"
+                       class="btn btn-outline-primary mt-1">Permission Groups</a>
+                    <a asp-area="@RosterController.Area"
+                       asp-controller="@RosterController.Name"
+                       asp-action="@nameof(RosterController.Upload)"
+                       class="btn btn-outline-primary mt-1">Upload Roster</a>
+                </div>
+            </div>
+        </div>
+    }
 </div>

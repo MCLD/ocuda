@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Ocuda.Utility.Models;
+﻿using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service.Filters
 {

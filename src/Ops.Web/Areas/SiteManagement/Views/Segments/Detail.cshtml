@@ -4,37 +4,82 @@
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
 
-<form asp-controller="@SegmentsController.Name" asp-action="@(nameof(SegmentsController.DeleteText))" method="post" role="form">
-    <input id="deleteSegmemtId" asp-for="SegmentId" type="hidden" />
-    <input id="deleteLanguageId" asp-for="LanguageId" type="hidden" />
-    <div modal id="deleteModal" name="Segment" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
-</form>
-
-<div class="row" style="padding-top: 1rem;">
-    <div class="col-12">
-        <input asp-for="SegmentName" formgroup readonly />
-        <input asp-for="SegmentStartDate" formgroup value="@Model.SegmentStartDate?.ToString()" datetime-picker="DateTimePickerType.DateTime" readonly />
-        <input asp-for="SegmentEndDate" formgroup value="@Model.SegmentStartDate?.ToString()" datetime-picker="DateTimePickerType.DateTime" readonly />
-        <select asp-for="SelectedLanguage" asp-items="Model.LanguageList" formgroup></select>
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Segment
+            <small class="text-muted">@Model.SegmentName</small>
+        </h1>
     </div>
-</div>
-
-@if (!Model.NewSegmentText)
-{
-    <div class="row">
-        <div class="col-12">
+    <div class="col-sm-6">
+        @if (!string.IsNullOrEmpty(Model.BackLink))
+        {
+            <a href="@Model.BackLink"
+               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+        }
+        else
+        {
+            <a asp-action="Index"
+               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Cancel</a>
+        }
+        @if (!Model.NewSegmentText && string.IsNullOrEmpty(Model.BackLink))
+        {
             <button type="button"
-                    class="btn btn-danger float-right"
+                    class="btn btn-outline-danger mt-2 mb-1 mr-2 float-right"
                     data-toggle="modal"
                     data-target="#deleteModal"
                     data-segmentId="@Model.SegmentId"
                     data-languageId="@Model.LanguageId"
                     data-languageDescription="@Model.LanguageDescription">
-                Delete
+                <span class="fas fa-minus-circle"></span>
+                Delete Segment
             </button>
+        }
+
+    </div>
+</div>
+
+
+<form asp-controller="@SegmentsController.Name"
+      asp-action="@(nameof(SegmentsController.DeleteText))"
+      method="post"
+      role="form">
+    <input id="deleteSegmemtId" asp-for="SegmentId" type="hidden" />
+    <input id="deleteLanguageId" asp-for="LanguageId" type="hidden" />
+    <div modal
+         id="deleteModal"
+         name="Segment"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+</form>
+
+@if (!string.IsNullOrEmpty(Model.Relationship))
+{
+    <div class="row" style="padding-top: 1rem;">
+        <div class="col-12 col-md-3 text-right">
+            Relationship(s)
+        </div>
+        <div class="col-12 col-md-9">
+            @Model.Relationship
         </div>
     </div>
 }
+
+<div class="row" style="padding-top: 1rem;">
+    <div class="col-12">
+        <span class="d-none"><input asp-for="SegmentName" formgroup readonly /></span>
+        <input asp-for="SegmentStartDate"
+               formgroup
+               value="@Model.SegmentStartDate?.ToString()"
+               datetime-picker="DateTimePickerType.DateTime"
+               readonly />
+        <input asp-for="SegmentEndDate"
+               formgroup
+               value="@Model.SegmentStartDate?.ToString()"
+               datetime-picker="DateTimePickerType.DateTime"
+               readonly />
+        <select asp-for="SelectedLanguage" asp-items="Model.LanguageList" formgroup></select>
+    </div>
+</div>
 
 <div class="row" style="padding-bottom: 1rem;">
     <div class="col-12 col-md-9 offset-md-3">
@@ -49,27 +94,23 @@
     <input asp-for="SegmentText.Header" formgroup />
 
     <div class="form-group row">
-        <label asp-for="SegmentText.Text" class="col-md-3 col-form-label text-md-right"></label>
+        <div class="col-md-3 text-md-right">
+            <label asp-for="SegmentText.Text" class="col-form-label"></label><br />
+            (up to 2000 characters)
+        </div>
         <div class="form-group-inner col-md-9">
             <textarea asp-for="SegmentText.Text" markdown-editor></textarea>
-            <span asp-validation-for="SegmentText.Text" class="validation-message text-danger"></span>
+            <span asp-validation-for="SegmentText.Text"
+                  class="validation-message text-danger"></span>
         </div>
     </div>
 
     <div class="row">
         <div class="offset-md-3 col-md-9">
-            @if (Model.PageLayoutId.HasValue)
-            {
-                <a asp-controller="@PagesController.Name" 
-                   asp-action="@nameof(PagesController.LayoutDetail)" 
-                   asp-route-id="@Model.PageLayoutId.Value" 
-                   class="btn btn-outline-secondary text-dark">Cancel</a>
-            }
-            else
-            {
-                <a asp-action="Index" class="btn btn-outline-secondary text-dark">Cancel</a>
-            }
-            <button type="submit" class="btn btn-success" buttonspinner>
+            <button type="submit"
+                    class="btn btn-outline-success btn-lg"
+                    buttonspinner>
+                <span class="far fa-save"></span>
                 Save
             </button>
         </div>
@@ -83,7 +124,8 @@
         var editor = new Markdown.Editor($("#SegmentText_Text"), { allowUploads: true });
         editor.run();
 
-        var segmentDetailsUrl = "@Url.Action(nameof(SegmentsController.Detail), new { id = Model.SegmentId})";
+        var segmentDetailsUrl
+            = "@Url.Action(nameof(SegmentsController.Detail), new { id = Model.SegmentId})";
 
         $("#SelectedLanguage").on("change", function () {
             window.location.href = segmentDetailsUrl + "?language=" + $(this).val();

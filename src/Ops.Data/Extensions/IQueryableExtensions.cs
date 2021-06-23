@@ -5,11 +5,13 @@ namespace Ocuda.Ops.Data.Extensions
 {
     public static class IQueryableExtensions
     {
-        public static IQueryable<T> ApplyPagination<T>(this IQueryable<T> queryable, BaseFilter filter)
+        public static IQueryable<T> ApplyPagination<T>(this IQueryable<T> queryable,
+            BaseFilter filter)
         {
-            if (filter.Skip != null && filter.Take != null)
+            if (filter?.Skip.HasValue == true && filter?.Take.HasValue == true)
             {
-                return queryable.Skip((int)filter.Skip).Take((int)filter.Take);
+                return queryable.Skip(filter.Skip.Value)
+                    .Take(filter.Take.Value);
             }
             else
             {

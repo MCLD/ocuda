@@ -2,55 +2,61 @@
 
 @if (Model.Features.Count() == 0)
 {
-    <div class="alert alert-warning">No Items found</div>
+    <div class="row">
+        <div class="col">
+            <div class="alert alert-warning">No Items found</div>
+        </div>
+    </div>
 }
 else
 {
-    <div>
-        <table class="table table-sm table-bordered table-striped">
-            <thead>
-                <tr>
-                    <td>Name</td>
-                    <td>Stub</td>
-                    <td>General Body Text</td>
-                    <td>&nbsp;</td>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var feature in Model.Features)
-                {
-                <tr class="itemRow">
-                    <td>
-                        @feature.Name
-                    </td>
-                    <td>
-                        @feature.Stub
-                    </td>
-                    <td>
-                        @if (!string.IsNullOrEmpty(feature.BodyText))
-                        {
-                            @if (feature.BodyText.Length > 200)
-                            {
-                                @(feature.BodyText.Substring(0, 200) + "...")
-                            }
-                        }
-                        else
-                        {
-                            @feature.BodyText
-                        }
-                    </td>
-                    <td style="vertical-align:middle;">
-                        <button type="button"
-                                class="btn btn-link btn-xs additemButton"
-                                data-itemtype="Feature"
-                                data-itemid="@feature.Id">
-                            <span class="fa fa-2x fa-plus-circle text-success" aria-hidden="true"></span>
-                        </button>
-                    </td>
-                </tr>
-                }
-            </tbody>
-        </table>
+    <div class="row">
+        <div class="col">
+            <table class="table table-sm table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <td>Name</td>
+                        <td>Stub</td>
+                        <td>Multi-location Text</td>
+                        <td>Action</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var feature in Model.Features)
+                    {
+                        <tr class="itemRow">
+                            <td class="align-middle">
+                                @feature.Name
+                            </td>
+                            <td class="align-middle">
+                                @feature.Stub
+                            </td>
+                            <td class="align-middle" style="line-height: 1rem;">
+                                @if (!string.IsNullOrEmpty(feature.BodyText))
+                                {
+                                    @if (feature.BodyText.Length > 150)
+                                    {
+                                        <small>@(feature.BodyText.Substring(0, 150) + "...")</small>
+                                    }
+                                }
+                                else
+                                {
+                                    <small>@feature.BodyText</small>
+                                }
+                            </td>
+                            <td class="align-middle">
+                                <button type="button"
+                                        class="btn btn-outline-primary additemButton"
+                                        data-itemtype="Feature"
+                                        data-itemid="@feature.Id">
+                                    <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
     @if (Model.PaginateModel.MaxPage > 1)
     {

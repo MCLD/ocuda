@@ -20,7 +20,7 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string Url { get; set; }
 
-        [DisplayName("Label")]
+        [DisplayName("Button Text")]
         public int LabelId { get; set; }
         public CarouselButtonLabel Label { get; set; }
 

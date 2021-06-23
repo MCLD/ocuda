@@ -10,7 +10,91 @@ namespace Ocuda.Ops.Data
     public abstract class OpsContext
         : Utility.Data.DbContextBase, IMigratableContext, IDataProtectionKeyContext
     {
-        protected OpsContext(DbContextOptions options) : base(options) { }
+        protected OpsContext(DbContextOptions options) : base(options)
+        {
+        }
+
+        public DbSet<Category> Categories { get; set; }
+
+        public DbSet<ClaimGroup> ClaimGroups { get; set; }
+
+        public DbSet<CoverIssueDetail> CoverIssueDetails { get; set; }
+
+        public DbSet<CoverIssueHeader> CoverIssueHeaders { get; set; }
+
+        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
+
+        public DbSet<DigitalDisplayAsset> DigitalDisplayAssets { get; set; }
+
+        public DbSet<DigitalDisplayAssetSet> DigitalDisplayAssetSets { get; set; }
+
+        public DbSet<DigitalDisplayDisplaySet> DigitalDisplayDisplaySets { get; set; }
+
+        public DbSet<DigitalDisplayItem> DigitalDisplayItems { get; set; }
+
+        public DbSet<DigitalDisplay> DigitalDisplays { get; set; }
+
+        public DbSet<DigitalDisplaySet> DigitalDisplaySets { get; set; }
+
+        public DbSet<EmailRecord> EmailRecords { get; set; }
+
+        public DbSet<EmailSetup> EmailSetups { get; set; }
+
+        public DbSet<EmailSetupText> EmailSetupTexts { get; set; }
+
+        public DbSet<EmailTemplate> EmailTemplates { get; set; }
+
+        public DbSet<EmailTemplateText> EmailTemplateTexts { get; set; }
+
+        public DbSet<ExternalResource> ExternalResources { get; set; }
+
+        public DbSet<FileLibrary> FileLibraries { get; set; }
+
+        public DbSet<FileLibraryFileType> FileLibraryFileTypes { get; set; }
+
+        public DbSet<File> Files { get; set; }
+
+        public DbSet<FileType> FileTypes { get; set; }
+
+        public DbSet<LinkLibrary> LinkLibraries { get; set; }
+
+        public DbSet<Link> Links { get; set; }
+
+        public DbSet<PermissionGroupApplication> PermissionGroupApplication { get; set; }
+
+        public DbSet<PermissionGroupPageContent> PermissionGroupPageContents { get; set; }
+
+        public DbSet<PermissionGroupPodcastItem> PermissionGroupPodcastItems { get; set; }
+
+        public DbSet<PermissionGroup> PermissionGroups { get; set; }
+
+        public DbSet<PostCategory> PostCategories { get; set; }
+
+        public DbSet<Post> Posts { get; set; }
+
+        public DbSet<RosterDetail> RosterDetails { get; set; }
+
+        public DbSet<RosterHeader> RosterHeaders { get; set; }
+
+        public DbSet<ScheduleClaim> ScheduleClaims { get; set; }
+
+        public DbSet<ScheduleLogCallDisposition> ScheduleLogCallDispositions { get; set; }
+
+        public DbSet<ScheduleLog> ScheduleLogs { get; set; }
+
+        public DbSet<SectionCategory> SectionCategories { get; set; }
+
+        public DbSet<SectionManagerGroup> SectionManagerGroups { get; set; }
+
+        public DbSet<Section> Sections { get; set; }
+
+        public DbSet<SiteSetting> SiteSettings { get; set; }
+
+        public DbSet<UserMetadata> UserMetadata { get; set; }
+
+        public DbSet<UserMetadataType> UserMetadataTypes { get; set; }
+
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,6 +108,12 @@ namespace Ocuda.Ops.Data
 
             // configure composite keys
             // https://docs.microsoft.com/en-us/ef/core/modeling/keys
+            modelBuilder.Entity<DigitalDisplayAssetSet>()
+                .HasKey(_ => new { _.DigitalDisplayAssetId, _.DigitalDisplaySetId });
+            modelBuilder.Entity<DigitalDisplayDisplaySet>()
+                .HasKey(_ => new { _.DigitalDisplayId, _.DigitalDisplaySetId });
+            modelBuilder.Entity<DigitalDisplayItem>()
+                .HasKey(_ => new { _.DigitalDisplayAssetId, _.DigitalDisplayId });
             modelBuilder.Entity<EmailSetupText>()
                 .HasKey(_ => new { _.EmailSetupId, _.PromenadeLanguageName });
             modelBuilder.Entity<EmailTemplateText>()
@@ -45,45 +135,13 @@ namespace Ocuda.Ops.Data
         }
 
         #region IMigratableContext
-        public new void Migrate() => Database.Migrate();
-        public new IEnumerable<string> GetPendingMigrationList() => Database.GetPendingMigrations();
-        public new string GetCurrentMigration() => Database.GetAppliedMigrations().Last();
-        #endregion IMigratableContext
 
-        public DbSet<ClaimGroup> ClaimGroups { get; set; }
-        public DbSet<CoverIssueDetail> CoverIssueDetails { get; set; }
-        public DbSet<CoverIssueHeader> CoverIssueHeaders { get; set; }
-        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
-        public DbSet<EmailRecord> EmailRecords { get; set; }
-        public DbSet<EmailSetup> EmailSetups { get; set; }
-        public DbSet<EmailSetupText> EmailSetupTexts { get; set; }
-        public DbSet<EmailTemplate> EmailTemplates { get; set; }
-        public DbSet<EmailTemplateText> EmailTemplateTexts { get; set; }
-        public DbSet<ExternalResource> ExternalResources { get; set; }
-        public DbSet<File> Files { get; set; }
-        public DbSet<FileLibrary> FileLibraries { get; set; }
-        public DbSet<FileLibraryFileType> FileLibraryFileTypes { get; set; }
-        public DbSet<FileType> FileTypes { get; set; }
-        public DbSet<Link> Links { get; set; }
-        public DbSet<LinkLibrary> LinkLibraries { get; set; }
-        public DbSet<PermissionGroup> PermissionGroups { get; set; }
-        public DbSet<PermissionGroupApplication> PermissionGroupApplication { get; set; }
-        public DbSet<PermissionGroupPageContent> PermissionGroupPageContents { get; set; }
-        public DbSet<PermissionGroupPodcastItem> PermissionGroupPodcastItems { get; set; }
-        public DbSet<PostCategory> PostCategories { get; set; }
-        public DbSet<Post> Posts { get; set; }
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<RosterHeader> RosterHeaders { get; set; }
-        public DbSet<RosterDetail> RosterDetails { get; set; }
-        public DbSet<ScheduleClaim> ScheduleClaims { get; set; }
-        public DbSet<ScheduleLog> ScheduleLogs { get; set; }
-        public DbSet<ScheduleLogCallDisposition> ScheduleLogCallDispositions { get; set; }
-        public DbSet<SectionCategory> SectionCategories { get; set; }
-        public DbSet<Section> Sections { get; set; }
-        public DbSet<SectionManagerGroup> SectionManagerGroups { get; set; }
-        public DbSet<SiteSetting> SiteSettings { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<UserMetadata> UserMetadata { get; set; }
-        public DbSet<UserMetadataType> UserMetadataTypes { get; set; }
+        public new string GetCurrentMigration() => Database.GetAppliedMigrations().Last();
+
+        public new IEnumerable<string> GetPendingMigrationList() => Database.GetPendingMigrations();
+
+        public new void Migrate() => Database.Migrate();
+
+        #endregion IMigratableContext
     }
 }

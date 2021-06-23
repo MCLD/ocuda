@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BranchLocator.Helpers;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models;
 using Ocuda.Promenade.Models.Entities;
@@ -18,19 +19,21 @@ namespace Ocuda.Promenade.Service
         private const int DaysInWeek = 7;
         private const string ndash = "\u2013";
 
-        private readonly ILocationHoursRepository _locationHoursRepository;
-        private readonly ILocationRepository _locationRepository;
-        private readonly ILocationGroupRepository _locationGroupRepository;
+        private readonly IFeatureRepository _featureRepository;
+        private readonly IGoogleClient _googleClient;
         private readonly IGroupRepository _groupRepository;
         private readonly ILocationFeatureRepository _locationFeatureRepository;
-        private readonly IFeatureRepository _featureRepository;
+        private readonly ILocationGroupRepository _locationGroupRepository;
         private readonly ILocationHoursOverrideRepository _locationHoursOverrideRepository;
+        private readonly ILocationHoursRepository _locationHoursRepository;
+        private readonly ILocationRepository _locationRepository;
 
         public LocationService(ILogger<LocationService> logger,
             IDateTimeProvider dateTimeProvider,
             ILocationRepository locationRepository,
             ILocationGroupRepository locationGroupRepository,
             IFeatureRepository featureRepository,
+            IGoogleClient googleClient,
             IGroupRepository groupRepository,
             ILocationFeatureRepository locationFeatureRepository,
             ILocationHoursRepository locationHoursRepository,
@@ -43,6 +46,7 @@ namespace Ocuda.Promenade.Service
                 ?? throw new ArgumentNullException(nameof(locationGroupRepository));
             _featureRepository = featureRepository
                 ?? throw new ArgumentNullException(nameof(featureRepository));
+            _googleClient = googleClient ?? throw new ArgumentNullException(nameof(googleClient));
             _groupRepository = groupRepository
                 ?? throw new ArgumentNullException(nameof(groupRepository));
             _locationFeatureRepository = locationFeatureRepository
@@ -53,9 +57,9 @@ namespace Ocuda.Promenade.Service
                 ?? throw new ArgumentNullException(nameof(locationHoursOverrideRepository));
         }
 
-        public async Task<Location> GetLocationByStubAsync(string stub)
+        public async Task<(double? Latitude, double? Longitude)> GeocodeAddressAsync(string address)
         {
-            return await _locationRepository.GetLocationByStub(stub);
+            return await _googleClient.GeocodeAsync(address);
         }
 
         public async Task<List<Location>> GetAllLocationsAsync()
@@ -63,263 +67,9 @@ namespace Ocuda.Promenade.Service
             return await _locationRepository.GetAllLocations();
         }
 
-        public async Task<ICollection<LocationHoursResult>> GetWeeklyHoursAsync(int locationId)
+        public async Task<string> GetClosureInformationAsync(DateTime date)
         {
-            var results = new List<LocationHoursResult>();
-
-            var location = await _locationRepository.FindAsync(locationId);
-
-            if (location.IsAlwaysOpen)
-            {
-                for (int day = 0; day < DaysInWeek; day++)
-                {
-                    results.Add(new LocationHoursResult
-                    {
-                        Open = true,
-                        DayOfWeek = (DayOfWeek)day,
-                        IsCurrentlyOpen = true
-                    });
-                }
-            }
-            else if (location.IsClosed)
-            {
-                for (int day = 0; day < DaysInWeek; day++)
-                {
-                    results.Add(new LocationHoursResult
-                    {
-                        Open = false,
-                        DayOfWeek = (DayOfWeek)day,
-                        IsCurrentlyOpen = false
-                    });
-                }
-            }
-            else
-            {
-                // Add override days
-                var now = DateTime.Now;
-                var firstDayOfWeek = now.AddDays(-(int)now.DayOfWeek);
-                var lastDayOfWeek = firstDayOfWeek.AddDays(DaysInWeek - 1);
-
-                var overrides = await _locationHoursOverrideRepository.GetBetweenDatesAsync(
-                    locationId, firstDayOfWeek, lastDayOfWeek);
-
-                foreach (var dayOverride in overrides)
-                {
-                    results.Add(new LocationHoursResult
-                    {
-                        OpenTime = dayOverride.OpenTime,
-                        CloseTime = dayOverride.CloseTime,
-                        Open = dayOverride.Open,
-                        DayOfWeek = dayOverride.Date.DayOfWeek,
-                        IsOverride = true
-                    });
-                }
-
-                // Fill in non-override days
-                if (results.Count < DaysInWeek)
-                {
-                    var weeklyHours
-                        = await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
-
-                    var remainingDays = weeklyHours
-                        .Where(_ => !results.Select(r => r.DayOfWeek).Contains(_.DayOfWeek));
-
-                    foreach (var day in remainingDays)
-                    {
-                        results.Add(new LocationHoursResult
-                        {
-                            OpenTime = day.OpenTime,
-                            CloseTime = day.CloseTime,
-                            Open = day.Open,
-                            DayOfWeek = day.DayOfWeek
-                        });
-                    }
-                }
-
-                // Set currently open
-                foreach (var dayResult in results)
-                {
-                    if (dayResult.Open && dayResult.OpenTime <= now && dayResult.CloseTime >= now)
-                    {
-                        dayResult.IsCurrentlyOpen = true;
-                    }
-                }
-
-                results = results.OrderBy(_ => _.DayOfWeek).ToList();
-            }
-
-            return results;
-        }
-
-        public async Task<LocationFeature> GetLocationFullFeatureAsync(string locationStub,
-            string featureStub)
-        {
-            return await _locationFeatureRepository.GetFullLocationFeatureAsync(locationStub,
-                featureStub);
-        }
-
-        public async Task<List<LocationFeature>> GetFullLocationFeaturesAsync(string locationStub)
-        {
-            return await _locationFeatureRepository.GetFullLocationFeaturesAsync(locationStub);
-        }
-
-        public async Task<List<LocationGroup>> GetLocationsNeighborsAsync(int groupId)
-        {
-            var locationGroups = await _locationGroupRepository.GetLocationsByGroupIdAsync(groupId);
-            foreach (var locationGroup in locationGroups)
-            {
-                if (locationGroup.HasSubscription)
-                {
-                    locationGroup.Location = await _locationRepository.FindAsync(locationGroup.LocationId);
-                }
-            }
-            return locationGroups;
-        }
-
-        public async Task<Group> GetLocationsNeighborGroup(int groupId)
-        {
-            return await _groupRepository.FindAsync(groupId);
-        }
-
-        public async Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId,
-            bool isStructuredData = false)
-        {
-            var location = await _locationRepository.FindAsync(locationId);
-            if (location.IsAlwaysOpen || location.IsClosed)
-            {
-                return null;
-            }
-
-            var weeklyHours = await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
-            // Order weeklyHours to start on Monday
-            weeklyHours = weeklyHours.OrderBy(_ => ((int)_.DayOfWeek + 6) % 7).ToList();
-
-            var dayGroupings
-                = new List<(List<DayOfWeek> DaysOfWeek, DateTime OpenTime, DateTime CloseTime)>();
-            var closedDays = new List<DayOfWeek>();
-            foreach (var day in weeklyHours)
-            {
-                if (day.Open)
-                {
-                    var (DaysOfWeek, OpenTime, CloseTime) = dayGroupings.LastOrDefault();
-                    if (dayGroupings.Count > 0 && OpenTime == day.OpenTime
-                        && CloseTime == day.CloseTime)
-                    {
-                        DaysOfWeek.Add(day.DayOfWeek);
-                    }
-                    else
-                    {
-                        dayGroupings.Add((
-                            DaysOfWeek: new List<DayOfWeek> { day.DayOfWeek },
-                            OpenTime: day.OpenTime.Value,
-                            CloseTime: day.CloseTime.Value));
-                    }
-                }
-                else
-                {
-                    closedDays.Add(day.DayOfWeek);
-                }
-            }
-
-            var formattedDayGroupings = new List<LocationDayGrouping>();
-            foreach (var (DaysOfWeek, OpenTime, CloseTime) in dayGroupings)
-            {
-                var days = isStructuredData ? GetFormattedDayGroupings(DaysOfWeek, true)
-                    : GetFormattedDayGroupings(DaysOfWeek);
-
-                var openTimeString = isStructuredData
-                    ? new StringBuilder(OpenTime.ToString("%H", CultureInfo.InvariantCulture))
-                    : new StringBuilder(OpenTime.ToString("%h", CultureInfo.InvariantCulture));
-
-                if (OpenTime.Minute != 0 || isStructuredData)
-                {
-                    openTimeString.Append(OpenTime.ToString(":mm", CultureInfo.InvariantCulture));
-                }
-
-                openTimeString.Append(isStructuredData
-                    ? ""
-                    : OpenTime.ToString(" tt", CultureInfo.InvariantCulture).ToLowerInvariant());
-
-                var closeTimeString = isStructuredData
-                    ? new StringBuilder(CloseTime.ToString("%H", CultureInfo.InvariantCulture))
-                    : new StringBuilder(CloseTime.ToString("%h", CultureInfo.InvariantCulture));
-
-                if (CloseTime.Minute != 0 || isStructuredData)
-                {
-                    closeTimeString
-                        .Append(CloseTime.ToString(":mm", CultureInfo.InvariantCulture));
-                }
-                closeTimeString.Append(isStructuredData
-                    ? ""
-                    : CloseTime.ToString(" tt", CultureInfo.InvariantCulture).ToLowerInvariant());
-
-                formattedDayGroupings.Add(new LocationDayGrouping
-                {
-                    Days = days,
-                    Time = $"{openTimeString} {ndash} {closeTimeString}"
-                });
-            }
-
-            if (closedDays.Count > 0 && !isStructuredData)
-            {
-                var formattedClosedDays = GetFormattedDayGroupings(closedDays);
-                formattedDayGroupings.Add(new LocationDayGrouping
-                {
-                    Days = formattedClosedDays,
-                    Time = "Closed"
-                });
-            }
-
-            return formattedDayGroupings;
-        }
-
-        private string GetFormattedDayGroupings(List<DayOfWeek> days,
-            bool isStructuredData = false)
-        {
-            var dayFormatter = new DateTimeFormatInfo();
-            if (days.Count == 1)
-            {
-                return isStructuredData
-                    ? dayFormatter.GetAbbreviatedDayName(days[0]).Substring(0, 2)
-                    : dayFormatter.GetAbbreviatedDayName(days[0]);
-            }
-            else
-            {
-                var firstDay = days[0];
-                var lastDay = days.Last();
-
-                if (days.Count == 2)
-                {
-                    if (isStructuredData)
-                    {
-                        return $"{dayFormatter.GetAbbreviatedDayName(firstDay).Substring(0, 2)}" +
-                            $"{ndash}{dayFormatter.GetAbbreviatedDayName(lastDay).Substring(0, 2)}";
-                    }
-                    else
-                    {
-                        return $"{dayFormatter.GetAbbreviatedDayName(firstDay)}" +
-                            $" & {dayFormatter.GetAbbreviatedDayName(lastDay)}";
-                    }
-                }
-                else if (days.Count == lastDay - firstDay + 1)
-                {
-                    if (isStructuredData)
-                    {
-                        return $"{dayFormatter.GetAbbreviatedDayName(firstDay).Substring(0, 2)}" +
-                            $"{ndash}{dayFormatter.GetAbbreviatedDayName(lastDay).Substring(0, 2)}";
-                    }
-                    else
-                    {
-                        return $"{dayFormatter.GetAbbreviatedDayName(firstDay)}" +
-                            $" {ndash} {dayFormatter.GetAbbreviatedDayName(lastDay)}";
-                    }
-                }
-                else
-                {
-                    return string.Join(", ",
-                        days.Select(_ => dayFormatter.GetAbbreviatedDayName(_)));
-                }
-            }
+            return await _locationHoursOverrideRepository.GetClosureInformationAsync(date);
         }
 
         public async Task<LocationHoursResult> GetCurrentStatusAsync(int locationId)
@@ -453,9 +203,307 @@ namespace Ocuda.Promenade.Service
             return result;
         }
 
-        public async Task<string> GetClosureInformationAsync(DateTime date)
+        public async Task<List<LocationDayGrouping>> GetFormattedWeeklyHoursAsync(int locationId,
+            bool isStructuredData = false)
         {
-            return await _locationHoursOverrideRepository.GetClosureInformationAsync(date);
+            var location = await _locationRepository.FindAsync(locationId);
+            if (location.IsAlwaysOpen || location.IsClosed)
+            {
+                return null;
+            }
+
+            var weeklyHours = await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
+            // Order weeklyHours to start on Monday
+            weeklyHours = weeklyHours.OrderBy(_ => ((int)_.DayOfWeek + 6) % 7).ToList();
+
+            var dayGroupings
+                = new List<(List<DayOfWeek> DaysOfWeek, DateTime OpenTime, DateTime CloseTime)>();
+            var closedDays = new List<DayOfWeek>();
+            foreach (var day in weeklyHours)
+            {
+                if (day.Open)
+                {
+                    var (DaysOfWeek, OpenTime, CloseTime) = dayGroupings.LastOrDefault();
+                    if (dayGroupings.Count > 0 && OpenTime == day.OpenTime
+                        && CloseTime == day.CloseTime)
+                    {
+                        DaysOfWeek.Add(day.DayOfWeek);
+                    }
+                    else
+                    {
+                        dayGroupings.Add((
+                            DaysOfWeek: new List<DayOfWeek> { day.DayOfWeek },
+                            OpenTime: day.OpenTime.Value,
+                            CloseTime: day.CloseTime.Value));
+                    }
+                }
+                else
+                {
+                    closedDays.Add(day.DayOfWeek);
+                }
+            }
+
+            var formattedDayGroupings = new List<LocationDayGrouping>();
+            foreach (var (DaysOfWeek, OpenTime, CloseTime) in dayGroupings)
+            {
+                var days = isStructuredData ? GetFormattedDayGroupings(DaysOfWeek, true)
+                    : GetFormattedDayGroupings(DaysOfWeek);
+
+                var openTimeString = isStructuredData
+                    ? new StringBuilder(OpenTime.ToString("%H", CultureInfo.InvariantCulture))
+                    : new StringBuilder(OpenTime.ToString("%h", CultureInfo.InvariantCulture));
+
+                if (OpenTime.Minute != 0 || isStructuredData)
+                {
+                    openTimeString.Append(OpenTime.ToString(":mm", CultureInfo.InvariantCulture));
+                }
+
+                openTimeString.Append(isStructuredData
+                    ? ""
+                    : OpenTime.ToString(" tt", CultureInfo.InvariantCulture).ToLowerInvariant());
+
+                var closeTimeString = isStructuredData
+                    ? new StringBuilder(CloseTime.ToString("%H", CultureInfo.InvariantCulture))
+                    : new StringBuilder(CloseTime.ToString("%h", CultureInfo.InvariantCulture));
+
+                if (CloseTime.Minute != 0 || isStructuredData)
+                {
+                    closeTimeString
+                        .Append(CloseTime.ToString(":mm", CultureInfo.InvariantCulture));
+                }
+                closeTimeString.Append(isStructuredData
+                    ? ""
+                    : CloseTime.ToString(" tt", CultureInfo.InvariantCulture).ToLowerInvariant());
+
+                formattedDayGroupings.Add(new LocationDayGrouping
+                {
+                    Days = days,
+                    Time = $"{openTimeString} {ndash} {closeTimeString}"
+                });
+            }
+
+            if (closedDays.Count > 0 && !isStructuredData)
+            {
+                var formattedClosedDays = GetFormattedDayGroupings(closedDays);
+                formattedDayGroupings.Add(new LocationDayGrouping
+                {
+                    Days = formattedClosedDays,
+                    Time = "Closed"
+                });
+            }
+
+            return formattedDayGroupings;
+        }
+
+        public async Task<List<LocationFeature>> GetFullLocationFeaturesAsync(string locationStub)
+        {
+            return await _locationFeatureRepository.GetFullLocationFeaturesAsync(locationStub);
+        }
+
+        public async Task<Location> GetLocationByStubAsync(string stub)
+        {
+            return await _locationRepository.GetLocationByStub(stub);
+        }
+
+        public async Task<LocationFeature> GetLocationFullFeatureAsync(string locationStub,
+            string featureStub)
+        {
+            return await _locationFeatureRepository.GetFullLocationFeatureAsync(locationStub,
+                featureStub);
+        }
+
+        public async Task<Group> GetLocationsNeighborGroup(int groupId)
+        {
+            return await _groupRepository.FindAsync(groupId);
+        }
+
+        public async Task<List<LocationGroup>> GetLocationsNeighborsAsync(int groupId)
+        {
+            var locationGroups
+                = await _locationGroupRepository.GetLocationsByGroupIdAsync(groupId);
+            foreach (var locationGroup in locationGroups)
+            {
+                if (locationGroup.HasSubscription)
+                {
+                    locationGroup.Location
+                        = await _locationRepository.FindAsync(locationGroup.LocationId);
+                }
+            }
+            return locationGroups;
+        }
+
+        public async Task<IList<Location>> GetLocationsStatusAsync(double? latitude,
+            double? longitude)
+        {
+            var locations = await _locationRepository.GetAllLocations();
+
+            foreach (var location in locations)
+            {
+                location.CurrentStatus = await GetCurrentStatusAsync(location.Id);
+                if (latitude.HasValue
+                    && longitude.HasValue
+                    && !string.IsNullOrWhiteSpace(location.GeoLocation)
+                    && location.GeoLocation.Contains(',', StringComparison.OrdinalIgnoreCase))
+                {
+                    var geolocation = location.GeoLocation.Split(',');
+                    if (geolocation.Length == 2
+                        && double.TryParse(geolocation[0], out var locationLatitude)
+                        && double.TryParse(geolocation[1], out var locationLongitude))
+                    {
+                        location.Distance = Math.Ceiling(HaversineHelper.Calculate(
+                                locationLatitude,
+                                locationLongitude,
+                                latitude.Value,
+                                longitude.Value));
+                    }
+                }
+            }
+
+            return latitude.HasValue && longitude.HasValue
+                ? locations.OrderBy(_ => _.Distance).ThenBy(_ => _.Name).ToList()
+                : locations.OrderBy(_ => _.Name).ToList();
+        }
+
+        public async Task<ICollection<LocationHoursResult>> GetWeeklyHoursAsync(int locationId)
+        {
+            var results = new List<LocationHoursResult>();
+
+            var location = await _locationRepository.FindAsync(locationId);
+
+            if (location.IsAlwaysOpen)
+            {
+                for (int day = 0; day < DaysInWeek; day++)
+                {
+                    results.Add(new LocationHoursResult
+                    {
+                        Open = true,
+                        DayOfWeek = (DayOfWeek)day,
+                        IsCurrentlyOpen = true
+                    });
+                }
+            }
+            else if (location.IsClosed)
+            {
+                for (int day = 0; day < DaysInWeek; day++)
+                {
+                    results.Add(new LocationHoursResult
+                    {
+                        Open = false,
+                        DayOfWeek = (DayOfWeek)day,
+                        IsCurrentlyOpen = false
+                    });
+                }
+            }
+            else
+            {
+                // Add override days
+                var now = DateTime.Now;
+                var firstDayOfWeek = now.AddDays(-(int)now.DayOfWeek);
+                var lastDayOfWeek = firstDayOfWeek.AddDays(DaysInWeek - 1);
+
+                var overrides = await _locationHoursOverrideRepository.GetBetweenDatesAsync(
+                    locationId, firstDayOfWeek, lastDayOfWeek);
+
+                foreach (var dayOverride in overrides)
+                {
+                    results.Add(new LocationHoursResult
+                    {
+                        OpenTime = dayOverride.OpenTime,
+                        CloseTime = dayOverride.CloseTime,
+                        Open = dayOverride.Open,
+                        DayOfWeek = dayOverride.Date.DayOfWeek,
+                        IsOverride = true
+                    });
+                }
+
+                // Fill in non-override days
+                if (results.Count < DaysInWeek)
+                {
+                    var weeklyHours
+                        = await _locationHoursRepository.GetWeeklyHoursAsync(locationId);
+
+                    var remainingDays = weeklyHours
+                        .Where(_ => !results.Select(r => r.DayOfWeek).Contains(_.DayOfWeek));
+
+                    foreach (var day in remainingDays)
+                    {
+                        results.Add(new LocationHoursResult
+                        {
+                            OpenTime = day.OpenTime,
+                            CloseTime = day.CloseTime,
+                            Open = day.Open,
+                            DayOfWeek = day.DayOfWeek
+                        });
+                    }
+                }
+
+                // Set currently open
+                foreach (var dayResult in results)
+                {
+                    if (dayResult.Open && dayResult.OpenTime <= now && dayResult.CloseTime >= now)
+                    {
+                        dayResult.IsCurrentlyOpen = true;
+                    }
+                }
+
+                results = results.OrderBy(_ => _.DayOfWeek).ToList();
+            }
+
+            return results;
+        }
+
+        public async Task<string> GetZipCodeAsync(double latitude, double longitude)
+        {
+            return await _googleClient.GetZipCodeAsync(latitude, longitude);
+        }
+
+        private string GetFormattedDayGroupings(List<DayOfWeek> days,
+            bool isStructuredData = false)
+        {
+            var dayFormatter = new DateTimeFormatInfo();
+            if (days.Count == 1)
+            {
+                return isStructuredData
+                    ? dayFormatter.GetAbbreviatedDayName(days[0]).Substring(0, 2)
+                    : dayFormatter.GetAbbreviatedDayName(days[0]);
+            }
+            else
+            {
+                var firstDay = days[0];
+                var lastDay = days.Last();
+
+                if (days.Count == 2)
+                {
+                    if (isStructuredData)
+                    {
+                        return $"{dayFormatter.GetAbbreviatedDayName(firstDay).Substring(0, 2)}" +
+                            $"{ndash}{dayFormatter.GetAbbreviatedDayName(lastDay).Substring(0, 2)}";
+                    }
+                    else
+                    {
+                        return $"{dayFormatter.GetAbbreviatedDayName(firstDay)}" +
+                            $" & {dayFormatter.GetAbbreviatedDayName(lastDay)}";
+                    }
+                }
+                else if (days.Count == lastDay - firstDay + 1)
+                {
+                    if (isStructuredData)
+                    {
+                        return $"{dayFormatter.GetAbbreviatedDayName(firstDay).Substring(0, 2)}" +
+                            $"{ndash}{dayFormatter.GetAbbreviatedDayName(lastDay).Substring(0, 2)}";
+                    }
+                    else
+                    {
+                        return $"{dayFormatter.GetAbbreviatedDayName(firstDay)}" +
+                            $" {ndash} {dayFormatter.GetAbbreviatedDayName(lastDay)}";
+                    }
+                }
+                else
+                {
+                    return string.Join(", ",
+                        days.Select(_ => dayFormatter.GetAbbreviatedDayName(_)));
+                }
+            }
         }
     }
 }

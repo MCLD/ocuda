@@ -1,0 +1,119 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location.LocationViewModel
+
+<div class="row">
+	<div class="col-sm-7">
+		<h1>
+			Structured Data
+			<small class="text-muted">
+				@Model.LocationName
+			</small>
+		</h1>
+	</div>
+	<div class="col-sm-5">
+		<a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+		   asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Name"
+		   asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Index))">Back</a>
+	</div>
+</div>
+
+@await Html.PartialAsync("_LocationPartial")
+
+<div class="row mt-4">
+	<div class="col-sm-8 offset-sm-2">
+		<div class="alert alert-info">
+			Configure
+			<a href="https://developers.google.com/search/docs/guides/intro-structured-data"
+			   target="_blank">Structured Data</a>
+			for this location. Please ensure proper
+			<a href="https://schema.org/" target="_blank">schema.org</a>
+			schemas and values.
+		</div>
+	</div>
+</div>
+<form asp-action="@nameof(LocationsController.StructuredData)" method="post" role="form">
+	<input type="hidden" asp-for="LocationStub" />
+	<div class="row mt-2">
+		<div class="col">
+			<input value="@Model.Location.AdministrativeArea"
+				   asp-for="Location.AdministrativeArea"
+				   formgroup
+				   autocomplete="off" />
+			<input value="@Model.Location.Type"
+				   asp-for="Location.Type"
+				   formgroup
+				   autocomplete="off" />
+			<input value="@Model.Location.AreaServedName"
+				   asp-for="Location.AreaServedName"
+				   formgroup
+				   autocomplete="off" />
+			<input value="@Model.Location.AreaServedType"
+				   asp-for="Location.AreaServedType"
+				   formgroup
+				   autocomplete="off" />
+			<input value="@Model.Location.Email"
+				   asp-for="Location.Email"
+				   formgroup
+				   autocomplete="off" />
+			<input value="@Model.Location.AddressType"
+				   asp-for="Location.AddressType"
+				   formgroup
+				   autocomplete="off" />
+			<input value="@Model.Location.ContactType"
+				   asp-for="Location.ContactType"
+				   formgroup
+				   autocomplete="off" />
+			<input value="@Model.Location.ParentOrganization"
+				   asp-for="Location.ParentOrganization"
+				   formgroup
+				   autocomplete="off" />
+			<div class="row form-group">
+				<label class="col-form-label text-md-right col-md-3">
+					Is Accessible For Free?
+				</label>
+				<div class="col-md-9">
+					<div class="custom-control custom-switch mt-2">
+						<input type="checkbox"
+							   class="custom-control-input switch"
+							   asp-for="Location.IsAccessibleForFree"
+							   value="@Model.Location.IsAccessibleForFree.ToString().ToLower()"
+							   id="isAccessibleForFree" />
+						<label class="col-form-label text-md-right col-md-3 custom-control-label text-hide"
+							   for="isAccessibleForFree"></label>
+					</div>
+				</div>
+			</div>
+			<input value="@Model.Location.PriceRange"
+				   asp-for="Location.PriceRange"
+				   formgroup
+				   autocomplete="off" />
+		</div>
+	</div>
+
+	<div class="row mt-2">
+		<div class="col-md-9 offset-md-3">
+			<button type="submit"
+					id="submit"
+					value="Submit"
+					class="btn btn-outline-success"
+					button-spinner>
+				<span class="buttonText">
+					<span class="far fa-save"></span>
+					Save Structured Data
+				</span>
+			</button>
+		</div>
+	</div>
+</form>
+
+@section scripts {
+<script>
+		$(document).on("click", ".switch", function(e){
+		if ($(this).val().toLowerCase() == "true") {
+			$(this).val("false");
+		}
+		else {
+			$(this).val("true");
+		}
+	});
+</script>
+}

@@ -36,21 +36,6 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
-        public async Task<DataWithCount<ICollection<Carousel>>> GetPaginatedListAsync(
-            BaseFilter filter)
-        {
-            var query = DbSet.AsNoTracking();
-
-            return new DataWithCount<ICollection<Carousel>>
-            {
-                Count = await query.CountAsync(),
-                Data = await query
-                    .ApplyPagination(filter)
-                    .Include(_ => _.Items)
-                    .ToListAsync()
-            };
-        }
-
         public async Task<Carousel> GetIncludingChildrenAsync(int id)
         {
             return await DbSet
@@ -88,6 +73,22 @@ namespace Ocuda.Ops.Data.Promenade
                 .Where(_ => _.CarouselId == id)
                 .Select(_ => (int?)_.PageLayoutId)
                 .SingleOrDefaultAsync();
+        }
+
+        public async Task<DataWithCount<ICollection<Carousel>>> GetPaginatedListAsync(
+                                            BaseFilter filter)
+        {
+            var query = DbSet.AsNoTracking();
+
+            return new DataWithCount<ICollection<Carousel>>
+            {
+                Count = await query.CountAsync(),
+                Data = await query
+                    .OrderBy(_ => _.Id)
+                    .ApplyPagination(filter)
+                    .Include(_ => _.Items)
+                    .ToListAsync()
+            };
         }
     }
 }

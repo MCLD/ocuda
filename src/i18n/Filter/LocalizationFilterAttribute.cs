@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 
 namespace Ocuda.i18n.Filter
 {
     [AttributeUsage(AttributeTargets.All, AllowMultiple = false)]
-    public class LocalizationFilterAttribute : Attribute, IAsyncResourceFilter
+    public sealed class LocalizationFilterAttribute : Attribute, IAsyncResourceFilter
     {
         private readonly CultureContextProvider _cultureContextProvider;
         private readonly IOptions<RequestLocalizationOptions> _l10nOptions;
@@ -29,19 +31,45 @@ namespace Ocuda.i18n.Filter
         public async Task OnResourceExecutionAsync(ResourceExecutingContext context,
             ResourceExecutionDelegate next)
         {
-            var currentCulture = _cultureContextProvider.GetCurrentCulture();
-            context.HttpContext.Items[LocalizationItemKey.ISOLanguageName]
-                = currentCulture.TwoLetterISOLanguageName;
-
             if (_l10nOptions.Value?.SupportedCultures.Count > 1)
             {
-                var cookieCulture = context.HttpContext
-                    .Request
-                    .Cookies[CookieRequestCultureProvider.DefaultCookieName];
+                var currentCulture = _cultureContextProvider.GetCurrentCulture();
 
-                if (currentCulture.Name == Culture.DefaultName)
+                string requestedCulture = null;
+
+                if (context.HttpContext.Request.Query.ContainsKey("culture"))
                 {
-                    if (cookieCulture != null)
+                    requestedCulture = context.HttpContext.Request.Query["culture"][0];
+                }
+
+                var cultureCookieSet = context.HttpContext
+                    .Request
+                    .Cookies
+                    .ContainsKey(CookieRequestCultureProvider.DefaultCookieName);
+
+                if (!string.IsNullOrEmpty(requestedCulture))
+                {
+                    // set to requested culture
+                    if (requestedCulture == Culture.DefaultName)
+                    {
+                        context.HttpContext
+                            .Response
+                            .Cookies
+                            .Delete(CookieRequestCultureProvider.DefaultCookieName);
+                    }
+                    else
+                    {
+                        context.HttpContext.Response.Cookies.Append(
+                            CookieRequestCultureProvider.DefaultCookieName,
+                            CookieRequestCultureProvider
+                                .MakeCookieValue(new RequestCulture(requestedCulture)),
+                            new CookieOptions { Expires = DateTimeOffset.UtcNow.AddDays(14) });
+                    }
+                }
+                else
+                {
+                    // no request, if default, clear the cookie
+                    if (cultureCookieSet && currentCulture.Name == Culture.DefaultName)
                     {
                         context.HttpContext
                             .Response
@@ -49,42 +77,60 @@ namespace Ocuda.i18n.Filter
                             .Delete(CookieRequestCultureProvider.DefaultCookieName);
                     }
                 }
-                else
+
+                Dictionary<string, StringValues> queryString = null;
+                if (context.HttpContext.Request.QueryString.HasValue)
                 {
-                    // no cookie or new culture selected, reset cookie
-                    context.HttpContext.Response.Cookies.Append(
-                        CookieRequestCultureProvider.DefaultCookieName,
-                        CookieRequestCultureProvider
-                            .MakeCookieValue(new RequestCulture(currentCulture.Name)),
-                        new CookieOptions { Expires = DateTimeOffset.UtcNow.AddDays(14) }
-                    );
+                    queryString
+                        = QueryHelpers.ParseQuery(context.HttpContext.Request.QueryString.Value);
+                    queryString.Remove("culture");
                 }
 
+                var currentUri = string.Format(CultureInfo.InvariantCulture,
+                    "{0}://{1}{2}{3}",
+                    context.HttpContext.Request.Scheme,
+                    context.HttpContext.Request.Host,
+                    context.HttpContext.Request.Path.HasValue
+                        ? context.HttpContext.Request.Path.Value : "",
+                    queryString != null ? new QueryBuilder(queryString).ToQueryString() : "");
+
                 // generate list for drop-down
-                var cultureList = new List<SelectListItem>();
+                var cultureList = new Dictionary<string, string>();
                 var cultureHrefLang = new Dictionary<string, string>
                 {
-                    { "x-default", Culture.DefaultName }
+                    { "x-default",
+                        QueryHelpers.AddQueryString(currentUri, "culture", Culture.DefaultName) }
                 };
+
                 foreach (var culture in _l10nOptions.Value.SupportedCultures)
                 {
                     var text = culture.Parent != null
                         ? culture.Parent.NativeName
                         : culture.NativeName;
-                    cultureList.Add(new SelectListItem(text, culture.Name));
-                    if (!cultureHrefLang.Keys.Contains(culture.Name))
+
+                    cultureList.Add(text,
+                        QueryHelpers.AddQueryString(currentUri, "culture", culture.Name));
+
+                    if (!cultureHrefLang.ContainsKey(culture.Name))
                     {
-                        cultureHrefLang.Add(culture.Name, culture.Name);
+                        cultureHrefLang.Add(culture.Name,
+                            QueryHelpers.AddQueryString(currentUri, "culture", culture.Name));
+
                         if (culture.Parent != null
-                            && !cultureHrefLang.Keys.Contains(culture.Parent.Name))
+                            && !cultureHrefLang.ContainsKey(culture.Parent.Name))
                         {
-                            cultureHrefLang.Add(culture.Parent.Name, culture.Parent.Name);
+                            cultureHrefLang.Add(culture.Parent.Name,
+                                QueryHelpers.AddQueryString(currentUri,
+                                    "culture",
+                                    culture.Parent.Name));
                         }
                     }
                 }
+
+                context.HttpContext.Items[LocalizationItemKey.CurrentCulture] = currentCulture;
+
                 context.HttpContext.Items[LocalizationItemKey.HrefLang] = cultureHrefLang;
-                context.HttpContext.Items[LocalizationItemKey.L10n] 
-                    = cultureList.OrderBy(_ => _.Text);
+                context.HttpContext.Items[LocalizationItemKey.L10n] = cultureList;
             }
 
             await next();

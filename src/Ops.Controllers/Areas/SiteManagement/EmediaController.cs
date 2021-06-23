@@ -103,7 +103,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> EditEmedia(EmediaViewModel viewModel)
         {
-            if (!string.IsNullOrEmpty(viewModel.Emedia.Stub))
+            if (!string.IsNullOrEmpty(viewModel?.Emedia.Stub))
             {
                 var currEmedia = await _emediaService.GetByStubAsync(viewModel.Emedia.Stub);
                 if (currEmedia.Id != viewModel.Emedia.Id)
@@ -182,7 +182,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> AddEmedia(EmediaViewModel viewModel)
         {
-            if (!string.IsNullOrEmpty(viewModel.Emedia.Stub))
+            if (!string.IsNullOrEmpty(viewModel?.Emedia.Stub))
             {
                 var currEmedia = await _emediaService.GetByStubAsync(viewModel.Emedia.Stub);
                 if (currEmedia != null)
@@ -197,8 +197,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 try
                 {
                     await _emediaService.AddEmedia(viewModel.Emedia);
-                    var emedia = await _emediaService.GetByStubAsync(viewModel.Emedia.Stub.ToLower().Trim());
-                    await _emediaService.UpdateEmediaCategoryAsync(viewModel.CategoryIds, emedia.Id);
+                    var emedia = await _emediaService
+                        .GetByStubAsync(viewModel.Emedia.Stub.ToLowerInvariant().Trim());
+                    await _emediaService.UpdateEmediaCategoryAsync(viewModel.CategoryIds,
+                        emedia.Id);
                     ShowAlertSuccess($"Added emedia: {emedia.Name}");
                     return RedirectToAction(nameof(EmediaController.EditEmedia),
                         new { emediaStub = viewModel.Emedia.Stub });

@@ -110,7 +110,7 @@ namespace Ocuda.Ops.Service
             }
 
             await DeleteNoSaveAsync(id);
-           
+
             await _segmentRepository.SaveAsync();
         }
 
@@ -183,6 +183,11 @@ namespace Ocuda.Ops.Service
         public async Task<int?> GetPageLayoutIdForSegmentAsync(int id)
         {
             return await _segmentRepository.GetPageLayoutIdForSegmentAsync(id);
+        }
+
+        public async Task<IDictionary<int, string>> GetNamesByIdsAsync(IEnumerable<int> ids)
+        {
+            return await _segmentRepository.GetNamesByIdsAsync(ids);
         }
     }
 }

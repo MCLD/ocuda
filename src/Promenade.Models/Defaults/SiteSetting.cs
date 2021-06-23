@@ -11,6 +11,15 @@ namespace Ocuda.Promenade.Models.Defaults
             #region Social
             new SiteSetting
             {
+                Category = "Social",
+                Description = "Id of a social card for the eMedia page",
+                Id = Keys.SiteSetting.Social.EmediaCardId,
+                Name = "eMedia social card id",
+                Type = SiteSettingType.Int,
+                Value = "-1"
+            },
+            new SiteSetting
+            {
                 Id = Keys.SiteSetting.Social.FacebookUrl,
                 Name = "Facebook URL",
                 Description = "The URL to a Facebook profile",
@@ -134,6 +143,24 @@ namespace Ocuda.Promenade.Models.Defaults
             new SiteSetting
             {
                 Category = "Scheduling",
+                Description = "Number of hours scheduling is available (decimals allowed)",
+                Id = Keys.SiteSetting.Scheduling.AvailableHours,
+                Name = "Available hours",
+                Type = SiteSettingType.Double,
+                Value = "7.5"
+            },
+            new SiteSetting
+            {
+                Category = "Scheduling",
+                Description = "Limit scheduling to this many hours after the current time (decimals allowed)",
+                Id = Keys.SiteSetting.Scheduling.BufferHours,
+                Name = "Buffer hours",
+                Type = SiteSettingType.Double,
+                Value = "4"
+            },
+            new SiteSetting
+            {
+                Category = "Scheduling",
                 Description = "Set to enable scheduling",
                 Id = Keys.SiteSetting.Scheduling.Enable,
                 Name = "Scheduling enabled",
@@ -161,12 +188,39 @@ namespace Ocuda.Promenade.Models.Defaults
             new SiteSetting
             {
                 Category = "Scheduling",
+                Description = "Segment to show if selected timeslot is over the limit",
+                Id = Keys.SiteSetting.Scheduling.OverLimitSegment,
+                Name = "Over Limit scheduling segment",
+                Type = SiteSettingType.Int,
+                Value = "-1"
+            },
+            new SiteSetting
+            {
+                Category = "Scheduling",
                 Description = "Segment to show if scheduling is successful",
                 Id = Keys.SiteSetting.Scheduling.ScheduledSegment,
                 Name = "Scheduled explanation segment",
                 Type = SiteSettingType.Int,
                 Value = "-1"
             },
+            new SiteSetting
+            {
+                Category = "Scheduling",
+                Description = "Starting hour scheduling is available, decimals allowed",
+                Id = Keys.SiteSetting.Scheduling.StartHour,
+                Name = "Start hour",
+                Type = SiteSettingType.Double,
+                Value = "9"
+            },
+            new SiteSetting
+            {
+                Category = "Scheduling",
+                Description = "Days of the week scheduling is unavailable, comma delimited",
+                Id = Keys.SiteSetting.Scheduling.UnavailableDays,
+                Name = "Unavailable days",
+                Type = SiteSettingType.StringNullable,
+                Value = "Sunday,Saturday"
+            }
             #endregion
         };
     }

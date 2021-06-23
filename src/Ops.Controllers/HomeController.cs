@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Home;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers
@@ -89,6 +92,19 @@ namespace Ocuda.Ops.Controllers
             TempData[TempDataKey.AlertWarning]
                 = $"Could not authenticate you for access to {returnUrl}.";
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet("[action]")]
+        public IActionResult Whoami()
+        {
+            return Json(new UserInformation
+            {
+                Username = UserClaim(ClaimType.Username),
+                Authenticated = !string.IsNullOrEmpty(UserClaim(ClaimType.Username)),
+                AuthenticatedAt = UserClaim(ClaimType.AuthenticatedAt) != null
+                    ? DateTime.Parse(UserClaim(ClaimType.AuthenticatedAt), CultureInfo.InvariantCulture)
+                    : null
+            });
         }
     }
 }

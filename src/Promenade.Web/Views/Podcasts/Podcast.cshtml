@@ -8,16 +8,17 @@
 }
 
 <div class="row">
-    <div class="col-6 col-md-3 mx-auto">
+    <div class="col-6 col-md-3 mx-auto mb-2">
         <img class="img-thumbnail img-fluid"
              src="@(Model.Podcast.ImageThumbnailUrl ?? Model.Podcast.ImageUrl)"
              alt="Logo for @Model.Podcast.Title" />
     </div>
     <div class="col-12 col-md-9">
-        <div class="h5">@Model.Podcast.Title</div>
+        <h1>@Model.Podcast.Title Podcast</h1>
         <p>@Model.Podcast.Description</p>
         <div class="row">
             <div class="col-12">
+                <span class="sr-only">You can listen to our podcast on:</span>
                 @foreach (var directoryInfo in Model.PodcastDirectoryInfos)
                 {
                     <a href="@directoryInfo.Url"
@@ -32,19 +33,23 @@
     </div>
 
 </div>
-<hr />
+<hr aria-hidden="true" />
 
 @foreach (var item in Model.PodcastItems)
 {
     <div class="row">
         <div class="col-12">
             <div class="row">
-                <div class="col-12 col-md-5 col-lg-6 col-xl-7">
-                    <div class="mb-2 lead"><a href="@Url.Action(nameof(PodcastsController.Episode), new { podcastStub = Model.Podcast.Stub, episodeStub = item.Stub})"><strong>@item.Title</strong></a></div>
+                <div class="col-12 col-lg-6 col-xl-7">
+                    <h2 class="mb-2">
+                        <a href="@Url.Action(nameof(PodcastsController.Episode), new { podcastStub = Model.Podcast.Stub, episodeStub = item.Stub})">
+                           @item.Title
+                        </a>
+                    </h2>
                     <div class="mb-2"><em>Episode @item.Episode, published @item.PublishDate.Value.ToLongDateString().</em></div>
                 </div>
-                <div class="col-12 col-md-7 col-lg-6 col-xl-5 text-right">
-                    <audio controls class="mb-2">
+                <div class="col-12 col-lg-6 col-xl-5 text-right">
+                    <audio controls class="mb-2 w-100">
                         <source src="@item.MediaUrl" type="@item.MediaType" />
                     </audio>
                 </div>
@@ -54,7 +59,7 @@
             <p>@item.Description</p>
         </div>
     </div>
-    <hr />
+    <hr aria-hidden="true" />
 }
 
 @if (Model.PaginateModel.MaxPage > 1)

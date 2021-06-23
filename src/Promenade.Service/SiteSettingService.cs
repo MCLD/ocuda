@@ -1,28 +1,28 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Promenade.Service.Abstract;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
+using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Promenade.Service
 {
-    public class SiteSettingService
+    public class SiteSettingService : BaseService<SiteSettingService>
     {
         private const string NoValue = "null";
 
-        private readonly ILogger _logger;
-        private readonly IDistributedCache _cache;
+        private readonly IOcudaCache _cache;
         private readonly ISiteSettingRepository _siteSettingRepository;
 
         public SiteSettingService(ILogger<SiteSettingService> logger,
-            IDistributedCache cache,
-            ISiteSettingRepository siteSettingRepository)
+            IDateTimeProvider dateTimeProvider,
+            IOcudaCache cache,
+            ISiteSettingRepository siteSettingRepository) : base(logger, dateTimeProvider)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _cache = cache ?? throw new ArgumentNullException(nameof(logger));
             _siteSettingRepository = siteSettingRepository
                 ?? throw new ArgumentNullException(nameof(siteSettingRepository));
@@ -57,6 +57,46 @@ namespace Ocuda.Promenade.Service
                     _logger.LogCritical("Invalid default value for Promenade boolean setting {SiteSettingKey}: {SiteSettingValue}",
                         key,
                         settingValue);
+                    return default;
+                }
+            }
+        }
+
+        public async Task<double> GetSettingDoubleAsync(string key)
+        {
+            return await GetSettingDoubleAsync(key, false);
+        }
+
+        public async Task<double> GetSettingDoubleAsync(string key, bool forceReload)
+        {
+            var settingValue = await GetSettingValueAsync(key, forceReload);
+
+            if (double.TryParse(settingValue, out double result))
+            {
+                return result;
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(settingValue))
+                {
+                    _logger.LogError("Invalid value for Promenade double setting {SiteSettingKey}: {SiteSettingValue}",
+                        key,
+                        settingValue);
+                }
+
+                var defaultSetting = GetDefaultSetting(key);
+                if (double.TryParse(defaultSetting.Value, out double defaultResult))
+                {
+                    return defaultResult;
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(defaultSetting.Value))
+                    {
+                        _logger.LogCritical("Invalid default value for Promenade double setting {SiteSettingKey}: {SiteSettingValue}",
+                            key,
+                            settingValue);
+                    }
                     return default;
                 }
             }
@@ -112,9 +152,11 @@ namespace Ocuda.Promenade.Service
             return await GetSettingValueAsync(key, forceReload);
         }
 
+        private static SiteSetting GetDefaultSetting(string key)
+            => Models.Defaults.SiteSettings.Get.Single(_ => _.Id == key);
+
         private async Task<string> GetSettingValueAsync(string key, bool forceReload)
         {
-            long start = Stopwatch.GetTimestamp();
             string setting = null;
 
             var cacheKey = string.Format(CultureInfo.InvariantCulture,
@@ -123,8 +165,8 @@ namespace Ocuda.Promenade.Service
 
             if (!forceReload)
             {
-                setting = await _cache.GetStringAsync(cacheKey);
-                if(setting?.Equals(NoValue, StringComparison.OrdinalIgnoreCase) == true)
+                setting = await _cache.GetStringFromCache(cacheKey);
+                if (setting?.Equals(NoValue, StringComparison.OrdinalIgnoreCase) == true)
                 {
                     return null;
                 }
@@ -135,21 +177,12 @@ namespace Ocuda.Promenade.Service
                 var siteSetting = await _siteSettingRepository.FindAsync(key)
                     ?? GetDefaultSetting(key);
                 setting = siteSetting?.Value ?? NoValue;
-                _logger.LogDebug("Cache miss for {CacheKey}, caching {Length} characters in {Elapsed} ms",
-                    cacheKey,
-                    setting?.Length,
-                    (Stopwatch.GetTimestamp() - start) * 1000 / (double)Stopwatch.Frequency);
-                await _cache.SetStringAsync(cacheKey,
+                await _cache.SaveToCacheAsync(cacheKey,
                     setting,
-                    new DistributedCacheEntryOptions
-                    {
-                        SlidingExpiration = new TimeSpan(1, 0, 0)
-                    });
+                    TimeSpan.FromHours(12),
+                    CacheSlidingExpiration);
             }
             return setting;
         }
-
-        private static SiteSetting GetDefaultSetting(string key)
-            => Models.Defaults.SiteSettings.Get.Single(_ => _.Id == key);
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Ocuda.Promenade.Service.Filters
+﻿namespace Ocuda.Promenade.Service.Filters
 {
     public class PodcastFilter : BaseFilter
     {

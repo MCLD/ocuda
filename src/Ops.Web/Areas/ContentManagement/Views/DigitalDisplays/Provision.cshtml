@@ -1,0 +1,62 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDisplays.ProvisionDisplayViewModel
+
+<div class="row">
+    <div class="col-sm-7">
+        <h1>Provision</h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Index))">Back</a>
+    </div>
+</div>
+
+@await Html.PartialAsync("_DigitalDisplaysPartial")
+
+<div class="row py-2">
+    <div class="col">
+        <p>
+            Provision a new digital display. The digital display should have
+            Screenly OSE installed and you should know its IP address.
+        </p>
+    </div>
+</div>
+
+<form asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Provision))">
+    <div class="form-group">
+        <label asp-for="DigitalDisplay.Name"></label>
+        <input asp-for="DigitalDisplay.Name" class="form-control" />
+        <span class="validation-message text-danger"
+              asp-validation-for="DigitalDisplay.Name"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="DigitalDisplay.RemoteAddress"></label>
+        <input asp-for="DigitalDisplay.RemoteAddress" class="form-control" />
+        <span class="validation-message text-danger"
+              asp-validation-for="DigitalDisplay.RemoteAddress"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="DigitalDisplay.BasicAuthentication"></label>
+        <input asp-for="DigitalDisplay.BasicAuthentication" class="form-control" />
+        <span class="validation-message text-danger"
+              asp-validation-for="DigitalDisplay.BasicAuthentication"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="DigitalDisplay.LocationId"></label>
+        <select asp-for="DigitalDisplay.LocationId"
+                asp-items="Model.Locations"
+                class="form-control"></select>
+        <span class="validation-message text-danger"
+              asp-validation-for="DigitalDisplay.LocationId"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="DigitalDisplay.LocationDescription"></label>
+        <input asp-for="DigitalDisplay.LocationDescription" class="form-control" />
+        <span class="validation-message text-danger"
+              asp-validation-for="DigitalDisplay.LocationDescription"></span>
+    </div>
+    <button type="submit" class="btn btn-outline-success">
+        <span class="fas fa-plus-circle"></span>
+        Provision
+    </button>
+</form>
