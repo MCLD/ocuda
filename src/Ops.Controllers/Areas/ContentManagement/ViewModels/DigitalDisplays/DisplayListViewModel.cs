@@ -23,11 +23,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDispla
         {
             if (display != null)
             {
-                if (System.DateTime.Now.AddHours(-2) < display.LastContentVerification)
+                if (System.DateTime.Now.AddHours(-2) > display.LastContentVerification)
                 {
                     return "table-warning";
                 }
-                else if (System.DateTime.Now.AddHours(-4) < display.LastContentVerification)
+                else if (System.DateTime.Now.AddHours(-4) > display.LastContentVerification)
                 {
                     return "table-danger";
                 }
