@@ -45,13 +45,24 @@ footer {
         color: white;
     }
 
-    .prom-nav-top > .prom-right-nav > div {
+    .prom-nav-top > .prom-right-nav {
+        margin: 0;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .prom-nav-top > .prom-right-nav > li {
         padding: 1rem 0.5rem;
         float: right;
     }
 
-        .prom-nav-top > .prom-right-nav > div > a {
+        .prom-nav-top > .prom-right-nav > li > a {
             color: white;
+            padding: 0;
+        }
+
+        .prom-nav-top > .prom-right-nav > li > a:hover {
+            text-decoration: underline;
         }
 
     .prom-nav-top > .prom-right-nav .prom-dropdown-swap-link {
