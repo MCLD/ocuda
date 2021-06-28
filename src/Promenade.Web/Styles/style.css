@@ -49,6 +49,7 @@ footer {
         margin: 0;
         display: flex;
         justify-content: flex-end;
+        list-style-type: none;
     }
 
     .prom-nav-top > .prom-right-nav > li {
