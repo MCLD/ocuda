@@ -7,6 +7,8 @@ using Ocuda.Promenade.Service;
 
 namespace Ocuda.Promenade.Controllers
 {
+    [Route("")]
+    [Route("{culture:cultureConstraint?}")]
     public class HomeController : BasePageController<HomeController>
     {
         public HomeController(ServiceFacades.Controller<HomeController> context,
@@ -23,6 +25,7 @@ namespace Ocuda.Promenade.Controllers
 
         public static string Name { get { return "Home"; } }
         protected override PageType PageType { get { return PageType.Home; } }
+
         [HttpGet("{stub?}/item/{id}")]
         public async Task<IActionResult> CarouselItem(string stub, int id)
         {

@@ -159,7 +159,10 @@
                 if (!string.IsNullOrEmpty(bannerImage))
                 {
                     <div class="row prom-nav-logo">
-                        <a asp-action="Index" asp-controller="Home" asp-area="">
+                        <a asp-action="Index"
+                           asp-controller="Home"
+                           asp-area=""
+                           asp-route-culture="">
                             <img src="@bannerImage"
                                  alt="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.BannerImageAlt]"
                                  style="max-width: 100%;" />

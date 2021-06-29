@@ -19,6 +19,7 @@ using Ocuda.Utility.Helpers;
 namespace Ocuda.Promenade.Controllers
 {
     [Route("[Controller]")]
+    [Route("{culture:cultureConstraint?}/[Controller]")]
     public class HelpController : BaseController<HelpController>
     {
         private const int HoursInADay = 24;

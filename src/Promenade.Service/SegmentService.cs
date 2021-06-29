@@ -98,9 +98,12 @@ namespace Ocuda.Promenade.Service
                         segmentText = await _segmentTextRepository
                             .GetByIdsAsync(currentLangaugeId, segmentId);
 
-                        await _cache.SaveToCacheAsync(segmentTextCacheKey,
-                            segmentText,
-                            cachePagesInHours);
+                        if (segmentText != null)
+                        {
+                            await _cache.SaveToCacheAsync(segmentTextCacheKey,
+                                segmentText,
+                                cachePagesInHours);
+                        }
                     }
                 }
 

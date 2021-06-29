@@ -20,6 +20,7 @@ using Ocuda.Utility.Services.Interfaces;
 namespace Ocuda.Promenade.Controllers
 {
     [Route("[Controller]")]
+    [Route("{culture:cultureConstraint?}/[Controller]")]
     public class PodcastsController : BaseController<PodcastsController>
     {
         private readonly IPathResolverService _pathResolverService;

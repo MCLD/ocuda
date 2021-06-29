@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -18,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using Ocuda.i18n;
+using Ocuda.i18n.RouteConstraint;
 using Ocuda.Promenade.Data;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility.Abstract;
@@ -34,6 +36,7 @@ namespace Ocuda.Promenade.Web
     {
         private readonly IConfiguration _config;
         private readonly bool _isDevelopment;
+        private RouteDataRequestCultureProvider _routeDataCultureProvider;
 
         public Startup(IConfiguration configuration,
             IWebHostEnvironment env)
@@ -90,8 +93,16 @@ namespace Ocuda.Promenade.Web
             {
                 DefaultRequestCulture = new RequestCulture(Culture.DefaultCulture),
                 SupportedCultures = Culture.SupportedCultures,
-                SupportedUICultures = Culture.SupportedCultures
+                SupportedUICultures = Culture.SupportedCultures,
             };
+
+            requestLocalizationOptions.RequestCultureProviders.Add(_routeDataCultureProvider);
+
+            requestLocalizationOptions
+                .RequestCultureProviders
+                .Remove(requestLocalizationOptions
+                    .RequestCultureProviders
+                    .Single(_ => _.GetType() == typeof(QueryStringRequestCultureProvider)));
 
             app.UseRequestLocalization(requestLocalizationOptions);
 
@@ -175,6 +186,14 @@ namespace Ocuda.Promenade.Web
                 _.DefaultRequestCulture = new RequestCulture(Culture.DefaultCulture);
                 _.SupportedCultures = Culture.SupportedCultures;
                 _.SupportedUICultures = Culture.SupportedCultures;
+                _routeDataCultureProvider = new RouteDataRequestCultureProvider
+                {
+                    Options = _
+                };
+                _.RequestCultureProviders.Insert(0, _routeDataCultureProvider);
+                _.RequestCultureProviders
+                    .Remove(_.RequestCultureProviders
+                        .Single(__ => __.GetType() == typeof(QueryStringRequestCultureProvider)));
             });
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -284,6 +303,9 @@ namespace Ocuda.Promenade.Web
             }
 
             services.AddDataProtection().PersistKeysToDbContext<PromenadeContext>();
+
+            services.Configure<RouteOptions>(_ =>
+                _.ConstraintMap.Add("cultureConstraint", typeof(CultureRouteConstraint)));
 
             if (_isDevelopment)
             {

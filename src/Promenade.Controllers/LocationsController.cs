@@ -12,6 +12,7 @@ using Ocuda.Promenade.Service;
 namespace Ocuda.Promenade.Controllers
 {
     [Route("[Controller]")]
+    [Route("{culture:cultureConstraint?}/[Controller]")]
     public class LocationsController : BaseController<LocationsController>
     {
         private readonly string _apiKey;
