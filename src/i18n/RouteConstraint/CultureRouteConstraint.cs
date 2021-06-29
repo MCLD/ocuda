@@ -22,11 +22,11 @@ namespace Ocuda.i18n.RouteConstraint
             RouteValueDictionary values,
             RouteDirection routeDirection)
         {
-            string culture = values[routeKey] as string;
+            string culture = values?[routeKey] as string;
             return _l10nOptions
                     .Value
                     .SupportedCultures
-                    .Any(_ => _.Name == culture || _.Parent?.Name == culture);
+                    .Any(_ => _.Name == culture);
         }
     }
 }
