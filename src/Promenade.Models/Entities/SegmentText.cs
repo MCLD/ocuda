@@ -5,24 +5,23 @@ namespace Ocuda.Promenade.Models.Entities
 {
     public class SegmentText
     {
-        [Key]
-        [Required]
-        public int SegmentId { get; set; }
+        [MaxLength(255)]
+        [DisplayName("Header (optional)")]
+        public string Header { get; set; }
 
-        public Segment Segment { get; set; }
+        public Language Language { get; set; }
 
         [Key]
         [Required]
         [DisplayName("Language")]
         public int LanguageId { get; set; }
 
-        public Language Language { get; set; }
+        public Segment Segment { get; set; }
 
-        [MaxLength(255)]
-        [DisplayName("Header (optional)")]
-        public string Header { get; set; }
+        [Key]
+        [Required]
+        public int SegmentId { get; set; }
 
-        [MaxLength(4000)]
         public string Text { get; set; }
     }
 }
