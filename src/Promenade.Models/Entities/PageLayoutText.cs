@@ -17,5 +17,5 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         [DisplayName("Page title")]
         public string Title { get; set; }
-    }z
+    }
 }
