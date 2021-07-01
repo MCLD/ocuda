@@ -15,9 +15,6 @@ namespace Ocuda.Promenade.Models.Entities
         [NotMapped]
         public bool IsPreview { get; set; }
 
-        [DisplayName("Is the title only visible to screen readers?")]
-        public bool IsTitleHidden { get; set; }
-
         public ICollection<PageItem> Items { get; set; }
 
         [Required]
