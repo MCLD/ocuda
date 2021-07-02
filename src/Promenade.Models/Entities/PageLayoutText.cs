@@ -5,7 +5,7 @@ namespace Ocuda.Promenade.Models.Entities
 {
     public class PageLayoutText
     {
-        [DisplayName("Is the title only visible to screen readers?")]
+        [DisplayName("Title Visibility")]
         public bool IsTitleHidden { get; set; }
 
         public Language Language { get; set; }

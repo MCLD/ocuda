@@ -36,7 +36,10 @@
 
 <form id="addForm" role="form">
     <input id="addLanguage" asp-for="LanguageId" type="hidden" />
-    <input id="addLayout" asp-for="PageItem.PageLayoutId" value="@Model.PageLayoutId" type="hidden" />
+    <input id="addLayout"
+           asp-for="PageItem.PageLayoutId"
+           value="@Model.PageLayoutId"
+           type="hidden" />
 
     <div modal
          id="addModal"
@@ -156,7 +159,13 @@
             <input asp-for="PageLayoutText.Title"
                    value="@Model.PageLayout.PageLayoutText?.Title"
                    formgroup />
-
+            <select asp-for="PageLayoutText.IsTitleHidden"
+                    class="form-control"
+                    formgroup>
+                <option value="false">Visible in a level 1 header at the top of the page</option>
+                <option selected="@(Model.PageLayout.PageLayoutText?.IsTitleHidden == true ? true : false)"
+                        value="true">Only visible to screen readers</option>
+            </select>
             <div class="row">
                 <div class="offset-md-3 col-md-9">
                     <button type="submit"

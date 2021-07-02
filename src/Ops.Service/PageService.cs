@@ -523,6 +523,7 @@ namespace Ocuda.Ops.Service
             else
             {
                 currentText.Title = layoutText.Title?.Trim();
+                currentText.IsTitleHidden = layoutText.IsTitleHidden;
 
                 _pageLayoutTextRepository.Update(currentText);
                 await _pageLayoutTextRepository.SaveAsync();
