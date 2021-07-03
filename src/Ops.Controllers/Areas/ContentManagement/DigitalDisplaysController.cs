@@ -454,12 +454,16 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         [HttpPost]
         [Route("[action]")]
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
             "CA1031:Do not catch general exception types",
             Justification = "Any error should return a valid JSON response")]
         public async Task<IActionResult> UploadJob(SlideUploadJob job)
         {
+            if (!await HasContentManagementRightsAsync())
+            {
+                return Json(ErrorJobResult("You do not have permission to upload an asset."));
+            }
+
             // validate job
             if (job == null)
             {
