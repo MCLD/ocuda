@@ -20,12 +20,12 @@ namespace Ocuda.Promenade.Data.Promenade
         public NavigationTextRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<NavigationTextRepository> logger)
         {
-            if (repositoryFacade == null)
+            if (repositoryFacade == null || repositoryFacade.context == null)
             {
                 throw new ArgumentNullException(nameof(repositoryFacade));
             }
 
-            _context = repositoryFacade.context ?? throw new ArgumentNullException();
+            _context = repositoryFacade.context;
             _dateTimeProvider = repositoryFacade.dateTimeProvider;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -34,7 +34,7 @@ namespace Ocuda.Promenade.Data.Promenade
         {
             get
             {
-                return _dbSet ?? (_dbSet = _context.Set<NavigationText>());
+                return _dbSet ??= _context.Set<NavigationText>();
             }
         }
 
@@ -42,7 +42,8 @@ namespace Ocuda.Promenade.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id == id && _.LanguageId == languageId).SingleAsync();
+                .Where(_ => _.Id == id && _.LanguageId == languageId)
+                .SingleOrDefaultAsync();
         }
     }
 }
