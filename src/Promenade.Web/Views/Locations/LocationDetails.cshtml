@@ -28,7 +28,8 @@
                 @Model.Location.State
                 @Model.Location.Zip
                 <br />
-                <a aria-label="Call us at: @Model.Location.Phone" href="tel:@Model.Location.Phone">@Model.Location.Phone</a>
+                <a aria-label="Call us at: @Model.Location.Phone"
+                   href="tel:@Model.Location.Phone">@Model.Location.Phone</a>
             </address>
             <div class="sr-only">Our current operating hours are:</div>
             @if (Model.Location.IsAlwaysOpen)

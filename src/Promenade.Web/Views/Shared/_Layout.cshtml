@@ -85,8 +85,10 @@
                                     <ul class="dropdown-menu" role="list">
                                         @foreach (var l10nItem in l10nLinks)
                                         {
-                                            <li><a href="@l10nItem.Value"
-                                               class="dropdown-item">@l10nItem.Key</a></li>
+                                            <li>
+                                                <a href="@l10nItem.Value"
+                                                   class="dropdown-item">@l10nItem.Key</a>
+                                            </li>
                                         }
                                     </ul>
                                 </div>
@@ -117,7 +119,8 @@
                                     }
                                     if (item.Navigations.Count() > 0)
                                     {
-                                        <li role="presentation" class="dropdown @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : "")">
+                                        <li role="presentation"
+                                            class="dropdown @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : "")">
                                             <a class="nav-link dropdown-toggle @(item.NavigationText.Label == null ? "" : "d-flex align-items-center")"
                                                data-toggle="dropdown"
                                                href="#"
@@ -228,7 +231,8 @@
 
             @if (leftNavigation?.Navigations.Count() > 0)
             {
-                <div role="complementary" class="col-12 col-sm-3 order-sm-first prom-leftnav-container">
+                <div role="complementary"
+                     class="col-12 col-sm-3 order-sm-first prom-leftnav-container">
                     <div class="prom-leftnav" aria-label="res">
                         @foreach (var item in leftNavigation.Navigations)
                         {
@@ -271,7 +275,8 @@
                         }
                     </div>
                     <div class="text-center prom-leftnav-social">
-                        <ul aria-label="Connect with us on social media!" class="nav d-inline-flex justify-content-center">
+                        <ul aria-label="Connect with us on social media!"
+                            class="nav d-inline-flex justify-content-center">
                             @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl].ToString()))
                             {
                                 <li>
