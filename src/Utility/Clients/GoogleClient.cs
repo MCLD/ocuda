@@ -124,7 +124,7 @@ namespace Ocuda.Utility.Clients
         {
             var uri = new Uri(QueryHelpers.AddQueryString(GeocodeLink,
                 new Dictionary<string, string> {
-                    { "latlng", HttpUtility.UrlEncode($"{latitude},{longitude}") },
+                    { "latlng", $"{latitude},{longitude}" },
                     { "key", HttpUtility.UrlEncode(_apiKey) }
                 }));
 

@@ -25,13 +25,16 @@
         <div class="col-12 mb-2">
             <form asp-action="@nameof(LocationsController.Find)"
                   method="get"
-                  role="form">
+                  role="form"
+                  id="ZipForm">
                 <div class="input-group">
                     <input asp-for="Zip"
                            placeholder="Enter a 5 digit ZIP code"
                            class="form-control default-text" />
                     <div class="input-group-append">
-                        <button class="btn btn-outline-primary" id="GoButton">
+                        <button class="btn btn-outline-primary"
+                                type="submit"
+                                id="GoButton">
                             Go
                         </button>
                     </div>
@@ -63,7 +66,7 @@
             <div class="col-12 col-md-6 col-lg-4 mt-2 mb-3 d-flex">
                 <div class="prom-location-tile flex-fill w-100">
                     @if (!string.IsNullOrEmpty(location.MapLink)
-                        && !string.IsNullOrEmpty(location.MapImagePath))
+                       && !string.IsNullOrEmpty(location.MapImagePath))
                     {
                         <a href="@location.MapLink">
                             <img src="@location.MapImagePath"
@@ -172,7 +175,8 @@
         $('#GoButton').on('click', function () {
             $('#GoButton').html('<span class="fa fa-spinner fa-spin"></span> Go');
             $('#GoButton').prop('disabled', true);
-            return true;
+            $('#ZipForm').submit();
+            return false;
         });
     </script>
 }
