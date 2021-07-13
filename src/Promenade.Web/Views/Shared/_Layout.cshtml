@@ -102,8 +102,10 @@
                                     if (item.ChangeToLinkWhenExtraSmall || item.Navigations.Count() == 0)
                                     {
                                         <li class="nav-item @(item.Navigations.Count() == 0 ? "" : "prom-nav-link")">
-                                            <a title="@item.NavigationText.Title"
-                                               aria-label="@item.NavigationText.AriaLabel"
+                                            <a title="@(string.IsNullOrEmpty(item.NavigationText.Label)
+                                                        && !string.IsNullOrEmpty(item.Icon)
+                                                        && !string.IsNullOrEmpty(item.NavigationText.Title)
+                                                        ? item.NavigationText.Title : null)"
                                                href="@(string.IsNullOrEmpty(item.Link) ? "#" : item.Link)"
                                                class="nav-link @(item.NavigationText.Label == null ? "" : "d-flex align-items-center")">
                                                 @if (!string.IsNullOrEmpty(item.Icon))
@@ -142,7 +144,10 @@
                                                     <li>
                                                         <a href="@subItem.Link"
                                                            class="dropdown-item"
-                                                           aria-label="@subItem.NavigationText.AriaLabel">
+                                                           title="@(string.IsNullOrEmpty(item.NavigationText.Label)
+                                                                    && !string.IsNullOrEmpty(item.Icon)
+                                                                    && !string.IsNullOrEmpty(item.NavigationText.Title)
+                                                                    ? item.NavigationText.Title : null)">
                                                             @if (!string.IsNullOrEmpty(subItem.Icon))
                                                             {
                                                                 <span class="@subItem.Icon"></span>
@@ -182,7 +187,10 @@
                                 if (item.ChangeToLinkWhenExtraSmall || item.Navigations.Count() == 0)
                                 {
                                     <li role="presentation" class="nav-item prom-nav-link">
-                                        <a aria-label="@item.NavigationText.AriaLabel"
+                                        <a title="@(string.IsNullOrEmpty(item.NavigationText.Label)
+                                                    && !string.IsNullOrEmpty(item.Icon)
+                                                    && !string.IsNullOrEmpty(item.NavigationText.Title)
+                                                    ? item.NavigationText.Title : null)"
                                            href="@item.Link"
                                            class="nav-link prom-nav-link"
                                            title="@item.NavigationText.Title">@item.NavigationText.Label</a>
@@ -204,7 +212,10 @@
                                                 <li>
                                                     <a href="@subItem.Link"
                                                        class="dropdown-item"
-                                                       aria-label="@subItem.NavigationText.AriaLabel">
+                                                       title="@(string.IsNullOrEmpty(item.NavigationText.Label)
+                                                                && !string.IsNullOrEmpty(item.Icon)
+                                                                && !string.IsNullOrEmpty(item.NavigationText.Title)
+                                                                ? item.NavigationText.Title : null)">
                                                         @if (!string.IsNullOrEmpty(subItem.Icon))
                                                         {
                                                             <span class="@subItem.Icon"></span>
@@ -256,7 +267,11 @@
                                                 <li>
                                                     <a href="@subItem.Link"
                                                        @(subItem.TargetNewWindow ? "target=\"_blank\"" : "")
-                                                       aria-label="@subItem.NavigationText.AriaLabel @(subItem.TargetNewWindow ? " (opens new window)" : "")">
+                                                       title="@(string.IsNullOrEmpty(subItem.NavigationText.Label)
+                                                            && !string.IsNullOrEmpty(subItem.Icon)
+                                                            && !string.IsNullOrEmpty(subItem.NavigationText.Title)
+                                                            ? subItem.NavigationText.Title : null)"
+                                                       aria-label="@(subItem.TargetNewWindow ? subItem.NavigationText.Label + " (opens new window)" : "")">
                                                         @subItem.NavigationText.Label
                                                     </a>
                                                 </li>
@@ -269,7 +284,6 @@
                             {
                                 leftNavigationFeaturetteNumber++;
                                 <a href="@item.Link"
-                                   aria-label="@item.NavigationText.AriaLabel"
                                    class="btn btn-secondary btn-block prom-leftnav-featurette-button prom-leftnav-featurette-button-@leftNavigationFeaturetteNumber">@item.NavigationText.Label</a>
                             }
                         }
@@ -283,7 +297,8 @@
                                     <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]"
                                        class="prom-leftnav-social-link"
                                        target="_blank"
-                                       aria-label="Visit our Facebook (opens new window)"><span class="fab fa-facebook"></span></a>
+                                       title="Visit our Facebook"
+                                       aria-label="(opens new window)"><span class="fab fa-facebook"></span></a>
                                     <span>&nbsp;</span>
                                 </li>
                             }
@@ -293,7 +308,8 @@
                                     <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl]"
                                        class="prom-leftnav-social-link"
                                        target="_blank"
-                                       aria-label="Visit our Instagram (opens new window)"><span class="fab fa-instagram"></span></a>
+                                       title="Visit our Instagram"
+                                       aria-label="(opens new window)"><span class="fab fa-instagram"></span></a>
                                     <span>&nbsp;</span>
                                 </li>
                             }
@@ -303,7 +319,8 @@
                                     <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]"
                                        class="prom-leftnav-social-link"
                                        target="_blank"
-                                       aria-label="Visit our Twitter (opens new window)"><span class="fab fa-twitter"></span></a>
+                                       title="Visit our Twitter"
+                                       aria-label="(opens new window)"><span class="fab fa-twitter"></span></a>
                                     <span>&nbsp;</span>
                                 </li>
                             }
@@ -313,7 +330,8 @@
                                     <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl]"
                                        class="prom-leftnav-social-link"
                                        target="_blank"
-                                       aria-label="Visit our Youtube (opens new window)"><span class="fab fa-youtube"></span></a>
+                                       title="Visit our Youtube"
+                                       aria-label="(opens new window)"><span class="fab fa-youtube"></span></a>
                                 </li>
                             }
                         </ul>
@@ -337,7 +355,10 @@
                         {
                             <div>
                                 <a href="@item.Link"
-                                   aria-label="@item.NavigationText.AriaLabel"
+                                   title="@(string.IsNullOrEmpty(item.NavigationText.Label)
+                                        && !string.IsNullOrEmpty(item.Icon)
+                                        && !string.IsNullOrEmpty(item.NavigationText.Title) ?
+                                        item.NavigationText.Title : null)"
                                    class="@(item.NavigationText.Label == null ? "" : "d-flex align-items-center")">
                                     @if (!string.IsNullOrEmpty(item.Icon))
                                     {
