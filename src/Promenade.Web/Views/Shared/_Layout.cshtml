@@ -103,20 +103,14 @@
                                     {
                                         <li class="nav-item @(item.Navigations.Count() == 0 ? "" : "prom-nav-link")">
                                             @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                                                     && !string.IsNullOrEmpty(item.Icon)
-                                                     && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                                   && !string.IsNullOrEmpty(item.Icon)
+                                                   && !string.IsNullOrEmpty(item.NavigationText.Title))
                                             {
                                                 <a title="@item.NavigationText.Title"
                                                    href="@(string.IsNullOrEmpty(item.Link) ? "#" : item.Link)"
                                                    class="nav-link @(item.NavigationText.Label == null ? "" : "d-flex align-items-center")">
-                                                    @if (!string.IsNullOrEmpty(item.Icon))
-                                                    {
-                                                        <span class="@item.Icon @(item.NavigationText.Label == null ? "" : "prom-fa-space")"></span>
-                                                    }
-                                                    @if (!string.IsNullOrEmpty(item.NavigationText.Label))
-                                                    {
-                                                        <span class="@(item.HideTextWhenExtraSmall ? "hidden-xxs" : "")">@item.NavigationText.Label</span>
-                                                    }
+                                                    <span class="@item.Icon"></span>
+                                                    <span class="@(item.HideTextWhenExtraSmall ? "hidden-xxs" : "")">@item.NavigationText.Label</span>
                                                 </a>
                                             }
                                             else
@@ -158,17 +152,14 @@
                                                 @foreach (var subItem in item.Navigations)
                                                 {
                                                     <li>
-                                                        @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                                                                && !string.IsNullOrEmpty(item.Icon)
-                                                                && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                                        @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
+                                                              && !string.IsNullOrEmpty(subItem.Icon)
+                                                              && !string.IsNullOrEmpty(subItem.NavigationText.Title))
                                                         {
                                                             <a href="@subItem.Link"
                                                                class="dropdown-item"
-                                                               title="@item.NavigationText.Title">
-                                                                @if (!string.IsNullOrEmpty(subItem.Icon))
-                                                                {
-                                                                    <span class="@subItem.Icon"></span>
-                                                                }
+                                                               title="@subItem.NavigationText.Title">
+                                                                <span class="@subItem.Icon"></span>
                                                                 @subItem.NavigationText.Label
                                                             </a>
                                                         }
@@ -217,8 +208,8 @@
                                 {
                                     <li role="presentation" class="nav-item prom-nav-link">
                                         @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                                                && !string.IsNullOrEmpty(item.Icon)
-                                                && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                              && !string.IsNullOrEmpty(item.Icon)
+                                              && !string.IsNullOrEmpty(item.NavigationText.Title))
                                         {
                                             <a href="@item.Link"
                                                class="nav-link prom-nav-link"
@@ -245,17 +236,14 @@
                                             @foreach (var subItem in item.Navigations)
                                             {
                                                 <li>
-                                                    @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                                                            && !string.IsNullOrEmpty(item.Icon)
-                                                            && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                                    @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
+                                                          && !string.IsNullOrEmpty(subItem.Icon)
+                                                          && !string.IsNullOrEmpty(subItem.NavigationText.Title))
                                                     {
                                                         <a href="@subItem.Link"
                                                            class="dropdown-item"
                                                            title="@item.NavigationText.Title">
-                                                            @if (!string.IsNullOrEmpty(subItem.Icon))
-                                                            {
-                                                                <span class="@subItem.Icon"></span>
-                                                            }
+                                                            <span class="@subItem.Icon"></span>
                                                             @subItem.NavigationText.Label
                                                         </a>
                                                     }
@@ -314,8 +302,8 @@
                                             {
                                                 <li>
                                                     @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
-                                                              && !string.IsNullOrEmpty(subItem.Icon)
-                                                              && !string.IsNullOrEmpty(subItem.NavigationText.Title))
+                                                            && !string.IsNullOrEmpty(subItem.Icon)
+                                                            && !string.IsNullOrEmpty(subItem.NavigationText.Title))
                                                     {
                                                         <a href="@subItem.Link"
                                                            @(subItem.TargetNewWindow ? "target=\"_blank\"" : "")
@@ -413,8 +401,8 @@
                         {
                             <div>
                                 @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                                           && !string.IsNullOrEmpty(item.Icon)
-                                           && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                         && !string.IsNullOrEmpty(item.Icon)
+                                         && !string.IsNullOrEmpty(item.NavigationText.Title))
                                 {
                                     <a href="@item.Link"
                                        title="@item.NavigationText.Title"
