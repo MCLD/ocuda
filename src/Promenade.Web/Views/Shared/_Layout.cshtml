@@ -102,20 +102,13 @@
                                     {
                                         <li class="nav-item @(item.Navigations.Count() == 0 ? "" : "prom-nav-link")">
                                             @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                                                     && !string.IsNullOrEmpty(item.Icon)
-                                                     && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                                && !string.IsNullOrEmpty(item.Icon)
+                                                && !string.IsNullOrEmpty(item.NavigationText.Title))
                                             {
                                                 <a title="@item.NavigationText.Title"
                                                    href="@(string.IsNullOrEmpty(item.Link) ? "#" : item.Link)"
-                                                   class="nav-link @(item.NavigationText.Label == null ? "" : "d-flex align-items-center")">
-                                                    @if (!string.IsNullOrEmpty(item.Icon))
-                                                    {
-                                                        <span class="@item.Icon @(item.NavigationText.Label == null ? "" : "prom-fa-space")"></span>
-                                                    }
-                                                    @if (!string.IsNullOrEmpty(item.NavigationText.Label))
-                                                    {
-                                                        <span class="@(item.HideTextWhenExtraSmall ? "hidden-xxs" : "")">@item.NavigationText.Label</span>
-                                                    }
+                                                   class="nav-link">
+                                                    <span class="@item.Icon"></span>
                                                 </a>
                                             }
                                             else
@@ -157,18 +150,14 @@
                                                 @foreach (var subItem in item.Navigations)
                                                 {
                                                     <li>
-                                                        @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                                                                && !string.IsNullOrEmpty(item.Icon)
-                                                                && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                                        @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
+                                                            && !string.IsNullOrEmpty(subItem.Icon)
+                                                            && !string.IsNullOrEmpty(subItem.NavigationText.Title))
                                                         {
                                                             <a href="@subItem.Link"
                                                                class="dropdown-item"
-                                                               title="@item.NavigationText.Title">
-                                                                @if (!string.IsNullOrEmpty(subItem.Icon))
-                                                                {
-                                                                    <span class="@subItem.Icon"></span>
-                                                                }
-                                                                @subItem.NavigationText.Label
+                                                               title="@subItem.NavigationText.Title">
+                                                                <span class="@subItem.Icon"></span>
                                                             </a>
                                                         }
                                                         else
@@ -216,12 +205,14 @@
                                 {
                                     <li role="presentation" class="nav-item prom-nav-link">
                                         @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                                                && !string.IsNullOrEmpty(item.Icon)
-                                                && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                            && !string.IsNullOrEmpty(item.Icon)
+                                            && !string.IsNullOrEmpty(item.NavigationText.Title))
                                         {
                                             <a href="@item.Link"
                                                class="nav-link prom-nav-link"
-                                               title="@item.NavigationText.Title">@item.NavigationText.Label</a>
+                                               title="@item.NavigationText.Title">
+                                                <span class="@item.Icon"></span>
+                                            </a>
                                         }
                                         else
                                         {
@@ -244,18 +235,14 @@
                                             @foreach (var subItem in item.Navigations)
                                             {
                                                 <li>
-                                                    @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                                                            && !string.IsNullOrEmpty(item.Icon)
-                                                            && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                                    @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
+                                                        && !string.IsNullOrEmpty(subItem.Icon)
+                                                        && !string.IsNullOrEmpty(subItem.NavigationText.Title))
                                                     {
                                                         <a href="@subItem.Link"
                                                            class="dropdown-item"
-                                                           title="@item.NavigationText.Title">
-                                                            @if (!string.IsNullOrEmpty(subItem.Icon))
-                                                            {
-                                                                <span class="@subItem.Icon"></span>
-                                                            }
-                                                            @subItem.NavigationText.Label
+                                                           title="@subItem.NavigationText.Title">
+                                                            <span class="@subItem.Icon"></span>
                                                         </a>
                                                     }
                                                     else
@@ -313,14 +300,14 @@
                                             {
                                                 <li>
                                                     @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
-                                                              && !string.IsNullOrEmpty(subItem.Icon)
-                                                              && !string.IsNullOrEmpty(subItem.NavigationText.Title))
+                                                        && !string.IsNullOrEmpty(subItem.Icon)
+                                                        && !string.IsNullOrEmpty(subItem.NavigationText.Title))
                                                     {
                                                         <a href="@subItem.Link"
                                                            @(subItem.TargetNewWindow ? "target=\"_blank\"" : "")
                                                            title="@subItem.NavigationText.Title"
                                                            aria-label="@(subItem.TargetNewWindow ? "(opens in a new window)" : "")">
-                                                            @subItem.NavigationText.Label
+                                                            <span class="@subItem.Icon"></span>
                                                         </a>
                                                     }
                                                     else
@@ -412,17 +399,12 @@
                         {
                             <div>
                                 @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                                           && !string.IsNullOrEmpty(item.Icon)
-                                           && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                    && !string.IsNullOrEmpty(item.Icon)
+                                    && !string.IsNullOrEmpty(item.NavigationText.Title))
                                 {
                                     <a href="@item.Link"
-                                       title="@item.NavigationText.Title"
-                                       class="@(item.NavigationText.Label == null ? "" : "d-flex align-items-center")">
-                                        @if (!string.IsNullOrEmpty(item.Icon))
-                                        {
-                                            <span class="@item.Icon @(item.NavigationText.Label == null ? "" : "prom-fa-space")"></span>
-                                        }
-                                        <span class="prom-footer-link-text">@item.NavigationText.Label</span>
+                                       title="@item.NavigationText.Title">
+                                        <span class="@item.Icon"></span>
                                     </a>
                                 }
                                 else
