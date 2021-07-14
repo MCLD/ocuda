@@ -110,7 +110,6 @@
                                                    href="@(string.IsNullOrEmpty(item.Link) ? "#" : item.Link)"
                                                    class="nav-link">
                                                     <span class="@item.Icon"></span>
-                                                    <span class="@(item.HideTextWhenExtraSmall ? "hidden-xxs" : "")">@item.NavigationText.Label</span>
                                                 </a>
                                             }
                                             else
@@ -160,7 +159,6 @@
                                                                class="dropdown-item"
                                                                title="@subItem.NavigationText.Title">
                                                                 <span class="@subItem.Icon"></span>
-                                                                @subItem.NavigationText.Label
                                                             </a>
                                                         }
                                                         else
@@ -213,7 +211,9 @@
                                         {
                                             <a href="@item.Link"
                                                class="nav-link prom-nav-link"
-                                               title="@item.NavigationText.Title">@item.NavigationText.Label</a>
+                                               title="@item.NavigationText.Title">
+                                                <span class="@item.Icon"></span>
+                                            </a>
                                         }
                                         else
                                         {
@@ -242,9 +242,8 @@
                                                     {
                                                         <a href="@subItem.Link"
                                                            class="dropdown-item"
-                                                           title="@item.NavigationText.Title">
+                                                           title="@subItem.NavigationText.Title">
                                                             <span class="@subItem.Icon"></span>
-                                                            @subItem.NavigationText.Label
                                                         </a>
                                                     }
                                                     else
@@ -309,7 +308,7 @@
                                                            @(subItem.TargetNewWindow ? "target=\"_blank\"" : "")
                                                            title="@subItem.NavigationText.Title"
                                                            aria-label="@(subItem.TargetNewWindow ? "(opens new window)" : "")">
-                                                            @subItem.NavigationText.Label
+                                                            <span class="@subItem.Icon"></span>
                                                         </a>
                                                     }
                                                     else
@@ -406,8 +405,7 @@
                                 {
                                     <a href="@item.Link"
                                        title="@item.NavigationText.Title">
-                                        <span class="@item.Icon></span>
-                                        <span class="prom-footer-link-text">@item.NavigationText.Label</span>
+                                        <span class="@item.Icon"></span>
                                     </a>
                                 }
                                 else
