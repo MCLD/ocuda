@@ -22,7 +22,6 @@
                 window.dataLayer = window.dataLayer || [];
                 function gtag() { dataLayer.push(arguments); }
                 gtag('js', new Date());
-
                 gtag('config', '@googleAnalyticsTrackingCode');
             </script>
         }
@@ -320,7 +319,7 @@
                                                         <a href="@subItem.Link"
                                                            @(subItem.TargetNewWindow ? "target=\"_blank\"" : "")
                                                            title="@subItem.NavigationText.Title"
-                                                           aria-label="@(subItem.TargetNewWindow ? "(opens new window)" : "")">
+                                                           aria-label="@(subItem.TargetNewWindow ? "(opens in a new window)" : "")">
                                                             @subItem.NavigationText.Label
                                                         </a>
                                                     }
@@ -328,7 +327,7 @@
                                                     {
                                                         <a href="@subItem.Link"
                                                            @(subItem.TargetNewWindow ? "target=\"_blank\"" : "")
-                                                           aria-label="@(subItem.TargetNewWindow ? subItem.NavigationText.Label + " (opens new window)" : "")">
+                                                           aria-label="@(subItem.TargetNewWindow ? subItem.NavigationText.Label + " (opens in a new window)" : "")">
                                                             @subItem.NavigationText.Label
                                                         </a>
                                                     }
@@ -356,7 +355,7 @@
                                        class="prom-leftnav-social-link"
                                        target="_blank"
                                        title="Visit our Facebook"
-                                       aria-label="(opens new window)"><span class="fab fa-facebook"></span></a>
+                                       aria-label="(opens in a new window)"><span class="fab fa-facebook"></span></a>
                                     <span>&nbsp;</span>
                                 </li>
                             }
@@ -367,7 +366,7 @@
                                        class="prom-leftnav-social-link"
                                        target="_blank"
                                        title="Visit our Instagram"
-                                       aria-label="(opens new window)"><span class="fab fa-instagram"></span></a>
+                                       aria-label="(opens in a new window)"><span class="fab fa-instagram"></span></a>
                                     <span>&nbsp;</span>
                                 </li>
                             }
@@ -378,7 +377,7 @@
                                        class="prom-leftnav-social-link"
                                        target="_blank"
                                        title="Visit our Twitter"
-                                       aria-label="(opens new window)"><span class="fab fa-twitter"></span></a>
+                                       aria-label="(opens in a new window)"><span class="fab fa-twitter"></span></a>
                                     <span>&nbsp;</span>
                                 </li>
                             }
@@ -389,7 +388,7 @@
                                        class="prom-leftnav-social-link"
                                        target="_blank"
                                        title="Visit our Youtube"
-                                       aria-label="(opens new window)"><span class="fab fa-youtube"></span></a>
+                                       aria-label="(opens in a new window)"><span class="fab fa-youtube"></span></a>
                                 </li>
                             }
                         </ul>
