@@ -22,7 +22,6 @@
                 window.dataLayer = window.dataLayer || [];
                 function gtag() { dataLayer.push(arguments); }
                 gtag('js', new Date());
-
                 gtag('config', '@googleAnalyticsTrackingCode');
             </script>
         }
@@ -102,19 +101,30 @@
                                     if (item.ChangeToLinkWhenExtraSmall || item.Navigations.Count() == 0)
                                     {
                                         <li class="nav-item @(item.Navigations.Count() == 0 ? "" : "prom-nav-link")">
-                                            <a title="@item.NavigationText.Title"
-                                               aria-label="@item.NavigationText.AriaLabel"
-                                               href="@(string.IsNullOrEmpty(item.Link) ? "#" : item.Link)"
-                                               class="nav-link @(item.NavigationText.Label == null ? "" : "d-flex align-items-center")">
-                                                @if (!string.IsNullOrEmpty(item.Icon))
-                                                {
-                                                    <span class="@item.Icon @(item.NavigationText.Label == null ? "" : "prom-fa-space")"></span>
-                                                }
-                                                @if (!string.IsNullOrEmpty(item.NavigationText.Label))
-                                                {
-                                                    <span class="@(item.HideTextWhenExtraSmall ? "hidden-xxs" : "")">@item.NavigationText.Label</span>
-                                                }
-                                            </a>
+                                            @if (string.IsNullOrEmpty(item.NavigationText.Label)
+                                                && !string.IsNullOrEmpty(item.Icon)
+                                                && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                            {
+                                                <a title="@item.NavigationText.Title"
+                                                   href="@(string.IsNullOrEmpty(item.Link) ? "#" : item.Link)"
+                                                   class="nav-link">
+                                                    <span class="@item.Icon"></span>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a href="@(string.IsNullOrEmpty(item.Link) ? "#" : item.Link)"
+                                                   class="nav-link @(item.NavigationText.Label == null ? "" : "d-flex align-items-center")">
+                                                    @if (!string.IsNullOrEmpty(item.Icon))
+                                                    {
+                                                        <span class="@item.Icon @(item.NavigationText.Label == null ? "" : "prom-fa-space")"></span>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(item.NavigationText.Label))
+                                                    {
+                                                        <span class="@(item.HideTextWhenExtraSmall ? "hidden-xxs" : "")">@item.NavigationText.Label</span>
+                                                    }
+                                                </a>
+                                            }
                                         </li>
                                     }
                                     if (item.Navigations.Count() > 0)
@@ -140,15 +150,27 @@
                                                 @foreach (var subItem in item.Navigations)
                                                 {
                                                     <li>
-                                                        <a href="@subItem.Link"
-                                                           class="dropdown-item"
-                                                           aria-label="@subItem.NavigationText.AriaLabel">
-                                                            @if (!string.IsNullOrEmpty(subItem.Icon))
-                                                            {
+                                                        @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
+                                                            && !string.IsNullOrEmpty(subItem.Icon)
+                                                            && !string.IsNullOrEmpty(subItem.NavigationText.Title))
+                                                        {
+                                                            <a href="@subItem.Link"
+                                                               class="dropdown-item"
+                                                               title="@subItem.NavigationText.Title">
                                                                 <span class="@subItem.Icon"></span>
-                                                            }
-                                                            @subItem.NavigationText.Label
-                                                        </a>
+                                                            </a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a href="@subItem.Link"
+                                                               class="dropdown-item">
+                                                                @if (!string.IsNullOrEmpty(subItem.Icon))
+                                                                {
+                                                                    <span class="@subItem.Icon"></span>
+                                                                }
+                                                                @subItem.NavigationText.Label
+                                                            </a>
+                                                        }
                                                     </li>
                                                 }
                                             </ul>
@@ -182,10 +204,21 @@
                                 if (item.ChangeToLinkWhenExtraSmall || item.Navigations.Count() == 0)
                                 {
                                     <li role="presentation" class="nav-item prom-nav-link">
-                                        <a aria-label="@item.NavigationText.AriaLabel"
-                                           href="@item.Link"
-                                           class="nav-link prom-nav-link"
-                                           title="@item.NavigationText.Title">@item.NavigationText.Label</a>
+                                        @if (string.IsNullOrEmpty(item.NavigationText.Label)
+                                            && !string.IsNullOrEmpty(item.Icon)
+                                            && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                        {
+                                            <a href="@item.Link"
+                                               class="nav-link prom-nav-link"
+                                               title="@item.NavigationText.Title">
+                                                <span class="@item.Icon"></span>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a href="@item.Link"
+                                               class="nav-link prom-nav-link">@item.NavigationText.Label</a>
+                                        }
                                     </li>
                                 }
                                 if (item.Navigations.Count() > 0)
@@ -202,15 +235,27 @@
                                             @foreach (var subItem in item.Navigations)
                                             {
                                                 <li>
-                                                    <a href="@subItem.Link"
-                                                       class="dropdown-item"
-                                                       aria-label="@subItem.NavigationText.AriaLabel">
-                                                        @if (!string.IsNullOrEmpty(subItem.Icon))
-                                                        {
+                                                    @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
+                                                        && !string.IsNullOrEmpty(subItem.Icon)
+                                                        && !string.IsNullOrEmpty(subItem.NavigationText.Title))
+                                                    {
+                                                        <a href="@subItem.Link"
+                                                           class="dropdown-item"
+                                                           title="@subItem.NavigationText.Title">
                                                             <span class="@subItem.Icon"></span>
-                                                        }
-                                                        @subItem.NavigationText.Label
-                                                    </a>
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a href="@subItem.Link"
+                                                           class="dropdown-item">
+                                                            @if (!string.IsNullOrEmpty(subItem.Icon))
+                                                            {
+                                                                <span class="@subItem.Icon"></span>
+                                                            }
+                                                            @subItem.NavigationText.Label
+                                                        </a>
+                                                    }
                                                 </li>
                                             }
                                         </ul>
@@ -254,11 +299,25 @@
                                             @foreach (var subItem in item.Navigations)
                                             {
                                                 <li>
-                                                    <a href="@subItem.Link"
-                                                       @(subItem.TargetNewWindow ? "target=\"_blank\"" : "")
-                                                       aria-label="@subItem.NavigationText.AriaLabel @(subItem.TargetNewWindow ? " (opens new window)" : "")">
-                                                        @subItem.NavigationText.Label
-                                                    </a>
+                                                    @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
+                                                        && !string.IsNullOrEmpty(subItem.Icon)
+                                                        && !string.IsNullOrEmpty(subItem.NavigationText.Title))
+                                                    {
+                                                        <a href="@subItem.Link"
+                                                           @(subItem.TargetNewWindow ? "target=\"_blank\"" : "")
+                                                           title="@subItem.NavigationText.Title"
+                                                           aria-label="@(subItem.TargetNewWindow ? "(opens in a new window)" : "")">
+                                                            <span class="@subItem.Icon"></span>
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a href="@subItem.Link"
+                                                           @(subItem.TargetNewWindow ? "target=\"_blank\"" : "")
+                                                           aria-label="@(subItem.TargetNewWindow ? subItem.NavigationText.Label + " (opens in a new window)" : "")">
+                                                            @subItem.NavigationText.Label
+                                                        </a>
+                                                    }
                                                 </li>
                                             }
                                         </ul>
@@ -269,7 +328,6 @@
                             {
                                 leftNavigationFeaturetteNumber++;
                                 <a href="@item.Link"
-                                   aria-label="@item.NavigationText.AriaLabel"
                                    class="btn btn-secondary btn-block prom-leftnav-featurette-button prom-leftnav-featurette-button-@leftNavigationFeaturetteNumber">@item.NavigationText.Label</a>
                             }
                         }
@@ -283,7 +341,8 @@
                                     <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]"
                                        class="prom-leftnav-social-link"
                                        target="_blank"
-                                       aria-label="Visit our Facebook (opens new window)"><span class="fab fa-facebook"></span></a>
+                                       title="Visit our Facebook"
+                                       aria-label="(opens in a new window)"><span class="fab fa-facebook"></span></a>
                                     <span>&nbsp;</span>
                                 </li>
                             }
@@ -293,7 +352,8 @@
                                     <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl]"
                                        class="prom-leftnav-social-link"
                                        target="_blank"
-                                       aria-label="Visit our Instagram (opens new window)"><span class="fab fa-instagram"></span></a>
+                                       title="Visit our Instagram"
+                                       aria-label="(opens in a new window)"><span class="fab fa-instagram"></span></a>
                                     <span>&nbsp;</span>
                                 </li>
                             }
@@ -303,7 +363,8 @@
                                     <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]"
                                        class="prom-leftnav-social-link"
                                        target="_blank"
-                                       aria-label="Visit our Twitter (opens new window)"><span class="fab fa-twitter"></span></a>
+                                       title="Visit our Twitter"
+                                       aria-label="(opens in a new window)"><span class="fab fa-twitter"></span></a>
                                     <span>&nbsp;</span>
                                 </li>
                             }
@@ -313,7 +374,8 @@
                                     <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl]"
                                        class="prom-leftnav-social-link"
                                        target="_blank"
-                                       aria-label="Visit our Youtube (opens new window)"><span class="fab fa-youtube"></span></a>
+                                       title="Visit our Youtube"
+                                       aria-label="(opens in a new window)"><span class="fab fa-youtube"></span></a>
                                 </li>
                             }
                         </ul>
@@ -336,15 +398,26 @@
                         @foreach (var item in footerNavigation.Navigations)
                         {
                             <div>
-                                <a href="@item.Link"
-                                   aria-label="@item.NavigationText.AriaLabel"
-                                   class="@(item.NavigationText.Label == null ? "" : "d-flex align-items-center")">
-                                    @if (!string.IsNullOrEmpty(item.Icon))
-                                    {
-                                        <span class="@item.Icon @(item.NavigationText.Label == null ? "" : "prom-fa-space")"></span>
-                                    }
-                                    <span class="prom-footer-link-text">@item.NavigationText.Label</span>
-                                </a>
+                                @if (string.IsNullOrEmpty(item.NavigationText.Label)
+                                    && !string.IsNullOrEmpty(item.Icon)
+                                    && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                {
+                                    <a href="@item.Link"
+                                       title="@item.NavigationText.Title">
+                                        <span class="@item.Icon"></span>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a href="@item.Link"
+                                       class="@(item.NavigationText.Label == null ? "" : "d-flex align-items-center")">
+                                        @if (!string.IsNullOrEmpty(item.Icon))
+                                        {
+                                            <span class="@item.Icon @(item.NavigationText.Label == null ? "" : "prom-fa-space")"></span>
+                                        }
+                                        <span class="prom-footer-link-text">@item.NavigationText.Label</span>
+                                    </a>
+                                }
                             </div>
                         }
                     </div>
