@@ -302,6 +302,13 @@ a.prom-leftnav-header:hover {
         color: white;
     }
 
+.emedia-help {
+    color: black;
+}
+    .emedia-help:hover {
+        color: black;
+    }
+
 /* carousels */
 
 .prom-carousel div {

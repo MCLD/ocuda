@@ -29,13 +29,15 @@
                                target="_blank"><h2 class="fs-6 d-inline">@emedia.Name</h2></a>
                             @if (!string.IsNullOrEmpty(emedia.EmediaText?.Details))
                             {
-                                <span class="fas fa-question-circle fa-pull-right"
-                                      style="cursor: pointer;"
-                                      data-target="#infoModal"
-                                      data-toggle="modal"
-                                      data-name="@emedia.Name"
-                                      data-details="@emedia.EmediaText.Details">
-                                </span>
+                                <a href="#"
+                                   class="emedia-help fa-pull-right"
+                                   data-target="#infoModal"
+                                   data-toggle="modal"
+                                   data-name="@emedia.Name Help"
+                                   data-details="@emedia.EmediaText.Details"
+                                   title="@emedia.Name help">
+                                    <span class="fas fa-question-circle"></span>
+                                </a>
                             }
                         </div>
                         <div class="card-body">
