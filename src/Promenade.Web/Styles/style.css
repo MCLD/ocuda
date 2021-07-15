@@ -16,7 +16,6 @@ span.prom-fa-space {
 
 .fs-6 {
     font-size: 1rem !important;
-    ;
 }
 
 @media (min-width: 385px) {
@@ -309,6 +308,7 @@ a.prom-leftnav-header:hover {
 .emedia-help {
     color: black;
 }
+
     .emedia-help:hover {
         color: black;
     }
