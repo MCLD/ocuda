@@ -44,6 +44,7 @@
                             @Html.Raw(emedia.EmediaText?.Description)
                         </div>
                         <div class="card-footer">
+                            <span class="sr-only">@emedia.Name offers:</span>
                             @foreach (var category in emedia.Categories)
                             {
                                 <span class="badge @category.Class">@category.CategoryText?.Text</span>
