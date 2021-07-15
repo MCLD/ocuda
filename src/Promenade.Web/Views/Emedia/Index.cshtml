@@ -4,8 +4,6 @@
     <socialcard card="@Model.SocialCard"></socialcard>
 }
 
-<div modal id="infoModal"></div>
-
 @foreach (var group in Model.GroupedEmedia)
 {
     if (!string.IsNullOrWhiteSpace(group.Segment?.SegmentText?.Text))
@@ -26,22 +24,25 @@
                         <div class="card-header">
                             <a aria-label="@emedia.Name (opens new window)"
                                href="@emedia.RedirectUrl"
-                               target="_blank">@emedia.Name</a>
+                               target="_blank"><h2 class="fs-6 d-inline">@emedia.Name</h2></a>
                             @if (!string.IsNullOrEmpty(emedia.EmediaText?.Details))
                             {
-                                <span class="fas fa-question-circle fa-pull-right"
-                                      style="cursor: pointer;"
-                                      data-target="#infoModal"
-                                      data-toggle="modal"
-                                      data-name="@emedia.Name"
-                                      data-details="@emedia.EmediaText.Details">
-                                </span>
+                                <a href="#"
+                                   class="emedia-help fa-pull-right"
+                                   data-target="#infoModal"
+                                   data-toggle="modal"
+                                   data-name="@emedia.Name Help"
+                                   data-details="@emedia.EmediaText.Details"
+                                   title="@emedia.Name help">
+                                    <span class="fas fa-question-circle"></span>
+                                </a>
                             }
                         </div>
                         <div class="card-body">
                             @Html.Raw(emedia.EmediaText?.Description)
                         </div>
                         <div class="card-footer">
+                            <span class="sr-only">@emedia.Name offers:</span>
                             @foreach (var category in emedia.Categories)
                             {
                                 <span class="badge @category.Class">@category.CategoryText?.Text</span>
@@ -53,6 +54,8 @@
         </div>
     }
 }
+
+<div modal id="infoModal"></div>
 
 @section scripts {
     <script>

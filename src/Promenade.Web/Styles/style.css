@@ -10,6 +10,14 @@ span.prom-fa-space {
     display: none;
 }
 
+.fs-5 {
+    font-size: 1.25rem !important;
+}
+
+.fs-6 {
+    font-size: 1rem !important;
+}
+
 @media (min-width: 385px) {
     .hidden-xxs {
         display: inline;
@@ -295,6 +303,14 @@ a.prom-leftnav-header:hover {
 
     .prom-locations-maplink:hover {
         color: white;
+    }
+
+.emedia-help {
+    color: black;
+}
+
+    .emedia-help:hover {
+        color: black;
     }
 
 /* carousels */
