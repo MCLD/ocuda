@@ -132,7 +132,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
             var viewModel = new PageViewModel
             {
                 Content = CommonMark.CommonMarkConverter.Convert(page.Content),
-                CanonicalUrl = await GetCanonicalUrl()
+                CanonicalUrl = await GetCanonicalUrlAsync()
             };
 
             if (page.SocialCardId.HasValue)
@@ -206,7 +206,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
             var viewModel = new PageLayoutViewModel
             {
-                CanonicalUrl = await GetCanonicalUrl(),
+                CanonicalUrl = await GetCanonicalUrlAsync(),
                 HasCarousels = pageLayout.Items.Any(_ => _.CarouselId.HasValue),
                 Stub = stub?.Trim()
             };
@@ -228,6 +228,10 @@ namespace Ocuda.Promenade.Controllers.Abstract
             viewModel.PageLayout = pageLayout;
 
             PageTitle = pageLayout.PageLayoutText?.Title;
+
+            viewModel.PageHeaderClasses = pageLayout.PageLayoutText?.IsTitleHidden == true
+                ? "oc-title sr-only"
+                : "oc-title";
 
             return View("LayoutPage", viewModel);
         }

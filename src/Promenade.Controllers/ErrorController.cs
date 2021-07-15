@@ -11,6 +11,7 @@ using Ocuda.Promenade.Service;
 namespace Ocuda.Promenade.Controllers
 {
     [Route("[controller]")]
+    [Route("{culture:cultureConstraint?}/[Controller]")]
     public class ErrorController : BaseController<ErrorController>
     {
         private readonly RedirectService _redirectService;

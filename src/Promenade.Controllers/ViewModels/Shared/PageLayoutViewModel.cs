@@ -11,6 +11,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Shared
 
         public bool HasCarousels { get; set; }
         public ImageFeatureTemplate PageFeatureTemplate { get; set; }
+        public string PageHeaderClasses { get; set; }
         public PageLayout PageLayout { get; set; }
         public string Stub { get; set; }
     }

@@ -49,7 +49,7 @@
 
 @if (!string.IsNullOrWhiteSpace(Model.PageLayout.PageLayoutText?.Title))
 {
-    <h1>@Model.PageLayout.PageLayoutText.Title</h1>
+    <h1 class="@Model.PageHeaderClasses">@Model.PageLayout.PageLayoutText.Title</h1>
 }
 
 @foreach (var item in Model.PageLayout.Items)

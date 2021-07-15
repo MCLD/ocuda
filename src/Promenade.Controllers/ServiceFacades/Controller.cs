@@ -9,54 +9,25 @@ namespace Ocuda.Promenade.Controllers.ServiceFacades
 {
     public class Controller<T>
     {
-        private readonly ILogger<T> _logger;
-        private readonly IConfiguration _config;
-        private readonly IStringLocalizer<Shared> _sharedLocalizer;
-        private readonly SiteSettingService _siteSettingService;
-
-        public ILogger<T> Logger
-        {
-            get
-            {
-                return _logger;
-            }
-        }
-
-        public IConfiguration Config
-        {
-            get
-            {
-                return _config;
-            }
-        }
-
-        public IStringLocalizer<Shared> SharedLocalizer
-        {
-            get
-            {
-                return _sharedLocalizer;
-            }
-        }
-
-        public SiteSettingService SiteSettingService
-        {
-            get
-            {
-                return _siteSettingService;
-            }
-        }
-
         public Controller(ILogger<T> logger,
             IConfiguration config,
             IStringLocalizer<Shared> sharedLocalizer,
             SiteSettingService siteSettingService)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
-            _sharedLocalizer = sharedLocalizer
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            Config = config ?? throw new ArgumentNullException(nameof(config));
+            SharedLocalizer = sharedLocalizer
                 ?? throw new ArgumentNullException(nameof(sharedLocalizer));
-            _siteSettingService = siteSettingService
+            SiteSettingService = siteSettingService
                 ?? throw new ArgumentNullException(nameof(siteSettingService));
         }
+
+        public IConfiguration Config { get; }
+
+        public ILogger<T> Logger { get; }
+
+        public IStringLocalizer<Shared> SharedLocalizer { get; }
+
+        public SiteSettingService SiteSettingService { get; }
     }
 }

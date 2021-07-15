@@ -146,17 +146,20 @@ namespace Ocuda.Promenade.Service
                             item.ImageFeatureItemText = await _imageFeatureItemTextRepository
                                 .GetByIdsAsync(item.Id, currentLanguageId.Value);
 
-                            item.ImageFeatureItemText.Filepath = _pathResolver
-                                .GetPublicContentUrl(ImagesFilePath,
-                                    languageName,
-                                    FeaturesFilePath,
-                                    item.ImageFeatureItemText.Filename);
-
-                            if (expire.HasValue)
+                            if (item.ImageFeatureItemText != null)
                             {
-                                await _cache.SaveToCacheAsync(itemTextCacheKey,
-                                    item.ImageFeatureItemText,
-                                    expire.Value);
+                                item.ImageFeatureItemText.Filepath = _pathResolver
+                                    .GetPublicContentUrl(ImagesFilePath,
+                                        languageName,
+                                        FeaturesFilePath,
+                                        item.ImageFeatureItemText.Filename);
+
+                                if (expire.HasValue)
+                                {
+                                    await _cache.SaveToCacheAsync(itemTextCacheKey,
+                                        item.ImageFeatureItemText,
+                                        expire.Value);
+                                }
                             }
                         }
                     }

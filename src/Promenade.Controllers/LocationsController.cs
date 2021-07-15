@@ -12,6 +12,7 @@ using Ocuda.Promenade.Service;
 namespace Ocuda.Promenade.Controllers
 {
     [Route("[Controller]")]
+    [Route("{culture:cultureConstraint?}/[Controller]")]
     public class LocationsController : BaseController<LocationsController>
     {
         private readonly string _apiKey;
@@ -115,7 +116,7 @@ namespace Ocuda.Promenade.Controllers
 
             var viewModel = new LocationDetailViewModel
             {
-                CanonicalUrl = await GetCanonicalUrl(),
+                CanonicalUrl = await GetCanonicalUrlAsync(),
                 Location = await _locationService.GetLocationByStubAsync(locationStub)
             };
 
@@ -227,7 +228,7 @@ namespace Ocuda.Promenade.Controllers
 
                 return View("LocationFeatureDetails", new LocationDetailViewModel
                 {
-                    CanonicalUrl = await GetCanonicalUrl(),
+                    CanonicalUrl = await GetCanonicalUrlAsync(),
                     LocationFeatures = new List<LocationsFeaturesViewModel>
                     {
                         new LocationsFeaturesViewModel(locationFeature)

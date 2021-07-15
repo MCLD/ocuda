@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Abstract;
@@ -14,6 +16,7 @@ namespace Ocuda.Promenade.Service
     public class NavigationService : BaseService<NavigationService>
     {
         private readonly IOcudaCache _cache;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly LanguageService _languageService;
         private readonly INavigationRepository _navigationRepository;
         private readonly INavigationTextRepository _navigationTextRepository;
@@ -21,11 +24,14 @@ namespace Ocuda.Promenade.Service
         public NavigationService(ILogger<NavigationService> logger,
             IDateTimeProvider dateTimeProvider,
             IOcudaCache cache,
+            IHttpContextAccessor httpContextAccessor,
             LanguageService languageService,
             INavigationRepository navigationRepository,
             INavigationTextRepository navigationTextRepository) : base(logger, dateTimeProvider)
         {
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            _httpContextAccessor = httpContextAccessor
+                ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _languageService = languageService
                 ?? throw new ArgumentNullException(nameof(languageService));
             _navigationRepository = navigationRepository
@@ -41,6 +47,15 @@ namespace Ocuda.Promenade.Service
 
         public async Task<Navigation> GetNavigation(int navigationId, bool forceReload)
         {
+            var currentCultureName = _httpContextAccessor
+                .HttpContext
+                .Features
+                .Get<IRequestCultureFeature>()
+                .RequestCulture
+                .UICulture?
+                .Name;
+
+            var currentLanguageId = await _languageService.GetLanguageIdAsync(currentCultureName);
             var defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync(forceReload);
 
             Navigation nav = null;
@@ -48,7 +63,7 @@ namespace Ocuda.Promenade.Service
             var cacheKey = string.Format(CultureInfo.InvariantCulture,
                 Utility.Keys.Cache.PromNavLang,
                 navigationId,
-                defaultLanguageId);
+                currentLanguageId);
 
             if (!forceReload)
             {
@@ -58,12 +73,22 @@ namespace Ocuda.Promenade.Service
             if (nav == null)
             {
                 nav = await _navigationRepository.FindAsync(navigationId);
+
                 if (nav.NavigationTextId != null)
                 {
                     nav.NavigationText = await _navigationTextRepository
-                        .FindAsync((int)nav.NavigationTextId, defaultLanguageId);
+                        .FindAsync((int)nav.NavigationTextId, currentLanguageId);
+
+                    if (nav.NavigationText == null)
+                    {
+                        nav.NavigationText = await _navigationTextRepository
+                            .FindAsync((int)nav.NavigationTextId, defaultLanguageId);
+                    }
                 }
-                nav.Navigations = await GetNavigationChildren(navigationId, defaultLanguageId);
+
+                nav.Navigations = await GetNavigationChildren(navigationId,
+                    currentLanguageId,
+                    defaultLanguageId);
 
                 await _cache.SaveToCacheAsync(cacheKey, nav, null, CacheSlidingExpiration);
             }
@@ -72,16 +97,25 @@ namespace Ocuda.Promenade.Service
         }
 
         private async Task<ICollection<Navigation>> GetNavigationChildren(int navigationId,
-            int languageId)
+            int languageId,
+            int defaultLanguageId)
         {
             var children = await _navigationRepository.GetChildren(navigationId);
             foreach (var child in children)
             {
-                child.Navigations = await GetNavigationChildren(child.Id, languageId);
+                child.Navigations = await GetNavigationChildren(child.Id,
+                    languageId,
+                    defaultLanguageId);
+
                 if (child.NavigationTextId != null)
                 {
                     child.NavigationText = await _navigationTextRepository
                         .FindAsync((int)child.NavigationTextId, languageId);
+                    if (child.NavigationText == null)
+                    {
+                        child.NavigationText = await _navigationTextRepository
+                            .FindAsync((int)child.NavigationTextId, defaultLanguageId);
+                    }
                 }
             }
             return children;

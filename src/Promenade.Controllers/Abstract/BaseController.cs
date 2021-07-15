@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using Ocuda.i18n;
 using Ocuda.i18n.Filter;
 using Ocuda.Promenade.Controllers.Filters;
 using Ocuda.Promenade.Models.Keys;
@@ -17,12 +19,10 @@ namespace Ocuda.Promenade.Controllers.Abstract
     [MiddlewareFilter(typeof(i18n.Middleware.LocalizationMiddleware))]
     public abstract class BaseController<T> : Controller
     {
-        protected readonly ILogger<T> _logger;
         protected readonly IConfiguration _config;
+        protected readonly ILogger<T> _logger;
         protected readonly IStringLocalizer<i18n.Resources.Shared> _sharedLocalizer;
         protected readonly SiteSettingService _siteSettingService;
-
-        protected string PageTitle { get; set; }
 
         protected BaseController(ServiceFacades.Controller<T> context)
         {
@@ -35,6 +35,8 @@ namespace Ocuda.Promenade.Controllers.Abstract
             _sharedLocalizer = context.SharedLocalizer;
             _siteSettingService = context.SiteSettingService;
         }
+
+        protected string PageTitle { get; set; }
 
         public override void OnActionExecuted(ActionExecutedContext context)
         {
@@ -59,15 +61,53 @@ namespace Ocuda.Promenade.Controllers.Abstract
             ViewData[Utility.Keys.ViewData.Title] = pageTitle;
         }
 
-        protected async Task<string> GetCanonicalUrl()
+        protected async Task<string> GetCanonicalUrlAsync()
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
             var isTLS = await _siteSettingService
                 .GetSettingBoolAsync(SiteSetting.Site.IsTLS, forceReload);
 
-            var scheme = isTLS ? Uri.UriSchemeHttps : Uri.UriSchemeHttp;
+            var actionLink = new UriBuilder(Url.Action(null, null, null, isTLS
+                ? Uri.UriSchemeHttps
+                : Uri.UriSchemeHttp));
 
-            return Url.Action(null, null, null, scheme);
+            var currentCulture
+                = HttpContext.Items[LocalizationItemKey.CurrentCulture] as CultureInfo;
+
+            // if the current culture is in the URI we'll want to remove it
+            actionLink = RemoveCulturePrefix(actionLink, currentCulture.Name);
+
+            if (currentCulture.Name == Culture.DefaultCulture.Name)
+            {
+                // for the default culture, exclude it from the URI
+                return actionLink.Uri.AbsoluteUri;
+            }
+            else
+            {
+                // for non-default cultures add properly-cased culture identifier to the URI
+                actionLink.Path = currentCulture.Name + actionLink.Path;
+                return actionLink.Uri.AbsoluteUri;
+            }
+        }
+
+        /// <summary>
+        /// If the path of the supplied <see cref="System.UriBuilder">UriBuilder</see> starts with
+        /// a slash, the specified cultureIdentifier, and then a slash, strip out one slash and
+        /// the cultureIdentifier and return the resulting UriBuilder.
+        /// </summary>
+        /// <param name="uriBuilder">A UriBuilder containing the page URI of interest</param>
+        /// <param name="cultureIdentifier">The culture identifier to remove frmo the URI</param>
+        /// <returns>A well-formed UriBuilder with the culture identifier removed</returns>
+        private static UriBuilder RemoveCulturePrefix(UriBuilder uriBuilder, 
+            string cultureIdentifier)
+        {
+            var cultureInUrl = $"/{cultureIdentifier}/";
+            if (uriBuilder.Path.Length > cultureInUrl.Length - 1
+                && uriBuilder.Path.StartsWith(cultureInUrl, StringComparison.OrdinalIgnoreCase))
+            {
+                uriBuilder.Path = uriBuilder.Path[(cultureInUrl.Length - 1)..];
+            }
+            return uriBuilder;
         }
     }
 }
