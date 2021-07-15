@@ -14,11 +14,13 @@
         </div>
         <div class="col-12 col-md-7 order-md-1">
             <h1>@Model.Location.Name</h1>
-            <a href="@Model.Location.MapLink"
-               class="btn btn-outline-secondary text-dark float-right ml-2"
+            <a aria-label="Go to our map link (opens new window)"
+               href="@Model.Location.MapLink"
+               class="btn btn-outline-secondary float-right ml-2 prom-locations-maplink"
                target="_blank">
                 <span class="fas fa-map-marker-alt"></span> Map
             </a>
+            <div class="sr-only">Our address is:</div>
             <address>
                 @Model.Location.Address
                 <br />
@@ -26,8 +28,10 @@
                 @Model.Location.State
                 @Model.Location.Zip
                 <br />
-                <a href="tel:@Model.Location.Phone">@Model.Location.Phone</a>
+                <a aria-label="Call us at: @Model.Location.Phone"
+                   href="tel:@Model.Location.Phone">@Model.Location.Phone</a>
             </address>
+            <div class="sr-only">Our current operating hours are:</div>
             @if (Model.Location.IsAlwaysOpen)
             {
                 <p>Open</p>
@@ -96,14 +100,21 @@
                        asp-route-featureStub="@feature.Stub"
                        data-toggle="modal"
                        data-target="#featureModal"
-                       target="_blank"
+                       target="@(feature.NewTab == true ? "_blank" : null)"
                        data-featureUrl="@Url.Action(nameof(LocationsController.FeatureInfo), LocationsController.Name, new { locationStub = Model.Location.Stub, featureStub = feature.Stub })"
                        data-name="@feature.Name">
                         <span class="fa-stack fa-2x d-block mx-auto">
                             <span class="fa fa-square fa-stack-2x"></span>
-                            <span class="@feature.Icon">@Html.Raw(feature.IconText)</span>
+                            <span class="@feature.Icon"
+                                  @(string.IsNullOrEmpty(feature.IconText) ? "" : "aria-hidden='true'")>
+                                @Html.Raw(feature.IconText)
+                            </span>
                         </span>
                         @feature.Name
+                        @if (feature.NewTab == true)
+                        {
+                            <span class="sr-only">(opens new window)</span>
+                        }
                     </a>
                 }
                 else
@@ -114,6 +125,10 @@
                             <span class="@feature.Icon"></span>
                         </span>
                         @feature.Name
+                        @if (feature.NewTab.HasValue && feature.NewTab.Value == true)
+                        {
+                            <span class="sr-only">(opens new window)</span>
+                        }
                     </a>
                 }
             </div>
@@ -140,7 +155,8 @@
 
             <p>
                 Interested in updates from every library in this area?
-                <a href="@Model.LocationNeighborGroup.SubscriptionUrl"
+                <a aria-label="Subscribe to updates from all of these libraries (opens new window)"
+                   href="@Model.LocationNeighborGroup.SubscriptionUrl"
                    target="_blank">Subscribe to updates from all of these libraries.</a>
             </p>
 
@@ -171,7 +187,8 @@
                                     <td>
                                         @if (!string.IsNullOrWhiteSpace(locationGroup.Location.EventLink))
                                         {
-                                            <a href="@locationGroup.Location.SubscriptionLink"
+                                            <a aria-label="Subscribe to emails from the @locationGroup.Location.Name"
+                                               href="@locationGroup.Location.SubscriptionLink"
                                                class="btn btn-sm btn-outline-secondary text-dark m-1 float-right">
                                                 <span class="far fa-envelope"></span>
                                                 Subscribe
@@ -179,7 +196,8 @@
                                         }
                                         @if (!string.IsNullOrWhiteSpace(locationGroup.Location.SubscriptionLink))
                                         {
-                                            <a href="@locationGroup.Location.EventLink"
+                                            <a aria-label="View events for the @locationGroup.Location.Name"
+                                               href="@locationGroup.Location.EventLink"
                                                class="btn btn-sm btn-outline-secondary text-dark m-1 float-right">
                                                 <span class="fas fa-calendar-alt"></span>
                                                 Events
@@ -203,6 +221,7 @@
                                     {
                                         <text>Updates from @Model.NearbyEventsCount locations</text>
                                     }
+                                    <span class="sr-only">(opens new window)</span>
                                 </a>
                             </td>
                         </tr>
