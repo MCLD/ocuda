@@ -10,6 +10,11 @@ span.prom-fa-space {
     display: none;
 }
 
+.fs-6 {
+    font-size: 1rem !important;
+    ;
+}
+
 @media (min-width: 385px) {
     .hidden-xxs {
         display: inline;
