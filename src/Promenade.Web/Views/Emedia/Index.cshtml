@@ -4,8 +4,6 @@
     <socialcard card="@Model.SocialCard"></socialcard>
 }
 
-<div modal id="infoModal"></div>
-
 @foreach (var group in Model.GroupedEmedia)
 {
     if (!string.IsNullOrWhiteSpace(group.Segment?.SegmentText?.Text))
@@ -56,6 +54,8 @@
         </div>
     }
 }
+
+<div modal id="infoModal"></div>
 
 @section scripts {
     <script>
