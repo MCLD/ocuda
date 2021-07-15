@@ -176,7 +176,7 @@ namespace Ocuda.Utility.TagHelpers
             button.AddCssClass(headerButtonClass);
             button.Attributes.Add("type", "button");
             button.Attributes.Add("data-dismiss", "modal");
-            button.Attributes.Add("aria-hidden", "true");
+            button.Attributes.Add("aria-label", "Close dialog.");
 
             var icon = new TagBuilder("span");
             icon.AddCssClass(headerIconClass);
