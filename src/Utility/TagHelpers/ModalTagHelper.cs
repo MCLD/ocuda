@@ -153,8 +153,8 @@ namespace Ocuda.Utility.TagHelpers
             var header = new TagBuilder("div");
             header.AddCssClass(headerClass);
 
-            var title = new TagBuilder("div");
-            title.AddCssClass("h5");
+            var title = new TagBuilder("h1");
+            title.AddCssClass("fs-5");
             title.AddCssClass(headerTitleClass);
             title.Attributes.Add("id", $"{Id}Label");
             var titleStrings = new List<string>();
