@@ -106,14 +106,14 @@
                                                && !string.IsNullOrEmpty(item.NavigationText.Title))
                                             {
                                                 <a title="@item.NavigationText.Title"
-                                                   href="@(string.IsNullOrEmpty(item.Link) ? "#" : item.Link)"
+                                                   href="@(string.IsNullOrEmpty(item.NavigationText.Link) ? "#" : item.NavigationText.Link)"
                                                    class="nav-link">
                                                     <span class="@item.Icon"></span>
                                                 </a>
                                             }
                                             else
                                             {
-                                                <a href="@(string.IsNullOrEmpty(item.Link) ? "#" : item.Link)"
+                                                <a href="@(string.IsNullOrEmpty(item.NavigationText.Link) ? "#" : item.NavigationText.Link)"
                                                    class="nav-link @(item.NavigationText.Label == null ? null : "d-flex align-items-center")">
                                                     @if (!string.IsNullOrEmpty(item.Icon))
                                                     {
@@ -154,7 +154,7 @@
                                                            && !string.IsNullOrEmpty(subItem.Icon)
                                                            && !string.IsNullOrEmpty(subItem.NavigationText.Title))
                                                         {
-                                                            <a href="@subItem.Link"
+                                                            <a href="@subItem.NavigationText.Link"
                                                                class="dropdown-item"
                                                                title="@subItem.NavigationText.Title">
                                                                 <span class="@subItem.Icon"></span>
@@ -162,7 +162,7 @@
                                                         }
                                                         else
                                                         {
-                                                            <a href="@subItem.Link"
+                                                            <a href="@subItem.NavigationText.Link"
                                                                class="dropdown-item">
                                                                 @if (!string.IsNullOrEmpty(subItem.Icon))
                                                                 {
@@ -211,7 +211,7 @@
                                            && !string.IsNullOrEmpty(item.Icon)
                                            && !string.IsNullOrEmpty(item.NavigationText.Title))
                                         {
-                                            <a href="@item.Link"
+                                            <a href="@item.NavigationText.Link"
                                                class="nav-link prom-nav-link"
                                                title="@item.NavigationText.Title">
                                                 <span class="@item.Icon"></span>
@@ -219,7 +219,7 @@
                                         }
                                         else
                                         {
-                                            <a href="@item.Link"
+                                            <a href="@item.NavigationText.Link"
                                                class="nav-link prom-nav-link">@item.NavigationText.Label</a>
                                         }
                                     </li>
@@ -242,7 +242,7 @@
                                                        && !string.IsNullOrEmpty(subItem.Icon)
                                                        && !string.IsNullOrEmpty(subItem.NavigationText.Title))
                                                     {
-                                                        <a href="@subItem.Link"
+                                                        <a href="@subItem.NavigationText.Link"
                                                            class="dropdown-item"
                                                            title="@subItem.NavigationText.Title">
                                                             <span class="@subItem.Icon"></span>
@@ -250,7 +250,7 @@
                                                     }
                                                     else
                                                     {
-                                                        <a href="@subItem.Link"
+                                                        <a href="@subItem.NavigationText.Link"
                                                            class="dropdown-item">
                                                             @if (!string.IsNullOrEmpty(subItem.Icon))
                                                             {
@@ -306,7 +306,7 @@
                                                        && !string.IsNullOrEmpty(subItem.Icon)
                                                        && !string.IsNullOrEmpty(subItem.NavigationText.Title))
                                                     {
-                                                        <a href="@subItem.Link"
+                                                        <a href="@subItem.NavigationText.Link"
                                                            target="@(subItem.TargetNewWindow ? "_blank" : null)"
                                                            title="@subItem.NavigationText.Title"
                                                            aria-label="@(subItem.TargetNewWindow ? "(opens in a new window)" : null)">
@@ -315,7 +315,7 @@
                                                     }
                                                     else
                                                     {
-                                                        <a href="@subItem.Link"
+                                                        <a href="@subItem.NavigationText.Link"
                                                            target="@(subItem.TargetNewWindow ? "_blank" : null)"
                                                            aria-label="@(subItem.TargetNewWindow ? subItem.NavigationText.Label + " (opens in a new window)" : null)">
                                                             @subItem.NavigationText.Label
@@ -330,7 +330,7 @@
                             else
                             {
                                 leftNavigationFeaturetteNumber++;
-                                <a href="@item.Link"
+                                <a href="@item.NavigationText.Link"
                                    class="btn btn-secondary btn-block prom-leftnav-featurette-button prom-leftnav-featurette-button-@leftNavigationFeaturetteNumber">@item.NavigationText.Label</a>
                             }
                         }
@@ -405,14 +405,14 @@
                                    && !string.IsNullOrEmpty(item.Icon)
                                    && !string.IsNullOrEmpty(item.NavigationText.Title))
                                 {
-                                    <a href="@item.Link"
+                                    <a href="@item.NavigationText.Link"
                                        title="@item.NavigationText.Title">
                                         <span class="@item.Icon"></span>
                                     </a>
                                 }
                                 else
                                 {
-                                    <a href="@item.Link"
+                                    <a href="@item.NavigationText.Link"
                                        class="@(item.NavigationText.Label == null ? null : "d-flex align-items-center")">
                                         @if (!string.IsNullOrEmpty(item.Icon))
                                         {
