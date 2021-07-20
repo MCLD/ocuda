@@ -100,10 +100,10 @@
                                 {
                                     if (item.ChangeToLinkWhenExtraSmall || item.Navigations.Count() == 0)
                                     {
-                                        <li class="nav-item @(item.Navigations.Count() == 0 ? "" : "prom-nav-link")">
+                                        <li class="nav-item @(item.Navigations.Count() == 0 ? null : "prom-nav-link")">
                                             @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                                                && !string.IsNullOrEmpty(item.Icon)
-                                                && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                               && !string.IsNullOrEmpty(item.Icon)
+                                               && !string.IsNullOrEmpty(item.NavigationText.Title))
                                             {
                                                 <a title="@item.NavigationText.Title"
                                                    href="@(string.IsNullOrEmpty(item.Link) ? "#" : item.Link)"
@@ -114,14 +114,14 @@
                                             else
                                             {
                                                 <a href="@(string.IsNullOrEmpty(item.Link) ? "#" : item.Link)"
-                                                   class="nav-link @(item.NavigationText.Label == null ? "" : "d-flex align-items-center")">
+                                                   class="nav-link @(item.NavigationText.Label == null ? null : "d-flex align-items-center")">
                                                     @if (!string.IsNullOrEmpty(item.Icon))
                                                     {
-                                                        <span class="@item.Icon @(item.NavigationText.Label == null ? "" : "prom-fa-space")"></span>
+                                                        <span class="@item.Icon @(item.NavigationText.Label == null ? null : "prom-fa-space")"></span>
                                                     }
                                                     @if (!string.IsNullOrEmpty(item.NavigationText.Label))
                                                     {
-                                                        <span class="@(item.HideTextWhenExtraSmall ? "hidden-xxs" : "")">@item.NavigationText.Label</span>
+                                                        <span class="@(item.HideTextWhenExtraSmall ? "hidden-xxs" : null)">@item.NavigationText.Label</span>
                                                     }
                                                 </a>
                                             }
@@ -130,8 +130,8 @@
                                     if (item.Navigations.Count() > 0)
                                     {
                                         <li role="presentation"
-                                            class="dropdown @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : "")">
-                                            <a class="nav-link dropdown-toggle @(item.NavigationText.Label == null ? "" : "d-flex align-items-center")"
+                                            class="dropdown @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : null)">
+                                            <a class="nav-link dropdown-toggle @(item.NavigationText.Label == null ? null : "d-flex align-items-center")"
                                                data-toggle="dropdown"
                                                href="#"
                                                role="button"
@@ -139,11 +139,11 @@
                                                aria-expanded="false">
                                                 @if (!string.IsNullOrEmpty(item.Icon))
                                                 {
-                                                    <span class="@item.Icon @(item.NavigationText.Label == null ? "" : "prom-fa-space")"></span>
+                                                    <span class="@item.Icon @(item.NavigationText.Label == null ? null : "prom-fa-space")"></span>
                                                 }
                                                 @if (!string.IsNullOrEmpty(item.NavigationText.Label))
                                                 {
-                                                    <span class="@(item.HideTextWhenExtraSmall ? "hidden-xxs" : "")">@item.NavigationText.Label</span>
+                                                    <span class="@(item.HideTextWhenExtraSmall ? "hidden-xxs" : null)">@item.NavigationText.Label</span>
                                                 }
                                             </a>
                                             <ul role="list" class="dropdown-menu dropdown-menu-right prom-nav-dropdown">
@@ -151,8 +151,8 @@
                                                 {
                                                     <li>
                                                         @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
-                                                            && !string.IsNullOrEmpty(subItem.Icon)
-                                                            && !string.IsNullOrEmpty(subItem.NavigationText.Title))
+                                                           && !string.IsNullOrEmpty(subItem.Icon)
+                                                           && !string.IsNullOrEmpty(subItem.NavigationText.Title))
                                                         {
                                                             <a href="@subItem.Link"
                                                                class="dropdown-item"
@@ -208,8 +208,8 @@
                                 {
                                     <li role="presentation" class="nav-item prom-nav-link">
                                         @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                                            && !string.IsNullOrEmpty(item.Icon)
-                                            && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                           && !string.IsNullOrEmpty(item.Icon)
+                                           && !string.IsNullOrEmpty(item.NavigationText.Title))
                                         {
                                             <a href="@item.Link"
                                                class="nav-link prom-nav-link"
@@ -227,20 +227,20 @@
                                 if (item.Navigations.Count() > 0)
                                 {
                                     <li role="presentation"
-                                        class="nav-item dropdown @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : "")">
+                                        class="nav-item dropdown @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : null)">
                                         <a class="nav-link dropdown-toggle"
                                            data-toggle="dropdown"
                                            href="#"
                                            role="button"
                                            aria-haspopup="true"
-                                           aria-expanded="false"><span class="nav-link-icon @(item.Icon != null ? item.Icon : "")"></span><span class="nav-link-text">@item.NavigationText.Label</span><span class="caret"></span></a>
+                                           aria-expanded="false"><span class="nav-link-icon @(item.Icon != null ? item.Icon : null)"></span><span class="nav-link-text">@item.NavigationText.Label</span><span class="caret"></span></a>
                                         <ul role="list" class="dropdown-menu prom-nav-dropdown">
                                             @foreach (var subItem in item.Navigations)
                                             {
                                                 <li>
                                                     @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
-                                                        && !string.IsNullOrEmpty(subItem.Icon)
-                                                        && !string.IsNullOrEmpty(subItem.NavigationText.Title))
+                                                       && !string.IsNullOrEmpty(subItem.Icon)
+                                                       && !string.IsNullOrEmpty(subItem.NavigationText.Title))
                                                     {
                                                         <a href="@subItem.Link"
                                                            class="dropdown-item"
@@ -281,7 +281,7 @@
             {
                 <div role="complementary"
                      class="col-12 col-sm-3 order-sm-first prom-leftnav-container">
-                    <div class="prom-leftnav" aria-label="res">
+                    <div class="prom-leftnav">
                         @foreach (var item in leftNavigation.Navigations)
                         {
                             if (item?.Navigations?.Count() > 0)
@@ -303,21 +303,21 @@
                                             {
                                                 <li>
                                                     @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
-                                                        && !string.IsNullOrEmpty(subItem.Icon)
-                                                        && !string.IsNullOrEmpty(subItem.NavigationText.Title))
+                                                       && !string.IsNullOrEmpty(subItem.Icon)
+                                                       && !string.IsNullOrEmpty(subItem.NavigationText.Title))
                                                     {
                                                         <a href="@subItem.Link"
-                                                           @(subItem.TargetNewWindow ? "target=\"_blank\"" : "")
+                                                           target="@(subItem.TargetNewWindow ? "_blank" : null)"
                                                            title="@subItem.NavigationText.Title"
-                                                           aria-label="@(subItem.TargetNewWindow ? "(opens in a new window)" : "")">
+                                                           aria-label="@(subItem.TargetNewWindow ? "(opens in a new window)" : null)">
                                                             <span class="@subItem.Icon"></span>
                                                         </a>
                                                     }
                                                     else
                                                     {
                                                         <a href="@subItem.Link"
-                                                           @(subItem.TargetNewWindow ? "target=\"_blank\"" : "")
-                                                           aria-label="@(subItem.TargetNewWindow ? subItem.NavigationText.Label + " (opens in a new window)" : "")">
+                                                           target="@(subItem.TargetNewWindow ? "_blank" : null)"
+                                                           aria-label="@(subItem.TargetNewWindow ? subItem.NavigationText.Label + " (opens in a new window)" : null)">
                                                             @subItem.NavigationText.Label
                                                         </a>
                                                     }
@@ -385,7 +385,7 @@
                     </div>
                 </div>
             }
-            <div class="col-12 @(leftNavigation?.Navigations.Count() > 0 ? "col-sm-9 order-sm-last" : "") prom-body-content-container"
+            <div class="col-12 @(leftNavigation?.Navigations.Count() > 0 ? "col-sm-9 order-sm-last" : null) prom-body-content-container"
                  role="main" id="mainContent">
                 <div class="prom-body-content">
                     @RenderBody()
@@ -402,8 +402,8 @@
                         {
                             <div>
                                 @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                                    && !string.IsNullOrEmpty(item.Icon)
-                                    && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                   && !string.IsNullOrEmpty(item.Icon)
+                                   && !string.IsNullOrEmpty(item.NavigationText.Title))
                                 {
                                     <a href="@item.Link"
                                        title="@item.NavigationText.Title">
@@ -413,10 +413,10 @@
                                 else
                                 {
                                     <a href="@item.Link"
-                                       class="@(item.NavigationText.Label == null ? "" : "d-flex align-items-center")">
+                                       class="@(item.NavigationText.Label == null ? null : "d-flex align-items-center")">
                                         @if (!string.IsNullOrEmpty(item.Icon))
                                         {
-                                            <span class="@item.Icon @(item.NavigationText.Label == null ? "" : "prom-fa-space")"></span>
+                                            <span class="@item.Icon @(item.NavigationText.Label == null ? null : "prom-fa-space")"></span>
                                         }
                                         <span class="prom-footer-link-text">@item.NavigationText.Label</span>
                                     </a>

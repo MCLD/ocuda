@@ -8,33 +8,57 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 {
     public interface IPageService
     {
-        Task<Page> GetByHeaderAndLanguageAsync(int headerId, int languageId);
+        Task<PageLayout> CloneLayoutAsync(int pageHeaderId, int layoutId, string clonedName);
+
         Task<Page> CreateAsync(Page page);
-        Task<Page> EditAsync(Page page);
-        Task DeleteAsync(Page page);
-        Task<DataWithCount<ICollection<PageHeader>>> GetPaginatedHeaderListAsync(PageFilter filter);
-        Task<PageHeader> GetHeaderByIdAsync(int id);
-        Task<ICollection<string>> GetHeaderLanguagesByIdAsync(int id);
+
         Task<PageHeader> CreateHeaderAsync(PageHeader header);
-        Task<PageHeader> EditHeaderAsync(PageHeader header);
+
+        Task<PageItem> CreateItemAsync(PageItem pageItem);
+
+        Task<PageLayout> CreateLayoutAsync(PageLayout layout);
+
+        Task DeleteAsync(Page page);
+
         Task DeleteHeaderAsync(int id);
-        Task<bool> StubInUseAsync(PageHeader header);
+
+        Task DeleteItemAsync(int pageItemId);
+
+        Task DeleteItemNoSaveAsync(int pageItemId, bool ignoreSort = false);
+
+        Task DeleteLayoutAsync(int id);
+
+        Task<Page> EditAsync(Page page);
+
+        Task<PageHeader> EditHeaderAsync(PageHeader header);
+
+        Task<PageItem> EditItemAsync(PageItem pageItem);
+
+        Task<PageLayout> EditLayoutAsync(PageLayout layout);
+
+        Task<Page> GetByHeaderAndLanguageAsync(int headerId, int languageId);
+
+        Task<PageHeader> GetHeaderByIdAsync(int id);
+
+        Task<PageItem> GetItemByIdAsync(int id);
+
+        Task<PageLayout> GetLayoutByIdAsync(int id);
+
+        Task<PageLayout> GetLayoutDetailsAsync(int id);
+
+        Task<PageLayout> GetLayoutForItemAsync(int itemId);
+
+        Task<DataWithCount<ICollection<PageHeader>>> GetPaginatedHeaderListAsync(PageFilter filter);
+
         Task<DataWithCount<ICollection<PageLayout>>> GetPaginatedLayoutListForHeaderAsync(
             int headerId, BaseFilter filter);
-        Task<PageLayout> CreateLayoutAsync(PageLayout layout);
-        Task<PageLayout> EditLayoutAsync(PageLayout layout);
-        Task DeleteLayoutAsync(int id);
-        Task<PageLayout> GetLayoutByIdAsync(int id);
-        Task<PageLayout> GetLayoutDetailsAsync(int id);
-        Task<PageLayoutText> SetLayoutTextAsync(PageLayoutText layoutText);
-        Task<PageItem> CreateItemAsync(PageItem pageItem);
-        Task<PageItem> EditItemAsync(PageItem pageItem);
-        Task DeleteItemAsync(int pageItemId);
-        Task UpdateItemSortOrder(int id, bool increase);
+
         Task<PageLayoutText> GetTextByLayoutAndLanguageAsync(int layoutId, int languageId);
-        Task<PageLayout> GetLayoutForItemAsync(int itemId);
-        Task<PageItem> GetItemByIdAsync(int id);
-        Task DeleteItemNoSaveAsync(int pageItemId, bool ignoreSort = false);
-        Task<PageLayout> CloneLayoutAsync(int pageHeaderId, int layoutId, string clonedName);
+
+        Task<PageLayoutText> SetLayoutTextAsync(PageLayoutText layoutText);
+
+        Task<bool> StubInUseAsync(PageHeader header);
+
+        Task UpdateItemSortOrder(int id, bool increase);
     }
 }
