@@ -86,6 +86,7 @@ namespace Ocuda.Utility.TagHelpers
             var formTag = new TagBuilder("form");
             formTag.MergeAttribute("role", "form");
             formTag.MergeAttribute("method", "get");
+            formTag.MergeAttribute("aria-hidden", "true");
             formTag.TagRenderMode = TagRenderMode.Normal;
 
             var inputTag = new TagBuilder("input");
@@ -95,6 +96,8 @@ namespace Ocuda.Utility.TagHelpers
             inputTag.MergeAttribute("max", model.MaxPage.ToString());
             inputTag.MergeAttribute("class", "page-link page-input");
             inputTag.MergeAttribute("value", model.CurrentPage.ToString());
+            inputTag.MergeAttribute("aria-label", "Current page, Page " +
+                model.CurrentPage.ToString() + " of " + model.MaxPage.ToString());
             inputTag.TagRenderMode = TagRenderMode.Normal;
 
             formTag.InnerHtml.AppendHtml(inputTag);
@@ -129,6 +132,8 @@ namespace Ocuda.Utility.TagHelpers
                 aTag.MergeAttribute("href", "#");
                 aTag.MergeAttribute("class", "page-link");
                 aTag.MergeAttribute("onclick", "return false;");
+                aTag.MergeAttribute("aria-hidden", "true");
+                aTag.MergeAttribute("tabindex", "-1");
                 aTag.InnerHtml.SetHtmlContent(text);
                 aTag.TagRenderMode = TagRenderMode.Normal;
                 liTag.InnerHtml.SetHtmlContent(aTag);
@@ -188,6 +193,22 @@ namespace Ocuda.Utility.TagHelpers
                     aTag.MergeAttribute("href", pageUrl);
                 }
 
+                if (glyph.Equals("fast-backward", StringComparison.OrdinalIgnoreCase))
+                {
+                    aTag.MergeAttribute("aria-label", "Go to first page.");
+                }
+                else if (glyph.Equals("backward", StringComparison.OrdinalIgnoreCase))
+                {
+                    aTag.MergeAttribute("aria-label", "Go to previous page.");
+                }
+                else if (glyph.Equals("forward", StringComparison.OrdinalIgnoreCase))
+                {
+                    aTag.MergeAttribute("aria-label", "Go to next page.");
+                }
+                else if (glyph.Equals("fast-forward", StringComparison.OrdinalIgnoreCase))
+                {
+                    aTag.MergeAttribute("aria-label", "Go to last page.");
+                }
                 aTag.InnerHtml.SetHtmlContent(spanTag);
                 liTag.InnerHtml.SetHtmlContent(aTag);
             }

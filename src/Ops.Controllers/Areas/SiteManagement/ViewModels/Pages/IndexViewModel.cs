@@ -25,5 +25,27 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
                     && PageHeaders?.Count > 0;
             }
         }
+        public string BaseLink { get; set; }
+        public string MakeLink(PageHeader pageHeader)
+        {
+            string type = pageHeader.Type.ToString().Trim('/').ToLowerInvariant();
+            string stub = pageHeader.Stub.Trim('/');
+
+            if (!string.IsNullOrEmpty(BaseLink))
+            {
+                if (type == "home" && stub == "index")
+                {
+                    return BaseLink;
+                }
+                else
+                {
+                    return BaseLink.TrimEnd('/') + '/' + type + '/' + stub;
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }

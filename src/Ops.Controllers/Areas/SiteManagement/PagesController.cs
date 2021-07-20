@@ -34,6 +34,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly IPermissionGroupService _permissionGroupService;
         private readonly ISegmentService _segmentService;
         private readonly ISocialCardService _socialCardService;
+
         public PagesController(ServiceFacades.Controller<PagesController> context,
             ICarouselService carouselService,
             ILanguageService languageService,
@@ -60,6 +61,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         public static string Area { get { return "SiteManagement"; } }
         public static string Name { get { return "Pages"; } }
+
         [HttpPost]
         [Route("[action]/{headerId}/{permissionGroupId}")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
@@ -877,11 +879,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     });
             }
 
-            foreach (var header in headerList.Data)
-            {
-                header.PageLanguages = await _pageService.GetHeaderLanguagesByIdAsync(header.Id);
-            }
-
             var viewModel = new IndexViewModel
             {
                 PageHeaders = headerList.Data,
@@ -896,10 +893,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     = new SelectList(await _imageFeatureService.GetAllTemplatesAsync(),
                         nameof(ImageFeatureTemplate.Id),
                         nameof(ImageFeatureTemplate.Name)),
+                BaseLink = await _siteSettingService
+                    .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.PromenadeUrl)
             };
 
             return View(viewModel);
         }
+
         [Route("[action]/{id}")]
         [HttpGet]
         [RestoreModelState]
