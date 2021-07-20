@@ -38,30 +38,25 @@
             }
         </select>
         <select id="addLayout" asp-for="PageHeader.IsLayoutPage" formgroup>
-            <option></option>
-            <option value="False">No</option>
             <option value="True">Yes</option>
         </select>
-        <div id="addTemplateContainer" class="d-none">
+        <div id="addTemplateContainer">
             <select id="addCarouselTemplate"
                     asp-for="PageHeader.LayoutCarouselTemplateId"
                     asp-items="@Model.CarouselTemplates"
-                    formgroup
-                    disabled>
+                    formgroup>
                 <option></option>
             </select>
             <select id="addFeatureTemplate"
                     asp-for="PageHeader.LayoutFeatureTemplateId"
                     asp-items="@Model.ImageFeatureTemplates"
-                    formgroup
-                    disabled>
+                    formgroup>
                 <option></option>
             </select>
             <select id="addWebslideTemplate"
                     asp-for="PageHeader.LayoutWebslideTemplateId"
                     asp-items="@Model.ImageFeatureTemplates"
-                    formgroup
-                    disabled>
+                    formgroup>
                 <option></option>
             </select>
         </div>
@@ -189,8 +184,6 @@ else
                         <tr>
                             <th>Name</th>
                             <th>Stub</th>
-                            <th>Type</th>
-                            <th>Languages</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -212,8 +205,6 @@ else
                                     }
                                 </td>
                                 <td class="align-middle">@header.Stub</td>
-                                <td class="align-middle">@header.Type.ToString()</td>
-                                <td class="align-middle">@string.Join(", ", header.PageLanguages)</td>
                                 <td class="align-middle text-nowrap">
                                     @if (Model.IsSiteManager)
                                     {
@@ -246,6 +237,15 @@ else
                                            class="btn btn-outline-primary"
                                            title="Edit page content">
                                             <span class="far fa-file-alt" aria-hidden="true"></span>
+                                        </a>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.BaseLink))
+                                    {
+                                        <a class="btn btn-outline-success text-success"
+                                           target="_blank"
+                                           href="@Model.MakeLink(header)"
+                                           title="View page">
+                                            <span class="fas fa-external-link-alt"></span>
                                         </a>
                                     }
                                     @if (Model.IsSiteManager)
@@ -303,15 +303,6 @@ else
                 }
             }
         })
-
-        $("#addLayout").on("change", function () {
-            if ($(this).val() == "True") {
-                $("#addTemplateContainer").removeClass("d-none").find("select").removeAttr("disabled");
-            }
-            else {
-                $("#addTemplateContainer").addClass("d-none").find("select").attr("disabled", "disabled");
-            }
-        });
 
         $("#addForm").submit(function (e) {
             e.preventDefault();

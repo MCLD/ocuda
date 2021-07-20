@@ -37,9 +37,6 @@ namespace Ocuda.Promenade.Models.Entities
         [DisplayName("Webslide Template")]
         public int? LayoutWebslideTemplateId { get; set; }
 
-        [NotMapped]
-        public ICollection<string> PageLanguages { get; set; }
-
         [Required]
         [MaxLength(255)]
         [DisplayName("Page Name")]

@@ -452,11 +452,6 @@ namespace Ocuda.Ops.Service
             return await _pageHeaderRepository.FindAsync(id);
         }
 
-        public async Task<ICollection<string>> GetHeaderLanguagesByIdAsync(int id)
-        {
-            return await _pageHeaderRepository.GetLanguagesByIdAsync(id);
-        }
-
         public async Task<PageItem> GetItemByIdAsync(int id)
         {
             return await _pageItemRepository.FindAsync(id);

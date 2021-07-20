@@ -339,6 +339,14 @@ namespace Ocuda.Ops.Service
                                 ioex.Message);
                             issues.Add(path, ioex.Message);
                         }
+                        catch (UnauthorizedAccessException uaex)
+                        {
+                            _logger.LogError(uaex,
+                                "Permission problem deleting file {FilePath}: {ErrorMessage}",
+                                path,
+                                uaex.Message);
+                            issues.Add(path, uaex.Message);
+                        }
                     }
                 }
             }
