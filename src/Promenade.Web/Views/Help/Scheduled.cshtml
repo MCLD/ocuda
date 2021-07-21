@@ -10,54 +10,54 @@
 }
 else
 {
-    <h1>Your time is scheduled</h1>
+    <h1>@Localizer[Promenade.ScheduleYourTimeIsScheduled]</h1>
 }
 
 @if (Model.ShowEmailMessage)
 {
     <p class="lead pt-2">
         <strong>
-            Please check your email for important information about this appointment.
+            @Localizer[Promenade.ScheduleCheckEmail]
         </strong>
     </p>
 }
 
-<p class="lead">Here are the details of your appointment:</p>
+<p class="lead">@Localizer[Promenade.ScheduleAppointmentDetails]</p>
 
 <div class="row">
-    <div class="col-md-3 text-md-right"><strong>Requested date and time</strong></div>
+    <div class="col-md-3 text-md-right"><strong>@Localizer[Promenade.ScheduleRequestedDateTime]</strong></div>
     <div class="col-md-9">@Model.DisplayTime</div>
 </div>
 <div class="row mt-2">
-    <div class="col-md-3 text-md-right"><strong>Name</strong></div>
+    <div class="col-md-3 text-md-right"><strong>@Localizer[Promenade.PromptName]</strong></div>
     <div class="col-md-9">@Model.ScheduleRequest.Name</div>
 </div>
 <div class="row mt-2">
-    <div class="col-md-3 text-md-right"><strong>Phone</strong></div>
+    <div class="col-md-3 text-md-right"><strong>@Localizer[Promenade.PromptPhone]</strong></div>
     <div class="col-md-9">@Model.FormattedPhone</div>
 </div>
 
 @if (!string.IsNullOrEmpty(Model.ScheduleRequest.Email))
 {
     <div class="row mt-2">
-        <div class="col-md-3 text-md-right"><strong>Email</strong></div>
+        <div class="col-md-3 text-md-right"><strong>@Localizer[Promenade.PromptEmail]</strong></div>
         <div class="col-md-9">@Model.ScheduleRequest.Email</div>
     </div>
 }
 
 <div class="row mt-2">
-    <div class="col-md-3 text-md-right"><strong>Subject</strong></div>
+    <div class="col-md-3 text-md-right"><strong>@Localizer[Promenade.PromptSchedule]</strong></div>
     <div class="col-md-9">@Model.DisplaySubject</div>
 </div>
 <div class="row mt-2">
-    <div class="col-md-3 text-md-right"><strong>Language</strong></div>
+    <div class="col-md-3 text-md-right"><strong>@Localizer[Promenade.PromptLanguage]</strong></div>
     <div class="col-md-9">@Model.ScheduleRequest.Language</div>
 </div>
 
 @if (!string.IsNullOrEmpty(Model.ScheduleRequest.Notes))
 {
     <div class="row mt-2">
-        <div class="col-md-3 text-md-right"><strong>Notes</strong></div>
+        <div class="col-md-3 text-md-right"><strong>@Localizer[Promenade.PromptNotes]</strong></div>
         <div class="col-md-9">@Model.ScheduleRequest.Notes</div>
     </div>
 }
@@ -65,6 +65,6 @@ else
 <div class="row">
     <div class="offset-md-3 mt-2">
         <a href="/"
-           class="btn btn-outline-dark m-2">Back to the site</a>
+           class="btn btn-outline-dark m-2">@Localizer[Promenade.ButtonBackToSite]</a>
     </div>
 </div>

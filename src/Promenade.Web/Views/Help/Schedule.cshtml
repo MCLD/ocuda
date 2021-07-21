@@ -10,7 +10,7 @@
 }
 else
 {
-    <h1>Schedule your time</h1>
+    <h1>@Localizer[Promenade.ScheduleYourTime]</h1>
 }
 
 @if (!string.IsNullOrEmpty(Model?.WarningText))
@@ -39,7 +39,7 @@ else
             <div>
                 <button type="submit"
                         class="btn btn-outline-dark m-2 btn-lg float-right">
-                    Next
+                    @Localizer[Promenade.ButtonNext]
                     <span class="fas fa-chevron-right"></span>
                 </button>
             </div>

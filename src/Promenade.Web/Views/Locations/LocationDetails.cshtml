@@ -12,13 +12,13 @@
         </div>
         <div class="col-12 col-md-7 order-md-1">
             <h1>@Model.Location.Name</h1>
-            <a aria-label="Go to our map link (opens new window)"
+            <a aria-label="@Localizer[Promenade.LocationSeeAMap]"
                href="@Model.Location.MapLink"
                class="btn btn-outline-secondary float-right ml-2 prom-locations-maplink"
                target="_blank">
                 <span class="fas fa-map-marker-alt"></span> Map
             </a>
-            <div class="sr-only">Our address is:</div>
+            <div class="sr-only">@Localizer[Promenade.LocationOurAddress]</div>
             <address>
                 @Model.Location.Address
                 <br />
@@ -26,13 +26,13 @@
                 @Model.Location.State
                 @Model.Location.Zip
                 <br />
-                <a aria-label="Call us at: @Model.Location.Phone"
+                <a aria-label="@Localizer[Promenade.LocationCallUsAt, Model.Location.Phone]"
                    href="tel:@Model.Location.Phone">@Model.Location.Phone</a>
             </address>
-            <div class="sr-only">Our current operating hours are:</div>
+            <div class="sr-only">@Localizer[Promenade.LocationCurrentHours]</div>
             @if (Model.Location.IsAlwaysOpen)
             {
-                <p>Open</p>
+                <p>@Localizer[Promenade.LocationOpen]</p>
             }
             else
             {
@@ -46,17 +46,17 @@
                         @if (Model.Location.IsClosed)
                         {
                             <strong style="font-size: 1.2rem;"
-                                    class="text-danger prom-locaton-isclosed">Closed</strong>
-                        }
-                        else
-                        {
-                            @foreach (var dayGrouping in Model.Location.LocationHours)
-                            {
-                                <strong>@dayGrouping.Days</strong>
-                                <span>@dayGrouping.Time</span>
-                                <br />
-                            }
-                        }
+                                    class="text-danger prom-locaton-isclosed">@Localizer[Promenade.LocationClosed]</strong>
+                                }
+                                else
+                                {
+                                    @foreach (var dayGrouping in Model.Location.LocationHours)
+                                    {
+                                        <strong>@dayGrouping.Days</strong>
+                                        <span>@dayGrouping.Time</span>
+                                        <br />
+                                    }
+                                }
                     }
                 </p>
             }
@@ -76,7 +76,7 @@
         </div>
     }
 
-    <h2>Library Information</h2>
+    <h2>@Localizer[Promenade.LocationInformationHeader]</h2>
 
     @if (Model.Location.DescriptionSegment?.Text?.Length > 0)
     {
@@ -111,7 +111,7 @@
                         @feature.Name
                         @if (feature.NewTab == true)
                         {
-                            <span class="sr-only">(opens new window)</span>
+                            <span class="sr-only">@Localizer[Promenade.NewWindow]</span>
                         }
                     </a>
                 }
@@ -125,7 +125,7 @@
                         @feature.Name
                         @if (feature.NewTab.HasValue && feature.NewTab.Value == true)
                         {
-                            <span class="sr-only">(opens new window)</span>
+                            <span class="sr-only">@Localizer[Promenade.NewWindow]</span>
                         }
                     </a>
                 }
@@ -149,13 +149,13 @@
     @if (Model.NearbyCount > 1)
     {
         <div class="prom-location-nearby">
-            <h2>Nearby Locations</h2>
+            <h2>@Localizer[Promenade.LocationNearbyLocationsHeader]</h2>
 
             <p>
-                Interested in updates from every library in this area?
-                <a aria-label="Subscribe to updates from all of these libraries (opens new window)"
+                @Localizer[Promenade.LocationInterestedInNearby]
+                <a aria-label="@Localizer[Promenade.LocationSubscribeNearbyNewWindow]"
                    href="@Model.LocationNeighborGroup.SubscriptionUrl"
-                   target="_blank">Subscribe to updates from all of these libraries.</a>
+                   target="_blank">@Localizer[Promenade.LocationSubscribeNearby]</a>
             </p>
 
             <div class="row">
@@ -185,20 +185,20 @@
                                     <td>
                                         @if (!string.IsNullOrWhiteSpace(locationGroup.Location.EventLink))
                                         {
-                                            <a aria-label="Subscribe to emails from the @locationGroup.Location.Name"
+                                            <a aria-label="@Localizer[Promenade.LocationSubscribeToName, locationGroup.Location.Name]"
                                                href="@locationGroup.Location.SubscriptionLink"
                                                class="btn btn-sm btn-outline-secondary text-dark m-1 float-right">
                                                 <span class="far fa-envelope"></span>
-                                                Subscribe
+                                                @Localizer[Promenade.ButtonSubscribe]
                                             </a>
                                         }
                                         @if (!string.IsNullOrWhiteSpace(locationGroup.Location.SubscriptionLink))
                                         {
-                                            <a aria-label="View events for the @locationGroup.Location.Name"
+                                            <a aria-label="@Localizer[Promenade.LocationViewEventsName, locationGroup.Location.Name]"
                                                href="@locationGroup.Location.EventLink"
                                                class="btn btn-sm btn-outline-secondary text-dark m-1 float-right">
                                                 <span class="fas fa-calendar-alt"></span>
-                                                Events
+                                                @Localizer[Promenade.LocationButtonEvents]
                                             </a>
                                         }
                                     </td>
@@ -213,13 +213,13 @@
                                     <span class="far fa-envelope"></span>
                                     @if (Model.NearbyCount == Model.NearbyEventsCount)
                                     {
-                                        <text>Updates from all @Model.NearbyEventsCount locations</text>
+                                        @Localizer[Promenade.LocationUpdatesFromAllCount, Model.NearbyEventsCount];
                                     }
                                     else
                                     {
-                                        <text>Updates from @Model.NearbyEventsCount locations</text>
+                                        @Localizer[Promenade.LocationUpdatesFromCount, Model.NearbyEventsCount];
                                     }
-                                    <span class="sr-only">(opens new window)</span>
+                                    <span class="sr-only">@Localizer[Promenade.NewWindow]</span>
                                 </a>
                             </td>
                         </tr>
