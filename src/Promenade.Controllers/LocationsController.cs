@@ -75,7 +75,7 @@ namespace Ocuda.Promenade.Controllers
             {
                 if (!long.TryParse(zip, out long _) || zip.Length != 5)
                 {
-                    issue = "Please enter a 5 digit numeric ZIP code.";
+                    issue = _localizer[i18n.Keys.Promenade.ZipCodeError];
                 }
                 else
                 {
@@ -85,7 +85,7 @@ namespace Ocuda.Promenade.Controllers
                     }
                     catch (Exception)
                     {
-                        issue = $"Problem finding ZIP code: {zip}";
+                        issue = _localizer[i18n.Keys.Promenade.ZipCodeErrorItem, zip];
                     }
                 }
             }
@@ -97,7 +97,9 @@ namespace Ocuda.Promenade.Controllers
                 }
                 catch (Exception)
                 {
-                    issue = $"Problem finding coordinates: {latitude}, {longitude}";
+                    issue = _localizer[i18n.Keys.Promenade.CoordinatesErrorItem,
+                        latitude,
+                        longitude];
                 }
             }
 
@@ -178,9 +180,10 @@ namespace Ocuda.Promenade.Controllers
 
             if (viewModel.Location.LocationHours != null)
             {
-                viewModel.StructuredLocationHours
-                    = (await _locationService.GetFormattedWeeklyHoursAsync(viewModel.Location.Id, true))
-                    .Select(_ => $"{_.Days} {_.Time}").ToList();
+                var hours = await _locationService
+                    .GetFormattedWeeklyHoursAsync(viewModel.Location.Id, true);
+
+                viewModel.StructuredLocationHours = hours.ConvertAll(_ => $"{_.Days} {_.Time}");
             }
 
             var locationFeatures
@@ -224,7 +227,9 @@ namespace Ocuda.Promenade.Controllers
             if (locationFeature?.Feature != null)
             {
                 var location = await _locationService.GetLocationByStubAsync(locationStub);
-                PageTitle = $"{locationFeature.Feature.Name} at {location.Name} Library";
+                PageTitle = _localizer[i18n.Keys.Promenade.LocationFeatureAt,
+                    locationFeature.Feature.Name,
+                    location.Name];
 
                 return View("LocationFeatureDetails", new LocationDetailViewModel
                 {
@@ -303,11 +308,12 @@ namespace Ocuda.Promenade.Controllers
                 viewModel = await CreateLocationViewModelAsync();
             }
 
-            PageTitle = "Find my library";
+            PageTitle = _localizer[i18n.Keys.Promenade.LocationFind];
 
             if (!string.IsNullOrWhiteSpace(viewModel.Zip))
             {
-                viewModel.Info = $"Libraries closest to ZIP code: {viewModel.Zip.Trim()}";
+                viewModel.Info = _localizer[i18n.Keys.Promenade.ZipCodeClosest,
+                    viewModel.Zip.Trim()];
             }
 
             return View("Locations", viewModel);

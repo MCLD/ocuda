@@ -11,6 +11,7 @@
         public static readonly string ButtonUseMyLocation = "Use my location";
         public static readonly string ConnectSocialMedia = "Connect with us on social media!";
         public static readonly string ConnectSocialOn = "Connect with us on {0}";
+        public static readonly string CoordinatesErrorItem = "There was a problem locating these coordinates: {0}, {1}";
         public static readonly string DateAtTime = "{0} at {1}";
         public static readonly string HelpItem = "{0} help";
         public static readonly string KeywordsItem = "Keywords: {0}";
@@ -20,6 +21,8 @@
         public static readonly string LocationCallUsAt = "Call us at {0}";
         public static readonly string LocationClosed = "Closed";
         public static readonly string LocationCurrentHours = "Our current operating hours are:";
+        public static readonly string LocationFeatureAt = "{0} at {1} Library";
+        public static readonly string LocationFind = "Find my Library";
         public static readonly string LocationInformationHeader = "Library Information";
         public static readonly string LocationInterestedInNearby = "Interested in updates from every library in this area?";
         public static readonly string LocationNearbyLocationsHeader = "Nearby Locations";
@@ -55,6 +58,9 @@
         public static readonly string ScheduleYourTime = "Schedule your time";
         public static readonly string ScheduleYourTimeIsScheduled = "Your time is scheduled";
         public static readonly string VisitHomePage = "Visit home page";
+        public static readonly string ZipCodeClosest = "Libraries closest to ZIP code: {0}";
+        public static readonly string ZipCodeError = "Please enter a 5 digit numeric ZIP code.";
+        public static readonly string ZipCodeErrorItem = "There was a problem finding this ZIP code: {0}";
         public static readonly string ZipCodePrompt = "Enter a 5 digit ZIP code";
     }
 }
