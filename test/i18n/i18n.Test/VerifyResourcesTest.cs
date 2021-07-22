@@ -32,19 +32,21 @@ namespace i18n.Test
         {
             var resourceFileKeys = XmlHelper.ExtractDataNames(filename, PathToResx).Keys;
 
-            var promenadeValues = new List<string>();
             var constStrings = typeof(Promenade).GetFields(BindingFlags.Public
                     | BindingFlags.Static
                     | BindingFlags.FlattenHierarchy)
-                    .Where(fi => fi.IsLiteral && !fi.IsInitOnly)
-                    .ToList();
+                .Where(_ => _.FieldType == typeof(string));
 
-            foreach (var constval in constStrings)
+            var missingValues = new List<string>();
+            foreach (var fieldInfo in constStrings)
             {
-                promenadeValues.Add((string)constval.GetValue(null));
+                if(!resourceFileKeys.Contains(fieldInfo.GetValue(null)))
+                {
+                    missingValues.Add((string)fieldInfo.GetValue(null));
+                }
             }
 
-            Assert.Empty(promenadeValues.Except(resourceFileKeys));
+            Assert.Empty(missingValues);
         }
     }
 }
