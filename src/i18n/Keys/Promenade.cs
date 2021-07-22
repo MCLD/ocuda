@@ -13,6 +13,16 @@
         public static readonly string ConnectSocialOn = "Connect with us on {0}";
         public static readonly string CoordinatesErrorItem = "There was a problem locating these coordinates: {0}, {1}";
         public static readonly string DateAtTime = "{0} at {1}";
+        public static readonly string ErrorAvailableDaysItem = "This service is only available on the following days: {0}";
+        public static readonly string ErrorDateClosedItem = "That date is not available for scheduling: {0}";
+        public static readonly string ErrorDateOnAfterItem = "You must request a date on or after: {0}";
+        public static readonly string ErrorEarliestTimeItem = "The earliest time you can select is: {0}";
+        public static readonly string ErrorFurthestDateItem = "The furthest date you can schedule a call is: {0}";
+        public static readonly string ErrorItemZipCode = "There was a problem finding this ZIP code: {0}";
+        public static readonly string ErrorSessionTimeout = "Unfortunately your session has timed out. Please reselect your time and subject.";
+        public static readonly string ErrorTelephoneFormat = "Please enter a telephone number in the format: ###-###-####";
+        public static readonly string ErrorTimeBeforeItem = "You must request a time before: {0}";
+        public static readonly string ErrorZipCode = "Please enter a 5 digit numeric ZIP code.";
         public static readonly string HelpItem = "{0} help";
         public static readonly string KeywordsItem = "Keywords: {0}";
         public static readonly string LocationBackToLocationName = "Back to {0}";
@@ -49,18 +59,20 @@
         public static readonly string PromptName = "Name";
         public static readonly string PromptNotes = "Notes";
         public static readonly string PromptPhone = "Phone";
+        public static readonly string PromptRequestedDate = "Requested date";
+        public static readonly string PromptRequestedTime = "Requested time";
         public static readonly string PromptSchedule = "Subject";
+        public static readonly string RequiredFieldItem = "The {0} field is required.";
         public static readonly string ScheduleAppointmentDetails = "Here are the details of your appointment:";
         public static readonly string ScheduleCheckEmail = "Please check your email for important information about this appointment.";
         public static readonly string ScheduleNotAvailable = "Scheduling is currently not available.";
         public static readonly string ScheduleRequestDifferentTime = "Request a different time";
         public static readonly string ScheduleRequestedDateTime = "Requested date and time";
+        public static readonly string ScheduleRequiredNotes = "Please help us out by telling us a little about your request.";
         public static readonly string ScheduleYourTime = "Schedule your time";
         public static readonly string ScheduleYourTimeIsScheduled = "Your time is scheduled";
         public static readonly string VisitHomePage = "Visit home page";
         public static readonly string ZipCodeClosest = "Libraries closest to ZIP code: {0}";
-        public static readonly string ZipCodeError = "Please enter a 5 digit numeric ZIP code.";
-        public static readonly string ZipCodeErrorItem = "There was a problem finding this ZIP code: {0}";
         public static readonly string ZipCodePrompt = "Enter a 5 digit ZIP code";
     }
 }

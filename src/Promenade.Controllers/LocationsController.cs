@@ -75,7 +75,7 @@ namespace Ocuda.Promenade.Controllers
             {
                 if (!long.TryParse(zip, out long _) || zip.Length != 5)
                 {
-                    issue = _localizer[i18n.Keys.Promenade.ZipCodeError];
+                    issue = _localizer[i18n.Keys.Promenade.ErrorZipCode];
                 }
                 else
                 {
@@ -85,7 +85,7 @@ namespace Ocuda.Promenade.Controllers
                     }
                     catch (Exception)
                     {
-                        issue = _localizer[i18n.Keys.Promenade.ZipCodeErrorItem, zip];
+                        issue = _localizer[i18n.Keys.Promenade.ErrorItemZipCode, zip];
                     }
                 }
             }
