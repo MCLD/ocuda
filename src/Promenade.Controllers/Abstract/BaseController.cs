@@ -21,7 +21,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
     {
         protected readonly IConfiguration _config;
         protected readonly ILogger<T> _logger;
-        protected readonly IStringLocalizer<i18n.Resources.Shared> _sharedLocalizer;
+        protected readonly IStringLocalizer<i18n.Resources.Shared> _localizer;
         protected readonly SiteSettingService _siteSettingService;
 
         protected BaseController(ServiceFacades.Controller<T> context)
@@ -32,7 +32,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
             }
             _logger = context.Logger;
             _config = context.Config;
-            _sharedLocalizer = context.SharedLocalizer;
+            _localizer = context.Localizer;
             _siteSettingService = context.SiteSettingService;
         }
 

@@ -10,7 +10,7 @@
 }
 else
 {
-    <h1>Schedule your time</h1>
+    <h1>@Localizer[Promenade.ScheduleYourTime]</h1>
 }
 <div class="row">
     <div class="col-12">
@@ -38,12 +38,12 @@ else
                 <a href="@Url.Action("Schedule", "Help")"
                    class="btn btn-outline-dark m-2 btn-lg float-left">
                     <span class="fas fa-chevron-left"></span>
-                    Back
+                    @Localizer[Promenade.ButtonBack]
                 </a>
                 <button type="submit"
                         class="btn btn-outline-success m-2 btn-lg float-right">
                     <span class="far fa-check-circle"></span>
-                    Submit
+                    @Localizer[Promenade.ButtonSubmit]
                 </button>
             </div>
         </form>
