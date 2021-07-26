@@ -31,7 +31,7 @@ else
                                name="@nameof(Model.SelectedTime)"
                                value="@suggestedTime.ToString("s", System.Globalization.CultureInfo.InvariantCulture)" />
                         <label for="@suggestedTime.ToString("s", System.Globalization.CultureInfo.InvariantCulture)">
-                            @Localizer[Promenade.DateAtTime, suggestedTime.ToLongDateString(), suggestedTime.ToShortTimeString()]
+                            @suggestedTime.ToString("f")
                         </label>
                     </div>
                 </div>

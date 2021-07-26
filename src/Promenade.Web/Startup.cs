@@ -344,7 +344,6 @@ namespace Ocuda.Promenade.Web
             services.AddScoped(typeof(Data.ServiceFacade.Repository<>));
 
             // utilities
-            services.AddScoped<CultureContextProvider>();
             services.AddScoped<IDateTimeProvider, CurrentDateTimeProvider>();
             services.AddScoped<Utility.Services.Interfaces.IOcudaCache,
                 Utility.Services.OcudaCache>();

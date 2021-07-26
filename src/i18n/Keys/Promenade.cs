@@ -12,7 +12,6 @@
         public static readonly string ConnectSocialMedia = "Connect with us on social media!";
         public static readonly string ConnectSocialOn = "Connect with us on {0}";
         public static readonly string CoordinatesErrorItem = "There was a problem locating these coordinates: {0}, {1}";
-        public static readonly string DateAtTime = "{0} at {1}";
         public static readonly string ErrorAvailableDaysItem = "This service is only available on the following days: {0}";
         public static readonly string ErrorDateClosedItem = "That date is not available for scheduling: {0}";
         public static readonly string ErrorDateOnAfterItem = "You must request a date on or after: {0}";
@@ -74,5 +73,14 @@
         public static readonly string VisitHomePage = "Visit home page";
         public static readonly string ZipCodeClosest = "Libraries closest to ZIP code: {0}";
         public static readonly string ZipCodePrompt = "Enter a 5 digit ZIP code";
+
+        public static readonly string ScheduleHowCanWeHelp = "How can we help?";
+        public static readonly string RequiredField = "You must supply a value for: {0}";
+        public static readonly string LocationClosedToday = "Closed today";
+        public static readonly string LocationOpensAtItem = "Opens at {0}";
+        public static readonly string LocationOpenUntilItem = "Open until {0}";
+        public static readonly string LocationOpensNextItem = "Opens {0} at {1}";
+        public static readonly string LocationTomorrow = "tomorrow";
+
     }
 }

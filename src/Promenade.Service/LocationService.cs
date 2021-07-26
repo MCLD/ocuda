@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BranchLocator.Helpers;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models;
 using Ocuda.Promenade.Models.Entities;
@@ -22,6 +23,7 @@ namespace Ocuda.Promenade.Service
         private readonly IFeatureRepository _featureRepository;
         private readonly IGoogleClient _googleClient;
         private readonly IGroupRepository _groupRepository;
+        private readonly IStringLocalizer<i18n.Resources.Shared> _localizer;
         private readonly ILocationFeatureRepository _locationFeatureRepository;
         private readonly ILocationGroupRepository _locationGroupRepository;
         private readonly ILocationHoursOverrideRepository _locationHoursOverrideRepository;
@@ -30,31 +32,33 @@ namespace Ocuda.Promenade.Service
 
         public LocationService(ILogger<LocationService> logger,
             IDateTimeProvider dateTimeProvider,
-            ILocationRepository locationRepository,
-            ILocationGroupRepository locationGroupRepository,
+            IStringLocalizer<i18n.Resources.Shared> localizer,
             IFeatureRepository featureRepository,
             IGoogleClient googleClient,
             IGroupRepository groupRepository,
             ILocationFeatureRepository locationFeatureRepository,
+            ILocationGroupRepository locationGroupRepository,
+            ILocationHoursOverrideRepository locationHoursOverrideRepository,
             ILocationHoursRepository locationHoursRepository,
-            ILocationHoursOverrideRepository locationHoursOverrideRepository)
+            ILocationRepository locationRepository)
             : base(logger, dateTimeProvider)
         {
-            _locationRepository = locationRepository
-                ?? throw new ArgumentNullException(nameof(locationRepository));
-            _locationGroupRepository = locationGroupRepository
-                ?? throw new ArgumentNullException(nameof(locationGroupRepository));
             _featureRepository = featureRepository
                 ?? throw new ArgumentNullException(nameof(featureRepository));
             _googleClient = googleClient ?? throw new ArgumentNullException(nameof(googleClient));
             _groupRepository = groupRepository
                 ?? throw new ArgumentNullException(nameof(groupRepository));
+            _localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
             _locationFeatureRepository = locationFeatureRepository
                 ?? throw new ArgumentNullException(nameof(locationFeatureRepository));
-            _locationHoursRepository = locationHoursRepository
-                ?? throw new ArgumentNullException(nameof(locationHoursRepository));
+            _locationGroupRepository = locationGroupRepository
+                ?? throw new ArgumentNullException(nameof(locationGroupRepository));
             _locationHoursOverrideRepository = locationHoursOverrideRepository
                 ?? throw new ArgumentNullException(nameof(locationHoursOverrideRepository));
+            _locationHoursRepository = locationHoursRepository
+                ?? throw new ArgumentNullException(nameof(locationHoursRepository));
+            _locationRepository = locationRepository
+                ?? throw new ArgumentNullException(nameof(locationRepository));
         }
 
         public async Task<(double? Latitude, double? Longitude)> GeocodeAddressAsync(string address)
@@ -133,27 +137,32 @@ namespace Ocuda.Promenade.Service
             {
                 if (!result.OpenTime.HasValue || !result.CloseTime.HasValue)
                 {
-                    result.StatusMessage = "Open";
+                    result.StatusMessage = _localizer[i18n.Keys.Promenade.LocationOpen];
                     result.IsCurrentlyOpen = true;
                 }
                 else if (result.OpenTime.Value.TimeOfDay > now.TimeOfDay)
                 {
-                    result.StatusMessage = $"Opens at {result.OpenTime.Value.ToString("h:mm tt", CultureInfo.InvariantCulture)}";
+                    var opensAt = result.OpenTime.Value.ToString("t", CultureInfo.CurrentCulture);
+                    result.StatusMessage = _localizer[i18n.Keys.Promenade.LocationOpensAtItem,
+                        opensAt];
                 }
                 else if (result.CloseTime.Value.TimeOfDay > now.TimeOfDay)
                 {
-                    result.StatusMessage = $"Open until {result.CloseTime.Value.ToString("h:mm tt", CultureInfo.InvariantCulture)}";
+                    var openUntil = result.CloseTime.Value.ToString("t",
+                        CultureInfo.CurrentCulture);
+                    result.StatusMessage = _localizer[i18n.Keys.Promenade.LocationOpenUntilItem,
+                        openUntil];
                     result.IsCurrentlyOpen = true;
                 }
                 else
                 {
-                    result.StatusMessage = "Closed";
+                    result.StatusMessage = _localizer[i18n.Keys.Promenade.LocationClosed];
                     showNextOpen = true;
                 }
             }
             else
             {
-                result.StatusMessage = "Closed today";
+                result.StatusMessage = _localizer[i18n.Keys.Promenade.LocationClosedToday];
                 showNextOpen = true;
             }
 
@@ -189,14 +198,22 @@ namespace Ocuda.Promenade.Service
                     var nextDay = "";
                     if ((int)nextOpen.DayOfWeek == ((int)now.DayOfWeek + 1) % DaysInWeek)
                     {
-                        nextDay = "tomorrow";
+                        nextDay = _localizer[i18n.Keys.Promenade.LocationTomorrow];
                     }
                     else
                     {
-                        nextDay = nextOpen.DayOfWeek.ToString();
+                        nextDay = CultureInfo
+                            .CurrentCulture
+                            .DateTimeFormat
+                            .GetAbbreviatedDayName(nextOpen.DayOfWeek);
                     }
 
-                    result.StatusMessage = $"Opens {nextDay} at {nextOpen.OpenTime.Value.ToString("h:mm tt", CultureInfo.InvariantCulture)}";
+                    var opensAt = nextOpen.OpenTime.Value.ToString("t",
+                        CultureInfo.CurrentCulture);
+
+                    result.StatusMessage = _localizer[i18n.Keys.Promenade.LocationOpensNextItem,
+                        nextDay,
+                        opensAt];
                 }
             }
 
@@ -288,7 +305,7 @@ namespace Ocuda.Promenade.Service
                 formattedDayGroupings.Add(new LocationDayGrouping
                 {
                     Days = formattedClosedDays,
-                    Time = "Closed"
+                    Time = _localizer[i18n.Keys.Promenade.LocationClosed]
                 });
             }
 

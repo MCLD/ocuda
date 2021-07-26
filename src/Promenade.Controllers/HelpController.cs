@@ -36,7 +36,7 @@ namespace Ocuda.Promenade.Controllers
             + nameof(ScheduleRequest.Notes);
 
         private const string ViewModelTelephoneId = nameof(ScheduleRequest)
-                            + "."
+            + "."
             + nameof(ScheduleRequest.ScheduleRequestTelephoneId);
 
         private static readonly TimeSpan QuantizeSpan = TimeSpan.FromMinutes(30);
@@ -499,7 +499,7 @@ namespace Ocuda.Promenade.Controllers
             else
             {
                 return await DisplayScheduleTimeFormAsync(viewModel,
-                    viewModel.ScheduleRequestTime); ;
+                    viewModel.ScheduleRequestTime);
             }
         }
 

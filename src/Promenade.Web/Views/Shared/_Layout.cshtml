@@ -65,8 +65,7 @@
                 @{
                     var topNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.TopNavigation]
                         as Ocuda.Promenade.Models.Entities.Navigation;
-                    var currentUiCulture = Context.Items[Ocuda.i18n.LocalizationItemKey.CurrentCulture]
-                        as System.Globalization.CultureInfo;
+                    var currentUiCulture = System.Globalization.CultureInfo.CurrentCulture;
                     var l10nLinks = Context.Items[Ocuda.i18n.LocalizationItemKey.L10n] as IDictionary<string, string>;
                     if (topNavigation?.Navigations.Count() > 0 || l10nLinks?.Count() > 1)
                     {

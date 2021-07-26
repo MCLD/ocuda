@@ -29,7 +29,8 @@ else
                    formgroup-val-required="@Model.EmailRequiredMessage"
                    type="email" />
             <select asp-for="ScheduleRequest.Language"
-                    asp-items="Model.Languages" formgroup></select>
+                    asp-items="Ocuda.Promenade.Controllers.ViewModels.Help.ScheduleDetailsViewModel.Languages" 
+                    formgroup></select>
             <textarea asp-for="ScheduleRequest.Notes"
                       maxlength="255"
                       formgroup-val-required="@Model.NotesRequiredMessage"
