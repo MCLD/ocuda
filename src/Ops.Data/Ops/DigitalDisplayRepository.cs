@@ -65,7 +65,16 @@ namespace Ocuda.Ops.Data.Ops
                 display.LastContentVerification = lastVerifiedAt;
                 display.LastCommunication = lastVerifiedAt;
                 Update(display);
-                await SaveAsync();
+                try
+                {
+                    await SaveAsync();
+                }
+                catch (DbUpdateConcurrencyException ducex)
+                {
+                    _logger.LogError("Can't update last communication/content verification for display {DisplayId}: {ErrorMessage}",
+                        displayId,
+                        ducex.Message);
+                }
             }
             else
             {
