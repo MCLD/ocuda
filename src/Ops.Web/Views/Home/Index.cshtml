@@ -6,24 +6,29 @@
         {
             <div class="card mb-4">
                 <div class="card-header">
-                    <h3>@post.Title</h3>
+                    <h2 class="h3 mb-0">@post.Title</h2>
                 </div>
-                <div class="card-body">
+                <div class="card-body pb-0">
                     @Html.Raw(post.Content)
                 </div>
-                <div class="card-footer d-flex">
+                <div class="card-footer d-flex flex-wrap">
                     <div class="flex-grow-1 mr-2">
-                        Posted by @post.CreatedByName
+                        Posted by
+                        @if (post.CreatedByUser != null && !string.IsNullOrEmpty(post.CreatedByUser.Username))
+                        {
+                            <a asp-controller="@ProfileController.Name"
+                               asp-action="@nameof(ProfileController.Index)"
+                               asp-route-id="@post.CreatedByUser.Username">@post.CreatedByName</a>
+                        }
+                        else
+                        {
+                            @post.CreatedByName
+                        }
                     </div>
-                    @post.PublishedAt.ToString("MM/dd/yyyy hh:mm tt")
+                    <span title="@((DateTime.Now.Date - post.PublishedAt.Date).TotalDays) days ago">@post.PublishedAt.ToString("f")</span>
                 </div>
             </div>
         }
-        <div>
-            @if (Model.PaginateModel.MaxPage > 1)
-            {
-                <paginate paginateModel="@Model.PaginateModel"></paginate>
-            }
-        </div>
+        <paginate paginateModel="@Model"></paginate>
     </div>
 </div>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -10,7 +11,7 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Utility.TagHelpers
 {
-    [HtmlTargetElement("paginate", Attributes = "paginateModel")]
+    [HtmlTargetElement("paginate", Attributes = nameof(PaginateModel))]
     public class PaginateTagHelper : TagHelper
     {
         private readonly IUrlHelperFactory _urlHelperFactory;
@@ -21,62 +22,20 @@ namespace Ocuda.Utility.TagHelpers
                 throw new ArgumentNullException(nameof(urlHelperFactory));
         }
 
+        [HtmlAttributeName("asButtons")]
+        public bool AsButtons { get; set; }
+
+        [HtmlAttributeName("paginateModel")]
+        public PaginateModel PaginateModel { get; set; }
+
         [ViewContext]
         [HtmlAttributeNotBound]
         public ViewContext ViewContextData { get; set; }
 
-        [HtmlAttributeName("paginateModel")]
-        public PaginateModel paginateModel { get; set; }
-
-        [HtmlAttributeName("asButtons")]
-        public bool asButtons { get; set; }
-
-        public override void Process(TagHelperContext context, TagHelperOutput output)
-        {
-            IUrlHelper url = _urlHelperFactory.GetUrlHelper(ViewContextData);
-            var ulTag = new TagBuilder("ul")
-            {
-                TagRenderMode = TagRenderMode.Normal
-            };
-            ulTag.MergeAttribute("class", "pagination");
-
-            string firstPage = paginateModel.FirstPage == null
-                               ? null
-                               : QueryBuilder(url, paginateModel.FirstPage, asButtons);
-            ulTag.InnerHtml.AppendHtml(PaginatorLi(firstPage, "fast-backward", asButtons));
-
-            string previousPage = paginateModel.PreviousPage == null
-                                  ? null
-                                  : QueryBuilder(url, paginateModel.PreviousPage, asButtons);
-            ulTag.InnerHtml.AppendHtml(PaginatorLi(previousPage, "backward", asButtons));
-
-            ulTag.InnerHtml.AppendHtml(PaginatorInput(paginateModel));
-
-            ulTag.InnerHtml.AppendHtml(
-                PaginatorLi($"of {paginateModel.MaxPage.ToString()}", asButtons));
-
-            string nextPage = paginateModel.NextPage == null
-                              ? null
-                              : QueryBuilder(url, paginateModel.NextPage, asButtons);
-
-            ulTag.InnerHtml.AppendHtml(PaginatorLi(nextPage, "forward", asButtons));
-
-            string lastPage = paginateModel.LastPage == null
-                              ? null
-                              : QueryBuilder(url, paginateModel.LastPage, asButtons);
-
-            ulTag.InnerHtml.AppendHtml(PaginatorLi(lastPage, "fast-forward", asButtons));
-
-            TagBuilder navTag = new TagBuilder("nav")
-            {
-                TagRenderMode = TagRenderMode.Normal
-            };
-            navTag.InnerHtml.SetHtmlContent(ulTag);
-            output.Content.SetHtmlContent(navTag);
-        }
-
         public static TagBuilder PaginatorInput(PaginateModel model)
         {
+            if (model == null) { throw new ArgumentNullException(nameof(model)); }
+
             var liTag = new TagBuilder("li")
             {
                 TagRenderMode = TagRenderMode.Normal
@@ -93,11 +52,12 @@ namespace Ocuda.Utility.TagHelpers
             inputTag.MergeAttribute("name", "page");
             inputTag.MergeAttribute("type", "number");
             inputTag.MergeAttribute("min", "1");
-            inputTag.MergeAttribute("max", model.MaxPage.ToString());
+            inputTag.MergeAttribute("max", model.MaxPage.ToString(CultureInfo.InvariantCulture));
             inputTag.MergeAttribute("class", "page-link page-input");
-            inputTag.MergeAttribute("value", model.CurrentPage.ToString());
-            inputTag.MergeAttribute("aria-label", "Current page, Page " +
-                model.CurrentPage.ToString() + " of " + model.MaxPage.ToString());
+            inputTag.MergeAttribute("value",
+                model.CurrentPage.ToString(CultureInfo.InvariantCulture));
+            inputTag.MergeAttribute("aria-label",
+                $"Current page, Page {model.CurrentPage} of {model.MaxPage}");
             inputTag.TagRenderMode = TagRenderMode.Normal;
 
             formTag.InnerHtml.AppendHtml(inputTag);
@@ -105,6 +65,58 @@ namespace Ocuda.Utility.TagHelpers
             liTag.InnerHtml.SetHtmlContent(formTag);
 
             return liTag;
+        }
+
+        public override void Process(TagHelperContext context, TagHelperOutput output)
+        {
+            if (context == null) { throw new ArgumentNullException(nameof(context)); }
+            if (output == null) { throw new ArgumentNullException(nameof(output)); }
+
+            if (PaginateModel == null || PaginateModel.MaxPage == 1)
+            {
+                output.SuppressOutput();
+                return;
+            }
+
+            IUrlHelper url = _urlHelperFactory.GetUrlHelper(ViewContextData);
+            var ulTag = new TagBuilder("ul")
+            {
+                TagRenderMode = TagRenderMode.Normal
+            };
+            ulTag.MergeAttribute("class", "pagination");
+
+            string firstPage = PaginateModel.FirstPage == null
+                               ? null
+                               : QueryBuilder(url, PaginateModel.FirstPage, AsButtons);
+            ulTag.InnerHtml.AppendHtml(PaginatorLi(firstPage, "fast-backward", AsButtons));
+
+            string previousPage = PaginateModel.PreviousPage == null
+                                  ? null
+                                  : QueryBuilder(url, PaginateModel.PreviousPage, AsButtons);
+            ulTag.InnerHtml.AppendHtml(PaginatorLi(previousPage, "backward", AsButtons));
+
+            ulTag.InnerHtml.AppendHtml(PaginatorInput(PaginateModel));
+
+            ulTag.InnerHtml.AppendHtml(PaginatorLi($"of {PaginateModel.MaxPage}", AsButtons));
+
+            string nextPage = PaginateModel.NextPage == null
+                              ? null
+                              : QueryBuilder(url, PaginateModel.NextPage, AsButtons);
+
+            ulTag.InnerHtml.AppendHtml(PaginatorLi(nextPage, "forward", AsButtons));
+
+            string lastPage = PaginateModel.LastPage == null
+                              ? null
+                              : QueryBuilder(url, PaginateModel.LastPage, AsButtons);
+
+            ulTag.InnerHtml.AppendHtml(PaginatorLi(lastPage, "fast-forward", AsButtons));
+
+            var navTag = new TagBuilder("nav")
+            {
+                TagRenderMode = TagRenderMode.Normal
+            };
+            navTag.InnerHtml.SetHtmlContent(ulTag);
+            output.Content.SetHtmlContent(navTag);
         }
 
         private static TagBuilder PaginatorLi(string text, bool asButtons)
@@ -152,7 +164,7 @@ namespace Ocuda.Utility.TagHelpers
             {
                 TagRenderMode = TagRenderMode.Normal
             };
-            spanTag.MergeAttribute("class", string.Format("fa fa-{0}", glyph));
+            spanTag.MergeAttribute("class", $"fa fa-{glyph}");
             if (asButtons)
             {
                 var buttonTag = new TagBuilder("button")
@@ -219,14 +231,7 @@ namespace Ocuda.Utility.TagHelpers
         {
             if (asButtons)
             {
-                if (page.HasValue)
-                {
-                    return page.ToString();
-                }
-                else
-                {
-                    return null;
-                }
+                return page?.ToString(CultureInfo.InvariantCulture);
             }
             else
             {

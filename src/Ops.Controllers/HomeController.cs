@@ -8,7 +8,6 @@ using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
-using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers
 {
@@ -18,8 +17,6 @@ namespace Ocuda.Ops.Controllers
         private readonly IPostService _postService;
         private readonly IUserService _userService;
 
-        public static string Name { get { return "Home"; } }
-
         public HomeController(ServiceFacades.Controller<HomeController> context,
             IPostService postService,
             IUserService userService) : base(context)
@@ -28,56 +25,7 @@ namespace Ocuda.Ops.Controllers
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
-        [HttpGet("")]
-        public async Task<IActionResult> Index(int page = 1)
-        {
-            var filter = new BlogFilter(page, 5)
-            {
-                IsShownOnHomePage = true
-            };
-
-            var posts = await _postService.GetPaginatedPostsAsync(filter);
-
-            var paginateModel = new PaginateModel
-            {
-                ItemCount = posts.Count,
-                CurrentPage = page,
-                ItemsPerPage = filter.Take.Value
-            };
-            if (paginateModel.PastMaxPage)
-            {
-                return RedirectToRoute(
-                    new
-                    {
-                        page = paginateModel.LastPage ?? 1
-                    });
-            }
-
-            foreach (var post in posts.Data)
-            {
-                var user = await _userService.GetByIdAsync(post.CreatedBy);
-                post.CreatedByName = user.Name;
-                post.Content = CommonMark.CommonMarkConverter.Convert(post.Content);
-            }
-
-            var viewModel = new IndexViewModel
-            {
-                Posts = posts.Data,
-                PaginateModel = paginateModel
-            };
-
-            return View(viewModel);
-        }
-
-        [HttpGet("[action]")]
-        public IActionResult Unauthorized(Uri returnUrl)
-        {
-            return View(new UnauthorizedViewModel
-            {
-                ReturnUrl = returnUrl?.ToString() ?? "",
-                Username = CurrentUsername
-            });
-        }
+        public static string Name { get { return "Home"; } }
 
         [HttpGet("[action]")]
         public IActionResult Authenticate(Uri returnUrl)
@@ -92,6 +40,52 @@ namespace Ocuda.Ops.Controllers
             TempData[TempDataKey.AlertWarning]
                 = $"Could not authenticate you for access to {returnUrl}.";
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet("")]
+        public async Task<IActionResult> Index(int page)
+        {
+            var showPage = page == default ? 1 : page;
+
+            var filter = new BlogFilter(showPage, 5)
+            {
+                IsShownOnHomePage = true
+            };
+
+            var posts = await _postService.GetPaginatedPostsAsync(filter);
+
+            var viewModel = new IndexViewModel
+            {
+                Posts = posts.Data,
+                ItemCount = posts.Count,
+                CurrentPage = showPage,
+                ItemsPerPage = filter.Take.Value
+            };
+
+            if (viewModel.PastMaxPage)
+            {
+                return RedirectToRoute(new { page = viewModel.LastPage ?? 1 });
+            }
+
+            foreach (var post in viewModel.Posts)
+            {
+                var user = await _userService.GetByIdAsync(post.CreatedBy);
+                post.CreatedByName = user.Name;
+                post.CreatedByUser = user;
+                post.Content = CommonMark.CommonMarkConverter.Convert(post.Content);
+            }
+
+            return View(viewModel);
+        }
+
+        [HttpGet("[action]")]
+        public IActionResult Unauthorized(Uri returnUrl)
+        {
+            return View(new UnauthorizedViewModel
+            {
+                ReturnUrl = returnUrl?.ToString() ?? "",
+                Username = CurrentUsername
+            });
         }
 
         [HttpGet("[action]")]
