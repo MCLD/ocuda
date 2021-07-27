@@ -6,26 +6,37 @@
         {
             <div class="card mb-4">
                 <div class="card-header">
-                    <h2 class="h3 mb-0">@post.Title</h2>
+                    <h2 class="lead mb-0">@post.Title</h2>
                 </div>
-                <div class="card-body pb-0">
+                <div class="card-body pb-0 pt-3">
                     @Html.Raw(post.Content)
                 </div>
-                <div class="card-footer d-flex flex-wrap">
+                <div class="card-footer d-flex flex-wrap py-1">
                     <div class="flex-grow-1 mr-2">
-                        Posted by
-                        @if (post.CreatedByUser != null && !string.IsNullOrEmpty(post.CreatedByUser.Username))
-                        {
-                            <a asp-controller="@ProfileController.Name"
-                               asp-action="@nameof(ProfileController.Index)"
-                               asp-route-id="@post.CreatedByUser.Username">@post.CreatedByName</a>
-                        }
-                        else
-                        {
-                            @post.CreatedByName
-                        }
+                        <em>
+                            <small class="text-muted">
+                                Posted by
+                                @if (!string.IsNullOrEmpty(post.CreatedByUsername))
+                                {
+                                    <a asp-controller="@ProfileController.Name"
+                                       asp-action="@nameof(ProfileController.Index)"
+                                       asp-route-id="@post.CreatedByUsername">@post.CreatedByName</a>
+                                }
+                                else
+                                {
+                                    @post.CreatedByName
+                                }
+                                in <a href="#">@post.SectionName</a>
+                            </small>
+                        </em>
                     </div>
-                    <span title="@((DateTime.Now.Date - post.PublishedAt.Date).TotalDays) days ago">@post.PublishedAt.ToString("f")</span>
+                    <span title="@post.PublishedAgo">
+                        <em>
+                            <small class="text-muted">
+                                @post.PublishedAt.ToString("f")
+                            </small>
+                        </em>
+                    </span>
                 </div>
             </div>
         }

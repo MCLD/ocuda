@@ -15,14 +15,11 @@ namespace Ocuda.Ops.Controllers
     public class HomeController : BaseController<HomeController>
     {
         private readonly IPostService _postService;
-        private readonly IUserService _userService;
 
         public HomeController(ServiceFacades.Controller<HomeController> context,
-            IPostService postService,
-            IUserService userService) : base(context)
+            IPostService postService) : base(context)
         {
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
         public static string Name { get { return "Home"; } }
@@ -69,9 +66,6 @@ namespace Ocuda.Ops.Controllers
 
             foreach (var post in viewModel.Posts)
             {
-                var user = await _userService.GetByIdAsync(post.CreatedBy);
-                post.CreatedByName = user.Name;
-                post.CreatedByUser = user;
                 post.Content = CommonMark.CommonMarkConverter.Convert(post.Content);
             }
 

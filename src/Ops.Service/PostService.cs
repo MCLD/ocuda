@@ -15,24 +15,28 @@ namespace Ocuda.Ops.Service
 {
     public class PostService : BaseService<PostService>, IPostService
     {
-        private readonly IPostRepository _postRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IPostRepository _postRepository;
+        private readonly ISectionService _sectionService;
+        private readonly IUserService _userService;
 
         public PostService(ILogger<PostService> logger,
             IHttpContextAccessor httpContextAccessor,
+            ICategoryRepository categoryRepository,
             IPostRepository postRepository,
-            ICategoryRepository categoryRepository)
+            ISectionService sectionService,
+            IUserService userService)
             : base(logger, httpContextAccessor)
         {
-            _postRepository = postRepository
-                ?? throw new ArgumentNullException(nameof(postRepository));
             _categoryRepository = categoryRepository
                 ?? throw new ArgumentNullException(nameof(categoryRepository));
-        }
-
-        public async Task<Post> GetPostByIdAsync(int id)
-        {
-            return await _postRepository.FindAsync(id);
+            _categoryRepository = categoryRepository
+                ?? throw new ArgumentNullException(nameof(categoryRepository));
+            _postRepository = postRepository
+                ?? throw new ArgumentNullException(nameof(postRepository));
+            _sectionService = sectionService
+                ?? throw new ArgumentNullException(nameof(sectionService));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
         public async Task CreatePostAsync(Post post)
@@ -49,6 +53,98 @@ namespace Ocuda.Ops.Service
                 post.CreatedBy = GetCurrentUserId();
 
                 await _postRepository.AddAsync(post);
+                await _postRepository.SaveAsync();
+            }
+        }
+
+        public async Task<List<Category>> GetCategoriesBySectionIdAsync(int sectionId)
+        {
+            return await _categoryRepository.GetCategoriesBySectionIdAsync(sectionId);
+        }
+
+        public async Task<Category> GetCategoryByIdAsync(int id)
+        {
+            return await _categoryRepository.FindAsync(id);
+        }
+
+        public async Task<DataWithCount<ICollection<Post>>> GetPaginatedPostsAsync(
+            BlogFilter filter)
+        {
+            var postsWithCount = await _postRepository.GetPaginatedListAsync(filter);
+
+            // populate additional info if it's a limited number of posts
+            if (postsWithCount.Count <= new BlogFilter().Take)
+            {
+                foreach (var post in postsWithCount.Data)
+                {
+                    if (post.CreatedByUser == null)
+                    {
+                        (post.CreatedByName, post.CreatedByUsername)
+                            = await _userService.GetNameUsernameAsync(post.CreatedBy);
+                    }
+                    if (string.IsNullOrEmpty(post.SectionName))
+                    {
+                        var section = await _sectionService.GetByIdAsync(post.SectionId);
+                        post.SectionName = section.Name;
+                    }
+                }
+            }
+
+            return postsWithCount;
+        }
+
+        public async Task<Post> GetPostByIdAsync(int id)
+        {
+            return await _postRepository.FindAsync(id);
+        }
+
+        public async Task<List<PostCategory>> GetPostCategoriesByIdAsync(int postId)
+        {
+            return await _postRepository.GetPostCategoriesAsync(postId);
+        }
+
+        public async Task<List<PostCategory>> GetPostCategoriesByIdsAsync(List<int> postIds)
+        {
+            var postList = new List<PostCategory>();
+            foreach (var id in postIds)
+            {
+                var postcats = await _postRepository.GetPostCategoriesAsync(id);
+                postList.AddRange(postcats);
+            }
+            return postList;
+        }
+
+        public async Task<List<Post>> GetPostsByCategoryIdAsync(int categoryId, int sectionId)
+        {
+            return await _postRepository.GetPostsBySectionCategoryIdAsync(categoryId, sectionId);
+        }
+
+        public async Task<Category> GetSectionCategoryByStubAsync(string stub, int sectionId)
+        {
+            var category = await _categoryRepository.GetCategoryByStubAsync(stub);
+
+            return await _categoryRepository.SectionHasCategoryAsync(category.Id, sectionId) ? category : null;
+        }
+
+        public async Task<Post> GetSectionPostByStubAsync(string stub, int sectionId)
+        {
+            return await _postRepository.GetSectionPostByStubAsync(stub, sectionId);
+        }
+
+        public async Task<List<Post>> GetTopSectionPostsAsync(int take, int sectionId)
+        {
+            return await _postRepository.GetTopSectionPostsAsync(sectionId, take);
+        }
+
+        public async Task RemovePostAsync(Post post)
+        {
+            if (post != null)
+            {
+                var currentCats = await _postRepository.GetPostCategoriesAsync(post.Id);
+                await _postRepository.DeletePostCategoriesAsync(
+                    currentCats.Select(_ => _.CategoryId).ToList(), post.Id);
+                _postRepository.Remove(post);
+
                 await _postRepository.SaveAsync();
             }
         }
@@ -70,24 +166,6 @@ namespace Ocuda.Ops.Service
             }
         }
 
-        public async Task<Post> GetSectionPostByStubAsync(string stub, int sectionId)
-        {
-            return await _postRepository.GetSectionPostByStubAsync(stub, sectionId);
-        }
-
-        public async Task RemovePostAsync(Post post)
-        {
-            if (post != null)
-            {
-                var currentCats = await _postRepository.GetPostCategoriesAsync(post.Id);
-                await _postRepository.DeletePostCategoriesAsync(
-                    currentCats.Select(_ => _.CategoryId).ToList(), post.Id);
-                _postRepository.Remove(post);
-
-                await _postRepository.SaveAsync();
-            }
-        }
-
         public async Task UpdatePostCategoriesAsync(List<int> newCategoryIds, int postId)
         {
             var currentCats = await _postRepository.GetPostCategoriesAsync(postId);
@@ -102,55 +180,6 @@ namespace Ocuda.Ops.Service
 
             await _postRepository.DeletePostCategoriesAsync(catsToDelete, postId);
             await _postRepository.AddPostCategoriesAsync(catsToAdd, postId);
-        }
-
-        public async Task<Category> GetCategoryByIdAsync(int id)
-        {
-            return await _categoryRepository.FindAsync(id);
-        }
-
-        public async Task<Category> GetSectionCategoryByStubAsync(string stub, int sectionId)
-        {
-            var category = await _categoryRepository.GetCategoryByStubAsync(stub);
-
-            return await _categoryRepository.SectionHasCategoryAsync(category.Id, sectionId) ? category : null;
-        }
-
-        public async Task<List<Category>> GetCategoriesBySectionIdAsync(int sectionId)
-        {
-            return await _categoryRepository.GetCategoriesBySectionIdAsync(sectionId);
-        }
-
-        public async Task<List<Post>> GetPostsByCategoryIdAsync(int categoryId, int sectionId)
-        {
-            return await _postRepository.GetPostsBySectionCategoryIdAsync(categoryId, sectionId);
-        }
-
-        public async Task<List<Post>> GetTopSectionPostsAsync(int take, int sectionId)
-        {
-            return await _postRepository.GetTopSectionPostsAsync(sectionId, take);
-        }
-
-        public async Task<DataWithCount<ICollection<Post>>> GetPaginatedPostsAsync(
-            BlogFilter filter)
-        {
-            return await _postRepository.GetPaginatedListAsync(filter);
-        }
-
-        public async Task<List<PostCategory>> GetPostCategoriesByIdsAsync(List<int> postIds)
-        {
-            var postList = new List<PostCategory>();
-            foreach (var id in postIds)
-            {
-                var postcats = await _postRepository.GetPostCategoriesAsync(id);
-                postList.AddRange(postcats);
-            }
-            return postList;
-        }
-
-        public async Task<List<PostCategory>> GetPostCategoriesByIdAsync(int postId)
-        {
-            return await _postRepository.GetPostCategoriesAsync(postId);
         }
     }
 }

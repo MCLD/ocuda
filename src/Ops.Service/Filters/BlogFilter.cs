@@ -2,13 +2,14 @@
 {
     public class BlogFilter : BaseFilter
     {
-        public int? SectionId { get; set; }
+        public BlogFilter(int? page = null, int take = 15) : base(page, take)
+        {
+        }
+
         public int? CategoryId { get; set; }
-        public bool? IsShownOnHomePage { get; set; }
-
         public int? FileLibraryId { get; set; }
+        public bool? IsShownOnHomePage { get; set; }
         public int? LinkLibraryId { get; set; }
-
-        public BlogFilter(int? page = null, int take = 15) : base(page, take) { }
+        public int? SectionId { get; set; }
     }
 }
