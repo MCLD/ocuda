@@ -26,6 +26,7 @@ namespace Ocuda.Ops.Models.Entities
         }
 
         public DateTime PublishedAt { get; set; }
+        public Section Section { get; set; }
         public int SectionId { get; set; }
 
         [NotMapped]

@@ -47,7 +47,7 @@ namespace Ocuda.Ops.Controllers
         public async Task<IActionResult> Index(int page)
         {
             var showPage = page == default ? 1 : page;
-            return await ShowPosts(new BlogFilter(showPage, 5)
+            return await ShowPostsAsync(new BlogFilter(showPage, 5)
             {
                 IsShownOnHomePage = true
             }, showPage);
@@ -63,7 +63,7 @@ namespace Ocuda.Ops.Controllers
             }
 
             var showPage = page == default ? 1 : page;
-            return await ShowPosts(new BlogFilter(showPage, 5)
+            return await ShowPostsAsync(new BlogFilter(showPage, 5)
             {
                 SectionId = section.Id
             }, showPage);
@@ -92,7 +92,7 @@ namespace Ocuda.Ops.Controllers
             });
         }
 
-        private async Task<IActionResult> ShowPosts(BlogFilter filter, int page)
+        private async Task<IActionResult> ShowPostsAsync(BlogFilter filter, int page)
         {
             var posts = await _postService.GetPaginatedPostsAsync(filter);
 
