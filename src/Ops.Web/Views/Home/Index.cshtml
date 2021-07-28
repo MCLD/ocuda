@@ -26,7 +26,13 @@
                                 {
                                     @post.CreatedByName
                                 }
-                                in <a href="#">@post.SectionName</a>
+                                @if (!string.IsNullOrEmpty(post.SectionStub) && !string.IsNullOrEmpty(post.SectionName))
+                                {
+                                    @:in
+                                    <a asp-controller="@HomeController.Name"
+                                       asp-action="@nameof(HomeController.SectionIndex)"
+                                       asp-route-stub="@post.SectionStub">@post.SectionName</a>
+                                }
                             </small>
                         </em>
                     </div>

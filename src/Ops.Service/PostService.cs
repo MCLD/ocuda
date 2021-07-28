@@ -30,8 +30,6 @@ namespace Ocuda.Ops.Service
         {
             _categoryRepository = categoryRepository
                 ?? throw new ArgumentNullException(nameof(categoryRepository));
-            _categoryRepository = categoryRepository
-                ?? throw new ArgumentNullException(nameof(categoryRepository));
             _postRepository = postRepository
                 ?? throw new ArgumentNullException(nameof(postRepository));
             _sectionService = sectionService
@@ -86,6 +84,7 @@ namespace Ocuda.Ops.Service
                     {
                         var section = await _sectionService.GetByIdAsync(post.SectionId);
                         post.SectionName = section.Name;
+                        post.SectionStub = section.Stub;
                     }
                 }
             }

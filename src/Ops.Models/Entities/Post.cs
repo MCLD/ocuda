@@ -31,6 +31,9 @@ namespace Ocuda.Ops.Models.Entities
         [NotMapped]
         public string SectionName { get; set; }
 
+        [NotMapped]
+        public string SectionStub { get; set; }
+
         public bool ShowOnHomePage { get; set; }
 
         [Required]

@@ -15,11 +15,15 @@ namespace Ocuda.Ops.Controllers
     public class HomeController : BaseController<HomeController>
     {
         private readonly IPostService _postService;
+        private readonly ISectionService _sectionService;
 
         public HomeController(ServiceFacades.Controller<HomeController> context,
-            IPostService postService) : base(context)
+            IPostService postService,
+            ISectionService sectionService) : base(context)
         {
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
+            _sectionService = sectionService
+                ?? throw new ArgumentNullException(nameof(sectionService));
         }
 
         public static string Name { get { return "Home"; } }
@@ -43,33 +47,26 @@ namespace Ocuda.Ops.Controllers
         public async Task<IActionResult> Index(int page)
         {
             var showPage = page == default ? 1 : page;
-
-            var filter = new BlogFilter(showPage, 5)
+            return await ShowPosts(new BlogFilter(showPage, 5)
             {
                 IsShownOnHomePage = true
-            };
+            }, showPage);
+        }
 
-            var posts = await _postService.GetPaginatedPostsAsync(filter);
-
-            var viewModel = new IndexViewModel
+        [HttpGet("{stub}")]
+        public async Task<IActionResult> SectionIndex(string stub, int page)
+        {
+            var section = await _sectionService.GetSectionByStubAsync(stub);
+            if (section == null)
             {
-                Posts = posts.Data,
-                ItemCount = posts.Count,
-                CurrentPage = showPage,
-                ItemsPerPage = filter.Take.Value
-            };
-
-            if (viewModel.PastMaxPage)
-            {
-                return RedirectToRoute(new { page = viewModel.LastPage ?? 1 });
+                return NotFound();
             }
 
-            foreach (var post in viewModel.Posts)
+            var showPage = page == default ? 1 : page;
+            return await ShowPosts(new BlogFilter(showPage, 5)
             {
-                post.Content = CommonMark.CommonMarkConverter.Convert(post.Content);
-            }
-
-            return View(viewModel);
+                SectionId = section.Id
+            }, showPage);
         }
 
         [HttpGet("[action]")]
@@ -93,6 +90,31 @@ namespace Ocuda.Ops.Controllers
                     ? DateTime.Parse(UserClaim(ClaimType.AuthenticatedAt), CultureInfo.InvariantCulture)
                     : null
             });
+        }
+
+        private async Task<IActionResult> ShowPosts(BlogFilter filter, int page)
+        {
+            var posts = await _postService.GetPaginatedPostsAsync(filter);
+
+            var viewModel = new IndexViewModel
+            {
+                Posts = posts.Data,
+                ItemCount = posts.Count,
+                CurrentPage = page,
+                ItemsPerPage = filter.Take.Value
+            };
+
+            if (viewModel.PastMaxPage)
+            {
+                return RedirectToRoute(new { page = viewModel.LastPage ?? 1 });
+            }
+
+            foreach (var post in viewModel.Posts)
+            {
+                post.Content = CommonMark.CommonMarkConverter.Convert(post.Content);
+            }
+
+            return View("Index", viewModel);
         }
     }
 }
