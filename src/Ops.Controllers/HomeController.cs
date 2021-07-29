@@ -16,14 +16,17 @@ namespace Ocuda.Ops.Controllers
     {
         private readonly IPostService _postService;
         private readonly ISectionService _sectionService;
+        private readonly IUserService _userService;
 
         public HomeController(ServiceFacades.Controller<HomeController> context,
             IPostService postService,
-            ISectionService sectionService) : base(context)
+            ISectionService sectionService,
+            IUserService userService) : base(context)
         {
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
             _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(sectionService));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
         public static string Name { get { return "Home"; } }
@@ -62,6 +65,15 @@ namespace Ocuda.Ops.Controllers
                 return NotFound();
             }
 
+            if (section.SupervisorsOnly)
+            {
+                var reports = await _userService.GetDirectReportsAsync(CurrentUserId);
+                if (reports?.Count == 0)
+                {
+                    return RedirectToUnauthorized();
+                }
+            }
+
             var showPage = page == default ? 1 : page;
             return await ShowPostsAsync(new BlogFilter(showPage, 5)
             {
@@ -70,11 +82,24 @@ namespace Ocuda.Ops.Controllers
         }
 
         [HttpGet("[action]")]
-        public IActionResult Unauthorized(Uri returnUrl)
+        public async Task<IActionResult> Unauthorized(Uri returnUrl)
         {
+            var adminEmail = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.Email.AdminAddress);
+
+            string mailLink = null;
+            if (!string.IsNullOrEmpty(adminEmail) && returnUrl != null)
+            {
+                mailLink = $"mailto:{adminEmail}?subject="
+                    + Uri.EscapeUriString("Requesting intranet access")
+                    + "&body="
+                    + Uri.EscapeUriString($"I ({CurrentUsername}) request access to: {returnUrl}");
+            }
+
             return View(new UnauthorizedViewModel
             {
-                ReturnUrl = returnUrl?.ToString() ?? "",
+                AdminEmail = mailLink,
+                ReturnUrl = returnUrl?.ToString(),
                 Username = CurrentUsername
             });
         }

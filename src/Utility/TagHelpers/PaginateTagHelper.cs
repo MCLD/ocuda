@@ -72,7 +72,7 @@ namespace Ocuda.Utility.TagHelpers
             if (context == null) { throw new ArgumentNullException(nameof(context)); }
             if (output == null) { throw new ArgumentNullException(nameof(output)); }
 
-            if (PaginateModel == null || PaginateModel.MaxPage == 1)
+            if (PaginateModel == null || PaginateModel.MaxPage < 2)
             {
                 output.SuppressOutput();
                 return;
