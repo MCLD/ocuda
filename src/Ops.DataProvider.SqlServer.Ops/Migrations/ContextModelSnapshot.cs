@@ -16,7 +16,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.8")
+                .HasAnnotation("ProductVersion", "5.0.4")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
@@ -669,8 +669,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("CreatedBy");
 
-                    b.HasIndex("SectionId");
-
                     b.HasIndex("UpdatedBy");
 
                     b.ToTable("FileLibraries");
@@ -942,8 +940,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 
                     b.HasIndex("CreatedBy");
 
-                    b.HasIndex("SectionId");
-
                     b.HasIndex("UpdatedBy");
 
                     b.ToTable("Posts");
@@ -1163,9 +1159,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<bool>("IsHomeSection")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -1174,9 +1167,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
-
-                    b.Property<bool>("SupervisorsOnly")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -1715,20 +1705,12 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Ocuda.Ops.Models.Entities.Section", "Section")
-                        .WithMany()
-                        .HasForeignKey("SectionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Ocuda.Ops.Models.Entities.User", "UpdatedByUser")
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreatedByUser");
-
-                    b.Navigation("Section");
 
                     b.Navigation("UpdatedByUser");
                 });
@@ -1851,20 +1833,12 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Ocuda.Ops.Models.Entities.Section", "Section")
-                        .WithMany()
-                        .HasForeignKey("SectionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Ocuda.Ops.Models.Entities.User", "UpdatedByUser")
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreatedByUser");
-
-                    b.Navigation("Section");
 
                     b.Navigation("UpdatedByUser");
                 });
