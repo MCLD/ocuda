@@ -10,6 +10,8 @@ namespace Ocuda.Ops.Models.Entities
         [MaxLength(255)]
         public string Icon { get; set; }
 
+        public bool IsHomeSection { get; set; }
+
         [MaxLength(255)]
         public string Name { get; set; }
 
