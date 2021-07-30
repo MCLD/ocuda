@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
@@ -18,21 +17,9 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
         }
 
-        public async Task<List<Section>> GetSectionsByNamesAsync(List<string> names)
+        public async Task<ICollection<Section>> GetAllAsync()
         {
-            if (names.Count > 0)
-            {
-                var sections = new List<Section>();
-                foreach (var name in names.OrderByDescending(_ => _).ToList())
-                {
-                    sections.Add(await _sectionRepository.GetSectionByNameAsync(name));
-                }
-                return sections;
-            }
-            else
-            {
-                return null;
-            }
+            return await _sectionRepository.GetAllAsync();
         }
 
         public async Task<Section> GetByIdAsync(int id)
@@ -40,14 +27,14 @@ namespace Ocuda.Ops.Service
             return await _sectionRepository.FindAsync(id);
         }
 
-        public async Task<List<Section>> GetAllSectionsAsync()
+        public async Task<ICollection<Section>> GetByNamesAsync(ICollection<string> names)
         {
-            return await _sectionRepository.GetAllSectionsAsync();
+            return await _sectionRepository.GetByNames(names);
         }
 
-        public async Task<Section> GetSectionByStubAsync(string stub)
+        public async Task<Section> GetByStubAsync(string stub)
         {
-            return await _sectionRepository.GetSectionByStubAsync(stub);
+            return await _sectionRepository.GetByStubAsync(stub);
         }
     }
 }

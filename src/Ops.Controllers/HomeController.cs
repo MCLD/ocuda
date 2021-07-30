@@ -14,15 +14,18 @@ namespace Ocuda.Ops.Controllers
     [Route("")]
     public class HomeController : BaseController<HomeController>
     {
+        private readonly IFileService _fileService;
         private readonly IPostService _postService;
         private readonly ISectionService _sectionService;
         private readonly IUserService _userService;
 
         public HomeController(ServiceFacades.Controller<HomeController> context,
+            IFileService fileService,
             IPostService postService,
             ISectionService sectionService,
             IUserService userService) : base(context)
         {
+            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
             _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(sectionService));
@@ -59,7 +62,7 @@ namespace Ocuda.Ops.Controllers
         [HttpGet("{stub}")]
         public async Task<IActionResult> SectionIndex(string stub, int page)
         {
-            var section = await _sectionService.GetSectionByStubAsync(stub);
+            var section = await _sectionService.GetByStubAsync(stub);
             if (section == null)
             {
                 return NotFound();
@@ -67,8 +70,8 @@ namespace Ocuda.Ops.Controllers
 
             if (section.SupervisorsOnly)
             {
-                var reports = await _userService.GetDirectReportsAsync(CurrentUserId);
-                if (reports?.Count == 0)
+                var isSupervisor = await _userService.IsSupervisor(CurrentUserId);
+                if (!isSupervisor)
                 {
                     return RedirectToUnauthorized();
                 }
@@ -137,6 +140,26 @@ namespace Ocuda.Ops.Controllers
             foreach (var post in viewModel.Posts)
             {
                 post.Content = CommonMark.CommonMarkConverter.Convert(post.Content);
+            }
+
+            if (filter.SectionId.HasValue)
+            {
+                var fileLibraries = await _fileService
+                    .GetBySectionIdAsync(filter.SectionId.Value);
+
+                if (fileLibraries?.Count > 0)
+                {
+                    foreach (var fileLibrary in fileLibraries)
+                    {
+                        fileLibrary.Files = await _fileService
+                            .GetFileLibraryFilesAsync(fileLibrary.Id);
+
+                        if (fileLibrary.Files?.Count > 0)
+                        {
+                            viewModel.FileLibraries.Add(fileLibrary);
+                        }
+                    }
+                }
             }
 
             return View("Index", viewModel);

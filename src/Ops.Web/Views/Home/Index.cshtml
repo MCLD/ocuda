@@ -1,7 +1,14 @@
 ﻿@model Ocuda.Ops.Controllers.ViewModels.Home.IndexViewModel
 
+@{
+    var classes = "col-sm-8 offset-sm-2";
+    if (Model.FileLibraries?.Count > 0)
+    {
+        classes = "col-lg-8";
+    }
+}
 <div class="row">
-    <div class="col-sm-8 offset-sm-2">
+    <div class="@classes">
         @foreach (var post in Model.Posts)
         {
             <div class="card mb-4">
@@ -48,4 +55,51 @@
         }
         <paginate paginateModel="@Model"></paginate>
     </div>
+    @if (Model.FileLibraries?.Count > 0)
+    {
+        <div class="col-lg-4">
+            @foreach (var fileLibrary in Model.FileLibraries)
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="lead mb-0">@fileLibrary.Name</h2>
+                    </div>
+                    <div class="card-body p-0 m-0">
+                        <table class="table table-sm mb-0">
+                            <tr>
+                                <th class="pl-2">File</th>
+                                <th>Size</th>
+                            </tr>
+                            @foreach (var file in fileLibrary.Files)
+                            {
+                                <tr>
+                                    <td class="pl-2">
+                                        <a href="#">
+                                            @if (string.IsNullOrEmpty(file.FileType?.Icon))
+                                            {
+                                                <span class="far fa-file pr-1"></span>
+                                            }
+                                            else
+                                            {
+                                                <span class="@file.FileType.Icon pr-1"></span>
+                                            }
+                                            @if (file.Name.Length > 18)
+                                            {
+                                                <small>@file.Name</small>
+                                            }
+                                            else
+                                            {
+                                                @file.Name
+                                            }
+                                        </a>
+                                    </td>
+                                    <td><small>@file.Size</small></td>
+                                </tr>
+                            }
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>

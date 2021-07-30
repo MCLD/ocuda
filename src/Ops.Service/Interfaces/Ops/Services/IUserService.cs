@@ -18,6 +18,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<(string name, string username)> GetNameUsernameAsync(int id);
 
+        Task<bool> IsSupervisor(int supervisorId);
+
         Task LoggedInUpdateAsync(User user);
 
         Task<User> LookupUserAsync(string username);

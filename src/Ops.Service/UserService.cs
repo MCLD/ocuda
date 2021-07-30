@@ -86,15 +86,21 @@ namespace Ocuda.Ops.Service
             return await _userRepository.FindAsync(id);
         }
 
-        public async Task<ICollection<User>> GetDirectReportsAsync(int supervisorId)
+        public async Task<ICollection<User>> GetDirectReportsAsync(int userId)
         {
-            return await _userRepository.GetDirectReportsAsync(supervisorId);
+            return await _userRepository.GetDirectReportsAsync(userId);
         }
 
         public async Task<(string name, string username)> GetNameUsernameAsync(int id)
         {
             // TODO add caching
             return await _userRepository.GetNameUsernameAsync(id);
+        }
+
+        public async Task<bool> IsSupervisor(int userId)
+        {
+            // TODO add caching
+            return await _userRepository.IsSupervisor(userId);
         }
 
         public async Task LoggedInUpdateAsync(User user)

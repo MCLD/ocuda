@@ -6,8 +6,10 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
     public interface ISectionRepository : IOpsRepository<Section, int>
     {
-        Task<Section> GetSectionByStubAsync(string stub);
-        Task<Section> GetSectionByNameAsync(string name);
-        Task<List<Section>> GetAllSectionsAsync();
+        Task<List<Section>> GetAllAsync();
+
+        Task<ICollection<Section>> GetByNames(ICollection<string> name);
+
+        Task<Section> GetByStubAsync(string stub);
     }
 }

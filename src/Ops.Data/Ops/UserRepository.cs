@@ -48,11 +48,11 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
-        public async Task<ICollection<User>> GetDirectReportsAsync(int supervisorId)
+        public async Task<ICollection<User>> GetDirectReportsAsync(int userId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.SupervisorId == supervisorId)
+                .Where(_ => _.SupervisorId == userId)
                 .Select(_ => new User
                 {
                     Name = _.Name,
@@ -103,6 +103,13 @@ namespace Ocuda.Ops.Data.Ops
                 .AsNoTracking()
                 .Where(_ => _.IsSysadmin)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> IsSupervisor(int userId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .AnyAsync(_ => _.SupervisorId == userId);
         }
 
         #endregion Initial setup methods

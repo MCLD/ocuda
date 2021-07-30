@@ -12,7 +12,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 
         Task<ICollection<User>> GetAllAsync();
 
-        Task<ICollection<User>> GetDirectReportsAsync(int supervisorId);
+        Task<ICollection<User>> GetDirectReportsAsync(int userId);
 
         Task<(string name, string username)> GetNameUsernameAsync(int id);
 
@@ -21,5 +21,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         Task<bool> IsDuplicateEmail(User user);
 
         Task<bool> IsDuplicateUsername(User user);
+
+        Task<bool> IsSupervisor(int userId);
     }
 }

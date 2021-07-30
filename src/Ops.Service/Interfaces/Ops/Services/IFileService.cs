@@ -9,38 +9,56 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IFileService
     {
-        Task<File> GetByIdAsync(int id);
-        Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter);
+        Task<FileLibrary> CreateLibraryAsync(FileLibrary library, int sectionId);
+
         Task<File> CreatePrivateFileAsync(File file, IFormFile fileDatas);
+
+        Task<File> CreatePublicFileAsync(File file, IFormFile fileData);
+
+        Task DeleteFileTypesByLibrary(int liAbid);
+
+        Task DeleteLibraryAsync(int id);
+
+        Task DeletePrivateFileAsync(int id);
+
+        Task DeletePublicFileAsync(int id);
+
+        Task<FileLibrary> EditLibraryTypesAsync(FileLibrary library, ICollection<int> fileTypeIds);
 
         Task<File> EditPrivateFileAsync(File file, IFormFile fileData,
             ICollection<IFormFile> thumbnailFiles, int[] thumbnailIdsToKeep);
 
-        Task<File> CreatePublicFileAsync(File file, IFormFile fileData);
-        string GetPublicFilePath(File file);
-        string GetPrivateFilePath(File file);
-        Task DeletePrivateFileAsync(int id);
-        Task<byte[]> ReadPrivateFileAsync(File file);
-        Task DeletePublicFileAsync(int id);
+        Task<ICollection<int>> GetAllFileTypeIdsAsync();
+
+        Task<ICollection<FileType>> GetAllFileTypesAsync();
+
+        Task<File> GetByIdAsync(int id);
+
+        Task<ICollection<FileLibrary>> GetBySectionIdAsync(int sectionId);
+
+        Task<ICollection<FileType>> GetFileLibrariesFileTypesAsync(int libraryId);
+
+        Task<ICollection<File>> GetFileLibraryFilesAsync(int id);
+
+        Task<FileType> GetFileTypeByIdAsync(int id);
+
+        Task<ICollection<int>> GetFileTypeIdsInUseByLibraryAsync(int libraryId);
 
         Task<FileLibrary> GetLibraryByIdAsync(int id);
+
+        Task<ICollection<int>> GetLibraryFileTypeIdsAsync(int libraryId);
 
         Task<DataWithCount<ICollection<FileLibrary>>> GetPaginatedLibraryListAsync(
             BlogFilter filter);
 
-        Task<FileLibrary> CreateLibraryAsync(FileLibrary library, int sectionId);
+        Task<DataWithCount<ICollection<File>>> GetPaginatedListAsync(BlogFilter filter);
 
-        Task<FileLibrary> EditLibraryTypesAsync(FileLibrary library, ICollection<int> fileTypeIds);
+        string GetPrivateFilePath(File file);
+
+        string GetPublicFilePath(File file);
+
+        Task<byte[]> ReadPrivateFileAsync(File file);
+
         Task UpdateLibrary(FileLibrary library);
-        Task DeleteLibraryAsync(int id);
-        Task<ICollection<int>> GetLibraryFileTypeIdsAsync(int libraryId);
-        Task<ICollection<int>> GetFileTypeIdsInUseByLibraryAsync(int libraryId);
-        Task<ICollection<FileType>> GetAllFileTypesAsync();
-        Task<ICollection<int>> GetAllFileTypeIdsAsync();
-        Task<FileType> GetFileTypeByIdAsync(int id);
-        Task<List<File>> GetFileLibraryFilesAsync(int id);
-        Task DeleteFileTypesByLibrary(int libid);
-        Task<List<FileLibrary>> GetFileLibrariesBySectionAsync(int sectionId);
-        Task<ICollection<FileType>> GetFileLibrariesFileTypesAsync(int libraryId);
     }
 }
