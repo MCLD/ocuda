@@ -38,6 +38,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(categoryService));
         }
 
+        #region Emedia
+
         [Route("")]
         [Route("[action]")]
         public async Task<IActionResult> Index(int page = 1)
@@ -218,5 +220,49 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToAction(nameof(EmediaController.AddEmedia));
             }
         }
+
+        #endregion
+
+        #region Emedia Groups
+
+        [Route("[action]")]
+        public async Task<IActionResult> Groups(int page = 1)
+        {
+            var filter = new BaseFilter(page);
+
+            var groupList = await _emediaService.GetPaginatedGroupListAsync(filter);
+
+            var paginateModel = new PaginateModel
+            {
+                ItemCount = groupList.Count,
+                CurrentPage = page,
+                ItemsPerPage = filter.Take.Value
+            };
+            if (paginateModel.PastMaxPage)
+            {
+                return RedirectToRoute(
+                    new
+                    {
+                        page = paginateModel.LastPage ?? 1
+                    });
+            }
+
+            var viewModel = new GroupsViewModel
+            {
+                EmediaGroups = groupList.Data,
+                PaginateModel = paginateModel
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeleteGroup(GroupsViewModel model)
+        {
+            return null;
+        }
+
+        #endregion
     }
 }

@@ -18,5 +18,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task DeleteAsync(int id);
         Task<DataWithCount<ICollection<Emedia>>> GetPaginatedListAsync(
             BaseFilter filter);
+        Task<DataWithCount<ICollection<EmediaGroup>>> GetPaginatedGroupListAsync(BaseFilter filter);
     }
 }

@@ -16,23 +16,27 @@ namespace Ocuda.Ops.Service
 {
     public class EmediaService : BaseService<EmediaService>, IEmediaService
     {
-        private readonly IEmediaRepository _emediaRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IEmediaRepository _emediaRepository;
         private readonly IEmediaCategoryRepository _emediaCategoryRepository;
+        private readonly IEmediaGroupRepository _emediaGroupRepository;
 
         public EmediaService(ILogger<EmediaService> logger,
             IHttpContextAccessor httpContextAccessor,
+            ICategoryRepository categoryRepository,
             IEmediaRepository emediaRepository,
             IEmediaCategoryRepository emediaCategoryRepository,
-            ICategoryRepository categoryRepository)
+            IEmediaGroupRepository emediaGroupRepository)
             : base(logger, httpContextAccessor)
         {
-            _emediaRepository = emediaRepository
-                ?? throw new ArgumentNullException(nameof(emediaRepository));
             _categoryRepository = categoryRepository
                 ?? throw new ArgumentNullException(nameof(categoryRepository));
+            _emediaRepository = emediaRepository
+                ?? throw new ArgumentNullException(nameof(emediaRepository));
             _emediaCategoryRepository = emediaCategoryRepository
                 ?? throw new ArgumentNullException(nameof(emediaCategoryRepository));
+            _emediaGroupRepository = emediaGroupRepository
+                ?? throw new ArgumentNullException(nameof(emediaGroupRepository));
         }
 
         public async Task<ICollection<Emedia>> GetAllEmedia()
@@ -151,6 +155,12 @@ namespace Ocuda.Ops.Service
                 _logger.LogError(ex, "Could not delete emedia", ex.Message);
                 throw;
             }
+        }
+
+        public async Task<DataWithCount<ICollection<EmediaGroup>>> GetPaginatedGroupListAsync(
+            BaseFilter filter)
+        {
+            return await _emediaGroupRepository.GetPaginatedListAsync(filter);
         }
     }
 }
