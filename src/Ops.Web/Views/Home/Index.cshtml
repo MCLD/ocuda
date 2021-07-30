@@ -1,104 +1,154 @@
 ﻿@model Ocuda.Ops.Controllers.ViewModels.Home.IndexViewModel
 
-@{
-    var classes = "col-sm-8 offset-sm-2";
-    if (Model.FileLibraries?.Count > 0)
-    {
-        classes = "col-lg-8";
-    }
-}
-<div class="row">
-    <div class="@classes">
-        @foreach (var post in Model.Posts)
-        {
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h2 class="lead mb-0">@post.Title</h2>
-                </div>
-                <div class="card-body pb-0 pt-3">
-                    @Html.Raw(post.Content)
-                </div>
-                <div class="card-footer d-flex flex-wrap py-1">
-                    <div class="flex-grow-1 mr-2">
-                        <em>
-                            <small class="text-muted">
-                                Posted by
-                                @if (!string.IsNullOrEmpty(post.CreatedByUsername))
-                                {
-                                    <a asp-controller="@ProfileController.Name"
-                                       asp-action="@nameof(ProfileController.Index)"
-                                       asp-route-id="@post.CreatedByUsername">@post.CreatedByName</a>
-                                }
-                                else
-                                {
-                                    @post.CreatedByName
-                                }
-                                @if (!string.IsNullOrEmpty(post.SectionStub) && !string.IsNullOrEmpty(post.SectionName))
-                                {
-                                    @:in
-                                    <a asp-controller="@HomeController.Name"
-                                       asp-action="@nameof(HomeController.SectionIndex)"
-                                       asp-route-stub="@post.SectionStub">@post.SectionName</a>
-                                }
-                            </small>
-                        </em>
-                    </div>
-                    <span title="@post.PublishedAgo">
-                        <em>
-                            <small class="text-muted">
-                                @post.PublishedAt.ToString("f")
-                            </small>
-                        </em>
-                    </span>
-                </div>
-            </div>
-        }
-        <paginate paginateModel="@Model"></paginate>
-    </div>
-    @if (Model.FileLibraries?.Count > 0)
-    {
-        <div class="col-lg-4">
-            @foreach (var fileLibrary in Model.FileLibraries)
+@if (!string.IsNullOrEmpty(Model.SectionName))
+{
+    <div class="row">
+        <h1 class="h2 pl-2 pb-2">
+            @Model.SectionName
+            @if (Model.SupervisorsOnly)
             {
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="lead mb-0">@fileLibrary.Name</h2>
+                <small class="text-muted">(Supervisors only)</small>
+            }
+        </h1>
+    </div>
+}
+
+<div class="row">
+    @if (Model.Posts?.Count > 0)
+    {
+        <div class="@Model.PostClasses">
+            @foreach (var post in Model.Posts)
+            {
+                <div class="card @post.BorderColor mb-4">
+                    <div class="card-header d-flex flex-wrap @post.TextColor">
+                        <div class="flex-grow-1">
+                            <h2 class="h5 mb-0">@post.Title</h2>
+                        </div>
+                        @if (post.IsPinned)
+                        {
+                            <span class="fas fa-map-pin"
+                                  title="This post is pinned to remain at the top."></span>
+                        }
                     </div>
-                    <div class="card-body p-0 m-0">
-                        <table class="table table-sm mb-0">
-                            <tr>
-                                <th class="pl-2">File</th>
-                                <th>Size</th>
-                            </tr>
-                            @foreach (var file in fileLibrary.Files)
-                            {
-                                <tr>
-                                    <td class="pl-2">
-                                        <a href="#">
-                                            @if (string.IsNullOrEmpty(file.FileType?.Icon))
-                                            {
-                                                <span class="far fa-file pr-1"></span>
-                                            }
-                                            else
-                                            {
-                                                <span class="@file.FileType.Icon pr-1"></span>
-                                            }
-                                            @if (file.Name.Length > 18)
-                                            {
-                                                <small>@file.Name</small>
-                                            }
-                                            else
-                                            {
-                                                @file.Name
-                                            }
-                                        </a>
-                                    </td>
-                                    <td><small>@file.Size</small></td>
-                                </tr>
-                            }
-                        </table>
+                    <div class="card-body pb-0 pt-3">
+                        @Html.Raw(post.Content)
+                    </div>
+                    <div class="card-footer d-flex flex-wrap py-1">
+                        <div class="flex-grow-1 mr-2">
+                            <em>
+                                <small class="text-muted">
+                                    Posted by
+                                    @if (!string.IsNullOrEmpty(post.CreatedByUsername))
+                                    {
+                                        <a asp-controller="@ProfileController.Name"
+                                           asp-action="@nameof(ProfileController.Index)"
+                                           asp-route-id="@post.CreatedByUsername">@post.CreatedByName</a>
+                                    }
+                                    else
+                                    {
+                                        @post.CreatedByName
+                                    }
+                                    @if (!string.IsNullOrEmpty(post.SectionStub) && !string.IsNullOrEmpty(post.SectionName))
+                                    {
+                                        @:in
+                                        <a asp-controller="@HomeController.Name"
+                                           asp-action="@nameof(HomeController.SectionIndex)"
+                                           asp-route-stub="@post.SectionStub">@post.SectionName</a>
+                                    }
+                                </small>
+                            </em>
+                        </div>
+                        <span title="@post.PublishedAgo">
+                            <em>
+                                <small class="text-muted">
+                                    @post.PublishedAt.ToString("f")
+                                </small>
+                            </em>
+                        </span>
                     </div>
                 </div>
+            }
+            <paginate paginateModel="@Model"></paginate>
+        </div>
+    }
+    @if (Model.LinkLibraries?.Count > 0 || Model.FileLibraries?.Count > 0)
+    {
+        <div class="@Model.LibraryClasses">
+            @if (Model.LinkLibraries?.Count > 0)
+            {
+                @foreach (var linkLibrary in Model.LinkLibraries)
+                {
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            <h2 class="h5 mb-0">@linkLibrary.Name</h2>
+                        </div>
+                        <div class="card-body p-0 pl-2 m-0">
+                            <table class="table table-borderless table-sm mt-1 mb-0">
+                                @foreach (var link in linkLibrary.Links)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a href="@link.Url">
+                                                @if (!string.IsNullOrEmpty(link.Icon))
+                                                {
+                                                    <span class="@link.Icon fa-fw pr-1"></span>
+                                                }
+                                                <small>@link.Name</small>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </table>
+                        </div>
+                    </div>
+                }
+            }
+            @if (Model.FileLibraries?.Count > 0)
+            {
+                @foreach (var fileLibrary in Model.FileLibraries)
+                {
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            <h2 class="h5 mb-0">@fileLibrary.Name</h2>
+                        </div>
+                        <div class="card-body p-0 m-0">
+                            <table class="table table-sm mb-0">
+                                <tr>
+                                    <th class="pl-2">File</th>
+                                    <th style="width: 20%;">Size</th>
+                                </tr>
+                                @foreach (var file in fileLibrary.Files)
+                                {
+                                    <tr>
+                                        <td class="pl-2">
+                                            <a asp-action="@nameof(HomeController.GetFile)"
+                                               asp-route-libraryId="@fileLibrary.Id"
+                                               asp-route-fileId="@file.Id">
+                                                @if (string.IsNullOrEmpty(file.FileType?.Icon))
+                                                {
+                                                    <span class="far fa-file fa-fw pr-1"></span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="@file.FileType.Icon fa-fw pr-1"></span>
+                                                }
+                                                @if (file.Name.Length > 18)
+                                                {
+                                                    <small>@file.Name</small>
+                                                }
+                                                else
+                                                {
+                                                    @file.Name
+                                                }
+                                            </a>
+                                        </td>
+                                        <td><small>@file.Size</small></td>
+                                    </tr>
+                                }
+                            </table>
+                        </div>
+                    </div>
+                }
             }
         </div>
     }

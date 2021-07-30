@@ -251,7 +251,7 @@ namespace Ocuda.Ops.Service
         public async Task<ICollection<File>> GetFileLibraryFilesAsync(int id)
         {
             var library = await GetLibraryByIdAsync(id);
-            var section = await _sectionService.GetByIdAsync(library.Id);
+            var section = await _sectionService.GetByIdAsync(library.SectionId);
             var files = await _fileRepository.GetFileLibraryFilesAsync(id);
 
             foreach (var file in files)
@@ -274,6 +274,25 @@ namespace Ocuda.Ops.Service
             }
 
             return files;
+        }
+
+        public async Task<string> GetFilePathAsync(int sectionId, string libraryStub, int fileId)
+        {
+            var section = await _sectionService.GetByIdAsync(sectionId);
+            var file = await GetByIdAsync(fileId);
+            var type = await GetFileTypeByIdAsync(file.FileTypeId);
+
+            var rootPath = System
+                .IO
+                .Directory
+                .GetParent(_hostingEnvironment.WebRootPath)
+                .FullName;
+            return System.IO.Path.Combine(rootPath,
+                "shared",
+                "sections",
+                section.Stub,
+                libraryStub,
+                file.Name + type.Extension);
         }
 
         public async Task<FileType> GetFileTypeByIdAsync(int id)

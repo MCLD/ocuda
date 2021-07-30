@@ -79,7 +79,8 @@ namespace Ocuda.Ops.Data.Ops
             {
                 Count = await query.CountAsync(),
                 Data = await query
-                    .OrderByDescending(_ => _.PublishedAt)
+                    .OrderByDescending(_ => _.IsPinned)
+                    .ThenByDescending(_ => _.PublishedAt)
                     .ApplyPagination(filter)
                     .ToListAsync()
             };

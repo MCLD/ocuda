@@ -40,6 +40,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<ICollection<File>> GetFileLibraryFilesAsync(int id);
 
+        Task<string> GetFilePathAsync(int sectionId, string libraryStub, int fileId);
+
         Task<FileType> GetFileTypeByIdAsync(int id);
 
         Task<ICollection<int>> GetFileTypeIdsInUseByLibraryAsync(int libraryId);

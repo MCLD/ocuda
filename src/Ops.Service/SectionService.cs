@@ -36,5 +36,10 @@ namespace Ocuda.Ops.Service
         {
             return await _sectionRepository.GetByStubAsync(stub);
         }
+
+        public async Task<int> GetHomeSectionIdAsync()
+        {
+            return await _sectionRepository.GetHomeSectionIdAsync();
+        }
     }
 }

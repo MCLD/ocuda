@@ -8,6 +8,15 @@ namespace Ocuda.Ops.Models.Entities
     public class Post : Abstract.BaseEntity
     {
         [NotMapped]
+        public string BorderColor
+        {
+            get
+            {
+                return IsPinned ? "border-info" : null;
+            }
+        }
+
+        [NotMapped]
         public List<Category> Categories { get; set; }
 
         [Required]
@@ -15,6 +24,8 @@ namespace Ocuda.Ops.Models.Entities
 
         [NotMapped]
         public string CreatedByUsername { get; set; }
+
+        public bool IsPinned { get; set; }
 
         [NotMapped]
         public string PublishedAgo
@@ -40,6 +51,15 @@ namespace Ocuda.Ops.Models.Entities
         [Required]
         [MaxLength(255)]
         public string Stub { get; set; }
+
+        [NotMapped]
+        public string TextColor
+        {
+            get
+            {
+                return IsPinned ? "text-info" : null;
+            }
+        }
 
         [Required]
         [MaxLength(255)]

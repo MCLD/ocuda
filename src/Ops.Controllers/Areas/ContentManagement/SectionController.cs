@@ -596,7 +596,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 ShowAlertDanger($"Could not find section {sectionStub}.");
                 return RedirectToAction(nameof(SectionController.Index));
             }
-            var linkLibs = await _linkService.GetLinkLibrariesBySectionAsync(section.Id);
+            var linkLibs = await _linkService.GetBySectionIdAsync(section.Id);
             var linkLib = linkLibs.Find(_ => _.Stub == linkLibStub);
             var itemsPerPage = await _siteSettingService
                 .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
@@ -775,7 +775,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 Section = section,
                 SectionCategories = await _postService.GetCategoriesBySectionIdAsync(section.Id),
                 FileLibraries = await _fileService.GetBySectionIdAsync(section.Id),
-                LinkLibraries = await _linkService.GetLinkLibrariesBySectionAsync(section.Id),
+                LinkLibraries = await _linkService.GetBySectionIdAsync(section.Id),
                 PaginateModel = paginateModel,
                 AllPosts = posts.Data.Select(_ =>
                 {
