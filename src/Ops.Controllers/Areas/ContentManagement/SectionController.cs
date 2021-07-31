@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -19,7 +20,7 @@ using Ocuda.Utility.Models;
 namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 {
     [Area("ContentManagement")]
-    //[Authorize(Policy = nameof(ClaimType.SiteManager))]
+    [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]/[controller]")]
     public class SectionController : BaseController<SectionController>
     {
