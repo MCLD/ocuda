@@ -27,6 +27,26 @@ namespace Ocuda.Ops.Data.Ops
                 .SingleOrDefaultAsync();
         }
 
+        public async Task<ICollection<File>> GetFileLibraryFilesAsync(int id)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Include(_ => _.FileType)
+                .Where(_ => _.FileLibraryId == id)
+                .OrderBy(_ => _.Name)
+                .ToListAsync();
+        }
+
+        public async Task<ICollection<int>> GetFileTypeIdsInUseByLibraryAsync(int libraryId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.FileLibraryId == libraryId)
+                .Select(_ => _.FileTypeId)
+                .Distinct()
+                .ToListAsync();
+        }
+
         public async Task<File> GetLatestByLibraryIdAsync(int id)
         {
             return await DbSet
@@ -55,24 +75,6 @@ namespace Ocuda.Ops.Data.Ops
                     .ApplyPagination(filter)
                     .ToListAsync()
             };
-        }
-
-        public async Task<ICollection<int>> GetFileTypeIdsInUseByLibraryAsync(int libraryId)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.FileLibraryId == libraryId)
-                .Select(_ => _.FileTypeId)
-                .Distinct()
-                .ToListAsync();
-        }
-
-        public async Task<List<File>> GetFileLibraryFilesAsync(int id)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.FileLibraryId == id)
-                .ToListAsync();
         }
     }
 }

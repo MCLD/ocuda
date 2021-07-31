@@ -1,23 +1,67 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section.SectionIndexViewModel
 
-    <div class="col-6">
-        @if (Model.UserSections != null)
+<div class="row mb-2">
+    <div class="col-sm-7">
+        <h1>Sections</h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
+        @if (false)
         {
-            @foreach (var userSection in Model.UserSections)
-            {
-                <div class="card">
-                    <div class="card-body">
-                        <span class="@userSection.Icon"></span>
-                        <h4 class="card-title">@userSection.Name</h4>
-                        <a href="@Url.Action(nameof(SectionController.Section), new { sectionStub = userSection.Stub})" class="stretched-link"></a>
-                    </div>
-                </div>
-            }
-        }
-        else
-        {
-            <div>
-                You dont manage any sections
-            </div>
+            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+                    data-toggle="modal"
+                    data-target="#addModal">
+                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                Add Section
+            </button>
         }
     </div>
+</div>
+
+<div class="row">
+    @if (Model.UserSections != null)
+    {
+        @foreach (var userSection in Model.UserSections)
+        {
+            <div class="col-12 col-sm-6 col-lg-4">
+                <div class="card mb-1">
+                    <div class="card-header d-flex flex-wrap">
+                        <div class="flex-grow-1">
+                            <h2 class="lead card-title mb-0">@userSection.Name</h2>
+                        </div>
+                        @if (!string.IsNullOrEmpty(userSection.Icon))
+                        {
+                            <div>
+                                <span class="@userSection.Icon"></span>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-body d-flex flex-wrap">
+                        <a asp-action="@nameof(SectionController.Section)"
+                           asp-route-sectionstub="@userSection.Stub"
+                           class="btn btn-outline-warning mr-1 mb-1">
+                            <span class="fas fa-tools"></span>
+                            Admin
+                        </a>
+                        <a asp-controller="@HomeController.Name"
+                           asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.SectionIndex)"
+                           asp-area=""
+                           asp-route-stub="@userSection.Stub"
+                           class="btn btn-outline-primary mr-1 mb-1">
+                            <span class="fas fa-list"></span>
+                            View
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div>
+            You dont manage any sections
+        </div>
+    }
+</div>

@@ -19,6 +19,15 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
+        public async Task<List<Link>> GetFileLibraryFilesAsync(int id)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.LinkLibraryId == id)
+                .OrderBy(_ => _.Name)
+                .ToListAsync();
+        }
+
         public async Task<Link> GetLatestByLibraryIdAsync(int id)
         {
             return await DbSet
@@ -45,14 +54,6 @@ namespace Ocuda.Ops.Data.Ops
                     .ApplyPagination(filter)
                     .ToListAsync()
             };
-        }
-
-        public async Task<List<Link>> GetFileLibraryFilesAsync(int id)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.LinkLibraryId == id)
-                .ToListAsync();
         }
     }
 }

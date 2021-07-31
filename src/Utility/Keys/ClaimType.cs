@@ -1,6 +1,6 @@
 ﻿namespace Ocuda.Utility.Keys
 {
-    public struct ClaimType
+    public class ClaimType
     {
         public const string ADGroup = "ADGroup";
         public const string AuthenticatedAt = "AuthenticatedAt";
