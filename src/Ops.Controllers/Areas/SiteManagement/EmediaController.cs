@@ -38,6 +38,64 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(categoryService));
         }
 
+        [Route("")]
+        [Route("[action]")]
+        public async Task<IActionResult> Index(int page = 1)
+        {
+            var filter = new BaseFilter(page);
+
+            var groupList = await _emediaService.GetPaginatedGroupListAsync(filter);
+
+            var paginateModel = new PaginateModel
+            {
+                ItemCount = groupList.Count,
+                CurrentPage = page,
+                ItemsPerPage = filter.Take.Value
+            };
+            if (paginateModel.PastMaxPage)
+            {
+                return RedirectToRoute(
+                    new
+                    {
+                        page = paginateModel.LastPage ?? 1
+                    });
+            }
+
+            var viewModel = new IndexViewModel
+            {
+                EmediaGroups = groupList.Data,
+                PaginateModel = paginateModel
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeleteGroup(IndexViewModel model)
+        {
+            try
+            {
+                await _emediaService.DeleteGroupAsync(model.EmediaGroup.Id);
+                ShowAlertSuccess($"Deleted emedia group: {model.EmediaGroup.Name}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting emedia group: {Message}", ex.Message);
+                ShowAlertDanger($"Error deleting emedia group: {model.EmediaGroup.Name}");
+            }
+
+            return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> Detail(int id)
+        {
+            return null;
+        }
+
+        /*
         #region Emedia
 
         [Route("")]
@@ -264,5 +322,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         #endregion
+        */
     }
 }

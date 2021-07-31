@@ -47,5 +47,13 @@ namespace Ocuda.Ops.Data.Promenade
                 .Where(_ => _.EmediaId == emediaId && _.CategoryId == categoryId)
                 .FirstOrDefault();
         }
+
+        public async Task<ICollection<EmediaCategory>> GetAllForGroupAsync(int groupId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Emedia.GroupId == groupId)
+                .ToListAsync();
+        }
     }
 }

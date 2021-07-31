@@ -383,8 +383,9 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.EmediaGroupRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaRepository,
                 Data.Promenade.EmediaRepository>();
-            services.AddScoped<
-                Service.Interfaces.Promenade.Repositories.IExternalResourcePromRepository,
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaTextRepository,
+                Data.Promenade.EmediaTextRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IExternalResourcePromRepository,
                 Data.Promenade.ExternalResourcePromRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IFeatureRepository,
                 Data.Promenade.FeatureRepository>();

@@ -20,13 +20,15 @@ namespace Ocuda.Ops.Service
         private readonly IEmediaRepository _emediaRepository;
         private readonly IEmediaCategoryRepository _emediaCategoryRepository;
         private readonly IEmediaGroupRepository _emediaGroupRepository;
+        private readonly IEmediaTextRepository _emediaTextReposiory;
 
         public EmediaService(ILogger<EmediaService> logger,
             IHttpContextAccessor httpContextAccessor,
             ICategoryRepository categoryRepository,
             IEmediaRepository emediaRepository,
             IEmediaCategoryRepository emediaCategoryRepository,
-            IEmediaGroupRepository emediaGroupRepository)
+            IEmediaGroupRepository emediaGroupRepository,
+            IEmediaTextRepository emediaTextRepository)
             : base(logger, httpContextAccessor)
         {
             _categoryRepository = categoryRepository
@@ -37,6 +39,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(emediaCategoryRepository));
             _emediaGroupRepository = emediaGroupRepository
                 ?? throw new ArgumentNullException(nameof(emediaGroupRepository));
+            _emediaTextReposiory = emediaTextRepository
+                ?? throw new ArgumentNullException(nameof(emediaTextRepository));
         }
 
         public async Task<ICollection<Emedia>> GetAllEmedia()
@@ -161,6 +165,28 @@ namespace Ocuda.Ops.Service
             BaseFilter filter)
         {
             return await _emediaGroupRepository.GetPaginatedListAsync(filter);
+        }
+
+        public async Task DeleteGroupAsync(int id)
+        {
+            var group = await _emediaGroupRepository.GetIncludingChildredAsync(id);
+
+            if (group == null)
+            {
+                throw new OcudaException("Emedia group does not exist.");
+            }
+
+            var emediaCategories = await _emediaCategoryRepository.GetAllForGroupAsync(id);
+            _emediaCategoryRepository.RemoveRange(emediaCategories);
+
+            var emediaTexts = await _emediaTextReposiory.GetAllForGroupAsync(group.Id);
+            _emediaTextReposiory.RemoveRange(emediaTexts);
+
+            _emediaRepository.RemoveRange(group.Emedias);
+
+            _emediaGroupRepository.Remove(group);
+
+            await _emediaGroupRepository.SaveAsync();
         }
     }
 }

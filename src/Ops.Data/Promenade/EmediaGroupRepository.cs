@@ -19,12 +19,13 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
-        public async Task<ICollection<EmediaGroup>> GetUsingSegmentAsync(int segmentId)
+        public async Task<EmediaGroup> GetIncludingChildredAsync(int id)
         {
             return await DbSet
+                .Where(_ => _.Id == id)
+                .Include(_ => _.Emedias)
                 .AsNoTracking()
-                .Where(_ => _.SegmentId == segmentId)
-                .ToListAsync();
+                .SingleOrDefaultAsync();
         }
 
         public async Task<DataWithCount<ICollection<EmediaGroup>>> GetPaginatedListAsync(
@@ -38,6 +39,14 @@ namespace Ocuda.Ops.Data.Promenade
                     .ApplyPagination(filter)
                     .ToListAsync()
             };
+        }
+
+        public async Task<ICollection<EmediaGroup>> GetUsingSegmentAsync(int segmentId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.SegmentId == segmentId)
+                .ToListAsync();
         }
     }
 }

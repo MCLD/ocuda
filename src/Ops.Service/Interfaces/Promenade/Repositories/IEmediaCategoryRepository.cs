@@ -13,5 +13,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
         Task<ICollection<EmediaCategory>> GetByCategoryIdAsync(int categoryId);
 
         EmediaCategory GetByEmediaAndCategoryId(int emediaId, int categoryId);
+        Task<ICollection<EmediaCategory>> GetAllForGroupAsync(int groupId);
     }
 }
