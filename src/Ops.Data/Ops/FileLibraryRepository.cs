@@ -19,6 +19,20 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
+        public async Task AddLibraryFileTypesAsync(List<int> fileTypeIds, int libraryId)
+        {
+            foreach (var fileType in fileTypeIds)
+            {
+                var fileLibType = new FileLibraryFileType
+                {
+                    FileLibraryId = libraryId,
+                    FileTypeId = fileType
+                };
+                await _context.FileLibraryFileTypes.AddAsync(fileLibType);
+            }
+            await _context.SaveChangesAsync();
+        }
+
         public override async Task<FileLibrary> FindAsync(int id)
         {
             return await DbSet
@@ -27,6 +41,39 @@ namespace Ocuda.Ops.Data.Ops
                 .ThenInclude(_ => _.FileType)
                 .Where(_ => _.Id == id)
                 .SingleOrDefaultAsync();
+        }
+
+        public async Task<ICollection<FileLibrary>> GetBySectionIdAsync(int sectionId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.SectionId == sectionId)
+                .OrderBy(_ => _.Name)
+                .ToListAsync();
+        }
+
+        public async Task<ICollection<int>> GetLibraryFileTypeIdsAsync(int libraryId)
+        {
+            return await _context.FileLibraryFileTypes
+                .AsNoTracking()
+                .Where(_ => _.FileLibraryId == libraryId)
+                .Select(_ => _.FileTypeId)
+                .ToListAsync();
+        }
+
+        public async Task<DataWithCount<ICollection<FileLibrary>>> GetPaginatedListAsync(
+                BlogFilter filter)
+        {
+            var query = DbSet.AsNoTracking();
+
+            return new DataWithCount<ICollection<FileLibrary>>
+            {
+                Count = await query.CountAsync(),
+                Data = await query
+                    .OrderByDescending(_ => _.Name)
+                    .ApplyPagination(filter)
+                    .ToListAsync()
+            };
         }
 
         public override void Remove(int id)
@@ -47,52 +94,6 @@ namespace Ocuda.Ops.Data.Ops
                 _context.FileLibraryFileTypes.Remove(fileLibType);
             }
             await _context.SaveChangesAsync();
-        }
-
-        public async Task AddLibraryFileTypesAsync(List<int> fileTypeIds, int libraryId)
-        {
-            foreach (var fileType in fileTypeIds)
-            {
-                var fileLibType = new FileLibraryFileType
-                {
-                    FileLibraryId = libraryId,
-                    FileTypeId = fileType
-                };
-                await _context.FileLibraryFileTypes.AddAsync(fileLibType);
-            }
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<DataWithCount<ICollection<FileLibrary>>> GetPaginatedListAsync(
-                BlogFilter filter)
-        {
-            var query = DbSet.AsNoTracking();
-
-            return new DataWithCount<ICollection<FileLibrary>>
-            {
-                Count = await query.CountAsync(),
-                Data = await query
-                    .OrderByDescending(_ => _.Name)
-                    .ApplyPagination(filter)
-                    .ToListAsync()
-            };
-        }
-
-        public async Task<ICollection<int>> GetLibraryFileTypeIdsAsync(int libraryId)
-        {
-            return await _context.FileLibraryFileTypes
-                .AsNoTracking()
-                .Where(_ => _.FileLibraryId == libraryId)
-                .Select(_ => _.FileTypeId)
-                .ToListAsync();
-        }
-
-        public async Task<List<FileLibrary>> GetFileLibrariesBySectionIdAsync(int sectionId)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.SectionId == sectionId)
-                .ToListAsync();
         }
     }
 }

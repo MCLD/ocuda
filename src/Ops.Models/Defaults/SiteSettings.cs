@@ -9,6 +9,7 @@ namespace Ocuda.Ops.Models.Defaults
         public static IEnumerable<SiteSetting> Get { get; } = new[]
         {
             #region Carousel
+
             new SiteSetting
             {
                 Id = Keys.SiteSetting.Carousel.ImageRestrictToDomains,
@@ -27,8 +28,11 @@ namespace Ocuda.Ops.Models.Defaults
                 Value = "",
                 Type = SiteSettingType.StringNullable
             },
-            #endregion
+
+            #endregion Carousel
+
             #region CoverIssueReporting
+
             new SiteSetting
             {
                 Id = Keys.SiteSetting.CoverIssueReporting.LeapBibUrl,
@@ -38,8 +42,19 @@ namespace Ocuda.Ops.Models.Defaults
                 Value = "",
                 Type = SiteSettingType.StringNullable
             },
-            #endregion
+
+            #endregion CoverIssueReporting
+
             #region Email
+
+            new SiteSetting{
+                Id = Keys.SiteSetting.Email.AdminAddress,
+                Name = "Email address of the intranet site administrator",
+                Description = "Email address in case staff has questions/poblems",
+                Category = "Email",
+                Value = "",
+                Type = SiteSettingType.StringNullable
+            },
             new SiteSetting
             {
                 Id = Keys.SiteSetting.Email.FromAddress,
@@ -121,8 +136,11 @@ namespace Ocuda.Ops.Models.Defaults
                 Value = "",
                 Type = SiteSettingType.StringNullable
             },
-            #endregion
+
+            #endregion Email
+
             #region FileManagement
+
             new SiteSetting
             {
                 Id = Keys.SiteSetting.FileManagement.MaxUploadBytes,
@@ -132,8 +150,11 @@ namespace Ocuda.Ops.Models.Defaults
                 Value = "2097152",
                 Type = SiteSettingType.Int
             },
-            #endregion
+
+            #endregion FileManagement
+
             #region SiteManagement
+
             new SiteSetting
             {
                 Id = Keys.SiteSetting.SiteManagement.PromenadePublicPath,
@@ -152,8 +173,11 @@ namespace Ocuda.Ops.Models.Defaults
                 Value = "",
                 Type = SiteSettingType.StringNullable
             },
-            #endregion
+
+            #endregion SiteManagement
+
             #region UserInterface
+
             new SiteSetting
             {
                 Id = Keys.SiteSetting.FileManagement.MaxThumbnailCount,
@@ -190,7 +214,8 @@ namespace Ocuda.Ops.Models.Defaults
                 Value = "10",
                 Type = SiteSettingType.Int
             }
-            #endregion
+
+            #endregion UserInterface
         };
     }
 }

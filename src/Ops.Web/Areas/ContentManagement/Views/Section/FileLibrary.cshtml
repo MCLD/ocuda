@@ -184,17 +184,17 @@
                                 <tr>
                                     <td class="mx-auto row-link" data-id="@file.Id" style="transform: rotate(0);">
                                         <span class="@Model.FileTypes.Where(_ => _.Id == file.FileTypeId).FirstOrDefault().Icon" style="font-size: 32px;"></span>
-                                        <a href="@Url.Action(nameof(SectionController.GetFile), new { fileLibId = Model.FileLibraryId, fileId=file.Id })"
+                                        <a href="@Url.Action(nameof(SectionController.GetFile), new { libraryId = Model.FileLibraryId, fileId=file.Id })"
                                            class="stretched-link"></a>
                                     </td>
                                     <td class="row-link" data-id="@file.Id" style="transform: rotate(0);">
                                         @file.Name
-                                        <a href="@Url.Action(nameof(SectionController.GetFile), new { fileLibId = Model.FileLibraryId, fileId=file.Id })"
+                                        <a href="@Url.Action(nameof(SectionController.GetFile), new { libraryId = Model.FileLibraryId, fileId=file.Id })"
                                            class="stretched-link"></a>
                                     </td>
                                     <td class="row-link" data-id="@file.Id" style="transform: rotate(0);">
                                         @file.Description
-                                        <a href="@Url.Action(nameof(SectionController.GetFile), new { fileLibId = Model.FileLibraryId, fileId=file.Id })"
+                                        <a href="@Url.Action(nameof(SectionController.GetFile), new { libraryId = Model.FileLibraryId, fileId=file.Id })"
                                            class="stretched-link"></a>
                                     </td>
                                     <td style="position: relative;">

@@ -7,24 +7,80 @@ namespace Ocuda.Ops.Models.Entities
 {
     public class Post : Abstract.BaseEntity
     {
-        public int SectionId { get; set; }
+        [NotMapped]
+        public string BorderColor
+        {
+            get
+            {
+                return IsPinned ? "border-info" : null;
+            }
+        }
+
+        [NotMapped]
+        public List<Category> Categories { get; set; }
 
         [Required]
-        [MaxLength(255)]
-        public string Title { get; set; }
+        public string Content { get; set; }
+
+        [NotMapped]
+        public string CreatedByUsername { get; set; }
+
+        public bool IsPinned { get; set; }
+
+        [NotMapped]
+        public string PublishedAgo
+        {
+            get
+            {
+                return ApproxTimeAgo(PublishedAt);
+            }
+        }
+
+        public DateTime PublishedAt { get; set; }
+        public Section Section { get; set; }
+        public int SectionId { get; set; }
+
+        [NotMapped]
+        public string SectionName { get; set; }
+
+        [NotMapped]
+        public string SectionStub { get; set; }
+
+        public bool ShowOnHomePage { get; set; }
 
         [Required]
         [MaxLength(255)]
         public string Stub { get; set; }
 
-        [Required]
-        public string Content { get; set; }
-
-        public bool ShowOnHomePage { get; set; }
-
-        public DateTime PublishedAt { get; set; }
-
         [NotMapped]
-        public List<Category> Categories { get; set; }
+        public string TextColor
+        {
+            get
+            {
+                return IsPinned ? "text-info" : null;
+            }
+        }
+
+        [Required]
+        [MaxLength(255)]
+        public string Title { get; set; }
+
+        private static string ApproxTimeAgo(DateTime date)
+        {
+            if (date == default) { return null; }
+            var diff = DateTime.Now - date;
+            if (diff.TotalDays > 1)
+            {
+                var days = Math.Floor(diff.TotalDays);
+                return $"{days:n0} {(days == 1 ? "day" : "days")} ago";
+            }
+            if (diff.TotalHours > 1)
+            {
+                var hours = Math.Floor(diff.TotalHours);
+                return $"{hours} {(hours == 1 ? "hour" : "hours")} ago";
+            }
+
+            return "recently";
+        }
     }
 }
