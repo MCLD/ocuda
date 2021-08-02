@@ -19,8 +19,17 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
+        public async Task<List<LinkLibrary>> GetLinkLibrariesBySectionIdAsync(int sectionId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.SectionId == sectionId)
+                .OrderBy(_ => _.Name)
+                .ToListAsync();
+        }
+
         public async Task<DataWithCount<ICollection<LinkLibrary>>> GetPaginatedListAsync(
-            BlogFilter filter)
+                    BlogFilter filter)
         {
             var query = DbSet.AsNoTracking();
 
@@ -32,14 +41,6 @@ namespace Ocuda.Ops.Data.Ops
                     .ApplyPagination(filter)
                     .ToListAsync()
             };
-        }
-
-        public async Task<List<LinkLibrary>> GetLinkLibrariesBySectionIdAsync(int sectionId)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.SectionId == sectionId)
-                .ToListAsync();
         }
     }
 }

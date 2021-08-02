@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,19 +24,19 @@ namespace Ocuda.Ops.Data.Ops
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<User> FindByUsernameAsync(string username)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => !_.IsDeleted && _.Username == username && !_.IsSysadmin)
-                .FirstOrDefaultAsync();
-        }
-
         public async Task<User> FindByEmailAsync(string email)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => !_.IsDeleted && _.Email == email && !_.IsSysadmin)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<User> FindByUsernameAsync(string username)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => !_.IsDeleted && _.Username == username && !_.IsSysadmin)
                 .FirstOrDefaultAsync();
         }
 
@@ -49,15 +48,29 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
-        public async Task<bool> IsDuplicateUsername(User user)
+        public async Task<ICollection<User>> GetDirectReportsAsync(int userId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Username == user.Username
-                         && _.Id != user.Id
-                         && !_.IsDeleted
-                         && !_.IsSysadmin)
-                .AnyAsync();
+                .Where(_ => _.SupervisorId == userId)
+                .Select(_ => new User
+                {
+                    Name = _.Name,
+                    Username = _.Username
+                })
+                .OrderBy(_ => _.Name)
+                .ToListAsync();
+        }
+
+        public async Task<(string name, string username)> GetNameUsernameAsync(int id)
+        {
+            var userDetails = await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Id == id)
+                .Select(_ => new { _.Name, _.Username })
+                .FirstOrDefaultAsync();
+
+            return (name: userDetails.Name, username: userDetails.Username);
         }
 
         public async Task<bool> IsDuplicateEmail(User user)
@@ -71,31 +84,19 @@ namespace Ocuda.Ops.Data.Ops
                 .AnyAsync();
         }
 
-        public async Task<Tuple<string, string>> GetUserInfoById(int id)
-        {
-            User user = await DbSet
-                .AsNoTracking()
-                .Where(_ => _.Id == id)
-                .FirstOrDefaultAsync();
-
-            return new Tuple<string, string>(user.Name, user.Username);
-        }
-
-        public async Task<ICollection<User>> GetDirectReportsAsync(int supervisorId)
+        public async Task<bool> IsDuplicateUsername(User user)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.SupervisorId == supervisorId)
-                .Select(_ => new User
-                {
-                    Name = _.Name,
-                    Username = _.Username
-                })
-                .OrderBy(_ => _.Name)
-                .ToListAsync();
+                .Where(_ => _.Username == user.Username
+                         && _.Id != user.Id
+                         && !_.IsDeleted
+                         && !_.IsSysadmin)
+                .AnyAsync();
         }
 
         #region Initial setup methods
+
         public async Task<User> GetSystemAdministratorAsync()
         {
             return await DbSet
@@ -103,6 +104,14 @@ namespace Ocuda.Ops.Data.Ops
                 .Where(_ => _.IsSysadmin)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<bool> IsSupervisor(int userId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .AnyAsync(_ => _.SupervisorId == userId);
+        }
+
         #endregion Initial setup methods
     }
 }

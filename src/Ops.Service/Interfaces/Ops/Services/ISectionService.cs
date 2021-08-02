@@ -6,9 +6,14 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface ISectionService
     {
-        Task<Section> GetSectionByStubAsync(string stub);
-        Task<List<Section>> GetSectionsByNamesAsync(List<string> names);
-        Task<List<Section>> GetAllSectionsAsync();
+        Task<ICollection<Section>> GetAllAsync();
+
         Task<Section> GetByIdAsync(int id);
+
+        Task<ICollection<Section>> GetByNamesAsync(ICollection<string> names);
+
+        Task<Section> GetByStubAsync(string stub);
+
+        Task<int> GetHomeSectionIdAsync();
     }
 }

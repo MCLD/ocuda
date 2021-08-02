@@ -30,36 +30,6 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(linkLibraryRepository));
         }
 
-        public async Task<int> GetLinkCountAsync()
-        {
-            return await _linkRepository.CountAsync();
-        }
-
-        public async Task<ICollection<Link>> GetLinksAsync()
-        {
-            return await _linkRepository.ToListAsync(_ => _.Name);
-        }
-
-        public async Task<Link> GetByIdAsync(int id)
-        {
-            return await _linkRepository.FindAsync(id);
-        }
-
-        public async Task<Link> GetLatestByLibraryIdAsync(int id)
-        {
-            return await _linkRepository.GetLatestByLibraryIdAsync(id);
-        }
-
-        public async Task<List<Link>> GetLinkLibraryLinksAsync(int id)
-        {
-            return await _linkRepository.GetFileLibraryFilesAsync(id);
-        }
-
-        public async Task<DataWithCount<ICollection<Link>>> GetPaginatedListAsync(BlogFilter filter)
-        {
-            return await _linkRepository.GetPaginatedListAsync(filter);
-        }
-
         public async Task<Link> CreateAsync(Link link)
         {
             var newLink = new Link
@@ -77,6 +47,36 @@ namespace Ocuda.Ops.Service
             return link;
         }
 
+        public async Task<LinkLibrary> CreateLibraryAsync(LinkLibrary library, int sectionId)
+        {
+            library.IsNavigation = false;
+            library.Name = library.Name?.Trim();
+            library.CreatedAt = DateTime.Now;
+            library.CreatedBy = GetCurrentUserId();
+
+            await _linkLibraryRepository.AddAsync(library);
+            await _linkLibraryRepository.SaveAsync();
+            return library;
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            _linkRepository.Remove(id);
+            await _linkRepository.SaveAsync();
+        }
+
+        public async Task DeleteLibraryAsync(int id)
+        {
+            var library = await _linkLibraryRepository.FindAsync(id);
+
+            if (library.IsNavigation)
+            {
+                throw new OcudaException("Cannot delete navigation link libraries.");
+            }
+            _linkLibraryRepository.Remove(id);
+            await _linkLibraryRepository.SaveAsync();
+        }
+
         public async Task<Link> EditAsync(Link link)
         {
             var currentLink = await _linkRepository.FindAsync(link.Id);
@@ -92,60 +92,12 @@ namespace Ocuda.Ops.Service
             return link;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<Link> GetByIdAsync(int id)
         {
-            _linkRepository.Remove(id);
-            await _linkRepository.SaveAsync();
+            return await _linkRepository.FindAsync(id);
         }
 
-        public async Task<LinkLibrary> GetLibraryByIdAsync(int id)
-        {
-            return await _linkLibraryRepository.FindAsync(id);
-        }
-
-        public async Task<DataWithCount<ICollection<LinkLibrary>>> GetPaginatedLibraryListAsync(
-            BlogFilter filter)
-        {
-            return await _linkLibraryRepository.GetPaginatedListAsync(filter);
-        }
-
-        public async Task<LinkLibrary> CreateLibraryAsync(LinkLibrary library, int sectionId)
-        {
-            library.IsNavigation = false;
-            library.Name = library.Name?.Trim();
-            library.CreatedAt = DateTime.Now;
-            library.CreatedBy = GetCurrentUserId();
-
-            await _linkLibraryRepository.AddAsync(library);
-            await _linkLibraryRepository.SaveAsync();
-            return library;
-        }
-
-        public async Task<LinkLibrary> UpdateLibraryAsync(LinkLibrary library)
-        {
-            library.Name = library.Name?.Trim();
-            library.Stub = library.Stub?.Trim();
-            library.UpdatedAt = DateTime.Now;
-            library.UpdatedBy = GetCurrentUserId();
-
-            _linkLibraryRepository.Update(library);
-            await _linkLibraryRepository.SaveAsync();
-            return library;
-        }
-
-        public async Task DeleteLibraryAsync(int id)
-        {
-            var library = await _linkLibraryRepository.FindAsync(id);
-
-            if (library.IsNavigation)
-            {
-                throw new OcudaException("Cannot delete navigation link libraries.");
-            }
-            _linkLibraryRepository.Remove(id);
-            await _linkLibraryRepository.SaveAsync();
-        }
-
-        public async Task<List<LinkLibrary>> GetLinkLibrariesBySectionAsync(int sectionId)
+        public async Task<List<LinkLibrary>> GetBySectionIdAsync(int sectionId)
         {
             var sectLinkLibs = await _linkLibraryRepository
                 .GetLinkLibrariesBySectionIdAsync(sectionId);
@@ -160,6 +112,54 @@ namespace Ocuda.Ops.Service
                 }
             }
             return linkLibs;
+        }
+
+        public async Task<Link> GetLatestByLibraryIdAsync(int id)
+        {
+            return await _linkRepository.GetLatestByLibraryIdAsync(id);
+        }
+
+        public async Task<LinkLibrary> GetLibraryByIdAsync(int id)
+        {
+            return await _linkLibraryRepository.FindAsync(id);
+        }
+
+        public async Task<int> GetLinkCountAsync()
+        {
+            return await _linkRepository.CountAsync();
+        }
+
+        public async Task<List<Link>> GetLinkLibraryLinksAsync(int id)
+        {
+            return await _linkRepository.GetFileLibraryFilesAsync(id);
+        }
+
+        public async Task<ICollection<Link>> GetLinksAsync()
+        {
+            return await _linkRepository.ToListAsync(_ => _.Name);
+        }
+
+        public async Task<DataWithCount<ICollection<LinkLibrary>>> GetPaginatedLibraryListAsync(
+            BlogFilter filter)
+        {
+            return await _linkLibraryRepository.GetPaginatedListAsync(filter);
+        }
+
+        public async Task<DataWithCount<ICollection<Link>>> GetPaginatedListAsync(BlogFilter filter)
+        {
+            return await _linkRepository.GetPaginatedListAsync(filter);
+        }
+
+        public async Task<LinkLibrary> UpdateLibraryAsync(LinkLibrary library)
+        {
+            library.Name = library.Name?.Trim();
+            library.Stub = library.Stub?.Trim();
+            library.UpdatedAt = DateTime.Now;
+            library.UpdatedBy = GetCurrentUserId();
+
+            _linkLibraryRepository.Update(library);
+            await _linkLibraryRepository.SaveAsync();
+            return library;
         }
     }
 }
