@@ -17,11 +17,9 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
     public class ScheduleController : BaseController<ScheduleController>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IScheduleService _scheduleService;
         private readonly IScheduleRequestService _scheduleRequestService;
+        private readonly IScheduleService _scheduleService;
         private readonly IUserService _userService;
-
-        public static string Name { get { return "Schedule"; } }
 
         public ScheduleController(ServiceFacades.Controller<ScheduleController> context,
             IHttpContextAccessor httpContextAccessor,
@@ -37,6 +35,127 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
             _scheduleRequestService = scheduleRequestService
                 ?? throw new ArgumentNullException(nameof(scheduleRequestService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        }
+
+        public static string Name { get { return "Schedule"; } }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> AddLog(ScheduleDetailViewModel viewModel)
+        {
+            var addLog = viewModel?.AddLog;
+
+            if (addLog.ScheduleLogCallDispositionId != null
+                || addLog.DurationMinutes != null
+                || addLog.Notes != null
+                || addLog.IsComplete)
+            {
+                await _scheduleService.AddLogAsync(addLog, true);
+            }
+
+            if (addLog.IsComplete)
+            {
+                TempData[TempDataKey.AlertSuccess]
+                    = $"Request #{addLog.ScheduleRequestId} marked as closed!";
+            }
+            else
+            {
+                TempData[TempDataKey.AlertInfo]
+                    = $"Comment posted to request #{addLog.ScheduleRequestId}.";
+            }
+
+            var requestedDate = GetClearSavedIndexParameter();
+
+            return RedirectToAction(nameof(Index), new { requestedDate });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> Cancel(int requestId)
+        {
+            await _scheduleService.CancelAsync(requestId);
+
+            TempData[TempDataKey.AlertWarning] = $"Request #{requestId} has been cancelled.";
+
+            var requestedDate = GetClearSavedIndexParameter();
+
+            return RedirectToAction(nameof(Index), new { requestedDate });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> Claim(int requestId)
+        {
+            await _scheduleService.ClaimAsync(requestId);
+
+            TempData[TempDataKey.AlertInfo] = $"You have claimed request #{requestId}.";
+
+            var requestedDate = GetClearSavedIndexParameter();
+
+            return RedirectToAction(nameof(Index), new { requestedDate });
+        }
+
+        [Route("[action]/{requestId}")]
+        public async Task<IActionResult> Details(int requestId)
+        {
+            var viewModel = new ScheduleDetailViewModel
+            {
+                ScheduleRequest = await _scheduleRequestService.GetRequestAsync(requestId),
+                RequestedDate = GetSavedIndexParameter()
+            };
+
+            if (viewModel.ScheduleRequest.ScheduleRequestSubject.FollowupEmailSetupId != null)
+            {
+                viewModel.FinishMessage = "Yes, send follow-up email";
+            }
+
+            if (viewModel.ScheduleRequest == null)
+            {
+                AlertDanger = $"Could not find request {requestId}.";
+            }
+            else
+            {
+                var claims = await _scheduleService.GetClaimsAsync(
+                    new int[] { viewModel.ScheduleRequest.Id });
+                viewModel.ScheduleClaim = claims.FirstOrDefault();
+                viewModel.ScheduleLogs
+                    = await _scheduleService.GetLogAsync(viewModel.ScheduleRequest.Id);
+
+                var users = new Dictionary<int, (string name, string username)>();
+                foreach (int userId in viewModel.ScheduleLogs.Select(_ => _.UserId).Distinct())
+                {
+                    if (userId != 0)
+                    {
+                        users.Add(userId, await _userService.GetNameUsernameAsync(userId));
+                    }
+                }
+
+                foreach (var scheduleLog in viewModel.ScheduleLogs)
+                {
+                    if (scheduleLog.UserId == 0)
+                    {
+                        scheduleLog.Name = "System";
+                    }
+                    else
+                    {
+                        scheduleLog.Name = users[scheduleLog.UserId].Item1;
+                        scheduleLog.Username = users[scheduleLog.UserId].Item2;
+                    }
+                }
+            }
+
+            if (viewModel.ScheduleClaim?.UserId == CurrentUserId)
+            {
+                viewModel.IsClaimedByCurrentUser = true;
+                var dispositions = await _scheduleService.GetCallDispositionsAsync();
+                viewModel.CallDispositions = dispositions.Select(_ => new SelectListItem
+                {
+                    Text = _.Disposition,
+                    Value = _.Id.ToString(CultureInfo.InvariantCulture)
+                }).Prepend(new SelectListItem());
+            }
+
+            return View(viewModel);
         }
 
         [Route("")]
@@ -79,67 +198,27 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
             });
         }
 
-        [Route("[action]/{requestId}")]
-        public async Task<IActionResult> Details(int requestId)
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> Unclaim(int requestId)
         {
-            var viewModel = new ScheduleDetailViewModel
-            {
-                ScheduleRequest = await _scheduleRequestService.GetRequestAsync(requestId),
-                RequestedDate = GetSavedIndexParameter()
-            };
+            await _scheduleService.UnclaimAsync(requestId);
 
-            if (viewModel.ScheduleRequest.ScheduleRequestSubject.FollowupEmailSetupId != null)
-            {
-                viewModel.FinishMessage = "Yes, send follow-up email";
-            }
+            TempData[TempDataKey.AlertWarning] = $"You have unclaimed request #{requestId}.";
 
-            if (viewModel.ScheduleRequest == null)
-            {
-                AlertDanger = $"Could not find request {requestId}.";
-            }
-            else
-            {
-                var claims = await _scheduleService.GetClaimsAsync(
-                    new int[] { viewModel.ScheduleRequest.Id });
-                viewModel.ScheduleClaim = claims.FirstOrDefault();
-                viewModel.ScheduleLogs
-                    = await _scheduleService.GetLogAsync(viewModel.ScheduleRequest.Id);
+            var requestedDate = GetClearSavedIndexParameter();
 
-                var users = new Dictionary<int, Tuple<string, string>>();
-                foreach (int userId in viewModel.ScheduleLogs.Select(_ => _.UserId).Distinct())
-                {
-                    if (userId != 0)
-                    {
-                        users.Add(userId, await _userService.GetUserInfoById(userId));
-                    }
-                }
+            return RedirectToAction(nameof(Index), new { requestedDate });
+        }
 
-                foreach (var scheduleLog in viewModel.ScheduleLogs)
-                {
-                    if (scheduleLog.UserId == 0)
-                    {
-                        scheduleLog.Name = "System";
-                    }
-                    else
-                    {
-                        scheduleLog.Name = users[scheduleLog.UserId].Item1;
-                        scheduleLog.Username = users[scheduleLog.UserId].Item2;
-                    }
-                }
-            }
-
-            if (viewModel.ScheduleClaim?.UserId == CurrentUserId)
-            {
-                viewModel.IsClaimedByCurrentUser = true;
-                var dispositions = await _scheduleService.GetCallDispositionsAsync();
-                viewModel.CallDispositions = dispositions.Select(_ => new SelectListItem
-                {
-                    Text = _.Disposition,
-                    Value = _.Id.ToString(CultureInfo.InvariantCulture)
-                }).Prepend(new SelectListItem());
-            }
-
-            return View(viewModel);
+        private string GetClearSavedIndexParameter()
+        {
+            var savedIndexParameter = GetSavedIndexParameter();
+            _httpContextAccessor
+                .HttpContext
+                .Session
+                .Remove("ScheduleController.Index");
+            return savedIndexParameter;
         }
 
         private string GetSavedIndexParameter()
@@ -154,85 +233,6 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
                 return date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             }
             return null;
-        }
-
-        private string GetClearSavedIndexParameter()
-        {
-            var savedIndexParameter = GetSavedIndexParameter();
-            _httpContextAccessor
-                .HttpContext
-                .Session
-                .Remove("ScheduleController.Index");
-            return savedIndexParameter;
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> Claim(int requestId)
-        {
-            await _scheduleService.ClaimAsync(requestId);
-
-            TempData[TempDataKey.AlertInfo] = $"You have claimed request #{requestId}.";
-
-            var requestedDate = GetClearSavedIndexParameter();
-
-            return RedirectToAction(nameof(Index), new { requestedDate });
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> Unclaim(int requestId)
-        {
-            await _scheduleService.UnclaimAsync(requestId);
-
-            TempData[TempDataKey.AlertWarning] = $"You have unclaimed request #{requestId}.";
-
-            var requestedDate = GetClearSavedIndexParameter();
-
-            return RedirectToAction(nameof(Index), new { requestedDate });
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> Cancel(int requestId)
-        {
-            await _scheduleService.CancelAsync(requestId);
-
-            TempData[TempDataKey.AlertWarning] = $"Request #{requestId} has been cancelled.";
-
-            var requestedDate = GetClearSavedIndexParameter();
-
-            return RedirectToAction(nameof(Index), new { requestedDate });
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> AddLog(ScheduleDetailViewModel viewModel)
-        {
-            var addLog = viewModel?.AddLog;
-
-            if (addLog.ScheduleLogCallDispositionId != null
-                || addLog.DurationMinutes != null
-                || addLog.Notes != null
-                || addLog.IsComplete)
-            {
-                await _scheduleService.AddLogAsync(addLog, true);
-            }
-
-            if (addLog.IsComplete)
-            {
-                TempData[TempDataKey.AlertSuccess]
-                    = $"Request #{addLog.ScheduleRequestId} marked as closed!";
-            }
-            else
-            {
-                TempData[TempDataKey.AlertInfo]
-                    = $"Comment posted to request #{addLog.ScheduleRequestId}.";
-            }
-
-            var requestedDate = GetClearSavedIndexParameter();
-
-            return RedirectToAction(nameof(Index), new { requestedDate });
         }
     }
 }
