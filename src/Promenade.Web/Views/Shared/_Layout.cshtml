@@ -284,7 +284,7 @@
             @if (leftNavigation?.Navigations.Count() > 0)
             {
                 <div role="complementary"
-                     class="col-12 col-sm-3 order-sm-first prom-leftnav-container">
+                     class="col-12 col-sm-3 order-last order-sm-first prom-leftnav-container">
                     <div class="prom-leftnav">
                         @foreach (var item in leftNavigation.Navigations)
                         {
@@ -389,7 +389,7 @@
                     </div>
                 </div>
             }
-            <div class="col-12 @(leftNavigation?.Navigations.Count() > 0 ? "col-sm-9 order-sm-last" : null) prom-body-content-container"
+            <div class="col-12 @(leftNavigation?.Navigations.Count() > 0 ? "col-sm-9 order-first order-sm-last" : null) prom-body-content-container"
                  role="main" id="mainContent">
                 <div class="prom-body-content">
                     @RenderBody()
