@@ -16,6 +16,7 @@ using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 {
@@ -24,6 +25,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
     [Route("[area]/[controller]")]
     public class SectionController : BaseController<SectionController>
     {
+        private readonly IOcudaCache _cache;
         private readonly IFileService _fileService;
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly ILinkService _linkService;
@@ -34,11 +36,13 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         public SectionController(ServiceFacades.Controller<SectionController> context,
             IFileService fileService,
             ILinkService linkService,
+            IOcudaCache cache,
             IPostService postService,
             ISectionService sectionService,
             IUserService userService,
             IWebHostEnvironment hostingEnvironment) : base(context)
         {
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _hostingEnvironment = hostingEnvironment
                 ?? throw new ArgumentNullException(nameof(hostingEnvironment));
@@ -255,6 +259,20 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 return RedirectToAction(nameof(SectionController.PostDetails),
                     new { sectionStub = section.Stub, postStub = viewModel.Post.Stub.Trim() });
             }
+        }
+
+        [Route("[action]")]
+        [HttpPost]
+        public async Task<IActionResult> ClearSectionCache()
+        {
+            if (string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            await _cache.RemoveAsync(Cache.OpsSections);
+            ShowAlertInfo("Section cache cleared.");
+            return RedirectToAction(nameof(Index));
         }
 
         [Route("[action]")]
@@ -582,7 +600,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             {
                 UserSections = string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
                     ? await _sectionService.GetByNamesAsync(UserClaims(ClaimType.SectionManager))
-                    : await _sectionService.GetAllAsync()
+                    : await _sectionService.GetAllAsync(),
+                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
             });
         }
 

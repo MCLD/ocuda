@@ -15,10 +15,12 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
-        public async Task<List<Section>> GetAllAsync()
+        public async Task<ICollection<Section>> GetAllAsync()
         {
             return await DbSet
                 .AsNoTracking()
+                .OrderByDescending(_ => _.IsHomeSection)
+                .ThenBy(_ => _.Name)
                 .ToListAsync();
         }
 

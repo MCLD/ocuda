@@ -4,22 +4,35 @@ using System.Threading.Tasks;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Ops.Service
 {
     public class SectionService : ISectionService
     {
+        private readonly IOcudaCache _cache;
         private readonly ISectionRepository _sectionRepository;
 
-        public SectionService(ISectionRepository sectionRepository)
+        public SectionService(IOcudaCache cache,
+            ISectionRepository sectionRepository)
         {
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _sectionRepository = sectionRepository
                 ?? throw new ArgumentNullException(nameof(sectionRepository));
         }
 
         public async Task<ICollection<Section>> GetAllAsync()
         {
-            return await _sectionRepository.GetAllAsync();
+            var sections = await _cache
+                .GetObjectFromCacheAsync<ICollection<Section>>(Utility.Keys.Cache.OpsSections);
+
+            if (sections == null || sections.Count == 0)
+            {
+                sections = await _sectionRepository.GetAllAsync();
+                await _cache.SaveToCacheAsync(Utility.Keys.Cache.OpsSections, sections, 1);
+            }
+
+            return sections;
         }
 
         public async Task<Section> GetByIdAsync(int id)
