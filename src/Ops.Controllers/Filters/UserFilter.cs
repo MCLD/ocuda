@@ -8,7 +8,8 @@ using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Filters
 {
-    public class UserFilterAttribute : Attribute, IAsyncResourceFilter
+    [AttributeUsage(AttributeTargets.All, AllowMultiple = false)]
+    public sealed class UserFilterAttribute : Attribute, IAsyncResourceFilter
     {
         private readonly ILogger<UserFilterAttribute> _logger;
         private readonly ISectionService _sectionService;
@@ -25,6 +26,9 @@ namespace Ocuda.Ops.Controllers.Filters
                 ?? throw new ArgumentNullException(nameof(userService));
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+            "CA1031:Do not catch general exception types",
+            Justification = "Fail safe if we can't tell the user is a supervisor")]
         public async Task OnResourceExecutionAsync(ResourceExecutingContext context,
             ResourceExecutionDelegate next)
         {
@@ -32,7 +36,7 @@ namespace Ocuda.Ops.Controllers.Filters
                 .Claims
                 .FirstOrDefault(_ => _.Type == ClaimType.Username);
 
-            if (usernameClaim != null)
+            if (usernameClaim != default)
             {
                 var user = await _userService.LookupUserAsync(usernameClaim.Value);
                 if (user != null)
@@ -55,7 +59,7 @@ namespace Ocuda.Ops.Controllers.Filters
                         }
                         if (!userIsSupervisor)
                         {
-                            sections = sections.Where(_ => _.SupervisorsOnly != true).ToList();
+                            sections = sections.Where(_ => !_.SupervisorsOnly).ToList();
                         }
                     }
                     context.HttpContext.Items[ItemKey.Sections] = sections;

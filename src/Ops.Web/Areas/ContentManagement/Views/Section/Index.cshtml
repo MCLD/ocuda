@@ -17,6 +17,17 @@
                 Add Section
             </button>
         }
+        @if (Model.IsSiteManager)
+        {
+            <form method="post"
+                  role="form"
+                  action="@Url.Action(nameof(SectionController.ClearSectionCache))">
+                <button class="btn btn-outline-warning mt-2 mb-1 mr-2 float-right"
+                        type="submit">
+                    Clear cache
+                </button>
+            </form>
+        }
     </div>
 </div>
 

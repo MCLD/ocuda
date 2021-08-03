@@ -61,8 +61,15 @@
                                asp-route-stub="@opsSection.Stub"
                                asp-controller="@HomeController.Name"
                                asp-action="@(nameof(HomeController.SectionIndex))">
-                                <span class="@opsSection.Icon"></span>
+                                @if (!string.IsNullOrEmpty(opsSection.Icon))
+                                {
+                                    <span class="@opsSection.Icon fa-fw"></span>
+                                }
                                 @opsSection.Name
+                                @if (opsSection.SupervisorsOnly)
+                                {
+                                    <span class="text-muted fas fa-lock fa-fw oc-dropdown-locked"></span>
+                                }
                             </a>
                         }
                     }
@@ -86,7 +93,7 @@
                        aria-haspopup="true"
                        aria-expanded="false"
                        title="Customer Service">
-                        <span class="fas fa-users"></span>
+                        <span class="fas fa-users fa-fw"></span>
                         Customer Service
                     </a>
                     <div class="dropdown-menu"
@@ -111,7 +118,7 @@
                        aria-haspopup="true"
                        aria-expanded="false"
                        title="Materials">
-                        <span class="fas fa-book"></span>
+                        <span class="fas fa-book fa-fw"></span>
                         Materials
                     </a>
                     <div class="dropdown-menu"
@@ -120,7 +127,7 @@
                            asp-controller="@Ocuda.Ops.Controllers.Areas.CoverIssue.HomeController.Name"
                            asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.CoverIssue))"
                            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.CoverIssue.HomeController.Index))">
-                            <span class="fas fa-book-dead"></span>
+                            <span class="fas fa-book-dead fa-fw"></span>
                             Cover Issues
                         </a>
                     </div>
@@ -141,7 +148,7 @@
                            aria-haspopup="true"
                            aria-expanded="false"
                            title="Management">
-                            <span class="fas fa-cog"></span>
+                            <span class="fas fa-cog fa-fw"></span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right"
                              aria-labelledby="navbarManagementDropdown">
@@ -151,7 +158,7 @@
                                    asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
                                    asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement))"
                                    asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">
-                                    <span class="fas fa-network-wired"></span>
+                                    <span class="fas fa-network-wired fa-fw"></span>
                                     Intranet Management
                                 </a>
                             }
@@ -159,7 +166,7 @@
                                asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
                                asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement))"
                                asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">
-                                <span class="fas fa-globe-americas"></span>
+                                <span class="fas fa-globe-americas fa-fw"></span>
                                 Site Management
                             </a>
                         </div>
@@ -174,7 +181,7 @@
                            asp-route-section=""
                            asp-route-area=""
                            asp-route-id="">
-                            <span class="fas fa-user-circle"></span>
+                            <span class="fas fa-user-circle fa-fw"></span>
                             @Context.Items[ItemKey.Nickname]
                         </a>
                     </li>
