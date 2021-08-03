@@ -6,5 +6,6 @@
         public const string ExternalJS = "ExternalJS";
         public const string NavColumn = "NavColumn";
         public const string Nickname = "Nickname";
+        public const string Sections = "Sections";
     }
 }

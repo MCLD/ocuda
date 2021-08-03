@@ -39,15 +39,36 @@
                 </a>
             }
         }
-        <a class="navbar-brand oc-navbrand"
-           asp-area=""
-           asp-route-section=""
-           asp-controller="Home"
-           asp-action="@(nameof(HomeController.Index))"
-           title="Intranet">
-            <span class="fas fa-info-circle"></span>
-            Intranet
-        </a>
+
+        <ul class="navbar-nav oc-navbrand">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle text-white"
+                   href="#"
+                   id="intranetDropdown"
+                   role="button"
+                   data-toggle="dropdown"
+                   title="Intranet">
+                    <span class="fas fa-info-circle"></span>
+                    Intranet
+                </a>
+                <div class="dropdown-menu">
+                    @if (Context.Items[ItemKey.Sections] != null)
+                    {
+                        @foreach (var opsSection in (ICollection<Ocuda.Ops.Models.Entities.Section>)Context.Items[ItemKey.Sections])
+                        {
+                            <a class="dropdown-item"
+                               asp-area=""
+                               asp-route-stub="@opsSection.Stub"
+                               asp-controller="@HomeController.Name"
+                               asp-action="@(nameof(HomeController.SectionIndex))">
+                                <span class="@opsSection.Icon"></span>
+                                @opsSection.Name
+                            </a>
+                        }
+                    }
+                </div>
+            </li>
+        </ul>
         <button class="navbar-toggler btn-sm justify-self-end" type="button"
                 data-toggle="collapse" data-target=".navbar-collapse">
             <span class="sr-only">Toggle Navigation</span>
