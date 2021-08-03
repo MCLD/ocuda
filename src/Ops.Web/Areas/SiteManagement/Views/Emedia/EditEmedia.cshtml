@@ -30,7 +30,13 @@
            value="@Model.Emedia.RedirectUrl"
            formgroup
            autocomplete="off" />
-    <select id="categoryIds" multiple="multiple" asp-for="CategoryIds" asp-items="Model.SelectionEmediaCategories" class="hidden" formgroup>
+    <select id="categoryIds" 
+            multiple="multiple" 
+            asp-for="CategoryIds" 
+            asp-items="Model.SelectionEmediaCategories" 
+            class="hidden"
+            size="7"
+            formgroup>
     </select>
     <div class="form-group row">
         <div class="col-md-9 offset-md-3">
@@ -58,12 +64,6 @@
                 {
                     @:$('#category-@id').click();
                 }
-            $("#categoryIds").multiselect({
-                nonSelectedText: "",
-                buttonClass: "form-control",
-                buttonWidth: "100%",
-                disableIfEmpty: true
-            });
         });
     </script>
 }
