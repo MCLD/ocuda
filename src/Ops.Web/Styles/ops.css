@@ -249,14 +249,14 @@ a.rowlink {
     transform: rotate(90deg);
 }
 
-.oc-section-locked {
-    font-size: 1rem;
-    vertical-align: middle;
-    margin-bottom: 0.25rem;
-}
-
 .oc-dropdown-locked {
     font-size: 0.6rem;
     vertical-align: middle;
     margin-bottom: 0.1rem;
+}
+
+.oc-section-locked {
+    font-size: 1rem;
+    vertical-align: middle;
+    margin-bottom: 0.25rem;
 }

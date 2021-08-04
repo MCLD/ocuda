@@ -2,10 +2,10 @@
 {
     public static class ItemKey
     {
-        public const string ExternalCSS = "ExternalCSS";
-        public const string ExternalJS = "ExternalJS";
-        public const string NavColumn = "NavColumn";
-        public const string Nickname = "Nickname";
-        public const string Sections = "Sections";
+        public static readonly string ExternalCSS = "ExternalCSS";
+        public static readonly string ExternalJS = "ExternalJS";
+        public static readonly string NavColumn = "NavColumn";
+        public static readonly string Nickname = "Nickname";
+        public static readonly string Sections = "Sections";
     }
 }
