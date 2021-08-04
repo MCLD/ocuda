@@ -26,9 +26,14 @@
                         <div class="flex-grow-1">
                             <h2 class="h5 mb-0">@post.Title</h2>
                         </div>
+                        @if (post.ShowOnHomePage && !string.IsNullOrEmpty(Model.SectionName))
+                        {
+                            <span class="fas fa-home fa-fw text-muted"
+                                  title="This post is shown on the Intranet home page."></span>
+                        }
                         @if (post.IsPinned)
                         {
-                            <span class="fas fa-map-pin"
+                            <span class="fas fa-map-pin fa-fw"
                                   title="This post is pinned to remain at the top."></span>
                         }
                     </div>
