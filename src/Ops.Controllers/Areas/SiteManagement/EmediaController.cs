@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Emedia;
 using Ocuda.Ops.Controllers.Filters;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
@@ -72,6 +73,47 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
+        public async Task<IActionResult> CreateGroup(IndexViewModel model)
+        {
+            JsonResponse response;
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var group = await _emediaService.CreateGroupAsync(model.EmediaGroup);
+                    response = new JsonResponse
+                    {
+                        Success = true,
+                        Url = Url.Action(nameof(GroupDetail), new { id = group.Id })
+                    };
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
+            }
+            else
+            {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
+                };
+            }
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
         public async Task<IActionResult> DeleteGroup(IndexViewModel model)
         {
             try
@@ -90,7 +132,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> Detail(int id)
+        public async Task<IActionResult> GroupDetail(int id)
         {
             return null;
         }

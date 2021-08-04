@@ -13,6 +13,12 @@
     </div>
 </div>
 
+<form id="addForm" role="form">
+    <div modal id="addModal" isLarge="true" name="Emedia Group" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+        <input id="addName" asp-for="EmediaGroup.Name" formgroup />
+    </div>
+</form>
+
 <form asp-controller="@EmediaController.Name" asp-action="@(nameof(EmediaController.DeleteGroup))" method="post" role="form">
     <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
 
@@ -38,7 +44,7 @@
                     {
                         <tr>
                             <td class="align-middle">
-                                <a asp-action="@(nameof(EmediaController.Detail))" asp-route-id="@group.Id">
+                                <a asp-action="@(nameof(EmediaController.GroupDetail))" asp-route-id="@group.Id">
                                     @group.Name
                                 </a>
                             </td>

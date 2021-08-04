@@ -34,11 +34,20 @@ namespace Ocuda.Ops.Data.Promenade
             return new DataWithCount<ICollection<EmediaGroup>>
             {
                 Count = await DbSet.AsNoTracking().CountAsync(),
-                Data = await DbSet.AsNoTracking()
-                    .OrderBy(_ => _.Name)
+                Data = await DbSet
+                    .OrderBy(_ => _.SortOrder)
                     .ApplyPagination(filter)
+                    .Include(_ => _.Emedias)
+                    .AsNoTracking()
                     .ToListAsync()
             };
+        }
+
+        public async Task<int?> GetMaxSortOrderAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .MaxAsync(_ => (int?)_.SortOrder);
         }
 
         public async Task<ICollection<EmediaGroup>> GetUsingSegmentAsync(int segmentId)

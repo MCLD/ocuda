@@ -167,6 +167,25 @@ namespace Ocuda.Ops.Service
             return await _emediaGroupRepository.GetPaginatedListAsync(filter);
         }
 
+        public async Task<EmediaGroup> CreateGroupAsync(EmediaGroup group)
+        {
+            group.Name = group.Name?.Trim();
+
+            var maxSortOrder = await _emediaGroupRepository.GetMaxSortOrderAsync();
+            if (maxSortOrder.HasValue)
+            {
+                group.SortOrder = maxSortOrder.Value + 1;
+            }
+            else
+            {
+                group.SortOrder = 0;
+            }
+
+            await _emediaGroupRepository.AddAsync(group);
+            await _emediaGroupRepository.SaveAsync();
+            return group;
+        }
+
         public async Task DeleteGroupAsync(int id)
         {
             var group = await _emediaGroupRepository.GetIncludingChildredAsync(id);
