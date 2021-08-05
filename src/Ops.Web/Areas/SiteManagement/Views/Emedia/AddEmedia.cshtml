@@ -27,7 +27,13 @@
     <input asp-for="Emedia.RedirectUrl"
            formgroup
            autocomplete="off" />
-    <select id="categoryIds" multiple="multiple" asp-for="CategoryIds" asp-items="Model.SelectionEmediaCategories" class="hidden" formgroup>
+    <select id="categoryIds" 
+            multiple="multiple" 
+            asp-for="CategoryIds" 
+            asp-items="Model.SelectionEmediaCategories" 
+            class="hidden"
+            size="7"
+            formgroup>
     </select>
     <div class="form-group row">
         <div class="col-md-9 offset-md-3">
@@ -51,13 +57,6 @@
             editorDetails.run();
             var editorDescr = new Markdown.Editor($("#Emedia_Description"), { allowUploads: false });
             editorDescr.run();
-
-            $("#categoryIds").multiselect({
-                nonSelectedText: "",
-                buttonClass: "form-control",
-                buttonWidth: "100%",
-                disableIfEmpty: true
-            });
         });
     </script>
 }
