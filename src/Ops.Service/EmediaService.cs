@@ -195,6 +195,15 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException("Emedia group does not exist.");
             }
 
+            var subsequentGroups = await _emediaGroupRepository
+                .GetSubsequentGroupsAsync(group.SortOrder);
+
+            if (subsequentGroups.Count > 0)
+            {
+                subsequentGroups.ForEach(_ => _.SortOrder--);
+                _emediaGroupRepository.UpdateRange(subsequentGroups);
+            }
+
             var emediaCategories = await _emediaCategoryRepository.GetAllForGroupAsync(id);
             _emediaCategoryRepository.RemoveRange(emediaCategories);
 
@@ -205,6 +214,39 @@ namespace Ocuda.Ops.Service
 
             _emediaGroupRepository.Remove(group);
 
+            await _emediaGroupRepository.SaveAsync();
+        }
+
+        public async Task UpdateGroupSortOrder(int id, bool increase)
+        {
+            var group = await _emediaGroupRepository.FindAsync(id);
+
+            int newSortOrder;
+            if (increase)
+            {
+                newSortOrder = group.SortOrder + 1;
+            }
+            else
+            {
+                if (group.SortOrder == 0)
+                {
+                    throw new OcudaException("Group is already in the first position.");
+                }
+                newSortOrder = group.SortOrder - 1;
+            }
+
+            var groupInPosition = await _emediaGroupRepository.GetByOrderAsync(newSortOrder);
+
+            if (groupInPosition == null)
+            {
+                throw new OcudaException("Group is already in the last position.");
+            }
+
+            groupInPosition.SortOrder = group.SortOrder;
+            group.SortOrder = newSortOrder;
+
+            _emediaGroupRepository.Update(group);
+            _emediaGroupRepository.Update(groupInPosition);
             await _emediaGroupRepository.SaveAsync();
         }
     }

@@ -132,6 +132,32 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
+        public async Task<JsonResult> ChangeGroupSort(int id, bool increase)
+        {
+            JsonResponse response;
+
+            try
+            {
+                await _emediaService.UpdateGroupSortOrder(id, increase);
+                response = new JsonResponse
+                {
+                    Success = true
+                };
+            }
+            catch (OcudaException ex)
+            {
+                response = new JsonResponse
+                {
+                    Message = ex.Message,
+                    Success = false
+                };
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
         public async Task<IActionResult> GroupDetail(int id)
         {
             return null;

@@ -19,6 +19,16 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
+        public async Task<EmediaGroup> FindAsync(int id)
+        {
+            var entity = await DbSet.FindAsync(id);
+            if (entity != null)
+            {
+                _context.Entry(entity).State = EntityState.Detached;
+            }
+            return entity;
+        }
+
         public async Task<EmediaGroup> GetIncludingChildredAsync(int id)
         {
             return await DbSet
@@ -26,6 +36,14 @@ namespace Ocuda.Ops.Data.Promenade
                 .Include(_ => _.Emedias)
                 .AsNoTracking()
                 .SingleOrDefaultAsync();
+        }
+
+        public async Task<EmediaGroup> GetByOrderAsync(int order)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.SortOrder == order)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<DataWithCount<ICollection<EmediaGroup>>> GetPaginatedListAsync(
@@ -48,6 +66,14 @@ namespace Ocuda.Ops.Data.Promenade
             return await DbSet
                 .AsNoTracking()
                 .MaxAsync(_ => (int?)_.SortOrder);
+        }
+
+        public async Task<List<EmediaGroup>> GetSubsequentGroupsAsync(int order)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.SortOrder > order)
+                .ToListAsync();
         }
 
         public async Task<ICollection<EmediaGroup>> GetUsingSegmentAsync(int segmentId)

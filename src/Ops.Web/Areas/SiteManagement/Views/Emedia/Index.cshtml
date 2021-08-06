@@ -10,23 +10,14 @@
         <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
            asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">Back</a>
+        <button data-toggle="modal"
+                data-target="#addModal"
+                class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
+            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            Add Group
+        </button>
     </div>
 </div>
-
-<form id="addForm" role="form">
-    <div modal id="addModal" isLarge="true" name="Emedia Group" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
-        <input id="addName" asp-for="EmediaGroup.Name" formgroup />
-    </div>
-</form>
-
-<form asp-controller="@EmediaController.Name" asp-action="@(nameof(EmediaController.DeleteGroup))" method="post" role="form">
-    <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
-
-    <input id="deleteId" asp-for="PaginateModel.CurrentPage" type="hidden" />
-    <input id="deleteName" asp-for="EmediaGroup.Id" type="hidden" />
-
-    <div modal id="deleteModal" name="Emedia Group" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
-</form>
 
 <div class="row">
     <div class="col-12">
@@ -51,6 +42,21 @@
                             <td class="align-middle">@group.Emedias.Count</td>
                             <td class="align-middle">
                                 <button type="button"
+                                        class="btn btn-outline-primary changeSort decreaseSortButton"
+                                        data-id="@group.Id"
+                                        data-increase="false"
+                                        data-item="true"
+                                        disabled="@(group.Id == Model.EmediaGroups.First().Id ? "disabled" : null)">
+                                    <span class="fas fa-arrow-up" aria-hidden="true"></span>
+                                </button>
+                                <button class="btn btn-outline-primary changeSort increaseSortButton"
+                                        data-id="@group.Id"
+                                        data-increase="true"
+                                        data-item="true"
+                                        disabled="@(group.Id == Model.EmediaGroups.Last().Id ? "disabled" : null)">
+                                    <span class="fas fa-arrow-down" aria-hidden="true"></span>
+                                </button>
+                                <button type="button"
                                         class="btn btn-outline-danger"
                                         data-toggle="modal"
                                         data-target="#deleteModal"
@@ -72,8 +78,39 @@
     <paginate paginateModel="@Model.PaginateModel"></paginate>
 }
 
+<form id="addForm" role="form">
+    <div modal id="addModal" isLarge="true" name="Emedia Group" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+        <input id="addName" asp-for="EmediaGroup.Name" formgroup />
+    </div>
+</form>
+
+<form asp-controller="@EmediaController.Name" asp-action="@(nameof(EmediaController.DeleteGroup))" method="post" role="form">
+    <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
+
+    <input id="deleteId" asp-for="EmediaGroup.Id" type="hidden" />
+    <input id="deleteName" asp-for="EmediaGroup.Name" type="hidden" />
+
+    <div modal id="deleteModal" name="Emedia Group" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+</form>
+
 @section scripts {
     <script>
+        $("#addForm").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.post("@(Url.Action(nameof(EmediaController.CreateGroup), EmediaController.Name))",
+                form.serialize(),
+                function (response) {
+                    if (response.success == true) {
+                        location.href = response.url;
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
+        });
+
         $("#deleteModal").on("show.bs.modal", function (e) {
             var button = $(e.relatedTarget);
             var id = button.data("id");
@@ -82,6 +119,57 @@
             $("#deleteId").val(id);
             $("#deleteName").val(name);
             modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
+        });
+
+        $(".changeSort").on("click", function () {
+            var button = $(this);
+            var id = button.data("id");
+            var increase = button.data("increase");
+            var icon = button.children("span");
+            if (icon.hasClass("fa-spinner") == false) {
+                icon.removeClass("fa-arrow-up fa-arrow-down").addClass("fa-spinner fa-pulse");
+                $.post("@Url.Action(nameof(EmediaController.ChangeGroupSort))",
+                    { id, increase },
+                    function (response) {
+                        icon.removeClass("fa-spinner fa-pulse");
+                        if (increase) {
+                            icon.addClass("fa-arrow-down");
+                        }
+                        else {
+                            icon.addClass("fa-arrow-up");
+                        }
+                        if (response.success) {
+                            var row = button.closest("tr");
+                            if (increase) {
+                                var nextRow = row.next();
+                                row.insertAfter(nextRow);
+                                row.find(".decreaseSortButton").removeAttr("disabled");
+                                if (row.next().length == 0) {
+                                    row.find(".increaseSortButton").attr("disabled", "disabled");
+                                }
+                                nextRow.find(".increaseSortButton").removeAttr("disabled");
+                                if (nextRow.prev().length == 0) {
+                                    nextRow.find(".decreaseSortButton").attr("disabled", "disabled");
+                                }
+                            }
+                            else {
+                                var prevRow = row.prev();
+                                row.insertBefore(prevRow);
+                                row.find(".increaseSortButton").removeAttr("disabled");
+                                if (row.prev().length == 0) {
+                                    row.find(".decreaseSortButton").attr("disabled", "disabled");
+                                }
+                                prevRow.find(".decreaseSortButton").removeAttr("disabled");
+                                if (prevRow.next().length == 0) {
+                                    prevRow.find(".increaseSortButton").attr("disabled", "disabled");
+                                }
+                            }
+                        }
+                        else {
+                            alert(response.message);
+                        }
+                });
+            }
         });
     </script>
 }
