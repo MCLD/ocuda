@@ -161,6 +161,11 @@ namespace Ocuda.Ops.Service
             }
         }
 
+        public async Task<EmediaGroup> GetGroupByIdAsync(int id)
+        {
+            return await _emediaGroupRepository.FindAsync(id);
+        }
+
         public async Task<DataWithCount<ICollection<EmediaGroup>>> GetPaginatedGroupListAsync(
             BaseFilter filter)
         {
@@ -184,6 +189,16 @@ namespace Ocuda.Ops.Service
             await _emediaGroupRepository.AddAsync(group);
             await _emediaGroupRepository.SaveAsync();
             return group;
+        }
+
+        public async Task<EmediaGroup> EditGroupAsync(EmediaGroup group)
+        {
+            var currentGroup = await _emediaGroupRepository.FindAsync(group.Id);
+            currentGroup.Name = group.Name?.Trim();
+
+            _emediaGroupRepository.Update(currentGroup);
+            await _emediaGroupRepository.SaveAsync();
+            return currentGroup;
         }
 
         public async Task DeleteGroupAsync(int id)

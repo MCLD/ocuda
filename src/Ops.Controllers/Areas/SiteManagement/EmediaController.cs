@@ -85,7 +85,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     response = new JsonResponse
                     {
                         Success = true,
-                        Url = Url.Action(nameof(GroupDetail), new { id = group.Id })
+                        Url = Url.Action(nameof(GroupDetails), new { id = group.Id })
                     };
                 }
                 catch (OcudaException ex)
@@ -109,6 +109,49 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     Message = string.Join(Environment.NewLine, errors)
                 };
             }
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> EditGroup(IndexViewModel model)
+        {
+            JsonResponse response;
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var group = await _emediaService.EditGroupAsync(model.EmediaGroup);
+                    response = new JsonResponse
+                    {
+                        Success = true
+                    };
+
+                    ShowAlertSuccess($"Updated group: {group.Name}");
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
+            }
+            else
+            {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
+                };
+            }
+
             return Json(response);
         }
 
@@ -156,11 +199,43 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> GroupDetail(int id)
+        [Route("[action]/{id}")]
+        public async Task<IActionResult> GroupDetails(int id, int page = 1)
         {
-            return null;
+            var group = await _emediaService.GetGroupByIdAsync(id);
+
+            if (group == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            var filter = new BaseFilter(page);
+
+            var emediaList = await _emediaService.GetPaginatedListAsync(filter);
+
+            var paginateModel = new PaginateModel
+            {
+                ItemCount = emediaList.Count,
+                CurrentPage = page,
+                ItemsPerPage = filter.Take.Value
+            };
+            if (paginateModel.PastMaxPage)
+            {
+                return RedirectToRoute(
+                    new
+                    {
+                        page = paginateModel.LastPage ?? 1
+                    });
+            }
+
+            var viewModel = new GroupDetailsViewModel
+            {
+                EmediaGroup = group,
+                Emedias = emediaList.Data,
+                PaginateModel = paginateModel
+            };
+
+            return View(viewModel);
         }
 
         /*

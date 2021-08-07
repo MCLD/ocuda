@@ -22,5 +22,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task DeleteGroupAsync(int id);
         Task<EmediaGroup> CreateGroupAsync(EmediaGroup group);
         Task UpdateGroupSortOrder(int id, bool increase);
+        Task<EmediaGroup> EditGroupAsync(EmediaGroup group);
+        Task<EmediaGroup> GetGroupByIdAsync(int id);
     }
 }
