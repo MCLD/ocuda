@@ -325,8 +325,12 @@ namespace Ocuda.Ops.Web
                 Data.Ops.PermissionGroupPodcastItemRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupPageContentRepository,
                 Data.Ops.PermissionGroupPageContentRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupReplaceFilesRepository,
+                Data.Ops.PermissionGroupReplaceFilesRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupRepository,
                 Data.Ops.PermissionGroupRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupSectionManagerRepository,
+                Data.Ops.PermissionGroupSectionManagerRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPostRepository,
                 Data.Ops.PostRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,

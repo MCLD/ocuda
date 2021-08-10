@@ -31,7 +31,11 @@ namespace Ocuda.Ops.Service
         private readonly IPermissionGroupPodcastItemRepository
             _permissionGroupPodcastItemRepository;
 
+        private readonly IPermissionGroupReplaceFilesRepository
+            _permissionGroupReplaceFilesRepository;
+
         private readonly IPermissionGroupRepository _permissionGroupRepository;
+        private readonly IPermissionGroupSectionManagerRepository _permissionGroupSectionManagerRepository;
 
         public PermissionGroupService(ILogger<PermissionGroupService> logger,
             IHttpContextAccessor httpContextAccessor,
@@ -39,6 +43,8 @@ namespace Ocuda.Ops.Service
             IPermissionGroupApplicationRepository permissionGroupApplicationRepository,
             IPermissionGroupPageContentRepository permissionGroupPageContentRepository,
             IPermissionGroupPodcastItemRepository permissionGroupPodcastItemRepository,
+            IPermissionGroupReplaceFilesRepository permissionGroupReplaceFilesRepository,
+            IPermissionGroupSectionManagerRepository permissionGroupSectionManagerRepository,
             IPermissionGroupRepository permissionGroupRepository)
             : base(logger, httpContextAccessor)
         {
@@ -54,6 +60,10 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(permissionGroupPodcastItemRepository));
             _permissionGroupRepository = permissionGroupRepository
                 ?? throw new ArgumentNullException(nameof(permissionGroupRepository));
+            _permissionGroupReplaceFilesRepository = permissionGroupReplaceFilesRepository
+                ?? throw new ArgumentNullException(nameof(permissionGroupReplaceFilesRepository));
+            _permissionGroupSectionManagerRepository = permissionGroupSectionManagerRepository
+                ?? throw new ArgumentNullException(nameof(permissionGroupSectionManagerRepository));
         }
 
         public async Task AddApplicationPermissionGroupAsync(string applicationPermission,
@@ -234,7 +244,11 @@ namespace Ocuda.Ops.Service
                 { typeof(PermissionGroupPodcastItem), async (_, __)
                     => await _permissionGroupPodcastItemRepository.AddSaveAsync(_, __) },
                 { typeof(PermissionGroupPageContent), async (_, __)
-                    => await _permissionGroupPageContentRepository.AddSaveAsync(_, __) }
+                    => await _permissionGroupPageContentRepository.AddSaveAsync(_, __) },
+                { typeof(PermissionGroupReplaceFiles), async(_, __)
+                    => await _permissionGroupReplaceFilesRepository.AddSaveAsync(_, __) },
+                { typeof(PermissionGroupSectionManager), async(_, __)
+                    => await _permissionGroupSectionManagerRepository.AddSaveAsync(_, __) }
             };
         }
 
@@ -245,7 +259,11 @@ namespace Ocuda.Ops.Service
                 { typeof(PermissionGroupPodcastItem), async _
                     => await _permissionGroupPodcastItemRepository.AnyPermissionGroupIdAsync(_) },
                 { typeof(PermissionGroupPageContent), async _
-                    => await _permissionGroupPageContentRepository.AnyPermissionGroupIdAsync(_) }
+                    => await _permissionGroupPageContentRepository.AnyPermissionGroupIdAsync(_) },
+                { typeof(PermissionGroupReplaceFiles), async _
+                    => await _permissionGroupReplaceFilesRepository.AnyPermissionGroupIdAsync(_) },
+                { typeof(PermissionGroupSectionManager), async _
+                    => await _permissionGroupSectionManagerRepository.AnyPermissionGroupIdAsync(_) }
             };
         }
 
@@ -256,7 +274,11 @@ namespace Ocuda.Ops.Service
                 { typeof(PermissionGroupPodcastItem), async _
                     => await _permissionGroupPodcastItemRepository.GetByPodcastId(_) },
                 { typeof(PermissionGroupPageContent), async _
-                    => await _permissionGroupPageContentRepository.GetByPageHeaderId(_) }
+                    => await _permissionGroupPageContentRepository.GetByPageHeaderId(_) },
+                { typeof(PermissionGroupReplaceFiles), async _
+                    => await _permissionGroupReplaceFilesRepository.GetByFileLibraryId(_) },
+                { typeof(PermissionGroupSectionManager), async _
+                    => await _permissionGroupSectionManagerRepository.GetBySectionIdAsync(_) }
             };
         }
 
@@ -267,7 +289,11 @@ namespace Ocuda.Ops.Service
                 { typeof(PermissionGroupPodcastItem),async (_, __)
                     => await _permissionGroupPodcastItemRepository.RemoveSaveAsync(_, __) },
                 { typeof(PermissionGroupPageContent),async (_, __)
-                    => await _permissionGroupPageContentRepository.RemoveSaveAsync(_, __) }
+                    => await _permissionGroupPageContentRepository.RemoveSaveAsync(_, __) },
+                { typeof(PermissionGroupReplaceFiles), async(_, __)
+                    => await _permissionGroupReplaceFilesRepository.RemoveSaveAsync(_, __) },
+                { typeof(PermissionGroupSectionManager), async(_, __)
+                    => await _permissionGroupSectionManagerRepository.RemoveSaveAsync(_, __) }
             };
         }
 
