@@ -211,18 +211,27 @@
         </form>
     </div>
 </div>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a href="@Url.Action(nameof(SectionController.Index))" class="navbar-brand">Section</a>
-    <span class="navbar-brand">/</span>
-    <a href="@Url.Action(nameof(SectionController.Section),
-        new { sectionStub = Model.Section.Stub})"
-       class="navbar-brand">@Model.Section.Name</a>
-    <a class="nav-link"
-       href="@Url.Action(nameof(SectionController.Posts),
-            new { sectionStub = Model.Section.Stub})">
-        Posts
-    </a>
-</nav>
+
+<div class="row mb-2">
+    <div class="col-sm-7">
+        <h1>Section: @Model.Section.Name</h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Index))">Back</a>
+        @if (false)
+        {
+            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+                    data-toggle="modal"
+                    data-target="#addModal">
+                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                Add Post
+            </button>
+        }
+    </div>
+</div>
+
 <div class="row">
     <div class="col-9">
         @if (!string.IsNullOrEmpty(Model.Section.EmbedVideoUrl))
@@ -274,8 +283,8 @@
                                         Category:&nbsp;
                                         <span>
                                             @foreach (var category in Model.PostCategories
-                                             .Where(_ => _.PostId == post.Id)
-                                             .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
+                                       .Where(_ => _.PostId == post.Id)
+                                       .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
                                             {
                                                 <a class="badge badge-pill badge-info"
                                                    href="@Url.Action(nameof(SectionController.Posts),
@@ -299,136 +308,132 @@
         }
     </div>
     <div class="col-3">
-        <div class="row">
-            <table class="table table-condensed table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th colspan="3">
-                            File Libraries
-                            <div class="float-right align-middle">
-                                <a role="button"
-                                   class="text-success align-middle"
-                                   id="addFileLibrary"
-                                   data-toggle="modal"
-                                   data-target="#addFileLibModal">
-                                    <span class="fas fa-plus-circle fa-lg align-middle"></span>
-                                </a>
-                            </div>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model.FileLibraries.Count > 0)
-                    {
-                        @foreach (var library in Model.FileLibraries)
-                        {
-                            <tr>
-                                <td class="row-link file-item text-center" data-stub="@library.Stub">
-                                    @library.Name
-                                </td>
-                                <td style="position: relative;" class="text-center">
-                                    <a role="button"
-                                       class="text-danger h4 editfile text-center"
-                                       data-toggle="modal"
-                                       data-target="#editLibModal"
-                                       data-id="@library.Id"
-                                       data-name="@library.Name"
-                                       data-stub="@library.Stub"
-                                       data-type="file">
-                                        <span class="far fa-edit float-right"></span>
-                                    </a>
-                                </td>
-                                <td style="position: relative;" class="text-center">
-                                    <button type="button"
-                                            class="btn btn-danger"
-                                            data-toggle="modal"
-                                            data-target="#deleteModal"
-                                            data-id="@library.Id"
-                                            data-name="@library.Name"
-                                            data-stub="@library.Stub"
-                                            data-type="file">
-                                        Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
+        <table class="table table-condensed table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th colspan="3">
+                        File Libraries
+                        <div class="float-right align-middle">
+                            <a role="button"
+                               class="text-success align-middle"
+                               id="addFileLibrary"
+                               data-toggle="modal"
+                               data-target="#addFileLibModal">
+                                <span class="fas fa-plus-circle fa-lg align-middle"></span>
+                            </a>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.FileLibraries.Count > 0)
+                {
+                    @foreach (var library in Model.FileLibraries)
                     {
                         <tr>
-                            <td>
-                                No File Libraries exist
+                            <td class="row-link file-item text-center" data-stub="@library.Stub">
+                                @library.Name
+                            </td>
+                            <td style="position: relative;" class="text-center">
+                                <a role="button"
+                                   class="text-danger h4 editfile text-center"
+                                   data-toggle="modal"
+                                   data-target="#editLibModal"
+                                   data-id="@library.Id"
+                                   data-name="@library.Name"
+                                   data-stub="@library.Stub"
+                                   data-type="file">
+                                    <span class="far fa-edit float-right"></span>
+                                </a>
+                            </td>
+                            <td style="position: relative;" class="text-center">
+                                <button type="button"
+                                        class="btn btn-danger"
+                                        data-toggle="modal"
+                                        data-target="#deleteModal"
+                                        data-id="@library.Id"
+                                        data-name="@library.Name"
+                                        data-stub="@library.Stub"
+                                        data-type="file">
+                                    Delete
+                                </button>
                             </td>
                         </tr>
                     }
-                </tbody>
-            </table>
-        </div>
-        <div class="row">
-            <table class="table table-condensed table-bordered table-hover">
-                <thead>
+                }
+                else
+                {
                     <tr>
-                        <th colspan="3">
-                            Link Libraries
-                            <div class="float-right align-middle">
-                                <a role="button"
-                                   class="text-success align-middle"
-                                   data-toggle="modal"
-                                   data-target="#addLinkLibModal"
-                                   id="addLinkLibrary">
-                                    <span class="fas fa-plus-circle fa-lg align-middle"></span>
-                                </a>
-                            </div>
-                        </th>
+                        <td>
+                            No File Libraries exist
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @if (Model.LinkLibraries.Count > 0)
-                    {
-                        @foreach (var library in Model.LinkLibraries)
-                        {
-                            <tr>
-                                <td class="row-link link-item text-center" data-stub="@library.Stub">
-                                    @library.Name
-                                </td>
-                                <td style="position: relative;" class="text-center align-middle">
-                                    <a role="button"
-                                       class="text-danger h4 editlink"
-                                       data-toggle="modal"
-                                       data-target="#editLibModal"
-                                       data-id="@library.Id"
-                                       data-name="@library.Name"
-                                       data-stub="@library.Stub"
-                                       data-type="link">
-                                        <span class="far fa-edit float-right"></span>
-                                    </a>
-                                </td>
-                                <td style="position: relative;" class="text-center">
-                                    <button type="button"
-                                            class="btn btn-danger"
-                                            data-toggle="modal"
-                                            data-target="#deleteModal"
-                                            data-id="@library.Id"
-                                            data-name="@library.Name"
-                                            data-stub="@library.Stub"
-                                            data-type="link">
-                                        Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
+                }
+            </tbody>
+        </table>
+        <table class="table table-condensed table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th colspan="3">
+                        Link Libraries
+                        <div class="float-right align-middle">
+                            <a role="button"
+                               class="text-success align-middle"
+                               data-toggle="modal"
+                               data-target="#addLinkLibModal"
+                               id="addLinkLibrary">
+                                <span class="fas fa-plus-circle fa-lg align-middle"></span>
+                            </a>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.LinkLibraries.Count > 0)
+                {
+                    @foreach (var library in Model.LinkLibraries)
                     {
                         <tr>
-                            <td>
-                                No Link Libraries exist
+                            <td class="row-link link-item text-center" data-stub="@library.Stub">
+                                @library.Name
+                            </td>
+                            <td style="position: relative;" class="text-center align-middle">
+                                <a role="button"
+                                   class="text-danger h4 editlink"
+                                   data-toggle="modal"
+                                   data-target="#editLibModal"
+                                   data-id="@library.Id"
+                                   data-name="@library.Name"
+                                   data-stub="@library.Stub"
+                                   data-type="link">
+                                    <span class="far fa-edit float-right"></span>
+                                </a>
+                            </td>
+                            <td style="position: relative;" class="text-center">
+                                <button type="button"
+                                        class="btn btn-danger"
+                                        data-toggle="modal"
+                                        data-target="#deleteModal"
+                                        data-id="@library.Id"
+                                        data-name="@library.Name"
+                                        data-stub="@library.Stub"
+                                        data-type="link">
+                                    Delete
+                                </button>
                             </td>
                         </tr>
                     }
-                </tbody>
-            </table>
-        </div>
+                }
+                else
+                {
+                    <tr>
+                        <td>
+                            No Link Libraries exist
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 @section scripts {
