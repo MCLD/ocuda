@@ -26,8 +26,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class PodcastsController : BaseController<PodcastsController>
     {
-        private const string PodcastContentType = "audio/mpeg";
         private const long MaximumFileSizeBytes = 75 * 1024 * 1024;
+        private const string PodcastContentType = "audio/mpeg";
 
         private static readonly string[] AcceptedContentTypes = {
             PodcastContentType,
@@ -39,9 +39,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IPermissionGroupService _permissionGroupService;
         private readonly IPodcastService _podcastService;
-
-        public static string Name { get { return "Podcasts"; } }
-        public static string Area { get { return "SiteManagement"; } }
 
         public PodcastsController(ServiceFacades.Controller<PodcastsController> context,
             IDateTimeProvider dateTimeProvider,
@@ -57,94 +54,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(podcastService));
         }
 
-        [Route("")]
-        [Route("[action]/{page}")]
-        public async Task<IActionResult> Index(int page = 1)
-        {
-            var filter = new BaseFilter(page);
-
-            var podcastList = await _podcastService.GetPaginatedListAsync(filter);
-
-            var paginateModel = new PaginateModel
-            {
-                ItemCount = podcastList.Count,
-                CurrentPage = page,
-                ItemsPerPage = filter.Take.Value
-            };
-
-            if (paginateModel.PastMaxPage)
-            {
-                return RedirectToRoute(
-                    new
-                    {
-                        page = paginateModel.LastPage ?? 1
-                    });
-            }
-
-            var viewModel = new IndexViewModel
-            {
-                Podcasts = podcastList.Data,
-                PaginateModel = paginateModel,
-                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
-                PermissionIds = UserClaims(ClaimType.PermissionId)
-            };
-
-            return View(viewModel);
-        }
-
-        [Route("[action]/{podcastId}")]
-        public async Task<IActionResult> Details(int podcastId)
-        {
-            var promenadeUrl = await _siteSettingService
-                    .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.PromenadeUrl);
-
-            return View(new DetailsViewModel
-            {
-                Podcast = await _podcastService.GetByIdAsync(podcastId),
-                PromenadeUrl = promenadeUrl.Trim('/')
-            });
-        }
-
-        [Route("[action]/{podcastId}")]
-        [Route("[action]/{podcastId}/{page}")]
-        public async Task<IActionResult> Episodes(int podcastId, int page = 1)
-        {
-            if (!await HasPermissionAsync<PermissionGroupPodcastItem>(_permissionGroupService,
-                podcastId))
-            {
-                return RedirectToUnauthorized();
-            }
-
-            var filter = new BaseFilter(page);
-
-            var episodes = await _podcastService.GetPaginatedEpisodeListAsync(podcastId, filter);
-
-            var paginateModel = new PaginateModel
-            {
-                ItemCount = episodes.Count,
-                CurrentPage = page,
-                ItemsPerPage = filter.Take.Value
-            };
-
-            if (paginateModel.PastMaxPage)
-            {
-                return RedirectToRoute(new { page = paginateModel.LastPage ?? 1 });
-            }
-
-            var podcast = await _podcastService.GetByIdAsync(podcastId);
-
-            var viewModel = new EpisodeIndexViewModel
-            {
-                PodcastId = podcastId,
-                PodcastTitle = podcast.Title,
-                Episodes = episodes.Data,
-                PaginateModel = paginateModel,
-                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
-                HasPermission = UserClaims(ClaimType.PermissionId).Any(_ => podcast.PermissionGroupIds?.Contains(_) == true)
-            };
-
-            return View(viewModel);
-        }
+        public static string Area { get { return "SiteManagement"; } }
+        public static string Name { get { return "Podcasts"; } }
 
         [Route("[action]/{podcastId}")]
         public async Task<IActionResult> AddEpisode(int podcastId)
@@ -169,49 +80,24 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             });
         }
 
-        [Route("[action]/{episodeId}")]
-        public async Task<IActionResult> EditEpisode(int episodeId)
+        [HttpPost]
+        [Route("[action]/{podcastId}/{permissionGroupId}")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        public async Task<IActionResult> AddPermissionGroup(int podcastId, int permissionGroupId)
         {
-            var episode = await _podcastService.GetPodcastItemByIdAsync(episodeId);
-
-            if (!await HasPermissionAsync<PermissionGroupPodcastItem>(_permissionGroupService,
-                episode.PodcastId))
+            try
             {
-                return RedirectToUnauthorized();
+                await _permissionGroupService
+                    .AddToPermissionGroupAsync<PermissionGroupPodcastItem>(podcastId,
+                    permissionGroupId);
+                AlertInfo = "Content permission added.";
+            }
+            catch (Exception ex)
+            {
+                AlertDanger = $"Problem adding permission: {ex.Message}";
             }
 
-            var podcast = await _podcastService.GetByIdAsync(episode.PodcastId);
-
-            var viewModel = new EpisodeDetailsViewModel
-            {
-                EditEpisode = true,
-                Episode = episode,
-                PodcastTitle = episode.Podcast.Title,
-                MaximumFileSizeMB = $"{MaximumFileSizeBytes / 1024 / 1024}"
-            };
-
-            if (!string.IsNullOrEmpty(podcast.Stub)
-                && episode.Episode != null)
-            {
-                var path = await FilePathToEpisodeAsync(podcast.Stub, episode.Episode);
-                var filename = FilenameOfEpisode(podcast.Stub, episode.Episode);
-
-                if (!string.IsNullOrEmpty(path))
-                {
-                    if (System.IO.File.Exists(Path.Combine(path, filename)))
-                    {
-                        viewModel.UploadedAt = System.IO.File.GetLastWriteTime(path);
-                        viewModel.Filename = filename;
-                    }
-                    else
-                    {
-                        viewModel.Filename = filename;
-                        viewModel.FileMissing = true;
-                    }
-                }
-            }
-
-            return View("EpisodeDetails", viewModel);
+            return RedirectToAction(nameof(Permissions), new { podcastId });
         }
 
         [Route("[action]")]
@@ -340,28 +226,196 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
         }
 
-        private async Task<string> FilePathToEpisodeAsync(string podcastStub, int? episodeNumber)
+        [Route("[action]/{podcastId}")]
+        public async Task<IActionResult> Details(int podcastId)
         {
-            if (episodeNumber == null)
-            {
-                throw new ArgumentNullException(nameof(episodeNumber));
-            }
+            var promenadeUrl = await _siteSettingService
+                    .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.PromenadeUrl);
 
-            string basePath = await _siteSettingService
-                .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
-            return Path.Combine(basePath, "podcasts",
-                podcastStub,
-                $"ep-{episodeNumber}");
+            return View(new DetailsViewModel
+            {
+                Podcast = await _podcastService.GetByIdAsync(podcastId),
+                PromenadeUrl = promenadeUrl.Trim('/')
+            });
         }
 
-        private string FilenameOfEpisode(string podcastStub, int? episodeNumber)
+        [Route("[action]/{episodeId}")]
+        public async Task<IActionResult> EditEpisode(int episodeId)
         {
-            if (episodeNumber == null)
+            var episode = await _podcastService.GetPodcastItemByIdAsync(episodeId);
+
+            if (!await HasPermissionAsync<PermissionGroupPodcastItem>(_permissionGroupService,
+                episode.PodcastId))
             {
-                throw new ArgumentNullException(nameof(episodeNumber));
+                return RedirectToUnauthorized();
             }
 
-            return $"{podcastStub}-ep-{episodeNumber}.mp3";
+            var podcast = await _podcastService.GetByIdAsync(episode.PodcastId);
+
+            var viewModel = new EpisodeDetailsViewModel
+            {
+                EditEpisode = true,
+                Episode = episode,
+                PodcastTitle = episode.Podcast.Title,
+                MaximumFileSizeMB = $"{MaximumFileSizeBytes / 1024 / 1024}"
+            };
+
+            if (!string.IsNullOrEmpty(podcast.Stub)
+                && episode.Episode != null)
+            {
+                var path = await FilePathToEpisodeAsync(podcast.Stub, episode.Episode);
+                var filename = FilenameOfEpisode(podcast.Stub, episode.Episode);
+
+                if (!string.IsNullOrEmpty(path))
+                {
+                    if (System.IO.File.Exists(Path.Combine(path, filename)))
+                    {
+                        viewModel.UploadedAt = System.IO.File.GetLastWriteTime(path);
+                        viewModel.Filename = filename;
+                    }
+                    else
+                    {
+                        viewModel.Filename = filename;
+                        viewModel.FileMissing = true;
+                    }
+                }
+            }
+
+            return View("EpisodeDetails", viewModel);
+        }
+
+        [Route("[action]/{podcastId}")]
+        [Route("[action]/{podcastId}/{page}")]
+        public async Task<IActionResult> Episodes(int podcastId, int page = 1)
+        {
+            if (!await HasPermissionAsync<PermissionGroupPodcastItem>(_permissionGroupService,
+                podcastId))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var filter = new BaseFilter(page);
+
+            var episodes = await _podcastService.GetPaginatedEpisodeListAsync(podcastId, filter);
+
+            var paginateModel = new PaginateModel
+            {
+                ItemCount = episodes.Count,
+                CurrentPage = page,
+                ItemsPerPage = filter.Take.Value
+            };
+
+            if (paginateModel.PastMaxPage)
+            {
+                return RedirectToRoute(new { page = paginateModel.LastPage ?? 1 });
+            }
+
+            var podcast = await _podcastService.GetByIdAsync(podcastId);
+
+            var viewModel = new EpisodeIndexViewModel
+            {
+                PodcastId = podcastId,
+                PodcastTitle = podcast.Title,
+                Episodes = episodes.Data,
+                PaginateModel = paginateModel,
+                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
+                HasPermission = UserClaims(ClaimType.PermissionId).Any(_ => podcast.PermissionGroupIds?.Contains(_) == true)
+            };
+
+            return View(viewModel);
+        }
+
+        [Route("")]
+        [Route("[action]/{page}")]
+        public async Task<IActionResult> Index(int page = 1)
+        {
+            var filter = new BaseFilter(page);
+
+            var podcastList = await _podcastService.GetPaginatedListAsync(filter);
+
+            var paginateModel = new PaginateModel
+            {
+                ItemCount = podcastList.Count,
+                CurrentPage = page,
+                ItemsPerPage = filter.Take.Value
+            };
+
+            if (paginateModel.PastMaxPage)
+            {
+                return RedirectToRoute(
+                    new
+                    {
+                        page = paginateModel.LastPage ?? 1
+                    });
+            }
+
+            var viewModel = new IndexViewModel
+            {
+                Podcasts = podcastList.Data,
+                PaginateModel = paginateModel,
+                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
+                PermissionIds = UserClaims(ClaimType.PermissionId)
+            };
+
+            return View(viewModel);
+        }
+
+        [Route("[action]/{podcastId}")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        public async Task<IActionResult> Permissions(int podcastId)
+        {
+            var podcast = await _podcastService.GetByIdAsync(podcastId);
+
+            var permissionGroups = await _permissionGroupService.GetAllAsync();
+            var podcastPermissions = await _permissionGroupService
+                .GetPermissionsAsync<PermissionGroupPodcastItem>(podcastId);
+
+            var availableGroups = new Dictionary<int, string>();
+            var assignedGroups = new Dictionary<int, string>();
+
+            foreach (var permissionGroup in permissionGroups)
+            {
+                var permission = podcastPermissions
+                    .SingleOrDefault(_ => _.PermissionGroupId == permissionGroup.Id);
+                if (permission == null)
+                {
+                    availableGroups.Add(permissionGroup.Id, permissionGroup.PermissionGroupName);
+                }
+                else
+                {
+                    assignedGroups.Add(permissionGroup.Id, permissionGroup.PermissionGroupName);
+                }
+            }
+
+            return View(new EpisodePermissionsViewModel
+            {
+                Title = podcast.Title,
+                Stub = podcast.Stub,
+                PodcastId = podcast.Id,
+                AvailableGroups = availableGroups,
+                AssignedGroups = assignedGroups
+            });
+        }
+
+        [HttpPost]
+        [Route("[action]/{podcastId}/{permissionGroupId}")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        public async Task<IActionResult> RemovePermissionGroup(int podcastId,
+            int permissionGroupId)
+        {
+            try
+            {
+                await _permissionGroupService
+                    .RemoveFromPermissionGroupAsync<PermissionGroupPodcastItem>(podcastId,
+                    permissionGroupId);
+                AlertInfo = "Content permission removed.";
+            }
+            catch (Exception ex)
+            {
+                AlertDanger = $"Problem removing permission: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(Permissions), new { podcastId });
         }
 
         [HttpPost]
@@ -493,82 +547,28 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return RedirectToAction(nameof(EditEpisode), new { episodeId = viewModel.Episode.Id });
         }
 
-        [Route("[action]/{podcastId}")]
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        public async Task<IActionResult> Permissions(int podcastId)
+        private string FilenameOfEpisode(string podcastStub, int? episodeNumber)
         {
-            var podcast = await _podcastService.GetByIdAsync(podcastId);
-
-            var permissionGroups = await _permissionGroupService.GetAllAsync();
-            var podcastPermissions = await _permissionGroupService
-                .GetPermissionsAsync<PermissionGroupPodcastItem>(podcastId);
-
-            var availableGroups = new Dictionary<int, string>();
-            var assignedGroups = new Dictionary<int, string>();
-
-            foreach (var permissionGroup in permissionGroups)
+            if (episodeNumber == null)
             {
-                var permission = podcastPermissions
-                    .SingleOrDefault(_ => _.PermissionGroupId == permissionGroup.Id);
-                if (permission == null)
-                {
-                    availableGroups.Add(permissionGroup.Id, permissionGroup.PermissionGroupName);
-                }
-                else
-                {
-                    assignedGroups.Add(permissionGroup.Id, permissionGroup.PermissionGroupName);
-                }
+                throw new ArgumentNullException(nameof(episodeNumber));
             }
 
-            return View(new EpisodePermissionsViewModel
-            {
-                Title = podcast.Title,
-                Stub = podcast.Stub,
-                PodcastId = podcast.Id,
-                AvailableGroups = availableGroups,
-                AssignedGroups = assignedGroups
-            });
+            return $"{podcastStub}-ep-{episodeNumber}.mp3";
         }
 
-        [HttpPost]
-        [Route("[action]/{podcastId}/{permissionGroupId}")]
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        public async Task<IActionResult> AddPermissionGroup(int podcastId, int permissionGroupId)
+        private async Task<string> FilePathToEpisodeAsync(string podcastStub, int? episodeNumber)
         {
-            try
+            if (episodeNumber == null)
             {
-                await _permissionGroupService
-                    .AddToPermissionGroupAsync<PermissionGroupPodcastItem>(podcastId,
-                    permissionGroupId);
-                AlertInfo = "Content permission added.";
-            }
-            catch (Exception ex)
-            {
-                AlertDanger = $"Problem adding permission: {ex.Message}";
+                throw new ArgumentNullException(nameof(episodeNumber));
             }
 
-            return RedirectToAction(nameof(Permissions), new { podcastId });
-        }
-
-        [HttpPost]
-        [Route("[action]/{podcastId}/{permissionGroupId}")]
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        public async Task<IActionResult> RemovePermissionGroup(int podcastId,
-            int permissionGroupId)
-        {
-            try
-            {
-                await _permissionGroupService
-                    .RemoveFromPermissionGroupAsync<PermissionGroupPodcastItem>(podcastId,
-                    permissionGroupId);
-                AlertInfo = "Content permission removed.";
-            }
-            catch (Exception ex)
-            {
-                AlertDanger = $"Problem removing permission: {ex.Message}";
-            }
-
-            return RedirectToAction(nameof(Permissions), new { podcastId });
+            string basePath = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+            return Path.Combine(basePath, "podcasts",
+                podcastStub,
+                $"ep-{episodeNumber}");
         }
     }
 }

@@ -21,12 +21,16 @@ namespace Ocuda.Ops.Service
         : BaseService<PermissionGroupService>, IPermissionGroupService
     {
         private readonly IDateTimeProvider _dateTimeProvider;
+
         private readonly IPermissionGroupApplicationRepository
             _permissionGroupApplicationRepository;
+
         private readonly IPermissionGroupPageContentRepository
             _permissionGroupPageContentRepository;
+
         private readonly IPermissionGroupPodcastItemRepository
             _permissionGroupPodcastItemRepository;
+
         private readonly IPermissionGroupRepository _permissionGroupRepository;
 
         public PermissionGroupService(ILogger<PermissionGroupService> logger,
@@ -52,10 +56,24 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(permissionGroupRepository));
         }
 
-        public async Task<DataWithCount<ICollection<PermissionGroup>>> GetPaginatedListAsync(
-            BaseFilter filter)
+        public async Task AddApplicationPermissionGroupAsync(string applicationPermission,
+            int permissionGroupId)
         {
-            return await _permissionGroupRepository.GetPaginatedListAsync(filter);
+            var permission = ApplicationPermissionDefinitions.ApplicationPermissions
+                .SingleOrDefault(_ => string.Equals(_.Id, applicationPermission,
+                    StringComparison.OrdinalIgnoreCase));
+
+            if (permission == null)
+            {
+                throw new OcudaException("Invalid application permission.");
+            }
+
+            await _permissionGroupApplicationRepository.AddAsync(new PermissionGroupApplication
+            {
+                ApplicationPermission = applicationPermission,
+                PermissionGroupId = permissionGroupId
+            });
+            await _permissionGroupApplicationRepository.SaveAsync();
         }
 
         public async Task<PermissionGroup> AddAsync(PermissionGroup permissionGroup)
@@ -76,6 +94,25 @@ namespace Ocuda.Ops.Service
             await _permissionGroupRepository.SaveAsync();
 
             return permissionGroup;
+        }
+
+        public async Task AddToPermissionGroupAsync<T>(int itemId, int permissionGroupId)
+            where T : PermissionGroupMappingBase
+        {
+            if (GetAddPermissionMap().TryGetValue(typeof(T), out var delegateMethod))
+            {
+                delegateMethod(itemId, permissionGroupId);
+            }
+            else
+            {
+                throw new OcudaException($"Unable to set permissions for {nameof(T)}");
+            }
+        }
+
+        public async Task DeleteAsync(int permissionGroupId)
+        {
+            _permissionGroupRepository.Remove(permissionGroupId);
+            await _permissionGroupRepository.SaveAsync();
         }
 
         public async Task<PermissionGroup> EditAsync(PermissionGroup permissionGroup)
@@ -102,118 +139,9 @@ namespace Ocuda.Ops.Service
             return currentPermissionGroup;
         }
 
-        public async Task DeleteAsync(int permissionGroupId)
-        {
-            _permissionGroupRepository.Remove(permissionGroupId);
-            await _permissionGroupRepository.SaveAsync();
-        }
-
-        private async Task ValidateAsync(PermissionGroup permissionGroup)
-        {
-            if (await _permissionGroupRepository.IsDuplicateAsync(permissionGroup))
-            {
-                throw new OcudaException($"Permission group '{permissionGroup.PermissionGroupName}' already exists.");
-            }
-        }
-
         public async Task<ICollection<PermissionGroup>> GetAllAsync()
         {
             return await _permissionGroupRepository.GetAllAsync();
-        }
-
-        public async Task<ICollection<T>> GetPermissionsAsync<T>(int itemId)
-            where T : PermissionGroupMappingBase
-        {
-            if (typeof(T) == typeof(PermissionGroupPageContent))
-            {
-                return (ICollection<T>)(await _permissionGroupPageContentRepository
-                    .GetByPageHeaderId(itemId));
-            }
-            else if (typeof(T) == typeof(PermissionGroupPodcastItem))
-            {
-                return (ICollection<T>)(await _permissionGroupPodcastItemRepository
-                    .GetByPodcastId(itemId));
-            }
-
-            throw new OcudaException($"Unable to get permissions for {nameof(T)}");
-        }
-
-        public async Task AddToPermissionGroupAsync<T>(int itemId, int permissionGroupId)
-            where T : PermissionGroupMappingBase
-        {
-            if (typeof(T) == typeof(PermissionGroupPageContent))
-            {
-                await _permissionGroupPageContentRepository.AddAsync(new PermissionGroupPageContent
-                {
-                    PageHeaderId = itemId,
-                    PermissionGroupId = permissionGroupId
-                });
-                await _permissionGroupPageContentRepository.SaveAsync();
-                return;
-            }
-            else if (typeof(T) == typeof(PermissionGroupPodcastItem))
-            {
-                await _permissionGroupPodcastItemRepository.AddAsync(new PermissionGroupPodcastItem
-                {
-                    PodcastId = itemId,
-                    PermissionGroupId = permissionGroupId
-                });
-                await _permissionGroupPodcastItemRepository.SaveAsync();
-                return;
-            }
-
-            throw new OcudaException($"Unable to set permissions for {nameof(T)}");
-        }
-
-        public async Task RemoveFromPermissionGroupAsync<T>(int itemId, int permissionGroupId)
-            where T : PermissionGroupMappingBase
-        {
-            if (typeof(T) == typeof(PermissionGroupPageContent))
-            {
-                _permissionGroupPageContentRepository.Remove(new PermissionGroupPageContent
-                {
-                    PageHeaderId = itemId,
-                    PermissionGroupId = permissionGroupId
-                });
-                await _permissionGroupPageContentRepository.SaveAsync();
-                return;
-            }
-            else if (typeof(T) == typeof(PermissionGroupPodcastItem))
-            {
-                _permissionGroupPodcastItemRepository.Remove(new PermissionGroupPodcastItem
-                {
-                    PodcastId = itemId,
-                    PermissionGroupId = permissionGroupId
-                });
-                await _permissionGroupPodcastItemRepository.SaveAsync();
-                return;
-            }
-
-            throw new OcudaException($"Unable to remove permissions for {nameof(T)}");
-        }
-
-        public async Task<bool>
-            HasPermissionAsync<T>(IEnumerable<int> permissionGroupIds)
-            where T : PermissionGroupMappingBase
-        {
-            if (typeof(T) == typeof(PermissionGroupPageContent))
-            {
-                return await _permissionGroupPageContentRepository
-                    .AnyPermissionGroupIdAsync(permissionGroupIds);
-            }
-            else if (typeof(T) == typeof(PermissionGroupPodcastItem))
-            {
-                return await _permissionGroupPodcastItemRepository
-                    .AnyPermissionGroupIdAsync(permissionGroupIds);
-            }
-
-            throw new OcudaException($"Unable to look up permissions for {nameof(T)}");
-        }
-
-        public async Task<ICollection<PermissionGroup>>
-            GetGroupsAsync(IEnumerable<int> permissionGroupIds)
-        {
-            return await _permissionGroupRepository.GetGroupsAsync(permissionGroupIds);
         }
 
         public async Task<int> GetApplicationPermissionGroupCountAsync(string permission)
@@ -229,24 +157,41 @@ namespace Ocuda.Ops.Service
                 .GetApplicationPermissionGroupsAsync(permission);
         }
 
-        public async Task AddApplicationPermissionGroupAsync(string applicationPermission,
-            int permissionGroupId)
+        public async Task<ICollection<PermissionGroup>>
+            GetGroupsAsync(IEnumerable<int> permissionGroupIds)
         {
-            var permission = ApplicationPermissionDefinitions.ApplicationPermissions
-                .SingleOrDefault(_ => string.Equals(_.Id, applicationPermission,
-                    StringComparison.OrdinalIgnoreCase));
+            return await _permissionGroupRepository.GetGroupsAsync(permissionGroupIds);
+        }
 
-            if (permission == null)
+        public async Task<DataWithCount<ICollection<PermissionGroup>>>
+            GetPaginatedListAsync(BaseFilter filter)
+        {
+            return await _permissionGroupRepository.GetPaginatedListAsync(filter);
+        }
+
+        public async Task<ICollection<T>> GetPermissionsAsync<T>(int itemId)
+            where T : PermissionGroupMappingBase
+        {
+            if (GetLookupPermissionMap().TryGetValue(typeof(T), out var delegateMethod))
             {
-                throw new OcudaException("Invalid application permission.");
+                return (await delegateMethod(itemId)) as ICollection<T>;
             }
 
-            await _permissionGroupApplicationRepository.AddAsync(new PermissionGroupApplication
+            throw new OcudaException($"Unable to get permissions for {nameof(T)}");
+        }
+
+        public async Task<bool>
+            HasPermissionAsync<T>(IEnumerable<int> permissionGroupIds)
+            where T : PermissionGroupMappingBase
+        {
+            if (GetHasPermissionMap().TryGetValue(typeof(T), out var delegateMethod))
             {
-                ApplicationPermission = applicationPermission,
-                PermissionGroupId = permissionGroupId
-            });
-            await _permissionGroupApplicationRepository.SaveAsync();
+                return await delegateMethod(permissionGroupIds);
+            }
+            else
+            {
+                throw new OcudaException($"Unable to look up permissions for {nameof(T)}");
+            }
         }
 
         public async Task RemoveApplicationPermissionGroupAsync(string applicationPermission,
@@ -267,6 +212,71 @@ namespace Ocuda.Ops.Service
                 PermissionGroupId = permissionGroupId
             });
             await _permissionGroupPageContentRepository.SaveAsync();
+        }
+
+        public async Task RemoveFromPermissionGroupAsync<T>(int itemId, int permissionGroupId)
+            where T : PermissionGroupMappingBase
+        {
+            if (GetRemovePermissionMap().TryGetValue(typeof(T), out var delegateMethod))
+            {
+                delegateMethod(itemId, permissionGroupId);
+            }
+            else
+            {
+                throw new OcudaException($"Unable to remove permissions for {nameof(T)}");
+            }
+        }
+
+        private Dictionary<Type, Action<int, int>> GetAddPermissionMap()
+        {
+            return new Dictionary<Type, Action<int, int>>
+            {
+                { typeof(PermissionGroupPodcastItem), async (_, __)
+                    => await _permissionGroupPodcastItemRepository.AddSaveAsync(_, __) },
+                { typeof(PermissionGroupPageContent), async (_, __)
+                    => await _permissionGroupPageContentRepository.AddSaveAsync(_, __) }
+            };
+        }
+
+        private Dictionary<Type, Func<IEnumerable<int>, Task<bool>>> GetHasPermissionMap()
+        {
+            return new Dictionary<Type, Func<IEnumerable<int>, Task<bool>>>
+            {
+                { typeof(PermissionGroupPodcastItem), async _
+                    => await _permissionGroupPodcastItemRepository.AnyPermissionGroupIdAsync(_) },
+                { typeof(PermissionGroupPageContent), async _
+                    => await _permissionGroupPageContentRepository.AnyPermissionGroupIdAsync(_) }
+            };
+        }
+
+        private Dictionary<Type, Func<int, Task<object>>> GetLookupPermissionMap()
+        {
+            return new Dictionary<Type, Func<int, Task<object>>>
+            {
+                { typeof(PermissionGroupPodcastItem), async _
+                    => await _permissionGroupPodcastItemRepository.GetByPodcastId(_) },
+                { typeof(PermissionGroupPageContent), async _
+                    => await _permissionGroupPageContentRepository.GetByPageHeaderId(_) }
+            };
+        }
+
+        private Dictionary<Type, Action<int, int>> GetRemovePermissionMap()
+        {
+            return new Dictionary<Type, Action<int, int>>
+            {
+                { typeof(PermissionGroupPodcastItem),async (_, __)
+                    => await _permissionGroupPodcastItemRepository.RemoveSaveAsync(_, __) },
+                { typeof(PermissionGroupPageContent),async (_, __)
+                    => await _permissionGroupPageContentRepository.RemoveSaveAsync(_, __) }
+            };
+        }
+
+        private async Task ValidateAsync(PermissionGroup permissionGroup)
+        {
+            if (await _permissionGroupRepository.IsDuplicateAsync(permissionGroup))
+            {
+                throw new OcudaException($"Permission group '{permissionGroup.PermissionGroupName}' already exists.");
+            }
         }
     }
 }
