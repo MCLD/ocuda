@@ -238,6 +238,119 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return View(viewModel);
         }
 
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> CreateEmedia(GroupDetailsViewModel model)
+        {
+            JsonResponse response;
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var group = await _emediaService.CreateAsync(model.Emedia);
+                    response = new JsonResponse
+                    {
+                        Success = true,
+                        Url = Url.Action(nameof(Details), new { id = group.Id })
+                    };
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
+            }
+            else
+            {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
+                };
+            }
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> EditEmedia(GroupDetailsViewModel model)
+        {
+            JsonResponse response;
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var emedia = await _emediaService.EditAsync(model.Emedia);
+                    response = new JsonResponse
+                    {
+                        Success = true
+                    };
+
+                    ShowAlertSuccess($"Updated emedia: {emedia.Name}");
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
+            }
+            else
+            {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
+                };
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeleteEmedia(GroupDetailsViewModel model)
+        {
+            try
+            {
+                await _emediaService.DeleteAsync(model.Emedia.Id);
+                ShowAlertSuccess($"Deleted emedia : {model.Emedia.Name}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting emedia: {Message}", ex.Message);
+                ShowAlertDanger($"Error deleting emedia: {model.Emedia.Name}");
+            }
+
+            return RedirectToAction(nameof(GroupDetails),
+                new
+                {
+                    id = model.EmediaGroup.Id,
+                    page = model.PaginateModel.CurrentPage
+                });
+        }
+
+        [Route("[action]/{id}")]
+        public async Task<IActionResult> Details(int id, int page = 1)
+        {
+            return View();
+        }
+
         /*
         #region Emedia
 

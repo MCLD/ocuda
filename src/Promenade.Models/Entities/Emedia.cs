@@ -14,10 +14,6 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public string Name { get; set; }
 
-        [MaxLength(255)]
-        [Required]
-        public string Stub { get; set; }
-
         public int GroupId { get; set; }
         public EmediaGroup Group { get; set; }
 

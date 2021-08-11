@@ -37,14 +37,6 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
-        public Emedia GetByStub(string emediaStub)
-        {
-            return DbSet
-                .AsNoTracking()
-                .Where(_ => _.Stub == emediaStub)
-                .FirstOrDefault();
-        }
-
         public async Task<DataWithCount<ICollection<Emedia>>> GetPaginatedListAsync(
             BaseFilter filter)
         {

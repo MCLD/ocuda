@@ -43,6 +43,42 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(emediaTextRepository));
         }
 
+        public async Task<Emedia> CreateAsync(Emedia emedia)
+        {
+            emedia.Name = emedia.Name?.Trim();
+            emedia.RedirectUrl = emedia.RedirectUrl?.Trim();
+
+            await _emediaRepository.AddAsync(emedia);
+            await _emediaRepository.SaveAsync();
+            return emedia;
+        }
+
+        public async Task<Emedia> EditAsync(Emedia emedia)
+        {
+            var currentEmedia = await _emediaRepository.FindAsync(emedia.Id);
+
+            currentEmedia.Name = emedia.Name?.Trim();
+            currentEmedia.RedirectUrl = emedia.RedirectUrl?.Trim();
+
+            _emediaRepository.Update(currentEmedia);
+            await _emediaRepository.SaveAsync();
+            return currentEmedia;
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var emedia = await _emediaRepository.FindAsync(id);
+
+            if (emedia == null)
+            {
+                throw new OcudaException("Emedia does not exist.");
+            }
+
+            _emediaRepository.Remove(emedia);
+
+            await _emediaRepository.SaveAsync();
+        }
+
         public async Task<ICollection<Emedia>> GetAllEmedia()
         {
             var emedias = (await _emediaRepository.GetAllAsync()).ToList();
@@ -58,22 +94,6 @@ namespace Ocuda.Ops.Service
                 emedia.Categories = emediaCategories;
             }
             return emedias;
-        }
-
-        public async Task<Emedia> GetByStubAsync(string emediaStub)
-        {
-            var emedia = _emediaRepository.GetByStub(emediaStub);
-            if (emedia != null)
-            {
-                var emediaCategories = new List<Category>();
-                foreach (var emediacat in await _emediaCategoryRepository.GetByEmediaIdAsync(emedia.Id))
-                {
-                    var category = await _categoryRepository.FindAsync(emediacat.CategoryId);
-                    emediaCategories.Add(category);
-                }
-                emedia.Categories = emediaCategories;
-            }
-            return emedia;
         }
 
         public async Task<ICollection<EmediaCategory>> GetEmediaCategoriesById(int emediaId)
@@ -127,38 +147,6 @@ namespace Ocuda.Ops.Service
             BaseFilter filter)
         {
             return await _emediaRepository.GetPaginatedListAsync(filter);
-        }
-
-        public async Task AddEmedia(Emedia emedia)
-        {
-            emedia.RedirectUrl = emedia.RedirectUrl.Trim();
-            emedia.Name = emedia.Name.Trim();
-            await _emediaRepository.AddAsync(emedia);
-            await _emediaRepository.SaveAsync();
-        }
-
-        public async Task UpdateEmedia(Emedia emedia)
-        {
-            var currentEmedia = await _emediaRepository.FindAsync(emedia.Id);
-            currentEmedia.RedirectUrl = emedia.RedirectUrl.Trim();
-            currentEmedia.Name = emedia.Name.Trim();
-            _emediaRepository.Update(currentEmedia);
-            await _emediaRepository.SaveAsync();
-        }
-
-        public async Task DeleteAsync(int id)
-        {
-            try
-            {
-                var emedia = await _emediaRepository.FindAsync(id);
-                _emediaRepository.Remove(emedia);
-                await _emediaRepository.SaveAsync();
-            }
-            catch (OcudaException ex)
-            {
-                _logger.LogError(ex, "Could not delete emedia", ex.Message);
-                throw;
-            }
         }
 
         public async Task<EmediaGroup> GetGroupByIdAsync(int id)
