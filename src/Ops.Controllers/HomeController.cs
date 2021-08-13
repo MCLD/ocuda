@@ -201,6 +201,7 @@ namespace Ocuda.Ops.Controllers
             if (filter.IsShownOnHomePage == true)
             {
                 filter.SectionId = await _sectionService.GetHomeSectionIdAsync();
+                viewModel.SectionStub = "Home";
             }
             else
             {
@@ -208,6 +209,7 @@ namespace Ocuda.Ops.Controllers
                 {
                     var section = await _sectionService.GetByIdAsync(filter.SectionId.Value);
                     viewModel.SectionName = section.Name;
+                    viewModel.SectionStub = section.Stub;
                     viewModel.SupervisorsOnly = section.SupervisorsOnly;
                 }
             }

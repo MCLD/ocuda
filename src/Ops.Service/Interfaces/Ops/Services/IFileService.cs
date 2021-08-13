@@ -36,6 +36,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<ICollection<FileLibrary>> GetBySectionIdAsync(int sectionId);
 
+        Task<FileLibrary> GetBySectionIdStubAsync(int sectionId, string stub);
+
         Task<ICollection<FileType>> GetFileLibrariesFileTypesAsync(int libraryId);
 
         Task<ICollection<File>> GetFileLibraryFilesAsync(int id);
@@ -58,6 +60,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         string GetPrivateFilePath(File file);
 
         string GetPublicFilePath(File file);
+
+        Task<bool> HasReplaceRightsAsync(int fileLibraryId);
 
         Task<byte[]> ReadPrivateFileAsync(File file);
 

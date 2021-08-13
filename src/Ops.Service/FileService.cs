@@ -25,6 +25,7 @@ namespace Ocuda.Ops.Service
         private readonly IFileTypeService _fileTypeService;
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IPathResolverService _pathResolver;
+        private readonly IPermissionGroupService _permissionGroupService;
         private readonly ISectionService _sectionService;
 
         public FileService(ILogger<FileService> logger,
@@ -33,9 +34,9 @@ namespace Ocuda.Ops.Service
             IFileRepository fileRepository,
             IFileTypeService fileTypeService,
             IPathResolverService pathResolver,
+            IPermissionGroupService permissionGroupService,
             ISectionService sectionService,
-            IWebHostEnvironment hostingEnvironment
-) : base(logger, httpContextAccessor)
+            IWebHostEnvironment hostingEnvironment) : base(logger, httpContextAccessor)
         {
             _fileLibraryRepository = fileLibraryRepository
                 ?? throw new ArgumentNullException(nameof(fileLibraryRepository));
@@ -43,12 +44,13 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(fileRepository));
             _fileTypeService = fileTypeService
                 ?? throw new ArgumentNullException(nameof(fileTypeService));
-            _pathResolver = pathResolver
-                ?? throw new ArgumentNullException(nameof(pathResolver));
-            _sectionService = sectionService
-                ?? throw new ArgumentNullException(nameof(sectionService));
             _hostingEnvironment = hostingEnvironment
                 ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+            _pathResolver = pathResolver ?? throw new ArgumentNullException(nameof(pathResolver));
+            _permissionGroupService = permissionGroupService
+                ?? throw new ArgumentNullException(nameof(permissionGroupService));
+            _sectionService = sectionService
+                ?? throw new ArgumentNullException(nameof(sectionService));
         }
 
         public async Task<FileLibrary> CreateLibraryAsync(FileLibrary library, int sectionId)
@@ -243,6 +245,11 @@ namespace Ocuda.Ops.Service
             return await _fileLibraryRepository.GetBySectionIdAsync(sectionId);
         }
 
+        public async Task<FileLibrary> GetBySectionIdStubAsync(int sectionId, string stub)
+        {
+            return await _fileLibraryRepository.GetBySectionIdStubAsync(sectionId, stub);
+        }
+
         public async Task<ICollection<FileType>> GetFileLibrariesFileTypesAsync(int libraryId)
         {
             return await _fileTypeService.GetTypesByLibraryIdsAsync(libraryId);
@@ -335,6 +342,15 @@ namespace Ocuda.Ops.Service
         public string GetPublicFilePath(File file)
         {
             return _pathResolver.GetPublicContentFilePath($"file{file.Id}{file.FileType.Extension}");
+        }
+
+        public async Task<bool> HasReplaceRightsAsync(int fileLibraryId)
+        {
+            var replacePermissions = await _permissionGroupService
+                .GetPermissionsAsync<PermissionGroupReplaceFiles>(fileLibraryId);
+
+            return replacePermissions.Any(_ => _.FileLibraryId == fileLibraryId
+                && GetPermissionIds().Contains(_.PermissionGroupId));
         }
 
         public async Task<byte[]> ReadPrivateFileAsync(File file)

@@ -43,9 +43,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     .Select(_ => int.Parse(_, CultureInfo.InvariantCulture))
                     .ToArray();
                 viewModel.HasPagePermissions = await _permissionGroupService
-                    .HasPermissionAsync<PermissionGroupPageContent>(numericPermissionIds);
+                    .HasAPermissionAsync<PermissionGroupPageContent>(numericPermissionIds);
                 viewModel.HasPodcastPermissions = await _permissionGroupService
-                    .HasPermissionAsync<PermissionGroupPodcastItem>(numericPermissionIds);
+                    .HasAPermissionAsync<PermissionGroupPodcastItem>(numericPermissionIds);
             }
 
             if (!viewModel.HasPermissions)

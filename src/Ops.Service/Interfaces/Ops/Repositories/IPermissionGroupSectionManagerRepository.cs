@@ -18,6 +18,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         public Task<ICollection<PermissionGroupSectionManager>>
             GetBySectionIdAsync(int sectionId);
 
+        public Task<IEnumerable<int>>
+            GetByPermissionGroupIdsAsync(IEnumerable<int> permissionGroupIds);
+
         public Task RemoveSaveAsync(int sectionId, int permissionGroupId);
     }
 }

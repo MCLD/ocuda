@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -201,7 +202,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [RestoreModelState]
         public async Task<IActionResult> AddPost(string sectionStub)
         {
-            var section = await GetSectionWhenManager(sectionStub);
+            var section = await GetSectionAsManagerAsync(sectionStub);
             if (section == null)
             {
                 ShowAlertDanger($"Could not find section {sectionStub}.");
@@ -447,7 +448,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [RestoreModelState]
         public async Task<IActionResult> EditPost(string sectionStub, string postStub)
         {
-            var section = await GetSectionWhenManager(sectionStub);
+            var section = await GetSectionAsManagerAsync(sectionStub);
             if (section == null)
             {
                 ShowAlertDanger($"Could not find section {sectionStub}.");
@@ -509,41 +510,48 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("{sectionStub}/[action]/{fileLibStub}")]
         [Route("{sectionStub}/[action]/{fileLibStub}/{page}")]
         public async Task<IActionResult> FileLibrary(string sectionStub,
-            string fileLibStub, int page = 1)
+            string fileLibStub,
+            int page)
         {
-            var section = await GetSectionWhenManager(sectionStub);
+            var section = await GetSectionAsManagerAsync(sectionStub);
             if (section == null)
             {
                 ShowAlertDanger($"Could not find section {sectionStub}.");
                 return RedirectToAction(nameof(SectionController.Index));
             }
-            var fileLibs = await _fileService.GetBySectionIdAsync(section.Id);
-            var fileLib = fileLibs.SingleOrDefault(_ => _.Stub == fileLibStub);
+
+            if (page == default)
+            {
+                page = 1;
+            }
+
+            var fileLibrary = await _fileService.GetBySectionIdStubAsync(section.Id, fileLibStub);
+
             var itemsPerPage = await _siteSettingService
                 .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
+
             var filter = new BlogFilter(page, itemsPerPage)
             {
-                FileLibraryId = fileLib.Id
+                FileLibraryId = fileLibrary.Id
             };
-            var files = await _fileService.GetPaginatedListAsync(filter);
-            var paginateModel = new PaginateModel
+
+            var filesAndCount = await _fileService.GetPaginatedListAsync(filter);
+
+            return View(new FileLibraryViewModel
             {
+                HasAdminRights = IsSiteManager() || await _sectionService.IsManagerAsync(section.Id),
                 CurrentPage = page,
+                FileLibraryId = fileLibrary.Id,
+                FileLibraryName = fileLibrary.Name,
+                FileLibraryStub = fileLibrary.Stub,
+                Files = filesAndCount.Data,
+                FileTypes = await _fileService.GetFileLibrariesFileTypesAsync(fileLibrary.Id),
+                ItemCount = filesAndCount.Count,
                 ItemsPerPage = filter.Take.Value,
-                ItemCount = files.Count
-            };
-            var viewModel = new FileLibraryViewModel
-            {
-                SectionStub = section.Stub,
+                HasReplaceRights = await _fileService.HasReplaceRightsAsync(fileLibrary.Id),
                 SectionName = section.Name,
-                FileLibraryStub = fileLib.Stub,
-                FileLibraryId = fileLib.Id,
-                FileLibraryName = fileLib.Name,
-                Files = files.Data,
-                FileTypes = await _fileService.GetFileLibrariesFileTypesAsync(fileLib.Id),
-                PaginateModel = paginateModel
-            };
-            return View(viewModel);
+                SectionStub = section.Stub
+            });
         }
 
         [Route("[action]/{libraryId:int}/{fileId:int}")]
@@ -552,7 +560,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         {
             var library = await _fileService.GetLibraryByIdAsync(libraryId);
 
-            var sectionAccess = await GetSectionWhenManager(library.SectionId);
+            var sectionAccess = await GetSectionAsManagerAsync(library.SectionId);
             if (sectionAccess == null)
             {
                 return RedirectToUnauthorized();
@@ -596,12 +604,13 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("")]
         public async Task<IActionResult> Index()
         {
+            var permissionGroupIds = UserClaims(ClaimType.PermissionId)
+                .Select(_ => int.Parse(_, CultureInfo.InvariantCulture));
+
             return View(new SectionIndexViewModel
             {
-                UserSections = string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
-                    ? await _sectionService.GetByNamesAsync(UserClaims(ClaimType.SectionManager))
-                    : await _sectionService.GetAllAsync(),
-                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
+                IsSiteManager = IsSiteManager(),
+                Sections = await _sectionService.GetManagedByCurrentUserAsync()
             });
         }
 
@@ -610,7 +619,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         public async Task<IActionResult> LinkLibrary(string sectionStub,
             string linkLibStub, int page = 1)
         {
-            var section = await GetSectionWhenManager(sectionStub);
+            var section = await GetSectionAsManagerAsync(sectionStub);
             if (section == null)
             {
                 ShowAlertDanger($"Could not find section {sectionStub}.");
@@ -646,7 +655,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("{sectionStub}/[action]/{postStub}")]
         public async Task<IActionResult> PostDetails(string sectionStub, string postStub)
         {
-            var section = await GetSectionWhenManager(sectionStub);
+            var section = await GetSectionAsManagerAsync(sectionStub);
             if (section == null)
             {
                 ShowAlertDanger($"Could not find section {sectionStub}.");
@@ -679,7 +688,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("{sectionStub}/[action]/{categoryStub}/{page}")]
         public async Task<IActionResult> Posts(string sectionStub, string categoryStub, int page = 1)
         {
-            var section = await GetSectionWhenManager(sectionStub);
+            var section = await GetSectionAsManagerAsync(sectionStub);
             if (section == null)
             {
                 ShowAlertDanger($"Could not find section {sectionStub}.");
@@ -761,7 +770,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("{sectionStub}/{page}")]
         public async Task<IActionResult> Section(string sectionStub, int page = 1)
         {
-            var section = await GetSectionWhenManager(sectionStub);
+            var section = await GetSectionAsManagerAsync(sectionStub);
             if (section == null)
             {
                 ShowAlertDanger($"Could not find section {sectionStub}.");
@@ -942,28 +951,20 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
         }
 
-        private async Task<Section> GetSectionWhenManager(int sectionId)
+        private async Task<Section> GetSectionAsManagerAsync(int sectionId)
         {
             var section = await _sectionService.GetByIdAsync(sectionId);
-            return SectionIfManager(section);
+            return await _sectionService.IsManagerAsync(section.Id)
+                ? section
+                : null;
         }
 
-        private async Task<Section> GetSectionWhenManager(string sectionStub)
+        private async Task<Section> GetSectionAsManagerAsync(string sectionStub)
         {
             var section = await _sectionService.GetByStubAsync(sectionStub);
-            return SectionIfManager(section);
-        }
-
-        private Section SectionIfManager(Section section)
-        {
-            if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
-            {
-                // full permissions
-                return section;
-            }
-
-            var sectionNames = UserClaims(ClaimType.SectionManager);
-            return sectionNames.Contains(section.Name) ? section : null;
+            return await _sectionService.IsManagerAsync(section.Id)
+                ? section
+                : null;
         }
     }
 }

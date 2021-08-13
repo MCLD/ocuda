@@ -173,6 +173,20 @@ namespace Ocuda.Ops.Service
             return await _permissionGroupRepository.GetGroupsAsync(permissionGroupIds);
         }
 
+        public async Task<IEnumerable<int>>
+            GetItemIdAccessAsync<T>(IEnumerable<int> permissionGroupIds)
+            where T : PermissionGroupMappingBase
+        {
+            if (GetItemAccessMap().TryGetValue(typeof(T), out var delegateMethod))
+            {
+                return await delegateMethod(permissionGroupIds.ToList());
+            }
+            else
+            {
+                throw new OcudaException($"Unable to look up permissions for {nameof(T)}");
+            }
+        }
+
         public async Task<DataWithCount<ICollection<PermissionGroup>>>
             GetPaginatedListAsync(BaseFilter filter)
         {
@@ -191,7 +205,7 @@ namespace Ocuda.Ops.Service
         }
 
         public async Task<bool>
-            HasPermissionAsync<T>(IEnumerable<int> permissionGroupIds)
+            HasAPermissionAsync<T>(IEnumerable<int> permissionGroupIds)
             where T : PermissionGroupMappingBase
         {
             if (GetHasPermissionMap().TryGetValue(typeof(T), out var delegateMethod))
@@ -264,6 +278,21 @@ namespace Ocuda.Ops.Service
                     => await _permissionGroupReplaceFilesRepository.AnyPermissionGroupIdAsync(_) },
                 { typeof(PermissionGroupSectionManager), async _
                     => await _permissionGroupSectionManagerRepository.AnyPermissionGroupIdAsync(_) }
+            };
+        }
+
+        private Dictionary<Type, Func<IEnumerable<int>, Task<IEnumerable<int>>>> GetItemAccessMap()
+        {
+            return new Dictionary<Type, Func<IEnumerable<int>, Task<IEnumerable<int>>>>
+            {
+                { typeof(PermissionGroupPodcastItem), async _
+                    => await _permissionGroupPodcastItemRepository.GetByPermissionGroupIdsAsync(_) },
+                { typeof(PermissionGroupPageContent), async _
+                    => await _permissionGroupPageContentRepository.GetByPermissionGroupIdsAsync(_) },
+                { typeof(PermissionGroupReplaceFiles), async _
+                    => await _permissionGroupReplaceFilesRepository.GetByPermissionGroupIdsAsync(_) },
+                { typeof(PermissionGroupSectionManager), async _
+                    => await _permissionGroupSectionManagerRepository.GetByPermissionGroupIdsAsync(_) }
             };
         }
 

@@ -15,5 +15,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<Section> GetByStubAsync(string stub);
 
         Task<int> GetHomeSectionIdAsync();
+
+        Task<ICollection<Section>> GetManagedByCurrentUserAsync();
+
+        Task<bool> IsManagerAsync(int sectionId);
     }
 }

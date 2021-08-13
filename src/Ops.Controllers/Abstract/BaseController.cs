@@ -159,6 +159,11 @@ namespace Ocuda.Ops.Controllers.Abstract
             }
         }
 
+        protected bool IsSiteManager()
+        {
+            return !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager));
+        }
+
         protected IActionResult RedirectToUnauthorized()
         {
             return RedirectToAction(nameof(HomeController.Unauthorized),

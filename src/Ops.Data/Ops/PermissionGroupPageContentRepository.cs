@@ -56,6 +56,16 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<int>>
+                                            GetByPermissionGroupIdsAsync(IEnumerable<int> permissionGroupIds)
+        {
+            return await DbSet
+                .Where(_ => permissionGroupIds.Contains(_.PermissionGroupId))
+                .AsNoTracking()
+                .Select(_ => _.PageHeaderId)
+                .ToListAsync();
+        }
+
         public async Task RemoveSaveAsync(int pageHeaderId, int permissionGroupId)
         {
             var item = await DbSet.SingleOrDefaultAsync(_ => _.PageHeaderId == pageHeaderId

@@ -115,8 +115,19 @@
                 @foreach (var fileLibrary in Model.FileLibraries)
                 {
                     <div class="card mb-2">
-                        <div class="card-header">
-                            <h2 class="h5 mb-0">@fileLibrary.Name</h2>
+                        <div class="card-header d-flex">
+                            <div class="flex-grow-1">
+                                <h2 class="h5 mb-0">@fileLibrary.Name</h2>
+                            </div>
+                            <a asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+                               asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibrary)"
+                               asp-area="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement)"
+                               asp-route-sectionStub="@Model.SectionStub"
+                               asp-route-fileLibStub="@fileLibrary.Stub"
+                               class="btn btn-sm btn-outline-secondary">
+                                <span class="fas fa-tasks fa-fw"
+                                      title="View this file library."></span>
+                            </a>
                         </div>
                         <div class="card-body p-0 m-0">
                             <table class="table table-sm mb-0">

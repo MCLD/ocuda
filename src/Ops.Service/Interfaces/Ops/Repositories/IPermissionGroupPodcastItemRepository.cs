@@ -14,6 +14,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         public Task<ICollection<PermissionGroupPodcastItem>>
             GetByPermissionGroupId(int permissionGroupId);
 
+        public Task<IEnumerable<int>>
+            GetByPermissionGroupIdsAsync(IEnumerable<int> permissionGroupIds);
+
         public Task<ICollection<PermissionGroupPodcastItem>> GetByPodcastId(int podcastId);
 
         public Task RemoveSaveAsync(int podcastId, int permissionGroupId);

@@ -12,18 +12,14 @@ namespace Ocuda.Ops.Service
     {
         private readonly IClaimGroupRepository _claimGroupRepository;
         private readonly IPermissionGroupRepository _permissionGroupRepository;
-        private readonly ISectionManagerGroupRepository _sectionManagerGroupRepository;
 
         public AuthorizationService(IClaimGroupRepository claimGroupRepository,
-            IPermissionGroupRepository permissionGroupRepository,
-            ISectionManagerGroupRepository sectionManagerGroupRepository)
+            IPermissionGroupRepository permissionGroupRepository)
         {
             _claimGroupRepository = claimGroupRepository
                 ?? throw new ArgumentNullException(nameof(claimGroupRepository));
             _permissionGroupRepository = permissionGroupRepository
                 ?? throw new ArgumentNullException(nameof(permissionGroupRepository));
-            _sectionManagerGroupRepository = sectionManagerGroupRepository
-                ?? throw new ArgumentNullException(nameof(sectionManagerGroupRepository));
         }
 
         public async Task EnsureSiteManagerGroupAsync(int currentUserId, string group)
@@ -52,11 +48,6 @@ namespace Ocuda.Ops.Service
         public async Task<ICollection<ClaimGroup>> GetClaimGroupsAsync()
         {
             return await _claimGroupRepository.ToListAsync(_ => _.GroupName);
-        }
-
-        public async Task<IEnumerable<SectionManagerGroup>> GetSectionManagerGroupsAsync()
-        {
-            return await _sectionManagerGroupRepository.ToListAsync(_ => _.GroupName);
         }
 
         public async Task<ICollection<PermissionGroup>> GetPermissionGroupsAsync()

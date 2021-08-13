@@ -17,6 +17,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         public Task<ICollection<PermissionGroupReplaceFiles>>
             GetByPermissionGroupIdAsync(int permissionGroupId);
 
+        public Task<IEnumerable<int>>
+            GetByPermissionGroupIdsAsync(IEnumerable<int> permissionGroupIds);
+
         public Task RemoveSaveAsync(int fileLibraryId, int permissionGroupId);
     }
 }

@@ -84,8 +84,6 @@ namespace Ocuda.Ops.Data
 
         public DbSet<SectionCategory> SectionCategories { get; set; }
 
-        public DbSet<SectionManagerGroup> SectionManagerGroups { get; set; }
-
         public DbSet<Section> Sections { get; set; }
 
         public DbSet<SiteSetting> SiteSettings { get; set; }

@@ -48,8 +48,18 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<int>>
+            GetByPermissionGroupIdsAsync(IEnumerable<int> permissionGroupIds)
+        {
+            return await DbSet
+                .Where(_ => permissionGroupIds.Contains(_.PermissionGroupId))
+                .AsNoTracking()
+                .Select(_ => _.SectionId)
+                .ToListAsync();
+        }
+
         public async Task<ICollection<PermissionGroupSectionManager>>
-            GetBySectionIdAsync(int sectionId)
+                    GetBySectionIdAsync(int sectionId)
         {
             return await DbSet
                 .AsNoTracking()

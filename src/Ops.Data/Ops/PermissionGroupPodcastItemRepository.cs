@@ -46,6 +46,16 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<int>>
+            GetByPermissionGroupIdsAsync(IEnumerable<int> permissionGroupIds)
+        {
+            return await DbSet
+                .Where(_ => permissionGroupIds.Contains(_.PermissionGroupId))
+                .AsNoTracking()
+                .Select(_ => _.PodcastId)
+                .ToListAsync();
+        }
+
         public async Task<ICollection<PermissionGroupPodcastItem>>
             GetByPodcastId(int podcastId)
         {

@@ -15,7 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Ocuda.Ops.Controllers;
-using Ocuda.Ops.Controllers.Authorization;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Clients;
@@ -229,12 +228,8 @@ namespace Ocuda.Ops.Web
                     _.LoginPath = "/Authenticate";
                 });
 
-            services.AddSingleton<IAuthorizationHandler, SectionManagerHandler>();
-
             services.AddAuthorization(_ =>
             {
-                _.AddPolicy(nameof(SectionManagerRequirement),
-                    policy => policy.Requirements.Add(new SectionManagerRequirement()));
                 _.AddPolicy(nameof(ClaimType.SiteManager),
                     policy => policy.RequireClaim(nameof(ClaimType.SiteManager)));
             });
@@ -347,8 +342,6 @@ namespace Ocuda.Ops.Web
                 Data.Ops.ScheduleLogRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ISectionRepository,
                 Data.Ops.SectionRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.ISectionManagerGroupRepository,
-                Data.Ops.SectionManagerGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ISiteSettingRepository,
                 Data.Ops.SiteSettingRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserMetadataTypeRepository,
