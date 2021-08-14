@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -17,6 +18,7 @@ namespace Ocuda.Promenade.Models.Entities
         public int GroupId { get; set; }
         public EmediaGroup Group { get; set; }
 
+        [DisplayName("Redirect Url")]
         [MaxLength(255)]
         [Required]
         public string RedirectUrl { get; set; }

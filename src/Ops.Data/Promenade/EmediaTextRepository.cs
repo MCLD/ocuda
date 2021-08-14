@@ -16,6 +16,14 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
+        public async Task<EmediaText> GetByEmediaAndLanguageAsync(int emediaId, int languageId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.EmediaId == emediaId && _.LanguageId == languageId)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<ICollection<EmediaText>> GetAllForGroupAsync(int groupId)
         {
             return await DbSet

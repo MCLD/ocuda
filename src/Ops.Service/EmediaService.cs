@@ -43,6 +43,16 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(emediaTextRepository));
         }
 
+        public async Task<Emedia> GetByIdAsync(int id)
+        {
+            return await _emediaRepository.FindAsync(id);
+        }
+
+        public async Task<Emedia> GetIncludingGroupAsync(int id)
+        {
+            return await _emediaRepository.GetIncludingGroupAsync(id);
+        }
+
         public async Task<Emedia> CreateAsync(Emedia emedia)
         {
             emedia.Name = emedia.Name?.Trim();
@@ -77,6 +87,12 @@ namespace Ocuda.Ops.Service
             _emediaRepository.Remove(emedia);
 
             await _emediaRepository.SaveAsync();
+        }
+
+        public async Task<EmediaText> GetTextByEmediaAndLanguageAsync(int emediaId,
+            int languageId)
+        {
+            return await _emediaTextReposiory.GetByEmediaAndLanguageAsync(emediaId, languageId);
         }
 
         public async Task<ICollection<Emedia>> GetAllEmedia()

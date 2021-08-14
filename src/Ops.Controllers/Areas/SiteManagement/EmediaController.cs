@@ -23,20 +23,25 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class EmediaController : BaseController<EmediaController>
     {
-        private readonly IEmediaService _emediaService;
         private readonly ICategoryService _categoryService;
+        private readonly IEmediaService _emediaService;
+        private readonly ILanguageService _languageService;
+
 
         public static string Name { get { return "Emedia"; } }
         public static string Area { get { return "SiteManagement"; } }
 
         public EmediaController(ServiceFacades.Controller<EmediaController> context,
+            ICategoryService categoryService,
             IEmediaService emediaService,
-            ICategoryService categoryService) : base(context)
+            ILanguageService languageService) : base(context)
         {
-            _emediaService = emediaService
-                ?? throw new ArgumentNullException(nameof(emediaService));
             _categoryService = categoryService
                 ?? throw new ArgumentNullException(nameof(categoryService));
+            _emediaService = emediaService
+                ?? throw new ArgumentNullException(nameof(emediaService));
+            _languageService = languageService
+                ?? throw new ArgumentNullException(nameof(languageService));
         }
 
         [Route("")]
@@ -346,9 +351,36 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         [Route("[action]/{id}")]
-        public async Task<IActionResult> Details(int id, int page = 1)
+        public async Task<IActionResult> Details(int id, string language)
         {
-            return View();
+            var emedia = await _emediaService.GetIncludingGroupAsync(id);
+
+            if (emedia == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            var languages = await _languageService.GetActiveAsync();
+
+            var selectedLanguage = languages
+                .FirstOrDefault(_ => _.Name.Equals(language, StringComparison.OrdinalIgnoreCase))
+                ?? languages.Single(_ => _.IsDefault);
+
+            var emediaText = await _emediaService.GetTextByEmediaAndLanguageAsync(emedia.Id,
+                selectedLanguage.Id);
+
+            var viewModel = new DetailsViewModel
+            {
+                Emedia = emedia,
+                LanguageId = selectedLanguage.Id,
+                LanguageList = new SelectList(languages,
+                    nameof(Language.Name),
+                    nameof(Language.Description),
+                    selectedLanguage.Name),
+                EmediaText = emediaText
+            };
+
+            return View(viewModel);
         }
 
         /*
