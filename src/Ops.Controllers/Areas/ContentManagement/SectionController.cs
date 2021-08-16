@@ -548,7 +548,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         [Route("[action]/{libraryId:int}/{fileId:int}")]
         [HttpGet]
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        [ResponseCache(Duration = 0, NoStore = true)]
         public async Task<IActionResult> GetFile(int libraryId, int fileId)
         {
             var library = await _fileService.GetLibraryByIdAsync(libraryId);
