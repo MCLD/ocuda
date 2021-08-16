@@ -56,7 +56,7 @@ namespace Ocuda.Ops.Controllers
 
         [Route("[action]/{libraryId:int}/{fileId:int}")]
         [HttpGet]
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        [ResponseCache(Duration = 0, NoStore = true)]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability",
             "CA2000:Dispose objects before losing scope",
             Justification = "ControllerBase.File handles disposal (dotnet/AspNetCore.Docs#14585)")]
