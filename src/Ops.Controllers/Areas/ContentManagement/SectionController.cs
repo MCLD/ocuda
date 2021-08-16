@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
@@ -506,6 +507,36 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                     new { sectionStub = viewModel.SectionStub, postStub = viewModel.Post.Stub });
             }
         }
+
+        [HttpPost]
+        [Route("[action]/{fileId}")]
+        public async Task<IActionResult> ReplaceFile(int reFileId, IFormFile reUploadFile)
+        {
+            //if (!await HasContentManagementRightsAsync())
+            //{
+            //    ShowAlertDanger("You do not have permission to add an asset.");
+            //    return RedirectToAction(nameof(Assets));
+            //}
+
+            if (reUploadFile == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            //var asset = await UploadAssetInternalAsync(assetFile);
+
+            //if (asset?.Id == null)
+            //{
+            //    ShowAlertDanger("An error occurred uploading that asset.");
+            //    return RedirectToAction(nameof(Assets));
+            //}
+
+            //return RedirectToAction(nameof(AssetAssociations),
+            //    new { digitalDisplayAssetId = asset.Id });
+
+            return RedirectToAction(nameof(Index));
+        }
+
 
         [Route("{sectionStub}/[action]/{fileLibStub}")]
         [Route("{sectionStub}/[action]/{fileLibStub}/{page}")]
