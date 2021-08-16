@@ -96,6 +96,8 @@ namespace Ocuda.Ops.Controllers
                     new { sectionStub = section.Stub });
             }
 
+            Response.Headers.Add("Cache-Control", "no-store, max-age=0");
+
             return File(new FileStream(filePath, FileMode.Open, FileAccess.Read),
                 System.Net.Mime.MediaTypeNames.Application.Octet,
                 filename);

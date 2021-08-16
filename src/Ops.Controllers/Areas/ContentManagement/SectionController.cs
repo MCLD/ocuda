@@ -548,7 +548,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         [Route("[action]/{libraryId:int}/{fileId:int}")]
         [HttpGet]
-        [ResponseCache(Duration = 0, NoStore = true)]
         public async Task<IActionResult> GetFile(int libraryId, int fileId)
         {
             var library = await _fileService.GetLibraryByIdAsync(libraryId);
@@ -588,6 +587,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 return RedirectToAction(nameof(SectionController.FileLibrary),
                     new { sectionStub = sectionAccess.Stub, fileLibStub = library.Stub });
             }
+
+            Response.Headers.Add("Cache-Control", "no-store, max-age=0");
 
             return File(new FileStream(filePath, FileMode.Open, FileAccess.Read),
                 System.Net.Mime.MediaTypeNames.Application.Octet,
