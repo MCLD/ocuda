@@ -15,6 +15,7 @@ using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 using Ocuda.Utility.Services.Interfaces;
@@ -117,43 +118,19 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             var fileLibrary = await _fileService.GetLibraryByIdAsync(model.FileLibraryId);
 
-            var extension = Path.GetExtension(model.UploadFile.FileName).ToUpperInvariant();
-            var libraryTypes = await _fileService.GetFileLibrariesFileTypesAsync(fileLibrary.Id);
-            if (libraryTypes == null)
-            {
-                ShowAlertDanger($"File library {fileLibrary.Name} is not configured to accept any file types.");
+            var extension = Path.GetExtension(model.UploadFile.FileName);
 
-                return RedirectToAction(nameof(FileLibrary), new
-                {
-                    sectionStub = section.Stub,
-                    fileLibStub = fileLibrary.Stub,
-                    page = model.CurrentPage
-                });
+            var path = GetFullPath(section.Stub, fileLibrary.Stub, model.File.Name + extension);
+
+            try
+            {
+                _fileService.VerifyAddFileAsync(fileLibrary.Id, extension, path);
+                model.File.FileLibraryId = fileLibrary.Id;
             }
-
-            if (libraryTypes.Any(_ => _.Extension.ToUpperInvariant() == extension))
+            catch (OcudaException oex)
             {
-                _logger.LogError("File library {LibraryName} is not configured to accept files of type: {Extension}",
-                    fileLibrary.Name,
-                    extension);
-                ShowAlertDanger($"File library {fileLibrary.Name} is not configured to accept files of type: {extension}");
-                return RedirectToAction(nameof(FileLibrary), new
-                {
-                    sectionStub = section.Stub,
-                    fileLibStub = fileLibrary.Stub,
-                    page = model.CurrentPage
-                });
-            }
+                ShowAlertDanger(oex.Message);
 
-            var filePath = Path.Combine(
-                Directory.GetParent(_hostingEnvironment.WebRootPath).FullName, "shared/sections",
-                section.Stub,
-                fileLibrary.Stub,
-                model.File.Name + extension);
-
-            if (System.IO.File.Exists(filePath))
-            {
-                ShowAlertDanger($"Library {fileLibrary.Name} already contains this file: {model.File.Name}");
                 return RedirectToAction(nameof(FileLibrary), new
                 {
                     sectionStub = section.Stub,
@@ -164,8 +141,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             if (model.UploadFile.Length > 0)
             {
-                using var fileStream = new FileStream(filePath, FileMode.Create);
+                using var fileStream = new FileStream(path, FileMode.Create);
                 await model.UploadFile.CopyToAsync(fileStream);
+                await _fileService.AddFileLibraryFileAsync(model.File, model.UploadFile);
                 ShowAlertSuccess($"Added to {fileLibrary.Name}: {model.File.Name}");
             }
             else
@@ -336,40 +314,40 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 return RedirectToUnauthorized();
             }
 
-            if (viewModel.File.Id != 0 && viewModel.FileLibraryId != 0
-                && !string.IsNullOrEmpty(viewModel.SectionStub))
+            if (viewModel.File.Id == default
+                || string.IsNullOrEmpty(viewModel.FileLibraryStub)
+                || string.IsNullOrEmpty(viewModel.SectionStub))
             {
-                var fileLib = await _fileService.GetLibraryByIdAsync(viewModel.FileLibraryId);
+                ShowAlertWarning("You must supply a valid file to delete.");
+
+                return RedirectToAction(nameof(Section), new { sectionStub = section.Stub });
+            }
+            else
+            {
                 var file = await _fileService.GetByIdAsync(viewModel.File.Id);
-                var filePath = Path.Combine(
-                    Directory.GetParent(_hostingEnvironment.WebRootPath).FullName, "shared");
-                filePath = Path.Combine(filePath, "sections");
-                var type = await _fileService.GetFileTypeByIdAsync(file.FileTypeId);
-                filePath = Path.Combine(filePath, section.Stub);
-                filePath = Path.Combine(filePath, fileLib.Stub);
-                filePath = Path.Combine(filePath, file.Name + type.Extension);
+                var fileType = await _fileService.GetFileTypeByIdAsync(file.FileTypeId);
+
+                var filePath = GetFullPath(section.Stub,
+                    viewModel.FileLibraryStub,
+                    file.Name + fileType.Extension);
+
                 if (!System.IO.File.Exists(filePath))
                 {
-                    _logger.LogError("{Filename} file not found at: {Path}",
-                        file.Name,
-                        filePath);
-                    ShowAlertDanger($"Failed to delete File Library '{file.Name}'");
-                    return RedirectToAction(nameof(SectionController.FileLibrary),
-                        new { sectionStub = section.Stub, fileLibStub = fileLib.Stub });
+                    ShowAlertWarning($"File does not exist: {file.Name}");
                 }
                 else
                 {
                     System.IO.File.Delete(filePath);
                     await _fileService.DeletePrivateFileAsync(file.Id);
-                    ShowAlertSuccess($"Deleted '{file.Name}' from '{fileLib.Name}'");
-                    return RedirectToAction(nameof(SectionController.FileLibrary),
-                        new { sectionStub = section.Stub, fileLibStub = fileLib.Stub });
+                    ShowAlertSuccess($"Deleted file: {file.Name}");
                 }
-            }
-            else
-            {
-                return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = viewModel.SectionStub, fileLibStub = viewModel.FileLibraryStub });
+
+                return RedirectToAction(nameof(FileLibrary), new
+                {
+                    sectionStub = section.Stub,
+                    fileLibStub = viewModel.FileLibraryStub,
+                    page = viewModel.CurrentPage
+                });
             }
         }
 
@@ -590,47 +568,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
         }
 
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> ReplaceFile(FileLibraryViewModel viewModel)
-        {
-            var section = await GetSectionAsManagerAsync(viewModel.SectionStub);
-            if (section == null)
-            {
-                var hasReplaceRights = await _fileService
-                    .HasReplaceRightsAsync(viewModel.FileLibraryId);
-                if (!hasReplaceRights)
-                {
-                    return RedirectToUnauthorized();
-                }
-            }
-
-            //if (reUploadFile == null)
-            //{
-            //    return RedirectToAction(nameof(Index));
-            //}
-
-            //var asset = await UploadAssetInternalAsync(assetFile);
-
-            //if (asset?.Id == null)
-            //{
-            //    ShowAlertDanger("An error occurred uploading that asset.");
-            //    return RedirectToAction(nameof(Assets));
-            //}
-
-            //return RedirectToAction(nameof(AssetAssociations),
-            //    new { digitalDisplayAssetId = asset.Id });
-
-            return RedirectToAction(nameof(FileLibrary), new
-            {
-                sectionStub = viewModel.SectionStub,
-                fileLibStub = viewModel.FileLibraryStub,
-                page = viewModel.CurrentPage
-            }
-            );
-        }
-
-
         [Route("{sectionStub}/[action]/{fileLibStub}")]
         [Route("{sectionStub}/[action]/{fileLibStub}/{page}")]
         public async Task<IActionResult> FileLibrary(string sectionStub,
@@ -676,7 +613,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 SectionStub = section.Stub
             });
         }
-
 
         [HttpGet]
         [Route("[action]/{libraryId:int}/{fileId:int}")]
@@ -882,6 +818,54 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
         }
 
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> ReplaceFile(FileLibraryViewModel viewModel)
+        {
+            var section = await GetSectionAsManagerAsync(viewModel.SectionStub);
+            if (section == null)
+            {
+                var hasReplaceRights = await _fileService
+                    .HasReplaceRightsAsync(viewModel.FileLibraryId);
+                if (!hasReplaceRights)
+                {
+                    return RedirectToUnauthorized();
+                }
+            }
+
+            var file = await _fileService.GetByIdAsync(viewModel.ReplaceFileId);
+            var fileType = await _fileService.GetFileTypeByIdAsync(file.FileTypeId);
+            var extension = Path.GetExtension(viewModel.UploadFile.FileName);
+
+            if (!fileType.Extension.Equals(extension, StringComparison.OrdinalIgnoreCase))
+            {
+                ShowAlertWarning($"Could not replace file: uploaded file type ({extension}) did not match existing file type ({fileType.Extension}).");
+            }
+            else
+            {
+                var path = GetFullPath(section.Stub, viewModel.FileLibraryStub, file.Name + extension);
+
+                if (viewModel.UploadFile.Length > 0)
+                {
+                    using var fileStream = new FileStream(path, FileMode.Truncate);
+                    await viewModel.UploadFile.CopyToAsync(fileStream);
+                    await _fileService.ReplaceFileLibraryFileAsync(file.Id);
+                    ShowAlertSuccess($"Replaced {file.Name}");
+                }
+                else
+                {
+                    ShowAlertDanger($"Empty file {viewModel.File.Name} not uploaded successfully.");
+                }
+            }
+
+            return RedirectToAction(nameof(FileLibrary), new
+            {
+                sectionStub = viewModel.SectionStub,
+                fileLibStub = viewModel.FileLibraryStub,
+                page = viewModel.CurrentPage
+            });
+        }
+
         [Route("{sectionStub}")]
         [Route("{sectionStub}/{page}")]
         public async Task<IActionResult> Section(string sectionStub, int page = 1)
@@ -941,7 +925,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         [Route("[action]")]
         [HttpPost]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
-
         public async Task<IActionResult> UpdateFileLibrary(FileLibraryViewModel viewModel)
         {
             var section = await GetSectionAsManagerAsync(viewModel?.SectionStub);
@@ -1078,6 +1061,17 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 return RedirectToAction(nameof(LinkLibrary),
                     new { sectionStub = viewModel.Section.Stub, linkLibStub = viewModel.LinkLibrary.Stub });
             }
+        }
+
+        private string GetFullPath(string sectionStub, string fileLibraryStub, string fileName)
+        {
+            return Path.Combine(
+                Directory.GetParent(_hostingEnvironment.WebRootPath).FullName,
+                "shared",
+                "sections",
+                sectionStub,
+                fileLibraryStub,
+                fileName);
         }
 
         private async Task<Section> GetSectionAsManagerAsync(int sectionId)

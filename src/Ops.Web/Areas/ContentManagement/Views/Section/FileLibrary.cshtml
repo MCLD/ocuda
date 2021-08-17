@@ -29,13 +29,14 @@
                     <input asp-for="CurrentPage" type="hidden" />
                     <input asp-for="SectionStub" type="hidden" />
                     <input asp-for="FileLibraryStub" type="hidden" />
+                    <p>Replace file: <strong id="ReplaceFileName"></strong></p>
                     <div class="input-group">
                         <label class="input-group-btn">
                             <span class="btn btn-light btn-file">
                                 <span class="far fa-file-image"></span> Select file...
                                 <input type="file"
+                                       id="ReplaceFileUpload"
                                        asp-for="UploadFile"
-                                       accept="@(string.Join(",",Model.FileTypes.Select(_=>_.Extension).ToList()))"
                                        style="display: none;" />
                             </span>
                         </label>
@@ -141,8 +142,9 @@
               method="post"
               role="form"
               action="@Url.Action(nameof(SectionController.DeleteFileFromLibrary))">
-            <input id="delSectionStub" asp-for="SectionStub" value="@Model.SectionStub" type="hidden" />
-            <input id="delFileLibId" asp-for="FileLibraryId" value="@Model.FileLibraryId" type="hidden" />
+            <input asp-for="SectionStub" type="hidden" />
+            <input asp-for="FileLibraryStub" type="hidden" />
+            <input asp-for="CurrentPage" type="hidden" />
             <input id="delFileId" asp-for="File.Id" type="hidden" />
             <div class="modal-content">
                 <div class="modal-header">
@@ -268,6 +270,7 @@
                                                 data-target="#replaceModal"
                                                 data-id="@file.Id"
                                                 data-name="@file.Name"
+                                                data-extension="@Model.FileTypes.Where(_ => _.Id == file.FileTypeId).FirstOrDefault().Extension"
                                                 title="Replace file">
                                             <span class="fas fa-sync-alt fa-fw"
                                                   aria-hidden="true"></span>
@@ -314,7 +317,9 @@
         $("#replaceModal").on("show.bs.modal", function (e) {
             let button = $(e.relatedTarget);
             let id = button.data("id");
+            $(this).find("#ReplaceFileName").text(button.data("name"));
             $(this).find("#ReplaceFileId").val(String(id));
+            $(this).find("#ReplaceFileUpload").attr("accept", button.data("extension"));
         });
         $("#deleteItem").click(function () {
             this.disabled = true;

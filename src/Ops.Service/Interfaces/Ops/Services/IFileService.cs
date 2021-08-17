@@ -9,9 +9,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IFileService
     {
-        Task<FileLibrary> CreateLibraryAsync(FileLibrary library, int sectionId);
+        Task<File> AddFileLibraryFileAsync(File file, IFormFile fileDatas);
 
-        Task<File> CreatePrivateFileAsync(File file, IFormFile fileDatas);
+        Task<FileLibrary> CreateLibraryAsync(FileLibrary library, int sectionId);
 
         Task<File> CreatePublicFileAsync(File file, IFormFile fileData);
 
@@ -65,6 +65,10 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<byte[]> ReadPrivateFileAsync(File file);
 
+        Task<File> ReplaceFileLibraryFileAsync(int fileId);
+
         Task UpdateLibrary(FileLibrary library);
+
+        Task VerifyAddFileAsync(int fileLibraryId, string extension, string filePath);
     }
 }

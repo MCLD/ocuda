@@ -53,6 +53,21 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(sectionService));
         }
 
+        public Task<File> AddFileLibraryFileAsync(File file, IFormFile fileData)
+        {
+            if (file == null)
+            {
+                throw new ArgumentNullException(nameof(file));
+            }
+
+            if (fileData == null)
+            {
+                throw new ArgumentNullException(nameof(fileData));
+            }
+
+            return AddFileLibraryFileInternalAsync(file, fileData);
+        }
+
         public async Task<FileLibrary> CreateLibraryAsync(FileLibrary library, int sectionId)
         {
             library.Name = library.Name?.Trim();
@@ -64,32 +79,6 @@ namespace Ocuda.Ops.Service
             await _fileLibraryRepository.SaveAsync();
 
             return library;
-        }
-
-        public async Task<File> CreatePrivateFileAsync(File file, IFormFile fileDatas)
-        {
-            var extension = System.IO.Path.GetExtension(fileDatas.FileName);
-            var fileType = await _fileTypeService.GetByExtensionAsync(extension);
-
-            if (fileType == null)
-            {
-                _logger.LogError("{Extension} is an unknown file type.", extension);
-                throw new OcudaException("Unknown file type.");
-            }
-
-            file.Description = file.Description?.Trim();
-            file.Name = file.Name?.Trim();
-            file.CreatedAt = DateTime.Now;
-            file.CreatedBy = GetCurrentUserId();
-            file.FileTypeId = fileType.Id;
-
-            await _fileRepository.AddAsync(file);
-            await _fileRepository.SaveAsync();
-
-            file.FileType = fileType;
-            await WritePrivateFileAsync(file, fileDatas);
-
-            return file;
         }
 
         public async Task<File> CreatePublicFileAsync(File file, IFormFile fileData)
@@ -363,6 +352,24 @@ namespace Ocuda.Ops.Service
             return ms.ToArray();
         }
 
+        public async Task<File> ReplaceFileLibraryFileAsync(int fileId)
+        {
+            var file = await _fileRepository.FindAsync(fileId);
+            if (file == null)
+            {
+                _logger.LogError("No file id: {FileId}", fileId);
+                throw new OcudaException($"Could not find id: {fileId}");
+            }
+
+            file.UpdatedAt = DateTime.Now;
+            file.UpdatedBy = GetCurrentUserId();
+
+            _fileRepository.Update(file);
+            await _fileRepository.SaveAsync();
+
+            return file;
+        }
+
         public async Task UpdateLibrary(FileLibrary library)
         {
             library.Name = library.Name?.Trim();
@@ -373,6 +380,55 @@ namespace Ocuda.Ops.Service
             _fileLibraryRepository.Update(library);
 
             await _fileLibraryRepository.SaveAsync();
+        }
+
+        public async Task VerifyAddFileAsync(int fileLibraryId, string extension, string filePath)
+        {
+            var libraryTypes = await GetFileLibrariesFileTypesAsync(fileLibraryId);
+            if (libraryTypes == null)
+            {
+                throw new OcudaException("This file library is not configured to accept any file types.");
+            }
+
+            if (!libraryTypes.Any(_ => _.Extension.Equals(extension, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new OcudaException($"This file library is not configured to accept files of type: {extension}");
+            }
+
+            if (System.IO.File.Exists(filePath))
+            {
+                throw new OcudaException("A file with this name already exists in this file library.");
+            }
+        }
+
+        private async Task<File> AddFileLibraryFileInternalAsync(File file, IFormFile fileData)
+        {
+            var fileLibrary = await _fileLibraryRepository.FindAsync(file.FileLibraryId);
+            if (fileLibrary == null)
+            {
+                _logger.LogError("No file library with id: {FileLibraryId}", file.FileLibraryId);
+                throw new OcudaException($"Could not find file library id: {file.FileLibraryId}");
+            }
+
+            var extension = System.IO.Path.GetExtension(fileData.FileName);
+            var fileType = await _fileTypeService.GetByExtensionAsync(extension);
+
+            if (fileType == null)
+            {
+                _logger.LogError("Unknown file type: {Extension}", extension);
+                throw new OcudaException($"Unknown file type: {extension}");
+            }
+
+            file.CreatedAt = DateTime.Now;
+            file.CreatedBy = GetCurrentUserId();
+            file.Description = file.Description?.Trim();
+            file.FileTypeId = fileType.Id;
+            file.Name = file.Name?.Trim();
+
+            await _fileRepository.AddAsync(file);
+            await _fileRepository.SaveAsync();
+
+            return file;
         }
 
         private async Task WritePrivateFileAsync(File file, IFormFile fileData,

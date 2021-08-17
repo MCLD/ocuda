@@ -49,6 +49,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
         public string SectionStub { get; set; }
 
         [Required]
+        [DisplayName("file")]
         public IFormFile UploadFile { get; set; }
     }
 }
