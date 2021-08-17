@@ -54,11 +54,12 @@ namespace Ocuda.Ops.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Route("[action]/{libraryId:int}/{fileId:int}")]
         [HttpGet]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability",
             "CA2000:Dispose objects before losing scope",
             Justification = "ControllerBase.File handles disposal (dotnet/AspNetCore.Docs#14585)")]
+        [Route("[action]/{libraryId:int}/{fileId:int}")]
+        [ResponseCache(NoStore = true)]
         public async Task<IActionResult> GetFile(int libraryId, int fileId)
         {
             var library = await _fileService.GetLibraryByIdAsync(libraryId);
@@ -92,7 +93,7 @@ namespace Ocuda.Ops.Controllers
                     library.Id);
 
                 return RedirectToAction(nameof(SectionIndex),
-                    new { sectionStub = section.Stub });
+                    new { stub = section.Stub });
             }
 
             return File(new FileStream(filePath, FileMode.Open, FileAccess.Read),

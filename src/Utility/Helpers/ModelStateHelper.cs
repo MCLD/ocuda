@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
-using Newtonsoft.Json;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Utility.Helpers
@@ -27,13 +27,13 @@ namespace Ocuda.Utility.Helpers
                 Time = DateTimeOffset.Now.ToUnixTimeSeconds()
             };
 
-            return JsonConvert.SerializeObject(storage);
+            return JsonSerializer.Serialize(storage);
         }
 
         public static (ModelStateDictionary modelState, long time) DeserializeModelState(
             string modelStateStorage)
         {
-            var storage = JsonConvert.DeserializeObject<ModelStateStorage>(modelStateStorage);
+            var storage = JsonSerializer.Deserialize<ModelStateStorage>(modelStateStorage);
             var modelState = new ModelStateDictionary();
 
             foreach (var item in storage.ModelStateItems)
