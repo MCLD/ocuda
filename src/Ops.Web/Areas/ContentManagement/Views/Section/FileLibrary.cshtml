@@ -25,23 +25,25 @@
                   role="form"
                   enctype="multipart/form-data">
                 <div class="modal-body">
-                    <input id="reFileId" type="hidden" />
+                    <input asp-for="ReplaceFileId" type="hidden" />
+                    <input asp-for="CurrentPage" type="hidden" />
+                    <input asp-for="SectionStub" type="hidden" />
+                    <input asp-for="FileLibraryStub" type="hidden" />
                     <div class="input-group">
                         <label class="input-group-btn">
                             <span class="btn btn-light btn-file">
-                                <span class="far fa-file-image"></span> Select file(s)...
+                                <span class="far fa-file-image"></span> Select file...
                                 <input type="file"
-                                       multiple="multiple"
-                                       id="reUploadFile"
+                                       asp-for="UploadFile"
                                        accept="@(string.Join(",",Model.FileTypes.Select(_=>_.Extension).ToList()))"
                                        style="display: none;" />
                             </span>
                         </label>
                         <input type="text" class="form-control
-                                               @(ViewData.ModelState.GetValidationState("ReUploadFile") == invalid
+                                               @(ViewData.ModelState.GetValidationState("UploadFile") == invalid
                                                    ? "input-validation-error" : "")" readonly />
                     </div>
-                    <span asp-validation-for="reUploadFile" class="text-danger"></span>
+                    <span asp-validation-for="UploadFile" class="text-danger"></span>
                 </div>
                 <div class="modal-footer">
                     <button type="button"
@@ -91,6 +93,7 @@
                            value="@Model.FileLibraryId"
                            autocomplete="off"
                            type="hidden" />
+                    <input asp-for="CurrentPage" type="hidden" />
                     <div class="input-group">
                         <label class="input-group-btn">
                             <span class="btn btn-light btn-file">
@@ -194,6 +197,7 @@
                     data-toggle="modal"
                     data-target="#listAddModal">
                 <span class="fas fa-file-upload" aria-hidden="true"></span>
+                Add file
             </button>
         }
     </div>
@@ -310,7 +314,7 @@
         $("#replaceModal").on("show.bs.modal", function (e) {
             let button = $(e.relatedTarget);
             let id = button.data("id");
-            $(this).find("#reFileId").val(String(id));
+            $(this).find("#ReplaceFileId").val(String(id));
         });
         $("#deleteItem").click(function () {
             this.disabled = true;

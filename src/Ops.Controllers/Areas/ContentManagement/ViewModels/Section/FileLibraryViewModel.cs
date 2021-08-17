@@ -40,6 +40,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
             }
         }
 
+        public int ReplaceFileId { get; set; }
+
         [Required]
         public string SectionName { get; set; }
 
