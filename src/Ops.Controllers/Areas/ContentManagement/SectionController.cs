@@ -30,17 +30,17 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         private readonly IFileService _fileService;
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly ILinkService _linkService;
+        private readonly IPermissionGroupService _permissionGroupService;
         private readonly IPostService _postService;
         private readonly ISectionService _sectionService;
-        private readonly IUserService _userService;
 
         public SectionController(ServiceFacades.Controller<SectionController> context,
             IFileService fileService,
             ILinkService linkService,
             IOcudaCache cache,
             IPostService postService,
+            IPermissionGroupService permissionGroupService,
             ISectionService sectionService,
-            IUserService userService,
             IWebHostEnvironment hostingEnvironment) : base(context)
         {
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
@@ -49,9 +49,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _linkService = linkService ?? throw new ArgumentNullException(nameof(linkService));
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
+            _permissionGroupService = permissionGroupService
+                ?? throw new ArgumentNullException(nameof(permissionGroupService));
             _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(sectionService));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
         public static string Area { get { return "ContentManagement"; } }
@@ -215,6 +216,31 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 return RedirectToAction(nameof(SectionController.LinkLibrary),
                     new { sectionStub = model.SectionStub, linkLibStub = model.LinkLibraryStub });
             }
+        }
+
+        [HttpPost("[action]/{stub}/{permissionGroupId}")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        public async Task<IActionResult> AddPermissionGroup(string stub, int permissionGroupId)
+        {
+            var section = await GetSectionAsManagerAsync(stub);
+            if (section == null)
+            {
+                return RedirectToUnauthorized();
+            }
+
+            try
+            {
+                await _permissionGroupService
+                    .AddToPermissionGroupAsync<PermissionGroupSectionManager>(section.Id,
+                permissionGroupId);
+                AlertInfo = "Group added for section management.";
+            }
+            catch (Exception ex)
+            {
+                AlertDanger = $"Problem adding permission: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(Permissions), new { stub });
         }
 
         [HttpGet("{sectionStub}/[action]")]
@@ -705,6 +731,44 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             return View(viewModel);
         }
 
+        [HttpGet("[action]/{stub}")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        public async Task<IActionResult> Permissions(string stub)
+        {
+            var section = await GetSectionAsManagerAsync(stub);
+
+            if (section == null)
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var permissionGroups = await _permissionGroupService.GetAllAsync();
+            var sectionPermissions = await _permissionGroupService
+                .GetPermissionsAsync<PermissionGroupSectionManager>(section.Id);
+
+            var viewModel = new PermissionsViewModel
+            {
+                Name = section.Name,
+                Stub = section.Stub,
+            };
+
+            foreach (var permissionGroup in permissionGroups)
+            {
+                if (sectionPermissions.Any(_ => _.PermissionGroupId == permissionGroup.Id))
+                {
+                    viewModel.AssignedGroups.Add(permissionGroup.Id,
+                        permissionGroup.PermissionGroupName);
+                }
+                else
+                {
+                    viewModel.AvailableGroups.Add(permissionGroup.Id,
+                        permissionGroup.PermissionGroupName);
+                }
+            }
+
+            return View(viewModel);
+        }
+
         [Route("{sectionStub}/[action]/{postStub}")]
         public async Task<IActionResult> PostDetails(string sectionStub, string postStub)
         {
@@ -816,6 +880,31 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                     return RedirectToAction(nameof(SectionController.Section), new { sectionStub });
                 }
             }
+        }
+
+        [HttpPost("[action]/{stub}/{permissionGroupId:int}")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        public async Task<IActionResult> RemovePermissionGroup(string stub, int permissionGroupId)
+        {
+            var section = await GetSectionAsManagerAsync(stub);
+            if (section == null)
+            {
+                return RedirectToUnauthorized();
+            }
+
+            try
+            {
+                await _permissionGroupService
+                    .RemoveFromPermissionGroupAsync<PermissionGroupSectionManager>(section.Id,
+                    permissionGroupId);
+                AlertInfo = "Group removed from section management.";
+            }
+            catch (Exception ex)
+            {
+                AlertDanger = $"Problem removing permission: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(Permissions), new { stub });
         }
 
         [HttpPost]

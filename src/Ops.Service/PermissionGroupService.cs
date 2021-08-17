@@ -112,6 +112,11 @@ namespace Ocuda.Ops.Service
             if (GetAddPermissionMap().TryGetValue(typeof(T), out var delegateMethod))
             {
                 delegateMethod(itemId, permissionGroupId);
+                _logger.LogInformation("User {CurrentUser} just added permission group id {PermissionGroupId} to {ItemType} id {ItemId}",
+                    GetCurrentUserId(),
+                    permissionGroupId,
+                    typeof(T).Name,
+                    itemId);
             }
             else
             {
@@ -244,6 +249,11 @@ namespace Ocuda.Ops.Service
             if (GetRemovePermissionMap().TryGetValue(typeof(T), out var delegateMethod))
             {
                 delegateMethod(itemId, permissionGroupId);
+                _logger.LogInformation("User {CurrentUser} just added permission group id {PermissionGroupId} to {ItemType} id {ItemId}",
+                    GetCurrentUserId(),
+                    permissionGroupId,
+                    typeof(T).Name,
+                    itemId);
             }
             else
             {
