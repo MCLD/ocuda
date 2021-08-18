@@ -58,8 +58,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         public static string Area { get { return "ContentManagement"; } }
         public static string Name { get { return "Section"; } }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> AddFileLibrary(SectionViewModel viewModel)
         {
@@ -141,8 +140,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             });
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> AddFileToLibrary(FileLibraryViewModel model)
         {
             var section = await GetSectionAsManagerAsync(model?.SectionStub);
@@ -193,8 +191,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             });
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> AddLinkLibrary(SectionViewModel model)
         {
@@ -223,8 +220,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 new { sectionStub = model.Section.Stub });
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> AddLinkToLibrary(LinkLibraryViewModel model)
         {
             var section = await GetSectionAsManagerAsync(model?.SectionStub);
@@ -298,8 +294,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             return View(viewModel);
         }
 
-        [HttpPost]
-        [Route("{sectionStub}/[action]")]
+        [HttpPost("{sectionStub}/[action]")]
         [SaveModelState]
         public async Task<IActionResult> AddPost(AddPostViewModel viewModel)
         {
@@ -349,8 +344,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
         }
 
-        [Route("[action]")]
-        [HttpPost]
+        [HttpPost("[action]")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> ClearSectionCache()
         {
@@ -364,8 +358,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             return RedirectToAction(nameof(Index));
         }
 
-        [Route("[action]")]
-        [HttpPost]
+        [HttpPost("[action]")]
         public async Task<IActionResult> DeleteFileFromLibrary(FileLibraryViewModel viewModel)
         {
             var section = await GetSectionAsManagerAsync(viewModel.SectionStub);
@@ -411,8 +404,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
         }
 
-        [Route("[action]")]
-        [HttpPost]
+        [HttpPost("[action]")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> DeleteFileLibrary(SectionViewModel model)
         {
@@ -464,8 +456,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
         }
 
-        [Route("[action]")]
-        [HttpPost]
+        [HttpPost("[action]")]
         public async Task<IActionResult> DeleteLinkFromLibrary(LinkLibraryViewModel model)
         {
             var section = await GetSectionAsManagerAsync(model?.SectionStub);
@@ -497,8 +488,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
         }
 
-        [Route("[action]")]
-        [HttpPost]
+        [HttpPost("[action]")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> DeleteLinkLibrary(SectionViewModel model)
         {
@@ -536,8 +526,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 new { sectionStub = section.Stub });
         }
 
-        [Route("[action]")]
-        [HttpPost]
+        [HttpPost("[action]")]
         public async Task<IActionResult> DeletePost(int postId, string sectionStub)
         {
             var section = await GetSectionAsManagerAsync(sectionStub);
@@ -592,8 +581,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
         }
 
-        [Route("{sectionStub}/[action]/{postStub}")]
-        [HttpPost]
+        [HttpPost("{sectionStub}/[action]/{postStub}")]
         [SaveModelState]
         public async Task<IActionResult> EditPost(EditPostViewModel viewModel)
         {
@@ -628,8 +616,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
         }
 
-        [Route("{sectionStub}/[action]/{fileLibraryStub}")]
-        [Route("{sectionStub}/[action]/{fileLibraryStub}/{page}")]
+        [HttpGet("{sectionStub}/[action]/{fileLibraryStub}")]
+        [HttpGet("{sectionStub}/[action]/{fileLibraryStub}/{page}")]
         public async Task<IActionResult> FileLibrary(string sectionStub,
             string fileLibraryStub,
             int page)
@@ -717,8 +705,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             return View(viewModel);
         }
 
-        [HttpGet]
-        [Route("[action]/{libraryId:int}/{fileId:int}")]
+        [HttpGet("[action]/{libraryId:int}/{fileId:int}")]
         [ResponseCache(NoStore = true)]
         public async Task<IActionResult> GetFile(int libraryId, int fileId)
         {
@@ -757,7 +744,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 file.Name + type.Extension);
         }
 
-        [Route("")]
+        [HttpGet("")]
         public async Task<IActionResult> Index()
         {
             var permissionGroupIds = UserClaims(ClaimType.PermissionId)
@@ -770,8 +757,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             });
         }
 
-        [Route("{sectionStub}/[action]/{linkLibStub}")]
-        [Route("{sectionStub}/[action]/{linkLibStub}/{page}")]
+        [HttpGet("{sectionStub}/[action]/{linkLibStub}")]
+        [HttpGet("{sectionStub}/[action]/{linkLibStub}/{page}")]
         public async Task<IActionResult> LinkLibrary(string sectionStub,
             string linkLibStub, int page = 1)
         {
@@ -846,7 +833,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             return View(viewModel);
         }
 
-        [Route("{sectionStub}/[action]/{postStub}")]
+        [HttpGet("{sectionStub}/[action]/{postStub}")]
         public async Task<IActionResult> PostDetails(string sectionStub, string postStub)
         {
             var section = await GetSectionAsManagerAsync(sectionStub);
@@ -877,9 +864,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
         }
 
-        [Route("{sectionStub}/[action]")]
-        [Route("{sectionStub}/[action]/{page}")]
-        [Route("{sectionStub}/[action]/{categoryStub}/{page}")]
+        [HttpGet("{sectionStub}/[action]")]
+        [HttpGet("{sectionStub}/[action]/{page}")]
+        [HttpGet("{sectionStub}/[action]/{categoryStub}/{page}")]
         public async Task<IActionResult> Posts(string sectionStub, string categoryStub, int page = 1)
         {
             var section = await GetSectionAsManagerAsync(sectionStub);
@@ -1018,8 +1005,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             return RedirectToAction(nameof(Permissions), new { stub });
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> ReplaceFile(FileLibraryViewModel viewModel)
         {
             var section = await GetSectionAsManagerAsync(viewModel.SectionStub);
@@ -1066,8 +1052,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             });
         }
 
-        [Route("{sectionStub}")]
-        [Route("{sectionStub}/{page}")]
+        [HttpGet("{sectionStub}")]
+        [HttpGet("{sectionStub}/{page}")]
         public async Task<IActionResult> Section(string sectionStub, int page = 1)
         {
             var section = await GetSectionAsManagerAsync(sectionStub);
@@ -1122,8 +1108,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             return View(viewModel);
         }
 
-        [Route("[action]")]
-        [HttpPost]
+        [HttpPost("[action]")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> UpdateFileLibrary(FileLibraryViewModel viewModel)
         {
@@ -1183,8 +1168,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 new { sectionStub = section.Stub });
         }
 
-        [Route("[action]")]
-        [HttpPost]
+        [HttpPost("[action]")]
         public async Task<IActionResult> UpdateLinkFromLibrary(LinkLibraryViewModel model)
         {
             var section = await GetSectionAsManagerAsync(model?.SectionStub);
@@ -1216,8 +1200,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
         }
 
-        [Route("[action]")]
-        [HttpPost]
+        [HttpPost("[action]")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> UpdateLinkLibrary(SectionViewModel viewModel)
         {
