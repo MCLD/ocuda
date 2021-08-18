@@ -195,12 +195,21 @@
            asp-route-stub="@Model.SectionStub">Back</a>
         @if (Model.HasAdminRights)
         {
-            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+            <button class="btn btn-outline-primary mt-2 mb-1 mr-2 float-right"
                     data-toggle="modal"
                     data-target="#listAddModal">
                 <span class="fas fa-file-upload" aria-hidden="true"></span>
                 Add file
             </button>
+            <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+               asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
+               asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+               asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibraryPermissions)"
+               asp-route-sectionStub="@Model.SectionStub"
+               asp-route-fileLibraryStub="@Model.FileLibraryStub">
+                <span class="fas fa-user-plus"></span>
+                Permissions
+            </a>
         }
     </div>
 </div>

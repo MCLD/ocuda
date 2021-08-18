@@ -1,0 +1,87 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section.FileLibraryPermissionsViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-7">
+        <h1>File library permissions</h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibrary))"
+           asp-route-sectionStub="@Model.SectionStub"
+           asp-route-fileLibraryStub="@Model.FileLibraryStub">Back</a>
+    </div>
+</div>
+
+<div class="row pt-1">
+    <div class="col-12">
+        <input asp-for="Name" formgroup readonly />
+        <input asp-for="FileLibraryStub" formgroup readonly />
+        <input asp-for="SectionName" formgroup readonly />
+    </div>
+</div>
+
+<div class="row pt-1">
+    <div class="col-12 col-sm-6">
+        <div class="card">
+            <div class="card-header">
+                Available Groups
+            </div>
+            <ul class="list-group list-group-flush">
+                @if (Model.AvailableGroups?.Count > 0)
+                {
+                    foreach (var availableGroup in Model.AvailableGroups)
+                    {
+                        <li class="list-group-item">
+                            <form asp-controller="@SectionController.Name"
+                                  asp-action="@(nameof(SectionController.AddFilePermissionGroup))"
+                                  asp-route-fileLibraryStub="@Model.FileLibraryStub"
+                                  asp-route-sectionStub="@Model.SectionStub"
+                                  asp-route-permissionGroupId="@availableGroup.Key">
+                                @availableGroup.Value
+                                <button class="btn btn-link text-success float-right">
+                                    <span class="fa fa-plus-circle"></span>
+                                </button>
+                            </form>
+                        </li>
+                    }
+                }
+                else
+                {
+                    <li class="list-group-item">No groups available.</li>
+                }
+            </ul>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6">
+        <div class="card">
+            <div class="card-header">
+                Assigned Groups
+            </div>
+            <ul class="list-group list-group-flush">
+                @if (Model.AssignedGroups?.Count > 0)
+                {
+                    foreach (var availableGroup in Model.AssignedGroups)
+                    {
+                        <li class="list-group-item">
+                            <form asp-controller="@SectionController.Name"
+                                  asp-action="@(nameof(SectionController.RemoveFilePermissionGroup))"
+                                  asp-route-fileLibraryStub="@Model.FileLibraryStub"
+                                  asp-route-sectionStub="@Model.SectionStub"
+                                  asp-route-permissionGroupId="@availableGroup.Key">
+                                @availableGroup.Value
+                                <button class="btn btn-link text-danger float-right">
+                                    <span class="fa fa-minus-circle"></span>
+                                </button>
+                            </form>
+                        </li>
+                    }
+                }
+                else
+                {
+                    <li class="list-group-item">No groups assigned.</li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

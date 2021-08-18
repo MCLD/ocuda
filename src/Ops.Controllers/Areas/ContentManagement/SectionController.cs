@@ -107,6 +107,40 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 new { sectionStub = section.Stub });
         }
 
+        [HttpPost("[action]/{sectionStub}/{fileLibraryStub}/{permissionGroupId:int}")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        public async Task<IActionResult> AddFilePermissionGroup(string sectionStub,
+            string fileLibraryStub,
+            int permissionGroupId)
+        {
+            var section = await GetSectionAsManagerAsync(sectionStub);
+            if (section == null)
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var fileLibrary = await _fileService
+                .GetBySectionIdStubAsync(section.Id, fileLibraryStub);
+
+            try
+            {
+                await _permissionGroupService
+                    .AddToPermissionGroupAsync<PermissionGroupReplaceFiles>(fileLibrary.Id,
+                permissionGroupId);
+                AlertInfo = "Group added for file replacement.";
+            }
+            catch (Exception ex)
+            {
+                AlertDanger = $"Problem adding permission: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(FileLibraryPermissions), new
+            {
+                SectionStub = sectionStub,
+                FileLibraryStub = fileLibraryStub
+            });
+        }
+
         [HttpPost]
         [Route("[action]")]
         public async Task<IActionResult> AddFileToLibrary(FileLibraryViewModel model)
@@ -135,7 +169,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 return RedirectToAction(nameof(FileLibrary), new
                 {
                     sectionStub = section.Stub,
-                    fileLibStub = fileLibrary.Stub,
+                    fileLibraryStub = fileLibrary.Stub,
                     page = model.CurrentPage
                 });
             }
@@ -154,7 +188,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             return RedirectToAction(nameof(FileLibrary), new
             {
                 sectionStub = section.Stub,
-                fileLibStub = fileLibrary.Stub,
+                fileLibraryStub = fileLibrary.Stub,
                 page = model.CurrentPage
             });
         }
@@ -371,7 +405,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 return RedirectToAction(nameof(FileLibrary), new
                 {
                     sectionStub = section.Stub,
-                    fileLibStub = viewModel.FileLibraryStub,
+                    fileLibraryStub = viewModel.FileLibraryStub,
                     page = viewModel.CurrentPage
                 });
             }
@@ -594,10 +628,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
         }
 
-        [Route("{sectionStub}/[action]/{fileLibStub}")]
-        [Route("{sectionStub}/[action]/{fileLibStub}/{page}")]
+        [Route("{sectionStub}/[action]/{fileLibraryStub}")]
+        [Route("{sectionStub}/[action]/{fileLibraryStub}/{page}")]
         public async Task<IActionResult> FileLibrary(string sectionStub,
-            string fileLibStub,
+            string fileLibraryStub,
             int page)
         {
             var section = await GetSectionAsManagerAsync(sectionStub);
@@ -611,7 +645,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 page = 1;
             }
 
-            var fileLibrary = await _fileService.GetBySectionIdStubAsync(section.Id, fileLibStub);
+            var fileLibrary = await _fileService.GetBySectionIdStubAsync(section.Id, fileLibraryStub);
 
             var itemsPerPage = await _siteSettingService
                 .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
@@ -638,6 +672,49 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 SectionName = section.Name,
                 SectionStub = section.Stub
             });
+        }
+
+        [HttpGet("[action]/{sectionStub}/{fileLibraryStub}")]
+        public async Task<IActionResult> FileLibraryPermissions(string sectionStub,
+            string fileLibraryStub)
+        {
+            var section = await GetSectionAsManagerAsync(sectionStub);
+
+            if (section == null)
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var fileLibrary = await _fileService
+                .GetBySectionIdStubAsync(section.Id, fileLibraryStub);
+
+            var permissionGroups = await _permissionGroupService.GetAllAsync();
+            var fileLibraryPermissions = await _permissionGroupService
+                .GetPermissionsAsync<PermissionGroupReplaceFiles>(fileLibrary.Id);
+
+            var viewModel = new FileLibraryPermissionsViewModel
+            {
+                Name = fileLibrary.Name,
+                SectionName = section.Name,
+                SectionStub = section.Stub,
+                FileLibraryStub = fileLibrary.Stub
+            };
+
+            foreach (var permissionGroup in permissionGroups)
+            {
+                if (fileLibraryPermissions.Any(_ => _.PermissionGroupId == permissionGroup.Id))
+                {
+                    viewModel.AssignedGroups.Add(permissionGroup.Id,
+                        permissionGroup.PermissionGroupName);
+                }
+                else
+                {
+                    viewModel.AvailableGroups.Add(permissionGroup.Id,
+                        permissionGroup.PermissionGroupName);
+                }
+            }
+
+            return View(viewModel);
         }
 
         [HttpGet]
@@ -672,7 +749,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                     library.Name,
                     library.Id);
                 return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = section.Stub, fileLibStub = library.Stub });
+                    new { sectionStub = section.Stub, fileLibraryStub = library.Stub });
             }
 
             return File(new FileStream(filePath, FileMode.Open, FileAccess.Read),
@@ -882,6 +959,40 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
         }
 
+        [HttpPost("[action]/{sectionStub}/{fileLibraryStub}/{permissionGroupId:int}")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        public async Task<IActionResult> RemoveFilePermissionGroup(string sectionStub,
+            string fileLibraryStub,
+            int permissionGroupId)
+        {
+            var section = await GetSectionAsManagerAsync(sectionStub);
+            if (section == null)
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var fileLibrary = await _fileService
+                .GetBySectionIdStubAsync(section.Id, fileLibraryStub);
+
+            try
+            {
+                await _permissionGroupService
+                    .RemoveFromPermissionGroupAsync<PermissionGroupReplaceFiles>(fileLibrary.Id,
+                permissionGroupId);
+                AlertInfo = "Group removed for file replacement.";
+            }
+            catch (Exception ex)
+            {
+                AlertDanger = $"Problem adding permission: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(FileLibraryPermissions), new
+            {
+                SectionStub = sectionStub,
+                FileLibraryStub = fileLibraryStub
+            });
+        }
+
         [HttpPost("[action]/{stub}/{permissionGroupId:int}")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> RemovePermissionGroup(string stub, int permissionGroupId)
@@ -950,7 +1061,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             return RedirectToAction(nameof(FileLibrary), new
             {
                 sectionStub = viewModel.SectionStub,
-                fileLibStub = viewModel.FileLibraryStub,
+                fileLibraryStub = viewModel.FileLibraryStub,
                 page = viewModel.CurrentPage
             });
         }
