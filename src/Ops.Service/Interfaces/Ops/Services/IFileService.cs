@@ -11,15 +11,15 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
     {
         Task<File> AddFileLibraryFileAsync(File file, IFormFile fileDatas);
 
-        Task<FileLibrary> CreateLibraryAsync(FileLibrary library, int sectionId);
+        Task<FileLibrary> CreateLibraryAsync(FileLibrary library);
 
         Task<File> CreatePublicFileAsync(File file, IFormFile fileData);
 
-        Task DeleteFileTypesByLibrary(int liAbid);
+        Task DeleteFileTypesByLibrary(int fileLibraryId);
 
-        Task DeleteLibraryAsync(int id);
+        Task DeleteLibraryAsync(int sectionId, int fileLibraryId);
 
-        Task DeletePrivateFileAsync(int id);
+        Task DeletePrivateFileAsync(int sectionId, string fileLibraryStub, int fileId);
 
         Task DeletePublicFileAsync(int id);
 
@@ -39,8 +39,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<FileLibrary> GetBySectionIdStubAsync(int sectionId, string stub);
 
         Task<ICollection<FileType>> GetFileLibrariesFileTypesAsync(int libraryId);
-
-        Task<ICollection<File>> GetFileLibraryFilesAsync(int id);
 
         Task<string> GetFilePathAsync(int sectionId, string libraryStub, int fileId);
 
@@ -69,6 +67,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task UpdateLibrary(FileLibrary library);
 
-        Task VerifyAddFileAsync(int fileLibraryId, string extension, string filePath);
+        Task<string> VerifyAddFileAsync(int fileLibraryId, string extension, string filename);
     }
 }

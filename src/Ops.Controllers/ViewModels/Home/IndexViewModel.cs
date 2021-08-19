@@ -10,6 +10,7 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
         {
             FileLibraries = new List<FileLibrary>();
             LinkLibraries = new List<LinkLibrary>();
+            var take = new Service.Filters.BlogFilter().Take;
         }
 
         public ICollection<FileLibrary> FileLibraries { get; }

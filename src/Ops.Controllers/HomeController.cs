@@ -230,18 +230,22 @@ namespace Ocuda.Ops.Controllers
                     }
                 }
 
-                var fileLibraries = await _fileService
-                    .GetBySectionIdAsync(filter.SectionId.Value);
+                var fileLibraries = await _fileService.GetBySectionIdAsync(filter.SectionId.Value);
 
                 if (fileLibraries?.Count > 0)
                 {
                     foreach (var fileLibrary in fileLibraries)
                     {
-                        fileLibrary.Files = await _fileService
-                            .GetFileLibraryFilesAsync(fileLibrary.Id);
+                        var fileLibraryFiles = await _fileService
+                            .GetPaginatedListAsync(new BlogFilter
+                            {
+                                FileLibraryId = fileLibrary.Id
+                            });
 
-                        if (fileLibrary.Files?.Count > 0)
+                        if (fileLibraryFiles.Count > 0)
                         {
+                            fileLibrary.Files = fileLibraryFiles.Data;
+                            fileLibrary.TotalFilesInLibrary = fileLibraryFiles.Count;
                             viewModel.FileLibraries.Add(fileLibrary);
                         }
                     }

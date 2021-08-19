@@ -160,7 +160,31 @@
                                                 }
                                             </a>
                                         </td>
-                                        <td><small>@file.Size</small></td>
+                                        <td>
+                                            <small>
+                                                @if (string.IsNullOrEmpty(file.Size))
+                                                {
+                                                    <span class="text-danger fas fa-exclamation-triangle"
+                                                          title="This file appears to be missing."></span>
+                                                }
+                                                else
+                                                {
+                                                    @file.Size
+                                                }
+                                            </small>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (fileLibrary.TotalFilesInLibrary > fileLibrary.Files.Count)
+                                {
+                                    <tr>
+                                        <td colspan="2" class="text-center">
+                                            <a asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+                                               asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibrary)"
+                                               asp-area="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement)"
+                                               asp-route-sectionStub="@Model.SectionStub"
+                                               asp-route-fileLibraryStub="@fileLibrary.Stub">More files...</a>
+                                        </td>
                                     </tr>
                                 }
                             </table>
