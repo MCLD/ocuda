@@ -232,7 +232,7 @@ namespace Ocuda.Ops.Service
 
             return assets
                 .ToDictionary(k => k.Id,
-                    v => _pathResolver.GetPublicContentUrl(BaseFilePath, v.Path));
+                    v => _pathResolver.GetPublicContentLink(BaseFilePath, v.Path));
         }
 
         public string GetAssetWebPath(DigitalDisplayAsset asset)
@@ -241,7 +241,7 @@ namespace Ocuda.Ops.Service
             {
                 throw new ArgumentNullException(nameof(asset));
             }
-            return _pathResolver.GetPublicContentUrl(BaseFilePath, asset.Path);
+            return _pathResolver.GetPublicContentLink(BaseFilePath, asset.Path);
         }
 
         public async Task<DigitalDisplay> GetDisplayAsync(int displayId)

@@ -149,7 +149,7 @@ namespace Ocuda.Promenade.Service
                             if (item.ImageFeatureItemText != null)
                             {
                                 item.ImageFeatureItemText.Filepath = _pathResolver
-                                    .GetPublicContentUrl(ImagesFilePath,
+                                    .GetPublicContentLink(ImagesFilePath,
                                         languageName,
                                         FeaturesFilePath,
                                         item.ImageFeatureItemText.Filename);
@@ -183,7 +183,7 @@ namespace Ocuda.Promenade.Service
                                 .GetByIdsAsync(item.Id, defaultLanguageId);
 
                             item.ImageFeatureItemText.Filepath = _pathResolver
-                                .GetPublicContentUrl(ImagesFilePath,
+                                .GetPublicContentLink(ImagesFilePath,
                                     languageName,
                                     FeaturesFilePath,
                                     item.ImageFeatureItemText.Filename);

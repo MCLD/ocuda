@@ -102,7 +102,7 @@ namespace Ocuda.Ops.Web
 
             // configure shared content directory
             var contentFilePath = pathResolver.GetPublicContentFilePath();
-            var contentUrl = pathResolver.GetPublicContentUrl();
+            var contentUrl = pathResolver.GetPublicContentLink();
             if (!contentUrl.StartsWith("/", StringComparison.OrdinalIgnoreCase))
             {
                 contentUrl = $"/{contentUrl}";

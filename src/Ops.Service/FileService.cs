@@ -91,10 +91,7 @@ namespace Ocuda.Ops.Service
             var section = await _sectionService.GetByIdAsync(library.SectionId);
 
             var path = _pathResolver
-                .GetPrivateContentFilePath(default,
-                    SectionsPath,
-                    section.Stub,
-                    library.Stub);
+                .GetPrivateContentFilePath(null, SectionsPath, section.Stub, library.Stub);
 
             var directory = new System.IO.DirectoryInfo(path);
 
@@ -155,10 +152,8 @@ namespace Ocuda.Ops.Service
             var library = await GetLibraryByIdAsync(fileLibraryId);
             var section = await _sectionService.GetByIdAsync(sectionId);
 
-            var filePath = _pathResolver.GetPrivateContentFilePath(default,
-                SectionsPath,
-                section.Stub,
-                library.Stub);
+            var filePath = _pathResolver
+                .GetPrivateContentFilePath(null, SectionsPath, section.Stub, library.Stub);
 
             var exists = System.IO.Directory.Exists(filePath);
 
@@ -432,12 +427,12 @@ namespace Ocuda.Ops.Service
             if (currentLibrary.Stub.Trim() != library.Stub.Trim())
             {
                 // must move files
-                var oldPath = _pathResolver.GetPrivateContentFilePath(default,
+                var oldPath = _pathResolver.GetPrivateContentFilePath(null,
                     SectionsPath,
                     currentLibrary.Section.Stub,
                     currentLibrary.Stub);
 
-                var newPath = _pathResolver.GetPrivateContentFilePath(default,
+                var newPath = _pathResolver.GetPrivateContentFilePath(null,
                     SectionsPath,
                     currentLibrary.Section.Stub,
                     library.Stub);

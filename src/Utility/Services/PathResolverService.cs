@@ -31,7 +31,7 @@ namespace Ocuda.Utility.Services
             return GetContentFilePath(false, fileName, pathElement);
         }
 
-        public string GetPublicContentUrl(params object[] pathElement)
+        public string GetPublicContentLink(params object[] pathElement)
         {
             var path = new StringBuilder(_config[Keys.Configuration.OcudaUrlSharedContent]);
             if (path.Length == 0)
@@ -42,7 +42,7 @@ namespace Ocuda.Utility.Services
             {
                 foreach (var element in pathElement)
                 {
-                    path.Append($"/{element.ToString().TrimStart('/').TrimEnd('/')}");
+                    path.Append('/').Append(element.ToString().TrimStart('/').TrimEnd('/'));
                 }
             }
             return path.ToString();
