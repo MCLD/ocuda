@@ -37,7 +37,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             if (!viewModel.HasPermissions)
             {
-                AlertWarning = "It appears that you do not have any Content Administration permissions. Please contact your system administrator for more information.";
+                AlertWarning = "It appears that you do not have any Intranet Administration permissions. Please contact your system administrator for more information.";
             }
 
             return View(viewModel);

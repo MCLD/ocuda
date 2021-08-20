@@ -8,6 +8,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
     {
         Task EnsureSiteManagerGroupAsync(int currentUserId, string group);
 
+        Task<ICollection<string>> GetAdminClaimsAsync(IEnumerable<int> permissionGroupIds);
+
         Task<ICollection<ClaimGroup>> GetClaimGroupsAsync();
 
         Task<ICollection<PermissionGroup>> GetPermissionGroupsAsync();

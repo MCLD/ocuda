@@ -21,6 +21,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<PermissionGroup> EditAsync(PermissionGroup permissionGroup);
 
+        Task<(bool siteAdminRights, bool contentAdminRights)>
+            GetAdminRightsAsync(IEnumerable<int> permissionGroupIds);
+
         Task<ICollection<PermissionGroup>> GetAllAsync();
 
         Task<int> GetApplicationPermissionGroupCountAsync(string permission);

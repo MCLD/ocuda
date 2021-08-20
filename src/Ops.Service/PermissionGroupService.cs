@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Abstract;
 using Ocuda.Ops.Models.Definitions;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
@@ -152,6 +153,31 @@ namespace Ocuda.Ops.Service
             await _permissionGroupRepository.SaveAsync();
 
             return currentPermissionGroup;
+        }
+
+        public async Task<(bool siteAdminRights, bool contentAdminRights)>
+            GetAdminRightsAsync(IEnumerable<int> permissionGroupIds)
+        {
+            var hasSiteAdminRights = (
+                await HasAPermissionAsync<PermissionGroupPageContent>(permissionGroupIds)
+                || await HasAPermissionAsync<PermissionGroupPodcastItem>(permissionGroupIds));
+
+            var hasContentAdminRights = (
+                await HasAPermissionAsync<PermissionGroupPageContent>(permissionGroupIds)
+                || await HasAPermissionAsync<PermissionGroupPodcastItem>(permissionGroupIds));
+
+            if (!hasContentAdminRights)
+            {
+                var ddGroups = await GetApplicationPermissionGroupsAsync(ApplicationPermission
+                    .DigitalDisplayContentManagement);
+
+                hasContentAdminRights = ddGroups
+                    .Select(_ => _.Id)
+                    .Intersect(permissionGroupIds)
+                    .Any();
+            }
+
+            return (siteAdminRights: hasSiteAdminRights, contentAdminRights: hasContentAdminRights);
         }
 
         public async Task<ICollection<PermissionGroup>> GetAllAsync()

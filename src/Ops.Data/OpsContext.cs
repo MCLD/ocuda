@@ -60,12 +60,10 @@ namespace Ocuda.Ops.Data
 
         public DbSet<Link> Links { get; set; }
 
-        public DbSet<PermissionGroupReplaceFiles> PermisionGroupReplaceFiles { get; set; }
         public DbSet<PermissionGroupApplication> PermissionGroupApplication { get; set; }
-
         public DbSet<PermissionGroupPageContent> PermissionGroupPageContents { get; set; }
-
         public DbSet<PermissionGroupPodcastItem> PermissionGroupPodcastItems { get; set; }
+        public DbSet<PermissionGroupReplaceFiles> PermissionGroupReplaceFiles { get; set; }
         public DbSet<PermissionGroup> PermissionGroups { get; set; }
         public DbSet<PermissionGroupSectionManager> PermissionGroupSectionManager { get; set; }
         public DbSet<PostCategory> PostCategories { get; set; }

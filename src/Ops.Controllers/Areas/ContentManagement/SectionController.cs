@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section;
 using Ocuda.Ops.Controllers.Filters;
@@ -588,10 +587,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             string fileLibraryStub,
             int page)
         {
-            var section = await GetSectionAsManagerAsync(sectionStub);
+            var section = await _sectionService.GetByStubAsync(sectionStub);
             if (section == null)
             {
-                return RedirectToUnauthorized();
+                ShowAlertDanger($"Section not found with stub {sectionStub}.");
+                return RedirectToAction(nameof(Index));
             }
 
             if (page == default)
@@ -669,39 +669,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
 
             return View(viewModel);
-        }
-
-        [HttpGet("[action]/{libraryId:int}/{fileId:int}")]
-        [ResponseCache(NoStore = true)]
-        public async Task<IActionResult> GetFile(int libraryId, int fileId)
-        {
-            var library = await _fileService.GetLibraryByIdAsync(libraryId);
-
-            var section = await GetSectionAsManagerAsync(library.SectionId);
-            if (section == null)
-            {
-                return RedirectToUnauthorized();
-            }
-
-            var filePath = await _fileService.GetFilePathAsync(section.Id, library.Stub, fileId);
-
-            if (!System.IO.File.Exists(filePath))
-            {
-                ShowAlertDanger($"File not found in file library {library.Name}: {Path.GetFileName(filePath)}");
-                _logger.LogError("File {FileName} not found at path {FilePath} for library {LibraryName} (id {LibraryId})",
-                    Path.GetFileName(filePath),
-                    filePath,
-                    library.Name,
-                    library.Id);
-                return RedirectToAction(nameof(SectionController.FileLibrary),
-                    new { sectionStub = section.Stub, fileLibraryStub = library.Stub });
-            }
-
-            var file = await _fileService.GetByIdAsync(fileId);
-
-            return File(new FileStream(filePath, FileMode.Open, FileAccess.Read),
-                System.Net.Mime.MediaTypeNames.Application.Octet,
-                file.Name + file.FileType.Extension);
         }
 
         [HttpGet("")]
@@ -977,6 +944,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 {
                     return RedirectToUnauthorized();
                 }
+                else
+                {
+                    section = await _sectionService.GetByStubAsync(viewModel.SectionStub);
+                }
             }
 
             var file = await _fileService.GetByIdAsync(viewModel.ReplaceFileId);
@@ -1021,7 +992,13 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var section = await GetSectionAsManagerAsync(sectionStub);
             if (section == null)
             {
-                return RedirectToUnauthorized();
+                return RedirectToAction(nameof(Controllers.HomeController.SectionIndex),
+                    Controllers.HomeController.Name,
+                    new
+                    {
+                        area = "",
+                        stub = sectionStub
+                    });
             }
 
             var filter = new BlogFilter(page, 5)

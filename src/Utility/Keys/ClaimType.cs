@@ -1,10 +1,11 @@
 ﻿namespace Ocuda.Utility.Keys
 {
-    public class ClaimType
+    public static class ClaimType
     {
         public const string ADGroup = "ADGroup";
         public const string AuthenticatedAt = "AuthenticatedAt";
-        public const string HasPermissions = "HasPermissions";
+        public const string HasContentAdminRights = "HasContentAdminRights";
+        public const string HasSiteAdminRights = "HasSiteAdminRights";
         public const string PermissionId = "PermissionId";
         public const string SiteManager = "SiteManager";
         public const string UserId = "UserId";

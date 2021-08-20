@@ -29,6 +29,7 @@
                     <input asp-for="CurrentPage" type="hidden" />
                     <input asp-for="SectionStub" type="hidden" />
                     <input asp-for="FileLibraryStub" type="hidden" />
+                    <input asp-for="FileLibraryId" type="hidden" />
                     <p>Replace file: <strong id="ReplaceFileName"></strong></p>
                     <div class="input-group">
                         <label class="input-group-btn">
@@ -236,12 +237,21 @@
                     {
                         <tr>
                             <td class="align-middle text-center">
-                                <a asp-action="@nameof(SectionController.GetFile)"
+                                <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.GetFile)"
+                                   asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+                                   asp-area=""
                                    asp-route-libraryId="@Model.FileLibraryId"
                                    asp-route-fileId="@file.Id"
                                    title="Download file"
                                    class="btn btn-outline-primary">
-                                    <span class="@Model.FileTypes.Where(_ => _.Id == file.FileTypeId).FirstOrDefault().Icon fa-fw fa-lg"></span>
+                                    @if (string.IsNullOrEmpty(file.FileType?.Icon))
+                                    {
+                                        <span class="far fa-file fa-fw fa-lg"></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="@file.FileType.Icon fa-fw fa-lg"></span>
+                                    }
                                 </a>
                             </td>
                             <td class="align-middle">

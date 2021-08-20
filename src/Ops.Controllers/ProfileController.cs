@@ -97,7 +97,7 @@ namespace Ocuda.Ops.Controllers
                 viewModel.AuthenticatedAt = DateTime.Parse(UserClaim(ClaimType.AuthenticatedAt),
                     CultureInfo.InvariantCulture);
 
-                if (!string.IsNullOrEmpty(UserClaim(ClaimType.HasPermissions)))
+                if (!string.IsNullOrEmpty(UserClaim(ClaimType.PermissionId)))
                 {
                     var permissionGroupIds = UserClaims(ClaimType.PermissionId)
                         .Select(_ => int.Parse(_, CultureInfo.InvariantCulture));
@@ -107,8 +107,8 @@ namespace Ocuda.Ops.Controllers
 
                     viewModel.Permissions = permissionLookup
                         .Select(_ => _.PermissionGroupName)
-                                        .OrderBy(_ => _)
-                                        .ToList();
+                        .OrderBy(_ => _)
+                        .ToList();
                 }
 
                 if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))

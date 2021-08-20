@@ -282,8 +282,6 @@ namespace Ocuda.Ops.Controllers.Filters
                             }
                         }
 
-                        bool hasPermissions = false;
-
                         if (isSiteManager)
                         {
                             // also add each individual permission claim
@@ -295,10 +293,14 @@ namespace Ocuda.Ops.Controllers.Filters
 
                             foreach (var permissionId in permissionGroups.Select(_ => _.Id))
                             {
-                                hasPermissions = true;
                                 claims.Add(new Claim(ClaimType.PermissionId,
                                     permissionId.ToString(CultureInfo.InvariantCulture)));
                             }
+
+                            claims.Add(new Claim(ClaimType.HasContentAdminRights,
+                                ClaimType.HasContentAdminRights));
+                            claims.Add(new Claim(ClaimType.HasSiteAdminRights,
+                                ClaimType.HasSiteAdminRights));
                         }
                         else
                         {
@@ -310,16 +312,17 @@ namespace Ocuda.Ops.Controllers.Filters
 
                             foreach (var permissionId in inPermissionGroup)
                             {
-                                hasPermissions = true;
                                 claims.Add(new Claim(ClaimType.PermissionId,
                                     permissionId.ToString(CultureInfo.InvariantCulture)));
                             }
-                        }
 
-                        if (hasPermissions)
-                        {
-                            claims.Add(new Claim(ClaimType.HasPermissions,
-                                ClaimType.HasPermissions));
+                            var hasAdminClaims = await _authorizationService
+                                .GetAdminClaimsAsync(inPermissionGroup);
+
+                            foreach (var hasAdminClaim in hasAdminClaims)
+                            {
+                                claims.Add(new Claim(hasAdminClaim, hasAdminClaim));
+                            }
                         }
 
                         // TODO: probably change the role claim type to our roles and not AD groups
