@@ -8,7 +8,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 {
     public interface ICategoryService
     {
-        Task<ICollection<Category>> GetAllCategories();
+        Task<ICollection<Category>> GetAllAsync();
         Category GetByClass(string categoryClass);
         Task AddCategory(Category category);
         Task<DataWithCount<ICollection<Category>>> GetPaginatedListAsync(

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -26,7 +27,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ICategoryService _categoryService;
         private readonly IEmediaService _emediaService;
         private readonly ILanguageService _languageService;
-
 
         public static string Name { get { return "Emedia"; } }
         public static string Area { get { return "SiteManagement"; } }
@@ -351,6 +351,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         [Route("[action]/{id}")]
+        [RestoreModelState]
         public async Task<IActionResult> Details(int id, string language)
         {
             var emedia = await _emediaService.GetIncludingGroupAsync(id);
@@ -371,6 +372,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var viewModel = new DetailsViewModel
             {
+                CategoryList = await _categoryService.GetAllAsync(),
                 Emedia = emedia,
                 LanguageId = selectedLanguage.Id,
                 LanguageList = new SelectList(languages,
@@ -381,6 +383,41 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             };
 
             return View(viewModel);
+        }
+
+        [HttpPost]
+        [Route("[action]/{id}")]
+        [SaveModelState]
+        public async Task<IActionResult> Details(DetailsViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _emediaService.SetEmediaTextAsync(model.EmediaText);
+                    ShowAlertSuccess("Updated emedia text");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error updating emedia text: {Message}", ex.Message);
+                    ShowAlertDanger($"Error updating emedia text");
+                }
+            }
+
+            var language = await _languageService.GetActiveByIdAsync(model.EmediaText.LanguageId);
+
+            return RedirectToAction(nameof(Details), new
+            {
+                id = model.EmediaText.EmediaId,
+                language = language.IsDefault ? null : language.Name
+            });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> ChangeCategories(int id, List<int> categories)
+        {
+            return null;
         }
 
         /*

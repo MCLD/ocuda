@@ -52,7 +52,8 @@ namespace Ocuda.Ops.Data.Promenade
             return new DataWithCount<ICollection<Emedia>>
             {
                 Count = await DbSet.AsNoTracking().CountAsync(),
-                Data = await DbSet.AsNoTracking()
+                Data = await DbSet
+                    .AsNoTracking()
                     .OrderBy(_ => _.Name)
                     .ApplyPagination(filter)
                     .ToListAsync()

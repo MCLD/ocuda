@@ -89,6 +89,29 @@ namespace Ocuda.Ops.Service
             await _emediaRepository.SaveAsync();
         }
 
+        public async Task SetEmediaTextAsync(EmediaText emediaText)
+        {
+            var currentText = await _emediaTextReposiory.GetByEmediaAndLanguageAsync(
+                emediaText.EmediaId, emediaText.LanguageId);
+
+            if (currentText == null)
+            {
+                emediaText.Description = emediaText.Description?.Trim();
+                emediaText.Details = emediaText.Details?.Trim();
+
+                await _emediaTextReposiory.AddAsync(emediaText);
+            }
+            else
+            {
+                currentText.Description = emediaText.Description?.Trim();
+                currentText.Details = emediaText.Details?.Trim();
+
+                 _emediaTextReposiory.Update(currentText);
+            }
+
+            await _emediaTextReposiory.SaveAsync();
+        }
+
         public async Task<EmediaText> GetTextByEmediaAndLanguageAsync(int emediaId,
             int languageId)
         {

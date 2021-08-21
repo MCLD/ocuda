@@ -26,5 +26,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<Emedia> GetByIdAsync(int id);
         Task<EmediaText> GetTextByEmediaAndLanguageAsync(int emediaId, int languageId);
         Task<Emedia> GetIncludingGroupAsync(int id);
+        Task SetEmediaTextAsync(EmediaText emediaText);
     }
 }

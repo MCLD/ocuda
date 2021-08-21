@@ -26,7 +26,7 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(categoryRepository));
         }
 
-        public async Task<ICollection<Category>> GetAllCategories()
+        public async Task<ICollection<Category>> GetAllAsync()
         {
             return await _categoryRepository.GetAllAsync();
         }

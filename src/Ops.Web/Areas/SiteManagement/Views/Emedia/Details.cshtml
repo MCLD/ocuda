@@ -29,6 +29,22 @@
                formgroup
                hide-required="true"
                readonly />
+        <div class="row form-group">
+            <label class="col-form-label text-md-right col-md-3" for="CategorySelection">Categories</label>
+            <div class="form-group-inner col-md-9">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <button class="btn btn-primary"
+                                type="button"
+                                data-toggle="modal"
+                                data-target="#categoryModal">
+                            <span class="far fa-edit"></span>
+                        </button>
+                    </div>
+                    <input asp-for="CategorySelection" class="form-control" readonly />
+                </div>
+            </div>
+        </div>
         <select asp-for="SelectedLanguage" asp-items="Model.LanguageList" formgroup></select>
     </div>
 </div>
@@ -41,6 +57,7 @@
 
 <form asp-action="@nameof(EmediaController.Details)" method="post" role="form">
     <input asp-for="EmediaText.EmediaId" value="@Model.Emedia.Id" type="hidden" />
+    <input asp-for="EmediaText.LanguageId" value="@Model.LanguageId" type="hidden" />
     <input asp-for="LanguageId" type="hidden" />
 
     <textarea asp-for="EmediaText.Description" formgroup></textarea>
@@ -68,11 +85,57 @@
     </div>
 </form>
 
+<form id="categoryForm" role="form">
+    <input asp-for="Emedia.Id" type="hidden" />
+
+    <div modal
+         id="categoryModal"
+         name="Categories"
+         type="ModalTypes.Edit">
+
+        @foreach (var category in Model.CategoryList)
+        {
+            <div>
+                <input id="@($"category{category.Id}")"
+                       class="categorySelector"
+                       data-id="@category.Id"
+                       type="checkbox"
+                       asp-checked="@(Model.CategorySelection?.Contains(category.Id) == true)" />
+                <label for="@($"category{category.Id}")">
+                    @category.Name
+                </label>
+            </div>
+        }
+    </div>
+</form>
+
 @section scripts {
     <script src="~/js/md.min.js" asp-append-version="true"></script>
 
     <script>
         var editor = new Markdown.Editor($("#EmediaText_Details"), { allowUploads: true });
         editor.run();
+
+        var emediaDetailsUrl
+            = "@Url.Action(nameof(EmediaController.Details), new { id = Model.Emedia.Id})";
+
+        $("#SelectedLanguage").on("change", function () {
+            window.location.href = emediaDetailsUrl + "?language=" + $(this).val();
+        });
+
+        $("#categoryForm").submit(function (e) {
+            e.preventDefault();
+
+            var id = @Model.Emedia.Id;
+            var categories = $(".categorySelector:checked")
+                .map(function () { return $(this).data("id"); })
+                .get();
+
+            $.post("@Url.Action(nameof(EmediaController.ChangeCategories), EmediaController.Name)",
+                { id, categories },
+                function (response) {
+
+                });
+        });
     </script>
 }
