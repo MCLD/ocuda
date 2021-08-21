@@ -3,6 +3,18 @@
 
 <h1>Web Site management</h1>
 
+@if (!Model.HasPermissions)
+{
+    <div class="row">
+        <div class="col-12 col-md-6 offset-md-3">
+            <div class="alert alert-warning">
+                It appears that you do not have any Web Site management permissions.
+                Please contact your system administrator for more information.
+            </div>
+        </div>
+    </div>
+}
+
 <div class="justify-content-center d-flex flex-wrap">
     @if (Model.IsSiteManager)
     {

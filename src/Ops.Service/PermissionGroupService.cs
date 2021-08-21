@@ -163,8 +163,8 @@ namespace Ocuda.Ops.Service
                 || await HasAPermissionAsync<PermissionGroupPodcastItem>(permissionGroupIds));
 
             var hasContentAdminRights = (
-                await HasAPermissionAsync<PermissionGroupPageContent>(permissionGroupIds)
-                || await HasAPermissionAsync<PermissionGroupPodcastItem>(permissionGroupIds));
+                await HasAPermissionAsync<PermissionGroupReplaceFiles>(permissionGroupIds)
+                || await HasAPermissionAsync<PermissionGroupSectionManager>(permissionGroupIds));
 
             if (!hasContentAdminRights)
             {

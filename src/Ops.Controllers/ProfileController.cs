@@ -97,9 +97,11 @@ namespace Ocuda.Ops.Controllers
                 viewModel.AuthenticatedAt = DateTime.Parse(UserClaim(ClaimType.AuthenticatedAt),
                     CultureInfo.InvariantCulture);
 
-                if (!string.IsNullOrEmpty(UserClaim(ClaimType.PermissionId)))
+                var permissionClaims = UserClaims(ClaimType.PermissionId);
+
+                if (permissionClaims?.Count > 0)
                 {
-                    var permissionGroupIds = UserClaims(ClaimType.PermissionId)
+                    var permissionGroupIds = permissionClaims
                         .Select(_ => int.Parse(_, CultureInfo.InvariantCulture));
 
                     var permissionLookup = await _permissionGroupService
