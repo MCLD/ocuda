@@ -41,7 +41,7 @@
                             <span class="far fa-edit"></span>
                         </button>
                     </div>
-                    <input asp-for="CategorySelection" class="form-control" readonly />
+                    <input asp-for="CategorySelection" value="@Model.CategorySelectionText" class="form-control" readonly />
                 </div>
             </div>
         </div>
@@ -100,7 +100,7 @@
                        class="categorySelector"
                        data-id="@category.Id"
                        type="checkbox"
-                       asp-checked="@(Model.CategorySelection?.Contains(category.Id) == true)" />
+                       checked="@(Model.CategorySelection?.Contains(category.Id) == true ? "checked" : null)" />
                 <label for="@($"category{category.Id}")">
                     @category.Name
                 </label>
@@ -134,7 +134,13 @@
             $.post("@Url.Action(nameof(EmediaController.ChangeCategories), EmediaController.Name)",
                 { id, categories },
                 function (response) {
-
+                    if (response.success == true) {
+                        location.reload();
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners($(this).find(".btn-spinner"));
+                    }
                 });
         });
     </script>

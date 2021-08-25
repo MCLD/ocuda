@@ -370,16 +370,21 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var emediaText = await _emediaService.GetTextByEmediaAndLanguageAsync(emedia.Id,
                 selectedLanguage.Id);
 
+            var selectedCategories = await _emediaService.GetCategoriesForEmediaAsync(emedia.Id);
+
             var viewModel = new DetailsViewModel
             {
                 CategoryList = await _categoryService.GetAllAsync(),
+                CategorySelection = selectedCategories.Select(_ => _.Id).ToList(),
+                CategorySelectionText = string.Join(", ",
+                    selectedCategories.Select(_ => _.Name).OrderBy(_ => _)),
                 Emedia = emedia,
+                EmediaText = emediaText,
                 LanguageId = selectedLanguage.Id,
                 LanguageList = new SelectList(languages,
                     nameof(Language.Name),
                     nameof(Language.Description),
-                    selectedLanguage.Name),
-                EmediaText = emediaText
+                    selectedLanguage.Name)
             };
 
             return View(viewModel);
@@ -415,9 +420,28 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> ChangeCategories(int id, List<int> categories)
+        public async Task<IActionResult> ChangeCategories(int id, ICollection<int> categories)
         {
-            return null;
+            JsonResponse response;
+
+            try
+            {
+                await _emediaService.UpdateCategoriesAsync(id, categories);
+                response = new JsonResponse
+                {
+                    Success = true
+                };
+            }
+            catch (OcudaException ex)
+            {
+                response = new JsonResponse
+                {
+                    Message = ex.Message,
+                    Success = false
+                };
+            }
+
+            return Json(response);
         }
 
         /*

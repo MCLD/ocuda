@@ -23,11 +23,21 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
-        public async Task<ICollection<EmediaCategory>> GetByEmediaIdAsync(int emediaId)
+        public async Task<ICollection<Category>> GetCategoriesForEmediaAsync(int emediaId)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.EmediaId == emediaId)
+                .Select(_ => _.Category)
+                .ToListAsync();
+        }
+
+        public async Task<ICollection<int>> GetCategoryIdsForEmediaAsync(int emediaId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.EmediaId == emediaId)
+                .Select(_ => _.CategoryId)
                 .ToListAsync();
         }
 
@@ -54,6 +64,15 @@ namespace Ocuda.Ops.Data.Promenade
                 .AsNoTracking()
                 .Where(_ => _.Emedia.GroupId == groupId)
                 .ToListAsync();
+        }
+
+        public void RemoveByEmediaAndCategories(int emediaId, ICollection<int> categoryIds)
+        {
+            var emediaCategories = DbSet
+                .AsNoTracking()
+                .Where(_ => _.EmediaId == emediaId && categoryIds.Contains(_.CategoryId));
+
+            DbSet.RemoveRange(emediaCategories);
         }
     }
 }

@@ -12,6 +12,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Emedia
 
         public ICollection<Promenade.Models.Entities.Category> CategoryList { get; set; }
         public ICollection<int> CategorySelection { get; set; }
+        public string CategorySelectionText { get; set; }
 
         public int LanguageId { get; set; }
         public SelectList LanguageList { get; set; }

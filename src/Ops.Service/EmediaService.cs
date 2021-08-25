@@ -135,15 +135,15 @@ namespace Ocuda.Ops.Service
             return emedias;
         }
 
-        public async Task<ICollection<EmediaCategory>> GetEmediaCategoriesById(int emediaId)
-        {
-            return await _emediaCategoryRepository.GetByEmediaIdAsync(emediaId);
-        }
-
         public async Task<ICollection<EmediaCategory>>
             GetEmediaCategoriesByCategoryId(int categoryId)
         {
             return await _emediaCategoryRepository.GetByCategoryIdAsync(categoryId);
+        }
+
+        public async Task<ICollection<Category>> GetCategoriesForEmediaAsync(int emediaId)
+        {
+            return await _emediaCategoryRepository.GetCategoriesForEmediaAsync(emediaId);
         }
 
         public async Task AddEmediaCategory(EmediaCategory emediaCategory)
@@ -156,29 +156,25 @@ namespace Ocuda.Ops.Service
             await _emediaCategoryRepository.SaveAsync();
         }
 
-        public async Task UpdateEmediaCategoryAsync(List<int> newCategoryIds, int emediaId)
+        public async Task UpdateCategoriesAsync(int emediaId, ICollection<int> categoryIds)
         {
-            var currentCats = await _emediaCategoryRepository.GetByEmediaIdAsync(emediaId);
-            var currentCatIds = currentCats.Select(_ => _.CategoryId).ToList();
+            var currentCategories = await _emediaCategoryRepository
+                .GetCategoryIdsForEmediaAsync(emediaId);
 
-            var addCategoryIds = newCategoryIds ?? new List<int>();
+            var categoriesIdsToAdd = categoryIds.Except(currentCategories).ToList();
+            var categoriesIdsToRemove = currentCategories.Except(categoryIds).ToList();
 
-            var catsToDelete = currentCatIds.Except(addCategoryIds).ToList();
-            foreach (var category in addCategoryIds.Except(currentCatIds).ToList())
-            {
-                var emediaCategory = new EmediaCategory
+            var categoriesToAdd = categoriesIdsToAdd
+                .Select(_ => new EmediaCategory
                 {
-                    EmediaId = emediaId,
-                    CategoryId = category
-                };
-                await _emediaCategoryRepository.AddAsync(emediaCategory);
-            }
-            foreach (var category in catsToDelete)
-            {
-                var emediaCat
-                    = _emediaCategoryRepository.GetByEmediaAndCategoryId(emediaId, category);
-                _emediaCategoryRepository.Remove(emediaCat);
-            }
+                    CategoryId = _,
+                    EmediaId = emediaId
+                })
+                .ToList();
+
+            await _emediaCategoryRepository.AddRangeAsync(categoriesToAdd);
+            _emediaCategoryRepository.RemoveByEmediaAndCategories(emediaId, categoriesIdsToRemove);
+
             await _emediaCategoryRepository.SaveAsync();
         }
 
