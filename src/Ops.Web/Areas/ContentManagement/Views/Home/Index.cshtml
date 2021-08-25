@@ -33,7 +33,7 @@
             </div>
         </div>
     }
-    @if (Model.HasSectionManagerPermissions)
+    @if (Model.IsSiteManager || Model.HasSectionManagerPermissions)
     {
         <div class="col-12 col-md-4 my-2">
             <div class="card">

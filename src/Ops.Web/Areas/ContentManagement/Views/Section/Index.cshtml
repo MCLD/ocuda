@@ -49,21 +49,24 @@
                     </div>
                     <div class="card-body d-flex flex-wrap">
                         <a asp-action="@nameof(SectionController.Section)"
-                           asp-route-sectionstub="@userSection.Stub"
+                           asp-route-sectionslug="@userSection.Slug"
                            class="btn btn-outline-primary mr-1 mb-1">
                             <span class="fas fa-tools"></span>
                             Admin
                         </a>
-                        <a asp-action="@nameof(SectionController.Permissions)"
-                           asp-route-stub="@userSection.Stub"
-                           class="btn btn-outline-primary mr-1 mb-1">
-                            <span class="fas fa-user-plus"></span>
-                            Permissions
-                        </a>
+                        @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
+                        {
+                            <a asp-action="@nameof(SectionController.Permissions)"
+                               asp-route-slug="@userSection.Slug"
+                               class="btn btn-outline-primary mr-1 mb-1">
+                                <span class="fas fa-user-plus"></span>
+                                Permissions
+                            </a>
+                        }
                         <a asp-controller="@HomeController.Name"
                            asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.SectionIndex)"
                            asp-area=""
-                           asp-route-stub="@userSection.Stub"
+                           asp-route-slug="@userSection.Slug"
                            class="btn btn-outline-primary mr-1 mb-1">
                             <span class="fas fa-list"></span>
                             View

@@ -8,14 +8,14 @@
         <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Section))"
-           asp-route-sectionStub="@Model.Stub">Back</a>
+           asp-route-sectionSlug="@Model.Slug">Back</a>
     </div>
 </div>
 
 <div class="row pt-1">
     <div class="col-12">
         <input asp-for="Name" formgroup readonly />
-        <input asp-for="Stub" formgroup readonly />
+        <input asp-for="Slug" formgroup readonly />
     </div>
 </div>
 
@@ -33,7 +33,7 @@
                         <li class="list-group-item">
                             <form asp-controller="@SectionController.Name"
                                   asp-action="@(nameof(SectionController.AddPermissionGroup))"
-                                  asp-route-stub="@Model.Stub"
+                                  asp-route-slug="@Model.Slug"
                                   asp-route-permissionGroupId="@availableGroup.Key">
                                 @availableGroup.Value
                                 <button class="btn btn-link text-success float-right">
@@ -63,7 +63,7 @@
                         <li class="list-group-item">
                             <form asp-controller="@SectionController.Name"
                                   asp-action="@(nameof(SectionController.RemovePermissionGroup))"
-                                  asp-route-stub="@Model.Stub"
+                                  asp-route-slug="@Model.Slug"
                                   asp-route-permissionGroupId="@availableGroup.Key">
                                 @availableGroup.Value
                                 <button class="btn btn-link text-danger float-right">

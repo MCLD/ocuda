@@ -15,8 +15,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
 
         public IDictionary<int, string> AvailableGroups { get; }
 
-        [DisplayName("Stub")]
-        public string FileLibraryStub { get; set; }
+        [DisplayName("Slug")]
+        public string FileLibrarySlug { get; set; }
 
         [DisplayName("File Library")]
         public string Name { get; set; }
@@ -24,6 +24,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
         [DisplayName("Section")]
         public string SectionName { get; set; }
 
-        public string SectionStub { get; set; }
+        public string SectionSlug { get; set; }
     }
 }

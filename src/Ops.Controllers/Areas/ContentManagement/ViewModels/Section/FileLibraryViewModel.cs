@@ -21,8 +21,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
         public string FileLibraryName { get; set; }
 
         [Required]
-        [DisplayName("File Library Stub")]
-        public string FileLibraryStub { get; set; }
+        [DisplayName("File Library Slug")]
+        public string FileLibrarySlug { get; set; }
 
         public ICollection<File> Files { get; set; }
         public ICollection<FileType> FileTypes { get; set; }
@@ -46,7 +46,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
         public string SectionName { get; set; }
 
         [Required]
-        public string SectionStub { get; set; }
+        public string SectionSlug { get; set; }
 
         [Required]
         [DisplayName("file")]

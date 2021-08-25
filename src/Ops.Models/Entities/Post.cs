@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -16,16 +15,22 @@ namespace Ocuda.Ops.Models.Entities
             }
         }
 
-        [NotMapped]
-        public List<Category> Categories { get; set; }
-
         [Required]
         public string Content { get; set; }
 
         [NotMapped]
         public string CreatedByUsername { get; set; }
 
-        public bool IsPinned { get; set; }
+        [NotMapped]
+        public bool IsPinned
+        {
+            get
+            {
+                return PinnedUntil.HasValue && DateTime.Now <= PinnedUntil.Value;
+            }
+        }
+
+        public DateTime? PinnedUntil { get; set; }
 
         [NotMapped]
         public string PublishedAgo
@@ -36,7 +41,9 @@ namespace Ocuda.Ops.Models.Entities
             }
         }
 
+        [Display(Name = "Published At")]
         public DateTime PublishedAt { get; set; }
+
         public Section Section { get; set; }
         public int SectionId { get; set; }
 
@@ -44,13 +51,14 @@ namespace Ocuda.Ops.Models.Entities
         public string SectionName { get; set; }
 
         [NotMapped]
-        public string SectionStub { get; set; }
+        public string SectionSlug { get; set; }
 
+        [Display(Name = "Featured")]
         public bool ShowOnHomePage { get; set; }
 
         [Required]
         [MaxLength(255)]
-        public string Stub { get; set; }
+        public string Slug { get; set; }
 
         [NotMapped]
         public string TextColor

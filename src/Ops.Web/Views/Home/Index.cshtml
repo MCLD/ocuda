@@ -55,12 +55,12 @@
                                     {
                                         @post.CreatedByName
                                     }
-                                    @if (!string.IsNullOrEmpty(post.SectionStub) && !string.IsNullOrEmpty(post.SectionName))
+                                    @if (!string.IsNullOrEmpty(post.SectionSlug) && !string.IsNullOrEmpty(post.SectionName))
                                     {
                                         @:in
                                         <a asp-controller="@HomeController.Name"
                                            asp-action="@nameof(HomeController.SectionIndex)"
-                                           asp-route-stub="@post.SectionStub">@post.SectionName</a>
+                                           asp-route-stub="@post.SectionSlug">@post.SectionName</a>
                                     }
                                 </small>
                             </em>
@@ -122,8 +122,8 @@
                             <a asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
                                asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibrary)"
                                asp-area="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement)"
-                               asp-route-sectionStub="@Model.SectionStub"
-                               asp-route-fileLibraryStub="@fileLibrary.Stub"
+                               asp-route-sectionSlug="@Model.SectionSlug"
+                               asp-route-fileLibrarySlug="@fileLibrary.Slug"
                                class="btn btn-sm btn-outline-secondary">
                                 <span class="fas fa-tasks fa-fw"
                                       title="View this file library."></span>
@@ -182,8 +182,8 @@
                                             <a asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
                                                asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibrary)"
                                                asp-area="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement)"
-                                               asp-route-sectionStub="@Model.SectionStub"
-                                               asp-route-fileLibraryStub="@fileLibrary.Stub">More files...</a>
+                                               asp-route-sectionSlug="@Model.SectionSlug"
+                                               asp-route-fileLibrarySlug="@fileLibrary.Slug">More files...</a>
                                         </td>
                                     </tr>
                                 }

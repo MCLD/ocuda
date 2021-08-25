@@ -64,10 +64,10 @@ namespace Ocuda.Ops.Service
             return sections.Where(_ => names.Contains(_.Name)).ToList();
         }
 
-        public async Task<Section> GetByStubAsync(string stub)
+        public async Task<Section> GetBySlugAsync(string slug)
         {
             var sections = await GetAllAsync();
-            return sections.SingleOrDefault(_ => _.Stub == stub);
+            return sections.SingleOrDefault(_ => _.Slug == slug);
         }
 
         public async Task<int> GetHomeSectionIdAsync()

@@ -12,9 +12,6 @@
               href="~/devmodules/bootstrap/dist/css/bootstrap.css"
               asp-append-version="true" />
         <link rel="stylesheet"
-              href="~/devmodules/bootstrap-multiselect/dist/css/bootstrap-multiselect.css"
-              asp-append-version="true" />
-        <link rel="stylesheet"
               href="~/devmodules/@@fortawesome/fontawesome-free/css/all.css"
               asp-append-version="true" />
         <link rel="stylesheet" href="~/devstyles/ops.css" asp-append-version="true" />
@@ -58,7 +55,7 @@
                         {
                             <a class="dropdown-item"
                                asp-area=""
-                               asp-route-stub="@opsSection.Stub"
+                               asp-route-stub="@opsSection.Slug"
                                asp-controller="@HomeController.Name"
                                asp-action="@(nameof(HomeController.SectionIndex))">
                                 @if (!string.IsNullOrEmpty(opsSection.Icon))
@@ -303,8 +300,6 @@
         <script src="~/devmodules/popper.js/dist/umd/popper.js"
                 asp-append-version="true"></script>
         <script src="~/devmodules/bootstrap/dist/js/bootstrap.js"
-                asp-append-version="true"></script>
-        <script src="~/devmodules/bootstrap-multiselect/dist/js/bootstrap-multiselect.js"
                 asp-append-version="true"></script>
         <script src="~/devmodules/jquery-validation/dist/jquery.validate.js"
                 asp-append-version="true"></script>

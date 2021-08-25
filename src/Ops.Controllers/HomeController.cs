@@ -79,7 +79,7 @@ namespace Ocuda.Ops.Controllers
             }
 
             var filePath = await _fileService.GetFilePathAsync(section.Id,
-                library.Stub,
+                library.Slug,
                 fileId);
             var filename = Path.GetFileName(filePath);
 
@@ -93,7 +93,7 @@ namespace Ocuda.Ops.Controllers
                     library.Id);
 
                 return RedirectToAction(nameof(SectionIndex),
-                    new { stub = section.Stub });
+                    new { slug = section.Slug });
             }
 
             return File(new FileStream(filePath, FileMode.Open, FileAccess.Read),
@@ -111,10 +111,10 @@ namespace Ocuda.Ops.Controllers
             }, showPage);
         }
 
-        [HttpGet("{stub}")]
-        public async Task<IActionResult> SectionIndex(string stub, int page)
+        [HttpGet("{slug}")]
+        public async Task<IActionResult> SectionIndex(string slug, int page)
         {
-            var section = await _sectionService.GetByStubAsync(stub);
+            var section = await _sectionService.GetBySlugAsync(slug);
             if (section == null)
             {
                 return NotFound();
@@ -202,7 +202,7 @@ namespace Ocuda.Ops.Controllers
             if (filter.IsShownOnHomePage == true)
             {
                 filter.SectionId = await _sectionService.GetHomeSectionIdAsync();
-                viewModel.SectionStub = "Home";
+                viewModel.SectionSlug = "Home";
             }
             else
             {
@@ -210,7 +210,7 @@ namespace Ocuda.Ops.Controllers
                 {
                     var section = await _sectionService.GetByIdAsync(filter.SectionId.Value);
                     viewModel.SectionName = section.Name;
-                    viewModel.SectionStub = section.Stub;
+                    viewModel.SectionSlug = section.Slug;
                     viewModel.SupervisorsOnly = section.SupervisorsOnly;
                 }
             }

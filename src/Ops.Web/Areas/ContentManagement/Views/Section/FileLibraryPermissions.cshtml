@@ -2,23 +2,21 @@
 
 <div class="row mb-2">
     <div class="col-sm-7">
-        <h1>File library permissions</h1>
+        <h1>File replacement permissions <small class="text-muted">@Model.Name</small></h1>
     </div>
     <div class="col-sm-5">
         <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibrary))"
-           asp-route-sectionStub="@Model.SectionStub"
-           asp-route-fileLibraryStub="@Model.FileLibraryStub">Back</a>
+           asp-route-sectionSlug="@Model.SectionSlug"
+           asp-route-fileLibrarySlug="@Model.FileLibrarySlug">Back</a>
     </div>
 </div>
 
 <div class="row pt-1">
     <div class="col-12">
-        <input asp-for="Name" formgroup readonly />
-        <input asp-for="FileLibraryStub" formgroup readonly />
         <input asp-for="SectionName" formgroup readonly />
-    </div>
+    </div>  
 </div>
 
 <div class="row pt-1">
@@ -35,8 +33,8 @@
                         <li class="list-group-item">
                             <form asp-controller="@SectionController.Name"
                                   asp-action="@(nameof(SectionController.AddFilePermissionGroup))"
-                                  asp-route-fileLibraryStub="@Model.FileLibraryStub"
-                                  asp-route-sectionStub="@Model.SectionStub"
+                                  asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
+                                  asp-route-sectionSlug="@Model.SectionSlug"
                                   asp-route-permissionGroupId="@availableGroup.Key">
                                 @availableGroup.Value
                                 <button class="btn btn-link text-success float-right">
@@ -66,8 +64,8 @@
                         <li class="list-group-item">
                             <form asp-controller="@SectionController.Name"
                                   asp-action="@(nameof(SectionController.RemoveFilePermissionGroup))"
-                                  asp-route-fileLibraryStub="@Model.FileLibraryStub"
-                                  asp-route-sectionStub="@Model.SectionStub"
+                                  asp-route-fileLibrarySlug="@Model.FileLibrarySlug"
+                                  asp-route-sectionSlug="@Model.SectionSlug"
                                   asp-route-permissionGroupId="@availableGroup.Key">
                                 @availableGroup.Value
                                 <button class="btn btn-link text-danger float-right">

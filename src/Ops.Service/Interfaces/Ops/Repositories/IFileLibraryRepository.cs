@@ -12,7 +12,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 
         Task<ICollection<FileLibrary>> GetBySectionIdAsync(int sectionId);
 
-        Task<FileLibrary> GetBySectionIdStubAsync(int sectionId, string stub);
+        Task<FileLibrary> GetBySectionIdSlugAsync(int sectionId, string stub);
 
         Task<ICollection<int>> GetLibraryFileTypeIdsAsync(int libraryId);
 

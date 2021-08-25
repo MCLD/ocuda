@@ -8,7 +8,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
     {
         public PaginateModel PaginateModel { get; set; }
 
-        public string SectionStub { get; set; }
+        public string SectionSlug { get; set; }
 
         public string SectionName { get; set; }
 

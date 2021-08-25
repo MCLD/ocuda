@@ -9,5 +9,10 @@ namespace Ocuda.Utility.Extensions
             return new DateTime((dateTime.Ticks + roundTo.Ticks - 1)
                 / roundTo.Ticks * roundTo.Ticks, dateTime.Kind);
         }
+
+        public static DateTime CombineWithTime(this DateTime dateTime, DateTime time)
+        {
+            return dateTime.Date.Add(time.TimeOfDay);
+        }
     }
 }

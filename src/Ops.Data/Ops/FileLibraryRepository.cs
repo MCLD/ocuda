@@ -52,11 +52,11 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
-        public async Task<FileLibrary> GetBySectionIdStubAsync(int sectionId, string stub)
+        public async Task<FileLibrary> GetBySectionIdSlugAsync(int sectionId, string slug)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.SectionId == sectionId && _.Stub == stub)
+                .Where(_ => _.SectionId == sectionId && _.Slug == slug)
                 .SingleOrDefaultAsync();
         }
 

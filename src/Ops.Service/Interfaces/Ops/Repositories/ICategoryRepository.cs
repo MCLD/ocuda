@@ -7,7 +7,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
     public interface ICategoryRepository : IOpsRepository<Category, int>
     {
         Task<List<Category>> GetCategoriesBySectionIdAsync(int sectionId);
-        Task<Category> GetCategoryByStubAsync(string stub);
+        Task<Category> GetCategoryBySlugAsync(string stub);
         Task<bool> SectionHasCategoryAsync(int categoryId, int sectionId);
     }
 }

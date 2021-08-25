@@ -18,12 +18,11 @@
                         <div class="modal-body">
                             <div id="modalItemList" class="col-12">
                                 <div class="col-sm-9">
-
-                                    <input asp-for="Section.Stub"
-                                           value="@Model.Section.Stub"
+                                    <input asp-for="Section.Slug"
+                                           value="@Model.Section.Slug"
                                            autocomplete="off"
                                            type="hidden" />
-                                    <input asp-for="LinkLibrary.Stub"
+                                    <input asp-for="LinkLibrary.Slug"
                                            autocomplete="off"
                                            type="hidden" />
                                     <input asp-for="LinkLibrary.Name"
@@ -69,21 +68,20 @@
                         <div class="modal-body">
                             <div id="modalItemList" class="col-12">
                                 <div class="col-sm-9">
-
-                                    <input asp-for="Section.Stub"
-                                           value="@Model.Section.Stub"
+                                    <input asp-for="Section.Slug"
+                                           value="@Model.Section.Slug"
                                            autocomplete="off"
                                            type="hidden" />
-                                    <input asp-for="FileLibrary.Stub"
+                                    <input asp-for="FileLibrary.Slug"
                                            autocomplete="off"
                                            type="hidden" />
-                                    <input asp-for="LinkLibrary.Stub"
+                                    <input asp-for="FileLibrary.Slug"
                                            autocomplete="off"
                                            type="hidden" />
-                                    <input asp-for="LinkLibrary.Id"
+                                    <input asp-for="LinkLibrary.Slug"
                                            autocomplete="off"
                                            type="hidden" value="0" />
-                                    <input asp-for="FileLibrary.Id"
+                                    <input asp-for="LinkLibrary.Id"
                                            autocomplete="off"
                                            type="hidden" value="0" />
                                     <input asp-for="FileLibrary.Name"
@@ -133,12 +131,11 @@
                         <div class="modal-body">
                             <div id="modalItemList" class="col-12">
                                 <div class="col-sm-9">
-
-                                    <input asp-for="Section.Stub"
-                                           value="@Model.Section.Stub"
+                                    <input asp-for="Section.Slug"
+                                           value="@Model.Section.Slug"
                                            autocomplete="off"
                                            type="hidden" />
-                                    <input asp-for="FileLibrary.Stub"
+                                    <input asp-for="FileLibrary.Slug"
                                            autocomplete="off"
                                            type="hidden" />
                                     <input asp-for="FileLibrary.Name"
@@ -166,6 +163,7 @@
         </div>
     </div>
 </div>
+
 <div class="modal fade"
      id="deleteModal"
      tabindex="-1"
@@ -175,7 +173,7 @@
         <form id="deleteForm"
               method="post"
               role="form">
-            <input asp-for="Section.Stub" value="@Model.Section.Stub" type="hidden" />
+            <input asp-for="Section.Slug" value="@Model.Section.Slug" type="hidden" />
             <input asp-for="FileLibrary.Id" type="hidden" />
             <input asp-for="LinkLibrary.Id" type="hidden" />
             <div class="modal-content">
@@ -214,7 +212,7 @@
 
 <div class="row mb-2">
     <div class="col-sm-7">
-        <h1>Section: @Model.Section.Name</h1>
+        <h1>Section <small class="text-muted">@Model.Section.Name</small></h1>
     </div>
     <div class="col-sm-5">
         <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
@@ -257,15 +255,19 @@
                         <div class="card">
                             <div class="card-header p-4" style="transform: rotate(0);">
                                 <div class="float-left align-middle">
-                                    <a class="float-left align-middle" href="@Url.Action(nameof(SectionController.PostDetails),
-                                        new { sectionStub = Model.Section.Stub, postStub = post.Stub})">
+                                    <a class="float-left align-middle"
+                                       asp-action="@nameof(SectionController.PostDetails)"
+                                       asp-route-sectionSlug="@Model.Section.Slug"
+                                       asp-route-postSlug="@post.Slug">
                                         <h5>
                                             @post.Title
                                         </h5>
                                     </a>
                                 </div>
                                 <div class="float-right align-middle h4">
-                                    <a href="@Url.Action(nameof(SectionController.EditPost), new { sectionStub = Model.Section.Stub, postStub = post.Stub})">
+                                    <a asp-action="@nameof(SectionController.EditPost)"
+                                       asp-route-sectionSlug="@Model.Section.Slug"
+                                       asp-route-postSlug="@post.Slug">
                                         <span class="far fa-edit float-right"></span>
                                     </a>
                                 </div>
@@ -288,8 +290,8 @@
                                             {
                                                 <a class="badge badge-pill badge-info"
                                                    href="@Url.Action(nameof(SectionController.Posts),
-                                        new { sectionStub = Model.Section.Stub,
-                                        categoryStub = category.Stub, page = 1})">
+                                        new { sectionSlug = Model.Section.Slug,
+                                            categorySlug = category.Stub, page = 1})">
                                                     @category.Name
                                                 </a>
                                             }
@@ -331,7 +333,7 @@
                     @foreach (var library in Model.FileLibraries)
                     {
                         <tr>
-                            <td class="row-link file-item text-center" data-stub="@library.Stub">
+                            <td class="row-link file-item text-center" data-slug="@library.Slug">
                                 @library.Name
                             </td>
                             <td style="position: relative;" class="text-center">
@@ -341,7 +343,7 @@
                                    data-target="#editLibModal"
                                    data-id="@library.Id"
                                    data-name="@library.Name"
-                                   data-stub="@library.Stub"
+                                   data-slug="@library.Slug"
                                    data-type="file">
                                     <span class="far fa-edit float-right"></span>
                                 </a>
@@ -353,7 +355,7 @@
                                         data-target="#deleteModal"
                                         data-id="@library.Id"
                                         data-name="@library.Name"
-                                        data-stub="@library.Stub"
+                                        data-slug="@library.Slug"
                                         data-type="file">
                                     Delete
                                 </button>
@@ -394,7 +396,7 @@
                     @foreach (var library in Model.LinkLibraries)
                     {
                         <tr>
-                            <td class="row-link link-item text-center" data-stub="@library.Stub">
+                            <td class="row-link link-item text-center" data-slug="@library.Slug">
                                 @library.Name
                             </td>
                             <td style="position: relative;" class="text-center align-middle">
@@ -404,7 +406,7 @@
                                    data-target="#editLibModal"
                                    data-id="@library.Id"
                                    data-name="@library.Name"
-                                   data-stub="@library.Stub"
+                                   data-slug="@library.Slug"
                                    data-type="link">
                                     <span class="far fa-edit float-right"></span>
                                 </a>
@@ -416,7 +418,7 @@
                                         data-target="#deleteModal"
                                         data-id="@library.Id"
                                         data-name="@library.Name"
-                                        data-stub="@library.Stub"
+                                        data-slug="@library.Slug"
                                         data-type="link">
                                     Delete
                                 </button>
@@ -439,14 +441,14 @@
 @section scripts {
     <script>
         $(".row-link.file-item").on("click", function () {
-            var link = "@Url.Action(nameof(SectionController.FileLibrary), new { sectionStub = Model.Section.Stub, fileLibraryStub = 0 })";
-            link = link.replace("0", $(this).data("stub"));
+            var link = "@Url.Action(nameof(SectionController.FileLibrary), new { sectionSlug = Model.Section.Slug, fileLibrarySlug = 0 })";
+            link = link.replace("0", $(this).data("slug"));
             window.location.href = link;
         });
 
         $(".row-link.link-item").on("click", function () {
-            var link = "@Url.Action(nameof(SectionController.LinkLibrary), new { sectionStub = Model.Section.Stub, linkLibStub = 0 })";
-            link = link.replace("0", $(this).data("stub"));
+            var link = "@Url.Action(nameof(SectionController.LinkLibrary), new { sectionSlug = Model.Section.Slug, linkLibSlug = 0 })";
+            link = link.replace("0", $(this).data("slug"));
             window.location.href = link;
         });
         $(".editfile").on("click", function () {
@@ -476,25 +478,25 @@
         });
         $("#editForm").submit(function () {
             if ($("#editForm").find("#LinkLibrary_Name").val()) {
-                linkstub = $("#editForm").find("#LinkLibrary_Name").val().toLowerCase().replace(/[^a-zA-Z0-9]/g, '').replace(/ /g,"-");
-                $("#editForm").find("#LinkLibrary_Stub").val(linkstub);
+                linkslug = $("#editForm").find("#LinkLibrary_Name").val().toLowerCase().replace(/[^a-zA-Z0-9]/g, '').replace(/ /g,"-");
+                $("#editForm").find("#LinkLibrary_Slug").val(linkslug);
                 $("#editForm").find("#FileLibrary_Name").remove();
-                $("#editForm").find("#FileLibrary_Stub").remove();
+                $("#editForm").find("#FileLibrary_Slug").remove();
             }
             else {
-                filestub =  $("#editForm").find("#FileLibrary_Name").val().toLowerCase().replace(/[^a-zA-Z0-9]/g, '').replace(/ /g,"-");
-                $("#editForm").find("#FileLibrary_Stub").val(filestub);
+                fileslug =  $("#editForm").find("#FileLibrary_Name").val().toLowerCase().replace(/[^a-zA-Z0-9]/g, '').replace(/ /g,"-");
+                $("#editForm").find("#FileLibrary_Slug").val(fileslug);
                 $("#editForm").find("#LinkLibrary_Name").remove();
-                $("#editForm").find("#LinkLibrary_Stub").remove();
+                $("#editForm").find("#LinkLibrary_Slug").remove();
             }
         });
         $("#addLinkLibModal").submit(function (event) {
-            stub = $("#addLinkLibModal").find("#LinkLibrary_Name").val().toLowerCase().replace(/ /g,"-").replace(/[^a-zA-Z0-9]/g, '');
-            $("#addLinkLibModal").find("#LinkLibrary_Stub").val(stub);
+            slug = $("#addLinkLibModal").find("#LinkLibrary_Name").val().toLowerCase().replace(/ /g,"-").replace(/[^a-zA-Z0-9]/g, '');
+            $("#addLinkLibModal").find("#LinkLibrary_Slug").val(slug);
         });
         $("#addFileLibModal").submit(function (event) {
-            stub = $("#addFileLibModal").find("#FileLibrary_Name").val().toLowerCase().replace(/ /g, "-").replace(/[^a-zA-Z0-9]/g, '');
-            $("#addFileLibModal").find("#FileLibrary_Stub").val(stub);
+            slug = $("#addFileLibModal").find("#FileLibrary_Name").val().toLowerCase().replace(/ /g, "-").replace(/[^a-zA-Z0-9]/g, '');
+            $("#addFileLibModal").find("#FileLibrary_Slug").val(slug);
         });
         $("#confirmDelButton").on("click", function () {
             $(this).html("Delete <span class='fa fa-spinner fa-pulse fa-lg fa-fw hidden'></span>");

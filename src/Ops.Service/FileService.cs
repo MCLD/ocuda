@@ -78,20 +78,20 @@ namespace Ocuda.Ops.Service
             }
 
             library.Name = library.Name?.Trim();
-            library.Stub = library.Stub?.Trim();
+            library.Slug = library.Slug?.Trim();
 
             var exists = await _fileLibraryRepository
-                .GetBySectionIdStubAsync(library.SectionId, library.Stub);
+                .GetBySectionIdSlugAsync(library.SectionId, library.Slug);
 
             if (exists != null)
             {
-                throw new OcudaException($"A file library for this section already exists with this stub: {library.Stub}");
+                throw new OcudaException($"A file library for this section already exists with this stub: {library.Slug}");
             }
 
             var section = await _sectionService.GetByIdAsync(library.SectionId);
 
             var path = _pathResolver
-                .GetPrivateContentFilePath(null, SectionsPath, section.Stub, library.Stub);
+                .GetPrivateContentFilePath(null, SectionsPath, section.Slug, library.Slug);
 
             var directory = new System.IO.DirectoryInfo(path);
 
@@ -153,7 +153,7 @@ namespace Ocuda.Ops.Service
             var section = await _sectionService.GetByIdAsync(sectionId);
 
             var filePath = _pathResolver
-                .GetPrivateContentFilePath(null, SectionsPath, section.Stub, library.Stub);
+                .GetPrivateContentFilePath(null, SectionsPath, section.Slug, library.Slug);
 
             var exists = System.IO.Directory.Exists(filePath);
 
@@ -288,9 +288,9 @@ namespace Ocuda.Ops.Service
             return await _fileLibraryRepository.GetBySectionIdAsync(sectionId);
         }
 
-        public async Task<FileLibrary> GetBySectionIdStubAsync(int sectionId, string stub)
+        public async Task<FileLibrary> GetBySectionIdSlugAsync(int sectionId, string stub)
         {
-            return await _fileLibraryRepository.GetBySectionIdStubAsync(sectionId, stub);
+            return await _fileLibraryRepository.GetBySectionIdSlugAsync(sectionId, stub);
         }
 
         public async Task<ICollection<FileType>> GetFileLibrariesFileTypesAsync(int libraryId)
@@ -306,7 +306,7 @@ namespace Ocuda.Ops.Service
             return _pathResolver
                 .GetPrivateContentFilePath(file.Name + file.FileType.Extension,
                     SectionsPath,
-                    section.Stub,
+                    section.Slug,
                     libraryStub);
         }
 
@@ -357,8 +357,8 @@ namespace Ocuda.Ops.Service
                 var filePath = _pathResolver
                     .GetPrivateContentFilePath(file.Name + file.FileType.Extension,
                         SectionsPath,
-                        section.Stub,
-                        library.Stub);
+                        section.Slug,
+                        library.Slug);
 
                 if (System.IO.File.Exists(filePath))
                 {
@@ -424,18 +424,18 @@ namespace Ocuda.Ops.Service
 
             var currentLibrary = await GetLibraryByIdAsync(library.Id);
 
-            if (currentLibrary.Stub.Trim() != library.Stub.Trim())
+            if (currentLibrary.Slug.Trim() != library.Slug.Trim())
             {
                 // must move files
                 var oldPath = _pathResolver.GetPrivateContentFilePath(null,
                     SectionsPath,
-                    currentLibrary.Section.Stub,
-                    currentLibrary.Stub);
+                    currentLibrary.Section.Slug,
+                    currentLibrary.Slug);
 
                 var newPath = _pathResolver.GetPrivateContentFilePath(null,
                     SectionsPath,
-                    currentLibrary.Section.Stub,
-                    library.Stub);
+                    currentLibrary.Section.Slug,
+                    library.Slug);
 
                 if (System.IO.Directory.GetFiles(newPath).Length > 0)
                 {
@@ -453,7 +453,7 @@ namespace Ocuda.Ops.Service
             }
 
             currentLibrary.Name = library.Name.Trim();
-            currentLibrary.Stub = library.Stub.Trim();
+            currentLibrary.Slug = library.Slug.Trim();
             currentLibrary.UpdatedAt = DateTime.Now;
             currentLibrary.UpdatedBy = GetCurrentUserId();
 
@@ -482,8 +482,8 @@ namespace Ocuda.Ops.Service
 
             var filePath = _pathResolver.GetPrivateContentFilePath(filename,
                     SectionsPath,
-                    section.Stub,
-                    library.Stub);
+                    section.Slug,
+                    library.Slug);
 
             if (System.IO.File.Exists(filePath))
             {

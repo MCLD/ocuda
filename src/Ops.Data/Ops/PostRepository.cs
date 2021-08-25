@@ -103,11 +103,11 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
-        public async Task<Post> GetSectionPostByStubAsync(string stub, int sectionId)
+        public async Task<Post> GetSectionPostBySlugAsync(string slug, int sectionId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == stub && _.SectionId == sectionId)
+                .Where(_ => _.Slug == slug && _.SectionId == sectionId)
                 .SingleOrDefaultAsync();
         }
 

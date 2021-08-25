@@ -19,7 +19,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task DeleteLibraryAsync(int sectionId, int fileLibraryId);
 
-        Task DeletePrivateFileAsync(int sectionId, string fileLibraryStub, int fileId);
+        Task DeletePrivateFileAsync(int sectionId, string fileLibrarySlug, int fileId);
 
         Task DeletePublicFileAsync(int id);
 
@@ -36,11 +36,11 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<ICollection<FileLibrary>> GetBySectionIdAsync(int sectionId);
 
-        Task<FileLibrary> GetBySectionIdStubAsync(int sectionId, string stub);
+        Task<FileLibrary> GetBySectionIdSlugAsync(int sectionId, string slug);
 
         Task<ICollection<FileType>> GetFileLibrariesFileTypesAsync(int libraryId);
 
-        Task<string> GetFilePathAsync(int sectionId, string libraryStub, int fileId);
+        Task<string> GetFilePathAsync(int sectionId, string librarySlug, int fileId);
 
         Task<FileType> GetFileTypeByIdAsync(int id);
 

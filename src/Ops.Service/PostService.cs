@@ -37,22 +37,21 @@ namespace Ocuda.Ops.Service
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
-        public async Task CreatePostAsync(Post post)
+        public async Task<Post> CreatePostAsync(Post post)
         {
             if (post != null)
             {
-                var now = DateTime.Now;
-
                 post.Content = post.Content?.Trim();
                 post.Title = post.Title?.Trim();
-                post.Stub = post.Stub?.Trim();
-                post.PublishedAt = now;
-                post.CreatedAt = now;
+                post.Slug = post.Slug?.Trim();
+                post.CreatedAt = DateTime.Now;
                 post.CreatedBy = GetCurrentUserId();
 
                 await _postRepository.AddAsync(post);
                 await _postRepository.SaveAsync();
             }
+
+            return post;
         }
 
         public async Task<List<Category>> GetCategoriesBySectionIdAsync(int sectionId)
@@ -84,7 +83,7 @@ namespace Ocuda.Ops.Service
                     {
                         var section = await _sectionService.GetByIdAsync(post.SectionId);
                         post.SectionName = section.Name;
-                        post.SectionStub = section.Stub;
+                        post.SectionSlug = section.Slug;
                     }
                 }
             }
@@ -118,16 +117,16 @@ namespace Ocuda.Ops.Service
             return await _postRepository.GetPostsBySectionCategoryIdAsync(categoryId, sectionId);
         }
 
-        public async Task<Category> GetSectionCategoryByStubAsync(string stub, int sectionId)
+        public async Task<Category> GetSectionCategoryBySlugAsync(string slug, int sectionId)
         {
-            var category = await _categoryRepository.GetCategoryByStubAsync(stub);
+            var category = await _categoryRepository.GetCategoryBySlugAsync(slug);
 
             return await _categoryRepository.SectionHasCategoryAsync(category.Id, sectionId) ? category : null;
         }
 
-        public async Task<Post> GetSectionPostByStubAsync(string stub, int sectionId)
+        public async Task<Post> GetSectionPostBySlugAsync(string slug, int sectionId)
         {
-            return await _postRepository.GetSectionPostByStubAsync(stub, sectionId);
+            return await _postRepository.GetSectionPostBySlugAsync(slug, sectionId);
         }
 
         public async Task<List<Post>> GetTopSectionPostsAsync(int take, int sectionId)
@@ -156,7 +155,7 @@ namespace Ocuda.Ops.Service
                 oldPost.ShowOnHomePage = post.ShowOnHomePage;
                 oldPost.Content = post.Content?.Trim();
                 oldPost.Title = post.Title?.Trim();
-                oldPost.Stub = post.Stub?.Trim();
+                oldPost.Slug = post.Slug?.Trim();
                 oldPost.UpdatedAt = DateTime.Now;
                 oldPost.UpdatedBy = GetCurrentUserId();
 

@@ -27,8 +27,8 @@
                 <div class="modal-body">
                     <input asp-for="ReplaceFileId" type="hidden" />
                     <input asp-for="CurrentPage" type="hidden" />
-                    <input asp-for="SectionStub" type="hidden" />
-                    <input asp-for="FileLibraryStub" type="hidden" />
+                    <input asp-for="SectionSlug" type="hidden" />
+                    <input asp-for="FileLibrarySlug" type="hidden" />
                     <input asp-for="FileLibraryId" type="hidden" />
                     <p>Replace file: <strong id="ReplaceFileName"></strong></p>
                     <div class="input-group">
@@ -41,9 +41,9 @@
                                        style="display: none;" />
                             </span>
                         </label>
-                        <input type="text" class="form-control
-                                               @(ViewData.ModelState.GetValidationState("UploadFile") == invalid
-                                                   ? "input-validation-error" : "")" readonly />
+                        <input type="text"
+                               class="form-control @(ViewData.ModelState.GetValidationState("UploadFile") == invalid ? "input-validation-error" : "")"
+                               readonly />
                     </div>
                     <span asp-validation-for="UploadFile" class="text-danger"></span>
                 </div>
@@ -87,8 +87,8 @@
                   role="form"
                   enctype="multipart/form-data">
                 <div class="modal-body">
-                    <input asp-for="SectionStub"
-                           value="@Model.SectionStub"
+                    <input asp-for="SectionSlug"
+                           value="@Model.SectionSlug"
                            autocomplete="off"
                            type="hidden" />
                     <input asp-for="FileLibraryId"
@@ -107,9 +107,9 @@
                                        style="display: none;" />
                             </span>
                         </label>
-                        <input type="text" class="form-control
-                                               @(ViewData.ModelState.GetValidationState("UploadFile") == invalid
-                                                   ? "input-validation-error" : "")" readonly />
+                        <input type="text" 
+                               class="form-control @(ViewData.ModelState.GetValidationState("UploadFile") == invalid ? "input-validation-error" : "")"
+                               readonly />
                     </div>
                     <span asp-validation-for="UploadFile" class="text-danger"></span>
                     <input asp-for="File.Name" autocomplete="off" formgroup />
@@ -142,9 +142,9 @@
         <form id="delFileForm"
               method="post"
               role="form"
-              action="@Url.Action(nameof(SectionController.DeleteFileFromLibrary))">
-            <input asp-for="SectionStub" type="hidden" />
-            <input asp-for="FileLibraryStub" type="hidden" />
+              asp-action="@nameof(SectionController.DeleteFileFromLibrary)">
+            <input asp-for="SectionSlug" type="hidden" />
+            <input asp-for="FileLibrarySlug" type="hidden" />
             <input asp-for="CurrentPage" type="hidden" />
             <input id="delFileId" asp-for="File.Id" type="hidden" />
             <div class="modal-content">
@@ -161,8 +161,10 @@
                     <span class="fa fa-exclamation-triangle text-danger fa-lg align-self-center mr-3"
                           aria-hidden="true"></span>
                     <span class="d-flex-grow-1">
-                        Are you sure you want to delete this file:
-                        <strong><span id="deleteModalText"></span></strong>?
+                        <p>
+                            Are you sure you want to delete this file:
+                            <strong><span id="deleteModalText"></span></strong>?
+                        </p>
                     </span>
                 </div>
                 <div class="modal-footer">
@@ -186,14 +188,14 @@
 
 <div class="row mb-2">
     <div class="col-sm-7">
-        <h1>File library: @Model.FileLibraryName</h1>
+        <h1>File library <small class="text-muted">@Model.FileLibraryName</small></h1>
     </div>
     <div class="col-sm-5">
         <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
            asp-area=""
            asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.HomeController.SectionIndex))"
-           asp-route-stub="@Model.SectionStub">Back</a>
+           asp-route-slug="@Model.SectionSlug">Back</a>
         @if (Model.HasAdminRights)
         {
             <button class="btn btn-outline-primary mt-2 mb-1 mr-2 float-right"
@@ -202,12 +204,15 @@
                 <span class="fas fa-file-upload" aria-hidden="true"></span>
                 Add file
             </button>
+        }
+        @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
+        {
             <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
                asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
                asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
                asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibraryPermissions)"
-               asp-route-sectionStub="@Model.SectionStub"
-               asp-route-fileLibraryStub="@Model.FileLibraryStub">
+               asp-route-sectionSlug="@Model.SectionSlug"
+               asp-route-fileLibrarySlug="@Model.FileLibrarySlug">
                 <span class="fas fa-user-plus"></span>
                 Permissions
             </a>
@@ -302,7 +307,8 @@
                                                 data-toggle="modal"
                                                 data-target="#deleteModal"
                                                 data-id="@file.Id"
-                                                data-name="@file.Name">
+                                                data-name="@file.Name"
+                                                title="Delete file">
                                             <span class="far fa-times-circle fa-fw"
                                                   aria-hidden="true"></span>
                                         </button>

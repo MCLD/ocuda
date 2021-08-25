@@ -18,7 +18,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
         [DisplayName("Section")]
         public string Name { get; set; }
 
-        [DisplayName("Stub")]
-        public string Stub { get; set; }
+        public string Slug { get; set; }
     }
 }
