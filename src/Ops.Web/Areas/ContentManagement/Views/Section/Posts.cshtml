@@ -79,8 +79,8 @@
                     <a href="@Url.Action(nameof(SectionController.AddPost), new { sectionSlug = Model.SectionSlug})"
                        class="btn btn-success"
                        id="addPost">
-                   Create Post
-                </a>
+                        Create Post
+                    </a>
                 </span>
             </div>
         </div>
@@ -93,7 +93,7 @@
                         <div class="card m-3">
                             <div class="card-header">
                                 <div class="float-left align-middle">
-                                    <a class="float-left align-middle" 
+                                    <a class="float-left align-middle"
                                        href="@Url.Action(nameof(SectionController.PostDetails),
                                             new { sectionSlug = Model.SectionSlug, postSlug = post.Slug})">
                                         <h5>
@@ -102,7 +102,7 @@
                                     </a>
                                 </div>
                                 <div class="float-right align-middle h4">
-                                    <a href="@Url.Action(nameof(SectionController.EditPost), 
+                                    <a href="@Url.Action(nameof(SectionController.EditPost),
                                             new { sectionSlug = Model.SectionSlug, postSlug = post.Slug})">
                                         <span class="far fa-edit float-right"></span>
                                     </a>
@@ -112,15 +112,24 @@
                                 @Html.Raw(post.Content)
                             </div>
                             <div class="card-footer">
-                                <div class="font-italic">Posted: @post.PublishedAt.ToString("MM/dd/yyyy hh:mm tt")</div>
+                                <div class="font-italic">
+                                    @if (post.PublishedAt.HasValue)
+                                    {
+                                        @:Posted: @post.PublishedAt.Value.ToString()
+                                    }
+                                    else
+                                    {
+                                        @:Draft
+                                    }
+                                </div>
                                 @if (Model.PostCategories.Count > 0)
                                 {
                                     <div class="font-italic">
                                         Category:&nbsp;
                                         <span>
                                             @foreach (var category in Model.PostCategories
-                                                .Where(_=>_.PostId == post.Id)
-                                                .Select(_=>Model.SectionCategories.Where(__=>__.Id == _.CategoryId).FirstOrDefault()).ToList())
+                                               .Where(_ => _.PostId == post.Id)
+                                               .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
                                             {
                                                 <a class="badge badge-pill badge-info"
                                                    href="@Url.Action(nameof(SectionController.Posts),

@@ -115,13 +115,20 @@
                                 </small>
                             </em>
                         </div>
-                        <span title="@post.PublishedAgo">
-                            <em>
-                                <small class="text-muted">
-                                    @post.PublishedAt.ToString("f")
-                                </small>
-                            </em>
-                        </span>
+                        @if (post.PublishedAt.HasValue)
+                        {
+                            <span title="@post.PublishedAgo">
+                                <em>
+                                    <small class="text-muted">
+                                        @post.PublishedAt.Value.ToString("f")
+                                    </small>
+                                </em>
+                            </span>
+                        }
+                        else
+                        {
+                            <em><small class="text-muted">draft</small></em>
+                        }
                     </div>
                 </div>
             }

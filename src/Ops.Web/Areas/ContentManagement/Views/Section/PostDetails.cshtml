@@ -146,7 +146,14 @@
                 <div class="card-footer">
                     <div class="float-left align-middle">
                         <div class="font-italic">
-                            Posted: @Model.Post.PublishedAt.ToString("MM/dd/yyyy hh:mm tt")
+                            @if (Model.Post.PublishedAt.HasValue)
+                            {
+                                @:Posted: @Model.Post.PublishedAt.Value.ToString()
+                            }
+                            else
+                            {
+                                @:Draft
+                            }
                         </div>
                         @if (Model.PostCategories.Count > 0)
                         {
@@ -154,8 +161,8 @@
                                 Category:&nbsp;
                                 <span>
                                     @foreach (var category in Model.PostCategories
-                                        .Where(_ => _.PostId == Model.Post.Id)
-                                        .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
+                                         .Where(_ => _.PostId == Model.Post.Id)
+                                         .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
                                     {
                                         <a class="badge badge-pill badge-info"
                                            href="@Url.Action(nameof(SectionController.Posts),
