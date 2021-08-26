@@ -11,11 +11,8 @@
     "jquery": "^3.6.0",
     "jquery-validation": "^1.19.3",
     "jquery-validation-unobtrusive": "^3.2.12",
-    "moment": "^2.29.1",
-    "moment-timezone": "^0.5.33",
     "popper.js": "^1.16.1",
     "slick-carousel": "^1.8.1",
-    "tempusdominus-bootstrap-4": "^5.39.0",
-    "tempusdominus-core": "^5.19.0"
+    "slugify": "^1.6.0"
   }
 }
