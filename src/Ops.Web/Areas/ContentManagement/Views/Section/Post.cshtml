@@ -34,7 +34,7 @@
             <input asp-for="Post.Id" value="@Model.Post?.Id" hidden />
             <input asp-for="Post.Title" formgroup value="@Model.Post.Title" />
             <input asp-for="Post.Slug" formgroup value="@Model.Post.Slug" />
-            @if (Model.Post.Id == default)
+            @if (!Model.Post.PublishedAt.HasValue)
             {
                 <div class="form-group row">
                     <label class="col-form-label text-md-right col-md-3"

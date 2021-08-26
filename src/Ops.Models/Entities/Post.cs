@@ -12,6 +12,10 @@ namespace Ocuda.Ops.Models.Entities
         {
             get
             {
+                if (!PublishedAt.HasValue)
+                {
+                    return "border-warning";
+                }
                 return IsPinned ? "border-info" : null;
             }
         }

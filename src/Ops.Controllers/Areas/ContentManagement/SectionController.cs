@@ -593,6 +593,19 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             if (ModelState.IsValid)
             {
+                if (viewModel.Publish)
+                {
+                    if (!viewModel.PublishAtDate.HasValue && !viewModel.PublishAtTime.HasValue)
+                    {
+                        viewModel.Post.PublishedAt = DateTime.Now;
+                    }
+                    else
+                    {
+                        viewModel.Post.PublishedAt = viewModel.PublishAtDate.Value
+                            .CombineWithTime(viewModel.PublishAtTime.Value);
+                    }
+                }
+
                 if (viewModel.PinUntilDate.HasValue && viewModel.PinUntilTime.HasValue)
                 {
                     viewModel.Post.PinnedUntil = viewModel.PinUntilDate.Value

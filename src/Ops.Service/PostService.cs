@@ -165,6 +165,11 @@ namespace Ocuda.Ops.Service
                 oldPost.UpdatedAt = DateTime.Now;
                 oldPost.UpdatedBy = GetCurrentUserId();
 
+                if (!oldPost.PublishedAt.HasValue && post.PublishedAt.HasValue)
+                {
+                    oldPost.PublishedAt = post.PublishedAt;
+                }
+
                 _postRepository.Update(oldPost);
                 await _postRepository.SaveAsync();
             }
