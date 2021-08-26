@@ -33,6 +33,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
         public Post Post { get; set; }
 
         public bool Publish { get; set; }
+        public DateTime? PinUntilDate { get; set; }
+
+        public DateTime? PinUntilTime { get; set; }
+
 
         [Display(Name = "Publish At")]
         public DateTime? PublishAtDate { get; set; }

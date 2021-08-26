@@ -55,7 +55,7 @@
                         {
                             <a class="dropdown-item"
                                asp-area=""
-                               asp-route-stub="@opsSection.Slug"
+                               asp-route-slug="@opsSection.Slug"
                                asp-controller="@HomeController.Name"
                                asp-action="@(nameof(HomeController.SectionIndex))">
                                 @if (!string.IsNullOrEmpty(opsSection.Icon))

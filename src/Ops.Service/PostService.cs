@@ -79,6 +79,11 @@ namespace Ocuda.Ops.Service
                         (post.CreatedByName, post.CreatedByUsername)
                             = await _userService.GetNameUsernameAsync(post.CreatedBy);
                     }
+                    if (post.UpdatedBy.HasValue && post.UpdatedByUser == null)
+                    {
+                        (post.UpdatedByName, post.UpdatedByUsername)
+                            = await _userService.GetNameUsernameAsync(post.UpdatedBy.Value);
+                    }
                     if (string.IsNullOrEmpty(post.SectionName))
                     {
                         var section = await _sectionService.GetByIdAsync(post.SectionId);
@@ -152,10 +157,11 @@ namespace Ocuda.Ops.Service
             if (post != null)
             {
                 var oldPost = await _postRepository.FindAsync(post.Id);
-                oldPost.ShowOnHomePage = post.ShowOnHomePage;
                 oldPost.Content = post.Content?.Trim();
-                oldPost.Title = post.Title?.Trim();
+                oldPost.PinnedUntil = post.PinnedUntil;
+                oldPost.ShowOnHomePage = post.ShowOnHomePage;
                 oldPost.Slug = post.Slug?.Trim();
+                oldPost.Title = post.Title?.Trim();
                 oldPost.UpdatedAt = DateTime.Now;
                 oldPost.UpdatedBy = GetCurrentUserId();
 

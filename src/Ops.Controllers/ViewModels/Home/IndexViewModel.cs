@@ -40,5 +40,6 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
         public string SectionName { get; set; }
         public string SectionSlug { get; set; }
         public bool SupervisorsOnly { get; set; }
+        public bool SectionManager { get; set; }
     }
 }

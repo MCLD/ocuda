@@ -311,40 +311,60 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             if (ModelState.IsValid)
             {
-                if(viewModel.Publish)
+                if (viewModel.Publish)
                 {
-                    if(viewModel.PublishAtDate == null || viewModel.PublishAtTime == null)
+                    if (!viewModel.PublishAtDate.HasValue && !viewModel.PublishAtTime.HasValue)
                     {
                         viewModel.Post.PublishedAt = DateTime.Now;
                     }
                     else
                     {
-                        viewModel.Post.PublishedAt = viewModel
-                            .PublishAtDate
-                            .Value
+                        viewModel.Post.PublishedAt = viewModel.PublishAtDate.Value
                             .CombineWithTime(viewModel.PublishAtTime.Value);
                     }
+                }
+
+                if (viewModel.PinUntilDate.HasValue && viewModel.PinUntilTime.HasValue)
+                {
+                    viewModel.Post.PinnedUntil = viewModel.PinUntilDate.Value
+                        .CombineWithTime(viewModel.PinUntilTime.Value);
                 }
 
                 try
                 {
                     post = await _postService.CreatePostAsync(viewModel.Post);
 
-                    ShowAlertSuccess($"Added post: {post.Title}");
+                    if(viewModel.Publish)
+                    {
+                        ShowAlertSuccess($"Added post: {post.Title}");
+                    }
+                    else
+                    {
+                        ShowAlertSuccess($"Created draft: {post.Title}");
+                    }
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Issue creating post: {ErrorMessage}", ex.Message);
                     ShowAlertDanger($"Could not create post: {ex.Message}");
+                    return RedirectToAction(nameof(SectionController.PostDetails),
+                        new { sectionSlug = section.Slug, postSlug = slug });
                 }
             }
             else
             {
                 ShowAlertDanger($"Could not create post: {ModelState.ErrorCount} validation errors.");
+                return RedirectToAction(nameof(SectionController.PostDetails),
+                    new { sectionSlug = section.Slug, postSlug = slug });
             }
 
-            return RedirectToAction(nameof(SectionController.PostDetails),
-                new { sectionSlug = section.Slug, postSlug = slug });
+            return RedirectToAction(nameof(Ocuda.Ops.Controllers.HomeController.SectionIndex),
+                Ocuda.Ops.Controllers.HomeController.Name,
+                new
+                {
+                    area = "",
+                    slug = section.Slug
+                });
         }
 
         [HttpPost("[action]")]
@@ -541,11 +561,14 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             try
             {
+                var post = await _postService.GetSectionPostBySlugAsync(postSlug, section.Id);
                 return View("Post", new PostViewModel
                 {
                     CanPromote = await HasAppPermissionAsync(_permissionGroupService,
                         ApplicationPermission.IntranetFrontPageManagement),
-                    Post = await _postService.GetSectionPostBySlugAsync(postSlug, section.Id),
+                    PinUntilDate = post.PinnedUntil,
+                    PinUntilTime = post.PinnedUntil,
+                    Post = post,
                     SectionId = section.Id,
                     SectionName = section.Name,
                     SectionSlug = section.Slug
@@ -570,6 +593,16 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             if (ModelState.IsValid)
             {
+                if (viewModel.PinUntilDate.HasValue && viewModel.PinUntilTime.HasValue)
+                {
+                    viewModel.Post.PinnedUntil = viewModel.PinUntilDate.Value
+                        .CombineWithTime(viewModel.PinUntilTime.Value);
+                }
+                else
+                {
+                    viewModel.Post.PinnedUntil = null;
+                }
+
                 try
                 {
                     await _postService.UpdatePostAsync(viewModel.Post);
@@ -586,8 +619,13 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 ShowAlertDanger($"Could not edit post: {ModelState.ErrorCount} validation errors.");
             }
 
-            return RedirectToAction(nameof(SectionController.PostDetails),
-                new { sectionSlug = section.Slug, postSlug = viewModel.Post.Slug });
+            return RedirectToAction(nameof(Ocuda.Ops.Controllers.HomeController.SectionIndex),
+                Ocuda.Ops.Controllers.HomeController.Name,
+                new
+                {
+                    area = "",
+                    slug = section.Slug
+                });
         }
 
         [HttpGet("{sectionSlug}/[action]/{fileLibrarySlug}")]

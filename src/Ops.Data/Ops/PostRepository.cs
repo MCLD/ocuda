@@ -64,6 +64,12 @@ namespace Ocuda.Ops.Data.Ops
                     && !_.Section.SupervisorsOnly);
             }
 
+            if (!filter.IncludeDrafts)
+            {
+                query = query
+                    .Where(_ => _.PublishedAt != null);
+            }
+
             if (filter.CategoryId.HasValue)
             {
                 query = query
@@ -74,13 +80,13 @@ namespace Ocuda.Ops.Data.Ops
                     .Where(_ => _.postCategory.CategoryId == filter.CategoryId.Value)
                     .Select(_ => _.post);
             }
-
+            
             return new DataWithCount<ICollection<Post>>
             {
                 Count = await query.CountAsync(),
                 Data = await query
-                    .OrderByDescending(_ => _.IsPinned)
-                    .ThenByDescending(_ => _.PublishedAt)
+                    .OrderByDescending(_ => _.PinnedUntil)
+                    .ThenByDescending(_ => _.PublishedAt ?? DateTime.MaxValue)
                     .ApplyPagination(filter)
                     .ToListAsync()
             };

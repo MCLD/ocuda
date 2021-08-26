@@ -135,10 +135,15 @@ namespace Ocuda.Ops.Controllers
             }
 
             var showPage = page == default ? 1 : page;
-            return await ShowPostsAsync(new BlogFilter(showPage, 5)
+
+            var filter = new BlogFilter(showPage, 5)
             {
                 SectionId = section.Id
-            }, showPage);
+            };
+
+            var isAdmin = await _sectionService.IsManagerAsync(section.Id);
+
+            return await ShowPostsAsync(filter, showPage, isAdmin);
         }
 
         [HttpGet("[action]")]
@@ -179,6 +184,14 @@ namespace Ocuda.Ops.Controllers
 
         private async Task<IActionResult> ShowPostsAsync(BlogFilter filter, int page)
         {
+            return await ShowPostsAsync(filter, page, false);
+        }
+
+
+        private async Task<IActionResult> ShowPostsAsync(BlogFilter filter, int page, bool isAdmin)
+        {
+            filter.IncludeDrafts = isAdmin;
+
             var posts = await _postService.GetPaginatedPostsAsync(filter);
 
             var viewModel = new IndexViewModel
@@ -186,7 +199,8 @@ namespace Ocuda.Ops.Controllers
                 Posts = posts.Data,
                 ItemCount = posts.Count,
                 CurrentPage = page,
-                ItemsPerPage = filter.Take.Value
+                ItemsPerPage = filter.Take.Value,
+                SectionManager = isAdmin
             };
 
             if (viewModel.PastMaxPage)

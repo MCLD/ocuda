@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Ocuda.Utility.Extensions;
 
 namespace Ocuda.Ops.Models.Entities
 {
@@ -30,6 +31,7 @@ namespace Ocuda.Ops.Models.Entities
             }
         }
 
+        [Display(Name = "Pinned until")]
         public DateTime? PinnedUntil { get; set; }
 
         [NotMapped]
@@ -37,14 +39,24 @@ namespace Ocuda.Ops.Models.Entities
         {
             get
             {
-                return ApproxTimeAgo(PublishedAt);
+                return PublishedAt?.ApproxTimeAgo();
+            }
+        }
+
+        [NotMapped]
+        public string UpdatedAgo
+        {
+            get
+            {
+                return UpdatedAt?.ApproxTimeAgo();
             }
         }
 
         [Display(Name = "Published At")]
-        public DateTime PublishedAt { get; set; }
+        public DateTime? PublishedAt { get; set; }
 
         public Section Section { get; set; }
+
         public int SectionId { get; set; }
 
         [NotMapped]
@@ -73,22 +85,7 @@ namespace Ocuda.Ops.Models.Entities
         [MaxLength(255)]
         public string Title { get; set; }
 
-        private static string ApproxTimeAgo(DateTime date)
-        {
-            if (date == default) { return null; }
-            var diff = DateTime.Now - date;
-            if (diff.TotalDays > 1)
-            {
-                var days = Math.Floor(diff.TotalDays);
-                return $"{days:n0} {(days == 1 ? "day" : "days")} ago";
-            }
-            if (diff.TotalHours > 1)
-            {
-                var hours = Math.Floor(diff.TotalHours);
-                return $"{hours} {(hours == 1 ? "hour" : "hours")} ago";
-            }
-
-            return "recently";
-        }
+        [NotMapped]
+        public string UpdatedByUsername { get; set; }
     }
 }

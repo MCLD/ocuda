@@ -2,16 +2,31 @@
 
 @if (!string.IsNullOrEmpty(Model.SectionName))
 {
-    <div class="row">
-        <h1 class="h2 pl-2 pb-2">
-            @Model.SectionName
-            @if (Model.SupervisorsOnly)
-            {
-                <small class="text-muted">
-                    (<span class="fas fa-lock oc-section-locked"></span> Supervisors only)
-                </small>
-            }
-        </h1>
+    <div class="d-flex">
+        <div class="flex-grow-1 align-middle">
+            <h1 class="h2 pl-2 pb-2 flex-grow-1">
+                @Model.SectionName
+                @if (Model.SupervisorsOnly)
+                {
+                    <small class="text-muted">
+                        (<span class="fas fa-lock oc-section-locked"></span> Supervisors only)
+                    </small>
+                }
+            </h1>
+        </div>
+        @if (Model.SectionManager)
+        {
+            <div>
+                <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.AddPost)"
+                   asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
+                   asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+                   asp-route-sectionSlug="@Model.SectionSlug"
+                   class="btn btn-sm btn-outline-success">
+                    <span class="fas fa-plus-circle"></span>
+                    Add Post
+                </a>
+            </div>
+        }
     </div>
 }
 
@@ -28,15 +43,50 @@
                         </div>
                         @if (post.ShowOnHomePage && !string.IsNullOrEmpty(Model.SectionName))
                         {
-                            <span class="fas fa-home fa-fw text-muted"
+                            <span class="fas fa-home fa-fw text-muted mt-1"
                                   title="This post is shown on the Intranet home page."></span>
                         }
                         @if (post.IsPinned)
                         {
-                            <span class="fas fa-map-pin fa-fw"
-                                  title="This post is pinned to remain at the top."></span>
+                            <span class="fas fa-map-pin fa-fw mt-1"
+                                  title="This post is pinned to remain at the top until @post.PinnedUntil."></span>
                         }
                     </div>
+                    @if (Model.SectionManager)
+                    {
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item p-1 m-0 bg-light d-flex">
+                                <span class="flex-grow-1">
+                                    <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.EditPost)"
+                                       asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
+                                       asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+                                       asp-route-postSlug="@post.Slug"
+                                       asp-route-sectionSlug="@Model.SectionSlug"
+                                       class="btn btn-sm btn-outline-secondary ml-3">
+                                        <span class="fas fa-edit fa-xs fa-fw" title="Edit post"></span>
+                                        Edit Post
+                                    </a>
+                                </span>
+                                @if (post.UpdatedAt.HasValue)
+                                {
+                                    <em class="mr-3 text-muted" title="@post.UpdatedAt.Value">
+                                        <small>
+                                            Last update
+                                            @if (post.UpdatedBy.HasValue && !string.IsNullOrEmpty(post.UpdatedByName))
+                                            {
+                                                @:by
+                                                <a asp-controller="@ProfileController.Name"
+                                                   asp-action="@nameof(ProfileController.Index)"
+                                                   asp-route-id="@post.UpdatedByUsername">@post.UpdatedByName</a>
+                                            }
+                                            @post.UpdatedAgo
+                                        </small>
+                                    </em>
+                                }
+                            </li>
+                        </ul>
+                    }
+
                     <div class="card-body pb-0 pt-3">
                         @Html.Raw(post.Content)
                     </div>

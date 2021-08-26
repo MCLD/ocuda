@@ -11,5 +11,6 @@
         public bool? IsShownOnHomePage { get; set; }
         public int? LinkLibraryId { get; set; }
         public int? SectionId { get; set; }
+        public bool IncludeDrafts { get; set; }
     }
 }
