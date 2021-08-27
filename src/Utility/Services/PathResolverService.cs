@@ -7,11 +7,10 @@ namespace Ocuda.Utility.Services
 {
     public class PathResolverService : Interfaces.IPathResolverService
     {
-        private const string DefaultPublicDirectory = "public";
         private const string DefaultPrivateDirectory = "private";
-
-        private readonly ILogger _logger;
+        private const string DefaultPublicDirectory = "public";
         private readonly IConfiguration _config;
+        private readonly ILogger _logger;
 
         public PathResolverService(ILogger<PathResolverService> logger,
             IConfiguration config)
@@ -20,7 +19,19 @@ namespace Ocuda.Utility.Services
             _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
-        public string GetPublicContentUrl(params object[] pathElement)
+        public string GetPrivateContentFilePath(string fileName = default,
+            params object[] pathElement)
+        {
+            return GetContentFilePath(true, fileName, pathElement);
+        }
+
+        public string GetPublicContentFilePath(string fileName = default,
+            params object[] pathElement)
+        {
+            return GetContentFilePath(false, fileName, pathElement);
+        }
+
+        public string GetPublicContentLink(params object[] pathElement)
         {
             var path = new StringBuilder(_config[Keys.Configuration.OcudaUrlSharedContent]);
             if (path.Length == 0)
@@ -31,27 +42,10 @@ namespace Ocuda.Utility.Services
             {
                 foreach (var element in pathElement)
                 {
-                    if (!path.ToString().EndsWith("/", StringComparison.OrdinalIgnoreCase)
-                        && !element.ToString().StartsWith("/", StringComparison.OrdinalIgnoreCase))
-                    {
-                        path.Append("/");
-                    }
-                    path.Append(element);
+                    path.Append('/').Append(element.ToString().TrimStart('/').TrimEnd('/'));
                 }
             }
             return path.ToString();
-        }
-
-        public string GetPublicContentFilePath(string fileName = default,
-            params object[] pathElement)
-        {
-            return GetContentFilePath(false, fileName, pathElement);
-        }
-
-        public string GetPrivateContentFilePath(string fileName = default,
-            params object[] pathElement)
-        {
-            return GetContentFilePath(true, fileName, pathElement);
         }
 
         private string GetContentFilePath(bool privatePath = false,

@@ -40,17 +40,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (permissionIds?.Count > 0)
             {
                 var numericPermissionIds = permissionIds
-                    .Select(_ => int.Parse(_, CultureInfo.InvariantCulture))
-                    .ToArray();
+                    .Select(_ => int.Parse(_, CultureInfo.InvariantCulture));
                 viewModel.HasPagePermissions = await _permissionGroupService
-                    .HasPermissionAsync<PermissionGroupPageContent>(numericPermissionIds);
+                    .HasAPermissionAsync<PermissionGroupPageContent>(numericPermissionIds);
                 viewModel.HasPodcastPermissions = await _permissionGroupService
-                    .HasPermissionAsync<PermissionGroupPodcastItem>(numericPermissionIds);
-            }
-
-            if (!viewModel.HasPermissions)
-            {
-                AlertWarning = "It appears that you do not have any Site Administration permissions. Please contact your system administrator for more information.";
+                    .HasAPermissionAsync<PermissionGroupPodcastItem>(numericPermissionIds);
             }
 
             return View(viewModel);

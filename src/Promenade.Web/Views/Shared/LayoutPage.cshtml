@@ -56,7 +56,7 @@
 {
     if (item.CarouselId.HasValue)
     {
-        <div class="row mb-4">
+        <div class="row mb-4" aria-hidden="true">
             <div class="col-12">
                 <div class="card">
                     @if (!string.IsNullOrEmpty(item.Carousel.CarouselText?.Title))
@@ -83,6 +83,22 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="sr-only">
+            @if (!string.IsNullOrEmpty(item.Carousel.CarouselText?.Title))
+            {
+                <h2>@item.Carousel.CarouselText.Title</h2>
+            }
+            <ul>
+                @foreach (var carouselItem in item.Carousel.Items)
+                {
+                    <li>
+                        <a href="@Url.Action(nameof(HomeController.CarouselItem), new { stub = Model.Stub, id = carouselItem.Id })">
+                            @carouselItem.CarouselItemText.Title
+                        </a>
+                    </li>
+                }
+            </ul>
         </div>
     }
     else if (item.PageFeatureId.HasValue)
@@ -133,7 +149,8 @@
                 <div id="carouselControls"
                      style="max-width: 740px"
                      class="carousel slide mx-auto d-block mb-4"
-                     data-ride="carousel">
+                     data-ride="carousel"
+                     aria-hidden="true">
                     <div class="carousel-inner">
                         @foreach (var webslideItem in item.Webslide.Items)
                         {
@@ -159,5 +176,15 @@
                 </div>
             </div>
         </div>
+        <ul class="sr-only">
+            @foreach (var webslideItem in item.Webslide.Items)
+            {
+                <li>
+                    <a href="@webslideItem.ImageFeatureItemText.Link">
+                        @webslideItem.ImageFeatureItemText.AltText
+                    </a>
+                </li>
+            }
+        </ul>
     }
 }

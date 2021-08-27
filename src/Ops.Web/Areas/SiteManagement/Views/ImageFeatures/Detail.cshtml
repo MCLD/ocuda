@@ -1,9 +1,5 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.ImageFeatures.DetailViewModel
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/dt-picker.min.css" asp-append-version="true" />
-}
-
 @{
     string imageAltText = string.Empty;
 
@@ -64,14 +60,36 @@
          name="Item"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addItemName" asp-for="ImageFeatureItem.Name" formgroup />
-        <input id="addItemStartDate"
-               asp-for="ImageFeatureItem.StartDate"
-               formgroup
-               datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
-        <input id="addItemEndDate"
-               asp-for="ImageFeatureItem.EndDate"
-               formgroup
-               datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
+        <div class="form-group row">
+            <label asp-for="ImageFeatureItem.StartDate"
+                   class="col-form-label col-12 col-md-3 text-md-right"></label>
+            <div class="form-group-inner col-12 col-md-5">
+                <input asp-for="ImageFeatureStartDate"
+                       class="form-control"
+                       type="date" />
+            </div>
+            <div class="form-group-inner col-12 col-md-4">
+                <input asp-for="ImageFeatureStartTime"
+                       class="form-control"
+                       step="60"
+                       type="time" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label asp-for="ImageFeatureItem.EndDate"
+                   class="col-form-label col-12 col-md-3 text-md-right"></label>
+            <div class="form-group-inner col-12 col-md-5">
+                <input asp-for="ImageFeatureEndDate"
+                       class="form-control"
+                       type="date" />
+            </div>
+            <div class="form-group-inner col-12 col-md-4">
+                <input asp-for="ImageFeatureEndTime"
+                       class="form-control"
+                       step="60"
+                       type="time" />
+            </div>
+        </div>
     </div>
 </form>
 
@@ -87,14 +105,40 @@
          name="Segment"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
         <input id="editItemName" asp-for="ImageFeatureItem.Name" formgroup />
-        <input id="editItemStartDate"
-               asp-for="ImageFeatureItem.StartDate"
-               formgroup
-               datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
-        <input id="editItemEndDate"
-               asp-for="ImageFeatureItem.EndDate"
-               formgroup
-               datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
+        <div class="form-group row">
+            <label asp-for="ImageFeatureItem.StartDate"
+                   class="col-form-label col-12 col-md-3 text-md-right"></label>
+            <div class="form-group-inner col-12 col-md-5">
+                <input asp-for="ImageFeatureStartDate"
+                       class="form-control"
+                       id="editItemStartDate"
+                       type="date" />
+            </div>
+            <div class="form-group-inner col-12 col-md-4">
+                <input asp-for="ImageFeatureStartTime"
+                       class="form-control"
+                       id="editItemStartTime"
+                       step="60"
+                       type="time" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label asp-for="ImageFeatureItem.EndDate"
+                   class="col-form-label col-12 col-md-3 text-md-right"></label>
+            <div class="form-group-inner col-12 col-md-5">
+                <input asp-for="ImageFeatureEndDate"
+                       class="form-control"
+                       id="editItemEndDate"
+                       type="date" />
+            </div>
+            <div class="form-group-inner col-12 col-md-4">
+                <input asp-for="ImageFeatureEndTime"
+                       class="form-control"
+                       id="editItemEndTime"
+                       step="60"
+                       type="time" />
+            </div>
+        </div>
     </div>
 </form>
 
@@ -183,8 +227,10 @@
                                         data-target="#editItemModal"
                                         data-id="@item.Id"
                                         data-name="@item.Name"
-                                        data-startdate="@item.StartDate"
-                                        data-enddate="@item.EndDate"
+                                        data-startdate="@item.StartDate?.ToString("yyyy-MM-dd")"
+                                        data-starttime="@item.StartDate?.ToString("HH:mm")"
+                                        data-enddate="@item.EndDate?.ToString("yyyy-MM-dd")"
+                                        data-endtime="@item.EndDate?.ToString("HH:mm")"
                                         title="Edit item details">
                                     <span class="fas fa-cog" aria-hidden="true"></span>
                                 </button>
@@ -280,13 +326,7 @@
 </div>
 
 @section scripts {
-    <script src="~/js/dt-picker.min.js" asp-append-version="true"></script>
     <script>
-        $(".datetimepicker").datetimepicker({
-            allowInputToggle: true,
-            sideBySide: true
-        });
-
         @if (Model.FocusItemId.HasValue)
         {
             <text>
@@ -321,15 +361,13 @@
 
         $("#editItemModal").on("show.bs.modal", function (e) {
             var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var name = button.data("name");
-            var startDate = button.data("startdate");
-            var endDate = button.data("enddate");
 
-            $("#editFeatureItem").val(id);
-            $("#editItemName").val(name);
-            $("#editItemStartDate").val(startDate);
-            $("#editItemEndDate").val(endDate);
+            $("#editFeatureItem").val(button.data("id"));
+            $("#editItemName").val(button.data("name"));
+            $("#editItemStartDate").val(button.data("startdate"));
+            $("#editItemStartTime").val(button.data("starttime"));
+            $("#editItemEndDate").val(button.data("enddate"));
+            $("#editItemEndTime").val(button.data("endtime"));
         });
 
         $("#editItemForm").submit(function (e) {

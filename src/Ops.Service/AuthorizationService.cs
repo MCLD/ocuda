@@ -11,19 +11,15 @@ namespace Ocuda.Ops.Service
     public class AuthorizationService : IAuthorizationService
     {
         private readonly IClaimGroupRepository _claimGroupRepository;
-        private readonly IPermissionGroupRepository _permissionGroupRepository;
-        private readonly ISectionManagerGroupRepository _sectionManagerGroupRepository;
+        private readonly IPermissionGroupService _permissionGroupService;
 
         public AuthorizationService(IClaimGroupRepository claimGroupRepository,
-            IPermissionGroupRepository permissionGroupRepository,
-            ISectionManagerGroupRepository sectionManagerGroupRepository)
+            IPermissionGroupService permissionGroupService)
         {
             _claimGroupRepository = claimGroupRepository
                 ?? throw new ArgumentNullException(nameof(claimGroupRepository));
-            _permissionGroupRepository = permissionGroupRepository
-                ?? throw new ArgumentNullException(nameof(permissionGroupRepository));
-            _sectionManagerGroupRepository = sectionManagerGroupRepository
-                ?? throw new ArgumentNullException(nameof(sectionManagerGroupRepository));
+            _permissionGroupService = permissionGroupService
+                ?? throw new ArgumentNullException(nameof(permissionGroupService));
         }
 
         public async Task EnsureSiteManagerGroupAsync(int currentUserId, string group)
@@ -54,14 +50,29 @@ namespace Ocuda.Ops.Service
             return await _claimGroupRepository.ToListAsync(_ => _.GroupName);
         }
 
-        public async Task<IEnumerable<SectionManagerGroup>> GetSectionManagerGroupsAsync()
-        {
-            return await _sectionManagerGroupRepository.ToListAsync(_ => _.GroupName);
-        }
-
         public async Task<ICollection<PermissionGroup>> GetPermissionGroupsAsync()
         {
-            return await _permissionGroupRepository.ToListAsync(_ => _.GroupName);
+            return await _permissionGroupService.GetAllAsync();
+        }
+
+        public async Task<ICollection<string>> GetAdminClaimsAsync(IEnumerable<int> permissionGroupIds)
+        {
+            var claims = new List<string>();
+
+            (bool siteAdminRights, bool contentAdminRights)
+                = await _permissionGroupService.GetAdminRightsAsync(permissionGroupIds);
+
+            if (siteAdminRights)
+            {
+                claims.Add(ClaimType.HasSiteAdminRights);
+            }
+
+            if (contentAdminRights)
+            {
+                claims.Add(ClaimType.HasContentAdminRights);
+            }
+
+            return claims;
         }
     }
 }

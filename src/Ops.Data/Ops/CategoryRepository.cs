@@ -24,7 +24,7 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
-        public async Task<Category> GetCategoryByStubAsync(string stub)
+        public async Task<Category> GetCategoryBySlugAsync(string stub)
         {
             return await DbSet
                 .AsNoTracking()

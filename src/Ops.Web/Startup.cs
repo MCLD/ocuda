@@ -2,7 +2,6 @@
 using System.IO;
 using System.Net.Http;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
@@ -15,7 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Ocuda.Ops.Controllers;
-using Ocuda.Ops.Controllers.Authorization;
 using Ocuda.Ops.Data;
 using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Clients;
@@ -104,7 +102,7 @@ namespace Ocuda.Ops.Web
 
             // configure shared content directory
             var contentFilePath = pathResolver.GetPublicContentFilePath();
-            var contentUrl = pathResolver.GetPublicContentUrl();
+            var contentUrl = pathResolver.GetPublicContentLink();
             if (!contentUrl.StartsWith("/", StringComparison.OrdinalIgnoreCase))
             {
                 contentUrl = $"/{contentUrl}";
@@ -229,12 +227,8 @@ namespace Ocuda.Ops.Web
                     _.LoginPath = "/Authenticate";
                 });
 
-            services.AddSingleton<IAuthorizationHandler, SectionManagerHandler>();
-
             services.AddAuthorization(_ =>
             {
-                _.AddPolicy(nameof(SectionManagerRequirement),
-                    policy => policy.Requirements.Add(new SectionManagerRequirement()));
                 _.AddPolicy(nameof(ClaimType.SiteManager),
                     policy => policy.RequireClaim(nameof(ClaimType.SiteManager)));
             });
@@ -325,8 +319,12 @@ namespace Ocuda.Ops.Web
                 Data.Ops.PermissionGroupPodcastItemRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupPageContentRepository,
                 Data.Ops.PermissionGroupPageContentRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupReplaceFilesRepository,
+                Data.Ops.PermissionGroupReplaceFilesRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupRepository,
                 Data.Ops.PermissionGroupRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupSectionManagerRepository,
+                Data.Ops.PermissionGroupSectionManagerRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPostRepository,
                 Data.Ops.PostRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
@@ -343,8 +341,6 @@ namespace Ocuda.Ops.Web
                 Data.Ops.ScheduleLogRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ISectionRepository,
                 Data.Ops.SectionRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.ISectionManagerGroupRepository,
-                Data.Ops.SectionManagerGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ISiteSettingRepository,
                 Data.Ops.SiteSettingRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserMetadataTypeRepository,

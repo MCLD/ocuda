@@ -17,39 +17,22 @@ namespace Ocuda.Utility.TagHelpers
     public class FormGroupTagHelper : TagHelper
     {
         private const string attributeName = "formgroup";
+        private const string defaultInnerDivClass = "form-group-inner col-md-9";
+        private const string defaultInputClass = "form-control";
+        private const string defaultLabelClass = "col-form-label text-md-right";
+        private const string defaultLabelLayoutClass = "col-md-3";
+        private const string defaultValidationMessageClass = "validation-message text-danger";
+        private const string defaultWrapperDivClass = "row form-group";
         private const string forAttributeName = "asp-for";
         private const string hideLabelAttributeName = "hide-label";
+        private const string hideLabelInnerDivClass = "form-group-inner col-12";
         private const string ignoreValidationAttributeName = "ignore-validation";
         private const string infoTooltipAttributeName = "info-tooltip";
-        private const string onBlurJs = "on-blur-js";
         private const string labelClassAttribute = "label-class";
         private const string labelNameAttribute = "label-name";
-        private const string dateTimePickerAttribute = "datetime-picker";
-
-        private const string defaultWrapperDivClass = "row form-group";
-        private const string defaultLabelLayoutClass = "col-md-3";
-        private const string defaultLabelClass = "col-form-label text-md-right";
-        private const string defaultInputClass = "form-control";
-        private const string defaultInnerDivClass = "form-group-inner col-md-9";
-        private const string hideLabelInnerDivClass = "form-group-inner col-12";
-        private const string defaultValidationMessageClass = "validation-message text-danger";
-        private const string validationIgnoreClass = "validation-ignore";
-
+        private const string onBlurJs = "on-blur-js";
         private const string requiredFieldClass = "fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker";
-
-        private const string dateTimeGroupClass = "input-group date";
-        private const string dateTimePickerClass = "datetimepicker";
-        private const string dateTimeDatePickerClass = "datepicker";
-        private const string dateTimeTimePickerClass = "timepicker";
-        private const string dateTimeGroupAppendClass = "input-group-append";
-        private const string dateTimeGroupTextClass = "input-group-text";
-        private const string dateTimeIconCalendarClass = "far fa-calendar-alt";
-        private const string dateTimeIconClockClass = "far fa-clock";
-        private const string dateTimeInputClass = "datetimepicker-input";
-        private const string dateTimeInputType = "text";
-        private const string dateTimeTargetInput = "nearest";
-        private const string dateTimeToggle = "datetimepicker";
-
+        private const string validationIgnoreClass = "validation-ignore";
         private readonly IHtmlGenerator _htmlGenerator;
         private readonly IStringLocalizer<i18n.Resources.Shared> _localizer;
         public FormGroupTagHelper(IHtmlGenerator htmlGenerator,
@@ -72,17 +55,14 @@ namespace Ocuda.Utility.TagHelpers
         [HtmlAttributeName(infoTooltipAttributeName)]
         public string InfoTooltip { get; set; }
 
-        [HtmlAttributeName(onBlurJs)]
-        public string OnBlurJs { get; set; }
-
         [HtmlAttributeName(labelClassAttribute)]
         public string LabelClass { get; set; }
 
         [HtmlAttributeName(labelNameAttribute)]
         public string LabelName { get; set; }
 
-        [HtmlAttributeName(dateTimePickerAttribute)]
-        public DateTimePickerType? DateTimePicker { get; set; }
+        [HtmlAttributeName(onBlurJs)]
+        public string OnBlurJs { get; set; }
 
         [ViewContext]
         [HtmlAttributeNotBound]
@@ -127,8 +107,42 @@ namespace Ocuda.Utility.TagHelpers
             output.Content.SetHtmlContent(formGroupDiv);
         }
 
+        private async Task<TagHelperOutput> CreateInputElement(TagHelperOutput output)
+        {
+            var attributes = new TagHelperAttributeList(output.Attributes);
+
+            string inputId = null;
+            if (output.Attributes.TryGetAttribute("id", out var idAttribute))
+            {
+                inputId = idAttribute.Value.ToString();
+            }
+
+            attributes.AddCssClass(defaultInputClass);
+            attributes.RemoveAll(attributeName);
+            var inputOutput = CreateTagHelperOutput(output.TagName, attributes);
+
+            inputOutput.Content.AppendHtml(output.PreContent.GetContent());
+            inputOutput.Content.AppendHtml(output.Content.GetContent());
+            inputOutput.Content.AppendHtml(await output.GetChildContentAsync());
+            inputOutput.Content.AppendHtml(output.PostContent.GetContent());
+
+            if (!string.IsNullOrEmpty(OnBlurJs))
+            {
+                inputOutput.Attributes.Add("onblur", $"{OnBlurJs}(this)");
+            }
+
+            if (inputOutput.Attributes.ContainsName("formgroup-val-required"))
+            {
+                var tagValue = inputOutput.Attributes["formgroup-val-required"];
+                inputOutput.Attributes.Add("data-val-required", tagValue.Value);
+                inputOutput.Attributes.Remove(tagValue);
+            }
+
+            return inputOutput;
+        }
+
         private async Task<TagHelperOutput> CreateLabelElement(TagHelperContext context,
-            TagHelperOutput output)
+                    TagHelperOutput output)
         {
             var labelTagHelper =
                 new LabelTagHelper(_htmlGenerator)
@@ -138,7 +152,6 @@ namespace Ocuda.Utility.TagHelpers
                 };
 
             TagHelperOutput labelOutput = CreateTagHelperOutput("label", null);
-
 
             if (!string.IsNullOrWhiteSpace(LabelName))
             {
@@ -181,89 +194,18 @@ namespace Ocuda.Utility.TagHelpers
             return labelOutput;
         }
 
-        private async Task<TagHelperOutput> CreateInputElement(TagHelperOutput output)
+        private TagHelperOutput CreateTagHelperOutput(string tagName,
+            TagHelperAttributeList attributes)
         {
-            var attributes = new TagHelperAttributeList(output.Attributes);
-
-            string inputId = null;
-            if (output.Attributes.TryGetAttribute("id", out var idAttribute))
-            {
-                inputId = idAttribute.Value.ToString();
-            }
-
-            attributes.AddCssClass(defaultInputClass);
-            attributes.RemoveAll(attributeName);
-            var inputOutput = CreateTagHelperOutput(output.TagName, attributes);
-
-            inputOutput.Content.AppendHtml(output.PreContent.GetContent());
-            inputOutput.Content.AppendHtml(output.Content.GetContent());
-            inputOutput.Content.AppendHtml(await output.GetChildContentAsync());
-            inputOutput.Content.AppendHtml(output.PostContent.GetContent());
-
-            if (!string.IsNullOrEmpty(OnBlurJs))
-            {
-                inputOutput.Attributes.Add("onblur", $"{OnBlurJs}(this)");
-            }
-
-            if (DateTimePicker.HasValue && !string.IsNullOrWhiteSpace(inputId))
-            {
-                var pickerId = $"{inputId}_datetimepicker";
-
-                var icon = new TagBuilder("span");
-                if (DateTimePicker.Value == DateTimePickerType.TimeOnly)
+            return new TagHelperOutput(
+                tagName: tagName,
+                attributes: attributes ?? new TagHelperAttributeList(),
+                getChildContentAsync: (_, __) =>
                 {
-                    icon.AddCssClass(dateTimeIconClockClass);
+                    return Task.Factory.StartNew<TagHelperContent>(
+                            () => new DefaultTagHelperContent());
                 }
-                else
-                {
-                    icon.AddCssClass(dateTimeIconCalendarClass);
-                }
-
-                var inputGroupText = new TagBuilder("div");
-                inputGroupText.AddCssClass(dateTimeGroupTextClass);
-                inputGroupText.InnerHtml.SetHtmlContent(icon);
-
-                var inputGroupAppend = new TagBuilder("div");
-                inputGroupAppend.AddCssClass(dateTimeGroupAppendClass);
-                inputGroupAppend.Attributes.Add("data-target", $"#{pickerId}");
-                inputGroupAppend.Attributes.Add("data-toggle", dateTimeToggle);
-                inputGroupAppend.InnerHtml.SetHtmlContent(inputGroupText);
-
-                inputOutput.Attributes.RemoveAll("type");
-                inputOutput.Attributes.Add("type", dateTimeInputType);
-                inputOutput.Attributes.AddCssClass(dateTimeInputClass);
-                inputOutput.Attributes.Add("data-target", $"#{pickerId}");
-                inputOutput.PostElement.SetHtmlContent(inputGroupAppend);
-
-                var pickerGroup = new TagBuilder("div");
-                pickerGroup.Attributes.Add("id", pickerId);
-                pickerGroup.AddCssClass(dateTimeGroupClass);
-                if (DateTimePicker == DateTimePickerType.DateOnly)
-                {
-                    pickerGroup.AddCssClass(dateTimeDatePickerClass);
-                }
-                else if (DateTimePicker == DateTimePickerType.TimeOnly)
-                {
-                    pickerGroup.AddCssClass(dateTimeTimePickerClass);
-                }
-                else
-                {
-                    pickerGroup.AddCssClass(dateTimePickerClass);
-                }
-
-                pickerGroup.Attributes.Add("data-target-input", dateTimeTargetInput);
-                inputOutput.PreElement.AppendHtml(pickerGroup.RenderStartTag());
-                inputOutput.PostElement.AppendHtml(pickerGroup.RenderEndTag());
-            }
-
-            if (inputOutput.Attributes.ContainsName("formgroup-val-required"))
-            {
-                var tagValue = inputOutput.Attributes["formgroup-val-required"];
-                inputOutput.Attributes.Add("data-val-required", tagValue.Value);
-                inputOutput.Attributes.Remove(tagValue);
-            }
-
-            return inputOutput;
+            );
         }
 
         private async Task<TagHelperOutput> CreateValidationMessageElement(TagHelperContext context)
@@ -303,26 +245,5 @@ namespace Ocuda.Utility.TagHelpers
 
             return div;
         }
-
-        private TagHelperOutput CreateTagHelperOutput(string tagName,
-            TagHelperAttributeList attributes)
-        {
-            return new TagHelperOutput(
-                tagName: tagName,
-                attributes: attributes ?? new TagHelperAttributeList(),
-                getChildContentAsync: (_, __) =>
-                {
-                    return Task.Factory.StartNew<TagHelperContent>(
-                            () => new DefaultTagHelperContent());
-                }
-            );
-        }
-    }
-
-    public enum DateTimePickerType
-    {
-        DateTime,
-        DateOnly,
-        TimeOnly
     }
 }

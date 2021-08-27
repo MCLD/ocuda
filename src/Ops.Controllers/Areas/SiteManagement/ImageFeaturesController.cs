@@ -16,6 +16,7 @@ using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Keys;
 using SixLabors.ImageSharp;
 
@@ -77,6 +78,22 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     {
                         try
                         {
+                            if(model.ImageFeatureStartDate.HasValue 
+                                && model.ImageFeatureStartTime.HasValue)
+                            {
+                                model.ImageFeatureItem.StartDate =
+                                    model.ImageFeatureStartDate.Value
+                                        .CombineWithTime(model.ImageFeatureStartTime.Value);
+                            }
+
+                            if (model.ImageFeatureEndDate.HasValue
+                                && model.ImageFeatureEndTime.HasValue)
+                            {
+                                model.ImageFeatureItem.EndDate =
+                                    model.ImageFeatureEndDate.Value
+                                        .CombineWithTime(model.ImageFeatureEndTime.Value);
+                            }
+
                             var featureItem = await _imageFeatureService.CreateItemAsync(
                                 model.ImageFeatureItem);
 
@@ -265,6 +282,22 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     {
                         try
                         {
+                            if (model.ImageFeatureStartDate.HasValue
+                                && model.ImageFeatureStartTime.HasValue)
+                            {
+                                model.ImageFeatureItem.StartDate =
+                                    model.ImageFeatureStartDate.Value
+                                        .CombineWithTime(model.ImageFeatureStartTime.Value);
+                            }
+
+                            if (model.ImageFeatureEndDate.HasValue
+                                && model.ImageFeatureEndTime.HasValue)
+                            {
+                                model.ImageFeatureItem.EndDate =
+                                    model.ImageFeatureEndDate.Value
+                                        .CombineWithTime(model.ImageFeatureEndTime.Value);
+                            }
+
                             featureItem = await _imageFeatureService.EditItemAsync(
                                 model.ImageFeatureItem);
 

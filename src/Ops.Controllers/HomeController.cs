@@ -54,11 +54,12 @@ namespace Ocuda.Ops.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Route("[action]/{libraryId:int}/{fileId:int}")]
         [HttpGet]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability",
             "CA2000:Dispose objects before losing scope",
             Justification = "ControllerBase.File handles disposal (dotnet/AspNetCore.Docs#14585)")]
+        [Route("[action]/{libraryId:int}/{fileId:int}")]
+        [ResponseCache(NoStore = true)]
         public async Task<IActionResult> GetFile(int libraryId, int fileId)
         {
             var library = await _fileService.GetLibraryByIdAsync(libraryId);
@@ -78,7 +79,7 @@ namespace Ocuda.Ops.Controllers
             }
 
             var filePath = await _fileService.GetFilePathAsync(section.Id,
-                library.Stub,
+                library.Slug,
                 fileId);
             var filename = Path.GetFileName(filePath);
 
@@ -92,7 +93,7 @@ namespace Ocuda.Ops.Controllers
                     library.Id);
 
                 return RedirectToAction(nameof(SectionIndex),
-                    new { sectionStub = section.Stub });
+                    new { slug = section.Slug });
             }
 
             return File(new FileStream(filePath, FileMode.Open, FileAccess.Read),
@@ -110,10 +111,10 @@ namespace Ocuda.Ops.Controllers
             }, showPage);
         }
 
-        [HttpGet("{stub}")]
-        public async Task<IActionResult> SectionIndex(string stub, int page)
+        [HttpGet("{slug}")]
+        public async Task<IActionResult> SectionIndex(string slug, int page)
         {
-            var section = await _sectionService.GetByStubAsync(stub);
+            var section = await _sectionService.GetBySlugAsync(slug);
             if (section == null)
             {
                 return NotFound();
@@ -134,10 +135,15 @@ namespace Ocuda.Ops.Controllers
             }
 
             var showPage = page == default ? 1 : page;
-            return await ShowPostsAsync(new BlogFilter(showPage, 5)
+
+            var filter = new BlogFilter(showPage, 5)
             {
                 SectionId = section.Id
-            }, showPage);
+            };
+
+            var isAdmin = await _sectionService.IsManagerAsync(section.Id);
+
+            return await ShowPostsAsync(filter, showPage, isAdmin);
         }
 
         [HttpGet("[action]")]
@@ -178,6 +184,14 @@ namespace Ocuda.Ops.Controllers
 
         private async Task<IActionResult> ShowPostsAsync(BlogFilter filter, int page)
         {
+            return await ShowPostsAsync(filter, page, false);
+        }
+
+
+        private async Task<IActionResult> ShowPostsAsync(BlogFilter filter, int page, bool isAdmin)
+        {
+            filter.IncludeDrafts = isAdmin;
+
             var posts = await _postService.GetPaginatedPostsAsync(filter);
 
             var viewModel = new IndexViewModel
@@ -185,7 +199,8 @@ namespace Ocuda.Ops.Controllers
                 Posts = posts.Data,
                 ItemCount = posts.Count,
                 CurrentPage = page,
-                ItemsPerPage = filter.Take.Value
+                ItemsPerPage = filter.Take.Value,
+                SectionManager = isAdmin
             };
 
             if (viewModel.PastMaxPage)
@@ -201,6 +216,7 @@ namespace Ocuda.Ops.Controllers
             if (filter.IsShownOnHomePage == true)
             {
                 filter.SectionId = await _sectionService.GetHomeSectionIdAsync();
+                viewModel.SectionSlug = "Home";
             }
             else
             {
@@ -208,6 +224,7 @@ namespace Ocuda.Ops.Controllers
                 {
                     var section = await _sectionService.GetByIdAsync(filter.SectionId.Value);
                     viewModel.SectionName = section.Name;
+                    viewModel.SectionSlug = section.Slug;
                     viewModel.SupervisorsOnly = section.SupervisorsOnly;
                 }
             }
@@ -227,18 +244,22 @@ namespace Ocuda.Ops.Controllers
                     }
                 }
 
-                var fileLibraries = await _fileService
-                    .GetBySectionIdAsync(filter.SectionId.Value);
+                var fileLibraries = await _fileService.GetBySectionIdAsync(filter.SectionId.Value);
 
                 if (fileLibraries?.Count > 0)
                 {
                     foreach (var fileLibrary in fileLibraries)
                     {
-                        fileLibrary.Files = await _fileService
-                            .GetFileLibraryFilesAsync(fileLibrary.Id);
+                        var fileLibraryFiles = await _fileService
+                            .GetPaginatedListAsync(new BlogFilter
+                            {
+                                FileLibraryId = fileLibrary.Id
+                            });
 
-                        if (fileLibrary.Files?.Count > 0)
+                        if (fileLibraryFiles.Count > 0)
                         {
+                            fileLibrary.Files = fileLibraryFiles.Data;
+                            fileLibrary.TotalFilesInLibrary = fileLibraryFiles.Count;
                             viewModel.FileLibraries.Add(fileLibrary);
                         }
                     }

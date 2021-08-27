@@ -9,17 +9,17 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IFileService
     {
-        Task<FileLibrary> CreateLibraryAsync(FileLibrary library, int sectionId);
+        Task<File> AddFileLibraryFileAsync(File file, IFormFile fileDatas);
 
-        Task<File> CreatePrivateFileAsync(File file, IFormFile fileDatas);
+        Task<FileLibrary> CreateLibraryAsync(FileLibrary library);
 
         Task<File> CreatePublicFileAsync(File file, IFormFile fileData);
 
-        Task DeleteFileTypesByLibrary(int liAbid);
+        Task DeleteFileTypesByLibrary(int fileLibraryId);
 
-        Task DeleteLibraryAsync(int id);
+        Task DeleteLibraryAsync(int sectionId, int fileLibraryId);
 
-        Task DeletePrivateFileAsync(int id);
+        Task DeletePrivateFileAsync(int sectionId, string fileLibrarySlug, int fileId);
 
         Task DeletePublicFileAsync(int id);
 
@@ -36,11 +36,11 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<ICollection<FileLibrary>> GetBySectionIdAsync(int sectionId);
 
+        Task<FileLibrary> GetBySectionIdSlugAsync(int sectionId, string slug);
+
         Task<ICollection<FileType>> GetFileLibrariesFileTypesAsync(int libraryId);
 
-        Task<ICollection<File>> GetFileLibraryFilesAsync(int id);
-
-        Task<string> GetFilePathAsync(int sectionId, string libraryStub, int fileId);
+        Task<string> GetFilePathAsync(int sectionId, string librarySlug, int fileId);
 
         Task<FileType> GetFileTypeByIdAsync(int id);
 
@@ -59,8 +59,14 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         string GetPublicFilePath(File file);
 
+        Task<bool> HasReplaceRightsAsync(int fileLibraryId);
+
         Task<byte[]> ReadPrivateFileAsync(File file);
 
+        Task<File> ReplaceFileLibraryFileAsync(int fileId);
+
         Task UpdateLibrary(FileLibrary library);
+
+        Task<string> VerifyAddFileAsync(int fileLibraryId, string extension, string filename);
     }
 }

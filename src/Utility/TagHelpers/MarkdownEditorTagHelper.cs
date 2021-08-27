@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Ocuda.Utility.TagHelpers.Extensions;
@@ -8,28 +9,36 @@ namespace Ocuda.Utility.TagHelpers
     [HtmlTargetElement("textarea", Attributes = attributeName)]
     public class MarkdownEditorTagHelper : TagHelper
     {
+        private const string activeClass = "active";
         private const string attributeName = "markdown-editor";
 
-        private const string navTabsClass = "nav nav-tabs";
+        private const string buttonRowClass = "md-button-row";
+        private const string editPanelClass = "bg-light border md-edit-panel mt-2 pt-1";
+        private const string inputClass = "md-input";
         private const string navItemClass = "nav-item";
         private const string navLinkClass = "nav-link";
-        private const string tabDataToggle = "tab";
-        private const string tabRole = "tab";
-
-        private const string tabContentClass = "tab-content md-editor";
+        private const string navTabsClass = "nav nav-pills";
         private const string panelClass = "tab-pane";
-        private const string editPanelClass = "md-edit-panel";
+        private const string previewClass = "border md-preview mt-2 p-3 rounded";
         private const string previewPanelClass = "md-preview-panel";
-        private const string tabPanelRole = "tabpanel";
-        private const string buttonRowClass = "md-button-row";
-        private const string inputClass = "md-input";
-        private const string previewClass = "md-preview";
-
-        private const string activeClass = "active";
         private const string showClass = "show";
+        private const string tabContentClass = "md-editor tab-content";
+        private const string tabDataToggle = "tab";
+        private const string tabPanelRole = "tabpanel";
+        private const string tabRole = "tab";
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            if (output == null)
+            {
+                throw new ArgumentNullException(nameof(output));
+            }
+
             string id;
             if (output.Attributes.TryGetAttribute("id", out var idAttribute))
             {

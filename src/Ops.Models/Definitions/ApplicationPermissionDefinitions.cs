@@ -18,6 +18,12 @@ namespace Ocuda.Ops.Models.Definitions
                 Id = ApplicationPermission.DigitalDisplayContentManagement,
                 Name = "Digital Display Content Management",
                 Info = "Users with this permission can manage assets in digital display sets."
+            },
+            new ApplicationPermissionDefinition
+            {
+                Id = ApplicationPermission.IntranetFrontPageManagement,
+                Name = "Intranet Front Page Management",
+                Info = "Users with this permission can push section posts to the front page and pin them."
             }
         };
     }

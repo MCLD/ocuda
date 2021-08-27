@@ -12,8 +12,12 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<ICollection<Section>> GetByNamesAsync(ICollection<string> names);
 
-        Task<Section> GetByStubAsync(string stub);
+        Task<Section> GetBySlugAsync(string slug);
 
         Task<int> GetHomeSectionIdAsync();
+
+        Task<ICollection<Section>> GetManagedByCurrentUserAsync();
+
+        Task<bool> IsManagerAsync(int sectionId);
     }
 }

@@ -1,9 +1,6 @@
 ﻿namespace Ocuda.Utility.Keys
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
-        "CA1815:Override equals and operator equals on value types",
-        Justification = "No instance value for this static type")]
-    public readonly struct Cache
+    public static class Cache
     {
         /// <summary>
         /// Status of a digital display, {0} is the digital display id
@@ -52,6 +49,11 @@
         /// </summary>
         ///
         public static readonly string OpsReturn = "auth.{0}.return";
+
+        /// <summary>
+        /// Ops sections
+        /// </summary>
+        public static readonly string OpsSections = "sections";
 
         /// <summary>
         /// Cached site settings, {0} is the site setting key

@@ -17,7 +17,7 @@ namespace Ocuda.Ops.Data.Ops
         : OpsRepository<OpsContext, PermissionGroup, int>, IPermissionGroupRepository
     {
         public PermissionGroupRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
-            ILogger<SectionManagerGroupRepository> logger) : base(repositoryFacade, logger)
+            ILogger<PermissionGroupRepository> logger) : base(repositoryFacade, logger)
         {
         }
 

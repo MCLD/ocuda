@@ -71,6 +71,8 @@ namespace Ocuda.Ops.Data.Ops
                 Count = await query.CountAsync(),
                 Data = await query
                     .Include(_ => _.FileType)
+                    .Include(_ => _.CreatedByUser)
+                    .Include(_ => _.UpdatedByUser)
                     .OrderByDescending(_ => _.CreatedAt)
                     .ApplyPagination(filter)
                     .ToListAsync()

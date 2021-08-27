@@ -153,7 +153,7 @@ namespace Ocuda.Ops.Service
         public async Task<LinkLibrary> UpdateLibraryAsync(LinkLibrary library)
         {
             library.Name = library.Name?.Trim();
-            library.Stub = library.Stub?.Trim();
+            library.Slug = library.Slug?.Trim();
             library.UpdatedAt = DateTime.Now;
             library.UpdatedBy = GetCurrentUserId();
 

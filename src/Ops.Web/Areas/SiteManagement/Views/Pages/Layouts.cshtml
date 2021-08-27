@@ -2,10 +2,6 @@
 
 @using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/dt-picker.min.css" asp-append-version="true" />
-}
-
 <div class="row mb-2">
     <div class="col-sm-6">
         <h1>
@@ -38,10 +34,23 @@
          name="Page Layout"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addName" asp-for="PageLayout.Name" formgroup />
-        <input id="addStartDate"
-               asp-for="PageLayout.StartDate"
-               formgroup
-               datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
+        <div class="form-group row">
+            <label asp-for="PageLayout.StartDate"
+                   class="col-form-label col-12 col-md-3 text-md-right"></label>
+            <div class="form-group-inner col-12 col-md-5">
+                <input asp-for="StartDate"
+                       required
+                       class="form-control"
+                       type="date" />
+            </div>
+            <div class="form-group-inner col-12 col-md-4">
+                <input asp-for="StartTime"
+                       class="form-control"
+                       required
+                       step="60"
+                       type="time" />
+            </div>
+        </div>
     </div>
 </form>
 
@@ -98,10 +107,25 @@
          name="Page Layout"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
         <input id="editName" asp-for="PageLayout.Name" formgroup />
-        <input id="editStartDate"
-               asp-for="PageLayout.StartDate"
-               formgroup
-               datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateTime" />
+        <div class="form-group row">
+            <label asp-for="PageLayout.StartDate"
+                   class="col-form-label col-12 col-md-3 text-md-right"></label>
+            <div class="form-group-inner col-12 col-md-5">
+                <input asp-for="StartDate"
+                       id="editStartDate"
+                       required
+                       class="form-control"
+                       type="date" />
+            </div>
+            <div class="form-group-inner col-12 col-md-4">
+                <input asp-for="StartTime"
+                       id="editStartTime"
+                       class="form-control"
+                       required
+                       step="60"
+                       type="time" />
+            </div>
+        </div>
     </div>
 </form>
 
@@ -178,7 +202,8 @@
                                             data-target="#editModal"
                                             data-id="@layout.Id"
                                             data-name="@layout.Name"
-                                            data-startdate="@layout.StartDate"
+                                            data-startdate="@layout.StartDate?.ToString("yyyy-MM-dd")"
+                                            data-starttime="@layout.StartDate?.ToString("HH:mm")"
                                             title="Edit layout name and start date">
                                         <span class="fas fa-cog" aria-hidden="true"></span>
                                     </button>
@@ -226,13 +251,7 @@
 
 
 @section Scripts {
-    <script src="~/js/dt-picker.min.js" asp-append-version="true"></script>
     <script>
-        $(".datetimepicker").datetimepicker({
-            allowInputToggle: true,
-            sideBySide: true
-        });
-
         $("#addForm").submit(function (e) {
             e.preventDefault();
             var form = $(this);
@@ -251,13 +270,10 @@
 
         $("#editModal").on("show.bs.modal", function (e) {
             var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var name = button.data("name");
-            var startDate = button.data("startdate");
-
-            $("#editId").val(id);
-            $("#editName").val(name);
-            $("#editStartDate").val(startDate);
+            $("#editId").val(button.data("id"));
+            $("#editName").val(button.data("name"));
+            $("#editStartDate").val(button.data("startdate"));
+            $("#editStartTime").val(button.data("starttime"));
         });
 
         $("#editForm").submit(function (e) {

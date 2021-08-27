@@ -63,7 +63,7 @@ namespace Ocuda.Promenade.Controllers.Filters
             }
 
             context.HttpContext.Items[ItemKey.PublicContentPath]
-                = _pathResolverService.GetPublicContentUrl();
+                = _pathResolverService.GetPublicContentLink();
 
             var externalResources = await _externalResourceService.GetAllAsync(forceReload);
 

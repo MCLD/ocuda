@@ -1,5 +1,22 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Users.PermissionViewModel
 
+<div class="row mb-2">
+    <div class="col-sm-7">
+        <h1>Permission Groups</h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
+        <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+                data-toggle="modal"
+                data-target="#addModal">
+            <span class="fa fa-plus-circle"></span>
+            Add Permission Group
+        </button>
+    </div>
+</div>
+
 <form>
     <div modal
          id="addModal"
@@ -48,21 +65,12 @@
            type="hidden" />
 </div>
 
-<div class="mb-2">
-    <button class="btn btn-outline-secondary text-dark"
-            data-toggle="modal"
-            data-target="#addModal">
-        <span class="fa fa-plus-circle"></span>
-        Add Permission Group
-    </button>
-</div>
-
 <table class="table table-sm table-bordered table-striped">
     <thead>
         <tr>
             <th>Permission Group Name</th>
             <th>AD Group Name</th>
-            <th>&nbsp;</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -71,25 +79,25 @@
             @foreach (var permissionGroup in Model.PermissionGroups)
             {
                 <tr>
-                    <td>@permissionGroup.PermissionGroupName</td>
-                    <td>@permissionGroup.GroupName</td>
+                    <td class="align-middle">@permissionGroup.PermissionGroupName</td>
+                    <td class="align-middle">@permissionGroup.GroupName</td>
                     <td align="center">
                         <button type="button"
-                                class="btn btn-info"
+                                class="btn btn-outline-primary"
                                 data-toggle="modal"
                                 data-target="#editModal"
                                 data-id="@permissionGroup.Id"
                                 data-permissiongroupname="@permissionGroup.PermissionGroupName"
                                 data-groupname="@permissionGroup.GroupName">
-                            <span class="fa fa-edit" aria-hidden="true"></span>
+                            <span class="fa fa-fw fa-edit" aria-hidden="true"></span>
                         </button>
                         <button type="button"
-                                class="btn btn-danger"
+                                class="btn btn-outline-danger"
                                 data-toggle="modal"
                                 data-target="#deleteModal"
                                 data-id="@permissionGroup.Id"
                                 data-permissiongroupname="@permissionGroup.PermissionGroupName">
-                            <span class="fas fa-times-circle" aria-hidden="true"></span>
+                            <span class="fas fa-fw fa-times-circle" aria-hidden="true"></span>
                         </button>
                     </td>
                 </tr>

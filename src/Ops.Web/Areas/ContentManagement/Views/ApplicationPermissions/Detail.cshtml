@@ -1,11 +1,14 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.ApplicationPermissions.DetailViewModel
 
-<a class="btn btn-outline-dark float-right"
-   asp-action="@(nameof(ApplicationPermissionsController.Index))">
-    <span class="fa fa-backward"></span>
-    Back
-</a>
-<h1>Assign application permissions</h1>
+<div class="row mb-2">
+    <div class="col-sm-7">
+        <h1>Application Permissions</h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-action="@(nameof(ApplicationPermissionsController.Index))">Back</a>
+    </div>
+</div>
 
 <div class="row pt-1">
     <div class="col-12">
@@ -32,8 +35,8 @@
                                 <input asp-for="ApplicationPermission.Id" type="hidden" />
                                 <input asp-for="PermissionGroupId" value="@availableGroup.Id" type="hidden" />
                                 @availableGroup.PermissionGroupName
-                                <button class="btn btn-link text-success float-right">
-                                    <span class="fa fa-plus-circle"></span>
+                                <button class="btn btn-outline-success float-right">
+                                    <span class="fas fa-fw fa-plus-circle"></span>
                                 </button>
                             </form>
                         </li>
@@ -62,8 +65,8 @@
                                 <input asp-for="ApplicationPermission.Id" type="hidden" />
                                 <input asp-for="PermissionGroupId" value="@assignedGroup.Id" type="hidden" />
                                 @assignedGroup.PermissionGroupName
-                                <button class="btn btn-link text-danger float-right">
-                                    <span class="fa fa-minus-circle"></span>
+                                <button class="btn btn-outline-danger float-right">
+                                    <span class="fas fa-fw fa-minus-circle"></span>
                                 </button>
                             </form>
                         </li>

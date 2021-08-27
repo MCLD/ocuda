@@ -18,9 +18,9 @@
                         <div class="modal-body">
                             <div id="modalItemList" class="col-12">
                                 <div class="col-sm-9">
-                                    <input asp-for="SectionStub" value="@Model.SectionStub" autocomplete="off" type="hidden" />
+                                    <input asp-for="SectionSlug" value="@Model.SectionSlug" autocomplete="off" type="hidden" />
                                     <input asp-for="SectionName" value="@Model.SectionName" autocomplete="off" type="hidden" />
-                                    <input asp-for="LinkLibraryStub" value="@Model.LinkLibrary.Stub" autocomplete="off" type="hidden" />
+                                    <input asp-for="LinkLibrarySlug" value="@Model.LinkLibrary.Slug" autocomplete="off" type="hidden" />
                                     <input asp-for="LinkLibraryId" value="@Model.LinkLibrary.Id" autocomplete="off" type="hidden" />
                                     <input asp-for="LinkLibraryName" value="@Model.LinkLibrary.Name" autocomplete="off" type="hidden" />
                                     <input asp-for="Link.Name" autocomplete="off" formgroup />
@@ -55,9 +55,9 @@
                             <div id="modalItemList" class="col-12">
                                 <div class="col-sm-9">
 
-                                    <input asp-for="SectionStub" value="@Model.SectionStub" autocomplete="off" type="hidden" />
+                                    <input asp-for="SectionSlug" value="@Model.SectionSlug" autocomplete="off" type="hidden" />
                                     <input asp-for="SectionName" value="@Model.SectionName" autocomplete="off" type="hidden" />
-                                    <input asp-for="LinkLibraryStub" value="@Model.LinkLibrary.Stub" autocomplete="off" type="hidden" />
+                                    <input asp-for="LinkLibrarySlug" value="@Model.LinkLibrary.Slug" autocomplete="off" type="hidden" />
                                     <input asp-for="LinkLibraryId" value="@Model.LinkLibrary.Id" autocomplete="off" type="hidden" />
                                     <input asp-for="LinkLibraryName" value="@Model.LinkLibrary.Name" autocomplete="off" type="hidden" />
                                     <input asp-for="Link.Id" autocomplete="off" type="hidden" />
@@ -87,9 +87,9 @@
               method="post"
               role="form"
               style="display:inline">
-            <input asp-for="SectionStub" value="@Model.SectionStub" autocomplete="off" type="hidden" />
+            <input asp-for="SectionSlug" value="@Model.SectionSlug" autocomplete="off" type="hidden" />
             <input asp-for="SectionName" value="@Model.SectionName" autocomplete="off" type="hidden" />
-            <input asp-for="LinkLibraryStub" value="@Model.LinkLibrary.Stub" autocomplete="off" type="hidden" />
+            <input asp-for="LinkLibrarySlug" value="@Model.LinkLibrary.Slug" autocomplete="off" type="hidden" />
             <input asp-for="LinkLibraryId" value="@Model.LinkLibrary.Id" autocomplete="off" type="hidden" />
             <input asp-for="LinkLibraryName" value="@Model.LinkLibrary.Name" autocomplete="off" type="hidden" />
             <input asp-for="Link.Id" type="hidden" />
@@ -128,10 +128,10 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a href="@Url.Action(nameof(SectionController.Index))" class="navbar-brand">Section</a>
     <span class="navbar-brand">/</span>
-    <a href="@Url.Action(nameof(SectionController.Section), new { sectionStub = Model.SectionStub})" class="navbar-brand">@Model.SectionName</a>
+    <a href="@Url.Action(nameof(SectionController.Section), new { sectionSlug = Model.SectionSlug})" class="navbar-brand">@Model.SectionName</a>
     <a class="nav-link"
        href="@Url.Action(nameof(SectionController.Posts),
-            new { sectionStub = Model.SectionStub,
+            new { sectionSlug = Model.SectionSlug,
             page=1})">
         Posts
     </a>

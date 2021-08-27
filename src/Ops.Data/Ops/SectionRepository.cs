@@ -15,36 +15,13 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
-        public async Task<List<Section>> GetAllAsync()
+        public async Task<ICollection<Section>> GetAllAsync()
         {
             return await DbSet
                 .AsNoTracking()
+                .OrderByDescending(_ => _.IsHomeSection)
+                .ThenBy(_ => _.Name)
                 .ToListAsync();
-        }
-
-        public async Task<ICollection<Section>> GetByNames(ICollection<string> names)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => names.Contains(_.Name))
-                .ToListAsync();
-        }
-
-        public async Task<Section> GetByStubAsync(string stub)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.Stub == stub)
-                .SingleOrDefaultAsync();
-        }
-
-        public async Task<int> GetHomeSectionIdAsync()
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.IsHomeSection == true)
-                .Select(_ => _.Id)
-                .SingleOrDefaultAsync();
         }
     }
 }
