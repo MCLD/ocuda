@@ -70,12 +70,10 @@
         <input asp-for="SegmentStartDate"
                formgroup
                value="@Model.SegmentStartDate?.ToString()"
-               datetime-picker="DateTimePickerType.DateTime"
                readonly />
         <input asp-for="SegmentEndDate"
                formgroup
                value="@Model.SegmentStartDate?.ToString()"
-               datetime-picker="DateTimePickerType.DateTime"
                readonly />
         <select asp-for="SelectedLanguage" asp-items="Model.LanguageList" formgroup></select>
     </div>

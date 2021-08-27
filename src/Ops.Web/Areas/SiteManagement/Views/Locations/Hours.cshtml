@@ -1,9 +1,5 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location.LocationHoursViewModel
 
-@section styles {
-    <link rel="stylesheet" href="~/css/dt-picker.min.css" asp-append-version="true" />
-}
-
 <div class="row">
     <div class="col-sm-7">
         <h1>
@@ -30,13 +26,13 @@
             <option value="">All Locations</option>
         </select>
         <input asp-for="AddOverride.Reason" formgroup />
-        <input asp-for="AddOverride.Date" formgroup datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateOnly" />
+        <input asp-for="AddOverride.Date" formgroup type="date" />
         <select asp-for="AddOverride.Open" formgroup>
             <option value="True">Open</option>
             <option value="False">Closed</option>
         </select>
-        <input asp-for="AddOverride.OpenTime" formgroup datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.TimeOnly" />
-        <input asp-for="AddOverride.CloseTime" formgroup datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.TimeOnly" />
+        <input asp-for="AddOverride.OpenTime" formgroup type="time" />
+        <input asp-for="AddOverride.CloseTime" formgroup type="time" />
     </div>
 </form>
 
@@ -49,13 +45,13 @@
             <option value="">All Locations</option>
         </select>
         <input asp-for="EditOverride.Reason" formgroup />
-        <input asp-for="EditOverride.Date" formgroup datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.DateOnly" />
+        <input asp-for="EditOverride.Date" formgroup type="date" />
         <select asp-for="EditOverride.Open" formgroup>
             <option value="True">Open</option>
             <option value="False">Closed</option>
         </select>
-        <input asp-for="EditOverride.OpenTime" formgroup datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.TimeOnly" />
-        <input asp-for="EditOverride.CloseTime" formgroup datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.TimeOnly" />
+        <input asp-for="EditOverride.OpenTime" formgroup type="time" />
+        <input asp-for="EditOverride.CloseTime" formgroup type="time" />
     </div>
 </form>
 
@@ -67,7 +63,7 @@
 </form>
 
 <div class="row">
-    <div class="col-12col-lg-10 col-xl-8 offset-lg-1 offset-xl-2">
+    <div class="col-12 col-lg-10 col-xl-8 offset-lg-1 offset-xl-2">
         <form asp-action="@nameof(LocationsController.Hours)" method=post role="form">
             <input id="hoursLocationStub" asp-for="LocationStub" type="hidden" />
             <table class="table table-sm table-borderless">
@@ -80,19 +76,29 @@
                             <strong>@Model.LocationHours[i].DayOfWeek.ToString()</strong>
                         </td>
                         <td>
-                            <select asp-for="LocationHours[i].Open" class="openSelector" formgroup hide-label="true">
+                            <select asp-for="LocationHours[i].Open"
+                                    class="openSelector"
+                                    formgroup hide-label="true">
                                 <option value="True">Open</option>
                                 <option value="False">Closed</option>
                             </select>
                         </td>
                         <td>
-                            <input asp-for="LocationHours[i].OpenTime" type="time" formgroup hide-label="true" datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.TimeOnly" />
+                            <input asp-for="LocationHours[i].OpenTime"
+                                   formgroup
+                                   hide-label="true"
+                                   step="60"
+                                   type="time" />
                         </td>
                         <td class="text-center">
                             &ndash;
                         </td>
                         <td>
-                            <input asp-for="LocationHours[i].CloseTime" type="time" formgroup hide-label="true" datetime-picker="Ocuda.Utility.TagHelpers.DateTimePickerType.TimeOnly" />
+                            <input asp-for="LocationHours[i].CloseTime"
+                                   formgroup
+                                   hide-label="true"
+                                   step="60"
+                                   type="time" />
                         </td>
                     </tr>
                 }
@@ -122,16 +128,17 @@
 
 <div class="row">
     <div class="col-12">
-        <table class="table table-sm table-bordered table-hover">
+        <table class="table table-sm table-bordered">
             <thead>
                 <tr>
                     <th class="align-middle">Reason</th>
                     <th class="align-middle">Date</th>
                     <th class="align-middle">Location</th>
                     <th class="align-middle">Hours</th>
-                    <th class="align-middle text-right">
+                    <th class="align-middle">
+                        Actions
                         <button type="button"
-                                class="btn btn-outline-success"
+                                class="btn btn-outline-success float-right"
                                 data-toggle="modal"
                                 data-target="#addModal">
                             <span class="fas fa-plus-circle"></span>
@@ -142,19 +149,24 @@
             <tbody>
                 @foreach (var hoursOverride in Model.LocationHoursOverrides)
                 {
-                    <tr class="cursor-pointer overrideRow"
-                        data-id="@hoursOverride.Id"
+                    <tr data-id="@hoursOverride.Id"
                         data-locationid="@hoursOverride.LocationId"
                         data-reason="@hoursOverride.Reason"
-                        data-date="@hoursOverride.Date"
+                        data-date="@hoursOverride.Date.Date.ToString("yyyy-MM-dd")"
                         data-open="@hoursOverride.Open"
-                        data-opentime="@hoursOverride.OpenTime"
-                        data-closetime="@hoursOverride.CloseTime">
+                        data-opentime="@hoursOverride.OpenTime?.ToString("HH:mm")"
+                        data-closetime="@hoursOverride.CloseTime?.ToString("HH:mm")">
                         <td class="align-middle">@hoursOverride.Reason</td>
                         <td class="align-middle">@hoursOverride.Date.ToShortDateString() &ndash; @hoursOverride.Date.DayOfWeek.ToString()</td>
                         <td class="align-middle">@(hoursOverride.LocationId.HasValue ? Model.LocationName : "All Locations")</td>
                         <td class="align-middle">@(hoursOverride.Open ? $"{hoursOverride.OpenTime.Value.ToShortTimeString()} {System.Net.WebUtility.HtmlDecode("&ndash;")} {hoursOverride.CloseTime.Value.ToShortTimeString()}" : "Closed")</td>
                         <td class="on-top cursor-default align-middle text-right">
+                            <button type="button"
+                                    class="btn btn-outline-primary"
+                                    data-toggle="modal"
+                                    data-target="#editModal">
+                                <span class="fas fa-edit"></span>
+                            </button>
                             <button type="button"
                                     class="btn btn-outline-danger"
                                     data-toggle="modal"
@@ -170,37 +182,25 @@
 </div>
 
 @section Scripts {
-    <script src="~/js/dt-picker.min.js" asp-append-version="true"></script>
-
     <script>
-        $(".datepicker").datetimepicker({
-            format: "L",
-            allowInputToggle: true
-
-        });
-        $(".timepicker").datetimepicker({
-            format: "LT",
-            allowInputToggle: true
-        });
-
         $(".openSelector").on("change", function () {
             if ($(this).val() == "True") {
-                $(this).closest("td").siblings().find(".timepicker").children(".datetimepicker-input").removeAttr("disabled");
+                $(this).closest("td").siblings().find("input[type=time]").removeAttr("disabled");
             }
             else {
-                $(this).closest("td").siblings().find(".timepicker").children(".datetimepicker-input")
+                $(this).closest("td").siblings().find("input[type=time]")
                     .attr("disabled", "disabled")
                     .val("");
             }
         })
-        .change();
+            .change();
 
         $("#AddOverride_Open").on("change", function () {
             if ($(this).val() == "True") {
-                $("#addModal").find(".timepicker").children(".datetimepicker-input").removeAttr("disabled");
+                $("#addModal").find("input[type=time]").removeAttr("disabled");
             }
             else {
-                $("#addModal").find(".timepicker").children(".datetimepicker-input")
+                $("#addModal").find("input[type=time]")
                     .attr("disabled", "disabled")
                     .val("");
             }
@@ -208,17 +208,17 @@
 
         $("#EditOverride_Open").on("change", function () {
             if ($(this).val() == "True") {
-                $("#editModal").find(".timepicker").children(".datetimepicker-input").removeAttr("disabled");
+                $("#editModal").find("input[type=time]").removeAttr("disabled");
             }
             else {
-                $("#editModal").find(".timepicker").children(".datetimepicker-input")
+                $("#editModal").find("input[type=time]")
                     .attr("disabled", "disabled")
                     .val("");
             }
         });
 
-        $(".overrideRow").on("click", "td:not(:last-child)", function () {
-            var row = $(this).parent("tr");
+        $('#editModal').on("show.bs.modal", function (e) {
+            let row = $(e.relatedTarget).closest("tr");
             $("#EditOverride_Id").val(row.data("id"));
             $("#EditOverride_LocationId").val(row.data("locationid"));
             $("#EditOverride_Reason").val(row.data("reason"));
@@ -226,12 +226,11 @@
             $("#EditOverride_Open").val(row.data("open")).change();
             $("#EditOverride_OpenTime").val(row.data("opentime"));
             $("#EditOverride_CloseTime").val(row.data("closetime"));
-            $("#editModal").modal();
         });
 
         $("#deleteModal").on("show.bs.modal", function (e) {
-            var row = $(e.relatedTarget).closest("tr");
-            var reason = row.data("reason");
+            let row = $(e.relatedTarget).closest("tr");
+            let reason = row.data("reason");
             $("#DeleteOverride_Id").val(row.data("id"));
             $("#DeleteOverride_Reason").val(reason);
             $(this).find(".modal-text").text("Are you sure you want to delete \"" + reason + "\"?");
