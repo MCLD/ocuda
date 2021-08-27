@@ -57,18 +57,18 @@ namespace Ocuda.Promenade.Controllers
                 return RedirectToAction(nameof(Podcast), new { stub = podcastStub });
             }
 
-            podcast.ImageUrl = _pathResolverService.GetPublicContentUrl(podcast.ImageUrl);
+            podcast.ImageUrl = _pathResolverService.GetPublicContentLink(podcast.ImageUrl);
             if (!string.IsNullOrEmpty(podcast.ImageThumbnailUrl))
             {
                 podcast.ImageThumbnailUrl
-                    = _pathResolverService.GetPublicContentUrl(podcast.ImageThumbnailUrl);
+                    = _pathResolverService.GetPublicContentLink(podcast.ImageThumbnailUrl);
             }
 
-            podcastItem.MediaUrl = _pathResolverService.GetPublicContentUrl(podcastItem.MediaUrl);
+            podcastItem.MediaUrl = _pathResolverService.GetPublicContentLink(podcastItem.MediaUrl);
             if (!string.IsNullOrWhiteSpace(podcastItem.ImageUrl))
             {
                 podcastItem.ImageUrl = _pathResolverService
-                    .GetPublicContentUrl(podcastItem.ImageUrl);
+                    .GetPublicContentLink(podcastItem.ImageUrl);
             }
 
             var viewModel = new EpisodeViewModel
@@ -116,11 +116,11 @@ namespace Ocuda.Promenade.Controllers
 
             foreach (var podcast in podcasts.Data)
             {
-                podcast.ImageUrl = _pathResolverService.GetPublicContentUrl(podcast.ImageUrl);
+                podcast.ImageUrl = _pathResolverService.GetPublicContentLink(podcast.ImageUrl);
                 if (!string.IsNullOrEmpty(podcast.ImageThumbnailUrl))
                 {
                     podcast.ImageThumbnailUrl
-                        = _pathResolverService.GetPublicContentUrl(podcast.ImageThumbnailUrl);
+                        = _pathResolverService.GetPublicContentLink(podcast.ImageThumbnailUrl);
                 }
             }
 
@@ -173,12 +173,12 @@ namespace Ocuda.Promenade.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            podcast.ImageUrl = _pathResolverService.GetPublicContentUrl(podcast.ImageUrl);
+            podcast.ImageUrl = _pathResolverService.GetPublicContentLink(podcast.ImageUrl);
 
             if (!string.IsNullOrEmpty(podcast.ImageThumbnailUrl))
             {
                 podcast.ImageThumbnailUrl
-                    = _pathResolverService.GetPublicContentUrl(podcast.ImageThumbnailUrl);
+                    = _pathResolverService.GetPublicContentLink(podcast.ImageThumbnailUrl);
             }
 
             var viewModel = new PodcastViewModel
@@ -196,11 +196,11 @@ namespace Ocuda.Promenade.Controllers
 
             foreach (var item in viewModel.PodcastItems)
             {
-                item.MediaUrl = _pathResolverService.GetPublicContentUrl(item.MediaUrl);
+                item.MediaUrl = _pathResolverService.GetPublicContentLink(item.MediaUrl);
 
                 if (!string.IsNullOrWhiteSpace(item.ImageUrl))
                 {
-                    item.ImageUrl = _pathResolverService.GetPublicContentUrl(item.ImageUrl);
+                    item.ImageUrl = _pathResolverService.GetPublicContentLink(item.ImageUrl);
                     viewModel.ShowEpisodeImages = true;
                 }
             }
@@ -245,7 +245,7 @@ namespace Ocuda.Promenade.Controllers
             var imageUrl = new UriBuilder
             {
                 Host = podcastUri.Host,
-                Path = _pathResolverService.GetPublicContentUrl(podcast.ImageUrl),
+                Path = _pathResolverService.GetPublicContentLink(podcast.ImageUrl),
                 Port = podcastUri.Port,
                 Scheme = podcastUri.Scheme
             }.Uri;
@@ -379,7 +379,7 @@ namespace Ocuda.Promenade.Controllers
                     new UriBuilder
                     {
                         Host = itemUri.Host,
-                        Path = _pathResolverService.GetPublicContentUrl(podcastItem.MediaUrl),
+                        Path = _pathResolverService.GetPublicContentLink(podcastItem.MediaUrl),
                         Port = itemUri.Port,
                         Scheme = itemUri.Scheme
                     }.Uri,
@@ -406,7 +406,7 @@ namespace Ocuda.Promenade.Controllers
                     var itemImageUrl = new UriBuilder
                     {
                         Host = itemUri.Host,
-                        Path = _pathResolverService.GetPublicContentUrl(podcastItem.ImageUrl),
+                        Path = _pathResolverService.GetPublicContentLink(podcastItem.ImageUrl),
                         Port = itemUri.Port,
                         Scheme = itemUri.Scheme
                     }.Uri;

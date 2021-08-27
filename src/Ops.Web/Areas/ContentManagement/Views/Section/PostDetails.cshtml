@@ -2,10 +2,10 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a href="@Url.Action(nameof(SectionController.Index))" class="navbar-brand">Section</a>
     <span class="navbar-brand">/</span>
-    <a href="@Url.Action(nameof(SectionController.Section), new { sectionStub = Model.SectionStub})" class="navbar-brand">@Model.SectionName</a>
+    <a href="@Url.Action(nameof(SectionController.Section), new { sectionSlug = Model.SectionSlug})" class="navbar-brand">@Model.SectionName</a>
     <a class="nav-link"
        href="@Url.Action(nameof(SectionController.Posts),
-            new { sectionStub = Model.SectionStub,
+            new { sectionSlug = Model.SectionSlug,
             page=1})">
         Posts
     </a>
@@ -18,11 +18,11 @@
     <div class="modal-dialog" role="document">
         <form id="deleteForm"
               action="@Url.Action(nameof(SectionController.DeletePost),
-                new { sectionStub = Model.SectionStub, postId = Model.Post.Id})"
+                new { sectionSlug = Model.SectionSlug, postId = Model.Post.Id})"
               method="post"
               role="form">
-            <input asp-for="Post.Id" value="@Model.SectionStub" type="hidden" />
-            <input asp-for="SectionStub" type="hidden" />
+            <input asp-for="Post.Id" value="@Model.SectionSlug" type="hidden" />
+            <input asp-for="SectionSlug" type="hidden" />
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title" id="deleteModalLabel">Delete Feature</h4>
@@ -70,7 +70,7 @@
                             {
                                 <li>
                                     <a href="@Url.Action(nameof(SectionController.Posts),
-                                       new { sectionStub = Model.SectionStub, categoryStub = category.Stub, page=1})"
+                                       new { sectionSlug = Model.SectionSlug, categorySlug = category.Stub, page=1})"
                                        class=" badge badge-light text-left"
                                        style="margin: 5px 10px; padding: 5px 10px; width:80%">
                                         @category.Name
@@ -99,7 +99,7 @@
                             {
                                 <li>
                                     <a href="@Url.Action(nameof(SectionController.PostDetails),
-                                       new { sectionStub = Model.SectionStub, postStub = post.Stub })"
+                                       new { sectionSlug = Model.SectionSlug, postSlug = post.Slug })"
                                        class="badge badge-light text-left"
                                        style="margin: 5px 10px; padding: 5px 10px; width:80%">
                                         @post.Title
@@ -118,7 +118,7 @@
             </div>
             <div class="row">
                 <span class="mx-auto">
-                    <a href="@Url.Action(nameof(SectionController.AddPost),new { sectionStub = Model.SectionStub})"
+                    <a href="@Url.Action(nameof(SectionController.AddPost),new { sectionSlug = Model.SectionSlug})"
                        class="btn btn-success"
                        id="addPost">
                         Create Post
@@ -135,7 +135,7 @@
                         </h4>
                     </div>
                     <div class="float-right align-middle h4">
-                        <a href="@Url.Action(nameof(SectionController.EditPost), new { sectionStub = Model.SectionStub, postStub = Model.Post.Stub})">
+                        <a href="@Url.Action(nameof(SectionController.EditPost), new { sectionSlug = Model.SectionSlug, postSlug = Model.Post.Slug})">
                             <span class="far fa-edit float-right"></span>
                         </a>
                     </div>
@@ -146,7 +146,14 @@
                 <div class="card-footer">
                     <div class="float-left align-middle">
                         <div class="font-italic">
-                            Posted: @Model.Post.PublishedAt.ToString("MM/dd/yyyy hh:mm tt")
+                            @if (Model.Post.PublishedAt.HasValue)
+                            {
+                                @:Posted: @Model.Post.PublishedAt.Value.ToString()
+                            }
+                            else
+                            {
+                                @:Draft
+                            }
                         </div>
                         @if (Model.PostCategories.Count > 0)
                         {
@@ -154,13 +161,13 @@
                                 Category:&nbsp;
                                 <span>
                                     @foreach (var category in Model.PostCategories
-                                        .Where(_ => _.PostId == Model.Post.Id)
-                                        .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
+                                         .Where(_ => _.PostId == Model.Post.Id)
+                                         .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
                                     {
                                         <a class="badge badge-pill badge-info"
                                            href="@Url.Action(nameof(SectionController.Posts),
-                                        new { sectionStub = Model.SectionStub,
-                                        categoryStub = category.Stub, page = 1})">
+                                        new { sectionSlug = Model.SectionSlug,
+                                        categorySlug = category.Stub, page = 1})">
                                             @category.Name
                                         </a>
                                     }

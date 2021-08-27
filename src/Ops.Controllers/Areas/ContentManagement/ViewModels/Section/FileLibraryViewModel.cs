@@ -7,34 +7,49 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
 {
-    public class FileLibraryViewModel
+    public class FileLibraryViewModel : PaginateModel
     {
-        public PaginateModel PaginateModel { get; set; }
+        private bool _replaceRights;
+
+        public File File { get; set; }
 
         [Required]
-        public string SectionStub { get; set; }
+        public int FileLibraryId { get; set; }
+
+        [Required]
+        [DisplayName("File Library Name")]
+        public string FileLibraryName { get; set; }
+
+        [Required]
+        [DisplayName("File Library Slug")]
+        public string FileLibrarySlug { get; set; }
+
+        public ICollection<File> Files { get; set; }
+        public ICollection<FileType> FileTypes { get; set; }
+        public bool HasAdminRights { get; set; }
+
+        public bool HasReplaceRights
+        {
+            set
+            {
+                _replaceRights = value;
+            }
+            get
+            {
+                return HasAdminRights || _replaceRights;
+            }
+        }
+
+        public int ReplaceFileId { get; set; }
 
         [Required]
         public string SectionName { get; set; }
 
         [Required]
-        [DisplayName("FileLibrary Stub")]
-        public string FileLibraryStub { get; set; }
+        public string SectionSlug { get; set; }
 
         [Required]
-        [DisplayName("FileLibrary Name")]
-        public string FileLibraryName { get; set; }
-
-        [Required]
-        public int FileLibraryId { get; set; }
-
-        public ICollection<FileType> FileTypes { get; set; }
-
-        public ICollection<File> Files { get; set; }
-
-        public File File { get; set; }
-
-        [Required]
+        [DisplayName("file")]
         public IFormFile UploadFile { get; set; }
     }
 }

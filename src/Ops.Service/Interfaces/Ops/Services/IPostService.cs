@@ -16,7 +16,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<List<Post>> GetPostsByCategoryIdAsync(int categoryId, int sectionId);
 
-        Task<Category> GetSectionCategoryByStubAsync(string stub, int sectionId);
+        Task<Category> GetSectionCategoryBySlugAsync(string slug, int sectionId);
 
         Task<DataWithCount<ICollection<Post>>> GetPaginatedPostsAsync(BlogFilter filter);
 
@@ -26,13 +26,13 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<List<PostCategory>> GetPostCategoriesByIdAsync(int postId);
 
-        Task CreatePostAsync(Post post);
+        Task<Post> CreatePostAsync(Post post);
 
         Task RemovePostAsync(Post post);
 
         Task UpdatePostAsync(Post post);
 
-        Task<Post> GetSectionPostByStubAsync(string stub, int sectionId);
+        Task<Post> GetSectionPostBySlugAsync(string slug, int sectionId);
 
         Task UpdatePostCategoriesAsync(List<int> newCategoryIds, int postId);
     }

@@ -5,7 +5,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
 {
     public class PostDetailsViewModel
     {
-        public string SectionStub { get; set; }
+        public string SectionSlug { get; set; }
 
         public string SectionName { get; set; }
 

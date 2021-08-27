@@ -1,9 +1,5 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment.IndexViewModel
 
-@section styles{
-    <link rel="stylesheet" href="~/css/dt-picker.min.css" asp-append-version="true" />
-}
-
 <div class="row">
     <div class="col-sm-7">
         <h1>Segments</h1>
@@ -24,11 +20,43 @@
 <form id="addForm" role="form">
     <div modal id="addModal" name="Segment" type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addName" asp-for="Segment.Name" formgroup />
-        <input id="addStartDate" asp-for="Segment.StartDate" formgroup datetime-picker="DateTimePickerType.DateTime" />
-        <input id="addEndDate" asp-for="Segment.EndDate" formgroup datetime-picker="DateTimePickerType.DateTime" />
+        <div class="form-group row">
+            <label asp-for="Segment.StartDate"
+                   class="col-form-label col-12 col-md-3 text-md-right"></label>
+            <div class="form-group-inner col-12 col-md-5">
+                <input asp-for="SegmentStartDate"
+                       class="form-control"
+                       id="editStartDate"
+                       type="date" />
+            </div>
+            <div class="form-group-inner col-12 col-md-4">
+                <input asp-for="SegmentStartTime"
+                       class="form-control"
+                       id="editStartTime"
+                       step="60"
+                       type="time" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label asp-for="Segment.EndDate"
+                   class="col-form-label col-12 col-md-3 text-md-right"></label>
+            <div class="form-group-inner col-12 col-md-5">
+                <input asp-for="SegmentEndDate"
+                       class="form-control"
+                       id="editEndDate"
+                       type="date" />
+            </div>
+            <div class="form-group-inner col-12 col-md-4">
+                <input asp-for="SegmentEndTime"
+                       class="form-control"
+                       id="editEndTime"
+                       step="60"
+                       type="time" />
+            </div>
+        </div>
         <select id="addIsActive" asp-for="Segment.IsActive" formgroup>
-            <option value="false">No</option>
             <option value="true">Yes</option>
+            <option value="false">No</option>
         </select>
     </div>
 </form>
@@ -37,25 +65,63 @@
     <input id="editId" asp-for="Segment.Id" type="hidden" />
     <div modal id="editModal" name="Segment" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
         <input id="editName" asp-for="Segment.Name" formgroup />
-        <input id="editStartDate" asp-for="Segment.StartDate" formgroup datetime-picker="DateTimePickerType.DateTime" />
-        <input id="editEndDate" asp-for="Segment.EndDate" formgroup datetime-picker="DateTimePickerType.DateTime" />
+        <div class="form-group row">
+            <label asp-for="Segment.StartDate"
+                   class="col-form-label col-12 col-md-3 text-md-right"></label>
+            <div class="form-group-inner col-12 col-md-5">
+                <input asp-for="SegmentStartDate"
+                       class="form-control"
+                       id="editStartDate"
+                       type="date" />
+            </div>
+            <div class="form-group-inner col-12 col-md-4">
+                <input asp-for="SegmentStartTime"
+                       class="form-control"
+                       id="editStartTime"
+                       step="60"
+                       type="time" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label asp-for="Segment.EndDate"
+                   class="col-form-label col-12 col-md-3 text-md-right"></label>
+            <div class="form-group-inner col-12 col-md-5">
+                <input asp-for="SegmentEndDate"
+                       class="form-control"
+                       id="editEndDate"
+                       type="date" />
+            </div>
+            <div class="form-group-inner col-12 col-md-4">
+                <input asp-for="SegmentEndTime"
+                       class="form-control"
+                       id="editEndTime"
+                       step="60"
+                       type="time" />
+            </div>
+        </div>
         <select id="editIsActive" asp-for="Segment.IsActive" formgroup>
-            <option value="false">No</option>
             <option value="true">Yes</option>
+            <option value="false">No</option>
         </select>
     </div>
 </form>
 
-<form asp-controller="@SegmentsController.Name" asp-action="@(nameof(SegmentsController.Delete))" method="post" role="form">
+<form asp-controller="@SegmentsController.Name"
+      asp-action="@(nameof(SegmentsController.Delete))"
+      method="post"
+      role="form">
     <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
     <input id="deleteId" asp-for="Segment.Id" type="hidden" />
     <input id="deleteName" asp-for="Segment.Name" type="hidden" />
-    <div modal id="deleteModal" name="Segment" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+    <div modal
+         id="deleteModal"
+         name="Segment"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
 </form>
 
 @if (Model.Segments.Count() == 0)
 {
-    <div class="alert alert-warning">No Segmets Found</div>
+    <div class="alert alert-warning">No segments found.</div>
 }
 else
 {
@@ -67,21 +133,24 @@ else
                         <tr>
                             <th>Name</th>
                             <th>Languages</th>
-                            <th>Is Active</th>
+                            <th>Schedule</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var segment in Model.Segments)
                         {
-                            <tr>
+                            <tr class="@Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment.IndexViewModel.RowClass(segment)">
                                 <td class="td-class align-middle">
-                                    <a asp-action="@(nameof(SegmentsController.Detail))" asp-route-id="@segment.Id">
+                                    <a asp-action="@(nameof(SegmentsController.Detail))"
+                                       asp-route-id="@segment.Id">
                                         @segment.Name
                                     </a>
                                 </td>
                                 <td class="align-middle">@string.Join(", ", segment.SegmentLanguages)</td>
-                                <td class="align-middle text-center"><span class="colored-icon fas @(segment.IsActive ? "fa-check" : "fa-times")"></span></td>
+                                <td class="align-middle text-center">
+                                    @Html.Raw(Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment.IndexViewModel.ActiveDescription(segment))
+                                </td>
                                 <td class="align-middle text-center on-top">
                                     <button type="button"
                                             class="btn btn-outline-primary"
@@ -89,8 +158,10 @@ else
                                             data-target="#editModal"
                                             data-id="@segment.Id"
                                             data-name="@segment.Name"
-                                            data-startdate="@segment.StartDate"
-                                            data-enddate="@segment.EndDate"
+                                            data-startdate="@segment.StartDate?.ToString("yyyy-MM-dd")"
+                                            data-starttime="@segment.StartDate?.ToString("HH:mm")"
+                                            data-enddate="@segment.EndDate?.ToString("yyyy-MM-dd")"
+                                            data-endtime="@segment.EndDate?.ToString("HH:mm")"
                                             data-active="@segment.IsActive">
                                         <span class="fas fa-edit" aria-hidden="true"></span>
                                     </button>
@@ -118,13 +189,7 @@ else
 }
 
 @section scripts {
-    <script src="~/js/dt-picker.min.js" asp-append-version="true"></script>
     <script>
-        $(".datetimepicker").datetimepicker({
-            allowInputToggle: true,
-            sideBySide: true
-        });
-
         $("#addForm").submit(function (e) {
             e.preventDefault();
             var form = $(this);
@@ -144,17 +209,13 @@ else
 
         $("#editModal").on("show.bs.modal", function (e) {
             var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var name = button.data("name");
-            var startDate = button.data("startdate");
-            var endDate = button.data("enddate");
-            var active = button.data("active");
-
-            $("#editId").val(id);
-            $("#editName").val(name);
-            $("#editStartDate").datetimepicker("date", startDate);
-            $("#editEndDate").datetimepicker("date", endDate);
-            $("#editIsActive").val(active.toLowerCase());
+            $("#editId").val(button.data("id"));
+            $("#editName").val(button.data("name"));
+            $("#editStartDate").val(button.data("startdate"));
+            $("#editStartTime").val(button.data("starttime"));
+            $("#editEndDate").val(button.data("enddate"));
+            $("#editEndTime").val(button.data("endtime"));
+            $("#editIsActive").val(button.data("active").toLowerCase());
         });
 
         $("#editForm").submit(function (e) {
@@ -182,6 +243,5 @@ else
             $("#deleteName").val(name);
             modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
         });
-
     </script>
 }

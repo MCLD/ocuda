@@ -18,6 +18,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 
@@ -279,14 +280,22 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            if (await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
-                model.PageLayout.PageHeaderId))
+            if (model != null &&
+                await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+                    model.PageLayout.PageHeaderId))
             {
                 if (ModelState.IsValid)
                 {
                     try
                     {
                         model.PageLayout.SocialCardId = null;
+
+                        if (model.StartDate.HasValue && model.StartTime.HasValue)
+                        {
+                            model.PageLayout.StartDate =
+                                model.StartDate.Value.CombineWithTime(model.StartTime.Value);
+                        }
+
                         var layout = await _pageService.CreateLayoutAsync(model.PageLayout);
                         response = new JsonResponse
                         {
@@ -701,14 +710,22 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var pageLayout = await _pageService.GetLayoutByIdAsync(model.PageLayout.Id);
 
-            if (await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
-                pageLayout.PageHeaderId))
+            if (model != null
+                && await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+                    pageLayout.PageHeaderId))
             {
                 if (ModelState.IsValid)
                 {
                     try
                     {
                         model.PageLayout.SocialCardId = null;
+
+                        if (model.StartDate.HasValue && model.StartTime.HasValue)
+                        {
+                            model.PageLayout.StartDate =
+                                model.StartDate.Value.CombineWithTime(model.StartTime.Value);
+                        }
+
                         var layout = await _pageService.EditLayoutAsync(model.PageLayout);
                         response = new JsonResponse
                         {

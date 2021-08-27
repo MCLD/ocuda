@@ -31,5 +31,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.ImageFeatures
 
         [DisplayName("Language")]
         public string SelectLanguage { get; set; }
+
+        public DateTime? ImageFeatureStartTime { get; set; }
+        public DateTime? ImageFeatureStartDate { get; set; }
+        public DateTime? ImageFeatureEndTime { get; set; }
+        public DateTime? ImageFeatureEndDate { get; set; }
+
     }
 }

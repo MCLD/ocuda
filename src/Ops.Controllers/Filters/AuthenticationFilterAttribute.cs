@@ -21,14 +21,14 @@ namespace Ocuda.Ops.Controllers.Filters
     [AttributeUsage(AttributeTargets.All, AllowMultiple = false)]
     public sealed class AuthenticationFilterAttribute : Attribute, IAsyncResourceFilter
     {
-        private readonly ILogger<AuthenticationFilterAttribute> _logger;
+        private readonly IAuthorizationService _authorizationService;
+        private readonly IDistributedCache _cache;
         private readonly IConfiguration _config;
         private readonly IDateTimeProvider _dateTimeProvider;
-        private readonly IDistributedCache _cache;
-        private readonly WebHelper _webHelper;
-        private readonly IAuthorizationService _authorizationService;
         private readonly ILdapService _ldapService;
+        private readonly ILogger<AuthenticationFilterAttribute> _logger;
         private readonly IUserService _userService;
+        private readonly WebHelper _webHelper;
 
         public AuthenticationFilterAttribute(ILogger<AuthenticationFilterAttribute> logger,
             IConfiguration configuration,
@@ -242,19 +242,16 @@ namespace Ocuda.Ops.Controllers.Filters
 
                         bool isSiteManager = false;
 
-                        // pull lists of AD groups that should be site and section managers
+                        // pull lists of AD groups that should be site managers
                         var claimGroups = await _authorizationService.GetClaimGroupsAsync();
                         var permissionGroups
                             = await _authorizationService.GetPermissionGroupsAsync();
-                        var sectionManagerGroups
-                            = await _authorizationService.GetSectionManagerGroupsAsync();
 
-                        var sectionManagerOf = new List<string>();
                         var claimantOf = new Dictionary<string, string>();
                         var inPermissionGroup = new List<int>();
 
                         // loop through group names and look up if each group provides claims
-                        // claims can be provided via ClaimGroups or SectionManagerGroups
+                        // claims can be provided via ClaimGroups
                         foreach (string groupName in adGroupNames)
                         {
                             claims.Add(new Claim(ClaimType.ADGroup, groupName));
@@ -265,8 +262,7 @@ namespace Ocuda.Ops.Controllers.Filters
                                 foreach (var claim in claimGroups
                                     .Where(_ => _.GroupName == groupName))
                                 {
-                                    if (claim.ClaimType != ClaimType.SectionManager
-                                        && !claimantOf.ContainsKey(claim.ClaimType))
+                                    if (!claimantOf.ContainsKey(claim.ClaimType))
                                     {
                                         claimantOf.Add(claim.ClaimType, groupName);
                                     }
@@ -279,23 +275,12 @@ namespace Ocuda.Ops.Controllers.Filters
                                     inPermissionGroup.Add(permission.Id);
                                 }
 
-                                foreach (var sectionManaged
-                                    in sectionManagerGroups.Where(_ => _.GroupName == groupName))
-                                {
-                                    if (!sectionManagerOf.Contains(sectionManaged.Section.Name))
-                                    {
-                                        sectionManagerOf.Add(sectionManaged.Section.Name);
-                                    }
-                                }
-
                                 if (claimantOf.ContainsKey(ClaimType.SiteManager))
                                 {
                                     isSiteManager = true;
                                 }
                             }
                         }
-
-                        bool hasPermissions = false;
 
                         if (isSiteManager)
                         {
@@ -308,10 +293,14 @@ namespace Ocuda.Ops.Controllers.Filters
 
                             foreach (var permissionId in permissionGroups.Select(_ => _.Id))
                             {
-                                hasPermissions = true;
                                 claims.Add(new Claim(ClaimType.PermissionId,
                                     permissionId.ToString(CultureInfo.InvariantCulture)));
                             }
+
+                            claims.Add(new Claim(ClaimType.HasContentAdminRights,
+                                ClaimType.HasContentAdminRights));
+                            claims.Add(new Claim(ClaimType.HasSiteAdminRights,
+                                ClaimType.HasSiteAdminRights));
                         }
                         else
                         {
@@ -323,23 +312,17 @@ namespace Ocuda.Ops.Controllers.Filters
 
                             foreach (var permissionId in inPermissionGroup)
                             {
-                                hasPermissions = true;
                                 claims.Add(new Claim(ClaimType.PermissionId,
                                     permissionId.ToString(CultureInfo.InvariantCulture)));
                             }
 
-                            // add section management claims
-                            foreach (var sectionName in sectionManagerOf)
-                            {
-                                claims.Add(new Claim(ClaimType.SectionManager,
-                                    sectionName));
-                            }
-                        }
+                            var hasAdminClaims = await _authorizationService
+                                .GetAdminClaimsAsync(inPermissionGroup);
 
-                        if (hasPermissions)
-                        {
-                            claims.Add(new Claim(ClaimType.HasPermissions,
-                                ClaimType.HasPermissions));
+                            foreach (var hasAdminClaim in hasAdminClaims)
+                            {
+                                claims.Add(new Claim(hasAdminClaim, hasAdminClaim));
+                            }
                         }
 
                         // TODO: probably change the role claim type to our roles and not AD groups

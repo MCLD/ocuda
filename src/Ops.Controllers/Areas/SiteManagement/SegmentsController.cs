@@ -20,6 +20,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 
@@ -58,13 +59,34 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> Create(IndexViewModel model)
         {
-            JsonResponse response;
+            if (model == null)
+            {
+                return Json(new JsonResponse
+                {
+                    Success = false,
+                    Message = "Invalid request to create a segment."
+                });
+            }
+
+            if (model.SegmentStartDate.HasValue && model.SegmentStartTime.HasValue)
+            {
+                model.Segment.StartDate = model
+                    .SegmentStartDate.Value.CombineWithTime(model.SegmentStartTime.Value);
+            }
+
+            if (model.SegmentEndDate.HasValue && model.SegmentEndTime.HasValue)
+            {
+                model.Segment.EndDate = model
+                    .SegmentEndDate.Value.CombineWithTime(model.SegmentStartTime.Value);
+            }
 
             if (model.Segment.StartDate.HasValue && model.Segment.EndDate.HasValue
                 && model.Segment.StartDate > model.Segment.EndDate)
             {
                 ModelState.AddModelError("Segment.StartDate", "Start Date cannot be after the End Date.");
             }
+
+            JsonResponse response;
 
             if (ModelState.IsValid)
             {
@@ -305,13 +327,28 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> Edit(IndexViewModel model)
         {
-            JsonResponse response;
-
-            if (model.Segment.StartDate.HasValue && model.Segment.EndDate.HasValue
-                && model.Segment.StartDate > model.Segment.EndDate)
+            if (model == null)
             {
-                ModelState.AddModelError("Segment.StartDate", "Start Date cannot be after the End Date.");
+                return Json(new JsonResponse
+                {
+                    Success = false,
+                    Message = "Invalid request to update a segment."
+                });
             }
+
+            if (model.SegmentStartDate.HasValue && model.SegmentStartTime.HasValue)
+            {
+                model.Segment.StartDate = model
+                    .SegmentStartDate.Value.CombineWithTime(model.SegmentStartTime.Value);
+            }
+
+            if (model.SegmentEndDate.HasValue && model.SegmentEndTime.HasValue)
+            {
+                model.Segment.EndDate = model
+                    .SegmentEndDate.Value.CombineWithTime(model.SegmentStartTime.Value);
+            }
+
+            JsonResponse response;
 
             if (ModelState.IsValid)
             {

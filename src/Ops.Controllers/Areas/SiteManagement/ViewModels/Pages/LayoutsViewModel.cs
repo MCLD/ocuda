@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Ocuda.Promenade.Models.Entities;
@@ -36,5 +37,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
                 ? "table-warning"
                 : string.Empty;
         }
+
+        public DateTime? StartDate { get; set; }
+        public DateTime? StartTime { get; set; }
     }
 }

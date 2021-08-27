@@ -2,7 +2,7 @@
 {
     public interface IPathResolverService
     {
-        string GetPublicContentUrl(params object[] pathElement);
+        string GetPublicContentLink(params object[] pathElement);
         string GetPublicContentFilePath(string fileName = default, params object[] pathElement);
         string GetPrivateContentFilePath(string fileName = default, params object[] pathElement);
     }

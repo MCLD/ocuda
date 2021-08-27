@@ -5,10 +5,10 @@
       "node_modules/jquery/dist/jquery.js",
       "node_modules/popper.js/dist/umd/popper.js",
       "node_modules/bootstrap/dist/js/bootstrap.js",
-      "node_modules/bootstrap-multiselect/dist/js/bootstrap-multiselect.js",
       "node_modules/jquery-validation/dist/jquery.validate.js",
       "node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js",
       "node_modules/slick-carousel/slick/slick.js",
+      "node_modules/slugify/slugify.js",
       "Scripts/Layout.js",
       "Scripts/ops.js"
     ],
@@ -39,17 +39,6 @@
     }
   },
   {
-    "outputFileName": "wwwroot/js/dt-picker.min.js",
-    "inputFiles": [
-      "node_modules/moment/moment.js",
-      "node_modules/tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4.js"
-    ],
-    "minify": {
-      "enabled": true,
-      "renameLocals": true
-    }
-  },
-  {
     "outputFileName": "wwwroot/js/coverissue-bookmarklet.min.js",
     "inputFiles": [
       "Scripts/CoverIssue-Bookmarklet.js"
@@ -63,7 +52,6 @@
     "outputFileName": "wwwroot/css/main.min.css",
     "inputFiles": [
       "node_modules/bootstrap/dist/css/bootstrap.css",
-      "node_modules/bootstrap-multiselect/dist/css/bootstrap-multiselect.css",
       "node_modules/@fortawesome/fontawesome-free/css/all.css",
       "node_modules/slick-carousel/slick/slick.css",
       "node_modules/slick-carousel/slick/slick-theme.css",
@@ -93,13 +81,4 @@
       "enabled": true
     }
   },
-  {
-    "outputFileName": "wwwroot/css/dt-picker.min.css",
-    "inputFiles": [
-      "node_modules/tempusdominus-bootstrap-4/build/css/tempusdominus-bootstrap-4.css"
-    ],
-    "minify": {
-      "enabled": true
-    }
-  }
 ]

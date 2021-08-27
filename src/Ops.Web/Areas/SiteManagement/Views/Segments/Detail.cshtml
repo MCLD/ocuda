@@ -70,12 +70,10 @@
         <input asp-for="SegmentStartDate"
                formgroup
                value="@Model.SegmentStartDate?.ToString()"
-               datetime-picker="DateTimePickerType.DateTime"
                readonly />
         <input asp-for="SegmentEndDate"
                formgroup
                value="@Model.SegmentStartDate?.ToString()"
-               datetime-picker="DateTimePickerType.DateTime"
                readonly />
         <select asp-for="SelectedLanguage" asp-items="Model.LanguageList" formgroup></select>
     </div>
@@ -120,11 +118,15 @@
     <script src="~/js/md.min.js" asp-append-version="true"></script>
 
     <script>
-        var editor = new Markdown.Editor($("#SegmentText_Text"), { allowUploads: true });
-        editor.run();
+        $(function () {
+            var editor = new Markdown.Editor($("#SegmentText_Text"), { allowUploads: false });
+            if (editor) {
+                editor.run();
+            }
+        });
 
         var segmentDetailsUrl
-            = "@Url.Action(nameof(SegmentsController.Detail), new { id = Model.SegmentId})";
+            = "@Url.Action(nameof(SegmentsController.Detail), new { id = Model.SegmentId })";
 
         $("#SelectedLanguage").on("change", function () {
             window.location.href = segmentDetailsUrl + "?language=" + $(this).val();

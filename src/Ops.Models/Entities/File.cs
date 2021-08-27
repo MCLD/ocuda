@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Ops.Models.Entities
@@ -13,6 +14,24 @@ namespace Ocuda.Ops.Models.Entities
         public FileType FileType { get; set; }
 
         public int FileTypeId { get; set; }
+
+        [NotMapped]
+        public DateTime LastUpdateAt
+        {
+            get
+            {
+                return UpdatedAt ?? CreatedAt;
+            }
+        }
+
+        [NotMapped]
+        public User LastUpdateBy
+        {
+            get
+            {
+                return UpdatedByUser ?? CreatedByUser;
+            }
+        }
 
         [Required]
         [MaxLength(255)]

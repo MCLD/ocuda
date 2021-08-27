@@ -8,10 +8,13 @@
         {
             get
             {
-                return IsSiteManager || HasDigitalDisplayPermissions;
+                return HasSectionManagerPermissions
+                    || IsSiteManager
+                    || HasDigitalDisplayPermissions;
             }
         }
 
+        public bool HasSectionManagerPermissions { get; set; }
         public bool IsSiteManager { get; set; }
     }
 }

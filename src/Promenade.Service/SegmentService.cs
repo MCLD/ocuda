@@ -63,7 +63,22 @@ namespace Ocuda.Promenade.Service
             if (segment == null)
             {
                 segment = await _segmentRepository.GetActiveAsync(segmentId);
-                await _cache.SaveToCacheAsync(segmentCacheKey, segment, cachePagesInHours);
+
+                bool cached = false;
+                if (segment.EndDate.HasValue)
+                {
+                    var timeFromNow = segment.EndDate.Value - DateTime.Now;
+                    if(timeFromNow < TimeSpan.FromHours(cachePagesInHours))
+                    {
+                        await _cache.SaveToCacheAsync(segmentCacheKey, segment, timeFromNow);
+                        cached = true;
+                    }
+                }
+
+                if(!cached)
+                {
+                    await _cache.SaveToCacheAsync(segmentCacheKey, segment, cachePagesInHours);
+                }
             }
 
             if (segment != null)

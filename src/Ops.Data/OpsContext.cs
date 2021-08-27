@@ -61,13 +61,11 @@ namespace Ocuda.Ops.Data
         public DbSet<Link> Links { get; set; }
 
         public DbSet<PermissionGroupApplication> PermissionGroupApplication { get; set; }
-
         public DbSet<PermissionGroupPageContent> PermissionGroupPageContents { get; set; }
-
         public DbSet<PermissionGroupPodcastItem> PermissionGroupPodcastItems { get; set; }
-
+        public DbSet<PermissionGroupReplaceFiles> PermissionGroupReplaceFiles { get; set; }
         public DbSet<PermissionGroup> PermissionGroups { get; set; }
-
+        public DbSet<PermissionGroupSectionManager> PermissionGroupSectionManager { get; set; }
         public DbSet<PostCategory> PostCategories { get; set; }
 
         public DbSet<Post> Posts { get; set; }
@@ -83,8 +81,6 @@ namespace Ocuda.Ops.Data
         public DbSet<ScheduleLog> ScheduleLogs { get; set; }
 
         public DbSet<SectionCategory> SectionCategories { get; set; }
-
-        public DbSet<SectionManagerGroup> SectionManagerGroups { get; set; }
 
         public DbSet<Section> Sections { get; set; }
 
@@ -130,6 +126,10 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.PermissionGroupId, _.PageHeaderId });
             modelBuilder.Entity<PermissionGroupPodcastItem>()
                 .HasKey(_ => new { _.PermissionGroupId, _.PodcastId });
+            modelBuilder.Entity<PermissionGroupReplaceFiles>()
+                .HasKey(_ => new { _.PermissionGroupId, _.FileLibraryId });
+            modelBuilder.Entity<PermissionGroupSectionManager>()
+               .HasKey(_ => new { _.PermissionGroupId, _.SectionId });
             modelBuilder.Entity<PostCategory>()
                 .HasKey(_ => new { _.PostId, _.CategoryId });
         }

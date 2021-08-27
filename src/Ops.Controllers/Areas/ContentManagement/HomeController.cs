@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Home;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
@@ -32,12 +35,17 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             {
                 IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
                 HasDigitalDisplayPermissions = await HasAppPermissionAsync(_permissionGroupService,
-                    ApplicationPermission.DigitalDisplayContentManagement)
+                    ApplicationPermission.DigitalDisplayContentManagement),
             };
 
-            if (!viewModel.HasPermissions)
+            var claimPermissionIds = UserClaims(ClaimType.PermissionId);
+
+            if (claimPermissionIds?.Count > 0)
             {
-                AlertWarning = "It appears that you do not have any Content Administration permissions. Please contact your system administrator for more information.";
+                var ids = claimPermissionIds
+                    .Select(_ => int.Parse(_, CultureInfo.InvariantCulture));
+                viewModel.HasSectionManagerPermissions = await _permissionGroupService
+                    .HasAPermissionAsync<PermissionGroupSectionManager>(ids);
             }
 
             return View(viewModel);

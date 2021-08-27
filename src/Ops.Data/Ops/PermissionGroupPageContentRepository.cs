@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Data.ServiceFacade;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Data.Ops
 {
@@ -17,6 +18,16 @@ namespace Ocuda.Ops.Data.Ops
             ILogger<PermissionGroupPageContentRepository> logger)
             : base(repositoryFacade, logger)
         {
+        }
+
+        public async Task AddSaveAsync(int pageHeaderId, int permissionGroupId)
+        {
+            await DbSet.AddAsync(new PermissionGroupPageContent
+            {
+                PageHeaderId = pageHeaderId,
+                PermissionGroupId = permissionGroupId
+            });
+            await SaveAsync();
         }
 
         public async Task<bool> AnyPermissionGroupIdAsync(IEnumerable<int> permissionGroupIds)
@@ -43,6 +54,28 @@ namespace Ocuda.Ops.Data.Ops
                 .AsNoTracking()
                 .Where(_ => _.PermissionGroupId == permissionGroupId)
                 .ToListAsync();
+        }
+
+        public async Task<IEnumerable<int>>
+                                            GetByPermissionGroupIdsAsync(IEnumerable<int> permissionGroupIds)
+        {
+            return await DbSet
+                .Where(_ => permissionGroupIds.Contains(_.PermissionGroupId))
+                .AsNoTracking()
+                .Select(_ => _.PageHeaderId)
+                .ToListAsync();
+        }
+
+        public async Task RemoveSaveAsync(int pageHeaderId, int permissionGroupId)
+        {
+            var item = await DbSet.SingleOrDefaultAsync(_ => _.PageHeaderId == pageHeaderId
+                && _.PermissionGroupId == permissionGroupId);
+            if (item == null)
+            {
+                throw new OcudaException($"Unable to find permission for page id {pageHeaderId} and permission group {permissionGroupId}");
+            }
+            DbSet.Remove(item);
+            await SaveAsync();
         }
     }
 }

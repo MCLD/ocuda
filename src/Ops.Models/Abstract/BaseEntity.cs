@@ -21,6 +21,9 @@ namespace Ocuda.Ops.Models.Abstract
         [ForeignKey(nameof(UpdatedByUser))]
         public int? UpdatedBy { get; set; }
 
+        [NotMapped]
+        public string UpdatedByName { get; set; }
+
         public User UpdatedByUser { get; set; }
     }
 }

@@ -52,6 +52,14 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
+        public async Task<FileLibrary> GetBySectionIdSlugAsync(int sectionId, string slug)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.SectionId == sectionId && _.Slug == slug)
+                .SingleOrDefaultAsync();
+        }
+
         public async Task<ICollection<int>> GetLibraryFileTypeIdsAsync(int libraryId)
         {
             return await _context.FileLibraryFileTypes

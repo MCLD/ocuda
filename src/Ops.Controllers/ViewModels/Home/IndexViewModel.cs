@@ -38,6 +38,8 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
 
         public ICollection<Post> Posts { get; set; }
         public string SectionName { get; set; }
+        public string SectionSlug { get; set; }
         public bool SupervisorsOnly { get; set; }
+        public bool SectionManager { get; set; }
     }
 }

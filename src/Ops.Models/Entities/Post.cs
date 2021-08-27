@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Ocuda.Utility.Extensions;
 
 namespace Ocuda.Ops.Models.Entities
 {
@@ -12,12 +12,13 @@ namespace Ocuda.Ops.Models.Entities
         {
             get
             {
+                if (!PublishedAt.HasValue)
+                {
+                    return "border-warning";
+                }
                 return IsPinned ? "border-info" : null;
             }
         }
-
-        [NotMapped]
-        public List<Category> Categories { get; set; }
 
         [Required]
         public string Content { get; set; }
@@ -25,32 +26,55 @@ namespace Ocuda.Ops.Models.Entities
         [NotMapped]
         public string CreatedByUsername { get; set; }
 
-        public bool IsPinned { get; set; }
+        [NotMapped]
+        public bool IsPinned
+        {
+            get
+            {
+                return PinnedUntil.HasValue && DateTime.Now <= PinnedUntil.Value;
+            }
+        }
+
+        [Display(Name = "Pinned until")]
+        public DateTime? PinnedUntil { get; set; }
 
         [NotMapped]
         public string PublishedAgo
         {
             get
             {
-                return ApproxTimeAgo(PublishedAt);
+                return PublishedAt?.ApproxTimeAgo();
             }
         }
 
-        public DateTime PublishedAt { get; set; }
+        [NotMapped]
+        public string UpdatedAgo
+        {
+            get
+            {
+                return UpdatedAt?.ApproxTimeAgo();
+            }
+        }
+
+        [Display(Name = "Published At")]
+        public DateTime? PublishedAt { get; set; }
+
         public Section Section { get; set; }
+
         public int SectionId { get; set; }
 
         [NotMapped]
         public string SectionName { get; set; }
 
         [NotMapped]
-        public string SectionStub { get; set; }
+        public string SectionSlug { get; set; }
 
+        [Display(Name = "Featured")]
         public bool ShowOnHomePage { get; set; }
 
         [Required]
         [MaxLength(255)]
-        public string Stub { get; set; }
+        public string Slug { get; set; }
 
         [NotMapped]
         public string TextColor
@@ -65,22 +89,7 @@ namespace Ocuda.Ops.Models.Entities
         [MaxLength(255)]
         public string Title { get; set; }
 
-        private static string ApproxTimeAgo(DateTime date)
-        {
-            if (date == default) { return null; }
-            var diff = DateTime.Now - date;
-            if (diff.TotalDays > 1)
-            {
-                var days = Math.Floor(diff.TotalDays);
-                return $"{days:n0} {(days == 1 ? "day" : "days")} ago";
-            }
-            if (diff.TotalHours > 1)
-            {
-                var hours = Math.Floor(diff.TotalHours);
-                return $"{hours} {(hours == 1 ? "hour" : "hours")} ago";
-            }
-
-            return "recently";
-        }
+        [NotMapped]
+        public string UpdatedByUsername { get; set; }
     }
 }

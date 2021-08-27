@@ -17,7 +17,7 @@ namespace Ocuda.Ops.Models.Entities
 
         [MaxLength(255)]
         [Required]
-        public string Stub { get; set; }
+        public string Slug { get; set; }
 
         public bool SupervisorsOnly { get; set; }
     }

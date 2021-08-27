@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Service.Abstract
@@ -21,19 +22,30 @@ namespace Ocuda.Ops.Service.Abstract
 
         protected int GetCurrentUserId()
         {
-            var userIdClaim = _httpContextAccessor.HttpContext
+            var claim = _httpContextAccessor.HttpContext
                 .User
                 .Claims
                 .First(_ => _.Type == ClaimType.UserId);
 
-            if (int.TryParse(userIdClaim.Value, out int id))
-            {
-                return id;
-            }
-            else
-            {
-                throw new OcudaException($"Could not convert '{ClaimType.UserId}' to a number.");
-            }
+            return int.Parse(claim.Value, CultureInfo.InvariantCulture);
+        }
+
+        protected IEnumerable<int> GetPermissionIds()
+        {
+            return _httpContextAccessor.HttpContext
+                .User
+                .Claims
+                .Where(_ => _.Type == ClaimType.PermissionId)
+                .Select(_ => int.Parse(_.Value, CultureInfo.InvariantCulture));
+        }
+
+        protected bool IsSiteManager()
+        {
+            return _httpContextAccessor.HttpContext
+                .User
+                .Claims
+                .Where(_ => _.Type == ClaimType.SiteManager)
+                .Any();
         }
     }
 }

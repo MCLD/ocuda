@@ -9,23 +9,69 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IPermissionGroupService
     {
-        Task<DataWithCount<ICollection<PermissionGroup>>> GetPaginatedListAsync(BaseFilter filter);
+        Task AddApplicationPermissionGroupAsync(string applicationPermission,
+            int permissionGroupId);
+
         Task<PermissionGroup> AddAsync(PermissionGroup permissionGroup);
-        Task<PermissionGroup> EditAsync(PermissionGroup permissionGroup);
-        Task DeleteAsync(int permissionGroupId);
-        Task<ICollection<PermissionGroup>> GetAllAsync();
-        Task<int> GetApplicationPermissionGroupCountAsync(string permission);
-        Task<ICollection<PermissionGroup>> GetApplicationPermissionGroupsAsync(string permission);
-        Task AddApplicationPermissionGroupAsync(string applicationPermission, int permissionGroupId);
-        Task RemoveApplicationPermissionGroupAsync(string applicationPermission, int permissionGroupId);
-        Task<ICollection<T>> GetPermissionsAsync<T>(int itemId)
-            where T : PermissionGroupMappingBase;
+
         Task AddToPermissionGroupAsync<T>(int itemId, int permissionGroupId)
             where T : PermissionGroupMappingBase;
+
+        Task DeleteAsync(int permissionGroupId);
+
+        Task<PermissionGroup> EditAsync(PermissionGroup permissionGroup);
+
+        Task<(bool siteAdminRights, bool contentAdminRights)>
+            GetAdminRightsAsync(IEnumerable<int> permissionGroupIds);
+
+        Task<ICollection<PermissionGroup>> GetAllAsync();
+
+        Task<int> GetApplicationPermissionGroupCountAsync(string permission);
+
+        Task<ICollection<PermissionGroup>> GetApplicationPermissionGroupsAsync(string permission);
+
+        Task<ICollection<PermissionGroup>> GetGroupsAsync(IEnumerable<int> permissionGroupIds);
+
+        /// <summary>
+        /// Get item ids of type T for the provided set of permissionGroupIds.
+        /// </summary>
+        /// <typeparam name="T">The <see cref="PermissionGroupMappingBase"/> representing what
+        /// type of permission you seek.</typeparam>
+        /// <param name="permissionGroupIds">A list of permissionGroupIds</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of item ids.</returns>
+        Task<IEnumerable<int>> GetItemIdAccessAsync<T>(IEnumerable<int> permissionGroupIds)
+            where T : PermissionGroupMappingBase;
+
+        Task<DataWithCount<ICollection<PermissionGroup>>>
+            GetPaginatedListAsync(BaseFilter filter);
+
+        /// <summary>
+        /// Get the appropriate <see cref="PermissionGroupMappingBase"/> based on an item id.
+        /// </summary>
+        /// <typeparam name="T">The <see cref="PermissionGroupMappingBase"/> representing what
+        /// type of permission you seek.</typeparam>
+        /// <param name="itemId">The item id</param>
+        /// <returns>An <see cref="ICollection{T}"/> of <see cref="PermissionGroupMappingBase"/>
+        /// objects.</returns>
+        Task<ICollection<T>> GetPermissionsAsync<T>(int itemId)
+            where T : PermissionGroupMappingBase;
+
+        /// <summary>
+        /// See if the provided list of permissionGroupIds has any permissions of type
+        /// <see cref="PermissionGroupMappingBase"/> - mostly to determine if the user should have
+        /// access to the section at all.
+        /// </summary>
+        /// <typeparam name="T">The <see cref="PermissionGroupMappingBase"/> representing what
+        /// type of permission you seek.</typeparam>
+        /// <param name="permissionGroupIds">A list of permissionGroupIds</param>
+        /// <returns>Whether or not there's one or more permissions.</returns>
+        Task<bool> HasAPermissionAsync<T>(IEnumerable<int> permissionGroupIds)
+            where T : PermissionGroupMappingBase;
+
+        Task RemoveApplicationPermissionGroupAsync(string applicationPermission,
+                            int permissionGroupId);
+
         Task RemoveFromPermissionGroupAsync<T>(int itemId, int permissionGroupId)
             where T : PermissionGroupMappingBase;
-        Task<bool> HasPermissionAsync<T>(IEnumerable<int> permissionGroupIds)
-            where T : PermissionGroupMappingBase;
-        Task<ICollection<PermissionGroup>> GetGroupsAsync(IEnumerable<int> permissionGroupIds);
     }
 }

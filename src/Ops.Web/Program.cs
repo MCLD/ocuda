@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ocuda.Utility.Keys;
 using Serilog;
@@ -11,6 +13,14 @@ namespace Ocuda.Ops.Web
     {
         private const string Product = "Ocuda.Ops";
 
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
+                .UseSerilog();
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+            "CA1031:Do not catch general exception types",
+            Justification = "Handle top-level system exceptions properly")]
         public static int Main(string[] args)
         {
             using var webHost = CreateHostBuilder(args).Build();
@@ -48,10 +58,14 @@ namespace Ocuda.Ops.Web
                         config[Configuration.OcudaRuntimeSessionTimeout]);
                 }
 
+                using (var scope = webHost.Services.CreateScope())
+                {
+                    Task.Run(() => new CacheManagement(scope).StartupClearAsync()).Wait();
+                }
+
                 webHost.Run();
                 return 0;
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 Log.Fatal(ex, "{Product} instance {Instance} v{Version} exited unexpectedly: {Message}",
@@ -61,7 +75,6 @@ namespace Ocuda.Ops.Web
                     ex.Message);
                 return 1;
             }
-#pragma warning restore CA1031 // Do not catch general exception types
             finally
             {
                 Log.Information("{Product} instance {Instance} v{Version} shutting down",
@@ -71,10 +84,5 @@ namespace Ocuda.Ops.Web
                 Log.CloseAndFlush();
             }
         }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
-                .UseSerilog();
     }
 }

@@ -16,7 +16,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.8")
+                .HasAnnotation("ProductVersion", "5.0.9")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
@@ -655,7 +655,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.Property<int>("SectionId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Stub")
+                    b.Property<string>("Slug")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -799,7 +799,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.Property<int>("SectionId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Stub")
+                    b.Property<string>("Slug")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -896,6 +896,36 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.ToTable("PermissionGroupPodcastItems");
                 });
 
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupReplaceFiles", b =>
+                {
+                    b.Property<int>("PermissionGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FileLibraryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PermissionGroupId", "FileLibraryId");
+
+                    b.HasIndex("FileLibraryId");
+
+                    b.ToTable("PermissionGroupReplaceFiles");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupSectionManager", b =>
+                {
+                    b.Property<int>("PermissionGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SectionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PermissionGroupId", "SectionId");
+
+                    b.HasIndex("SectionId");
+
+                    b.ToTable("PermissionGroupSectionManager");
+                });
+
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.Post", b =>
                 {
                     b.Property<int>("Id")
@@ -913,10 +943,10 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsPinned")
-                        .HasColumnType("bit");
+                    b.Property<DateTime?>("PinnedUntil")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("PublishedAt")
+                    b.Property<DateTime?>("PublishedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("SectionId")
@@ -925,7 +955,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.Property<bool>("ShowOnHomePage")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Stub")
+                    b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -1173,7 +1203,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("Stub")
+                    b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -1209,44 +1239,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("SectionCategories");
-                });
-
-            modelBuilder.Entity("Ocuda.Ops.Models.Entities.SectionManagerGroup", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("GroupName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int>("SectionId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("SectionId");
-
-                    b.HasIndex("UpdatedBy");
-
-                    b.ToTable("SectionManagerGroups");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.SiteSetting", b =>
@@ -1846,6 +1838,28 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.Navigation("PermissionGroup");
                 });
 
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupReplaceFiles", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.FileLibrary", "FileLibrary")
+                        .WithMany()
+                        .HasForeignKey("FileLibraryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FileLibrary");
+                });
+
+            modelBuilder.Entity("Ocuda.Ops.Models.Entities.PermissionGroupSectionManager", b =>
+                {
+                    b.HasOne("Ocuda.Ops.Models.Entities.Section", "Section")
+                        .WithMany()
+                        .HasForeignKey("SectionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Section");
+                });
+
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.Post", b =>
                 {
                     b.HasOne("Ocuda.Ops.Models.Entities.User", "CreatedByUser")
@@ -1991,32 +2005,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("Section");
-                });
-
-            modelBuilder.Entity("Ocuda.Ops.Models.Entities.SectionManagerGroup", b =>
-                {
-                    b.HasOne("Ocuda.Ops.Models.Entities.User", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Ocuda.Ops.Models.Entities.Section", "Section")
-                        .WithMany()
-                        .HasForeignKey("SectionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Ocuda.Ops.Models.Entities.User", "UpdatedByUser")
-                        .WithMany()
-                        .HasForeignKey("UpdatedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("Section");
-
-                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("Ocuda.Ops.Models.Entities.SiteSetting", b =>

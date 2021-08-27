@@ -11,14 +11,14 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section
         public PaginateModel PaginateModel { get; set; }
 
         [Required]
-        public string SectionStub { get; set; }
+        public string SectionSlug { get; set; }
 
         [Required]
         public string SectionName { get; set; }
 
         [Required]
-        [DisplayName("LinkLibrary Stub")]
-        public string LinkLibraryStub { get; set; }
+        [DisplayName("LinkLibrary Slug")]
+        public string LinkLibrarySlug { get; set; }
 
         [Required]
         [DisplayName("LinkLibrary Name")]

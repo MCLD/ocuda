@@ -1,0 +1,159 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section.PostViewModel
+
+@using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section;
+
+@section styles {
+    <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
+}
+
+<div class="row mb-2">
+    <div class="col-sm-7">
+        <h1>
+            Post
+            @if (!string.IsNullOrEmpty(Model.Post.Title))
+            {
+                <small class="text-muted">@Model.Post.Title</small>
+            }
+        </h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.HomeController.SectionIndex))"
+           asp-area=""
+           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+           asp-route-slug="@Model.SectionSlug">Back</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <form form-action="@nameof(SectionController.EditPost)"
+              method="post"
+              role="form">
+            <input asp-for="Post.SectionId" value="@Model.SectionId" hidden />
+            <input asp-for="Post.Id" value="@Model.Post?.Id" hidden />
+            <input asp-for="Post.Title" formgroup value="@Model.Post.Title" />
+            <input asp-for="Post.Slug" formgroup value="@Model.Post.Slug" />
+            @if (!Model.Post.PublishedAt.HasValue)
+            {
+                <div class="form-group row">
+                    <label class="col-form-label text-md-right col-md-3"
+                           asp-for="Publish"></label>
+                    <div class="form-group-inner col-md-9">
+                        <select asp-for="Publish"
+                                class="form-control"
+                                asp-items="PostViewModel.PublishSelect">
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row d-none" id="PublishWhen">
+                    <div class="col-md-3 text-md-right">
+                        <label asp-for="PublishAtDate" class="col-form-label"></label>
+                        <span class="fas fa-info-circle text-info"
+                              title="Leave date and time empty to publish this post when you save it."></span>
+                    </div>
+                    <div class="form-group-inner col-md-3">
+                        <input asp-for="PublishAtDate"
+                               type="date"
+                               class="form-control"
+                               asp-items="Model.PublishSelect" />
+                    </div>
+                    <div class="form-group-inner col-md-3">
+                        <input asp-for="PublishAtTime"
+                               type="time"
+                               class="form-control"
+                               asp-items="Model.PublishSelect" />
+                    </div>
+                </div>
+            }
+            else
+            {
+                <input asp-for="Post.PublishedAt"
+                       formgroup
+                       value="@Model.Post.PublishedAt"
+                       disabled />
+            }
+            <div class="form-group row">
+                <label class="col-form-label text-md-right col-md-3"
+                       asp-for="Post.ShowOnHomePage"></label>
+                <div class="form-group-inner col-md-9">
+                    <select asp-for="Post.ShowOnHomePage"
+                            class="form-control"
+                            disabled="@(!Model.CanPromote)"
+                            asp-items="Model.ShowOnHomepageSelect">
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-3 text-md-right">
+                    <label asp-for="Post.PinnedUntil" class="col-form-label"></label>
+                    <span class="fas fa-info-circle text-info"
+                          title="Leave date and time empty to not pin this post to the top of the @Model.SectionName section."></span>
+                </div>
+                <div class="form-group-inner col-md-3">
+                    <input asp-for="PinUntilDate"
+                           type="date"
+                           class="form-control"
+                           asp-items="Model.PublishSelect" />
+                </div>
+                <div class="form-group-inner col-md-3">
+                    <input asp-for="PinUntilTime"
+                           type="time"
+                           class="form-control"
+                           asp-items="Model.PublishSelect" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-form-label text-md-right col-md-3">
+                    <label asp-for="Post.Content"></label>
+                </div>
+                <div class="col-md-9">
+                    <textarea asp-for="Post.Content" markdown-editor></textarea>
+                    <span asp-validation-for="Post.Content"
+                          class="validation-message text-danger"></span>
+                </div>
+            </div>
+            <div class="row float-right">
+                <div class="col">
+                    <button aria-label="Confirm"
+                            class="btn btn-outline-success"
+                            id="addPostBtn"
+                            type="submit">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/md.min.js" asp-append-version="true"></script>
+    <script>
+        $(function () {
+            var editor = new Markdown.Editor($("#Post_Content"), { allowUploads: false });
+            if (editor) {
+                editor.run();
+            }
+
+            $('#Publish').change(function (e) {
+                if (this.value === 'True') {
+                    $('#PublishWhen').removeClass('d-none');
+                } else {
+                    $('#PublishWhen').addClass('d-none');
+                }
+            })
+
+            $('#Post_Title').blur(function (e) {
+                if ($('#Post_Slug').val().length == 0 && slugify) {
+                    let now = new Date();
+                    $('#Post_Slug').val(slugify(now.getFullYear()
+                        + ' '
+                        + ('0' + (now.getMonth() + 1)).slice(-2)
+                        + ' '
+                        + $('#Post_Title').val()));
+                }
+            });
+        });
+    </script>
+}
