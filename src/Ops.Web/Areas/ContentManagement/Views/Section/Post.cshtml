@@ -143,6 +143,17 @@
                     $('#PublishWhen').addClass('d-none');
                 }
             })
+
+            $('#Post_Title').blur(function (e) {
+                if ($('#Post_Slug').val().length == 0 && slugify) {
+                    let now = new Date();
+                    $('#Post_Slug').val(slugify(now.getFullYear()
+                        + ' '
+                        + ('0' + (now.getMonth() + 1)).slice(-2)
+                        + ' '
+                        + $('#Post_Title').val()));
+                }
+            });
         });
     </script>
 }
