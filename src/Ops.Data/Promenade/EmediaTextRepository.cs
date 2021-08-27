@@ -24,11 +24,30 @@ namespace Ocuda.Ops.Data.Promenade
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<ICollection<EmediaText>> GetAllForEmediaAsync(int emediaId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.EmediaId == emediaId)
+                .ToListAsync();
+        }
+
         public async Task<ICollection<EmediaText>> GetAllForGroupAsync(int groupId)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.Emedia.GroupId == groupId)
+                .ToListAsync();
+        }
+
+        public async Task<ICollection<string>> GetUsedLanguagesForEmediaAsync(int emediaId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.EmediaId == emediaId)
+                .OrderByDescending(_ => _.Language.IsDefault)
+                .ThenBy(_ => _.Language.Name)
+                .Select(_ => _.Language.Name)
                 .ToListAsync();
         }
     }

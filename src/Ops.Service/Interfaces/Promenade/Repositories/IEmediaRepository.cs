@@ -11,7 +11,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
         Task<Emedia> FindAsync(int id);
         Task<ICollection<Emedia>> GetAllAsync();
         Task<Emedia> GetIncludingGroupAsync(int id);
-        Task<DataWithCount<ICollection<Emedia>>> GetPaginatedListAsync(
+        Task<DataWithCount<ICollection<Emedia>>> GetPaginatedListForGroupAsync(int groupId,
             BaseFilter filter);
     }
 }

@@ -48,7 +48,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> Index(int page = 1)
         {
-            var filter = new BaseFilter(page);
+            var itemsPerPage = await _siteSettingService
+                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
+
+            var filter = new BaseFilter(page, itemsPerPage);
 
             var groupList = await _emediaService.GetPaginatedGroupListAsync(filter);
 
@@ -214,9 +217,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToAction(nameof(Index));
             }
 
-            var filter = new BaseFilter(page);
+            var itemsPerPage = await _siteSettingService
+                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
 
-            var emediaList = await _emediaService.GetPaginatedListAsync(filter);
+            var filter = new BaseFilter(page, itemsPerPage);
+
+            var emediaList = await _emediaService.GetPaginatedListForGroupAsync(group.Id, filter);
 
             var paginateModel = new PaginateModel
             {
@@ -231,6 +237,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     {
                         page = paginateModel.LastPage ?? 1
                     });
+            }
+
+            foreach (var emedia in emediaList.Data)
+            {
+                emedia.EmediaLanguages = await _emediaService.GetEmediaLanguagesAsync(emedia.Id);
             }
 
             var viewModel = new GroupDetailsViewModel

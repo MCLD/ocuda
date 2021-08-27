@@ -22,11 +22,11 @@
 
 <div class="row">
     <div class="col-12">
-        <table class="table table-sm table-bordered table-striped">
+        <table class="table table-sm table-bordered">
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Redirect Url</th>
+                    <th>Languages</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -50,7 +50,7 @@
                 }
                 else
                 {
-                    @foreach (var emedia in Model.Emedias)
+                    foreach (var emedia in Model.Emedias)
                     {
                         <tr>
                             <td class="align-middle">
@@ -58,7 +58,7 @@
                                     @emedia.Name
                                 </a>
                             </td>
-                            <td class="align-middle">@emedia.RedirectUrl</td>
+                            <td class="align-middle">@string.Join(", ", emedia.EmediaLanguages)</td>
                             <td class="align-middle">
                                 <button type="button"
                                         class="btn btn-outline-primary"

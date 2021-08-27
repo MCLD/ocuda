@@ -16,14 +16,27 @@ namespace Ocuda.Ops.Service
     public class CategoryService : BaseService<CategoryService>, ICategoryService
     {
         private readonly ICategoryRepository _categoryRepository;
+        private readonly ICategoryTextRepository _categoryTextRepository;
+        private readonly IEmediaCategoryRepository _emediaCategoryRepository;
 
         public CategoryService(ILogger<CategoryService> logger,
             IHttpContextAccessor httpContextAccessor,
-            ICategoryRepository categoryRepository)
+            ICategoryRepository categoryRepository,
+            ICategoryTextRepository categoryTextRepository,
+            IEmediaCategoryRepository emediaCategoryRepository)
             : base(logger, httpContextAccessor)
         {
             _categoryRepository = categoryRepository
                 ?? throw new ArgumentNullException(nameof(categoryRepository));
+            _categoryTextRepository = categoryTextRepository
+                ?? throw new ArgumentNullException(nameof(categoryTextRepository));
+            _emediaCategoryRepository = emediaCategoryRepository
+                ?? throw new ArgumentNullException(nameof(emediaCategoryRepository));
+        }
+
+        public async Task<Category> GetByIdAsync(int id)
+        {
+            return await _categoryRepository.FindAsync(id);
         }
 
         public async Task<ICollection<Category>> GetAllAsync()
@@ -31,18 +44,6 @@ namespace Ocuda.Ops.Service
             return await _categoryRepository.GetAllAsync();
         }
 
-        public Category GetByClass(string categoryClass)
-        {
-            return _categoryRepository.GetByClass(categoryClass);
-        }
-
-        public async Task AddCategory(Category category)
-        {
-            category.Name = category.Name.Trim();
-            category.Class = category.Class.ToLower().Trim();
-            await _categoryRepository.AddAsync(category);
-            await _categoryRepository.SaveAsync();
-        }
 
         public async Task<DataWithCount<ICollection<Category>>> GetPaginatedListAsync(
             BaseFilter filter)
@@ -50,28 +51,61 @@ namespace Ocuda.Ops.Service
             return await _categoryRepository.GetPaginatedListAsync(filter);
         }
 
-        public async Task UpdateCategory(Category category)
+        public async Task<ICollection<string>> GetCategoryLanguagesAsync(int id)
+        {
+            return await _categoryTextRepository.GetUsedLanguagesForCategoryAsync(id);
+        }
+
+        public async Task<Category> CreateAsync(Category category)
+        {
+            category.Class = category.Class?.ToLowerInvariant().Trim();
+            category.Name = category.Name?.Trim();
+
+            await _categoryRepository.AddAsync(category);
+            await _categoryRepository.SaveAsync();
+
+            return category;
+        }
+
+        public async Task<Category> EditAsync(Category category)
         {
             var currentCategory = await _categoryRepository.FindAsync(category.Id);
-            currentCategory.Name = category.Name.Trim();
-            currentCategory.Class = category.Class.ToLower().Trim();
+
+            currentCategory.Class = category.Class?.ToLowerInvariant().Trim();
+            currentCategory.Name = category.Name?.Trim();
+
             _categoryRepository.Update(currentCategory);
             await _categoryRepository.SaveAsync();
+
+            return currentCategory;
         }
 
         public async Task DeleteAsync(int id)
         {
-            try
+            var category = await _categoryRepository.FindAsync(id);
+
+            if (category == null)
             {
-                var category = await _categoryRepository.FindAsync(id);
-                _categoryRepository.Remove(category);
-                await _categoryRepository.SaveAsync();
+                throw new OcudaException("Category does not exist.");
             }
-            catch (OcudaException ex)
-            {
-                _logger.LogError(ex, "Could not delete category", ex.Message);
-                throw;
-            }
+
+            var categoryTexts = await _categoryTextRepository.GetAllForCategoryAsync(category.Id);
+
+            var emediaCategories = await _emediaCategoryRepository
+                .GetByCategoryIdAsync(category.Id);
+
+            _categoryTextRepository.RemoveRange(categoryTexts);
+            _emediaCategoryRepository.RemoveRange(emediaCategories);
+            _categoryRepository.Remove(category);
+
+            await _categoryRepository.SaveAsync();
+        }
+
+        public async Task<CategoryText> GetTextByCategoryAndLanguageAsync(int categoryId,
+            int languageId)
+        {
+            return await _categoryTextRepository.GetByCategoryAndLanguageAsync(categoryId,
+                languageId);
         }
     }
 }

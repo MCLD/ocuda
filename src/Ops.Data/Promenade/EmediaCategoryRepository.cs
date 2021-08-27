@@ -58,6 +58,14 @@ namespace Ocuda.Ops.Data.Promenade
                 .FirstOrDefault();
         }
 
+        public async Task<ICollection<EmediaCategory>> GetAllForEmediaAsync(int emediaId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.EmediaId == emediaId)
+                .ToListAsync();
+        }
+
         public async Task<ICollection<EmediaCategory>> GetAllForGroupAsync(int groupId)
         {
             return await DbSet

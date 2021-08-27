@@ -28,5 +28,8 @@ namespace Ocuda.Promenade.Models.Entities
 
         [NotMapped]
         public EmediaText EmediaText { get; set; }
+
+        [NotMapped]
+        public ICollection<string> EmediaLanguages { get; set; }
     }
 }

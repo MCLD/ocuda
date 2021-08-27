@@ -46,14 +46,15 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
-        public async Task<DataWithCount<ICollection<Emedia>>> GetPaginatedListAsync(
-            BaseFilter filter)
+        public async Task<DataWithCount<ICollection<Emedia>>> GetPaginatedListForGroupAsync(
+            int groupId, BaseFilter filter)
         {
+            var query = DbSet.AsNoTracking().Where(_ => _.GroupId == groupId);
+
             return new DataWithCount<ICollection<Emedia>>
             {
-                Count = await DbSet.AsNoTracking().CountAsync(),
-                Data = await DbSet
-                    .AsNoTracking()
+                Count = await query.CountAsync(),
+                Data = await query
                     .OrderBy(_ => _.Name)
                     .ApplyPagination(filter)
                     .ToListAsync()

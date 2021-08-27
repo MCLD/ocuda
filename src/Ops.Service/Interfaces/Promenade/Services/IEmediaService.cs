@@ -11,8 +11,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<ICollection<Emedia>> GetAllEmedia();
         Task<ICollection<EmediaCategory>> GetEmediaCategoriesByCategoryId(int categoryId);
         Task DeleteAsync(int id);
-        Task<DataWithCount<ICollection<Emedia>>> GetPaginatedListAsync(
-            BaseFilter filter);
         Task<DataWithCount<ICollection<EmediaGroup>>> GetPaginatedGroupListAsync(BaseFilter filter);
         Task DeleteGroupAsync(int id);
         Task<EmediaGroup> CreateGroupAsync(EmediaGroup group);
@@ -27,5 +25,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task SetEmediaTextAsync(EmediaText emediaText);
         Task UpdateCategoriesAsync(int emediaId, ICollection<int> categoryIds);
         Task<ICollection<Category>> GetCategoriesForEmediaAsync(int emediaId);
+        Task<ICollection<string>> GetEmediaLanguagesAsync(int id);
+        Task<DataWithCount<ICollection<Emedia>>> GetPaginatedListForGroupAsync(int emediaId,
+            BaseFilter filter);
     }
 }

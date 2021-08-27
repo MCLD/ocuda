@@ -3,10 +3,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
-using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Category;
+using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Categories;
 using Ocuda.Ops.Controllers.Filters;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
@@ -23,18 +25,22 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     {
         private readonly ICategoryService _categoryService;
         private readonly IEmediaService _emediaService;
+        private readonly ILanguageService _languageService;
 
         public static string Name { get { return "Categories"; } }
         public static string Area { get { return "SiteManagement"; } }
 
         public CategoriesController(ServiceFacades.Controller<CategoriesController> context,
             ICategoryService categoryService,
-            IEmediaService emediaService) : base(context)
+            IEmediaService emediaService,
+            ILanguageService languageService) : base(context)
         {
             _categoryService = categoryService
                 ?? throw new ArgumentNullException(nameof(categoryService));
             _emediaService = emediaService
                 ?? throw new ArgumentNullException(nameof(emediaService));
+            _languageService = languageService
+                ?? throw new ArgumentNullException(nameof(languageService));
         }
 
         [Route("")]
@@ -44,6 +50,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var itemsPerPage = await _siteSettingService
                 .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
             var filter = new BaseFilter(page, itemsPerPage);
+
             var categoryList = await _categoryService.GetPaginatedListAsync(filter);
 
             var paginateModel = new PaginateModel
@@ -52,7 +59,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 CurrentPage = page,
                 ItemsPerPage = filter.Take.Value
             };
-
             if (paginateModel.PastMaxPage)
             {
                 return RedirectToRoute(
@@ -62,15 +68,157 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     });
             }
 
-            var viewModel = new CategoryViewModel
+            foreach (var category in categoryList.Data)
             {
-                AllCategories = categoryList.Data,
+                category.CategoryLanguages = await _categoryService
+                    .GetCategoryLanguagesAsync(category.Id);
+            }
+
+            var viewModel = new IndexViewModel
+            {
+                Categories = categoryList.Data,
                 PaginateModel = paginateModel
             };
 
             return View(viewModel);
         }
 
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> CreateCategory(IndexViewModel model)
+        {
+            JsonResponse response;
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var category = await _categoryService.CreateAsync(model.Category);
+                    response = new JsonResponse
+                    {
+                        Success = true,
+                        Url = Url.Action(nameof(Details), new { id = category.Id })
+                    };
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
+            }
+            else
+            {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
+                };
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> EditCategory(IndexViewModel model)
+        {
+            JsonResponse response;
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var category = await _categoryService.EditAsync(model.Category);
+                    response = new JsonResponse
+                    {
+                        Success = true
+                    };
+
+                    ShowAlertSuccess($"Updated category: {category.Name}");
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
+            }
+            else
+            {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
+                };
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeleteCategory(IndexViewModel model)
+        {
+            try
+            {
+                await _categoryService.DeleteAsync(model.Category.Id);
+                ShowAlertSuccess($"Deleted category: {model.Category}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting category: {Message}", ex.Message);
+                ShowAlertDanger($"Error deleting category: {model.Category.Name}");
+            }
+
+            return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
+        }
+
+        [Route("[action]")]
+        [RestoreModelState]
+        public async Task<IActionResult> Details(int id, string language)
+        {
+            var category = await _categoryService.GetByIdAsync(id);
+
+            if (category == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            var languages = await _languageService.GetActiveAsync();
+
+            var selectedLanguage = languages
+                .FirstOrDefault(_ => _.Name.Equals(language, StringComparison.OrdinalIgnoreCase))
+                ?? languages.Single(_ => _.IsDefault);
+
+            var viewModel = new DetailsViewModel
+            {
+                Category = category,
+                CategoryText = await _categoryService.GetTextByCategoryAndLanguageAsync(category.Id,
+                    selectedLanguage.Id),
+                LanguageId = selectedLanguage.Id,
+                LanguageList = new SelectList(languages,
+                    nameof(Language.Name),
+                    nameof(Language.Description),
+                    selectedLanguage.Name)
+            };
+
+            return View(viewModel);
+        }
+
+        /*
         [HttpPost]
         [Route("[action]")]
         [SaveModelState]
@@ -170,5 +318,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToAction(nameof(CategoriesController.Index));
             }
         }
+        */
     }
 }
