@@ -377,6 +377,8 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.CarouselTextRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICategoryRepository,
                 Data.Promenade.CategoryRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ICategoryTextRepository,
+                Data.Promenade.CategoryTextRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaCategoryRepository,
                 Data.Promenade.EmediaCategoryRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaGroupRepository,

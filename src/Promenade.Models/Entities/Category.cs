@@ -23,5 +23,8 @@ namespace Ocuda.Promenade.Models.Entities
 
         [NotMapped]
         public ICollection<string> CategoryLanguages { get; set; }
+
+        [NotMapped]
+        public ICollection<string> CategoryEmedias { get; set; }
     }
 }

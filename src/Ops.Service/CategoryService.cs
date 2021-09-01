@@ -56,9 +56,14 @@ namespace Ocuda.Ops.Service
             return await _categoryTextRepository.GetUsedLanguagesForCategoryAsync(id);
         }
 
+        public async Task<ICollection<string>> GetCategoryEmediasAsync(int id)
+        {
+            return await _emediaCategoryRepository.GetEmediasForCategoryAsync(id);
+        }
+
         public async Task<Category> CreateAsync(Category category)
         {
-            category.Class = category.Class?.ToLowerInvariant().Trim();
+            category.Class = category.Class?.Trim().ToLowerInvariant();
             category.Name = category.Name?.Trim();
 
             await _categoryRepository.AddAsync(category);
@@ -71,7 +76,7 @@ namespace Ocuda.Ops.Service
         {
             var currentCategory = await _categoryRepository.FindAsync(category.Id);
 
-            currentCategory.Class = category.Class?.ToLowerInvariant().Trim();
+            currentCategory.Class = category.Class?.Trim().ToLowerInvariant();
             currentCategory.Name = category.Name?.Trim();
 
             _categoryRepository.Update(currentCategory);
@@ -106,6 +111,27 @@ namespace Ocuda.Ops.Service
         {
             return await _categoryTextRepository.GetByCategoryAndLanguageAsync(categoryId,
                 languageId);
+        }
+
+        public async Task SetCategoryTextAsync (CategoryText categoryText)
+        {
+            var currentText = await _categoryTextRepository.GetByCategoryAndLanguageAsync(
+                categoryText.CategoryId, categoryText.LanguageId);
+
+            if (currentText == null)
+            {
+                categoryText.Text = categoryText.Text?.Trim();
+
+                await _categoryTextRepository.AddAsync(categoryText);
+            }
+            else
+            {
+                currentText.Text = categoryText.Text?.Trim();
+
+                _categoryTextRepository.Update(categoryText);
+            }
+
+            await _categoryTextRepository.SaveAsync();
         }
     }
 }

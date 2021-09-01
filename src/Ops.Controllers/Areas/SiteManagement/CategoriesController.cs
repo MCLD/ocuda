@@ -24,7 +24,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     public class CategoriesController : BaseController<CategoriesController>
     {
         private readonly ICategoryService _categoryService;
-        private readonly IEmediaService _emediaService;
         private readonly ILanguageService _languageService;
 
         public static string Name { get { return "Categories"; } }
@@ -32,13 +31,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         public CategoriesController(ServiceFacades.Controller<CategoriesController> context,
             ICategoryService categoryService,
-            IEmediaService emediaService,
             ILanguageService languageService) : base(context)
         {
             _categoryService = categoryService
                 ?? throw new ArgumentNullException(nameof(categoryService));
-            _emediaService = emediaService
-                ?? throw new ArgumentNullException(nameof(emediaService));
             _languageService = languageService
                 ?? throw new ArgumentNullException(nameof(languageService));
         }
@@ -72,6 +68,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 category.CategoryLanguages = await _categoryService
                     .GetCategoryLanguagesAsync(category.Id);
+
+                category.CategoryEmedias = await _categoryService
+                    .GetCategoryEmediasAsync(category.Id);
             }
 
             var viewModel = new IndexViewModel
@@ -175,7 +174,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             try
             {
                 await _categoryService.DeleteAsync(model.Category.Id);
-                ShowAlertSuccess($"Deleted category: {model.Category}");
+                ShowAlertSuccess($"Deleted category: {model.Category.Name}");
             }
             catch (Exception ex)
             {
@@ -186,7 +185,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
         }
 
-        [Route("[action]")]
+        [Route("[action]/{id}")]
         [RestoreModelState]
         public async Task<IActionResult> Details(int id, string language)
         {
@@ -218,106 +217,32 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return View(viewModel);
         }
 
-        /*
         [HttpPost]
-        [Route("[action]")]
+        [Route("[action]/{id}")]
         [SaveModelState]
-        public async Task<IActionResult> EditCategory(CategoryViewModel viewModel)
+        public async Task<IActionResult> Details (DetailsViewModel model)
         {
-            if (!string.IsNullOrEmpty(viewModel?.Category?.Class))
-            {
-                var currCategory = _categoryService.GetByClass(viewModel.Category.Class);
-                if (currCategory != null && currCategory.Id != viewModel.Category.Id)
-                {
-                    ModelState.AddModelError("Category.Class", "This stub already exists");
-                    ShowAlertDanger("Class is required for a category");
-                    return RedirectToAction(nameof(CategoriesController.Index));
-                }
-            }
             if (ModelState.IsValid)
             {
                 try
                 {
-                    await _categoryService.UpdateCategory(viewModel.Category);
-                    ShowAlertSuccess($"Updated category: {viewModel.Category.Name}");
-                    return RedirectToAction(nameof(CategoriesController.Index));
+                    await _categoryService.SetCategoryTextAsync(model.CategoryText);
+                    ShowAlertSuccess("Updated category text");
                 }
-                catch (OcudaException ex)
+                catch (Exception ex)
                 {
-                    ShowAlertDanger($"Unable to Update category: {viewModel.Category.Name}");
-                    _logger.LogError(ex, "Problem updating category: {Message}", ex.Message);
-                    return RedirectToAction(nameof(CategoriesController.Index));
+                    _logger.LogError(ex, "Error updating category text: {Message}", ex.Message);
+                    ShowAlertDanger("Error updating category text");
                 }
-            }
-            else
-            {
-                ShowAlertDanger($"Invalid Parameters: {viewModel.Category.Name}");
-                return RedirectToAction(nameof(CategoriesController.Index));
-            }
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        [SaveModelState]
-        public async Task<IActionResult> DeleteCategory(Category category)
-        {
-            try
-            {
-                var categories = await _emediaService.GetEmediaCategoriesByCategoryId(category.Id);
-                if (categories.ToList().Count > 0)
-                {
-                    ShowAlertDanger($"Remove {category.Name}'s categories before deleting.");
-                    return RedirectToAction(nameof(CategoriesController.Index));
-                }
-                await _categoryService.DeleteAsync(category.Id);
-                ShowAlertSuccess($"Deleted category: {category.Name}");
-            }
-            catch (OcudaException ex)
-            {
-                _logger.LogError(ex, "Problem deleting category: {Message}", ex.Message);
-                ShowAlertDanger($"Unable to Delete category {category.Name}: {ex.Message}");
             }
 
-            return RedirectToAction(nameof(CategoriesController.Index));
-        }
+            var language = await _languageService.GetActiveByIdAsync(model.CategoryText.LanguageId);
 
-        [HttpPost]
-        [Route("[action]")]
-        [SaveModelState]
-        public async Task<IActionResult> AddCategory(CategoryViewModel viewModel)
-        {
-            if (!string.IsNullOrEmpty(viewModel?.Category?.Class))
+            return RedirectToAction(nameof(Details), new
             {
-                var currCategory = _categoryService.GetByClass(viewModel.Category.Class);
-                if (currCategory != null)
-                {
-                    ModelState.AddModelError("Category.Class", "This class already exists");
-                    ShowAlertDanger("Class is required for a category");
-                    return RedirectToAction(nameof(CategoriesController.Index));
-                }
-            }
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    await _categoryService.AddCategory(viewModel.Category);
-                    var category = _categoryService.GetByClass(viewModel.Category.Class.ToLower().Trim());
-                    ShowAlertSuccess($"Added Category: {category.Name}");
-                    return RedirectToAction(nameof(CategoriesController.Index));
-                }
-                catch (OcudaException ex)
-                {
-                    ShowAlertDanger($"Unable to Create Category: {ex.Message}");
-                    _logger.LogError(ex, "Problem creating category: {Message}", ex.Message);
-                    return RedirectToAction(nameof(CategoriesController.Index));
-                }
-            }
-            else
-            {
-                ShowAlertDanger($"Invalid paramaters");
-                return RedirectToAction(nameof(CategoriesController.Index));
-            }
+                id = model.CategoryText.CategoryId,
+                language = language.IsDefault ? null : language.Name
+            });
         }
-        */
     }
 }

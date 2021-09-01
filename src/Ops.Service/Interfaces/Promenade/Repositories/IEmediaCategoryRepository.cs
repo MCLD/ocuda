@@ -14,5 +14,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
         void RemoveByEmediaAndCategories(int emediaId, ICollection<int> categoryIds);
         Task<ICollection<Category>> GetCategoriesForEmediaAsync(int emediaId);
         Task<ICollection<EmediaCategory>> GetAllForEmediaAsync(int emediaId);
+        Task<ICollection<string>> GetEmediasForCategoryAsync(int categoryId);
     }
 }

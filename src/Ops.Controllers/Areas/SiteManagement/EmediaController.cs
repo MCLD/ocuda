@@ -416,7 +416,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error updating emedia text: {Message}", ex.Message);
-                    ShowAlertDanger($"Error updating emedia text");
+                    ShowAlertDanger("Error updating emedia text");
                 }
             }
 

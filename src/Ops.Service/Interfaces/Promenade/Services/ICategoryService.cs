@@ -17,5 +17,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task DeleteAsync(int id);
         Task<Category> GetByIdAsync(int id);
         Task<CategoryText> GetTextByCategoryAndLanguageAsync(int categoryId, int languageId);
+        Task<ICollection<string>> GetCategoryEmediasAsync(int id);
+        Task SetCategoryTextAsync(CategoryText categoryText);
     }
 }

@@ -259,6 +259,7 @@ namespace Ocuda.Ops.Service
 
             _emediaCategoryRepository.RemoveRange(emediaCategories);
             _emediaTextReposiory.RemoveRange(emediaTexts);
+            _emediaRepository.RemoveRange(group.Emedias);
             _emediaGroupRepository.Remove(group);
 
             await _emediaGroupRepository.SaveAsync();

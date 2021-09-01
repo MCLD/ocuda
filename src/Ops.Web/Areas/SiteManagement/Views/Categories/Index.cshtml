@@ -64,7 +64,8 @@
                                         data-toggle="modal"
                                         data-target="#deleteModal"
                                         data-id="@category.Id"
-                                        data-name="@category.Name">
+                                        data-name="@category.Name"
+                                        data-emedia="@string.Join("|", category.CategoryEmedias)">
                                     <span class="fas fa-minus-circle" aria-hidden="true"></span>
                                 </button>
                             </td>
@@ -115,6 +116,7 @@
          id="deleteModal"
          name="Category"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
+        <div id="dependentWarnings" class="d-none"></div>
     </div>
 </form>
 
@@ -165,12 +167,37 @@
 
         $("#deleteModal").on("show.bs.modal", function (e) {
             var button = $(e.relatedTarget);
+
             var id = button.data("id");
             var name = button.data("name");
+            var emedia = button.data("emedia");
+
             var modal = $(this);
+
             $("#deleteId").val(id);
             $("#deleteName").val(name);
+
             modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
+
+            var dependentWarning = modal.find("#dependentWarnings");
+
+            if (emedia) {
+                dependentWarning.text("").removeClass("d-none");
+
+                var emedias = emedia.split("|");
+
+                dependentWarning.append("<div>The following <strong>emedia</strong> use this category:</div>");
+                dependentWarning.append("<ul id=\"emediaDependents\"></ul>");
+
+                var emediaDependents = dependentWarning.find("#emediaDependents");
+
+                $.each(emedias, function (index, value) {
+                    emediaDependents.append("<li>" + value + "</li>")
+                });
+            }
+            else {
+                dependentWarning.addClass("d-none");
+            }
         });
     </script>
 }

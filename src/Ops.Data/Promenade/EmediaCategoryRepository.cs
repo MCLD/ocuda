@@ -74,6 +74,16 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
+        public async Task<ICollection<string>> GetEmediasForCategoryAsync(int categoryId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.CategoryId == categoryId)
+                .Select(_ => _.Emedia.Name)
+                .OrderBy(_ => _)
+                .ToListAsync();
+        }
+
         public void RemoveByEmediaAndCategories(int emediaId, ICollection<int> categoryIds)
         {
             var emediaCategories = DbSet
