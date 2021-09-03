@@ -60,12 +60,9 @@
 @section scripts {
     <script>
         $("#infoModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var modal = $(this);
-            var name = button.data("name");
-            var details = button.data("details");
-            modal.find(".modal-title").text(name);
-            modal.find(".modal-body").html(details);
+            let button = $(e.relatedTarget);
+            $(this).find(".modal-title").text(button.data("name"));
+            $(this).find(".modal-body").html(button.data("details"));
         });
     </script>
 }

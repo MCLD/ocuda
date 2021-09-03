@@ -9,6 +9,10 @@ using Xunit;
 
 namespace i18n.Test
 {
+    /// <summary>
+    /// Verify that all the i18n text resources are present in both the resource files for English
+    /// and Spanish.
+    /// </summary>
     public class VerifyResourcesTest
     {
         private const string BasePathToResx = "..{0}..{0}..{0}..{0}..{0}..{0}src{0}i18n{0}Resources";
@@ -40,7 +44,7 @@ namespace i18n.Test
             var missingValues = new List<string>();
             foreach (var fieldInfo in constStrings)
             {
-                if(!resourceFileKeys.Contains(fieldInfo.GetValue(null)))
+                if (!resourceFileKeys.Contains(fieldInfo.GetValue(null)))
                 {
                     missingValues.Add((string)fieldInfo.GetValue(null));
                 }

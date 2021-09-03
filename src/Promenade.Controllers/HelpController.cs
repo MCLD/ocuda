@@ -735,7 +735,7 @@ namespace Ocuda.Promenade.Controllers
             if (blockedDays.Count >= Enum.GetNames(typeof(DayOfWeek)).Length)
             {
                 _logger.LogCritical("No available days configured for scheduling.");
-                throw new OcudaException("No available times for scheduling could be found");
+                throw new OcudaException(_localizer[i18n.Keys.Promenade.ErrorNoTimes]);
             }
 
             var startHour = await _siteSettingService.GetSettingDoubleAsync(

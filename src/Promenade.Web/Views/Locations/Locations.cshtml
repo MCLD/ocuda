@@ -162,7 +162,7 @@
         }
 
         $('#GeoButton').on('click', function () {
-            $('#GeoButton').html('<span class="fa fa-spinner fa-spin"></span> ' + useMyLocation);
+            $('#GeoButton').html('<span class="fas fa-spinner fa-spin"></span> ' + useMyLocation);
             $('#GeoButton').prop('disabled', true);
             var geoOptions = {
                 enableHighAccuracy: true,
@@ -173,7 +173,7 @@
         });
 
         $('#GoButton').on('click', function () {
-            $('#GoButton').html('<span class="fa fa-spinner fa-spin"></span> Go');
+            $('#GoButton').html('<span class="fas fa-spinner fa-spin"></span> Go');
             $('#GoButton').prop('disabled', true);
             $('#ZipForm').submit();
             return false;
