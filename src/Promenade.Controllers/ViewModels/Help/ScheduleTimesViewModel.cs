@@ -9,7 +9,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Help
 {
     public class ScheduleTimesViewModel
     {
-        [Display(Name = "Requested date and time")]
+        [Display(Name = i18n.Keys.Promenade.PromptRequestedDateAndTime)]
         public string DisplayTime
         {
             get
@@ -18,10 +18,10 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Help
             }
         }
 
-        [Display(Name = "Requested date")]
+        [Display(Name = i18n.Keys.Promenade.PromptRequestedDate)]
         public DateTime? RequestedDate { get; set; }
 
-        [Display(Name = "Requested time")]
+        [Display(Name = i18n.Keys.Promenade.PromptRequestedTime)]
         public DateTime? RequestedTime { get; set; }
 
         public DateTime ScheduleRequestTime { get; set; }

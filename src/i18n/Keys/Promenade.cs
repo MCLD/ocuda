@@ -2,6 +2,11 @@
 {
     public static class Promenade
     {
+        public const string PromptPhone = "Phone";
+        public const string PromptRequestedDate = "Requested date";
+        public const string PromptRequestedDateAndTime = "Requested date and time";
+        public const string PromptRequestedTime = "Requested time";
+        public const string PromptSubject = "Subject";
         public static readonly string ButtonBack = "Back";
         public static readonly string ButtonBackToSite = "Back to the site";
         public static readonly string ButtonGo = "Go";
@@ -66,10 +71,6 @@
         public static readonly string PromptLanguage = "Language";
         public static readonly string PromptName = "Name";
         public static readonly string PromptNotes = "Notes";
-        public static readonly string PromptPhone = "Phone";
-        public static readonly string PromptRequestedDate = "Requested date";
-        public static readonly string PromptRequestedTime = "Requested time";
-        public static readonly string PromptSchedule = "Subject";
         public static readonly string RequiredField = "You must supply a value for: {0}";
         public static readonly string RequiredFieldItem = "The {0} field is required.";
         public static readonly string ScheduleAppointmentDetails = "Here are the details of your appointment:";

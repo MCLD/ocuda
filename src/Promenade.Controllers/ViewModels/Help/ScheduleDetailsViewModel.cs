@@ -25,10 +25,10 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Help
             }
         }
 
-        [Display(Name = "Subject")]
+        [Display(Name = i18n.Keys.Promenade.PromptSubject)]
         public string DisplaySubject { get; set; }
 
-        [Display(Name = "Requested date and time")]
+        [Display(Name = i18n.Keys.Promenade.PromptRequestedDateAndTime)]
         public string DisplayTime
         {
             get
@@ -60,7 +60,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Help
         public string NotesRequiredMessage { get; set; }
         public ScheduleRequest ScheduleRequest { get; set; }
 
-        [Display(Name = "Phone")]
+        [Display(Name = i18n.Keys.Promenade.PromptPhone)]
         [MaxLength(255)]
         [Required(ErrorMessage = ErrorMessage.FieldRequired)]
         public string ScheduleRequestPhone { get; set; }
