@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -237,6 +238,12 @@ namespace Ocuda.Ops.Web
             {
                 services.AddControllersWithViews(_ =>
                         _.ModelBinderProviders.RemoveType<DateTimeModelBinderProvider>())
+                    .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                    .AddDataAnnotationsLocalization(_ =>
+                    {
+                        _.DataAnnotationLocalizerProvider = (__, factory)
+                            => factory.Create(typeof(i18n.Resources.Shared));
+                    })
                     .AddSessionStateTempDataProvider()
                     .AddRazorRuntimeCompilation();
             }
@@ -244,6 +251,12 @@ namespace Ocuda.Ops.Web
             {
                 services.AddControllersWithViews(_ =>
                         _.ModelBinderProviders.RemoveType<DateTimeModelBinderProvider>())
+                    .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                    .AddDataAnnotationsLocalization(_ =>
+                    {
+                        _.DataAnnotationLocalizerProvider = (__, factory)
+                            => factory.Create(typeof(i18n.Resources.Shared));
+                    })
                     .AddSessionStateTempDataProvider();
             }
 

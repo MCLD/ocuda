@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
@@ -20,29 +23,40 @@ namespace Ocuda.Promenade.Service
 
         private readonly IOcudaCache _cache;
         private readonly IConfiguration _config;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly LanguageService _languageService;
         private readonly IScheduleRequestLimitRepository _scheduleRequestLimitRepository;
         private readonly IScheduleRequestRepository _scheduleRequestRepository;
         private readonly IScheduleRequestSubjectRepository _scheduleRequestSubjectRepository;
+        private readonly IScheduleRequestSubjectTextRepository _scheduleRequestSubjectTextRepository;
         private readonly IScheduleRequestTelephoneRepository _scheduleRequestTelephoneRepository;
 
         public ScheduleService(ILogger<ScheduleService> logger,
             IDateTimeProvider dateTimeProvider,
             IConfiguration config,
+            IHttpContextAccessor httpContextAccessor,
             IOcudaCache cache,
-            IScheduleRequestRepository scheduleRequestRepository,
             IScheduleRequestLimitRepository scheduleRequestLimitRepository,
+            IScheduleRequestRepository scheduleRequestRepository,
             IScheduleRequestSubjectRepository scheduleRequestSubjectRepository,
-            IScheduleRequestTelephoneRepository scheduleRequestTelephoneRepository)
-            : base(logger, dateTimeProvider)
+            IScheduleRequestSubjectTextRepository scheduleRequestSubjectTextRepository,
+            IScheduleRequestTelephoneRepository scheduleRequestTelephoneRepository,
+            LanguageService languageService) : base(logger, dateTimeProvider)
         {
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _config = config ?? throw new ArgumentNullException(nameof(config));
-            _scheduleRequestRepository = scheduleRequestRepository
-                ?? throw new ArgumentNullException(nameof(scheduleRequestRepository));
+            _httpContextAccessor = httpContextAccessor
+                ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            _languageService = languageService
+                ?? throw new ArgumentNullException(nameof(languageService));
             _scheduleRequestLimitRepository = scheduleRequestLimitRepository
                 ?? throw new ArgumentNullException(nameof(scheduleRequestLimitRepository));
+            _scheduleRequestRepository = scheduleRequestRepository
+                ?? throw new ArgumentNullException(nameof(scheduleRequestRepository));
             _scheduleRequestSubjectRepository = scheduleRequestSubjectRepository
                 ?? throw new ArgumentNullException(nameof(scheduleRequestRepository));
+            _scheduleRequestSubjectTextRepository = scheduleRequestSubjectTextRepository
+                ?? throw new ArgumentNullException(nameof(scheduleRequestSubjectTextRepository));
             _scheduleRequestTelephoneRepository = scheduleRequestTelephoneRepository
                 ?? throw new ArgumentNullException(nameof(scheduleRequestTelephoneRepository));
         }
@@ -164,7 +178,12 @@ namespace Ocuda.Promenade.Service
             IEnumerable<ScheduleRequestSubject> subjects = null;
             var pageCacheDuration = GetPageCacheDuration(_config);
 
-            if (pageCacheDuration > 0 && !forceReload)
+            if (pageCacheDuration == 0)
+            {
+                forceReload = true;
+            }
+
+            if (!forceReload)
             {
                 subjects = await _cache
                     .GetObjectFromCacheAsync<IEnumerable<ScheduleRequestSubject>>(
@@ -179,6 +198,40 @@ namespace Ocuda.Promenade.Service
                     pageCacheDuration);
             }
 
+            var currentCultureName = _httpContextAccessor
+                .HttpContext
+                .Features
+                .Get<IRequestCultureFeature>()
+                .RequestCulture
+                .UICulture?
+                .Name;
+
+            int defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync();
+            int? currentLanguageId = null;
+
+            if (!string.IsNullOrWhiteSpace(currentCultureName))
+            {
+                currentLanguageId = await _languageService.GetLanguageIdAsync(currentCultureName);
+            }
+
+            foreach (var subject in subjects)
+            {
+                if (currentLanguageId.HasValue)
+                {
+                    subject.SubjectText = await GetSubjectTextAsync(forceReload,
+                        pageCacheDuration,
+                        currentLanguageId.Value,
+                        subject.Id);
+                }
+
+                if (string.IsNullOrEmpty(subject.SubjectText))
+                {
+                    subject.SubjectText = await GetSubjectTextAsync(forceReload,
+                        pageCacheDuration,
+                        defaultLanguageId,
+                        subject.Id);
+                }
+            }
             return subjects;
         }
 
@@ -213,6 +266,37 @@ namespace Ocuda.Promenade.Service
             addedRequest.ScheduleRequestTelephone = requestTelephone;
 
             return addedRequest;
+        }
+
+        private async Task<string> GetSubjectTextAsync(bool forceReload,
+            int pageCacheDuration,
+            int languageId,
+            int subjectId)
+        {
+            var cacheKey = string.Format(CultureInfo.InvariantCulture,
+                Utility.Keys.Cache.PromScheduleSubjectTexts,
+                languageId,
+                subjectId);
+
+            string subjectText = null;
+
+            if (!forceReload)
+            {
+                subjectText = await _cache.GetStringFromCache(cacheKey);
+            }
+
+            if (string.IsNullOrEmpty(subjectText))
+            {
+                subjectText = await _scheduleRequestSubjectTextRepository
+                        .GetByIdsAsync(subjectId, languageId);
+            }
+
+            if (!string.IsNullOrEmpty(subjectText) && pageCacheDuration > 0)
+            {
+                await _cache.SaveToCacheAsync(cacheKey, subjectText, pageCacheDuration);
+            }
+
+            return subjectText;
         }
     }
 }

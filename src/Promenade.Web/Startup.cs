@@ -427,6 +427,8 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.ScheduleRequestRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IScheduleRequestSubjectRepository,
                 Data.Promenade.ScheduleRequestSubjectRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IScheduleRequestSubjectTextRepository,
+                Data.Promenade.ScheduleRequestSubjectTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IScheduleRequestTelephoneRepository,
                 Data.Promenade.ScheduleRequestTelephoneRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ISegmentRepository,
