@@ -627,7 +627,7 @@ namespace Ocuda.Promenade.Controllers
 
             scheduleViewModel.Subjects = subjects.Select(_ => new SelectListItem
             {
-                Text = _.Subject,
+                Text = _.SubjectText,
                 Value = _.Id.ToString(CultureInfo.InvariantCulture)
             });
 

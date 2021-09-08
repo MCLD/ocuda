@@ -279,6 +279,7 @@ namespace Ocuda.Promenade.Service
                 subjectId);
 
             string subjectText = null;
+            bool foundInCache = false;
 
             if (!forceReload)
             {
@@ -289,11 +290,11 @@ namespace Ocuda.Promenade.Service
             {
                 subjectText = await _scheduleRequestSubjectTextRepository
                         .GetByIdsAsync(subjectId, languageId);
-            }
 
-            if (!string.IsNullOrEmpty(subjectText) && pageCacheDuration > 0)
-            {
-                await _cache.SaveToCacheAsync(cacheKey, subjectText, pageCacheDuration);
+                if (!string.IsNullOrEmpty(subjectText) && pageCacheDuration > 0)
+                {
+                    await _cache.SaveToCacheAsync(cacheKey, subjectText, pageCacheDuration);
+                }
             }
 
             return subjectText;
