@@ -12,7 +12,7 @@
         </div>
         <div class="col-12 col-md-7 order-md-1">
             <h1>@Model.Location.Name</h1>
-            <a aria-label="@Localizer[Promenade.LocationSeeAMap]"
+            <a aria-label="@Localizer[Promenade.NewWindowItem, @Localizer[Promenade.LocationSeeAMap]]"
                href="@Model.Location.MapLink"
                class="btn btn-outline-secondary float-right ml-2 prom-locations-maplink"
                target="_blank">
@@ -153,7 +153,7 @@
 
             <p>
                 @Localizer[Promenade.LocationInterestedInNearby]
-                <a aria-label="@Localizer[Promenade.LocationSubscribeNearbyNewWindow]"
+                <a aria-label="@Localizer[Promenade.NewWindowItem, @Localizer[Promenade.LocationSubscribeNearby]]"
                    href="@Model.LocationNeighborGroup.SubscriptionUrl"
                    target="_blank">@Localizer[Promenade.LocationSubscribeNearby]</a>
             </p>

@@ -51,10 +51,9 @@
         public static readonly string LocationOpenUntilItem = "Open until {0}";
         public static readonly string LocationOurAddress = "Our address:";
         public static readonly string LocationProblem = "There was a problem determining your location.";
-        public static readonly string LocationSeeAMap = "See a map to this location (opens in a new window)";
+        public static readonly string LocationSeeAMap = "See a map to this location";
         public static readonly string LocationsHeader = "Locations";
         public static readonly string LocationSubscribeNearby = "Subscribe to updates from all of these libraries.";
-        public static readonly string LocationSubscribeNearbyNewWindow = "Subscribe to updates from all of these libraries (opens in a new window)";
         public static readonly string LocationSubscribeToName = "Subscribe to updates from: {0}";
         public static readonly string LocationTomorrow = "tomorrow";
         public static readonly string LocationUpdatesFromAllCount = "Updates from all {0} locations";
@@ -78,7 +77,6 @@
         public static readonly string ScheduleHowCanWeHelp = "How can we help?";
         public static readonly string ScheduleNotAvailable = "Scheduling is currently not available.";
         public static readonly string ScheduleRequestDifferentTime = "Request a different time";
-        public static readonly string ScheduleRequestedDateTime = "Requested date and time";
         public static readonly string ScheduleRequiredNotes = "Please help us out by telling us a little about your request.";
         public static readonly string ScheduleYourTime = "Schedule your time";
         public static readonly string ScheduleYourTimeIsScheduled = "Your time is scheduled";
