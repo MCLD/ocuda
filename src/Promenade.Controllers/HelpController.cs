@@ -555,7 +555,7 @@ namespace Ocuda.Promenade.Controllers
                 }
             }
 
-            scheduleViewModel.DisplaySubject = subject.Subject;
+            scheduleViewModel.DisplaySubject = subject.SubjectText;
 
             scheduleViewModel.ScheduleRequest = new ScheduleRequest
             {

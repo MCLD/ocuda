@@ -175,15 +175,16 @@ namespace Ocuda.Promenade.Service
 
         public async Task<IEnumerable<ScheduleRequestSubject>> GetSubjectsAsync(bool forceReload)
         {
+            var doForceReload = forceReload;
             IEnumerable<ScheduleRequestSubject> subjects = null;
             var pageCacheDuration = GetPageCacheDuration(_config);
 
             if (pageCacheDuration == 0)
             {
-                forceReload = true;
+                doForceReload = true;
             }
 
-            if (!forceReload)
+            if (!doForceReload)
             {
                 subjects = await _cache
                     .GetObjectFromCacheAsync<IEnumerable<ScheduleRequestSubject>>(
@@ -218,7 +219,7 @@ namespace Ocuda.Promenade.Service
             {
                 if (currentLanguageId.HasValue)
                 {
-                    subject.SubjectText = await GetSubjectTextAsync(forceReload,
+                    subject.SubjectText = await GetSubjectTextAsync(doForceReload,
                         pageCacheDuration,
                         currentLanguageId.Value,
                         subject.Id);
@@ -226,7 +227,7 @@ namespace Ocuda.Promenade.Service
 
                 if (string.IsNullOrEmpty(subject.SubjectText))
                 {
-                    subject.SubjectText = await GetSubjectTextAsync(forceReload,
+                    subject.SubjectText = await GetSubjectTextAsync(doForceReload,
                         pageCacheDuration,
                         defaultLanguageId,
                         subject.Id);
@@ -279,7 +280,6 @@ namespace Ocuda.Promenade.Service
                 subjectId);
 
             string subjectText = null;
-            bool foundInCache = false;
 
             if (!forceReload)
             {
