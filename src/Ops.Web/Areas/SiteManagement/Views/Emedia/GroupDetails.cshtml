@@ -11,6 +11,16 @@
         <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
            asp-action="@(nameof(EmediaController.Index))">Back</a>
 
+        @if (!Model.EmediaGroup.SegmentId.HasValue)
+        {
+            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+                    data-toggle="modal"
+                    data-target="#updateSegmentModal">
+                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                Add a Segment
+            </button>
+        }
+
         <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
                 data-toggle="modal"
                 data-target="#addModal">
@@ -19,6 +29,43 @@
         </button>
     </div>
 </div>
+
+@if (Model.EmediaGroup.SegmentId.HasValue)
+{
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="row form-group">
+                <label class="col-form-label text-md-right col-md-3" for="SegmentName">Segment</label>
+                <div class="form-group-inner col-md-9">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <button class="btn btn-primary"
+                                    type="button"
+                                    data-toggle="modal"
+                                    data-target="#updateSegmentModal">
+                                <span class="far fa-edit"></span>
+                            </button>
+                        </div>
+                        <input asp-for="EmediaGroup.Segment.Name" class="form-control" readonly />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="offset-md-3 col-md-9">
+                    <button type="submit"
+                            class="btn btn-outline-danger"
+                            data-toggle="modal"
+                            data-target="#deleteSegmentModal"
+                            data-id="@Model.EmediaGroup.Id"
+                            data-name="@Model.EmediaGroup.Segment.Name">
+                        <span class="fas fa-times"></span>
+                        Delete Segment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 <div class="row">
     <div class="col-12">
@@ -102,10 +149,10 @@
 <form id="addForm" role="form">
     <input asp-for="Emedia.GroupId" value="@Model.EmediaGroup.Id" type="hidden" />
 
-    <div modal 
-         id="addModal" 
-         isLarge="true" 
-         name="Emedia" 
+    <div modal
+         id="addModal"
+         isLarge="true"
+         name="Emedia"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addName" asp-for="Emedia.Name" formgroup />
         <input id="addUrl" asp-for="Emedia.RedirectUrl" formgroup />
@@ -131,12 +178,41 @@
     <input id="deleteId" asp-for="Emedia.Id" type="hidden" />
     <input id="deleteName" asp-for="Emedia.Name" type="hidden" />
 
-    <div modal 
-         id="deleteModal" 
-         name="Emedia" 
+    <div modal
+         id="deleteModal"
+         name="Emedia"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
     </div>
 </form>
+
+<form id="updateSegmentForm" role="form">
+    <input id="updateSegmentGroupId" asp-for="EmediaGroupId" value="@Model.EmediaGroup.Id" type="hidden" />
+
+    <div modal
+         id="updateSegmentModal"
+         isLarge="true"
+         name="Segment"
+         type="@(Model.EmediaGroup.SegmentId.HasValue ? Ocuda.Utility.TagHelpers.ModalTypes.Edit : Ocuda.Utility.TagHelpers.ModalTypes.Add)">
+        <input id="updateSegmentName" asp-for="Segment.Name" value="@Model.EmediaGroup.Segment?.Name" formgroup />
+    </div>
+</form>
+
+@if (Model.EmediaGroup.SegmentId.HasValue)
+{
+<form asp-controller="@EmediaController.Name" asp-action="@(nameof(EmediaController.DeleteGroupSegment))" method="post" role="form">
+    <input id="deleteSegmentCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
+
+    <input id="deleteSegmentGroupId" asp-for="EmediaGroupId" value="@Model.EmediaGroup.Id" type="hidden" />
+    <input id="deleteSegmentNape" asp-for="Segment.Name" value="@Model.EmediaGroup.Segment.Name" type="hidden" />
+
+    <div modal
+         id="deleteSegmentModal"
+         isLarge="true"
+         name="Segment"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
+    </div>
+</form>
+}
 
 @section scripts {
     <script>
@@ -184,6 +260,37 @@
         });
 
         $("#deleteModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+            var modal = $(this);
+            $("#deleteId").val(id);
+            $("#deleteName").val(name);
+            modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
+        });
+
+        $("#updateSegmentForm").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.post("@(Url.Action(nameof(EmediaController.UpdateGroupSegment), EmediaController.Name))",
+                form.serialize(),
+                function (response) {
+                    if (response.success == true) {
+                        if (response.location) {
+                            location.href = response.url;
+                        }
+                        else {
+                            location.reload();
+                        }
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
+        });
+
+        $("#deleteSegmentModal").on("show.bs.modal", function (e) {
             var button = $(e.relatedTarget);
             var id = button.data("id");
             var name = button.data("name");

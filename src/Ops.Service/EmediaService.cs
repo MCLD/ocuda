@@ -21,6 +21,7 @@ namespace Ocuda.Ops.Service
         private readonly IEmediaCategoryRepository _emediaCategoryRepository;
         private readonly IEmediaGroupRepository _emediaGroupRepository;
         private readonly IEmediaTextRepository _emediaTextReposiory;
+        private readonly ISegmentService _segmentService;
 
         public EmediaService(ILogger<EmediaService> logger,
             IHttpContextAccessor httpContextAccessor,
@@ -28,7 +29,8 @@ namespace Ocuda.Ops.Service
             IEmediaRepository emediaRepository,
             IEmediaCategoryRepository emediaCategoryRepository,
             IEmediaGroupRepository emediaGroupRepository,
-            IEmediaTextRepository emediaTextRepository)
+            IEmediaTextRepository emediaTextRepository,
+            ISegmentService segmentService)
             : base(logger, httpContextAccessor)
         {
             _categoryRepository = categoryRepository
@@ -41,6 +43,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(emediaGroupRepository));
             _emediaTextReposiory = emediaTextRepository
                 ?? throw new ArgumentNullException(nameof(emediaTextRepository));
+            _segmentService = segmentService
+                ?? throw new ArgumentNullException(nameof(segmentService));
         }
 
         public async Task<Emedia> GetByIdAsync(int id)
@@ -112,7 +116,7 @@ namespace Ocuda.Ops.Service
                 currentText.Description = emediaText.Description?.Trim();
                 currentText.Details = emediaText.Details?.Trim();
 
-                 _emediaTextReposiory.Update(currentText);
+                _emediaTextReposiory.Update(currentText);
             }
 
             await _emediaTextReposiory.SaveAsync();
@@ -200,6 +204,11 @@ namespace Ocuda.Ops.Service
             return await _emediaGroupRepository.FindAsync(id);
         }
 
+        public async Task<EmediaGroup> GetGroupIncludingSegmentAsync(int id)
+        {
+            return await _emediaGroupRepository.GetIncludingSegmentAsync(id);
+        }
+
         public async Task<DataWithCount<ICollection<EmediaGroup>>> GetPaginatedGroupListAsync(
             BaseFilter filter)
         {
@@ -237,7 +246,7 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteGroupAsync(int id)
         {
-            var group = await _emediaGroupRepository.GetIncludingChildredAsync(id);
+            var group = await _emediaGroupRepository.GetIncludingEmediaAsync(id);
 
             if (group == null)
             {
@@ -253,6 +262,11 @@ namespace Ocuda.Ops.Service
                 _emediaGroupRepository.UpdateRange(subsequentGroups);
             }
 
+            if (group.SegmentId.HasValue)
+            {
+                await _segmentService.DeleteNoSaveAsync(group.SegmentId.Value);
+            }
+
             var emediaCategories = await _emediaCategoryRepository.GetAllForGroupAsync(id);
 
             var emediaTexts = await _emediaTextReposiory.GetAllForGroupAsync(group.Id);
@@ -262,6 +276,31 @@ namespace Ocuda.Ops.Service
             _emediaRepository.RemoveRange(group.Emedias);
             _emediaGroupRepository.Remove(group);
 
+            await _emediaGroupRepository.SaveAsync();
+        }
+
+        public async Task AddGroupSegmentAsync(EmediaGroup group)
+        {
+            var currentGroup = await _emediaGroupRepository.FindAsync(group.Id);
+            currentGroup.Segment = await _segmentService.CreateNoSaveAsync(group.Segment);
+
+            _emediaGroupRepository.Update(currentGroup);
+            await _emediaGroupRepository.SaveAsync();
+        }
+
+        public async Task DeleteGroupSegmentAsync(int groupId)
+        {
+            var group = await _emediaGroupRepository.FindAsync(groupId);
+            if (!group.SegmentId.HasValue)
+            {
+                throw new OcudaException("Emedia group does not have a segment.");
+            }
+
+            await _segmentService.DeleteNoSaveAsync(group.SegmentId.Value);
+
+            group.SegmentId = null;
+            _emediaGroupRepository.Update(group);
+            
             await _emediaGroupRepository.SaveAsync();
         }
 

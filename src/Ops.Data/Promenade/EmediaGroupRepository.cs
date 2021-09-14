@@ -29,11 +29,20 @@ namespace Ocuda.Ops.Data.Promenade
             return entity;
         }
 
-        public async Task<EmediaGroup> GetIncludingChildredAsync(int id)
+        public async Task<EmediaGroup> GetIncludingEmediaAsync(int id)
         {
             return await DbSet
                 .Where(_ => _.Id == id)
                 .Include(_ => _.Emedias)
+                .AsNoTracking()
+                .SingleOrDefaultAsync();
+        }
+
+        public async Task<EmediaGroup> GetIncludingSegmentAsync(int id)
+        {
+            return await DbSet
+                .Where(_ => _.Id == id)
+                .Include(_ => _.Segment)
                 .AsNoTracking()
                 .SingleOrDefaultAsync();
         }

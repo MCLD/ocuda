@@ -27,6 +27,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ICategoryService _categoryService;
         private readonly IEmediaService _emediaService;
         private readonly ILanguageService _languageService;
+        private readonly ISegmentService _segmentService;
 
         public static string Name { get { return "Emedia"; } }
         public static string Area { get { return "SiteManagement"; } }
@@ -34,7 +35,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         public EmediaController(ServiceFacades.Controller<EmediaController> context,
             ICategoryService categoryService,
             IEmediaService emediaService,
-            ILanguageService languageService) : base(context)
+            ILanguageService languageService,
+            ISegmentService segmentService) : base(context)
         {
             _categoryService = categoryService
                 ?? throw new ArgumentNullException(nameof(categoryService));
@@ -42,6 +44,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(emediaService));
             _languageService = languageService
                 ?? throw new ArgumentNullException(nameof(languageService));
+            _segmentService = segmentService
+                ?? throw new ArgumentNullException(nameof(segmentService));
         }
 
         [Route("")]
@@ -210,7 +214,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]/{id}")]
         public async Task<IActionResult> GroupDetails(int id, int page = 1)
         {
-            var group = await _emediaService.GetGroupByIdAsync(id);
+            var group = await _emediaService.GetGroupIncludingSegmentAsync(id);
 
             if (group == null)
             {
@@ -251,7 +255,96 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 PaginateModel = paginateModel
             };
 
+            if (group.SegmentId.HasValue)
+            {
+                viewModel.SegmentLanguages = await _segmentService
+                    .GetSegmentLanguagesByIdAsync(group.Id);
+            }
+
             return View(viewModel);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> UpdateGroupSegment(GroupDetailsViewModel model)
+        {
+            JsonResponse response;
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    string url = null;
+
+                    var group = await _emediaService.GetGroupByIdAsync(model.EmediaGroupId);
+                    if (group.SegmentId.HasValue)
+                    {
+                        var segment = await _segmentService.GetByIdAsync(group.SegmentId.Value);
+                        segment.Name = model.Segment.Name;
+                        segment = await _segmentService.EditAsync(segment);
+                        ShowAlertSuccess($"Updated group segment: {segment.Name}");
+                    }
+                    else
+                    {
+                        group.Segment = model.Segment;
+                        await _emediaService.AddGroupSegmentAsync(group);
+                        url = Url.Action(
+                            nameof(SegmentsController.Detail),
+                            SegmentsController.Name,
+                            new { id = group.SegmentId });
+                    }
+
+                    response = new JsonResponse
+                    {
+                        Success = true,
+                        Url = url
+                    };
+                }
+                catch (Exception ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
+            }
+            else
+            {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
+                };
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeleteGroupSegment(GroupDetailsViewModel model)
+        {
+            try
+            {
+                await _emediaService.DeleteGroupSegmentAsync(model.EmediaGroupId);
+                ShowAlertSuccess($"Deleted group segment: {model.Segment.Name}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting group segment: {Message}", ex.Message);
+                ShowAlertDanger($"Error deleting group segment: {model.Segment.Name}");
+            }
+
+            return RedirectToAction(nameof(GroupDetails), new
+            {
+                id = model.EmediaGroupId,
+                page = model.PaginateModel.CurrentPage
+            });
         }
 
         [HttpPost]

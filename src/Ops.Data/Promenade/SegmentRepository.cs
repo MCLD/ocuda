@@ -28,6 +28,15 @@ namespace Ocuda.Ops.Data.Promenade
             return entity;
         }
 
+        public async Task<Segment> GetIncludingChildrenAsync(int id)
+        {
+            return await DbSet
+                .Where(_ => _.Id == id)
+                .Include(_ => _.SegmentText)
+                .AsNoTracking()
+                .SingleOrDefaultAsync();
+        }
+
         public async Task<ICollection<Segment>> GetAllActiveSegmentsAsync()
         {
             return await DbSet

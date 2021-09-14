@@ -28,5 +28,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<ICollection<string>> GetEmediaLanguagesAsync(int id);
         Task<DataWithCount<ICollection<Emedia>>> GetPaginatedListForGroupAsync(int emediaId,
             BaseFilter filter);
+        Task AddGroupSegmentAsync(EmediaGroup group);
+        Task<EmediaGroup> GetGroupIncludingSegmentAsync(int id);
+        Task DeleteGroupSegmentAsync(int groupId);
     }
 }

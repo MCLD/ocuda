@@ -10,7 +10,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     {
         Task<EmediaGroup> FindAsync(int id);
         Task<EmediaGroup> GetByOrderAsync(int order);
-        Task<EmediaGroup> GetIncludingChildredAsync(int id);
+        Task<EmediaGroup> GetIncludingEmediaAsync(int id);
+        Task<EmediaGroup> GetIncludingSegmentAsync(int id);
         Task<int?> GetMaxSortOrderAsync();
         Task<DataWithCount<ICollection<EmediaGroup>>> GetPaginatedListAsync(BaseFilter filter);
         Task<List<EmediaGroup>> GetSubsequentGroupsAsync(int order);
