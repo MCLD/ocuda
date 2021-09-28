@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Ocuda.i18n</AssemblyName>
     <Authors>Maricopa County Library District Web developers</Authors>
@@ -13,9 +12,7 @@
     <RootNamespace>Ocuda.i18n</RootNamespace>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
-
 </Project>

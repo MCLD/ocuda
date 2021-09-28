@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,7 +15,8 @@ namespace i18n.Test
     public class VerifyResourcesTest
     {
         private const string BasePathToResx = "..{0}..{0}..{0}..{0}..{0}..{0}src{0}i18n{0}Resources";
-
+        private const char NonBreakingSpaceCharacter = (char)160;
+        private const char SpaceCharacter = (char)32;
         private readonly string PathToResx;
 
         public VerifyResourcesTest()
@@ -34,23 +34,18 @@ namespace i18n.Test
 
         private void TestResxHasItems(string filename)
         {
-            var resourceFileKeys = XmlHelper.ExtractDataNames(filename, PathToResx).Keys;
+            var resourceFileKeys = XmlHelper.ExtractDataNames(filename, PathToResx)
+                .Keys
+                .Select(_ => _.Replace(NonBreakingSpaceCharacter, SpaceCharacter));
 
             var constStrings = typeof(Promenade).GetFields(BindingFlags.Public
                     | BindingFlags.Static
                     | BindingFlags.FlattenHierarchy)
                 .Where(_ => _.FieldType == typeof(string));
 
-            var missingValues = new List<string>();
-            foreach (var fieldInfo in constStrings)
-            {
-                if (!resourceFileKeys.Contains(fieldInfo.GetValue(null)))
-                {
-                    missingValues.Add((string)fieldInfo.GetValue(null));
-                }
-            }
+            var constValues = constStrings.Select(_ => (string)_.GetValue(null));
 
-            Assert.Empty(missingValues);
+            Assert.Empty(resourceFileKeys.Except(constValues));
         }
     }
 }
