@@ -47,7 +47,8 @@
                     <button type="submit"
                             id="delModalButton"
                             class="btn btn-danger pull-right"
-                            aria-label="Confirm">
+                            aria-label="Confirm"
+                            button-spinner>
                         Delete
                     </button>
                 </div>
@@ -194,9 +195,6 @@
     <script>
         $("#delPost").on('click', function () {
             $("#deleteModal").modal("show");
-        });
-        $("#delModalButton").on("click", function () {
-            this.innerHTML = 'Delete <span class="fa fa-spinner fa-spin"></span>';
         });
     </script>
 }

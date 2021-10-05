@@ -222,7 +222,7 @@
         {
             <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
                     data-toggle="modal"
-                    data-target="#addModal">
+                    data-target="#addModalTitle">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Add Post
             </button>
@@ -504,9 +504,6 @@
         $("#addFileLibModal").submit(function (event) {
             slug = $("#addFileLibModal").find("#FileLibrary_Name").val().toLowerCase().replace(/ /g, "-").replace(/[^a-zA-Z0-9]/g, '');
             $("#addFileLibModal").find("#FileLibrary_Slug").val(slug);
-        });
-        $("#confirmDelButton").on("click", function () {
-            $(this).html("Delete <span class='fa fa-spinner fa-pulse fa-lg fa-fw hidden'></span>");
         });
         $("#deleteModal").on("show.bs.modal", function (e) {
             var button = $(e.relatedTarget);

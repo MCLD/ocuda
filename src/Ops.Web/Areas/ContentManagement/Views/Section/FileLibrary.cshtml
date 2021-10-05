@@ -177,7 +177,8 @@
                             aria-label="Confirm"
                             id="deleteItem"
                             type="submit"
-                            value="Submit">
+                            value="Submit"
+                            button-spinner>
                         Delete
                     </button>
                 </div>
@@ -345,10 +346,6 @@
             $(this).find("#ReplaceFileName").text(button.data("name"));
             $(this).find("#ReplaceFileId").val(String(id));
             $(this).find("#ReplaceFileUpload").attr("accept", button.data("extension"));
-        });
-        $("#deleteItem").click(function () {
-            this.disabled = true;
-            this.innerHTML = 'Delete <span class="fas fa-spinner fa-spin"></span>';
         });
     </script>
 }
