@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.Localization;
 using Ocuda.Utility.TagHelpers.Extensions;
 
 namespace Ocuda.Utility.TagHelpers
@@ -33,11 +34,13 @@ namespace Ocuda.Utility.TagHelpers
         private const string requiredFieldClass = "fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker";
         private const string validationIgnoreClass = "validation-ignore";
         private readonly IHtmlGenerator _htmlGenerator;
-
-        public FormGroupTagHelper(IHtmlGenerator htmlGenerator)
+        private readonly IStringLocalizer<i18n.Resources.Shared> _localizer;
+        public FormGroupTagHelper(IHtmlGenerator htmlGenerator,
+            IStringLocalizer<i18n.Resources.Shared> localizer)
         {
             _htmlGenerator = htmlGenerator
                 ?? throw new ArgumentNullException(nameof(htmlGenerator));
+            _localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
         }
 
         [HtmlAttributeName(forAttributeName)]
@@ -174,7 +177,7 @@ namespace Ocuda.Utility.TagHelpers
                 tooltip.AddCssClass("fas fa-info-circle");
                 tooltip.Attributes.Add("data-toggle", "tooltip");
                 tooltip.Attributes.Add("href", "#");
-                tooltip.Attributes.Add("title", InfoTooltip);
+                tooltip.Attributes.Add("title", _localizer[InfoTooltip]);
                 tooltip.Attributes.Add("onclick", $"alert('{popupTooltip}');");
                 labelOutput.Content.AppendHtml("&nbsp;");
                 labelOutput.Content.AppendHtml(tooltip.RenderSelfClosingTag());

@@ -18,7 +18,7 @@
                            asp-route-locationStub="@Model.Location.Stub"
                            asp-route-featureStub="" class="btn btn-outline-dark">
                             <span class="fa fa-arrow-circle-left" aria-hidden="true"></span>
-                            Back to @Model.Location.Name
+                            @Localizer[Promenade.LocationBackToLocationName, Model.Location.Name];
                         </a>
                     </p>
                 </td>

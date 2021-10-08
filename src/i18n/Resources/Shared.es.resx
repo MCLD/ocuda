@@ -117,8 +117,576 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Test" xml:space="preserve">
-    <value>Prueba</value>
-    <comment>Test</comment>
+  <data name="Phone">
+    <value>Teléfono</value>
+    <comment>Label prompting a customer to enter their telephone number</comment>
+  </data>
+  <data name="Requested date">
+    <value>Fecha solicitada</value>
+    <comment>Label prompting a customer to select a date</comment>
+  </data>
+  <data name="Requested date and time">
+    <value>Fecha y hora solicitadas</value>
+    <comment>Label to show a customer what date and time they selected</comment>
+  </data>
+  <data name="Requested time">
+    <value>Tiempo solicitado</value>
+    <comment>Label prompting a customer to select a time</comment>
+  </data>
+  <data name="Subject">
+    <value>Tema</value>
+    <comment>Label next to a drop-down with a list of subjects</comment>
+  </data>
+  <data name="Back">
+    <value>Regresar</value>
+    <comment>Navigation button: go back to a previous page</comment>
+  </data>
+  <data name="Back to the site">
+    <value>Volver al sitio</value>
+    <comment>Navigation button: go back to the Web site</comment>
+  </data>
+  <data name="Go">
+    <value>Ir</value>
+    <comment>Navigation button: perform a search or other action</comment>
+  </data>
+  <data name="Next">
+    <value>Próximo</value>
+    <comment>Navigation button: go forward to the next page in a process</comment>
+  </data>
+  <data name="Submit">
+    <value>Enviar</value>
+    <comment>Button: submit form data</comment>
+  </data>
+  <data name="Subscribe">
+    <value>Suscribir</value>
+    <comment>Button: subscribe to a mailing list</comment>
+  </data>
+  <data name="Use my location">
+    <value>Usa mi ubicación</value>
+    <comment>Button: engage a mobile device's GPS to look up the customer's location</comment>
+  </data>
+  <data name="Connect with us on social media!">
+    <value>¡Conéctese con nosotros en las redes sociales!</value>
+    <comment>Call to action: visit social media accounts</comment>
+  </data>
+  <data name="Connect with us on {0}">
+    <value>Conéctese con nosotros en {0}</value>
+    <comment>Call to action: visit a specific social media account; {0} is replaced with the platform (e.g. "Twitter" or "Instagram")</comment>
+  </data>
+  <data name="There was a problem locating these coordinates: {0}, {1}">
+    <value>Hubo un problema al localizar estas coordenadas: {0}, {1}</value>
+    <comment>Error message: that the customer's geographic location couldn't be located; {0} and {1} are the GPS coordinates</comment>
+  </data>
+  <data name="Error">
+    <value>Error</value>
+    <comment>Message indicating a general, unspecified error</comment>
+  </data>
+  <data name="This service is only available on the following days: {0}">
+    <value>Este servicio solo está disponible los siguientes días: {0}</value>
+    <comment>Error message: showing which days a service is available; {0} are the days the service is available</comment>
+  </data>
+  <data name="That date is not available for scheduling: {0}">
+    <value>Esa fecha no está disponible para programación: {0}</value>
+    <comment>Error message: a day is not available for a service; {0} is the date the customer selected</comment>
+  </data>
+  <data name="You must request a date on or after: {0}">
+    <value>Debe solicitar una fecha a partir del: {0}</value>
+    <comment>Error message: the earliest day a service can be engaged; {0} is the earliest date</comment>
+  </data>
+  <data name="The earliest time you can select is: {0}">
+    <value>La primera hora que puede seleccionar es: {0}</value>
+    <comment>Error message: the earliest time a service can be engaged; {0} is the earliest time</comment>
+  </data>
+  <data name="The furthest date you can schedule a call is: {0}">
+    <value>La fecha más lejana en la que puede programar una llamada es: {0}</value>
+    <comment>Error message: the latest date that a telephone call can be scheduled; {0} is the furthest date a call can be scheduled</comment>
+  </data>
+  <data name="There was a problem finding this ZIP code: {0}">
+    <value>Hubo un problema para encontrar este código postal: {0}</value>
+    <comment>Error message: that a ZIP code could not be found; {0} is the ZIP code the customer entered</comment>
+  </data>
+  <data name="No available times for scheduling could be found.">
+    <value>No se pudieron encontrar horarios disponibles para la programación.</value>
+    <comment>Error message: there are no times available to schedule</comment>
+  </data>
+  <data name="Page not found">
+    <value>Página no encontrada</value>
+    <comment>Web error when a page is not found (a 404 error)</comment>
+  </data>
+  <data name="An error occurred while processing your request.">
+    <value>Se produjo un error al procesar su solicitud.</value>
+    <comment>Message indicating a general, unspecified error</comment>
+  </data>
+  <data name="Unfortunately your session has timed out. Please reselect your time and subject.">
+    <value>Lamentablemente, se agotó el tiempo de espera de su sesión. Vuelva a seleccionar su hora y tema.</value>
+    <comment>Too long has elapsed while the user was viewing a form and their session expired.</comment>
+  </data>
+  <data name="Please enter a telephone number in the format: ###-###-####">
+    <value>Ingrese un número de teléfono en el formato: ### - ### - ####</value>
+    <comment>Error message: telephone number was not entered in the proper format</comment>
+  </data>
+  <data name="You must request a time before: {0}">
+    <value>Debe solicitar una hora antes: {0}</value>
+    <comment>Error message: the latest time a service can be requested; {0} is the latest time</comment>
+  </data>
+  <data name="Please enter a 5 digit numeric ZIP code.">
+    <value>Ingrese un código postal numérico de 5 dígitos.</value>
+    <comment>Error message: the ZIP code format was not correct</comment>
+  </data>
+  <data name="{0} help">
+    <value>{0} ayuda</value>
+    <comment>Title for help on a specific resource; {0} is the name of the resource (e.g. "ConsumerReports.org" or "OverDrive")</comment>
+  </data>
+  <data name="Keywords: {0}">
+    <value>Palabras clave: {0}</value>
+    <comment>Display a list of keywords; {0} is replaced with a comma-separated list of keywords</comment>
+  </data>
+  <data name="Back to {0}">
+    <value>Volver a {0}</value>
+    <comment>Button: return to the page detailing a location; {0} is the name of the location</comment>
+  </data>
+  <data name="Details">
+    <value>Detalles</value>
+    <comment>Button: view details</comment>
+  </data>
+  <data name="Events">
+    <value>Eventos</value>
+    <comment>Button: view events</comment>
+  </data>
+  <data name="Call us at {0}">
+    <value>Llámanos al {0}.</value>
+    <comment>Call to action: message to call us; {0} is replaced with the telephone number</comment>
+  </data>
+  <data name="Closed">
+    <value>Cerrado</value>
+    <comment>Location status message, the location is closed</comment>
+  </data>
+  <data name="Closed today">
+    <value>Hoy está cerrado</value>
+    <comment>Location status message, the location is closed for today</comment>
+  </data>
+  <data name="Our current operating hours are:">
+    <value>Nuestras horas de funcionamiento actuales son:</value>
+    <comment>Label prefixing the current operating hours of a location</comment>
+  </data>
+  <data name="{0} at {1} Library">
+    <value>{0} en {1} Biblioteca</value>
+    <comment>Location feature heading; {0} is the feature of the location, {1} is the name of the location</comment>
+  </data>
+  <data name="Find my Library">
+    <value>Encuentra mi biblioteca</value>
+    <comment>Title of the page to locate the nearest library</comment>
+  </data>
+  <data name="Library Information">
+    <value>Información de la biblioteca</value>
+    <comment>Page header for information section of location page</comment>
+  </data>
+  <data name="Interested in updates from every library in this area?">
+    <value>¿Está interesado en las actualizaciones de todas las bibliotecas de esta área?</value>
+    <comment>Prompt before button to subscribe to multiple mailing lists</comment>
+  </data>
+  <data name="Nearby Locations">
+    <value>Ubicaciones cercanas</value>
+    <comment>Page header for other locations which are narby</comment>
+  </data>
+  <data name="Open">
+    <value>Abierto</value>
+    <comment>Location status message, the location is open</comment>
+  </data>
+  <data name="Opens at {0}">
+    <value>Abre a las {0}</value>
+    <comment>Location status message, the location opens at a time; {0} is replaced with the time</comment>
+  </data>
+  <data name="Opens {0} at {1}">
+    <value>Abre {0} a las {1}</value>
+    <comment>Location status message, the location opens at a date and time; {0} is the day of the week, {1} is the time</comment>
+  </data>
+  <data name="Open until {0}">
+    <value>Abierto hasta las {0}</value>
+    <comment>Location status message, open until a time; {0} is the time that the location closes</comment>
+  </data>
+  <data name="Our address:">
+    <value>Nuestra dirección:</value>
+    <comment>Label indicating the location address follows</comment>
+  </data>
+  <data name="There was a problem determining your location.">
+    <value>Hubo un problema al determinar su ubicación.</value>
+    <comment>Error message: location could not be determined for finding the nearest location via GPS</comment>
+  </data>
+  <data name="See a map to this location">
+    <value>Ver un mapa de esta ubicación</value>
+    <comment>Label indicating a link takes the customer to a map of the location</comment>
+  </data>
+  <data name="Locations">
+    <value>Ubicaciones</value>
+    <comment>Page header for showing locations</comment>
+  </data>
+  <data name="Subscribe to updates from all of these libraries.">
+    <value>Suscríbase a las actualizaciones de todas estas bibliotecas.</value>
+    <comment>Link to subscribe to mailing lists for all libraries which are listed</comment>
+  </data>
+  <data name="Subscribe to updates from: {0}">
+    <value>Suscríbase para recibir actualizaciones de: {0}</value>
+    <comment>Link to subscribe to a mailing list for a location; {0} is the name of the location</comment>
+  </data>
+  <data name="tomorrow">
+    <value>mañana</value>
+    <comment>Location status message, word to indicate the next open date is tomorrow</comment>
+  </data>
+  <data name="Updates from all {0} locations">
+    <value>Actualizaciones de todas las {0} ubicaciones</value>
+    <comment>Button to subscribe to updates from all listed locations; {0} is the number of locations</comment>
+  </data>
+  <data name="Updates from {0} locations">
+    <value>Actualizaciones de {0} ubicaciones</value>
+    <comment>Button to subscribe to updates from a number of listed locations; {0} is the number of locations</comment>
+  </data>
+  <data name="View events at: {0}">
+    <value>Ver eventos en: {0}</value>
+    <comment>Link to view events at a location; {0} is the name of the location</comment>
+  </data>
+  <data name="(opens in a new window)">
+    <value>(Se abre en una nueva ventana)</value>
+    <comment>Information added to buttons or links to indicate they open in a new window</comment>
+  </data>
+  <data name="{0} (opens in a new window)">
+    <value>{0} (se abre en una nueva ventana)</value>
+    <comment>Description of a link with information added to indicate the link opens in a new window; {0} is the link description</comment>
+  </data>
+  <data name="{0} offers:">
+    <value>{0} ofertas:</value>
+    <comment>Label indicating what type of materials a service offers; {0} is the name of the service (e.g. "ConsumerReports.org", "OverDrive")</comment>
+  </data>
+  <data name="Episode {0}, published {1}.">
+    <value>Episodio {0}, publicado {1}.</value>
+    <comment>Podcast details message; {0} is the episode number, {1} is the publication date</comment>
+  </data>
+  <data name="You can listen to our podcast on:">
+    <value>Puede escuchar nuestro podcast en:</value>
+    <comment>Label prompting external services which carry a podcast</comment>
+  </data>
+  <data name="Podcasts">
+    <value>Podcasts</value>
+    <comment>Page header for podcasts</comment>
+  </data>
+  <data name="{0} Podcast">
+    <value>{0} Podcast</value>
+    <comment>Podcast title; {0} is the name of the podcast</comment>
+  </data>
+  <data name="Email">
+    <value>Correo electrónico</value>
+    <comment>Label prompting a customer to enter their email address</comment>
+  </data>
+  <data name="Language">
+    <value>Idioma</value>
+    <comment>Label prompting a customer to select a language</comment>
+  </data>
+  <data name="Name">
+    <value>Nombre</value>
+    <comment>Label prompting a customer to enter their name</comment>
+  </data>
+  <data name="Notes">
+    <value>Notas</value>
+    <comment>Label prompting a customer to enter notes regarding their service request</comment>
+  </data>
+  <data name="You must supply a value for: {0}">
+    <value>Debe proporcionar un valor para: {0}</value>
+    <comment>Error message: required field; {0} is the required field</comment>
+  </data>
+  <data name="The {0} field is required.">
+    <value>El área {0} es obligatorio.</value>
+    <comment>Label noting that a field is required; {0} is the required field</comment>
+  </data>
+  <data name="Here are the details of your appointment:">
+    <value>Aquí están los detalles de su cita:</value>
+    <comment>Label indicating the details for a customer's service appointment</comment>
+  </data>
+  <data name="Please check your email for important information about this appointment.">
+    <value>Consulte su correo electrónico para obtener información importante sobre esta cita.</value>
+    <comment>Label indicating the customer should check their email for details about the appointment</comment>
+  </data>
+  <data name="How can we help?">
+    <value>¿Cómo podemos ayudar?</value>
+    <comment>Label asking what sort of assistance the customer needs</comment>
+  </data>
+  <data name="Scheduling is currently not available.">
+    <value>La programación no está disponible actualmente.</value>
+    <comment>Label asserting that scheduling appointments is currently not available</comment>
+  </data>
+  <data name="Request a different time">
+    <value>Solicite una hora diferente</value>
+    <comment>Label encouraging selection of a different time if the selected time is not available</comment>
+  </data>
+  <data name="Please help us out by telling us a little about your request.">
+    <value>Ayúdenos contándonos un poco sobre su solicitud.</value>
+    <comment>Label encouraging customer to describe their help request</comment>
+  </data>
+  <data name="Schedule your time">
+    <value>Programe su tiempo</value>
+    <comment>Header for customers to schedule a time for their help request</comment>
+  </data>
+  <data name="Your time is scheduled">
+    <value>Su tiempo está programado</value>
+    <comment>Header for success page once a customer's time is scheduled</comment>
+  </data>
+  <data name="Visit home page">
+    <value>Visite la página de inicio</value>
+    <comment>Label describing the home page link</comment>
+  </data>
+  <data name="Libraries closest to ZIP code: {0}">
+    <value>Bibliotecas más cercanas al código postal: {0}</value>
+    <comment>Label describing the search results for libraries close to a ZIP code; {0} is the ZIP code</comment>
+  </data>
+  <data name="Enter a 5 digit ZIP code">
+    <value>Ingrese un código postal de 5 dígitos</value>
+    <comment>Prompt to enter a five digit ZIP code to find the nearest locations</comment>
+  </data>
+  <data name="Requested date">
+    <value>Fecha solicitada</value>
+    <comment>Label prompting a customer to select a date</comment>
+  </data>
+  <data name="Requested date and time">
+    <value>Fecha y hora solicitadas</value>
+    <comment>Label to show a customer what date and time they selected</comment>
+  </data>
+  <data name="Requested time">
+    <value>Tiempo solicitado</value>
+    <comment>Label prompting a customer to select a time</comment>
+  </data>
+  <data name="Back to the site">
+    <value>Volver al sitio</value>
+    <comment>Navigation button: go back to the Web site</comment>
+  </data>
+  <data name="Use my location">
+    <value>Usa mi ubicación</value>
+    <comment>Button: engage a mobile device's GPS to look up the customer's location</comment>
+  </data>
+  <data name="Connect with us on social media!">
+    <value>¡Conéctese con nosotros en las redes sociales!</value>
+    <comment>Call to action: visit social media accounts</comment>
+  </data>
+  <data name="Connect with us on {0}">
+    <value>Conéctese con nosotros en {0}</value>
+    <comment>Call to action: visit a specific social media account; {0} is replaced with the platform (e.g. "Twitter" or "Instagram")</comment>
+  </data>
+  <data name="There was a problem locating these coordinates: {0}, {1}">
+    <value>Hubo un problema al localizar estas coordenadas: {0}, {1}</value>
+    <comment>Error message: that the customer's geographic location couldn't be located; {0} and {1} are the GPS coordinates</comment>
+  </data>
+  <data name="This service is only available on the following days: {0}">
+    <value>Este servicio solo está disponible los siguientes días: {0}</value>
+    <comment>Error message: showing which days a service is available; {0} are the days the service is available</comment>
+  </data>
+  <data name="That date is not available for scheduling: {0}">
+    <value>Esa fecha no está disponible para programación: {0}</value>
+    <comment>Error message: a day is not available for a service; {0} is the date the customer selected</comment>
+  </data>
+  <data name="You must request a date on or after: {0}">
+    <value>Debe solicitar una fecha a partir del: {0}</value>
+    <comment>Error message: the earliest day a service can be engaged; {0} is the earliest date</comment>
+  </data>
+  <data name="The earliest time you can select is: {0}">
+    <value>La primera hora que puede seleccionar es: {0}</value>
+    <comment>Error message: the earliest time a service can be engaged; {0} is the earliest time</comment>
+  </data>
+  <data name="The furthest date you can schedule a call is: {0}">
+    <value>La fecha más lejana en la que puede programar una llamada es: {0}</value>
+    <comment>Error message: the latest date that a telephone call can be scheduled; {0} is the furthest date a call can be scheduled</comment>
+  </data>
+  <data name="There was a problem finding this ZIP code: {0}">
+    <value>Hubo un problema para encontrar este código postal: {0}</value>
+    <comment>Error message: that a ZIP code could not be found; {0} is the ZIP code the customer entered</comment>
+  </data>
+  <data name="No available times for scheduling could be found.">
+    <value>No se pudieron encontrar horarios disponibles para la programación.</value>
+    <comment>Error message: there are no times available to schedule</comment>
+  </data>
+  <data name="Page not found">
+    <value>Página no encontrada</value>
+    <comment>Web error when a page is not found (a 404 error)</comment>
+  </data>
+  <data name="An error occurred while processing your request.">
+    <value>Se produjo un error al procesar su solicitud.</value>
+    <comment>Message indicating a general, unspecified error</comment>
+  </data>
+  <data name="Unfortunately your session has timed out. Please reselect your time and subject.">
+    <value>Lamentablemente, se agotó el tiempo de espera de su sesión. Vuelva a seleccionar su hora y tema.</value>
+    <comment>Too long has elapsed while the user was viewing a form and their session expired.</comment>
+  </data>
+  <data name="Please enter a telephone number in the format: ###-###-####">
+    <value>Ingrese un número de teléfono en el formato: ### - ### - ####</value>
+    <comment>Error message: telephone number was not entered in the proper format</comment>
+  </data>
+  <data name="You must request a time before: {0}">
+    <value>Debe solicitar una hora antes: {0}</value>
+    <comment>Error message: the latest time a service can be requested; {0} is the latest time</comment>
+  </data>
+  <data name="Please enter a 5 digit numeric ZIP code.">
+    <value>Ingrese un código postal numérico de 5 dígitos.</value>
+    <comment>Error message: the ZIP code format was not correct</comment>
+  </data>
+  <data name="{0} help">
+    <value>{0} ayuda</value>
+    <comment>Title for help on a specific resource; {0} is the name of the resource (e.g. "ConsumerReports.org" or "OverDrive")</comment>
+  </data>
+  <data name="Keywords: {0}">
+    <value>Palabras clave: {0}</value>
+    <comment>Display a list of keywords; {0} is replaced with a comma-separated list of keywords</comment>
+  </data>
+  <data name="Back to {0}">
+    <value>Volver a {0}</value>
+    <comment>Button: return to the page detailing a location; {0} is the name of the location</comment>
+  </data>
+  <data name="Call us at {0}">
+    <value>Llámanos al {0}.</value>
+    <comment>Call to action: message to call us; {0} is replaced with the telephone number</comment>
+  </data>
+  <data name="Closed today">
+    <value>Hoy está cerrado</value>
+    <comment>Location status message, the location is closed for today</comment>
+  </data>
+  <data name="Our current operating hours are:">
+    <value>Nuestras horas de funcionamiento actuales son:</value>
+    <comment>Label prefixing the current operating hours of a location</comment>
+  </data>
+  <data name="{0} at {1} Library">
+    <value>{0} en {1} Biblioteca</value>
+    <comment>Location feature heading; {0} is the feature of the location, {1} is the name of the location</comment>
+  </data>
+  <data name="Find my Library">
+    <value>Encuentra mi biblioteca</value>
+    <comment>Title of the page to locate the nearest library</comment>
+  </data>
+  <data name="Library Information">
+    <value>Información de la biblioteca</value>
+    <comment>Page header for information section of location page</comment>
+  </data>
+  <data name="Interested in updates from every library in this area?">
+    <value>¿Está interesado en las actualizaciones de todas las bibliotecas de esta área?</value>
+    <comment>Prompt before button to subscribe to multiple mailing lists</comment>
+  </data>
+  <data name="Nearby Locations">
+    <value>Ubicaciones cercanas</value>
+    <comment>Page header for other locations which are narby</comment>
+  </data>
+  <data name="Opens at {0}">
+    <value>Abre a las {0}</value>
+    <comment>Location status message, the location opens at a time; {0} is replaced with the time</comment>
+  </data>
+  <data name="Opens {0} at {1}">
+    <value>Abre {0} a las {1}</value>
+    <comment>Location status message, the location opens at a date and time; {0} is the day of the week, {1} is the time</comment>
+  </data>
+  <data name="Open until {0}">
+    <value>Abierto hasta las {0}</value>
+    <comment>Location status message, open until a time; {0} is the time that the location closes</comment>
+  </data>
+  <data name="Our address:">
+    <value>Nuestra dirección:</value>
+    <comment>Label indicating the location address follows</comment>
+  </data>
+  <data name="There was a problem determining your location.">
+    <value>Hubo un problema al determinar su ubicación.</value>
+    <comment>Error message: location could not be determined for finding the nearest location via GPS</comment>
+  </data>
+  <data name="See a map to this location">
+    <value>Ver un mapa de esta ubicación</value>
+    <comment>Label indicating a link takes the customer to a map of the location</comment>
+  </data>
+  <data name="Subscribe to updates from all of these libraries.">
+    <value>Suscríbase a las actualizaciones de todas estas bibliotecas.</value>
+    <comment>Link to subscribe to mailing lists for all libraries which are listed</comment>
+  </data>
+  <data name="Subscribe to updates from: {0}">
+    <value>Suscríbase para recibir actualizaciones de: {0}</value>
+    <comment>Link to subscribe to a mailing list for a location; {0} is the name of the location</comment>
+  </data>
+  <data name="Updates from all {0} locations">
+    <value>Actualizaciones de todas las {0} ubicaciones</value>
+    <comment>Button to subscribe to updates from all listed locations; {0} is the number of locations</comment>
+  </data>
+  <data name="Updates from {0} locations">
+    <value>Actualizaciones de {0} ubicaciones</value>
+    <comment>Button to subscribe to updates from a number of listed locations; {0} is the number of locations</comment>
+  </data>
+  <data name="View events at: {0}">
+    <value>Ver eventos en: {0}</value>
+    <comment>Link to view events at a location; {0} is the name of the location</comment>
+  </data>
+  <data name="(opens in a new window)">
+    <value>(Se abre en una nueva ventana)</value>
+    <comment>Information added to buttons or links to indicate they open in a new window</comment>
+  </data>
+  <data name="{0} (opens in a new window)">
+    <value>{0} (se abre en una nueva ventana)</value>
+    <comment>Description of a link with information added to indicate the link opens in a new window; {0} is the link description</comment>
+  </data>
+  <data name="{0} offers:">
+    <value>{0} ofertas:</value>
+    <comment>Label indicating what type of materials a service offers; {0} is the name of the service (e.g. "ConsumerReports.org", "OverDrive")</comment>
+  </data>
+  <data name="Episode {0}, published {1}.">
+    <value>Episodio {0}, publicado {1}.</value>
+    <comment>Podcast details message; {0} is the episode number, {1} is the publication date</comment>
+  </data>
+  <data name="You can listen to our podcast on:">
+    <value>Puede escuchar nuestro podcast en:</value>
+    <comment>Label prompting external services which carry a podcast</comment>
+  </data>
+  <data name="{0} Podcast">
+    <value>{0} Podcast</value>
+    <comment>Podcast title; {0} is the name of the podcast</comment>
+  </data>
+  <data name="You must supply a value for: {0}">
+    <value>Debe proporcionar un valor para: {0}</value>
+    <comment>Error message: required field; {0} is the required field</comment>
+  </data>
+  <data name="The {0} field is required.">
+    <value>El área {0} es obligatorio.</value>
+    <comment>Label noting that a field is required; {0} is the required field</comment>
+  </data>
+  <data name="Here are the details of your appointment:">
+    <value>Aquí están los detalles de su cita:</value>
+    <comment>Label indicating the details for a customer's service appointment</comment>
+  </data>
+  <data name="Please check your email for important information about this appointment.">
+    <value>Consulte su correo electrónico para obtener información importante sobre esta cita.</value>
+    <comment>Label indicating the customer should check their email for details about the appointment</comment>
+  </data>
+  <data name="How can we help?">
+    <value>¿Cómo podemos ayudar?</value>
+    <comment>Label asking what sort of assistance the customer needs</comment>
+  </data>
+  <data name="Scheduling is currently not available.">
+    <value>La programación no está disponible actualmente.</value>
+    <comment>Label asserting that scheduling appointments is currently not available</comment>
+  </data>
+  <data name="Request a different time">
+    <value>Solicite una hora diferente</value>
+    <comment>Label encouraging selection of a different time if the selected time is not available</comment>
+  </data>
+  <data name="Please help us out by telling us a little about your request.">
+    <value>Ayúdenos contándonos un poco sobre su solicitud.</value>
+    <comment>Label encouraging customer to describe their help request</comment>
+  </data>
+  <data name="Schedule your time">
+    <value>Programe su tiempo</value>
+    <comment>Header for customers to schedule a time for their help request</comment>
+  </data>
+  <data name="Your time is scheduled">
+    <value>Su tiempo está programado</value>
+    <comment>Header for success page once a customer's time is scheduled</comment>
+  </data>
+  <data name="Visit home page">
+    <value>Visite la página de inicio</value>
+    <comment>Label describing the home page link</comment>
+  </data>
+  <data name="Libraries closest to ZIP code: {0}">
+    <value>Bibliotecas más cercanas al código postal: {0}</value>
+    <comment>Label describing the search results for libraries close to a ZIP code; {0} is the ZIP code</comment>
+  </data>
+  <data name="Enter a 5 digit ZIP code">
+    <value>Ingrese un código postal de 5 dígitos</value>
+    <comment>Prompt to enter a five digit ZIP code to find the nearest locations</comment>
   </data>
 </root>

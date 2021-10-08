@@ -1,6 +1,6 @@
 ﻿@model Ocuda.Promenade.Controllers.ViewModels.Locations.LocationViewModel
 
-<h1>Locations</h1>
+<h1>@Localizer[Promenade.LocationsHeader]</h1>
 
 @if (Model.CanSearchAddress)
 {
@@ -29,14 +29,14 @@
                   id="ZipForm">
                 <div class="input-group">
                     <input asp-for="Zip"
-                           placeholder="Enter a 5 digit ZIP code"
+                           placeholder="@Localizer[Promenade.ZipCodePrompt]"
                            class="form-control default-text" />
                     <div class="input-group-append">
                         <button class="btn btn-outline-primary"
                                 type="submit"
                                 id="GoButton"
                                 button-spinner>
-                            Go
+                            @Localizer[Promenade.ButtonGo]
                         </button>
                     </div>
                 </div>
@@ -48,11 +48,11 @@
             <form asp-action="Location" method="get" role="form" id="GeoForm">
                 <input asp-for="Latitude" id="Latitude" hidden />
                 <input asp-for="Longitude" id="Longitude" hidden />
-                <button class="btn btn-outline-primary"
+                <button class="btn btn-outline-primary btn-block"
                         id="GeoButton"
                         button-spinner>
                     <span class="fas fa-map-marker-alt"></span>
-                    Use my location
+                    @Localizer[Promenade.ButtonUseMyLocation]
                 </button>
             </form>
         </div>
@@ -67,7 +67,7 @@
             <div class="col-12 col-md-6 col-lg-4 mt-2 mb-3 d-flex">
                 <div class="prom-location-tile flex-fill w-100">
                     @if (!string.IsNullOrEmpty(location.MapLink)
-                       && !string.IsNullOrEmpty(location.MapImagePath))
+                     && !string.IsNullOrEmpty(location.MapImagePath))
                     {
                         <a href="@location.MapLink">
                             <img src="@location.MapImagePath"
@@ -107,7 +107,7 @@
                                 <a asp-action="@nameof(LocationsController.Locations)"
                                    asp-route-locationStub="@location.Stub"
                                    class="btn btn-outline-dark">
-                                    Details
+                                    @Localizer[Promenade.LocationButtonDetails]
                                 </a>
                             </div>
                             <div class="col-6 text-right">
@@ -115,7 +115,7 @@
                                 {
                                     <a href="@location.EventLink"
                                        class="btn btn-outline-dark">
-                                        Events
+                                        @Localizer[Promenade.LocationButtonEvents]
                                     </a>
                                 }
                                 else
@@ -139,6 +139,7 @@
 
 @section scripts {
     <script>
+        var useMyLocation = '@Localizer[Promenade.ButtonUseMyLocation]';
 
         $().ready(function () {
             if (location.protocol != 'https:' && location.hostname != 'localhost') {
@@ -156,7 +157,7 @@
         var geoFailure = function (error) {
             $('#GeoButton').html(useMyLocation);
             $('#GeoButton').prop('disabled', false);
-            alert('There was a problem determining your location.');
+            alert('@Localizer[Promenade.LocationProblem]');
             console.log(error.message);
         }
 

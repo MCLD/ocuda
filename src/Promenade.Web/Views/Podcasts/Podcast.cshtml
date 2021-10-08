@@ -11,14 +11,14 @@
     <div class="col-6 col-md-3 mx-auto mb-2">
         <img class="img-thumbnail img-fluid"
              src="@(Model.Podcast.ImageThumbnailUrl ?? Model.Podcast.ImageUrl)"
-             alt="Logo for @Model.Podcast.Title" />
+             alt="@Model.Podcast.Title" />
     </div>
     <div class="col-12 col-md-9">
         <h1>@Model.Podcast.Title Podcast</h1>
         <p>@Model.Podcast.Description</p>
         <div class="row">
             <div class="col-12">
-                <span class="sr-only">You can listen to our podcast on:</span>
+                <span class="sr-only">@Localizer[Promenade.PodcastListenOn]</span>
                 @foreach (var directoryInfo in Model.PodcastDirectoryInfos)
                 {
                     <a href="@directoryInfo.Url"
@@ -31,7 +31,6 @@
             </div>
         </div>
     </div>
-
 </div>
 <hr aria-hidden="true" />
 
@@ -43,10 +42,10 @@
                 <div class="col-12 col-lg-6 col-xl-7">
                     <h2 class="mb-2">
                         <a href="@Url.Action(nameof(PodcastsController.Episode), new { podcastStub = Model.Podcast.Stub, episodeStub = item.Stub})">
-                           @item.Title
+                            @item.Title
                         </a>
                     </h2>
-                    <div class="mb-2"><em>Episode @item.Episode, published @item.PublishDate.Value.ToLongDateString().</em></div>
+                    <div class="mb-2"><em>@Localizer[Promenade.PodcastEpisodePublished, item.Episode, item.PublishDate.Value.ToLongDateString()]</em></div>
                 </div>
                 <div class="col-12 col-lg-6 col-xl-5 text-right">
                     <audio controls class="mb-2 w-100">

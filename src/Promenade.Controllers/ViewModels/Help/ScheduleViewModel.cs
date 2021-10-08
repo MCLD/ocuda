@@ -7,23 +7,21 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Help
 {
     public class ScheduleViewModel
     {
-        public SegmentText SegmentText { get; set; }
-        public IEnumerable<SelectListItem> Subjects { get; set; }
-
         [Required]
-        [Display(Name = "Requested date")]
+        [Display(Name = i18n.Keys.Promenade.PromptRequestedDate)]
         public System.DateTime RequestedDate { get; set; }
 
         [Required]
-        [Display(Name = "Requested time")]
+        [Display(Name = i18n.Keys.Promenade.PromptRequestedTime)]
         public System.DateTime RequestedTime { get; set; }
 
+        public SegmentText SegmentText { get; set; }
         [Required]
-        [Display(Name = "Subject")]
+        [Display(Name = i18n.Keys.Promenade.PromptSubject)]
         public int SubjectId { get; set; }
 
-        public string WarningText { get; set; }
-
+        public IEnumerable<SelectListItem> Subjects { get; set; }
         public IEnumerable<SelectListItem> TimeBlocks { get; set; }
+        public string WarningText { get; set; }
     }
 }

@@ -20,8 +20,8 @@ namespace Ocuda.Promenade.Controllers.Abstract
     public abstract class BaseController<T> : Controller
     {
         protected readonly IConfiguration _config;
+        protected readonly IStringLocalizer<i18n.Resources.Shared> _localizer;
         protected readonly ILogger<T> _logger;
-        protected readonly IStringLocalizer<i18n.Resources.Shared> _sharedLocalizer;
         protected readonly SiteSettingService _siteSettingService;
 
         protected BaseController(ServiceFacades.Controller<T> context)
@@ -32,7 +32,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
             }
             _logger = context.Logger;
             _config = context.Config;
-            _sharedLocalizer = context.SharedLocalizer;
+            _localizer = context.Localizer;
             _siteSettingService = context.SiteSettingService;
         }
 
@@ -71,13 +71,10 @@ namespace Ocuda.Promenade.Controllers.Abstract
                 ? Uri.UriSchemeHttps
                 : Uri.UriSchemeHttp));
 
-            var currentCulture
-                = HttpContext.Items[LocalizationItemKey.CurrentCulture] as CultureInfo;
-
             // if the current culture is in the URI we'll want to remove it
-            actionLink = RemoveCulturePrefix(actionLink, currentCulture.Name);
+            actionLink = RemoveCulturePrefix(actionLink, CultureInfo.CurrentCulture.Name);
 
-            if (currentCulture.Name == Culture.DefaultCulture.Name)
+            if (CultureInfo.CurrentCulture.Name == Culture.DefaultCulture.Name)
             {
                 // for the default culture, exclude it from the URI
                 return actionLink.Uri.AbsoluteUri;
@@ -85,7 +82,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
             else
             {
                 // for non-default cultures add properly-cased culture identifier to the URI
-                actionLink.Path = currentCulture.Name + actionLink.Path;
+                actionLink.Path = CultureInfo.CurrentCulture.Name + actionLink.Path;
                 return actionLink.Uri.AbsoluteUri;
             }
         }
@@ -98,7 +95,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
         /// <param name="uriBuilder">A UriBuilder containing the page URI of interest</param>
         /// <param name="cultureIdentifier">The culture identifier to remove frmo the URI</param>
         /// <returns>A well-formed UriBuilder with the culture identifier removed</returns>
-        private static UriBuilder RemoveCulturePrefix(UriBuilder uriBuilder, 
+        private static UriBuilder RemoveCulturePrefix(UriBuilder uriBuilder,
             string cultureIdentifier)
         {
             var cultureInUrl = $"/{cultureIdentifier}/";

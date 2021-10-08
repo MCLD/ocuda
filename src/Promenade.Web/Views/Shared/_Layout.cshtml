@@ -65,8 +65,7 @@
                 @{
                     var topNavigation = Context.Items[Ocuda.Promenade.Controllers.ItemKey.TopNavigation]
                         as Ocuda.Promenade.Models.Entities.Navigation;
-                    var currentUiCulture = Context.Items[Ocuda.i18n.LocalizationItemKey.CurrentCulture]
-                        as System.Globalization.CultureInfo;
+                    var currentUiCulture = System.Globalization.CultureInfo.CurrentCulture;
                     var l10nLinks = Context.Items[Ocuda.i18n.LocalizationItemKey.L10n] as IDictionary<string, string>;
                     if (topNavigation?.Navigations.Count() > 0 || l10nLinks?.Count() > 1)
                     {
@@ -102,8 +101,8 @@
                                     {
                                         <li class="nav-item @(item.Navigations.Count() == 0 ? null : "prom-nav-link")">
                                             @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                                               && !string.IsNullOrEmpty(item.Icon)
-                                               && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                              && !string.IsNullOrEmpty(item.Icon)
+                                              && !string.IsNullOrEmpty(item.NavigationText.Title))
                                             {
                                                 <a title="@item.NavigationText.Title"
                                                    aria-label="@item.NavigationText.Title"
@@ -152,8 +151,8 @@
                                                 {
                                                     <li>
                                                         @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
-                                                           && !string.IsNullOrEmpty(subItem.Icon)
-                                                           && !string.IsNullOrEmpty(subItem.NavigationText.Title))
+                                                          && !string.IsNullOrEmpty(subItem.Icon)
+                                                          && !string.IsNullOrEmpty(subItem.NavigationText.Title))
                                                         {
                                                             <a href="@subItem.NavigationText.Link"
                                                                class="dropdown-item"
@@ -188,7 +187,7 @@
                 var bannerImage = Context.Items[Ocuda.Promenade.Controllers.ItemKey.BannerImage] as string;
                 if (!string.IsNullOrEmpty(bannerImage))
                 {
-                    <div class="row prom-nav-logo" role="banner" aria-label="Visit home page">
+                    <div class="row prom-nav-logo" role="banner" aria-label="@Localizer[Promenade.VisitHomePage]">
                         <a asp-action="Index"
                            asp-controller="Home"
                            asp-area=""
@@ -210,8 +209,8 @@
                                 {
                                     <li role="presentation" class="nav-item prom-nav-link">
                                         @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                                           && !string.IsNullOrEmpty(item.Icon)
-                                           && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                          && !string.IsNullOrEmpty(item.Icon)
+                                          && !string.IsNullOrEmpty(item.NavigationText.Title))
                                         {
                                             <a href="@item.NavigationText.Link"
                                                class="nav-link prom-nav-link"
@@ -242,8 +241,8 @@
                                             {
                                                 <li>
                                                     @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
-                                                       && !string.IsNullOrEmpty(subItem.Icon)
-                                                       && !string.IsNullOrEmpty(subItem.NavigationText.Title))
+                                                      && !string.IsNullOrEmpty(subItem.Icon)
+                                                      && !string.IsNullOrEmpty(subItem.NavigationText.Title))
                                                     {
                                                         <a href="@subItem.NavigationText.Link"
                                                            class="dropdown-item"
@@ -307,13 +306,13 @@
                                             {
                                                 <li>
                                                     @if (string.IsNullOrEmpty(subItem.NavigationText.Label)
-                                                       && !string.IsNullOrEmpty(subItem.Icon)
-                                                       && !string.IsNullOrEmpty(subItem.NavigationText.Title))
+                                                      && !string.IsNullOrEmpty(subItem.Icon)
+                                                      && !string.IsNullOrEmpty(subItem.NavigationText.Title))
                                                     {
                                                         <a href="@subItem.NavigationText.Link"
                                                            target="@(subItem.TargetNewWindow ? "_blank" : null)"
                                                            title="@subItem.NavigationText.Title"
-                                                           aria-label="@(subItem.TargetNewWindow ? @subItem.NavigationText.Title + "(opens in a new window)" : null)">
+                                                           aria-label="@(subItem.TargetNewWindow ? Localizer[Promenade.NewWindow] : null)">
                                                             <span class="@subItem.Icon"></span>
                                                         </a>
                                                     }
@@ -321,7 +320,7 @@
                                                     {
                                                         <a href="@subItem.NavigationText.Link"
                                                            target="@(subItem.TargetNewWindow ? "_blank" : null)"
-                                                           aria-label="@(subItem.TargetNewWindow ? subItem.NavigationText.Label + " (opens in a new window)" : null)">
+                                                           aria-label="@(subItem.TargetNewWindow ? Localizer[Promenade.NewWindowItem, subItem.NavigationText.Label] : null)">
                                                             @subItem.NavigationText.Label
                                                         </a>
                                                     }
@@ -340,7 +339,7 @@
                         }
                     </div>
                     <div class="text-center prom-leftnav-social">
-                        <ul aria-label="Connect with us on social media!"
+                        <ul aria-label="@Localizer[Promenade.ConnectSocialMedia]"
                             class="nav d-inline-flex justify-content-center">
                             @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl].ToString()))
                             {
@@ -348,8 +347,8 @@
                                     <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]"
                                        class="prom-leftnav-social-link"
                                        target="_blank"
-                                       title="Visit our Facebook"
-                                       aria-label="Visit our Facebook (opens in a new window)"><span class="fab fa-facebook"></span></a>
+                                       title="@Localizer[Promenade.ConnectSocialOn, "Facebook"]"
+                                       aria-label="@Localizer[Promenade.NewWindow]"><span class="fab fa-facebook"></span></a>
                                     <span>&nbsp;</span>
                                 </li>
                             }
@@ -359,8 +358,8 @@
                                     <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl]"
                                        class="prom-leftnav-social-link"
                                        target="_blank"
-                                       title="Visit our Instagram"
-                                       aria-label="Visit our Instagram (opens in a new window)"><span class="fab fa-instagram"></span></a>
+                                       title="@Localizer[Promenade.ConnectSocialOn, "Instagram"]"
+                                       aria-label="@Localizer[Promenade.NewWindow]"><span class="fab fa-instagram"></span></a>
                                     <span>&nbsp;</span>
                                 </li>
                             }
@@ -370,8 +369,8 @@
                                     <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]"
                                        class="prom-leftnav-social-link"
                                        target="_blank"
-                                       title="Visit our Twitter"
-                                       aria-label="Visit our Twitter (opens in a new window)"><span class="fab fa-twitter"></span></a>
+                                       title="@Localizer[Promenade.ConnectSocialOn, "Twitter"]"
+                                       aria-label="@Localizer[Promenade.NewWindow]"><span class="fab fa-twitter"></span></a>
                                     <span>&nbsp;</span>
                                 </li>
                             }
@@ -381,8 +380,8 @@
                                     <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl]"
                                        class="prom-leftnav-social-link"
                                        target="_blank"
-                                       title="Visit our Youtube"
-                                       aria-label="Visit our Youtube (opens in a new window)"><span class="fab fa-youtube"></span></a>
+                                       title="@Localizer[Promenade.ConnectSocialOn, "YouTube"]"
+                                       aria-label="@Localizer[Promenade.NewWindow]"><span class="fab fa-youtube"></span></a>
                                 </li>
                             }
                         </ul>
@@ -406,8 +405,8 @@
                         {
                             <div>
                                 @if (string.IsNullOrEmpty(item.NavigationText.Label)
-                                   && !string.IsNullOrEmpty(item.Icon)
-                                   && !string.IsNullOrEmpty(item.NavigationText.Title))
+                                  && !string.IsNullOrEmpty(item.Icon)
+                                  && !string.IsNullOrEmpty(item.NavigationText.Title))
                                 {
                                     <a href="@item.NavigationText.Link"
                                        title="@item.NavigationText.Title"

@@ -11,23 +11,20 @@ namespace Ocuda.Promenade.Controllers.ServiceFacades
     {
         public Controller(ILogger<T> logger,
             IConfiguration config,
-            IStringLocalizer<Shared> sharedLocalizer,
+            IStringLocalizer<Shared> localizer,
             SiteSettingService siteSettingService)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Config = config ?? throw new ArgumentNullException(nameof(config));
-            SharedLocalizer = sharedLocalizer
-                ?? throw new ArgumentNullException(nameof(sharedLocalizer));
+            Localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
             SiteSettingService = siteSettingService
                 ?? throw new ArgumentNullException(nameof(siteSettingService));
         }
 
         public IConfiguration Config { get; }
 
+        public IStringLocalizer<Shared> Localizer { get; }
         public ILogger<T> Logger { get; }
-
-        public IStringLocalizer<Shared> SharedLocalizer { get; }
-
         public SiteSettingService SiteSettingService { get; }
     }
 }
