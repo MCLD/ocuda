@@ -170,7 +170,7 @@
     <comment>Call to action: visit social media accounts</comment>
   </data>
   <data name="Connect with us on {0}">
-    <value>Conéctese  con nosotros en {0}</value>
+    <value>Conéctese con nosotros en {0}</value>
     <comment>Call to action: visit a specific social media account; {0} is replaced with the platform (e.g. "Twitter" or "Instagram")</comment>
   </data>
   <data name="There was a problem locating these coordinates: {0}, {1}">
@@ -466,7 +466,7 @@
     <comment>Call to action: visit social media accounts</comment>
   </data>
   <data name="Connect with us on {0}">
-    <value>Conéctese  con nosotros en {0}</value>
+    <value>Conéctese con nosotros en {0}</value>
     <comment>Call to action: visit a specific social media account; {0} is replaced with the platform (e.g. "Twitter" or "Instagram")</comment>
   </data>
   <data name="There was a problem locating these coordinates: {0}, {1}">

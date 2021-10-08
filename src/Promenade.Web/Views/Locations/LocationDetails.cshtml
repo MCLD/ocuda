@@ -47,16 +47,16 @@
                         {
                             <strong style="font-size: 1.2rem;"
                                     class="text-danger prom-locaton-isclosed">@Localizer[Promenade.LocationClosed]</strong>
-                                }
-                                else
-                                {
-                                    @foreach (var dayGrouping in Model.Location.LocationHours)
-                                    {
-                                        <strong>@dayGrouping.Days</strong>
-                                        <span>@dayGrouping.Time</span>
-                                        <br />
-                                    }
-                                }
+                        }
+                        else
+                        {
+                            @foreach (var dayGrouping in Model.Location.LocationHours)
+                            {
+                                <strong>@dayGrouping.Days</strong>
+                                <span>@dayGrouping.Time</span>
+                                <br />
+                            }
+                        }
                     }
                 </p>
             }
