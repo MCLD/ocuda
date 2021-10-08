@@ -202,6 +202,11 @@
         public static readonly string PromScheduleSubjects = "schedulesubjects";
 
         /// <summary>
+        /// Cached schedule subject texts, {0} is the language id, {1} is the schedule subject id
+        /// </summary>
+        public static readonly string PromScheduleSubjectTexts = "schedulesubjecttexts.{0}.{1}";
+
+        /// <summary>
         /// Cached segment, {0} is the segment id
         /// </summary>
         public static readonly string PromSegment = "segment.{0}";

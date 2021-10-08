@@ -10,7 +10,7 @@
 }
 else
 {
-    <h1>Schedule your time</h1>
+    <h1>@Localizer[Promenade.ScheduleYourTime]</h1>
 }
 
 <div class="row">
@@ -31,9 +31,7 @@ else
                                name="@nameof(Model.SelectedTime)"
                                value="@suggestedTime.ToString("s", System.Globalization.CultureInfo.InvariantCulture)" />
                         <label for="@suggestedTime.ToString("s", System.Globalization.CultureInfo.InvariantCulture)">
-                            @suggestedTime.ToLongDateString()
-                            at
-                            @suggestedTime.ToShortTimeString()
+                            @suggestedTime.ToString("f")
                         </label>
                     </div>
                 </div>
@@ -46,7 +44,7 @@ else
                                name="@nameof(Model.SelectedTime)"
                                value=""
                                required />
-                        <label for="requestedDateTime">Request a different time</label>
+                        <label for="requestedDateTime">@Localizer[Promenade.ScheduleRequestDifferentTime]</label>
                     </div>
                 </div>
 
@@ -62,11 +60,11 @@ else
                 <a href="@Url.Action(nameof(HelpController.Schedule), HelpController.Name)"
                    class="btn btn-outline-dark m-2 btn-lg float-left">
                     <span class="fas fa-chevron-left"></span>
-                    Back
+                    @Localizer[Promenade.ButtonBack]
                 </a>
                 <button type="submit"
                         class="btn btn-outline-dark m-2 btn-lg float-right">
-                    Next
+                    @Localizer[Promenade.ButtonNext]
                     <span class="fas fa-chevron-right"></span>
                 </button>
             </div>

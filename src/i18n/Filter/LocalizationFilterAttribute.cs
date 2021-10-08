@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -15,14 +16,10 @@ namespace Ocuda.i18n.Filter
     {
         private const string CultureRouteKey = "culture";
 
-        private readonly CultureContextProvider _cultureContextProvider;
         private readonly IOptions<RequestLocalizationOptions> _l10nOptions;
 
-        public LocalizationFilterAttribute(CultureContextProvider cultureContextProvider,
-            IOptions<RequestLocalizationOptions> l10nOptions)
+        public LocalizationFilterAttribute(IOptions<RequestLocalizationOptions> l10nOptions)
         {
-            _cultureContextProvider = cultureContextProvider
-                ?? throw new ArgumentNullException(nameof(cultureContextProvider));
             _l10nOptions = l10nOptions
                 ?? throw new ArgumentNullException(nameof(l10nOptions));
         }
@@ -32,8 +29,6 @@ namespace Ocuda.i18n.Filter
         {
             if (_l10nOptions.Value?.SupportedCultures.Count > 1)
             {
-                var currentCulture = _cultureContextProvider.GetCurrentCulture();
-
                 string requestedCulture = context.RouteData.Values.ContainsKey(CultureRouteKey)
                     ? context.RouteData.Values[CultureRouteKey] as string
                     : null;
@@ -65,7 +60,7 @@ namespace Ocuda.i18n.Filter
                 else
                 {
                     // no request, if default, clear the cookie
-                    if (cultureCookieSet && currentCulture.Name == Culture.DefaultName)
+                    if (cultureCookieSet && CultureInfo.CurrentCulture.Name == Culture.DefaultName)
                     {
                         context.HttpContext
                             .Response
@@ -87,7 +82,7 @@ namespace Ocuda.i18n.Filter
                 if (context.HttpContext.Request.Path.HasValue)
                 {
                     string path = context.HttpContext.Request.Path.Value;
-                    var cultureCheck = $"/{currentCulture.Name}";
+                    var cultureCheck = $"/{CultureInfo.CurrentCulture.Name}";
                     var requestCultureCheck = !string.IsNullOrEmpty(requestedCulture)
                         ? $"/{requestedCulture}"
                         : null;
@@ -146,8 +141,6 @@ namespace Ocuda.i18n.Filter
                         }
                     }
                 }
-
-                context.HttpContext.Items[LocalizationItemKey.CurrentCulture] = currentCulture;
 
                 context.HttpContext.Items[LocalizationItemKey.HrefLang] = cultureHrefLang;
                 context.HttpContext.Items[LocalizationItemKey.L10n] = cultureList;

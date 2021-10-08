@@ -344,7 +344,6 @@ namespace Ocuda.Promenade.Web
             services.AddScoped(typeof(Data.ServiceFacade.Repository<>));
 
             // utilities
-            services.AddScoped<CultureContextProvider>();
             services.AddScoped<IDateTimeProvider, CurrentDateTimeProvider>();
             services.AddScoped<Utility.Services.Interfaces.IOcudaCache,
                 Utility.Services.OcudaCache>();
@@ -428,6 +427,8 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.ScheduleRequestRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IScheduleRequestSubjectRepository,
                 Data.Promenade.ScheduleRequestSubjectRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IScheduleRequestSubjectTextRepository,
+                Data.Promenade.ScheduleRequestSubjectTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IScheduleRequestTelephoneRepository,
                 Data.Promenade.ScheduleRequestTelephoneRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ISegmentRepository,

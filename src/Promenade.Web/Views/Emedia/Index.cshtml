@@ -22,7 +22,7 @@
                 <div class="col-12 col-md-4 d-flex mb-4">
                     <div class="card flex-fill w-100">
                         <div class="card-header">
-                            <a aria-label="@emedia.Name (opens new window)"
+                            <a aria-label="@Localizer[Promenade.NewWindowItem, emedia.Name]"
                                href="@emedia.RedirectUrl"
                                target="_blank"><h2 class="fs-6 d-inline btn-link">@emedia.Name</h2></a>
                             @if (!string.IsNullOrEmpty(emedia.EmediaText?.Details))
@@ -33,7 +33,7 @@
                                    data-toggle="modal"
                                    data-name="@emedia.Name Help"
                                    data-details="@emedia.EmediaText.Details"
-                                   title="@emedia.Name help">
+                                   title="@Localizer[Promenade.HelpItem, emedia.Name]">
                                     <span class="fas fa-question-circle"></span>
                                 </a>
                             }
@@ -42,7 +42,7 @@
                             @Html.Raw(emedia.EmediaText?.Description)
                         </div>
                         <div class="card-footer">
-                            <span class="sr-only">@emedia.Name offers:</span>
+                            <span class="sr-only">@Localizer[Promenade.OffersItem, emedia.Name]</span>
                             @foreach (var category in emedia.Categories)
                             {
                                 <span class="badge @category.Class">@category.CategoryText?.Text</span>
@@ -60,12 +60,9 @@
 @section scripts {
     <script>
         $("#infoModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var modal = $(this);
-            var name = button.data("name");
-            var details = button.data("details");
-            modal.find(".modal-title").text(name);
-            modal.find(".modal-body").html(details);
+            let button = $(e.relatedTarget);
+            $(this).find(".modal-title").text(button.data("name"));
+            $(this).find(".modal-body").html(button.data("details"));
         });
     </script>
 }

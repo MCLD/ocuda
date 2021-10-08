@@ -1,18 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Ocuda.i18n.l10nKeys;
+using Ocuda.i18n.Keys;
 using Ocuda.Utility.Helpers;
 using Xunit;
 
 namespace i18n.Test
 {
+    /// <summary>
+    /// Verify that all the i18n text resources are present in both the resource files for English
+    /// and Spanish.
+    /// </summary>
     public class VerifyResourcesTest
     {
         private const string BasePathToResx = "..{0}..{0}..{0}..{0}..{0}..{0}src{0}i18n{0}Resources";
-
+        private const char NonBreakingSpaceCharacter = (char)160;
+        private const char SpaceCharacter = (char)32;
         private readonly string PathToResx;
 
         public VerifyResourcesTest()
@@ -23,67 +27,25 @@ namespace i18n.Test
         }
 
         [Fact]
-        public void TestEnglishResxHasAllAnnotations() => TestResxHasAnnotations("Shared.en.resx");
+        public void TestEnglishResxHasAllItems() => TestResxHasItems("Shared.en.resx");
 
         [Fact]
-        public void TestSpanishResxHasAllAnnotations() => TestResxHasAnnotations("Shared.es.resx");
+        public void TestSpanishResxHasAllItems() => TestResxHasItems("Shared.es.resx");
 
-        private void TestResxHasAnnotations(string filename)
+        private void TestResxHasItems(string filename)
         {
-            var resourceFileKeys = XmlHelper.ExtractDataNames(filename, PathToResx).Keys;
+            var resourceFileKeys = XmlHelper.ExtractDataNames(filename, PathToResx)
+                .Keys
+                .Select(_ => _.Replace(NonBreakingSpaceCharacter, SpaceCharacter));
 
-            var annotationValues = new List<string>();
-            foreach (var classType in typeof(Annotations).GetNestedTypes(BindingFlags.Public))
-            {
-                var constStrings = classType.GetFields(BindingFlags.Public
+            var constStrings = typeof(Promenade).GetFields(BindingFlags.Public
                     | BindingFlags.Static
                     | BindingFlags.FlattenHierarchy)
-                    .Where(fi => fi.IsLiteral && !fi.IsInitOnly)
-                    .ToList();
+                .Where(_ => _.FieldType == typeof(string));
 
-                foreach (var constval in constStrings)
-                {
-                    annotationValues.Add((string)constval.GetValue(null));
-                }
-            }
+            var constValues = constStrings.Select(_ => (string)_.GetValue(null));
 
-            var displayNameValues = new List<string>();
-            foreach (var classType in typeof(DisplayNames).GetNestedTypes(BindingFlags.Public))
-            {
-                var constStrings = classType.GetFields(BindingFlags.Public
-                    | BindingFlags.Static
-                    | BindingFlags.FlattenHierarchy)
-                    .Where(fi => fi.IsLiteral && !fi.IsInitOnly)
-                    .ToList();
-
-                foreach (var constval in constStrings)
-                {
-                    displayNameValues.Add((string)constval.GetValue(null));
-                }
-            }
-
-            var errorMessageValues = new List<string>();
-            foreach (var classType in typeof(ErrorMessages).GetNestedTypes(BindingFlags.Public))
-            {
-                var constStrings = classType.GetFields(BindingFlags.Public
-                    | BindingFlags.Static
-                    | BindingFlags.FlattenHierarchy)
-                    .Where(fi => fi.IsLiteral && !fi.IsInitOnly)
-                    .ToList();
-
-                foreach (var constval in constStrings)
-                {
-                    errorMessageValues.Add((string)constval.GetValue(null));
-                }
-            }
-
-            var localizationValues = annotationValues
-                .Concat(displayNameValues)
-                .Concat(errorMessageValues);
-
-            var missingItems = localizationValues.Except(resourceFileKeys);
-
-            Assert.Empty(missingItems);
+            Assert.Empty(resourceFileKeys.Except(constValues));
         }
     }
 }

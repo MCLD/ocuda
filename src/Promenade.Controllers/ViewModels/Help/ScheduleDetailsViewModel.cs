@@ -1,64 +1,52 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Utility;
 using Ocuda.Utility.Helpers;
 
 namespace Ocuda.Promenade.Controllers.ViewModels.Help
 {
     public class ScheduleDetailsViewModel
     {
-        public SegmentText SegmentText { get; set; }
+        public static IEnumerable<SelectListItem> Languages
+        {
+            get
+            {
+                return i18n.Culture.SupportedCultures
+                    .Select(_ => new SelectListItem
+                    {
+                        Text = _.NativeName,
+                        Value = _.Name,
+                        Selected = _.Name == CultureInfo.CurrentCulture.Name
+                    });
+            }
+        }
 
-        public string EmailRequiredMessage { get; set; }
-        public string NotesRequiredMessage { get; set; }
+        [Display(Name = i18n.Keys.Promenade.PromptSubject)]
+        public string DisplaySubject { get; set; }
 
-        [Display(Name = "Requested date and time")]
+        [Display(Name = i18n.Keys.Promenade.PromptRequestedDateAndTime)]
         public string DisplayTime
         {
             get
             {
-                return ScheduleRequest.RequestedTime.ToShortDateString()
-                    + " at "
-                    + ScheduleRequest.RequestedTime.ToShortTimeString();
+                return ScheduleRequest.RequestedTime.ToString("f", CultureInfo.CurrentCulture);
             }
         }
 
-        [Display(Name = "Subject")]
-        public string DisplaySubject { get; set; }
-
+        public string EmailRequiredMessage { get; set; }
         public bool ForceReload { get; set; }
 
-        public ScheduleRequest ScheduleRequest { get; set; }
-
-        public ICollection<SelectListItem> Languages
+        public string FormattedLanguage
         {
             get
             {
-                return _languages;
+                return new CultureInfo(ScheduleRequest?.Language).NativeName;
             }
         }
-
-        //TODO use available site langauges for this
-        private static readonly SelectListItem[] _languages = new[]
-        {
-            new SelectListItem
-            {
-                 Text = new CultureInfo("en-US").NativeName,
-                 Value = "en-US"
-            },
-            new SelectListItem
-            {
-                Text = new CultureInfo("es-US").NativeName,
-                Value = "es-US"
-            }
-        };
-
-        [Display(Name = "Phone")]
-        [MaxLength(255)]
-        [Required]
-        public string ScheduleRequestPhone { get; set; }
 
         public string FormattedPhone
         {
@@ -69,14 +57,15 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Help
             }
         }
 
-        public string FormattedLanguage
-        {
-            get
-            {
-                return new CultureInfo(ScheduleRequest?.Language).NativeName;
-            }
-        }
+        public string NotesRequiredMessage { get; set; }
+        public ScheduleRequest ScheduleRequest { get; set; }
 
+        [Display(Name = i18n.Keys.Promenade.PromptPhone)]
+        [MaxLength(255)]
+        [Required(ErrorMessage = ErrorMessage.FieldRequired)]
+        public string ScheduleRequestPhone { get; set; }
+
+        public SegmentText SegmentText { get; set; }
         public bool ShowEmailMessage { get; set; }
     }
 }

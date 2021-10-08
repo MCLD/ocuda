@@ -32,4 +32,8 @@
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\i18n\i18n.csproj" />
+  </ItemGroup>
+
 </Project>

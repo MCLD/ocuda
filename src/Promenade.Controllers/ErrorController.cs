@@ -51,7 +51,7 @@ namespace Ocuda.Promenade.Controllers
                     id,
                     originalPath);
 
-                PageTitle = "Page not found";
+                PageTitle = _localizer[i18n.Keys.Promenade.ErrorPageNotFound];
 
                 return NotFound();
             }
