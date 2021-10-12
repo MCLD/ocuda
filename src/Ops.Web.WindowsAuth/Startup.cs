@@ -6,12 +6,12 @@ using System.Security.Principal;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
+using Ocuda.Utility.Services.Interfaces;
 using Serilog;
 
 namespace Ops.Web.WindowsAuth
@@ -126,7 +126,7 @@ namespace Ops.Web.WindowsAuth
                         }
                         else
                         {
-                            var cache = app.ApplicationServices.GetRequiredService<IDistributedCache>();
+                            var cache = app.ApplicationServices.GetRequiredService<IOcudaCache>();
 
                             // by default time out cookies and distributed cache in 2 minutes
                             int authTimeoutMinutes = 2;
@@ -138,11 +138,10 @@ namespace Ops.Web.WindowsAuth
                                 _logger.Warning(BadConfig, Configuration.OpsAuthTimeoutMinutes);
                             }
 
-                            var cacheExpiration = new DistributedCacheEntryOptions()
-                                .SetAbsoluteExpiration(new TimeSpan(0, authTimeoutMinutes, 0));
+                            var cacheExpiration = new TimeSpan(0, authTimeoutMinutes, 0);
 
                             string referer
-                                = await cache.GetStringAsync(CacheKey(Cache.OpsReturn, id));
+                                = await cache.GetStringFromCache(CacheKey(Cache.OpsReturn, id));
 
                             if (string.IsNullOrEmpty(CacheDiscriminator))
                             {
@@ -162,14 +161,14 @@ namespace Ops.Web.WindowsAuth
                                     CacheDiscriminator);
                             }
 
-                            await cache.SetStringAsync(CacheKey(Cache.OpsUsername, id),
+                            await cache.SaveToCacheAsync(CacheKey(Cache.OpsUsername, id),
                                 username,
                                 cacheExpiration);
 
                             int groupId = 1;
                             foreach (string roleName in roleNames)
                             {
-                                await cache.SetStringAsync(CacheKey(Cache.OpsGroup, id, groupId),
+                                await cache.SaveToCacheAsync(CacheKey(Cache.OpsGroup, id, groupId),
                                     roleName,
                                     cacheExpiration);
                                 groupId++;
