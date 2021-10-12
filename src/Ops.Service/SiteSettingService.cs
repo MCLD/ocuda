@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Defaults;
@@ -12,19 +12,18 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
+using Ocuda.Utility.Services.Interfaces;
 
 namespace Ocuda.Ops.Service
 {
     public class SiteSettingService : BaseService<SiteSettingService>, ISiteSettingService
     {
-        private readonly IDistributedCache _cache;
+        private readonly IOcudaCache _cache;
         private readonly ISiteSettingRepository _siteSettingRepository;
-
-        private int CacheMinutes { get; }
 
         public SiteSettingService(ILogger<SiteSettingService> logger,
             IHttpContextAccessor httpContextAccessor,
-            IDistributedCache cache,
+            IOcudaCache cache,
             IConfiguration config,
             ISiteSettingRepository siteSettingRepository)
             : base(logger, httpContextAccessor)
@@ -44,6 +43,8 @@ namespace Ocuda.Ops.Service
                 CacheMinutes = timeout;
             }
         }
+
+        private int CacheMinutes { get; }
 
         /// <summary>
         /// Ensure all site settings exist in the database.
@@ -108,28 +109,6 @@ namespace Ocuda.Ops.Service
             return await GetSettingValueAsync(key);
         }
 
-        private async Task<string> GetSettingValueAsync(string key)
-        {
-            if (CacheMinutes == 0)
-            {
-                var siteSetting = await _siteSettingRepository.FindAsync(key);
-                return siteSetting.Value;
-            }
-            else
-            {
-                string cacheKey = string.Format(Utility.Keys.Cache.OpsSiteSetting, key);
-                var value = await _cache.GetStringAsync(key);
-                if (value == null)
-                {
-                    var siteSetting = await _siteSettingRepository.FindAsync(key);
-                    value = siteSetting.Value;
-                    await _cache.SetStringAsync(cacheKey, value, new DistributedCacheEntryOptions()
-                            .SetAbsoluteExpiration(new TimeSpan(0, CacheMinutes, 0)));
-                }
-                return value;
-            }
-        }
-
         public async Task<SiteSetting> UpdateAsync(string key, string value)
         {
             var currentSetting = await _siteSettingRepository.FindAsync(key);
@@ -151,9 +130,10 @@ namespace Ocuda.Ops.Service
 
             if (CacheMinutes > 0)
             {
-                string cacheKey = string.Format(Utility.Keys.Cache.OpsSiteSetting, key);
-                await _cache.SetStringAsync(cacheKey, value, new DistributedCacheEntryOptions()
-                    .SetAbsoluteExpiration(new TimeSpan(0, CacheMinutes, 0)));
+                string cacheKey = string.Format(CultureInfo.InvariantCulture,
+                    Utility.Keys.Cache.OpsSiteSetting,
+                    key);
+                await _cache.SaveToCacheAsync(cacheKey, value, new TimeSpan(0, CacheMinutes, 0));
             }
 
             return currentSetting;
@@ -191,6 +171,31 @@ namespace Ocuda.Ops.Service
                     siteSetting.Id,
                     siteSetting.Value);
                 throw new OcudaException($"{siteSetting.Name} requires a value of type {siteSetting.Type}.");
+            }
+        }
+
+        private async Task<string> GetSettingValueAsync(string key)
+        {
+            if (CacheMinutes == 0)
+            {
+                var siteSetting = await _siteSettingRepository.FindAsync(key);
+                return siteSetting.Value;
+            }
+            else
+            {
+                string cacheKey = string.Format(CultureInfo.InvariantCulture,
+                    Utility.Keys.Cache.OpsSiteSetting,
+                    key);
+                var value = await _cache.GetStringFromCache(key);
+                if (value == null)
+                {
+                    var siteSetting = await _siteSettingRepository.FindAsync(key);
+                    value = siteSetting.Value;
+                    await _cache.SaveToCacheAsync(cacheKey,
+                        value,
+                        new TimeSpan(0, CacheMinutes, 0));
+                }
+                return value;
             }
         }
     }

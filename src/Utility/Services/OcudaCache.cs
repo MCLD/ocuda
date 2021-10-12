@@ -36,6 +36,15 @@ namespace Ocuda.Utility.Services
             return GetIntFromCacheInternalAsync(cacheKey);
         }
 
+        public Task<long?> GetLongFromCacheAsync(string cacheKey)
+        {
+            if (string.IsNullOrEmpty(cacheKey))
+            {
+                throw new ArgumentNullException(nameof(cacheKey));
+            }
+            return GetLongFromCacheInternalAsync(cacheKey);
+        }
+
         public async Task<T> GetObjectFromCacheAsync<T>(string cacheKey) where T : class
         {
             var cachedJson = await GetStringFromCache(cacheKey);
@@ -169,6 +178,30 @@ namespace Ocuda.Utility.Services
             return null;
         }
 
+        private async Task<long?> GetLongFromCacheInternalAsync(string cacheKey)
+        {
+            var cachedValue = await _cache.GetAsync(cacheKey);
+
+            if (cachedValue?.Length > 0)
+            {
+                _logger.LogTrace("Cache hit for {CacheKey}", cacheKey);
+
+                try
+                {
+                    return BitConverter.ToInt64(cachedValue);
+                }
+                catch (ArgumentOutOfRangeException ex)
+                {
+                    _logger.LogWarning(ex,
+                        "Error converting long with key {CacheKey} from cache: {ErrorMessage}",
+                        cacheKey,
+                        ex.Message);
+                    await _cache.RemoveAsync(cacheKey);
+                }
+            }
+            return null;
+        }
+
         private async Task<string> GetStringFromCacheInternalAsync(string cacheKey)
         {
             return await _cache.GetStringAsync(cacheKey);
@@ -212,6 +245,13 @@ namespace Ocuda.Utility.Services
             else if (item is int intValue)
             {
                 var bytes = BitConverter.GetBytes(intValue);
+                await _cache.SetAsync(cacheKey, bytes, cacheEntryOptions);
+                description = "bytes " + BitConverter.ToString(bytes);
+                length = bytes.Length;
+            }
+            else if (item is long longValue)
+            {
+                var bytes = BitConverter.GetBytes(longValue);
                 await _cache.SetAsync(cacheKey, bytes, cacheEntryOptions);
                 description = "bytes " + BitConverter.ToString(bytes);
                 length = bytes.Length;

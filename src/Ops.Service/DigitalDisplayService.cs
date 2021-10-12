@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
@@ -22,7 +21,7 @@ namespace Ocuda.Ops.Service
     {
         private const string BaseFilePath = "digitaldisplay";
 
-        private readonly IDistributedCache _cache;
+        private readonly IOcudaCache _cache;
         private readonly IDigitalDisplayAssetRepository _digitalDisplayAssetRepository;
         private readonly IDigitalDisplayAssetSetRepository _digitalDisplayAssetSetRepository;
         private readonly IDigitalDisplayDisplaySetRepository _digitalDisplayDisplaySetRepository;
@@ -34,7 +33,7 @@ namespace Ocuda.Ops.Service
 
         public DigitalDisplayService(ILogger<DigitalDisplayService> logger,
             IHttpContextAccessor httpContextAccessor,
-            IDistributedCache cache,
+            IOcudaCache cache,
             IDigitalDisplayAssetRepository digitalDisplayAssetRepository,
             IDigitalDisplayAssetSetRepository digitalDisplayAssetSetRepository,
             IDigitalDisplayItemRepository digitalDisplayItemRepository,
@@ -276,11 +275,11 @@ namespace Ocuda.Ops.Service
                 Utility.Keys.Cache.OpsDigitalDisplayStatusAt,
                 displayId);
 
-            string message = await _cache.GetStringAsync(statusKey);
+            string message = await _cache.GetStringFromCache(statusKey);
 
-            var asOfTicks = await _cache.GetAsync(statusAtKey);
-            var asOf = asOfTicks != null
-                ? DateTime.FromBinary(BitConverter.ToInt64(asOfTicks, 0))
+            var asOfTicks = await _cache.GetLongFromCacheAsync(statusAtKey);
+            var asOf = asOfTicks.HasValue
+                ? DateTime.FromBinary(asOfTicks.Value)
                 : default;
 
             return (asOf, message);
@@ -348,8 +347,8 @@ namespace Ocuda.Ops.Service
             }
             else
             {
-                await _cache.SetStringAsync(statusKey, status);
-                await _cache.SetAsync(statusAtKey, BitConverter.GetBytes(DateTime.Now.Ticks));
+                await _cache.SaveToCacheAsync(statusKey, status, 24);
+                await _cache.SaveToCacheAsync(statusAtKey, DateTime.Now.Ticks, 24);
             }
         }
 

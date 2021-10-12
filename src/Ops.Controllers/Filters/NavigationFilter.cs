@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Ocuda.Ops.Models;
@@ -17,12 +16,12 @@ namespace Ocuda.Ops.Controllers.Filters
         //todo move this to configuration
         private const string NavMenuFileName = "NavMenu.json";
 
+        private readonly IOcudaCache _cache;
         private readonly ILogger<NavigationFilterAttribute> _logger;
-        private readonly IDistributedCache _cache;
         private readonly IPathResolverService _pathResolverService;
 
         public NavigationFilterAttribute(ILogger<NavigationFilterAttribute> logger,
-           IDistributedCache cache,
+           IOcudaCache cache,
            IPathResolverService pathResolverService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -36,7 +35,7 @@ namespace Ocuda.Ops.Controllers.Filters
         {
             if (!string.IsNullOrEmpty(NavMenuFileName))
             {
-                string navJson = _cache.GetString(Cache.OpsLeftNav);
+                string navJson = await _cache.GetStringFromCache(Cache.OpsLeftNav);
                 if (string.IsNullOrEmpty(navJson))
                 {
                     var navMenuJsonFile = _pathResolverService.GetPrivateContentFilePath(NavMenuFileName);
@@ -44,12 +43,9 @@ namespace Ocuda.Ops.Controllers.Filters
                     {
                         using StreamReader file = File.OpenText(navMenuJsonFile);
                         navJson = file.ReadToEnd();
-                        _cache.SetString(Cache.OpsLeftNav,
+                        await _cache.SaveToCacheAsync(Cache.OpsLeftNav,
                             navJson,
-                            new DistributedCacheEntryOptions
-                            {
-                                AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
-                            });
+                            TimeSpan.FromHours(1));
                     }
                 }
 
