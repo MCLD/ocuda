@@ -9,6 +9,8 @@ namespace Ocuda.Utility.Services.Interfaces
 
         Task<int?> GetIntFromCacheAsync(string cacheKey);
 
+        Task<long?> GetLongFromCacheAsync(string cacheKey);
+
         Task<T> GetObjectFromCacheAsync<T>(string cacheKey) where T : class;
 
         Task<string> GetStringFromCache(string cacheKey);

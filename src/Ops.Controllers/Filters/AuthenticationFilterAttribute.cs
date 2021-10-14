@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Helpers;
 using Ocuda.Utility.Keys;
+using Ocuda.Utility.Services.Interfaces;
 using Serilog.Context;
 
 namespace Ocuda.Ops.Controllers.Filters
@@ -22,7 +22,7 @@ namespace Ocuda.Ops.Controllers.Filters
     public sealed class AuthenticationFilterAttribute : Attribute, IAsyncResourceFilter
     {
         private readonly IAuthorizationService _authorizationService;
-        private readonly IDistributedCache _cache;
+        private readonly IOcudaCache _cache;
         private readonly IConfiguration _config;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly ILdapService _ldapService;
@@ -31,25 +31,24 @@ namespace Ocuda.Ops.Controllers.Filters
         private readonly WebHelper _webHelper;
 
         public AuthenticationFilterAttribute(ILogger<AuthenticationFilterAttribute> logger,
+            IAuthorizationService authorizationService,
             IConfiguration configuration,
             IDateTimeProvider dateTimeProvider,
-            IDistributedCache cache,
-            WebHelper webHelper,
-            IAuthorizationService authorizationService,
             ILdapService ldapService,
-            IUserService userService)
+            IOcudaCache cache,
+            IUserService userService,
+            WebHelper webHelper)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _authorizationService = authorizationService
+                ?? throw new ArgumentNullException(nameof(authorizationService));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _dateTimeProvider = dateTimeProvider
                 ?? throw new ArgumentNullException(nameof(dateTimeProvider));
-            _webHelper = webHelper ?? throw new ArgumentNullException(nameof(webHelper));
-            _authorizationService = authorizationService
-                ?? throw new ArgumentNullException(nameof(authorizationService));
-            _ldapService = ldapService
-                ?? throw new ArgumentNullException(nameof(ldapService));
+            _ldapService = ldapService ?? throw new ArgumentNullException(nameof(ldapService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _webHelper = webHelper ?? throw new ArgumentNullException(nameof(webHelper));
         }
 
         public async Task OnResourceExecutionAsync(ResourceExecutingContext context,
@@ -109,9 +108,6 @@ namespace Ocuda.Ops.Controllers.Filters
                     // all authentication bits will expire after 2 minutes
                     var authenticationExpiration = new TimeSpan(0, authTimeoutMinutes, 0);
 
-                    var cacheExpiration = new DistributedCacheEntryOptions()
-                        .SetAbsoluteExpiration(authenticationExpiration);
-
                     // check existing authentication id cookie
                     var id = context.HttpContext.Request.Cookies[Cookie.OpsAuthId];
                     if (id == null)
@@ -130,18 +126,17 @@ namespace Ocuda.Ops.Controllers.Filters
 
                     // check if there's a username stored in the cache
                     // if so, the authentication has redirected us back here
-                    username = await _cache
-                        .GetStringAsync(string.Format(CultureInfo.InvariantCulture,
+                    username = await _cache.GetStringFromCache(string.Format(CultureInfo.InvariantCulture,
                             Cache.OpsUsername,
                             id));
 
                     if (string.IsNullOrEmpty(username))
                     {
                         // if there is no username: set a return url and redirect to authentication
-                        await _cache.SetStringAsync(string
+                        await _cache.SaveToCacheAsync(string
                                 .Format(CultureInfo.InvariantCulture, Cache.OpsReturn, id),
                             _webHelper.GetCurrentUrl(context.HttpContext),
-                            cacheExpiration);
+                            authenticationExpiration);
 
                         string cacheDiscriminator
                             = _config[Configuration.OpsDistributedCacheInstanceDiscriminator]
@@ -218,7 +213,7 @@ namespace Ocuda.Ops.Controllers.Filters
                         // prime the loop
                         int groupId = 1;
                         var adGroupName
-                            = await _cache.GetStringAsync(string
+                            = await _cache.GetStringFromCache(string
                                 .Format(CultureInfo.InvariantCulture,
                                     Cache.OpsGroup,
                                     id,
@@ -234,7 +229,7 @@ namespace Ocuda.Ops.Controllers.Filters
                                 groupId));
                             groupId++;
                             adGroupName = await _cache
-                                .GetStringAsync(string.Format(CultureInfo.InvariantCulture,
+                                .GetStringFromCache(string.Format(CultureInfo.InvariantCulture,
                                     Cache.OpsGroup,
                                     id,
                                     groupId));
