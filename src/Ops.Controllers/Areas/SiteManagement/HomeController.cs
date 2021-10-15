@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Home;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
 
@@ -41,6 +42,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 var numericPermissionIds = permissionIds
                     .Select(_ => int.Parse(_, CultureInfo.InvariantCulture));
+                viewModel.HasEmediaPermissions = await HasAppPermissionAsync(
+                    _permissionGroupService, ApplicationPermission.EmediaManagement);
                 viewModel.HasPagePermissions = await _permissionGroupService
                     .HasAPermissionAsync<PermissionGroupPageContent>(numericPermissionIds);
                 viewModel.HasPodcastPermissions = await _permissionGroupService

@@ -44,6 +44,9 @@
                 </div>
             </div>
         </div>
+    }
+    @if (Model.IsSiteManager || Model.HasEmediaPermissions)
+    {
         <div class="col-12 col-md-4 my-2">
             <div class="card">
                 <div class="card-header lead font-weight-bold">
@@ -57,6 +60,9 @@
                 </div>
             </div>
         </div>
+    }
+    @if (Model.IsSiteManager)
+    {
         <div class="col-12 col-md-4 my-2">
             <div class="card">
                 <div class="card-header lead font-weight-bold">

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
@@ -10,23 +9,24 @@ using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Emedia;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
-using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 {
     [Area("SiteManagement")]
-    [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]/[controller]")]
     public class EmediaController : BaseController<EmediaController>
     {
         private readonly ICategoryService _categoryService;
         private readonly IEmediaService _emediaService;
         private readonly ILanguageService _languageService;
+        private readonly IPermissionGroupService _permissionGroupService;
         private readonly ISegmentService _segmentService;
 
         public static string Name { get { return "Emedia"; } }
@@ -36,6 +36,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ICategoryService categoryService,
             IEmediaService emediaService,
             ILanguageService languageService,
+            IPermissionGroupService permissionGroupService,
             ISegmentService segmentService) : base(context)
         {
             _categoryService = categoryService
@@ -44,6 +45,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(emediaService));
             _languageService = languageService
                 ?? throw new ArgumentNullException(nameof(languageService));
+            _permissionGroupService = permissionGroupService
+                ?? throw new ArgumentNullException(nameof(permissionGroupService));
             _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
         }
@@ -52,6 +55,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> Index(int page = 1)
         {
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
+            {
+                return RedirectToUnauthorized();
+            }
+
             var itemsPerPage = await _siteSettingService
                 .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
 
@@ -89,38 +98,51 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            if (ModelState.IsValid)
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
             {
-                try
+                if (ModelState.IsValid)
                 {
-                    var group = await _emediaService.CreateGroupAsync(model.EmediaGroup);
-                    response = new JsonResponse
+                    try
                     {
-                        Success = true,
-                        Url = Url.Action(nameof(GroupDetails), new { id = group.Id })
-                    };
+                        var group = await _emediaService.CreateGroupAsync(model.EmediaGroup);
+                        response = new JsonResponse
+                        {
+                            Success = true,
+                            Url = Url.Action(nameof(GroupDetails), new { id = group.Id })
+                        };
+                    }
+                    catch (OcudaException ex)
+                    {
+                        response = new JsonResponse
+                        {
+                            Success = false,
+                            Message = ex.Message
+                        };
+                    }
                 }
-                catch (OcudaException ex)
+                else
                 {
+                    var errors = ModelState.Values
+                        .SelectMany(_ => _.Errors)
+                        .Select(_ => _.ErrorMessage);
+
                     response = new JsonResponse
                     {
                         Success = false,
-                        Message = ex.Message
+                        Message = string.Join(Environment.NewLine, errors)
                     };
                 }
             }
             else
             {
-                var errors = ModelState.Values
-                    .SelectMany(_ => _.Errors)
-                    .Select(_ => _.ErrorMessage);
-
                 response = new JsonResponse
                 {
-                    Success = false,
-                    Message = string.Join(Environment.NewLine, errors)
+                    Message = "Unauthorized",
+                    Success = false
                 };
             }
+
             return Json(response);
         }
 
@@ -130,37 +152,49 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            if (ModelState.IsValid)
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
             {
-                try
+                if (ModelState.IsValid)
                 {
-                    var group = await _emediaService.EditGroupAsync(model.EmediaGroup);
-                    response = new JsonResponse
+                    try
                     {
-                        Success = true
-                    };
+                        var group = await _emediaService.EditGroupAsync(model.EmediaGroup);
+                        response = new JsonResponse
+                        {
+                            Success = true
+                        };
 
-                    ShowAlertSuccess($"Updated group: {group.Name}");
+                        ShowAlertSuccess($"Updated group: {group.Name}");
+                    }
+                    catch (OcudaException ex)
+                    {
+                        response = new JsonResponse
+                        {
+                            Success = false,
+                            Message = ex.Message
+                        };
+                    }
                 }
-                catch (OcudaException ex)
+                else
                 {
+                    var errors = ModelState.Values
+                        .SelectMany(_ => _.Errors)
+                        .Select(_ => _.ErrorMessage);
+
                     response = new JsonResponse
                     {
                         Success = false,
-                        Message = ex.Message
+                        Message = string.Join(Environment.NewLine, errors)
                     };
                 }
             }
             else
             {
-                var errors = ModelState.Values
-                    .SelectMany(_ => _.Errors)
-                    .Select(_ => _.ErrorMessage);
-
                 response = new JsonResponse
                 {
-                    Success = false,
-                    Message = string.Join(Environment.NewLine, errors)
+                    Message = "Unauthorized",
+                    Success = false
                 };
             }
 
@@ -171,6 +205,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> DeleteGroup(IndexViewModel model)
         {
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
+            {
+                return RedirectToUnauthorized();
+            }
+
             try
             {
                 await _emediaService.DeleteGroupAsync(model.EmediaGroup.Id);
@@ -191,19 +231,31 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            try
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
             {
-                await _emediaService.UpdateGroupSortOrder(id, increase);
-                response = new JsonResponse
+                try
                 {
-                    Success = true
-                };
+                    await _emediaService.UpdateGroupSortOrder(id, increase);
+                    response = new JsonResponse
+                    {
+                        Success = true
+                    };
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Message = ex.Message,
+                        Success = false
+                    };
+                }
             }
-            catch (OcudaException ex)
+            else
             {
                 response = new JsonResponse
                 {
-                    Message = ex.Message,
+                    Message = "Unauthorized",
                     Success = false
                 };
             }
@@ -214,6 +266,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]/{id}")]
         public async Task<IActionResult> GroupDetails(int id, int page = 1)
         {
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
+            {
+                return RedirectToUnauthorized();
+            }
+
             var group = await _emediaService.GetGroupIncludingSegmentAsync(id);
 
             if (group == null)
@@ -270,55 +328,67 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            if (ModelState.IsValid)
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
             {
-                try
+                if (ModelState.IsValid)
                 {
-                    string url = null;
+                    try
+                    {
+                        string url = null;
 
-                    var group = await _emediaService.GetGroupByIdAsync(model.EmediaGroupId);
-                    if (group.SegmentId.HasValue)
-                    {
-                        var segment = await _segmentService.GetByIdAsync(group.SegmentId.Value);
-                        segment.Name = model.Segment.Name;
-                        segment = await _segmentService.EditAsync(segment);
-                        ShowAlertSuccess($"Updated group segment: {segment.Name}");
-                    }
-                    else
-                    {
-                        group.Segment = model.Segment;
-                        await _emediaService.AddGroupSegmentAsync(group);
-                        url = Url.Action(
-                            nameof(SegmentsController.Detail),
-                            SegmentsController.Name,
-                            new { id = group.SegmentId });
-                    }
+                        var group = await _emediaService.GetGroupByIdAsync(model.EmediaGroupId);
+                        if (group.SegmentId.HasValue)
+                        {
+                            var segment = await _segmentService.GetByIdAsync(group.SegmentId.Value);
+                            segment.Name = model.Segment.Name;
+                            segment = await _segmentService.EditAsync(segment);
+                            ShowAlertSuccess($"Updated group segment: {segment.Name}");
+                        }
+                        else
+                        {
+                            group.Segment = model.Segment;
+                            await _emediaService.AddGroupSegmentAsync(group);
+                            url = Url.Action(
+                                nameof(SegmentsController.Detail),
+                                SegmentsController.Name,
+                                new { id = group.SegmentId });
+                        }
 
-                    response = new JsonResponse
+                        response = new JsonResponse
+                        {
+                            Success = true,
+                            Url = url
+                        };
+                    }
+                    catch (Exception ex)
                     {
-                        Success = true,
-                        Url = url
-                    };
+                        response = new JsonResponse
+                        {
+                            Success = false,
+                            Message = ex.Message
+                        };
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
+                    var errors = ModelState.Values
+                        .SelectMany(_ => _.Errors)
+                        .Select(_ => _.ErrorMessage);
+
                     response = new JsonResponse
                     {
                         Success = false,
-                        Message = ex.Message
+                        Message = string.Join(Environment.NewLine, errors)
                     };
                 }
             }
             else
             {
-                var errors = ModelState.Values
-                    .SelectMany(_ => _.Errors)
-                    .Select(_ => _.ErrorMessage);
-
                 response = new JsonResponse
                 {
-                    Success = false,
-                    Message = string.Join(Environment.NewLine, errors)
+                    Message = "Unauthorized",
+                    Success = false
                 };
             }
 
@@ -329,6 +399,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> DeleteGroupSegment(GroupDetailsViewModel model)
         {
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
+            {
+                return RedirectToUnauthorized();
+            }
+
             try
             {
                 await _emediaService.DeleteGroupSegmentAsync(model.EmediaGroupId);
@@ -353,38 +429,51 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            if (ModelState.IsValid)
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
             {
-                try
+                if (ModelState.IsValid)
                 {
-                    var group = await _emediaService.CreateAsync(model.Emedia);
-                    response = new JsonResponse
+                    try
                     {
-                        Success = true,
-                        Url = Url.Action(nameof(Details), new { id = group.Id })
-                    };
+                        var group = await _emediaService.CreateAsync(model.Emedia);
+                        response = new JsonResponse
+                        {
+                            Success = true,
+                            Url = Url.Action(nameof(Details), new { id = group.Id })
+                        };
+                    }
+                    catch (OcudaException ex)
+                    {
+                        response = new JsonResponse
+                        {
+                            Success = false,
+                            Message = ex.Message
+                        };
+                    }
                 }
-                catch (OcudaException ex)
+                else
                 {
+                    var errors = ModelState.Values
+                        .SelectMany(_ => _.Errors)
+                        .Select(_ => _.ErrorMessage);
+
                     response = new JsonResponse
                     {
                         Success = false,
-                        Message = ex.Message
+                        Message = string.Join(Environment.NewLine, errors)
                     };
                 }
             }
             else
             {
-                var errors = ModelState.Values
-                    .SelectMany(_ => _.Errors)
-                    .Select(_ => _.ErrorMessage);
-
                 response = new JsonResponse
                 {
-                    Success = false,
-                    Message = string.Join(Environment.NewLine, errors)
+                    Message = "Unauthorized",
+                    Success = false
                 };
             }
+
             return Json(response);
         }
 
@@ -394,37 +483,49 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            if (ModelState.IsValid)
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
             {
-                try
+                if (ModelState.IsValid)
                 {
-                    var emedia = await _emediaService.EditAsync(model.Emedia);
-                    response = new JsonResponse
+                    try
                     {
-                        Success = true
-                    };
+                        var emedia = await _emediaService.EditAsync(model.Emedia);
+                        response = new JsonResponse
+                        {
+                            Success = true
+                        };
 
-                    ShowAlertSuccess($"Updated emedia: {emedia.Name}");
+                        ShowAlertSuccess($"Updated emedia: {emedia.Name}");
+                    }
+                    catch (OcudaException ex)
+                    {
+                        response = new JsonResponse
+                        {
+                            Success = false,
+                            Message = ex.Message
+                        };
+                    }
                 }
-                catch (OcudaException ex)
+                else
                 {
+                    var errors = ModelState.Values
+                        .SelectMany(_ => _.Errors)
+                        .Select(_ => _.ErrorMessage);
+
                     response = new JsonResponse
                     {
                         Success = false,
-                        Message = ex.Message
+                        Message = string.Join(Environment.NewLine, errors)
                     };
                 }
             }
             else
             {
-                var errors = ModelState.Values
-                    .SelectMany(_ => _.Errors)
-                    .Select(_ => _.ErrorMessage);
-
                 response = new JsonResponse
                 {
-                    Success = false,
-                    Message = string.Join(Environment.NewLine, errors)
+                    Message = "Unauthorized",
+                    Success = false
                 };
             }
 
@@ -435,6 +536,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> DeleteEmedia(GroupDetailsViewModel model)
         {
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
+            {
+                return RedirectToUnauthorized();
+            }
+
             try
             {
                 await _emediaService.DeleteAsync(model.Emedia.Id);
@@ -458,6 +565,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [RestoreModelState]
         public async Task<IActionResult> Details(int id, string language)
         {
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
+            {
+                return RedirectToUnauthorized();
+            }
+
             var emedia = await _emediaService.GetIncludingGroupAsync(id);
 
             if (emedia == null)
@@ -499,6 +612,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> Details(DetailsViewModel model)
         {
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
+            {
+                return RedirectToUnauthorized();
+            }
+
             if (ModelState.IsValid)
             {
                 try
@@ -528,19 +647,31 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            try
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.EmediaManagement))
             {
-                await _emediaService.UpdateCategoriesAsync(id, categories);
-                response = new JsonResponse
+                try
                 {
-                    Success = true
-                };
+                    await _emediaService.UpdateCategoriesAsync(id, categories);
+                    response = new JsonResponse
+                    {
+                        Success = true
+                    };
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Message = ex.Message,
+                        Success = false
+                    };
+                }
             }
-            catch (OcudaException ex)
+            else
             {
                 response = new JsonResponse
                 {
-                    Message = ex.Message,
+                    Message = "Unauthorized",
                     Success = false
                 };
             }

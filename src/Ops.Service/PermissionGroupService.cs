@@ -162,6 +162,17 @@ namespace Ocuda.Ops.Service
                 await HasAPermissionAsync<PermissionGroupPageContent>(permissionGroupIds)
                 || await HasAPermissionAsync<PermissionGroupPodcastItem>(permissionGroupIds));
 
+            if (!hasSiteAdminRights)
+            {
+                var emediaGroups = await GetApplicationPermissionGroupsAsync(ApplicationPermission
+                    .EmediaManagement);
+
+                hasSiteAdminRights = emediaGroups
+                    .Select(_ => _.Id)
+                    .Intersect(permissionGroupIds)
+                    .Any();
+            }
+
             var hasContentAdminRights = (
                 await HasAPermissionAsync<PermissionGroupReplaceFiles>(permissionGroupIds)
                 || await HasAPermissionAsync<PermissionGroupSectionManager>(permissionGroupIds));

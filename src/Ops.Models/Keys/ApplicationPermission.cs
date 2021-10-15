@@ -10,6 +10,8 @@
         public static readonly string DigitalDisplayContentManagement
             = "DigitalDisplayContentManagement";
 
+        public static readonly string EmediaManagement = "EmediaManagement";
+
         public static readonly string IntranetFrontPageManagement = "IntranetFrontPageManagement";
     }
 }

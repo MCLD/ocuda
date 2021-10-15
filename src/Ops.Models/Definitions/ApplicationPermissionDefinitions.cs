@@ -21,6 +21,12 @@ namespace Ocuda.Ops.Models.Definitions
             },
             new ApplicationPermissionDefinition
             {
+                Id = ApplicationPermission.EmediaManagement,
+                Name = "Emedia Management",
+                Info = "Users with this permission can manage the Promenade Emedia page."
+            },
+            new ApplicationPermissionDefinition
+            {
                 Id = ApplicationPermission.IntranetFrontPageManagement,
                 Name = "Intranet Front Page Management",
                 Info = "Users with this permission can push section posts to the front page and pin them."
