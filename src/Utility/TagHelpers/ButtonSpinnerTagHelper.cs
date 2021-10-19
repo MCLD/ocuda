@@ -21,6 +21,11 @@ namespace Ocuda.Utility.TagHelpers
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
+            if (output == null)
+            {
+                throw new System.ArgumentNullException(nameof(output));
+            }
+
             var existingClasses = output.Attributes.FirstOrDefault(f => f.Name == classAttribute);
             var buttonClasses = string.Empty;
             if (existingClasses != null)

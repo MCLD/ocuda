@@ -79,3 +79,40 @@ document.addEventListener("DOMContentLoaded", function () {
         $(".prom-modal-details").modal().show();
     });
 });
+
+function ResetSpinners(target) {
+    if (target != null) {
+        target.removeClass("disabled");
+        target.children(".fa-spinner").addClass("d-none");
+    }
+    else {
+        $(".btn-spinner, .btn-spinner-no-validate").removeClass("disabled");
+        $(".btn-spinner, .btn-spinner-no-validate").children(".fa-spinner").addClass("d-none");
+    }
+}
+
+window.onunload = function () {
+    ResetSpinners();
+};
+
+$(".btn-spinner").on("click", function (e) {
+    if ($(this).hasClass("disabled")) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+    }
+    else {
+        var parentForm = $(this).closest("form");
+
+        if (!$(this).hasClass("spinner-ignore-validation")
+            && (parentForm.length > 0 && !parentForm.valid())) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+        }
+        else {
+            parentForm.find(".btn-spinner").addClass("disabled");
+            $(this).children(".fa-spinner").removeClass("d-none");
+        }
+    }
+});

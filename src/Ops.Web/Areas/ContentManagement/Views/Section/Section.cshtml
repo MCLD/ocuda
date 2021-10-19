@@ -505,9 +505,6 @@
             slug = $("#addFileLibModal").find("#FileLibrary_Name").val().toLowerCase().replace(/ /g, "-").replace(/[^a-zA-Z0-9]/g, '');
             $("#addFileLibModal").find("#FileLibrary_Slug").val(slug);
         });
-        $("#confirmDelButton").on("click", function () {
-            $(this).html("Delete <span class='fa fa-spinner fa-pulse fa-lg fa-fw hidden'></span>");
-        });
         $("#deleteModal").on("show.bs.modal", function (e) {
             var button = $(e.relatedTarget);
             var id = button.data("id");

@@ -117,7 +117,8 @@
                     <button id="delButton"
                             type="submit"
                             class="btn btn-danger pull-right"
-                            aria-label="Confirm">
+                            aria-label="Confirm"
+                            button-spinner>
                         Delete
                     </button>
                 </div>
@@ -255,9 +256,6 @@
         });
         $("#addLinkButton").on('click', function (e) {
             $("#listAddModal").modal("show");
-        });
-        $("#delButton").on('click', function (e) {
-            this.innerHTML = 'Delete <span class="fa fa-spinner fa-spin"></span>';
         });
         $(document).ready(function () {
             $('.icon-picker').iconpicker();

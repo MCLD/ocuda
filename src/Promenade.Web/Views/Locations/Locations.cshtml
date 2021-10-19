@@ -34,7 +34,8 @@
                     <div class="input-group-append">
                         <button class="btn btn-outline-primary"
                                 type="submit"
-                                id="GoButton">
+                                id="GoButton"
+                                button-spinner>
                             @Localizer[Promenade.ButtonGo]
                         </button>
                     </div>
@@ -47,9 +48,9 @@
             <form asp-action="Location" method="get" role="form" id="GeoForm">
                 <input asp-for="Latitude" id="Latitude" hidden />
                 <input asp-for="Longitude" id="Longitude" hidden />
-                <button type="button"
-                        class="btn btn-outline-primary btn-block"
-                        id="GeoButton">
+                <button class="btn btn-outline-primary btn-block"
+                        id="GeoButton"
+                        button-spinner>
                     <span class="fas fa-map-marker-alt"></span>
                     @Localizer[Promenade.ButtonUseMyLocation]
                 </button>
@@ -144,7 +145,6 @@
             if (location.protocol != 'https:' && location.hostname != 'localhost') {
                 location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
             }
-            $('#GeoButton').html(useMyLocation);
             $('#GeoButton').show();
         });
 
@@ -162,8 +162,6 @@
         }
 
         $('#GeoButton').on('click', function () {
-            $('#GeoButton').html('<span class="fas fa-spinner fa-spin"></span> ' + useMyLocation);
-            $('#GeoButton').prop('disabled', true);
             var geoOptions = {
                 enableHighAccuracy: true,
                 maximumAge: 30000,
@@ -173,8 +171,6 @@
         });
 
         $('#GoButton').on('click', function () {
-            $('#GoButton').html('<span class="fas fa-spinner fa-spin"></span> Go');
-            $('#GoButton').prop('disabled', true);
             $('#ZipForm').submit();
             return false;
         });
