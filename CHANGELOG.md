@@ -48,6 +48,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Marking cover sheet issues as resolved when they had been reported two or more times
 - Site settings not being able to be updated
 - Empty site settings being set to a null value
+- Site manager permission not being listed if user belongs to other permission groups
 
 ## 1.0.0
 ### Added
