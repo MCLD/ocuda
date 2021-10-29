@@ -50,9 +50,12 @@
                     </div>
                 </div>
             </div>
+
+            <input asp-for="SegmentLanguages" value="@string.Join(", ", Model.SegmentLanguages)" formgroup readonly />
+
             <div class="row">
                 <div class="offset-md-3 col-md-9">
-                    <a asp-controller="@SegmentsController.Name" 
+                    <a asp-controller="@SegmentsController.Name"
                        asp-action="@nameof(SegmentsController.Detail)"
                        asp-route-id="@Model.EmediaGroup.SegmentId"
                        class="btn btn-outline-info">
@@ -206,19 +209,19 @@
 
 @if (Model.EmediaGroup.SegmentId.HasValue)
 {
-<form asp-controller="@EmediaController.Name" asp-action="@(nameof(EmediaController.DeleteGroupSegment))" method="post" role="form">
-    <input id="deleteSegmentCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
+    <form asp-controller="@EmediaController.Name" asp-action="@(nameof(EmediaController.DeleteGroupSegment))" method="post" role="form">
+        <input id="deleteSegmentCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
 
-    <input id="deleteSegmentGroupId" asp-for="EmediaGroupId" value="@Model.EmediaGroup.Id" type="hidden" />
-    <input id="deleteSegmentNape" asp-for="Segment.Name" value="@Model.EmediaGroup.Segment.Name" type="hidden" />
+        <input id="deleteSegmentGroupId" asp-for="EmediaGroupId" value="@Model.EmediaGroup.Id" type="hidden" />
+        <input id="deleteSegmentNape" asp-for="Segment.Name" value="@Model.EmediaGroup.Segment.Name" type="hidden" />
 
-    <div modal
-         id="deleteSegmentModal"
-         isLarge="true"
-         name="Segment"
-         type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
-    </div>
-</form>
+        <div modal
+             id="deleteSegmentModal"
+             isLarge="true"
+             name="Segment"
+             type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
+        </div>
+    </form>
 }
 
 @section scripts {

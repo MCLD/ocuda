@@ -310,7 +310,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (group.SegmentId.HasValue)
             {
                 viewModel.SegmentLanguages = await _segmentService
-                    .GetSegmentLanguagesByIdAsync(group.Id);
+                    .GetSegmentLanguagesByIdAsync(group.SegmentId.Value);
             }
 
             return View(viewModel);

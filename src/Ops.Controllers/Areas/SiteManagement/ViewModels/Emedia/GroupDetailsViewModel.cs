@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Models;
 
@@ -14,6 +14,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Emedia
 
         public int EmediaGroupId { get; set; }
         public Promenade.Models.Entities.Segment Segment { get; set; }
+
+        [DisplayName("Languages")]
         public ICollection<string> SegmentLanguages { get; set; }
     }
 }
