@@ -16,13 +16,6 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
-        public async Task<ICollection<EmediaCategory>> GetAllAsync()
-        {
-            return await DbSet
-                .AsNoTracking()
-                .ToListAsync();
-        }
-
         public async Task<ICollection<Category>> GetCategoriesForEmediaAsync(int emediaId)
         {
             return await DbSet
@@ -47,15 +40,6 @@ namespace Ocuda.Ops.Data.Promenade
                 .AsNoTracking()
                 .Where(_ => _.CategoryId == categoryId)
                 .ToListAsync();
-        }
-
-        public EmediaCategory GetByEmediaAndCategoryId
-            (int emediaId, int categoryId)
-        {
-            return DbSet
-                .AsNoTracking()
-                .Where(_ => _.EmediaId == emediaId && _.CategoryId == categoryId)
-                .FirstOrDefault();
         }
 
         public async Task<ICollection<EmediaCategory>> GetAllForEmediaAsync(int emediaId)

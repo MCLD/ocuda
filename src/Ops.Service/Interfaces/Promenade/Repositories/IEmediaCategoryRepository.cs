@@ -6,9 +6,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 {
     public interface IEmediaCategoryRepository : IGenericRepository<EmediaCategory>
     {
-        Task<ICollection<EmediaCategory>> GetAllAsync();
         Task<ICollection<EmediaCategory>> GetByCategoryIdAsync(int categoryId);
-        EmediaCategory GetByEmediaAndCategoryId(int emediaId, int categoryId);
         Task<ICollection<EmediaCategory>> GetAllForGroupAsync(int groupId);
         Task<ICollection<int>> GetCategoryIdsForEmediaAsync(int emediaId);
         void RemoveByEmediaAndCategories(int emediaId, ICollection<int> categoryIds);

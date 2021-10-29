@@ -9,7 +9,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     public interface IEmediaRepository : IGenericRepository<Emedia>
     {
         Task<Emedia> FindAsync(int id);
-        Task<ICollection<Emedia>> GetAllAsync();
         Task<Emedia> GetIncludingGroupAsync(int id);
         Task<DataWithCount<ICollection<Emedia>>> GetPaginatedListForGroupAsync(int groupId,
             BaseFilter filter);

@@ -38,14 +38,6 @@ namespace Ocuda.Ops.Data.Promenade
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<ICollection<Emedia>> GetAllAsync()
-        {
-            return await DbSet
-                .AsNoTracking()
-                .OrderBy(_ => _.Name)
-                .ToListAsync();
-        }
-
         public async Task<DataWithCount<ICollection<Emedia>>> GetPaginatedListForGroupAsync(
             int groupId, BaseFilter filter)
         {

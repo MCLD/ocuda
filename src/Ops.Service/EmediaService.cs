@@ -16,7 +16,6 @@ namespace Ocuda.Ops.Service
 {
     public class EmediaService : BaseService<EmediaService>, IEmediaService
     {
-        private readonly ICategoryRepository _categoryRepository;
         private readonly IEmediaRepository _emediaRepository;
         private readonly IEmediaCategoryRepository _emediaCategoryRepository;
         private readonly IEmediaGroupRepository _emediaGroupRepository;
@@ -25,7 +24,6 @@ namespace Ocuda.Ops.Service
 
         public EmediaService(ILogger<EmediaService> logger,
             IHttpContextAccessor httpContextAccessor,
-            ICategoryRepository categoryRepository,
             IEmediaRepository emediaRepository,
             IEmediaCategoryRepository emediaCategoryRepository,
             IEmediaGroupRepository emediaGroupRepository,
@@ -33,8 +31,6 @@ namespace Ocuda.Ops.Service
             ISegmentService segmentService)
             : base(logger, httpContextAccessor)
         {
-            _categoryRepository = categoryRepository
-                ?? throw new ArgumentNullException(nameof(categoryRepository));
             _emediaRepository = emediaRepository
                 ?? throw new ArgumentNullException(nameof(emediaRepository));
             _emediaCategoryRepository = emediaCategoryRepository
@@ -45,11 +41,6 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(emediaTextRepository));
             _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
-        }
-
-        public async Task<Emedia> GetByIdAsync(int id)
-        {
-            return await _emediaRepository.FindAsync(id);
         }
 
         public async Task<Emedia> GetIncludingGroupAsync(int id)
@@ -133,42 +124,9 @@ namespace Ocuda.Ops.Service
             return await _emediaTextReposiory.GetByEmediaAndLanguageAsync(emediaId, languageId);
         }
 
-        public async Task<ICollection<Emedia>> GetAllEmedia()
-        {
-            var emedias = (await _emediaRepository.GetAllAsync()).ToList();
-            var emediaCats = await _emediaCategoryRepository.GetAllAsync();
-            foreach (var emedia in emedias)
-            {
-                var emediaCategories = new List<Category>();
-                foreach (var emediacat in emediaCats.Where(_ => _.EmediaId == emedia.Id))
-                {
-                    var category = await _categoryRepository.FindAsync(emediacat.CategoryId);
-                    emediaCategories.Add(category);
-                }
-                emedia.Categories = emediaCategories;
-            }
-            return emedias;
-        }
-
-        public async Task<ICollection<EmediaCategory>>
-            GetEmediaCategoriesByCategoryId(int categoryId)
-        {
-            return await _emediaCategoryRepository.GetByCategoryIdAsync(categoryId);
-        }
-
         public async Task<ICollection<Category>> GetCategoriesForEmediaAsync(int emediaId)
         {
             return await _emediaCategoryRepository.GetCategoriesForEmediaAsync(emediaId);
-        }
-
-        public async Task AddEmediaCategory(EmediaCategory emediaCategory)
-        {
-            if (emediaCategory == null)
-            {
-                throw new ArgumentNullException(nameof(emediaCategory));
-            }
-            await _emediaCategoryRepository.AddAsync(emediaCategory);
-            await _emediaCategoryRepository.SaveAsync();
         }
 
         public async Task UpdateCategoriesAsync(int emediaId, ICollection<int> categoryIds)
