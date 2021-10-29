@@ -31,5 +31,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task AddGroupSegmentAsync(EmediaGroup group);
         Task<EmediaGroup> GetGroupIncludingSegmentAsync(int id);
         Task DeleteGroupSegmentAsync(int groupId);
+        Task<EmediaGroup> GetGroupUsingSegmentAsync(int segmentId);
     }
 }

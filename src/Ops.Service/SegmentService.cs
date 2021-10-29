@@ -153,8 +153,8 @@ namespace Ocuda.Ops.Service
         {
             var inUseBy = new List<string>();
 
-            var emediaGroups = await _emediaGroupRepository.GetUsingSegmentAsync(id);
-            foreach (var emediaGroup in emediaGroups)
+            var emediaGroup = await _emediaGroupRepository.GetUsingSegmentAsync(id);
+            if (emediaGroup != null)
             {
                 inUseBy.Add($"Emedia Group: {emediaGroup.Name}");
             }

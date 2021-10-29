@@ -209,6 +209,11 @@ namespace Ocuda.Ops.Service
             return await _emediaGroupRepository.GetIncludingSegmentAsync(id);
         }
 
+        public async Task<EmediaGroup> GetGroupUsingSegmentAsync(int segmentId)
+        {
+            return await _emediaGroupRepository.GetUsingSegmentAsync(segmentId);
+        }
+
         public async Task<DataWithCount<ICollection<EmediaGroup>>> GetPaginatedGroupListAsync(
             BaseFilter filter)
         {

@@ -15,6 +15,7 @@ using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
@@ -30,17 +31,21 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class SegmentsController : BaseController<SegmentsController>
     {
+        private readonly IEmediaService _emediaService;
         private readonly ILanguageService _languageService;
         private readonly ILocationService _locationService;
         private readonly IPermissionGroupService _permissionGroupService;
         private readonly ISegmentService _segmentService;
 
         public SegmentsController(ServiceFacades.Controller<SegmentsController> context,
+            IEmediaService emediaService,
             ILanguageService languageService,
             ILocationService locationService,
             IPermissionGroupService permissionGroupService,
             ISegmentService segmentService) : base(context)
         {
+            _emediaService = emediaService
+                ?? throw new ArgumentNullException(nameof(emediaService));
             _languageService = languageService
                 ?? throw new ArgumentNullException(nameof(languageService));
             _locationService = locationService
@@ -238,6 +243,19 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             else
             {
+                var emediaGroup = await _emediaService.GetGroupUsingSegmentAsync(segment.Id);
+
+                if (emediaGroup != null)
+                {
+                    backLink = Url.Action(nameof(EmediaController.GroupDetails),
+                        EmediaController.Name,
+                        new
+                        {
+                            id = emediaGroup.Id
+                        });
+                    relationship = "This segment is used by emedia group: " + emediaGroup.Name;
+                }
+               
                 var locations = await _locationService.GetLocationsBySegment(segment.Id);
 
                 if (locations?.Count == 1)
@@ -439,16 +457,22 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     var pageHeaderId = await _segmentService.GetPageHeaderIdForSegmentAsync(
                         segmentId);
-                    if (!pageHeaderId.HasValue)
+                    if (pageHeaderId.HasValue)
                     {
-                        return false;
-                    }
-                    var permissionGroups = await _permissionGroupService
-                        .GetPermissionsAsync<PermissionGroupPageContent>(pageHeaderId.Value);
-                    var permissionGroupsStrings = permissionGroups
-                        .Select(_ => _.PermissionGroupId.ToString(CultureInfo.InvariantCulture));
+                        var permissionGroups = await _permissionGroupService
+                            .GetPermissionsAsync<PermissionGroupPageContent>(pageHeaderId.Value);
+                        var permissionGroupsStrings = permissionGroups
+                            .Select(_ => _.PermissionGroupId.ToString(CultureInfo.InvariantCulture));
 
-                    return permissionClaims.Any(_ => permissionGroupsStrings.Contains(_));
+                        return permissionClaims.Any(_ => permissionGroupsStrings.Contains(_));
+                    }
+
+                    var emediaGroup = await _emediaService.GetGroupUsingSegmentAsync(segmentId);
+                    if (emediaGroup != null)
+                    {
+                        return await HasAppPermissionAsync(_permissionGroupService,
+                            ApplicationPermission.EmediaManagement);
+                    }
                 }
                 return false;
             }

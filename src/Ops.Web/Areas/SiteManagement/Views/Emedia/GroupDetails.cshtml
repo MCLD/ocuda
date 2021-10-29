@@ -52,6 +52,13 @@
             </div>
             <div class="row">
                 <div class="offset-md-3 col-md-9">
+                    <a asp-controller="@SegmentsController.Name" 
+                       asp-action="@nameof(SegmentsController.Detail)"
+                       asp-route-id="@Model.EmediaGroup.SegmentId"
+                       class="btn btn-outline-info">
+                        <span class="fa fa-file-alt"></span>
+                        Segment Details
+                    </a>
                     <button type="submit"
                             class="btn btn-outline-danger"
                             data-toggle="modal"

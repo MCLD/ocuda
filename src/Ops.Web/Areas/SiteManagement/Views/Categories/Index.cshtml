@@ -184,7 +184,7 @@
             if (emedia) {
                 dependentWarning.text("").removeClass("d-none");
 
-                var emedias = emedia.split("|");
+                var emedias = emedia.toString().split("|");
 
                 dependentWarning.append("<div>The following <strong>emedia</strong> use this category:</div>");
                 dependentWarning.append("<ul id=\"emediaDependents\"></ul>");

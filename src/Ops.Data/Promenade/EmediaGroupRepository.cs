@@ -85,12 +85,12 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
-        public async Task<ICollection<EmediaGroup>> GetUsingSegmentAsync(int segmentId)
+        public async Task<EmediaGroup> GetUsingSegmentAsync(int segmentId)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.SegmentId == segmentId)
-                .ToListAsync();
+                .SingleOrDefaultAsync();
         }
     }
 }

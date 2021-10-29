@@ -101,45 +101,42 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
-                if (ModelState.IsValid)
+                response = new JsonResponse
                 {
-                    try
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+            else if (ModelState.IsValid)
+            {
+                try
+                {
+                    var group = await _emediaService.CreateGroupAsync(model.EmediaGroup);
+                    response = new JsonResponse
                     {
-                        var group = await _emediaService.CreateGroupAsync(model.EmediaGroup);
-                        response = new JsonResponse
-                        {
-                            Success = true,
-                            Url = Url.Action(nameof(GroupDetails), new { id = group.Id })
-                        };
-                    }
-                    catch (OcudaException ex)
-                    {
-                        response = new JsonResponse
-                        {
-                            Success = false,
-                            Message = ex.Message
-                        };
-                    }
+                        Success = true,
+                        Url = Url.Action(nameof(GroupDetails), new { id = group.Id })
+                    };
                 }
-                else
+                catch (OcudaException ex)
                 {
-                    var errors = ModelState.Values
-                        .SelectMany(_ => _.Errors)
-                        .Select(_ => _.ErrorMessage);
-
                     response = new JsonResponse
                     {
                         Success = false,
-                        Message = string.Join(Environment.NewLine, errors)
+                        Message = ex.Message
                     };
                 }
             }
             else
             {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
                 response = new JsonResponse
                 {
-                    Message = "Unauthorized",
-                    Success = false
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
                 };
             }
 
@@ -155,46 +152,43 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
-                if (ModelState.IsValid)
+                response = new JsonResponse
                 {
-                    try
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+            else if (ModelState.IsValid)
+            {
+                try
+                {
+                    var group = await _emediaService.EditGroupAsync(model.EmediaGroup);
+                    response = new JsonResponse
                     {
-                        var group = await _emediaService.EditGroupAsync(model.EmediaGroup);
-                        response = new JsonResponse
-                        {
-                            Success = true
-                        };
+                        Success = true
+                    };
 
-                        ShowAlertSuccess($"Updated group: {group.Name}");
-                    }
-                    catch (OcudaException ex)
-                    {
-                        response = new JsonResponse
-                        {
-                            Success = false,
-                            Message = ex.Message
-                        };
-                    }
+                    ShowAlertSuccess($"Updated group: {group.Name}");
                 }
-                else
+                catch (OcudaException ex)
                 {
-                    var errors = ModelState.Values
-                        .SelectMany(_ => _.Errors)
-                        .Select(_ => _.ErrorMessage);
-
                     response = new JsonResponse
                     {
                         Success = false,
-                        Message = string.Join(Environment.NewLine, errors)
+                        Message = ex.Message
                     };
                 }
             }
             else
             {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
                 response = new JsonResponse
                 {
-                    Message = "Unauthorized",
-                    Success = false
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
                 };
             }
 
@@ -234,6 +228,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
+                response = new JsonResponse
+                {
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+            else
+            {
                 try
                 {
                     await _emediaService.UpdateGroupSortOrder(id, increase);
@@ -250,14 +252,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         Success = false
                     };
                 }
-            }
-            else
-            {
-                response = new JsonResponse
-                {
-                    Message = "Unauthorized",
-                    Success = false
-                };
             }
 
             return Json(response);
@@ -331,64 +325,62 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
-                if (ModelState.IsValid)
+                response = new JsonResponse
                 {
-                    try
-                    {
-                        string url = null;
-
-                        var group = await _emediaService.GetGroupByIdAsync(model.EmediaGroupId);
-                        if (group.SegmentId.HasValue)
-                        {
-                            var segment = await _segmentService.GetByIdAsync(group.SegmentId.Value);
-                            segment.Name = model.Segment.Name;
-                            segment = await _segmentService.EditAsync(segment);
-                            ShowAlertSuccess($"Updated group segment: {segment.Name}");
-                        }
-                        else
-                        {
-                            group.Segment = model.Segment;
-                            await _emediaService.AddGroupSegmentAsync(group);
-                            url = Url.Action(
-                                nameof(SegmentsController.Detail),
-                                SegmentsController.Name,
-                                new { id = group.SegmentId });
-                        }
-
-                        response = new JsonResponse
-                        {
-                            Success = true,
-                            Url = url
-                        };
-                    }
-                    catch (Exception ex)
-                    {
-                        response = new JsonResponse
-                        {
-                            Success = false,
-                            Message = ex.Message
-                        };
-                    }
-                }
-                else
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+            else if (ModelState.IsValid)
+            {
+                try
                 {
-                    var errors = ModelState.Values
-                        .SelectMany(_ => _.Errors)
-                        .Select(_ => _.ErrorMessage);
+                    string url = null;
+
+                    var group = await _emediaService.GetGroupByIdAsync(model.EmediaGroupId);
+                    if (group.SegmentId.HasValue)
+                    {
+                        var segment = await _segmentService.GetByIdAsync(group.SegmentId.Value);
+                        segment.Name = model.Segment.Name;
+                        segment = await _segmentService.EditAsync(segment);
+                        ShowAlertSuccess($"Updated group segment: {segment.Name}");
+                    }
+                    else
+                    {
+                        group.Segment = model.Segment;
+                        group.Segment.IsActive = true;
+                        await _emediaService.AddGroupSegmentAsync(group);
+                        url = Url.Action(
+                            nameof(SegmentsController.Detail),
+                            SegmentsController.Name,
+                            new { id = group.SegmentId });
+                    }
 
                     response = new JsonResponse
                     {
+                        Success = true,
+                        Url = url
+                    };
+                }
+                catch (Exception ex)
+                {
+                    response = new JsonResponse
+                    {
                         Success = false,
-                        Message = string.Join(Environment.NewLine, errors)
+                        Message = ex.Message
                     };
                 }
             }
             else
             {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
                 response = new JsonResponse
                 {
-                    Message = "Unauthorized",
-                    Success = false
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
                 };
             }
 
@@ -432,45 +424,42 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
-                if (ModelState.IsValid)
+                response = new JsonResponse
                 {
-                    try
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+            else if (ModelState.IsValid)
+            {
+                try
+                {
+                    var group = await _emediaService.CreateAsync(model.Emedia);
+                    response = new JsonResponse
                     {
-                        var group = await _emediaService.CreateAsync(model.Emedia);
-                        response = new JsonResponse
-                        {
-                            Success = true,
-                            Url = Url.Action(nameof(Details), new { id = group.Id })
-                        };
-                    }
-                    catch (OcudaException ex)
-                    {
-                        response = new JsonResponse
-                        {
-                            Success = false,
-                            Message = ex.Message
-                        };
-                    }
+                        Success = true,
+                        Url = Url.Action(nameof(Details), new { id = group.Id })
+                    };
                 }
-                else
+                catch (OcudaException ex)
                 {
-                    var errors = ModelState.Values
-                        .SelectMany(_ => _.Errors)
-                        .Select(_ => _.ErrorMessage);
-
                     response = new JsonResponse
                     {
                         Success = false,
-                        Message = string.Join(Environment.NewLine, errors)
+                        Message = ex.Message
                     };
                 }
             }
             else
             {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
                 response = new JsonResponse
                 {
-                    Message = "Unauthorized",
-                    Success = false
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
                 };
             }
 
@@ -486,46 +475,43 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
-                if (ModelState.IsValid)
+                response = new JsonResponse
                 {
-                    try
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+            else if (ModelState.IsValid)
+            {
+                try
+                {
+                    var emedia = await _emediaService.EditAsync(model.Emedia);
+                    response = new JsonResponse
                     {
-                        var emedia = await _emediaService.EditAsync(model.Emedia);
-                        response = new JsonResponse
-                        {
-                            Success = true
-                        };
+                        Success = true
+                    };
 
-                        ShowAlertSuccess($"Updated emedia: {emedia.Name}");
-                    }
-                    catch (OcudaException ex)
-                    {
-                        response = new JsonResponse
-                        {
-                            Success = false,
-                            Message = ex.Message
-                        };
-                    }
+                    ShowAlertSuccess($"Updated emedia: {emedia.Name}");
                 }
-                else
+                catch (OcudaException ex)
                 {
-                    var errors = ModelState.Values
-                        .SelectMany(_ => _.Errors)
-                        .Select(_ => _.ErrorMessage);
-
                     response = new JsonResponse
                     {
                         Success = false,
-                        Message = string.Join(Environment.NewLine, errors)
+                        Message = ex.Message
                     };
                 }
             }
             else
             {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
                 response = new JsonResponse
                 {
-                    Message = "Unauthorized",
-                    Success = false
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
                 };
             }
 
@@ -650,6 +636,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.EmediaManagement))
             {
+                response = new JsonResponse
+                {
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+            else
+            {
                 try
                 {
                     await _emediaService.UpdateCategoriesAsync(id, categories);
@@ -666,14 +660,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         Success = false
                     };
                 }
-            }
-            else
-            {
-                response = new JsonResponse
-                {
-                    Message = "Unauthorized",
-                    Success = false
-                };
             }
 
             return Json(response);

@@ -15,6 +15,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
         Task<int?> GetMaxSortOrderAsync();
         Task<DataWithCount<ICollection<EmediaGroup>>> GetPaginatedListAsync(BaseFilter filter);
         Task<List<EmediaGroup>> GetSubsequentGroupsAsync(int order);
-        Task<ICollection<EmediaGroup>> GetUsingSegmentAsync(int segmentId);
+        Task<EmediaGroup> GetUsingSegmentAsync(int segmentId);
     }
 }
