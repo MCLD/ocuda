@@ -29,29 +29,24 @@ namespace Ocuda.Ops.Data.Promenade
             return entity;
         }
 
-        public async Task<ICollection<Emedia>> GetAllAsync()
+        public async Task<Emedia> GetIncludingGroupAsync(int id)
         {
             return await DbSet
+                .Include(_ => _.Group)
+                .Where(_ => _.Id == id)
                 .AsNoTracking()
-                .OrderBy(_ => _.Name)
-                .ToListAsync();
+                .FirstOrDefaultAsync();
         }
 
-        public Emedia GetByStub(string emediaStub)
+        public async Task<DataWithCount<ICollection<Emedia>>> GetPaginatedListForGroupAsync(
+            int groupId, BaseFilter filter)
         {
-            return DbSet
-                .AsNoTracking()
-                .Where(_ => _.Stub == emediaStub)
-                .FirstOrDefault();
-        }
+            var query = DbSet.AsNoTracking().Where(_ => _.GroupId == groupId);
 
-        public async Task<DataWithCount<ICollection<Emedia>>> GetPaginatedListAsync(
-            BaseFilter filter)
-        {
             return new DataWithCount<ICollection<Emedia>>
             {
-                Count = await DbSet.AsNoTracking().CountAsync(),
-                Data = await DbSet.AsNoTracking()
+                Count = await query.CountAsync(),
+                Data = await query
                     .OrderBy(_ => _.Name)
                     .ApplyPagination(filter)
                     .ToListAsync()

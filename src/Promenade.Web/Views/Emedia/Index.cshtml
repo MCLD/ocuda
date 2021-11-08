@@ -6,13 +6,24 @@
 
 @foreach (var group in Model.GroupedEmedia)
 {
-    if (!string.IsNullOrWhiteSpace(group.Segment?.SegmentText?.Text))
+    if (group.Segment?.SegmentText != null)
     {
-        <div class="row">
-            <div class="col-12">
-                @Html.Raw(group.Segment.SegmentText.Text)
+        if (!string.IsNullOrWhiteSpace(group.Segment.SegmentText.Header))
+        {
+            <div class="row">
+                <div class="col-12">
+                    <h1>@group.Segment.SegmentText.Header</h1>
+                </div>
             </div>
-        </div>
+        }
+        if (!string.IsNullOrWhiteSpace(group.Segment.SegmentText.Text))
+        {
+            <div class="row">
+                <div class="col-12">
+                    @Html.Raw(group.Segment.SegmentText.Text)
+                </div>
+            </div>
+        }
     }
     if (group.Emedias.Any())
     {
@@ -31,7 +42,7 @@
                                    class="emedia-help fa-pull-right"
                                    data-target="#infoModal"
                                    data-toggle="modal"
-                                   data-name="@emedia.Name Help"
+                                   data-name="@Localizer[Promenade.HelpItem, emedia.Name]"
                                    data-details="@emedia.EmediaText.Details"
                                    title="@Localizer[Promenade.HelpItem, emedia.Name]">
                                     <span class="fas fa-question-circle"></span>

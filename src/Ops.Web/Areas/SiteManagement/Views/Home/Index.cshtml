@@ -34,6 +34,22 @@
         <div class="col-12 col-md-4 my-2">
             <div class="card">
                 <div class="card-header lead font-weight-bold">
+                    @CategoriesController.Name
+                </div>
+                <div class="card-body">
+                    <a asp-area="@CategoriesController.Area"
+                       asp-controller="@CategoriesController.Name"
+                       asp-action="@nameof(CategoriesController.Index)"
+                       class="btn btn-outline-info mt-1">@CategoriesController.Name</a>
+                </div>
+            </div>
+        </div>
+    }
+    @if (Model.IsSiteManager || Model.HasEmediaPermissions)
+    {
+        <div class="col-12 col-md-4 my-2">
+            <div class="card">
+                <div class="card-header lead font-weight-bold">
                     @EmediaController.Name
                 </div>
                 <div class="card-body">
@@ -41,13 +57,12 @@
                        asp-controller="@EmediaController.Name"
                        asp-action="@nameof(EmediaController.Index)"
                        class="btn btn-outline-info mt-1">@EmediaController.Name</a>
-                    <a asp-area="@CategoriesController.Area"
-                       asp-controller="@CategoriesController.Name"
-                       asp-action="@nameof(CategoriesController.Index)"
-                       class="btn btn-outline-info mt-1">Emedia Categories</a>
                 </div>
             </div>
         </div>
+    }
+    @if (Model.IsSiteManager)
+    {
         <div class="col-12 col-md-4 my-2">
             <div class="card">
                 <div class="card-header lead font-weight-bold">

@@ -1,0 +1,56 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Categories.DetailsViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Category
+            <small class="text-muted">@Model.Category.Name</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a asp-action="@(nameof(EmediaController.Index))"
+           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+    </div>
+</div>
+
+<div class="row pt-3">
+    <div class="col-12">
+        <select asp-for="SelectedLanguage" asp-items="Model.LanguageList" formgroup></select>
+    </div>
+</div>
+
+<div class="row pb-3">
+    <div class="col-12 col-md-9 offset-md-3">
+        <hr />
+    </div>
+</div>
+
+<form asp-action="@nameof(CategoriesController.Details)" method="post" role="form">
+    <input asp-for="CategoryText.CategoryId" value="@Model.Category.Id" type="hidden" />
+    <input asp-for="CategoryText.LanguageId" value="@Model.LanguageId" type="hidden" />
+    <input asp-for="LanguageId" type="hidden" />
+
+    <input asp-for="CategoryText.Text" formgroup />
+
+    <div class="row">
+        <div class="offset-md-3 col-md-9">
+            <button type="submit"
+                    class="btn btn-outline-success btn-lg"
+                    buttonspinner>
+                <span class="far fa-save"></span>
+                Save
+            </button>
+        </div>
+    </div>
+</form>
+
+@section scripts {
+    <script>
+        var categoryDetailsUrl
+            = "@Url.Action(nameof(CategoriesController.Details), new { id = Model.Category.Id})";
+
+        $("#SelectedLanguage").on("change", function () {
+            window.location.href = categoryDetailsUrl + "?language=" + $(this).val();
+        });
+    </script>
+}

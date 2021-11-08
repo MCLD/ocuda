@@ -49,13 +49,5 @@ namespace Ocuda.Ops.Data.Promenade
                     .ToListAsync()
             };
         }
-
-        public Category GetByClass(string categoryClass)
-        {
-            return DbSet
-                .AsNoTracking()
-                .Where(_ => _.Class == categoryClass)
-                .FirstOrDefault();
-        }
     }
 }

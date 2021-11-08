@@ -9,12 +9,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     public interface ICategoryRepository : IGenericRepository<Category>
     {
         Task<Category> FindAsync(int id);
-
         Task<ICollection<Category>> GetAllAsync();
-
-        Task<DataWithCount<ICollection<Category>>> GetPaginatedListAsync(
-            BaseFilter filter);
-
-        Category GetByClass(string categoryClass);
+        Task<DataWithCount<ICollection<Category>>> GetPaginatedListAsync(BaseFilter filter);
     }
 }

@@ -1,0 +1,147 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Emedia.DetailsViewModel
+
+@section styles {
+    <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
+}
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Emedia
+            <small class="text-muted">@Model.Emedia.Name</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a asp-action="@(nameof(EmediaController.GroupDetails))"
+           asp-route-id="@Model.Emedia.GroupId"
+           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+    </div>
+</div>
+
+<div class="row pt-3">
+    <div class="col-12">
+        <input asp-for="Emedia.Group.Name"
+               formgroup
+               hide-required="true"
+               label-name="Group"
+               readonly />
+        <input asp-for="Emedia.RedirectUrl"
+               formgroup
+               hide-required="true"
+               readonly />
+        <div class="row form-group">
+            <label class="col-form-label text-md-right col-md-3" for="CategorySelection">Categories</label>
+            <div class="form-group-inner col-md-9">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <button class="btn btn-primary"
+                                type="button"
+                                data-toggle="modal"
+                                data-target="#categoryModal">
+                            <span class="far fa-edit"></span>
+                        </button>
+                    </div>
+                    <input asp-for="CategorySelection" value="@Model.CategorySelectionText" class="form-control" readonly />
+                </div>
+            </div>
+        </div>
+        <select asp-for="SelectedLanguage" asp-items="Model.LanguageList" formgroup></select>
+    </div>
+</div>
+
+<div class="row pb-3">
+    <div class="col-12 col-md-9 offset-md-3">
+        <hr />
+    </div>
+</div>
+
+<form asp-action="@nameof(EmediaController.Details)" method="post" role="form">
+    <input asp-for="EmediaText.EmediaId" value="@Model.Emedia.Id" type="hidden" />
+    <input asp-for="EmediaText.LanguageId" value="@Model.LanguageId" type="hidden" />
+    <input asp-for="LanguageId" type="hidden" />
+
+    <textarea asp-for="EmediaText.Description" formgroup></textarea>
+
+    <div class="form-group row">
+        <div class="col-md-3 text-md-right">
+            <label asp-for="EmediaText.Details" class="col-form-label"></label>
+        </div>
+        <div class="form-group-inner col-md-9">
+            <textarea asp-for="EmediaText.Details" markdown-editor></textarea>
+            <span asp-validation-for="EmediaText.Details"
+                  class="validation-message text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="offset-md-3 col-md-9">
+            <button type="submit"
+                    class="btn btn-outline-success btn-lg"
+                    buttonspinner>
+                <span class="far fa-save"></span>
+                Save
+            </button>
+        </div>
+    </div>
+</form>
+
+<form id="categoryForm" role="form">
+    <input asp-for="Emedia.Id" type="hidden" />
+
+    <div modal
+         id="categoryModal"
+         name="Categories"
+         type="ModalTypes.Edit">
+
+        @foreach (var category in Model.CategoryList)
+        {
+            <div>
+                <input id="@($"category{category.Id}")"
+                       class="categorySelector"
+                       data-id="@category.Id"
+                       type="checkbox"
+                       checked="@(Model.CategorySelection?.Contains(category.Id) == true ? "checked" : null)" />
+                <label for="@($"category{category.Id}")">
+                    @category.Name
+                </label>
+            </div>
+        }
+    </div>
+</form>
+
+@section scripts {
+    <script src="~/js/md.min.js" asp-append-version="true"></script>
+
+    <script>
+        var editor = new Markdown.Editor($("#EmediaText_Details"), { allowUploads: true });
+        editor.run();
+
+        var emediaDetailsUrl
+            = "@Url.Action(nameof(EmediaController.Details), new { id = Model.Emedia.Id})";
+
+        $("#SelectedLanguage").on("change", function () {
+            window.location.href = emediaDetailsUrl + "?language=" + $(this).val();
+        });
+
+        $("#categoryForm").submit(function (e) {
+            e.preventDefault();
+
+            var id = @Model.Emedia.Id;
+            var categories = $(".categorySelector:checked")
+                .map(function () { return $(this).data("id"); })
+                .get();
+
+            $.post("@Url.Action(nameof(EmediaController.ChangeCategories), EmediaController.Name)",
+                { id, categories },
+                function (response) {
+                    if (response.success == true) {
+                        location.reload();
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners($(this).find(".btn-spinner"));
+                    }
+                });
+        });
+    </script>
+}

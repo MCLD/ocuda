@@ -26,6 +26,7 @@ namespace Ocuda.Utility.TagHelpers
         private const string forAttributeName = "asp-for";
         private const string hideLabelAttributeName = "hide-label";
         private const string hideLabelInnerDivClass = "form-group-inner col-12";
+        private const string hideRequiredAttributeName = "hide-required";
         private const string ignoreValidationAttributeName = "ignore-validation";
         private const string infoTooltipAttributeName = "info-tooltip";
         private const string labelClassAttribute = "label-class";
@@ -48,6 +49,9 @@ namespace Ocuda.Utility.TagHelpers
 
         [HtmlAttributeName(hideLabelAttributeName)]
         public bool HideLabel { get; set; }
+
+        [HtmlAttributeName(hideRequiredAttributeName)]
+        public bool HideRequired { get; set; }
 
         [HtmlAttributeName(ignoreValidationAttributeName)]
         public bool IgnoreValidation { get; set; }
@@ -183,8 +187,8 @@ namespace Ocuda.Utility.TagHelpers
                 labelOutput.Content.AppendHtml(tooltip.RenderSelfClosingTag());
             }
 
-            if (output.Attributes.ContainsName("data-val-required")
-                || output.Attributes.ContainsName("formgroup-val-required"))
+            if (!HideRequired && (output.Attributes.ContainsName("data-val-required")
+                || output.Attributes.ContainsName("formgroup-val-required")))
             {
                 var icon = new TagBuilder("span");
                 icon.AddCssClass(requiredFieldClass);

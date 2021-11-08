@@ -16,18 +16,21 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
-        public async Task<ICollection<EmediaCategory>> GetAllAsync()
-        {
-            return await DbSet
-                .AsNoTracking()
-                .ToListAsync();
-        }
-
-        public async Task<ICollection<EmediaCategory>> GetByEmediaIdAsync(int emediaId)
+        public async Task<ICollection<Category>> GetCategoriesForEmediaAsync(int emediaId)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.EmediaId == emediaId)
+                .Select(_ => _.Category)
+                .ToListAsync();
+        }
+
+        public async Task<ICollection<int>> GetCategoryIdsForEmediaAsync(int emediaId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.EmediaId == emediaId)
+                .Select(_ => _.CategoryId)
                 .ToListAsync();
         }
 
@@ -39,13 +42,39 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
-        public EmediaCategory GetByEmediaAndCategoryId
-            (int emediaId, int categoryId)
+        public async Task<ICollection<EmediaCategory>> GetAllForEmediaAsync(int emediaId)
         {
-            return DbSet
+            return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.EmediaId == emediaId && _.CategoryId == categoryId)
-                .FirstOrDefault();
+                .Where(_ => _.EmediaId == emediaId)
+                .ToListAsync();
+        }
+
+        public async Task<ICollection<EmediaCategory>> GetAllForGroupAsync(int groupId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Emedia.GroupId == groupId)
+                .ToListAsync();
+        }
+
+        public async Task<ICollection<string>> GetEmediasForCategoryAsync(int categoryId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.CategoryId == categoryId)
+                .Select(_ => _.Emedia.Name)
+                .OrderBy(_ => _)
+                .ToListAsync();
+        }
+
+        public void RemoveByEmediaAndCategories(int emediaId, ICollection<int> categoryIds)
+        {
+            var emediaCategories = DbSet
+                .AsNoTracking()
+                .Where(_ => _.EmediaId == emediaId && categoryIds.Contains(_.CategoryId));
+
+            DbSet.RemoveRange(emediaCategories);
         }
     }
 }
