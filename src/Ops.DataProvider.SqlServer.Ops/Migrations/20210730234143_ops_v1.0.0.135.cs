@@ -53,9 +53,16 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
 
-            migrationBuilder.Sql("DECLARE @SysadminId int;"
-                + "SET @SysadminId = (SELECT TOP 1[Id] FROM[Users] WHERE[IsSysadmin] = 1);"
-                + "INSERT INTO [Sections] "
+            migrationBuilder.Sql(
+                "DECLARE @SysadminId int = (SELECT TOP 1[Id] FROM[Users] WHERE[IsSysadmin] = 1);"
+                + "IF @SysadminId IS NULL"
+                + " BEGIN"
+                + "  INSERT INTO[Users]([CreatedAt], [CreatedBy], [ExcludeFromRoster], [IsDeleted],"
+                + "    [IsSysadmin], [Name], [ReauthenticateUser], [Username])"
+                + "    VALUES (GETDATE(), 0, 0, 0, 1, 'System', 0, 'sysadmin');"
+                + "  SET @SysadminId = SCOPE_IDENTITY();"
+                + " END"
+                + " INSERT INTO [Sections] "
                 + " ([CreatedAt], [CreatedBy], [Name], [Icon], [Stub], [IsHomeSection])"
                 + " VALUES(GETDATE(), @SysadminId, 'Home', 'fas fa-info-circle', 'Home', 1);");
         }
