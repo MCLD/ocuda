@@ -1,0 +1,60 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Products.ProductViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Product
+            <small class="text-muted">@Model.Product.Name</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a asp-controller="@HomeController.Name"
+           asp-action="@(nameof(HomeController.Index))"
+           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div>
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Updated At</th>
+                        <th>Updated By</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var inventory in Model.LocationInventories)
+                    {
+                    <tr>
+                        <td class="align-middle">@inventory.Location.Name</td>
+                        <td class="align-middle">@inventory.InventoryStatus</td>
+                        <td class="align-middle">@inventory.UpdatedAt</td>
+                        <td class="align-middle">
+                            <a 
+                               asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
+                               asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
+                               asp-route-id="@inventory.UpdatedByUsername">
+                                @inventory.UpdatedByName
+                            </a>
+                        </td>
+                        <td class="align-middle">
+                            <a class="btn btn-sm btn-outline-dark"
+                               asp-action="@nameof(ProductsController.LocationInventory)"
+                               asp-route-locationid="@inventory.LocationId"
+                               asp-route-slug="@Model.Product.Slug">
+                                <span class="fas fa-edit"></span>
+                                Update
+                            </a>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

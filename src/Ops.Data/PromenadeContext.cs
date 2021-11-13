@@ -91,6 +91,10 @@ namespace Ocuda.Ops.Data
 
         public DbSet<Podcast> Podcasts { get; set; }
 
+        public DbSet<ProductLocationInventory> ProductLocationInventories { get; set; }
+
+        public DbSet<Product> Products { get; set; }
+
         public DbSet<ScheduleRequest> ScheduleRequest { get; set; }
 
         public DbSet<ScheduleRequestLimit> ScheduleRequestLimits { get; set; }
@@ -148,6 +152,8 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.PageLayoutId, _.LanguageId });
             modelBuilder.Entity<PodcastDirectoryInfo>()
                 .HasKey(_ => new { _.PodcastId, _.PodcastDirectoryId });
+            modelBuilder.Entity<ProductLocationInventory>()
+                .HasKey(_ => new { _.ProductId, _.LocationId });
             modelBuilder.Entity<ScheduleRequestLimit>()
                 .HasKey(_ => new { _.DayOfWeek, _.Hour });
             modelBuilder.Entity<ScheduleRequestSubjectText>()
