@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Products;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
@@ -71,6 +72,30 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             };
 
             return View(viewModel);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> UpdateInventoryStatus(LocationInventoryViewModel model)
+        {
+            try
+            {
+                await _productService.UpdateInventoryStatus(model.ProductId, model.LocationId, 
+                    model.InventoryStatus);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating inventory status: {Message}", ex.Message);
+                ShowAlertDanger($"Error updating inventory status");
+                return RedirectToAction(nameof(LocationInventory), new
+                {
+                    slug = model.ProductSlug,
+                    locationId = model.LocationId
+                });
+            }
+
+            ShowAlertSuccess($"Inventory status updated for {model.LocationName}");
+            return RedirectToAction(nameof(Product), new { slug = model.ProductSlug });
         }
     }
 }

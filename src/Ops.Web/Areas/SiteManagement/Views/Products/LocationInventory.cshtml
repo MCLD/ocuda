@@ -49,13 +49,26 @@
             <div class="card-header">
                 <span class="h5">Update Status</span>
             </div>
-            <div class="card-body p-0">
-                <select asp-for="InventoryStatus" 
-                        asp-items="Html.GetEnumSelectList<ProductLocationInventory.Status>()"
-                        hide-label="true" 
-                        formgroup>
-                    <option selected="selected"></option>
-                </select>
+            <div class="card-body">
+                <form asp-controller="@ProductsController.Name"
+                      asp-action="@(nameof(ProductsController.UpdateInventoryStatus))"
+                      method="post"
+                      role="form">
+                    <input asp-for="ProductId" value="@Model.LocationInventory.ProductId" type="hidden" />
+                    <input asp-for="LocationId" value="@Model.LocationInventory.LocationId" type="hidden" />
+                    <input asp-for="LocationName" value="@Model.LocationInventory.Location.Name" type="hidden" />
+                    <input asp-for="ProductSlug" value="@Model.Product.Slug" type="hidden" />
+                    <select asp-for="InventoryStatus"
+                            asp-items="Html.GetEnumSelectList<ProductLocationInventory.Status>()"
+                            hide-label="true"
+                            formgroup>
+                    </select>
+                    <button class="btn btn-primary"
+                            type="submit"
+                            button-spinner>
+                        Update
+                    </button>
+                </form>
             </div>
         </div>
     </div>
