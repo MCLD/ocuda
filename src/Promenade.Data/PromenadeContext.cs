@@ -99,6 +99,8 @@ namespace Ocuda.Promenade.Data
                 .HasKey(_ => new { _.PageLayoutId, _.LanguageId });
             modelBuilder.Entity<PodcastDirectoryInfo>()
                 .HasKey(_ => new { _.PodcastId, _.PodcastDirectoryId });
+            modelBuilder.Entity<ProductLocationInventory>()
+                .HasKey(_ => new { _.ProductId, _.LocationId });
             modelBuilder.Entity<ScheduleRequestLimit>()
                 .HasKey(_ => new { _.DayOfWeek, _.Hour });
             modelBuilder.Entity<ScheduleRequestSubjectText>()
