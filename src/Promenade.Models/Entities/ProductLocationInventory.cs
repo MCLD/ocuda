@@ -6,23 +6,30 @@ namespace Ocuda.Promenade.Models.Entities
 {
     public class ProductLocationInventory
     {
+        public enum Status
+        {
+            None,
+            Few,
+            Many
+        }
+
+        public DateTime CreatedAt { get; set; }
+
+        public int CreatedBy { get; set; }
+
+        public Status InventoryStatus { get; set; }
+
+        public Location Location { get; set; }
+
         [Key]
         [Required]
-        public int ProductId { get; set; }
+        public int LocationId { get; set; }
 
         public Product Product { get; set; }
 
         [Key]
         [Required]
-        public int LocationId { get; set; }
-        
-        public Location Location { get; set; }
-
-        public Status InventoryStatus { get; set; }
-
-        public DateTime CreatedAt { get; set; }
-
-        public int CreatedBy { get; set; }
+        public int ProductId { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
 
@@ -33,12 +40,5 @@ namespace Ocuda.Promenade.Models.Entities
 
         [NotMapped]
         public string UpdatedByUsername { get; set; }
-
-        public enum Status
-        {
-            None,
-            Low,
-            High
-        }
     }
 }

@@ -14,9 +14,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     {
         private readonly IProductService _productService;
 
-        public static string Name { get { return "Products"; } }
-        public static string Area { get { return "SiteManagement"; } }
-
         public ProductsController(ServiceFacades.Controller<ProductsController> context,
             IProductService productService)
             : base(context)
@@ -25,27 +22,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(productService));
         }
 
-        [Route("{slug}")]
-        public async Task<IActionResult> Product(string slug)
-        {
-            var product = await _productService.GetBySlugAsnyc(slug);
+        public static string Area
+        { get { return "SiteManagement"; } }
 
-            if (product == null)
-            {
-                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
-            }
-
-            var locationInventories = await _productService
-                .GetLocationInventoriesForProductAsync(product.Id);
-
-            var viewModel = new ProductViewModel
-            {
-                Product = product,
-                LocationInventories = locationInventories
-            };
-
-            return View(viewModel);
-        }
+        public static string Name
+        { get { return "Products"; } }
 
         [Route("{slug}/{locationId}")]
         public async Task<IActionResult> LocationInventory(string slug, int locationId)
@@ -74,13 +55,35 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return View(viewModel);
         }
 
+        [Route("{slug}")]
+        public async Task<IActionResult> Product(string slug)
+        {
+            var product = await _productService.GetBySlugAsnyc(slug);
+
+            if (product == null)
+            {
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
+
+            var locationInventories = await _productService
+                .GetLocationInventoriesForProductAsync(product.Id);
+
+            var viewModel = new ProductViewModel
+            {
+                Product = product,
+                LocationInventories = locationInventories
+            };
+
+            return View(viewModel);
+        }
+
         [HttpPost]
         [Route("[action]")]
         public async Task<IActionResult> UpdateInventoryStatus(LocationInventoryViewModel model)
         {
             try
             {
-                await _productService.UpdateInventoryStatus(model.ProductId, model.LocationId, 
+                await _productService.UpdateInventoryStatus(model.ProductId, model.LocationId,
                     model.InventoryStatus);
             }
             catch (Exception ex)
