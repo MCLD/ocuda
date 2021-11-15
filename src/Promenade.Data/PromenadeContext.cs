@@ -54,6 +54,8 @@ namespace Ocuda.Promenade.Data
         public DbSet<PodcastDirectoryInfo> PodcastDirectoryInfos { get; set; }
         public DbSet<PodcastItem> PodcastItems { get; }
         public DbSet<Podcast> Podcasts { get; }
+        public DbSet<ProductLocationInventory> ProductLocationInventories { get; }
+        public DbSet<Product> Products { get; }
         public DbSet<ScheduleRequest> ScheduleRequest { get; set; }
         public DbSet<ScheduleRequestLimit> ScheduleRequestLimits { get; }
         public DbSet<ScheduleRequestSubject> ScheduleRequestSubject { get; }
