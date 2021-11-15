@@ -1,0 +1,75 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Products.LocationInventoryViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Product
+            <small class="text-muted">@Model.Product.Name</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a asp-controller="@ProductsController.Name"
+           asp-action="@(nameof(ProductsController.Product))"
+           asp-route-slug="@Model.Product.Slug"
+           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-md-6">
+        <div class="card mb-2">
+            <div class="card-header">
+                <span class="h5 font-weight-bold">@Model.LocationInventory.Location.Name</span>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <tr>
+                        <th>Status</th>
+                        <td>@Model.LocationInventory.InventoryStatus</td>
+                    </tr>
+                    <tr>
+                        <th>Updated At</th>
+                        <td>@Model.LocationInventory.UpdatedAt</td>
+                    </tr>
+                    <tr>
+                        <th>Updated By</th>
+                        <td>
+                            <a asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
+                               asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
+                               asp-route-id="@Model.LocationInventory.UpdatedByUsername">@Model.LocationInventory.UpdatedByName</a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <div class="card mb-2">
+            <div class="card-header">
+                <span class="h5">Update On-hand Count</span>
+            </div>
+            <div class="card-body">
+                <form asp-controller="@ProductsController.Name"
+                      asp-action="@(nameof(ProductsController.UpdateInventoryStatus))"
+                      method="post"
+                      role="form">
+                    <input asp-for="ProductId" value="@Model.LocationInventory.ProductId" type="hidden" />
+                    <input asp-for="LocationId" value="@Model.LocationInventory.LocationId" type="hidden" />
+                    <input asp-for="LocationName" value="@Model.LocationInventory.Location.Name" type="hidden" />
+                    <input asp-for="ProductSlug" value="@Model.Product.Slug" type="hidden" />
+                    <select asp-for="InventoryStatus"
+                            asp-items="Html.GetEnumSelectList<ProductLocationInventory.Status>()"
+                            hide-label="true"
+                            formgroup>
+                    </select>
+                    <button class="btn btn-primary"
+                            type="submit"
+                            button-spinner>
+                        Update
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

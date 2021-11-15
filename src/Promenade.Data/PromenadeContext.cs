@@ -54,6 +54,8 @@ namespace Ocuda.Promenade.Data
         public DbSet<PodcastDirectoryInfo> PodcastDirectoryInfos { get; set; }
         public DbSet<PodcastItem> PodcastItems { get; }
         public DbSet<Podcast> Podcasts { get; }
+        public DbSet<ProductLocationInventory> ProductLocationInventories { get; }
+        public DbSet<Product> Products { get; }
         public DbSet<ScheduleRequest> ScheduleRequest { get; set; }
         public DbSet<ScheduleRequestLimit> ScheduleRequestLimits { get; }
         public DbSet<ScheduleRequestSubject> ScheduleRequestSubject { get; }
@@ -97,6 +99,8 @@ namespace Ocuda.Promenade.Data
                 .HasKey(_ => new { _.PageLayoutId, _.LanguageId });
             modelBuilder.Entity<PodcastDirectoryInfo>()
                 .HasKey(_ => new { _.PodcastId, _.PodcastDirectoryId });
+            modelBuilder.Entity<ProductLocationInventory>()
+                .HasKey(_ => new { _.ProductId, _.LocationId });
             modelBuilder.Entity<ScheduleRequestLimit>()
                 .HasKey(_ => new { _.DayOfWeek, _.Hour });
             modelBuilder.Entity<ScheduleRequestSubjectText>()
