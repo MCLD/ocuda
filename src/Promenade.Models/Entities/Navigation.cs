@@ -26,7 +26,6 @@ namespace Ocuda.Promenade.Models.Entities
         [NotMapped]
         public NavigationText NavigationText { get; set; }
 
-        public int? NavigationTextId { get; set; }
         public int Order { get; set; }
         public bool TargetNewWindow { get; set; }
     }

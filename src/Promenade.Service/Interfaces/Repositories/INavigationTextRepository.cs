@@ -5,6 +5,6 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
     public interface INavigationTextRepository
     {
-        Task<NavigationText> FindAsync(int id, int languageId);
+        Task<NavigationText> GetByIdsAsync(int navigationId, int languageId);
     }
 }

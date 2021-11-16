@@ -38,11 +38,11 @@ namespace Ocuda.Promenade.Data.Promenade
             }
         }
 
-        public async Task<NavigationText> FindAsync(int id, int languageId)
+        public async Task<NavigationText> GetByIdsAsync(int navigationId, int languageId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id == id && _.LanguageId == languageId)
+                .Where(_ => _.NavigationId == navigationId && _.LanguageId == languageId)
                 .SingleOrDefaultAsync();
         }
     }
