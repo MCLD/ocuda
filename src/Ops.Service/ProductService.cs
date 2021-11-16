@@ -38,27 +38,11 @@ namespace Ocuda.Ops.Service
 
         public async Task<Product> GetBySlugAsnyc(string slug)
         {
-            var formattedSlug = slug.Trim().ToLower();
+            var formattedSlug = slug
+                .Trim()
+                .ToLower(System.Globalization.CultureInfo.CurrentCulture);
 
             return await _productRepository.GetActiveBySlugAsync(formattedSlug);
-        }
-
-        public async Task<ICollection<ProductLocationInventory>>
-            GetLocationInventoriesForProductAsync(int productId)
-        {
-            var inventories = await _productLocationInventoryRepository
-                .GetForProductAsync(productId);
-
-            foreach (var inventory in inventories)
-            {
-                if (inventory.UpdatedBy.HasValue)
-                {
-                    (inventory.UpdatedByName, inventory.UpdatedByUsername) =
-                        await _userService.GetNameUsernameAsync(inventory.UpdatedBy.Value);
-                }
-            }
-
-            return inventories;
         }
 
         public async Task<ProductLocationInventory> GetInventoryByProductAndLocation(int productId,
@@ -74,6 +58,24 @@ namespace Ocuda.Ops.Service
             }
 
             return inventory;
+        }
+
+        public async Task<ICollection<ProductLocationInventory>>
+                    GetLocationInventoriesForProductAsync(int productId)
+        {
+            var inventories = await _productLocationInventoryRepository
+                .GetForProductAsync(productId);
+
+            foreach (var inventory in inventories)
+            {
+                if (inventory.UpdatedBy.HasValue)
+                {
+                    (inventory.UpdatedByName, inventory.UpdatedByUsername) =
+                        await _userService.GetNameUsernameAsync(inventory.UpdatedBy.Value);
+                }
+            }
+
+            return inventories;
         }
 
         public async Task UpdateInventoryStatus(int productId, int locationId,
