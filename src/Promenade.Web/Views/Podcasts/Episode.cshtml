@@ -9,10 +9,23 @@
                 @Localizer[Promenade.PodcastEpisodePublished, Model.PodcastItem.Episode, Model.PodcastItem.PublishDate.Value.ToLongDateString()]
             </em>
         </div>
-        <audio controls class="mb-2 w-100">
+        <audio id="player" controls class="mb-2 w-100">
             <source src="@Model.PodcastItem.MediaUrl" type="@Model.PodcastItem.MediaType" />
         </audio>
         <p>@Model.PodcastItem.Description</p>
         <div><em>@Localizer[Promenade.KeywordsItem, Model.PodcastItem.Keywords]</em></div>
     </div>
 </div>
+
+@if (!string.IsNullOrWhiteSpace(Context.Items[Ocuda.Promenade.Controllers.ItemKey.GoogleAnalyticsTrackingCode] as string))
+{
+    <script>
+        var player = document.getElementById("player");
+        player.addEventListener("play", function () {
+            gtag('event', 'Podcast play', {
+                'event_category': '@Model.Podcast.Title',
+                'event_label': '@Model.PodcastItem.Episode.Value'
+            });
+        });
+    </script>
+ } 
