@@ -20,13 +20,13 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                 {
                     table.PrimaryKey("PK_NavigationTextsTemp", x => new { x.NavigationId, x.LanguageId });
                     table.ForeignKey(
-                        name: "FK_NavigationTextsTemp_Navigations_NavigationId",
+                        name: "FK_NavigationTexts_Navigations_NavigationId",
                         column: x => x.NavigationId,
                         principalTable: "Navigations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_NavigationTextsTemp_Languages_LanguageId",
+                        name: "FK_NavigationTexts_Languages_LanguageId",
                         column: x => x.LanguageId,
                         principalTable: "Languages",
                         principalColumn: "Id",
@@ -50,6 +50,15 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                 name: "NavigationTextsTemp",
                 newName: "NavigationTexts");
 
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_NavigationTextsTemp",
+                table: "NavigationTexts");
+
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_NavigationTexts",
+                table: "NavigationTexts",
+                columns: new[] { "NavigationId", "LanguageId" });
+
             migrationBuilder.CreateIndex(
                 name: "IX_NavigationTexts_LanguageId",
                 table: "NavigationTexts",
@@ -58,29 +67,34 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "NavigationTexts");
+            migrationBuilder.DropIndex(
+                name: "IX_NavigationTexts_LanguageId",
+                table: "NavigationTexts");
 
-            migrationBuilder.CreateTable(
-               name: "NavigationTexts",
-               columns: table => new
-               {
-                   Id = table.Column<int>(nullable: false),
-                   LanguageId = table.Column<int>(nullable: false),
-                   Link = table.Column<string>(maxLength: 255, nullable: true),
-                   Label = table.Column<string>(maxLength: 255, nullable: true),
-                   Title = table.Column<string>(maxLength: 255, nullable: true),
-               },
-               constraints: table =>
-               {
-                   table.PrimaryKey("PK_NavigationTexts", x => new { x.Id, x.LanguageId });
-               });
+            migrationBuilder.DropForeignKey(
+                name: "FK_NavigationTexts_Navigations_NavigationId",
+                table: "NavigationTexts");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_NavigationTexts_Languages_LanguageId",
+                table: "NavigationTexts");
+
+            migrationBuilder.RenameColumn(
+                name: "NavigationId",
+                table: "NavigationTexts",
+                newName: "Id");
 
             migrationBuilder.AddColumn<int>(
                 name: "NavigationTextId",
                 table: "Navigations",
                 type: "int",
                 nullable: true);
+
+            migrationBuilder.Sql(@"UPDATE Navigations
+                                    SET NavigationTextId = N.Id
+                                    FROM Navigations AS N
+                                    JOIN NavigationTexts AS NT
+                                    ON N.Id = NT.Id");
         }
     }
 }
