@@ -17,9 +17,10 @@
     </div>
 </div>
 
-@if (Context.Items.ContainsKey(Ocuda.Promenade.Controllers.ItemKey.GoogleAnalyticsTrackingCode))
-{
-    <script>
+@section scripts {
+    @if (Context.Items.ContainsKey(Ocuda.Promenade.Controllers.ItemKey.GoogleAnalyticsTrackingCode))
+    {
+        <script>
         var player = document.getElementById("player");
         player.addEventListener("play", function () {
             gtag('event', 'Podcast play', {
@@ -27,5 +28,6 @@
                 'event_label': '@Model.PodcastItem.Episode.Value'
             });
         });
-    </script>
-} 
+        </script>
+    }
+}

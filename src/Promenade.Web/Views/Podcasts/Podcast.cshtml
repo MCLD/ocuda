@@ -69,9 +69,10 @@
         </div>
     </div>
 }
-@if (Context.Items.ContainsKey(Ocuda.Promenade.Controllers.ItemKey.GoogleAnalyticsTrackingCode))
-{
-    <script>
+@section scripts {
+    @if (Context.Items.ContainsKey(Ocuda.Promenade.Controllers.ItemKey.GoogleAnalyticsTrackingCode))
+    {
+        <script>
         var players = document.getElementsByTagName("audio");
         for (var index = 0; index < players.length; index++) {
             var episode = players[index].getAttribute("data-episode");
@@ -82,5 +83,6 @@
                 });
             });
         }
-    </script>
+        </script>
+    }
 }
