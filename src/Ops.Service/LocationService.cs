@@ -24,13 +24,15 @@ namespace Ocuda.Ops.Service
 
         private readonly IGoogleClient _googleClient;
         private readonly ILocationHoursRepository _locationHoursRepository;
+        private readonly ILocationProductMapRepository _locationProductMapRepository;
         private readonly ILocationRepository _locationRepository;
 
         public LocationService(ILogger<LocationService> logger,
             IGoogleClient googleClient,
             IHttpContextAccessor httpContextAccessor,
             ILocationRepository locationRepository,
-            ILocationHoursRepository locationHoursRepository)
+            ILocationHoursRepository locationHoursRepository,
+            ILocationProductMapRepository locationProductMapRepository)
             : base(logger, httpContextAccessor)
         {
             _googleClient = googleClient ?? throw new ArgumentNullException(nameof(googleClient));
@@ -38,6 +40,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(locationRepository));
             _locationHoursRepository = locationHoursRepository
                 ?? throw new ArgumentNullException(nameof(locationHoursRepository));
+            _locationProductMapRepository = locationProductMapRepository
+                ?? throw new ArgumentNullException(nameof(locationProductMapRepository));
         }
 
         public async Task<Location> AddLocationAsync(Location location)
@@ -65,6 +69,24 @@ namespace Ocuda.Ops.Service
             return location;
         }
 
+        public async Task AddLocationMappingAsync(int productId, string importLocation, int locationId)
+        {
+            try
+            {
+                await _locationProductMapRepository.AddAsync(new LocationProductMap
+                {
+                    ImportLocation = importLocation,
+                    LocationId = locationId,
+                    ProductId = productId
+                });
+                await _locationProductMapRepository.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OcudaException(ex.Message, ex);
+            }
+        }
+
         public async Task DeleteAsync(int id)
         {
             var locationHours = await _locationHoursRepository.GetLocationHoursByLocationId(id);
@@ -73,6 +95,13 @@ namespace Ocuda.Ops.Service
             var location = await _locationRepository.FindAsync(id);
             _locationRepository.Remove(location);
             await _locationRepository.SaveAsync();
+        }
+
+        public async Task DeleteMappingAsync(int locationMapId)
+        {
+            var mapping = await _locationProductMapRepository.FindAsync(locationMapId);
+            _locationProductMapRepository.Remove(mapping);
+            await _locationProductMapRepository.SaveAsync();
         }
 
         public async Task<Location> EditAlwaysOpenAsync(Location location)
@@ -104,6 +133,11 @@ namespace Ocuda.Ops.Service
             _locationRepository.Update(location);
             await _locationRepository.SaveAsync();
             return location;
+        }
+
+        public async Task<IEnumerable<LocationProductMap>> GetAllLocationProductMapsAsync(int productId)
+        {
+            return await _locationProductMapRepository.GetByProductAsync(productId);
         }
 
         public async Task<List<Location>> GetAllLocationsAsync()
@@ -228,6 +262,15 @@ namespace Ocuda.Ops.Service
             return await _googleClient.GetLocationLinkAsync(placeId);
         }
 
+        public async Task<IDictionary<string, int>> GetLocationProductMapAsync(int productId)
+        {
+            var locationProductMap = await _locationProductMapRepository
+                .GetByProductAsync(productId);
+
+            return locationProductMap
+                .ToDictionary(k => k.ImportLocation, v => v.LocationId);
+        }
+
         public async Task<ICollection<Location>> GetLocationsBySegment(int segmentId)
         {
             return await _locationRepository.GetUsingSegmentAsync(segmentId);
@@ -242,6 +285,29 @@ namespace Ocuda.Ops.Service
                                             BaseFilter filter)
         {
             return await _locationRepository.GetPaginatedListAsync(filter);
+        }
+
+        public async Task UpdateLocationMappingAsync(int locationMapId, string importLocation, int locationId)
+        {
+            var existing = await _locationProductMapRepository.FindAsync(locationMapId);
+
+            if (existing == null)
+            {
+                throw new OcudaException("Unable to find that location map.");
+            }
+
+            existing.ImportLocation = importLocation;
+            existing.LocationId = locationId;
+
+            try
+            {
+                _locationProductMapRepository.Update(existing);
+                await _locationProductMapRepository.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new OcudaException(ex.Message, ex);
+            }
         }
 
         private string GetFormattedDayGroupings(List<DayOfWeek> days)
