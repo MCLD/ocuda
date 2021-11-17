@@ -30,6 +30,12 @@ namespace Ocuda.Ops.Models.Definitions
                 Id = ApplicationPermission.IntranetFrontPageManagement,
                 Name = "Intranet Front Page Management",
                 Info = "Users with this permission can push section posts to the front page and pin them."
+            },
+            new ApplicationPermissionDefinition
+            {
+                Id = ApplicationPermission.NavigationManagement,
+                Name = "Navigation Management",
+                Info = "Users with this permission can manage the Promenade navigations."
             }
         };
     }
