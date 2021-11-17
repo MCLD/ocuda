@@ -69,7 +69,7 @@
         </div>
     </div>
 }
-@if (!string.IsNullOrWhiteSpace(Context.Items[Ocuda.Promenade.Controllers.ItemKey.GoogleAnalyticsTrackingCode] as string))
+@if (Context.Items.ContainsKey(Ocuda.Promenade.Controllers.ItemKey.GoogleAnalyticsTrackingCode))
 {
     <script>
         var players = document.getElementsByTagName("audio");
