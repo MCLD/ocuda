@@ -77,7 +77,7 @@
             var episode = players[index].getAttribute("data-episode");
             players[index].addEventListener("play", function () {
                 gtag('event', 'Podcast play', {
-                    'event_category': '@Model.Podcast.Title',
+                    'event_category': '@Html.Raw(Model.Podcast.Title.Replace("'", "\\'"))',
                     'event_label': episode
                 });
             });

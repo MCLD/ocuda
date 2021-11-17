@@ -23,9 +23,9 @@
         var player = document.getElementById("player");
         player.addEventListener("play", function () {
             gtag('event', 'Podcast play', {
-                'event_category': '@Model.Podcast.Title',
+                'event_category': '@Html.Raw(Model.Podcast.Title.Replace("'", "\\'"))',
                 'event_label': '@Model.PodcastItem.Episode.Value'
             });
         });
     </script>
- } 
+} 
