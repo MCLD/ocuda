@@ -15,5 +15,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Podcasts
         public string Filename { get; set; }
         public bool FileMissing { get; set; }
         public string MaximumFileSizeMB { get; set; }
+        public string ShowNotesSegmentName { get; set; }
     }
 }

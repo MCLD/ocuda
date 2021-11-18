@@ -1,5 +1,9 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Podcasts.EpisodeDetailsViewModel
 
+@section styles{
+    <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
+}
+
 <div class="modal" tabindex="-1" role="dialog" id="uploadModal">
     <div class="modal-dialog" role="document">
         <form asp-action="@nameof(PodcastsController.UpdatePodcastFile)"
@@ -38,6 +42,57 @@
     </div>
 </div>
 
+<div class="modal fade"
+     data-backdrop="static"
+     data-keyboard="false"
+     id="addSegmentModal"
+     tabindex="-1"
+     role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <form method="post"
+              role="form"
+              asp-controller="@PodcastsController.Name"
+              asp-action="@nameof(PodcastsController.AddShowNotes)"
+              asp-route-episodeId="@Model.Episode.Id"
+              novalidate="novalidate">
+            <div class="row">
+                <div class="col-12 col-sm-10 col-sm-offset-1">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addSegmentTitle">
+                                Add segment: Podcast - '@Model.Episode.Podcast.Title' - Show notes #@Model.Episode.Episode.Value
+                            </h5>
+                            <button type="button"
+                                    class="close"
+                                    data-dismiss="modal"
+                                    aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Segment text:</p>
+                            <textarea style="width: 100%;"
+                                      id="shownotes-segment-text"
+                                      name="segmentText"
+                                      rows="5"
+                                      markdown-editor></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button"
+                                    class="btn btn-outline-dark mr-1"
+                                    data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-outline-success" button-spinner>
+                                <span class="buttonText">Add Segment</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
 <div class="row mb-2">
     <div class="col-sm-6">
@@ -196,4 +251,57 @@
             @Model.MaximumFileSizeMB MB
         </div>
     </div>
+    <div class="row form-group mt-4">
+        <div class="col-form-label text-md-right col-md-3">
+            <label asp-for="Episode.ShowNotesSegmentId">
+            </label><span class="fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker"></span>
+        </div>
+        <div class="col-md-9">
+            <div class="input-group">
+                <input type="text"
+                       class="form-control"
+                       disabled
+                       value="@Model.ShowNotesSegmentName" />
+                <div class="input-group-append">
+                    @if (string.IsNullOrEmpty(Model.ShowNotesSegmentName))
+                    {
+                        <button id="addShowNotesSegment"
+                                class="btn btn-outline-success"
+                                data-segment="Description"
+                                data-segment-display="Description"
+                                data-toggle="modal"
+                                data-target="#addSegmentModal">
+                            <span class="fas fa-plus-circle"
+                                  aria-hidden="true"
+                                  title="Add segment"></span>
+                        </button>
+                    }
+                    else
+                    {
+                        <a class="btn btn-outline-primary"
+                           asp-action="@nameof(SegmentsController.Detail)"
+                           asp-controller="@SegmentsController.Name"
+                           asp-route-id="@Model.Episode.ShowNotesSegmentId">
+                            <span class="far fa-file-alt"
+                                  aria-hidden="true"
+                                  title="Edit segment"></span>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+        <span class="validation-message text-danger"
+              asp-validation-for="Episode.ShowNotesSegmentId"></span>
+    </div>
+}
+@section scripts{
+    <script src="~/js/md.min.js" asp-append-version="true"></script>
+    <script>
+        $(function () {
+            var segmentEditor = new Markdown.Editor($("#shownotes-segment-text"), { allowUploads: false });
+            if (segmentEditor) {
+                segmentEditor.run();
+            }
+        });
+    </script>
 }
