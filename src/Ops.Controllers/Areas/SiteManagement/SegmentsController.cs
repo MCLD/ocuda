@@ -35,6 +35,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ILanguageService _languageService;
         private readonly ILocationService _locationService;
         private readonly IPermissionGroupService _permissionGroupService;
+        private readonly IPodcastService _podcastService;
         private readonly ISegmentService _segmentService;
 
         public SegmentsController(ServiceFacades.Controller<SegmentsController> context,
@@ -42,6 +43,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ILanguageService languageService,
             ILocationService locationService,
             IPermissionGroupService permissionGroupService,
+            IPodcastService podcastService,
             ISegmentService segmentService) : base(context)
         {
             _emediaService = emediaService
@@ -52,6 +54,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(locationService));
             _permissionGroupService = permissionGroupService
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
+            _podcastService = podcastService
+                ?? throw new ArgumentNullException(nameof(podcastService));
             _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
         }
@@ -255,7 +259,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         });
                     relationship = "This segment is used by emedia group: " + emediaGroup.Name;
                 }
-               
+
                 var locations = await _locationService.GetLocationsBySegment(segment.Id);
 
                 if (locations?.Count == 1)
@@ -273,6 +277,19 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     relationship = string.Format(CultureInfo.InvariantCulture,
                         "This segment is used for multiple locations: {0}",
                         string.Join(", ", locations.Select(_ => _.Name)));
+                }
+
+                var episode = await _podcastService.GetEpisodeBySegmentIdAsync(segment.Id);
+
+                if (episode != null)
+                {
+                    backLink = Url.Action(nameof(PodcastsController.EditEpisode),
+                        PodcastsController.Name,
+                        new
+                        {
+                            episodeId = episode.Id
+                        });
+                    relationship = $"This segment is used for podcast '{episode.Podcast.Title}' episode #{episode.Episode.Value}";
                 }
             }
 

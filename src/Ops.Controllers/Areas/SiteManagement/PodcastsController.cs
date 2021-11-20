@@ -268,6 +268,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 MaximumFileSizeMB = $"{MaximumFileSizeBytes / 1024 / 1024}"
             };
 
+            if (episode.ShowNotesSegmentId.HasValue)
+            {
+                var segment = await _segmentService.GetByIdAsync(episode.ShowNotesSegmentId.Value);
+                viewModel.ShowNotesSegmentName = segment.Name;
+            }
+
             if (!string.IsNullOrEmpty(podcast.Stub)
                 && episode.Episode != null)
             {
@@ -559,7 +565,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]/{episodeId}")]
         public async Task<IActionResult> AddShowNotes(int episodeId, string segmentText)
         {
-
             if (episodeId == 0)
             {
                 ShowAlertDanger("Invalid add segment request: no episode specified.");
@@ -610,7 +615,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             return RedirectToAction(nameof(EditEpisode), new { episodeId });
         }
-
 
         private string FilenameOfEpisode(string podcastStub, int? episodeNumber)
         {

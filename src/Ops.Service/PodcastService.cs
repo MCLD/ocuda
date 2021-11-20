@@ -98,5 +98,12 @@ namespace Ocuda.Ops.Service
                 MediaSize = Convert.ToInt32(new System.IO.FileInfo(path).Length)
             };
         }
+
+        public async Task<PodcastItem> GetEpisodeBySegmentIdAsync(int segmentId)
+        {
+            var episode = await _podcastItemRepository.GetUsingSegmentAsync(segmentId);
+            episode.Podcast = await _podcastRepository.GetByIdAsync(episode.PodcastId);
+            return episode;
+        }
     }
 }
