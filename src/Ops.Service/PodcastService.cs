@@ -102,7 +102,10 @@ namespace Ocuda.Ops.Service
         public async Task<PodcastItem> GetEpisodeBySegmentIdAsync(int segmentId)
         {
             var episode = await _podcastItemRepository.GetUsingSegmentAsync(segmentId);
-            episode.Podcast = await _podcastRepository.GetByIdAsync(episode.PodcastId);
+            if (episode != null)
+            {
+                episode.Podcast = await _podcastRepository.GetByIdAsync(episode.PodcastId);
+            }
             return episode;
         }
     }
