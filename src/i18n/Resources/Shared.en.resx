@@ -689,4 +689,12 @@
     <value>Enter a 5 digit ZIP code</value>
     <comment>Prompt to enter a five digit ZIP code to find the nearest locations</comment>
   </data>
+  <data name="Show Notes for {0}">
+    <value>Show Notes for {0}</value>
+    <comment>Header for a podcast's show notes; {0} is the episode title</comment>
+  </data>
+  <data name="View show notes">
+    <value>View show notes</value>
+    <comment>Label that links to a podcast's show notes</comment>
+  </data>
 </root>

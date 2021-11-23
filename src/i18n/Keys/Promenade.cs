@@ -80,6 +80,8 @@
         public static readonly string ScheduleRequiredNotes = "Please help us out by telling us a little about your request.";
         public static readonly string ScheduleYourTime = "Schedule your time";
         public static readonly string ScheduleYourTimeIsScheduled = "Your time is scheduled";
+        public static readonly string ShowNotesFor = "Show Notes for {0}";
+        public static readonly string ViewShowNotes = "View show notes";
         public static readonly string VisitHomePage = "Visit home page";
         public static readonly string ZipCodeClosest = "Libraries closest to ZIP code: {0}";
         public static readonly string ZipCodePrompt = "Enter a 5 digit ZIP code";
