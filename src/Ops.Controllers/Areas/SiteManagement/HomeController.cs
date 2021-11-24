@@ -44,6 +44,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     .Select(_ => int.Parse(_, CultureInfo.InvariantCulture));
                 viewModel.HasEmediaPermissions = await HasAppPermissionAsync(
                     _permissionGroupService, ApplicationPermission.EmediaManagement);
+                viewModel.HasNavigationPermissions = await HasAppPermissionAsync(
+                    _permissionGroupService, ApplicationPermission.NavigationManagement);
                 viewModel.HasPagePermissions = await _permissionGroupService
                     .HasAPermissionAsync<PermissionGroupPageContent>(numericPermissionIds);
                 viewModel.HasPodcastPermissions = await _permissionGroupService

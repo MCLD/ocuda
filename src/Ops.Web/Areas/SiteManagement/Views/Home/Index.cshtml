@@ -86,6 +86,22 @@
             </div>
         </div>
     }
+    @if (Model.IsSiteManager || Model.HasNavigationPermissions)
+    {
+        <div class="col-12 col-md-4 my-2">
+            <div class="card">
+                <div class="card-header lead font-weight-bold">
+                    @NavigationsController.Name
+                </div>
+                <div class="card-body">
+                    <a asp-area="@NavigationsController.Area"
+                       asp-controller="@NavigationsController.Name"
+                       asp-action="@nameof(NavigationsController.Index)"
+                       class="btn btn-outline-info mt-1">View @NavigationsController.Name</a>
+                </div>
+            </div>
+        </div>
+    }
     @if (Model.IsSiteManager || Model.HasPagePermissions)
     {
         <div class="col-12 col-md-4 my-2">

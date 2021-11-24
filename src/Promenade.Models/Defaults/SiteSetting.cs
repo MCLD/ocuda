@@ -104,7 +104,8 @@ namespace Ocuda.Promenade.Models.Defaults
                 Name = "Footer Navigation Id",
                 Description = "Id of the Navigation object to use in the footer",
                 Category = "Site",
-                Type = SiteSettingType.Int
+                Type = SiteSettingType.Int,
+                Value = "-1"
             },
             new SiteSetting
             {
@@ -112,7 +113,8 @@ namespace Ocuda.Promenade.Models.Defaults
                 Name = "Left Navigation Id",
                 Description = "Id of the Navigation object to use on the left",
                 Category = "Site",
-                Type = SiteSettingType.Int
+                Type = SiteSettingType.Int,
+                Value = "-1"
             },
             new SiteSetting
             {
@@ -120,7 +122,8 @@ namespace Ocuda.Promenade.Models.Defaults
                 Name = "Middle Navigation Id",
                 Description = "Id of the Navigation object to use in the middle",
                 Category = "Site",
-                Type = SiteSettingType.Int
+                Type = SiteSettingType.Int,
+                Value = "-1"
             },
             new SiteSetting
             {
@@ -128,7 +131,8 @@ namespace Ocuda.Promenade.Models.Defaults
                 Name = "Top Navigation Id",
                 Description = "Id of the Navigation object to use on the top",
                 Category = "Site",
-                Type = SiteSettingType.Int
+                Type = SiteSettingType.Int,
+                Value = "-1"
             },
             new SiteSetting
             {

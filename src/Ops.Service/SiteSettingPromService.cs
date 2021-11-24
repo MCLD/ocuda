@@ -139,6 +139,20 @@ namespace Ocuda.Ops.Service
             }
         }
 
+        public async Task<int> GetSettingIntAsync(string key)
+        {
+            var settingValue = await GetSettingValueAsync(key);
+
+            if (int.TryParse(settingValue, out int result))
+            {
+                return result;
+            }
+            else
+            {
+                throw new OcudaException($"Invalid value for interger setting {key}: {settingValue}");
+            }
+        }
+
         private async Task<string> GetSettingValueAsync(string key)
         {
             var siteSetting = await _siteSettingPromRepository.FindAsync(key);

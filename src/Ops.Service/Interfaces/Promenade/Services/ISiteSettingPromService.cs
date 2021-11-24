@@ -9,6 +9,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task EnsureSiteSettingsExistAsync();
         Task<ICollection<SiteSetting>> GetAllAsync();
         Task<double> GetSettingDoubleAsync(string key);
+        Task<int> GetSettingIntAsync(string key);
         Task<string> GetSettingStringAsync(string key);
         Task<SiteSetting> UpdateAsync(string key, string value);
     }

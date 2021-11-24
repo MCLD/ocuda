@@ -1,0 +1,129 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Navigations.IndexViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Navigations
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a asp-controller="@HomeController.Name"
+           asp-action="@(nameof(HomeController.Index))"
+           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+        <button data-toggle="modal"
+                data-target="#addModal"
+                class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
+            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            Add Navigation
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div>
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var navigation in Model.TopLevelNavigations)
+                    {
+                        string position;
+                        if (navigation.Id == Model.TopNavigationId)
+                        {
+                            position = "Top";
+                        }
+                        else if (navigation.Id == Model.MiddleNavigationId)
+                        {
+                            position = "Middle";
+                        }
+                        else if (navigation.Id == Model.LeftNavigationId)
+                        {
+                            position = "Left";
+                        }
+                        else if (navigation.Id == Model.FooterNavigationId)
+                        {
+                            position = "Footer";
+                        }
+                        else
+                        {
+                            position = string.Empty;
+                        }
+
+                        <tr>
+                            <td class="align-middle">
+                                <a asp-action="@(nameof(NavigationsController.Details))" asp-route-id="@navigation.Id">
+                                    @navigation.Name
+                                </a>
+                            </td>
+                            <td class="align-middle">@position</td>
+                            <td class="align-middle">
+                                @*
+                                        <button type="button"
+                                                class="btn btn-outline-primary"
+                                                data-toggle="modal"
+                                                data-target="#editModal"
+                                                data-id="@group.Id"
+                                                data-name="@group.Name"
+                                                title="Edit Group">
+                                            <span class="fas fa-cog" aria-hidden="true"></span>
+                                        </button>
+                                        <a asp-controller="@EmediaController.Name"
+                                           asp-action="@(nameof(EmediaController.GroupDetails))"
+                                           asp-route-id="@group.Id"
+                                           class="btn btn-outline-primary"
+                                           title="Edit group content">
+                                            <span class="far fa-file-alt" aria-hidden="true"></span>
+                                        </a>
+                                        <button type="button"
+                                                class="btn btn-outline-danger"
+                                                data-toggle="modal"
+                                                data-target="#deleteModal"
+                                                data-id="@group.Id"
+                                                data-name="@group.Name">
+                                            <span class="fas fa-minus-circle" aria-hidden="true"></span>
+                                        </button>
+                                    </td>
+                                *@
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<form id="addForm" role="form">
+    <div modal
+         id="addModal"
+         isLarge="true"
+         name="Emedia Group"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+        <input id="addName" asp-for="Navigation.Name" formgroup />
+    </div>
+</form>
+
+@section scripts {
+    <script>
+        $("#addForm").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.post("@(Url.Action(nameof(NavigationsController.CreateTopLevelNavigation), NavigationsController.Name))",
+                form.serialize(),
+                function (response) {
+                    if (response.success == true) {
+                        location.href = response.url;
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
+        });
+    </script>
+}
