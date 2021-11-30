@@ -142,12 +142,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             try
             {
-                var episode = await _podcastService.GetEpisodeBySegmentIdAsync(model.Segment.Id);
-                if (episode != null)
-                {
-                    episode.ShowNotesSegmentId = null;
-                    await _podcastService.UpdatePodcastItemAsync(episode);
-                }
                 await _segmentService.DeleteAsync(model.Segment.Id);
                 ShowAlertSuccess($"Deleted segment: {model.Segment.Name}");
             }

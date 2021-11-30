@@ -17,6 +17,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 
@@ -232,6 +233,39 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     return View("EpisodeDetails", viewModel);
                 }
             }
+        }
+
+        [Route("[action]")]
+        [HttpPost]
+        public async Task<IActionResult> DeleteEpisodeShowNotes(int segmentId)
+        {
+            try
+            {
+                var episode = await _podcastService.GetEpisodeBySegmentIdAsync(segmentId);
+                if (episode != null)
+                {
+                    if (!await HasPermissionAsync<PermissionGroupPodcastItem>(_permissionGroupService,
+                        episode.PodcastId))
+                    {
+                        return RedirectToUnauthorized();
+                    }
+                    episode.ShowNotesSegmentId = null;
+                    await _podcastService.UpdatePodcastItemAsync(episode);
+                    await _segmentService.DeleteAsync(segmentId);
+                    ShowAlertSuccess($"Deleted show notes for: {episode.Title}");
+                    return RedirectToAction(nameof(EditEpisode), new { episodeId = episode.Id });
+                }
+                else
+                {
+                    ShowAlertDanger($"Could not find podcast episode with segment ID: {segmentId}");
+                }
+            }
+            catch (OcudaException ex)
+            {
+                _logger.LogError(ex, "Error deleting segment: {Message}", ex.Message);
+                ShowAlertDanger($"Unable to delete podcast episode show notes: {ex.Message}");
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         [Route("[action]/{podcastId}")]
@@ -613,6 +647,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             await _podcastService.UpdatePodcastItemAsync(episode);
 
+            ShowAlertSuccess($"Added show notes for: {episode.Title}");
             return RedirectToAction(nameof(EditEpisode), new { episodeId });
         }
 
