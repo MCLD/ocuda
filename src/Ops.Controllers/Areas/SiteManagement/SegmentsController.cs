@@ -496,6 +496,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         return await HasAppPermissionAsync(_permissionGroupService,
                             ApplicationPermission.EmediaManagement);
                     }
+
+                    var podcast = await _podcastService.GetEpisodeBySegmentIdAsync(segmentId);
+                    if (podcast != null)
+                    {
+                        return await HasPermissionAsync<PermissionGroupPodcastItem>(_permissionGroupService,
+                        podcast.PodcastId);
+                    }
                 }
                 return false;
             }
