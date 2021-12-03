@@ -15,7 +15,7 @@ RUN dotnet test
 RUN dotnet publish -c Release -o "/app/publish/promenade" "src/Promenade.Web"
 
 # Get runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:5.0@sha256:8550452e9c42ce045d642860eef636598274aab606506eb7cba071e4b6bd4976 as publish
+FROM mcr.microsoft.com/dotnet/aspnet:5.0@sha256:5c4472d0db1b0c8f0e51b1d8531b9f8fbc6df031caca8d07dd7a0e4b72b5b340 as publish
 WORKDIR /app
 
 # Install curl for health monitoring
