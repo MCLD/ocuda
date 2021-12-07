@@ -60,8 +60,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(segmentService));
         }
 
-        public static string Area { get { return "SiteManagement"; } }
-        public static string Name { get { return "Segments"; } }
+        public static string Area
+        { get { return "SiteManagement"; } }
+
+        public static string Name
+        { get { return "Segments"; } }
 
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpPost]
@@ -219,31 +222,41 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ShowAlertDanger($"Could not find Segment with ID: {id}");
                 return RedirectToAction(nameof(SegmentsController.Index));
             }
-
             var languages = await _languageService.GetActiveAsync();
 
             var selectedLanguage = languages
                 .FirstOrDefault(_ => _.Name.Equals(language, StringComparison.OrdinalIgnoreCase))
                 ?? languages.Single(_ => _.IsDefault);
 
-            var segmentText = await _segmentService
-                .GetBySegmentAndLanguageAsync(id, selectedLanguage.Id);
+            var viewModel = new DetailViewModel
+            {
+                LanguageDescription = selectedLanguage.Description,
+                LanguageId = selectedLanguage.Id,
+                LanguageList = new SelectList(languages,
+                    nameof(Language.Name),
+                    nameof(Language.Description),
+                    selectedLanguage.Name),
+                SegmentEndDate = segment.EndDate,
+                SegmentId = segment.Id,
+                SegmentName = segment.Name,
+                SegmentStartDate = segment.StartDate,
+                SegmentText = await _segmentService.GetBySegmentAndLanguageAsync(id, selectedLanguage.Id)
+            };
 
-            string backLink = null;
-            string relationship = null;
+            viewModel.NewSegmentText = viewModel.SegmentText == null;
 
             var pageLayoutId
                 = await _segmentService.GetPageLayoutIdForSegmentAsync(segment.Id);
 
             if (pageLayoutId.HasValue)
             {
-                backLink = Url.Action(nameof(PagesController.LayoutDetail),
+                viewModel.BackLink = Url.Action(nameof(PagesController.LayoutDetail),
                     PagesController.Name,
                     new
                     {
                         id = pageLayoutId.Value
                     });
-                relationship = "This segment is used page layout ID: " + pageLayoutId.Value;
+                viewModel.Relationship = "This segment is used page layout ID: " + pageLayoutId.Value;
             }
             else
             {
@@ -251,30 +264,30 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                 if (emediaGroup != null)
                 {
-                    backLink = Url.Action(nameof(EmediaController.GroupDetails),
+                    viewModel.BackLink = Url.Action(nameof(EmediaController.GroupDetails),
                         EmediaController.Name,
                         new
                         {
                             id = emediaGroup.Id
                         });
-                    relationship = "This segment is used by emedia group: " + emediaGroup.Name;
+                    viewModel.Relationship = "This segment is used by emedia group: " + emediaGroup.Name;
                 }
 
                 var locations = await _locationService.GetLocationsBySegment(segment.Id);
 
                 if (locations?.Count == 1)
                 {
-                    backLink = Url.Action(nameof(LocationsController.Location),
+                    viewModel.BackLink = Url.Action(nameof(LocationsController.Location),
                         LocationsController.Name,
                         new
                         {
                             locationStub = locations.First().Stub
                         });
-                    relationship = "This segment is used for location: " + locations.First().Name;
+                    viewModel.Relationship = "This segment is used for location: " + locations.First().Name;
                 }
                 if (locations?.Count > 1)
                 {
-                    relationship = string.Format(CultureInfo.InvariantCulture,
+                    viewModel.Relationship = string.Format(CultureInfo.InvariantCulture,
                         "This segment is used for multiple locations: {0}",
                         string.Join(", ", locations.Select(_ => _.Name)));
                 }
@@ -283,33 +296,18 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                 if (episode != null)
                 {
-                    backLink = Url.Action(nameof(PodcastsController.EditEpisode),
+                    viewModel.BackLink = Url.Action(nameof(PodcastsController.EditEpisode),
                         PodcastsController.Name,
                         new
                         {
                             episodeId = episode.Id
                         });
-                    relationship = $"This segment is used for podcast '{episode.Podcast.Title}' episode #{episode.Episode.Value}";
+                    viewModel.Relationship = $"This segment is used for podcast '{episode.Podcast.Title}' episode #{episode.Episode.Value}";
+                    string pubDate = episode.PublishDate.HasValue ? episode.PublishDate.Value.ToLongDateString() : "...";
+                    viewModel.AutomatedHeaderMarkup = $"<strong>Show notes for {episode.Title}</strong>"
+                        + $"<br>{episode.Podcast.Title}.<em> Episode {episode.Episode}, published {pubDate}.</em>";
                 }
             }
-
-            var viewModel = new DetailViewModel
-            {
-                BackLink = backLink,
-                LanguageDescription = selectedLanguage.Description,
-                LanguageId = selectedLanguage.Id,
-                LanguageList = new SelectList(languages,
-                    nameof(Language.Name),
-                    nameof(Language.Description),
-                    selectedLanguage.Name),
-                NewSegmentText = segmentText == null,
-                Relationship = relationship,
-                SegmentEndDate = segment.EndDate,
-                SegmentId = segment.Id,
-                SegmentName = segment.Name,
-                SegmentStartDate = segment.StartDate,
-                SegmentText = segmentText
-            };
 
             return View(viewModel);
         }

@@ -107,7 +107,21 @@
     <input asp-for="SegmentId" type="hidden" />
     <input asp-for="LanguageId" type="hidden" />
 
-    <input asp-for="SegmentText.Header" formgroup />
+    @if (!string.IsNullOrEmpty(Model.AutomatedHeaderMarkup))
+    {
+        <div class="form-group row">
+            <div class="col-md-3 text-md-right">
+                <label asp-for="AutomatedHeaderMarkup" class="col-form-label"></label>
+            </div>
+            <div class="col-md-9">
+                @Html.Raw(Model.AutomatedHeaderMarkup)
+            </div>
+        </div>
+    }
+    else
+    {
+        <input asp-for="SegmentText.Header" formgroup />
+    }
 
     <div class="form-group row">
         <div class="col-md-3 text-md-right">

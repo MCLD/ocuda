@@ -7,6 +7,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment
 {
     public class DetailViewModel
     {
+        [DisplayName("Displayed header")]
+        public string AutomatedHeaderMarkup { get; set; }
+
         public string BackLink { get; set; }
         public string LanguageDescription { get; set; }
         public int LanguageId { get; set; }

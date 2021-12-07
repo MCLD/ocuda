@@ -509,8 +509,10 @@ namespace Ocuda.Promenade.Controllers
 
             if (podcastItem.ShowNotesSegmentId.HasValue)
             {
+                var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
                 var segmentText = await _segmentService.GetSegmentTextBySegmentIdAsync(
-                    podcastItem.ShowNotesSegmentId.Value, false);
+                    podcastItem.ShowNotesSegmentId.Value, forceReload);
 
                 segmentText.Text = CommonMark.CommonMarkConverter.Convert(
                         segmentText.Text);

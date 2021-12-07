@@ -366,3 +366,18 @@ a.prom-leftnav-header:hover {
         -moz-appearance: textfield;
         -webkit-appearance: none;
     }
+
+@media print {
+    div#mainContent.col-sm-9 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    body {
+        background-color: white;
+    }
+
+    .prom-content-container {
+        background-color: white;
+    }
+}
