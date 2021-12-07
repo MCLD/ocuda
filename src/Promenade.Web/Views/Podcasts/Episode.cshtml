@@ -2,12 +2,29 @@
 
 <div class="row">
     <div class="col-12">
-        <h1 class="mb-2">@Model.PodcastItem.Title</h1>
-        <div class="mb-4">
-            <em>
-                <a href="@Url.Action(nameof(PodcastsController.Podcast), new { stub = Model.Podcast.Stub})">@Localizer[Promenade.PodcastTitle, Model.Podcast.Title]</a>.
-                @Localizer[Promenade.PodcastEpisodePublished, Model.PodcastItem.Episode, Model.PodcastItem.PublishDate.Value.ToLongDateString()]
-            </em>
+        <div class="row">
+            <div class="col-12 col-lg">
+                <h1 class="mb-2">@Model.PodcastItem.Title</h1>
+                <div class="mb-2">
+                    <em>
+                        <a href="@Url.Action(nameof(PodcastsController.Podcast), new { stub = Model.Podcast.Stub})">@Localizer[Promenade.PodcastTitle, Model.Podcast.Title]</a>.
+                        @Localizer[Promenade.PodcastEpisodePublished, Model.PodcastItem.Episode, Model.PodcastItem.PublishDate.Value.ToLongDateString()]
+                    </em>
+                </div>
+            </div>
+            <div class="col-12 col-lg-auto text-sm-left text-md-left text-lg-right">
+                @if (Model.PodcastItem.ShowNotesSegmentId.HasValue)
+                {
+                    <div class="mb-4 mb-sm-2">
+                        <a href="@Url.Action(nameof(PodcastsController.ShowNotes), new { podcastStub = Model.Podcast.Stub, episodeStub = Model.PodcastItem.Stub})"
+                           target="_blank"
+                           class="btn d-block d-md-inline-block btn-outline-primary">
+                            @Localizer[Promenade.ViewShowNotes]
+                            <span class="sr-only">@Localizer[Promenade.NewWindow]</span>
+                        </a>
+                    </div>
+                }
+            </div>
         </div>
         <audio controls class="mb-2 w-100">
             <source src="@Model.PodcastItem.MediaUrl" type="@Model.PodcastItem.MediaType" />
