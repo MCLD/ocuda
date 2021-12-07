@@ -38,6 +38,7 @@ Environment variables:
 - GHCR_PAT - optional - GitHub Container Registry Personal Access Token
 - GHCR_USER - optional - username to log in to the GitHub Container Registry
 
+Version 1.1.0 released 2021-12-02
 EOF
   exit
 }
@@ -126,7 +127,10 @@ if [[ -z ${BLD_BRANCH} ]]; then
   fi
 fi
 
-if [[ $BLD_BRANCH = "master" || $BLD_BRANCH = "main" || $BLD_BRANCH = "develop" ]]; then
+if [[ $BLD_BRANCH = "develop"
+      || $BLD_BRANCH = "main"
+      || $BLD_BRANCH = "master"
+      || $BLD_BRANCH = "test" ]]; then
   BLD_DOCKER_TAG=$BLD_BRANCH
   BLD_VERSION=${BLD_BRANCH}-${BLD_VERSION_DATE}
   BLD_PUSH=true
@@ -262,18 +266,21 @@ if [[ $BLD_PUSH = true ]]; then
 
   if [[ $BLD_RELEASE = "true" && -f "release-publish.bash" && publish -eq 1 ]]; then
     msg "${BLUE}===${NOFORMAT} Publishing release package for $BLD_RELEASE_VERSION"
+    mkdir -p publish
     if [[ -f "release.env" ]]; then
-      docker run -it \
+      docker run -i \
       --rm \
       --entrypoint "/app/release-publish.bash" \
       --env-file release.env \
       -e BLD_RELEASE_VERSION="$BLD_RELEASE_VERSION" \
+      -v "${PWD}/package:/package" \
       "$BLD_FULL_DOCKER_IMAGE"
     else
-      docker run -it \
+      docker run -i \
       --rm \
       --entrypoint "/app/release-publish.bash" \
       -e BLD_RELEASE_VERSION="$BLD_RELEASE_VERSION" \
+      -v "${PWD}/package:/package" \
       "$BLD_FULL_DOCKER_IMAGE"
     fi
     msg "${GREEN}===${NOFORMAT} Publish script complete"
@@ -286,7 +293,7 @@ else
   --build-arg IMAGE_VERSION="$BLD_VERSION" \
   --target build .
   msg "${GREEN}===${NOFORMAT} Docker image built"
-  msg "${ORANGE}===${NOFORMAT} Not pushing Docker image: branch is not main, develop, or versioned release"
+  msg "${ORANGE}===${NOFORMAT} Not pushing Docker image: branch is not develop, main, test, or versioned release"
 fi
 
 msg "${PURPLE}===${NOFORMAT} Build script complete in $((SECONDS - BLD_STARTAT)) seconds."
