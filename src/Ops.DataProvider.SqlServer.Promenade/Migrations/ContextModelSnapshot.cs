@@ -1270,9 +1270,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Property<int?>("Season")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ShowNotesSegmentId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Stub")
                         .IsRequired()
                         .HasMaxLength(50)
