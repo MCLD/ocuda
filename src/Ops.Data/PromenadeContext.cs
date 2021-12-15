@@ -66,6 +66,7 @@ namespace Ocuda.Ops.Data
         public DbSet<LocationHours> LocationHours { get; set; }
 
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; set; }
+        public DbSet<LocationProductMap> LocationProductMaps { get; set; }
 
         public DbSet<Location> Locations { get; set; }
 
