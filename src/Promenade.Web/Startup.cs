@@ -269,8 +269,7 @@ namespace Ocuda.Promenade.Web
                                 .UseSqlServer(promCs)
                                 .AddInterceptors(new DbLoggingInterceptor()),
                                 poolSize);
-                        services.AddHealthChecks()
-                            .AddDbContextCheck<DataProvider.SqlServer.Promenade.Context>();
+                        services.AddHealthChecks();
                     }
                     else
                     {
@@ -287,8 +286,7 @@ namespace Ocuda.Promenade.Web
                             DataProvider.SqlServer.Promenade.Context>(_ => _
                                 .UseSqlServer(promCs)
                                 .AddInterceptors(new DbLoggingInterceptor()));
-                        services.AddHealthChecks()
-                            .AddDbContextCheck<DataProvider.SqlServer.Promenade.Context>();
+                        services.AddHealthChecks();
                     }
                     else
                     {
