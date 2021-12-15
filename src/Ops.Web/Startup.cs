@@ -403,6 +403,8 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.ImageFeatureTemplateRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILanguageRepository,
                 Data.Promenade.LanguageRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationProductMapRepository,
+                Data.Promenade.LocationProductMapRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationRepository,
                Data.Promenade.LocationRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationFeatureRepository,

@@ -37,8 +37,16 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
+        public async Task<Location> GetLocationByStub(string locationStub)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Stub == locationStub)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(
-            BaseFilter filter)
+                    BaseFilter filter)
         {
             return new DataWithCount<ICollection<Location>>
             {
@@ -49,21 +57,15 @@ namespace Ocuda.Ops.Data.Promenade
                     .ToListAsync()
             };
         }
-
-        public async Task<Location> GetLocationByStub(string locationStub)
+        public async Task<ICollection<Location>> GetUsingSegmentAsync(int segmentId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == locationStub)
-                .FirstOrDefaultAsync();
-        }
-
-        public async Task<bool> IsDuplicateStubAsync(Location location)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.Id != location.Id && _.Stub == location.Stub)
-                .AnyAsync();
+                .Where(_ => _.DescriptionSegmentId == segmentId
+                    || _.PostFeatureSegmentId == segmentId
+                    || _.PreFeatureSegmentId == segmentId
+                    || _.HoursSegmentId == segmentId)
+                .ToListAsync();
         }
 
         public async Task<bool> IsDuplicateNameAsync(Location location)
@@ -74,15 +76,12 @@ namespace Ocuda.Ops.Data.Promenade
                 .AnyAsync();
         }
 
-        public async Task<ICollection<Location>> GetUsingSegmentAsync(int segmentId)
+        public async Task<bool> IsDuplicateStubAsync(Location location)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.DescriptionSegmentId == segmentId
-                    || _.PostFeatureSegmentId == segmentId
-                    || _.PreFeatureSegmentId == segmentId
-                    || _.HoursSegmentId == segmentId)
-                .ToListAsync();
+                .Where(_ => _.Id != location.Id && _.Stub == location.Stub)
+                .AnyAsync();
         }
     }
 }

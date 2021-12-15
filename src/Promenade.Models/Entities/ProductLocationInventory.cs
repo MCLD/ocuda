@@ -17,7 +17,16 @@ namespace Ocuda.Promenade.Models.Entities
 
         public int CreatedBy { get; set; }
 
-        public Status InventoryStatus { get; set; }
+        [NotMapped]
+        public Status InventoryStatus
+        {
+            get
+            {
+                return GetStatus(ItemCount);
+            }
+        }
+
+        public int? ItemCount { get; set; }
 
         public Location Location { get; set; }
 
@@ -25,11 +34,23 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public int LocationId { get; set; }
 
+        public int ManyThreshhold { get; set; }
+
         public Product Product { get; set; }
 
         [Key]
         [Required]
         public int ProductId { get; set; }
+
+        public DateTime? ThreshholdUpdatedAt { get; set; }
+
+        public int? ThreshholdUpdatedBy { get; set; }
+
+        [NotMapped]
+        public string ThreshholdUpdatedByName { get; set; }
+
+        [NotMapped]
+        public string ThreshholdUpdatedByUsername { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
 
@@ -40,5 +61,18 @@ namespace Ocuda.Promenade.Models.Entities
 
         [NotMapped]
         public string UpdatedByUsername { get; set; }
+
+        public Status GetStatus(int? itemCount)
+        {
+            if (!itemCount.HasValue || itemCount == 0)
+            {
+                return Status.None;
+            }
+            if (itemCount >= ManyThreshhold)
+            {
+                return Status.Many;
+            }
+            return Status.Few;
+        }
     }
 }
