@@ -9,9 +9,23 @@
     </div>
     <div class="col-sm-6">
         <a asp-controller="@ProductsController.Name"
-           asp-action="@(nameof(ProductsController.Product))"
-           asp-route-slug="@Model.Product.Slug"
+           asp-action="@nameof(ProductsController.Product)"
+           asp-route-productSlug="@Model.Product.Slug"
            class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+        <a asp-controller="@ProductsController.Name"
+           asp-action="@nameof(ProductsController.UploadDistribution)"
+           asp-route-productSlug="@Model.Product.Slug"
+           class="btn btn-outline-info mt-2 mb-1 mr-2 float-right">
+            <span class="fas fa-file-upload"></span>
+            Upload Distribution
+        </a>
+        <a asp-controller="@ProductsController.Name"
+           asp-action="@nameof(ProductsController.UploadReplenishment)"
+           asp-route-productSlug="@Model.Product.Slug"
+           class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
+            <span class="fas fa-file-upload"></span>
+            Upload Replenishment
+        </a>
     </div>
 </div>
 
@@ -26,10 +40,12 @@
                     <tr>
                         <th>Status</th>
                         <td>@Model.LocationInventory.InventoryStatus</td>
+                        <td>&nbsp;</td>
                     </tr>
                     <tr>
                         <th>Updated At</th>
                         <td>@Model.LocationInventory.UpdatedAt</td>
+                        <td>&nbsp;</td>
                     </tr>
                     <tr>
                         <th>Updated By</th>
@@ -38,38 +54,98 @@
                                asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
                                asp-route-id="@Model.LocationInventory.UpdatedByUsername">@Model.LocationInventory.UpdatedByName</a>
                         </td>
+                        <td>&nbsp;</td>
                     </tr>
+                    <tr>
+                        <th class="text-middle">Many threshhold (less than this = few)</th>
+                        <td class="text-middle">@Model.LocationInventory.ManyThreshhold</td>
+                        <td class="text-middle"><button class="pull-right btn btn-sm btn-outline-primary"
+                            data-toggle="modal"
+                            data-target="#threshholdModal">Adjust</button></td>
+                    </tr>
+                    @if (Model.LocationInventory.ThreshholdUpdatedAt.HasValue)
+                    {
+                        <tr>
+                            <th>Threshhold updated at</th>
+                            <td>@Model.LocationInventory.ThreshholdUpdatedAt</td>
+                            <td>&nbsp;</td>
+                        </tr>                    
+                        <tr>
+                            <th>Threshhold updated by</th>
+                            <td><a asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
+                               asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
+                               asp-route-id="@Model.LocationInventory.ThreshholdUpdatedByUsername">@Model.LocationInventory.ThreshholdUpdatedByName</a></td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    }
                 </table>
             </div>
         </div>
     </div>
 
     <div class="col-12 col-md-6">
-        <div class="card mb-2">
-            <div class="card-header">
-                <span class="h5">Update On-hand Count</span>
-            </div>
-            <div class="card-body">
-                <form asp-controller="@ProductsController.Name"
-                      asp-action="@(nameof(ProductsController.UpdateInventoryStatus))"
-                      method="post"
-                      role="form">
-                    <input asp-for="ProductId" value="@Model.LocationInventory.ProductId" type="hidden" />
-                    <input asp-for="LocationId" value="@Model.LocationInventory.LocationId" type="hidden" />
-                    <input asp-for="LocationName" value="@Model.LocationInventory.Location.Name" type="hidden" />
-                    <input asp-for="ProductSlug" value="@Model.Product.Slug" type="hidden" />
-                    <select asp-for="InventoryStatus"
-                            asp-items="Html.GetEnumSelectList<ProductLocationInventory.Status>()"
-                            hide-label="true"
-                            formgroup>
-                    </select>
-                    <button class="btn btn-primary"
+        <form asp-controller="@ProductsController.Name"
+              asp-action="@(nameof(ProductsController.UpdateInventoryStatus))"
+              method="post"
+              role="form">
+            <input asp-for="ProductId" value="@Model.LocationInventory.ProductId" type="hidden" />
+            <input asp-for="LocationId" value="@Model.LocationInventory.LocationId" type="hidden" />
+            <input asp-for="LocationName" value="@Model.LocationInventory.Location.Name" type="hidden" />
+            <input asp-for="ProductSlug" value="@Model.Product.Slug" type="hidden" />
+            <div class="card mb-2">
+                <div class="card-header">
+                    <span class="h5">Update On-hand Count</span>
+                </div>
+                <div class="card-body">
+                    <input asp-for="ItemCount" value="@Model.LocationInventory.ItemCount" formgroup type="number" />
+                </div>
+                <div class="card-footer text-right">
+                    <button class="btn btn-outline-primary"
                             type="submit"
                             button-spinner>
                         Update
                     </button>
-                </form>
+                </div>
+            </div>
+        </form>
+    </div>
+</div> 
+
+<form asp-action="@nameof(ProductsController.UpdateThreshhold)"
+      asp-route-productSlug="@Model.Product.Slug"
+      asp-route-locationSlug="@Model.LocationInventory.Location.Stub"
+      method="post"
+      role="form"
+      enctype="multipart/form-data">
+    <div class="modal fade"
+         id="threshholdModal"
+         tabindex="-1"
+         aria-labelledby="threshholdModalLabel"
+         aria-hidden="true"
+         data-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="threshholdModalLabel">Many threshhold</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="threshholdValue">Many threshhold</label>
+                        <input type="number" 
+                               class="form-control"
+                               name="threshholdValue"
+                               id="threshholdValue"
+                               value="@Model.LocationInventory.ManyThreshhold" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-outline-primary">Update</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</form>

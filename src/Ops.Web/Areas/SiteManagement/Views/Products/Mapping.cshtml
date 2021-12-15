@@ -1,0 +1,196 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Products.MappingViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Location Mapping
+            <small class="text-muted">@Model.Product.Name</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a asp-controller="@ProductsController.Name"
+           asp-action="@nameof(ProductsController.Product)"
+           asp-route-productSlug="@Model.Product.Slug"
+           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+        <a asp-controller="@ProductsController.Name"
+           asp-action="@nameof(ProductsController.UploadDistribution)"
+           asp-route-productSlug="@Model.Product.Slug"
+           class="btn btn-outline-info mt-2 mb-1 mr-2 float-right">
+            <span class="fas fa-file-upload"></span>
+            Upload Distribution
+        </a>
+        <a asp-controller="@ProductsController.Name"
+           asp-action="@nameof(ProductsController.UploadReplenishment)"
+           asp-route-productSlug="@Model.Product.Slug"
+           class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
+            <span class="fas fa-file-upload"></span>
+            Upload Replenishment
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-md-6 offset-md-3">
+        <table class="table table-sm table-bordered">
+            <tr>
+                <th class="align-middle">Text in spreadsheet</th>
+                <th class="align-middle">Maps to location</th>
+                <th class="align-middle">
+                    Action
+                    <button type="button"
+                            class="btn btn-sm btn-outline-success float-right"
+                            data-toggle="modal"
+                            data-target="#mappingModal">
+                        <span class="fas fa-sm fa-plus-circle"></span>
+                    </button>
+                </th>
+            </tr>
+            @if (Model.LocationMap?.Count() > 0)
+            {
+                @foreach (var locationMap in Model.LocationMap)
+                {
+                    <tr>
+                        <td>@locationMap.ImportLocation</td>
+                        <td>@(Model.Locations.SingleOrDefault(_ => _.Id == locationMap.LocationId)?.Name ?? "Unknown")</td>
+                        <td>
+                            <button type="button"
+                            class="btn btn-sm btn-outline-danger"
+                            data-toggle="modal"
+                            data-target="#mappingRemoveModal"
+                            data-locationmapid="@locationMap.Id"
+                            data-locationid="@locationMap.LocationId"
+                            data-importlocation="@locationMap.ImportLocation">
+                                <span class="fas fa-minus-circle"></span>
+                            </button>
+                            <button type="button"
+                            class="btn btn-sm btn-outline-primary"
+                            data-toggle="modal"
+                            data-target="#mappingModal"
+                            data-locationmapid="@locationMap.Id"
+                            data-locationid="@locationMap.LocationId"
+                            data-importlocation="@locationMap.ImportLocation">
+                                <span class="fas fa-edit"></span>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3">
+                        No mappings found.
+                        <button type="button"
+                            class="btn btn-sm btn-outline-success"
+                            data-toggle="modal"
+                            data-target="#mappingModal">
+                            <span class="fas fa-plus-circle"></span>
+                            Add mapping
+                        </button>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+
+<form asp-action="@nameof(ProductsController.EditMapping)"
+      asp-route-productSlug="@Model.Product.Slug"
+      method="post"
+      role="form"
+      enctype="multipart/form-data">
+    <input type="hidden" name="locationMapId" id="locationMapId" />
+    <div class="modal fade"
+         id="mappingModal"
+         tabindex="-1"
+         aria-labelledby="mappingModalLabel"
+         aria-hidden="true"
+         data-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mappingModalLabel">Mapping</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="importLocation">Spreadsheet text</label>
+                        <input type="text" class="form-control" name="importLocation" id="importLocation" />
+                    </div>
+                    <div class="form-group">
+                        <label for="locationId">Maps to location</label>
+                        <select class="form-control" id="locationId" name="locationId" asp-items="Model.LocationSelect"></select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-outline-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form method="post"
+      role="form"
+      enctype="multipart/form-data"
+      asp-action="@nameof(ProductsController.RemoveMapping)">
+    <input type="hidden" name="locationMapId" id="removeLocationMapId" />
+    <input type="hidden" name="productSlug" value="@Model.Product.Slug" />
+    <div class="modal fade"
+         id="mappingRemoveModal"
+         tabindex="-1"
+         aria-labelledby="mappingRemoveModalLabel"
+         aria-hidden="true"
+         data-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mappingRemoveModalLabel">Remove Mapping</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="importLocationRemove">Spreadsheet text</label>
+                        <input type="text" class="form-control" name="importLocationRemove" id="importLocationRemove" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label for="locationId">Maps to location</label>
+                        <select class="form-control" 
+                                id="locationIdRemove"
+                                name="locationIdRemove"
+                                asp-items="Model.LocationSelect"
+                                disabled></select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-outline-danger">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+<script>
+    $("#mappingModal").on("show.bs.modal", function (event) {
+        var sender = $(event.relatedTarget);
+        $("#locationMapId").val(sender.data("locationmapid"));
+        $("#importLocation").val(sender.data("importlocation"));
+        $("#locationId").val(sender.data("locationid"));
+    });
+
+    $("#mappingRemoveModal").on("show.bs.modal", function (event) {
+        var sender = $(event.relatedTarget);
+        $("#removeLocationMapId").val(sender.data("locationmapid"));
+        $("#importLocationRemove").val(sender.data("importlocation"));
+        $("#locationIdRemove").val(sender.data("locationid"));
+        console.log(sender.data("locationmapid"));
+    });
+</script>
+}
