@@ -8,8 +8,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IHistoricalIncidentService
     {
-        Task<DataWithCount<ICollection<HistoricalIncident>>> GetPaginatedAsync(BaseFilter filter);
+        public Task<HistoricalIncident> GetAsync(int id);
 
-        public Task<Post> GetPostByIdAsync(int id);
+        Task<DataWithCount<ICollection<HistoricalIncident>>> GetPaginatedAsync(SearchFilter filter);
     }
 }

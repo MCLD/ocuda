@@ -21,13 +21,13 @@ namespace Ocuda.Ops.Data.Ops
         {
         }
 
-        public async Task<HistoricalIncident> GetHistoricalIncidentAsync(int id)
+        public async Task<HistoricalIncident> GetAsync(int id)
         {
             return await DbSet.AsNoTracking().SingleOrDefaultAsync(_ => _.Id == id);
         }
 
         public async Task<DataWithCount<ICollection<HistoricalIncident>>>
-            GetPaginatedListAsync(SearchFilter filter)
+            GetPaginatedAsync(SearchFilter filter)
         {
             if (filter == null) { throw new ArgumentNullException(nameof(filter)); }
 

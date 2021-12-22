@@ -8,9 +8,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 {
     public interface IHistoricalIncidentRepository : IOpsRepository<HistoricalIncident, int>
     {
-        public Task<HistoricalIncident> GetHistoricalIncidentAsync(int id);
+        public Task<HistoricalIncident> GetAsync(int id);
 
         public Task<DataWithCount<ICollection<HistoricalIncident>>>
-            GetPaginatedListAsync(SearchFilter filter);
+            GetPaginatedAsync(SearchFilter filter);
     }
 }
