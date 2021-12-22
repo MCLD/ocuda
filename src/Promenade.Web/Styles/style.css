@@ -313,6 +313,10 @@ a.prom-leftnav-header:hover {
         color: black;
     }
 
+blockquote {
+    padding-left: 3rem;
+}
+
 /* carousels */
 
 .prom-carousel div {
