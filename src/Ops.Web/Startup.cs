@@ -288,6 +288,8 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Utility.Email.Sender>();
 
             // repositories
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
+                Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IClaimGroupRepository,
                 Data.Ops.ClaimGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ICoverIssueDetailRepository,
@@ -296,10 +298,10 @@ namespace Ocuda.Ops.Web
                 Data.Ops.CoverIssueHeaderRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IDigitalDisplayAssetRepository,
                 Data.Ops.DigitalDisplayAssetRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IDigitalDisplayDisplaySetRepository,
-                Data.Ops.DigitalDisplayDisplaySetRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IDigitalDisplayAssetSetRepository,
                 Data.Ops.DigitalDisplayAssetSetRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IDigitalDisplayDisplaySetRepository,
+                Data.Ops.DigitalDisplayDisplaySetRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IDigitalDisplayItemRepository,
                 Data.Ops.DigitalDisplayItemRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IDigitalDisplayRepository,
@@ -320,26 +322,26 @@ namespace Ocuda.Ops.Web
                 Data.Ops.FileRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IFileTypeRepository,
                 Data.Ops.FileTypeRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IHistoricalIncidentRepository,
+                Data.Ops.HistoricalIncidentRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkLibraryRepository,
                 Data.Ops.LinkLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository,
                 Data.Ops.LinkRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupApplicationRepository,
                 Data.Ops.PermissionGroupApplicationRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupPodcastItemRepository,
-                Data.Ops.PermissionGroupPodcastItemRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupPageContentRepository,
                 Data.Ops.PermissionGroupPageContentRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupReplaceFilesRepository,
-                Data.Ops.PermissionGroupReplaceFilesRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupPodcastItemRepository,
+                Data.Ops.PermissionGroupPodcastItemRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupReplaceFilesRepository
+                , Data.Ops.PermissionGroupReplaceFilesRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupRepository,
                 Data.Ops.PermissionGroupRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPermissionGroupSectionManagerRepository,
                 Data.Ops.PermissionGroupSectionManagerRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IPostRepository,
                 Data.Ops.PostRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.ICategoryRepository,
-                Data.Ops.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterDetailRepository,
                 Data.Ops.RosterDetailRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterHeaderRepository,
@@ -401,21 +403,18 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.ImageFeatureTemplateRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILanguageRepository,
                 Data.Promenade.LanguageRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationProductMapRepository,
-                Data.Promenade.LocationProductMapRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationRepository,
-               Data.Promenade.LocationRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationFeatureRepository,
                 Data.Promenade.LocationFeatureRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationGroupRepository,
                 Data.Promenade.LocationGroupRepository>();
-            services.AddScoped<
-                Service.Interfaces.Promenade.Repositories.ILocationHoursOverrideRepository,
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationHoursOverrideRepository,
                 Data.Promenade.LocationHoursOverrideRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationHoursRepository,
                 Data.Promenade.LocationHoursRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageRepository,
-                Data.Promenade.PageRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationProductMapRepository,
+                Data.Promenade.LocationProductMapRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationRepository,
+                Data.Promenade.LocationRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageHeaderRepository,
                 Data.Promenade.PageHeaderRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageItemRepository,
@@ -424,10 +423,12 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.PageLayoutRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageLayoutTextRepository,
                 Data.Promenade.PageLayoutTextRepository>();
-            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPodcastRepository,
-                Data.Promenade.PodcastRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPageRepository,
+                Data.Promenade.PageRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IPodcastItemsRepository,
                 Data.Promenade.PodcastItemsRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IPodcastRepository,
+                Data.Promenade.PodcastRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IProductLocationInventoryRepository,
                 Data.Promenade.ProductLocationInventoryRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IProductRepository,
@@ -448,8 +449,7 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.SocialCardRepository>();
 
             // services
-            services.AddScoped<Service.Interfaces.Ops.Services.IAuthorizationService,
-                AuthorizationService>();
+            services.AddScoped<IAuthorizationService, AuthorizationService>();
             services.AddScoped<ICarouselService, CarouselService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<ICoverIssueService, CoverIssueService>();
@@ -463,6 +463,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IFileTypeService, FileTypeService>();
             services.AddScoped<IGroupService, GroupService>();
+            services.AddScoped<IHistoricalIncidentService, HistoricalIncidentService>();
             services.AddScoped<IImageFeatureService, ImageFeatureService>();
             services.AddScoped<IInitialSetupService, InitialSetupService>();
             services.AddScoped<IInsertSampleDataService, InsertSampleDataService>();
