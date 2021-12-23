@@ -9,7 +9,6 @@ using Ocuda.Promenade.Service.Abstract;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Services.Interfaces;
-using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace Ocuda.Promenade.Service
 {
@@ -70,12 +69,12 @@ namespace Ocuda.Promenade.Service
 
             Product product = null;
 
-            if(!forceReload)
+            if (!forceReload)
             {
                 product = await _cache.GetObjectFromCacheAsync<Product>(cacheKey);
             }
 
-            if(product == null)
+            if (product == null)
             {
                 product = await _productRepository.GetAsync(slug);
 
@@ -100,12 +99,12 @@ namespace Ocuda.Promenade.Service
 
             ICollection<Product> products = null;
 
-            if(!forceReload)
+            if (!forceReload)
             {
                 products = await _cache.GetObjectFromCacheAsync<ICollection<Product>>(cacheKey);
             }
 
-            if(products == null)
+            if (products == null)
             {
                 products = await _productRepository.GetAllNamesSlugsAsync();
 

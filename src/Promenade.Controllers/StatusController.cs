@@ -57,7 +57,7 @@ namespace Ocuda.Promenade.Controllers
 
             var product = await _productService.GetProductAsync(slug, forceReload);
 
-            if(product == null)
+            if (product == null)
             {
                 return StatusCode(Microsoft.AspNetCore.Http.StatusCodes.Status404NotFound);
             }
