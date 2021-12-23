@@ -197,6 +197,12 @@ Markdown.HookCollection = HookCollection;
         if (options.allowImages == null) {
             options.allowImages = true;
         }
+        if (options.allowCode == null) {
+            options.allowCode = true;
+        }
+        if (options.allowHR == null) {
+            options.allowHR = true;
+        }
 
         if (typeof options.handler === "function") { //backwards compatible behavior
             options = { helpButton: options };
@@ -235,7 +241,17 @@ Markdown.HookCollection = HookCollection;
                     f();
                 }
             }
-            uiManager = new UIManager(target, panels, undoManager, commandManager, options.allowUploads, options.allowImages, options.helpButton, getString);
+            uiManager = new UIManager(target,
+                panels,
+                undoManager,
+                commandManager,
+                options.allowUploads,
+                options.allowImages,
+                options.allowCode,
+                options.allowHR,
+                options.helpButton,
+                getString);
+
             uiManager.setUndoRedoButtonStates();
         };
 
@@ -1257,7 +1273,16 @@ Markdown.HookCollection = HookCollection;
         }, 0);
     };
 
-    function UIManager(target, panels, undoManager, commandManager, allowUploads, allowImages, helpOptions, getString) {
+    function UIManager(target,
+        panels,
+        undoManager,
+        commandManager,
+        allowUploads,
+        allowImages,
+        allowCode,
+        allowHR,
+        helpOptions,
+        getString) {
         var inputBox = panels.input,
             buttons = {}; // buttons.undo, buttons.link, etc. The actual DOM elements.
 
@@ -1513,7 +1538,9 @@ Markdown.HookCollection = HookCollection;
                 return this.doLinkOrImage(chunk, postProcessing, false, allowUploads);
             }));
             buttons.quote = makeButton(getString("quote"), "fas fa-quote-left", bindCommand("doBlockquote"));
-            buttons.code = makeButton(getString("code"), "fas fa-code", bindCommand("doCode"));
+            if (allowCode) {
+                buttons.code = makeButton(getString("code"), "fas fa-code", bindCommand("doCode"));
+            }
             if (allowImages) {
                 buttons.image = makeButton(getString("image"), "fas fa-image", bindCommand(function (chunk, postProcessing) {
                     return this.doLinkOrImage(chunk, postProcessing, true, allowUploads);
@@ -1527,7 +1554,9 @@ Markdown.HookCollection = HookCollection;
                 this.doList(chunk, postProcessing, false);
             }));
             buttons.heading = makeButton(getString("heading"), "fas fa-heading", bindCommand("doHeading"));
-            buttons.hr = makeButton(getString("hr"), "far fa-minus-square", bindCommand("doHorizontalRule"));
+            if (allowHR) {
+                buttons.hr = makeButton(getString("hr"), "far fa-minus-square", bindCommand("doHorizontalRule"));
+            }
             makeSpacer();
             buttons.undo = makeButton(getString("undo"), "fas fa-undo", null);
             buttons.undo.execute = function (manager) { if (manager) manager.undo(); };
