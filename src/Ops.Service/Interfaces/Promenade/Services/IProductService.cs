@@ -6,8 +6,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 {
     public interface IProductService
     {
-        Task<ICollection<string>> BulkInventoryStatusUpdateAsync(int productId, 
-            bool addValues, 
+        Task<ICollection<string>> BulkInventoryStatusUpdateAsync(int productId,
+            bool addValues,
             IDictionary<int, int> adjustments);
 
         Task<Product> GetBySlugAsync(string slug);

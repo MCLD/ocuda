@@ -83,5 +83,13 @@
         public static readonly string VisitHomePage = "Visit home page";
         public static readonly string ZipCodeClosest = "Libraries closest to ZIP code: {0}";
         public static readonly string ZipCodePrompt = "Enter a 5 digit ZIP code";
+
+        public static readonly string ProductInventoryLocation = "Location";
+        public static readonly string ProductInventoryHours = "Hours";
+        public static readonly string ProductInventoryStatus = "Status";
+        public static readonly string ProductInventoryLastUpdate = "Last Update";
+        public static readonly string ProductInventoryHas = "Has {0}";
+        public static readonly string ProductInventoryDoesNotHave = "Does not have {0}";
+        public static readonly string ProductInventoryCurrentAvailability = "{0} - Current Availability";
     }
 }

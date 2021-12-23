@@ -15,7 +15,7 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
-        public async Task<Product> GetActiveBySlugAsync (string slug)
+        public async Task<Product> GetActiveBySlugAsync(string slug)
         {
             return await DbSet
                 .AsNoTracking()
