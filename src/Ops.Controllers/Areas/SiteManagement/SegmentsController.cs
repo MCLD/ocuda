@@ -307,6 +307,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     viewModel.AutomatedHeaderMarkup = $"<strong>Show notes for {episode.Title}</strong>"
                         + $"<br>{episode.Podcast.Title}.<em> Episode {episode.Episode}, published {pubDate}.</em>";
                 }
+                viewModel.IsShowNotes = episode != null;
             }
 
             return View(viewModel);

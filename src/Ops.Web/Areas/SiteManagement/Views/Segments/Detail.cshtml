@@ -159,7 +159,12 @@
 
 <script>
     $(function () {
-        var editor = new Markdown.Editor($("#SegmentText_Text"), { allowUploads: false, allowImages: false });
+        var editor = new Markdown.Editor($("#SegmentText_Text"), { 
+            allowUploads: false,
+            allowImages: false,
+            allowCode: @Json.Serialize(!Model.IsShowNotes),
+            allowHR: @Json.Serialize(!Model.IsShowNotes)
+        });
         if (editor) {
             editor.run();
         }
