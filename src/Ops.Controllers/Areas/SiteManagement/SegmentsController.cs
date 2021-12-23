@@ -493,7 +493,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     if (podcast != null)
                     {
                         return await HasPermissionAsync<PermissionGroupPodcastItem>(_permissionGroupService,
-                        podcast.PodcastId);
+                            podcast.PodcastId) && await HasAppPermissionAsync(_permissionGroupService,
+                                ApplicationPermission.PodcastShowNotesManagement);
                     }
                 }
                 return false;

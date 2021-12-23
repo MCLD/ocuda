@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Podcasts;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
@@ -299,7 +300,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 EditEpisode = true,
                 Episode = episode,
                 PodcastTitle = episode.Podcast.Title,
-                MaximumFileSizeMB = $"{MaximumFileSizeBytes / 1024 / 1024}"
+                MaximumFileSizeMB = $"{MaximumFileSizeBytes / 1024 / 1024}",
+                CanEditShowNotes = await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.PodcastShowNotesManagement)
             };
 
             if (episode.ShowNotesSegmentId.HasValue)
@@ -614,7 +617,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
 
             if (!await HasPermissionAsync<PermissionGroupPodcastItem>(_permissionGroupService,
-                episode.PodcastId))
+                episode.PodcastId) && !await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.PodcastShowNotesManagement))
             {
                 return RedirectToUnauthorized();
             }

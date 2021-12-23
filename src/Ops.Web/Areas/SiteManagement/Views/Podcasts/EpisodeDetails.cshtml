@@ -321,7 +321,7 @@
                                   title="Add segment"></span>
                         </button>
                     }
-                    else
+                    else if (!string.IsNullOrEmpty(Model.ShowNotesSegmentName) && Model.CanEditShowNotes)
                     {
                         <a class="btn btn-outline-primary"
                            asp-action="@nameof(SegmentsController.Detail)"
