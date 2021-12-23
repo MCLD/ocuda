@@ -617,7 +617,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
 
             if (!await HasPermissionAsync<PermissionGroupPodcastItem>(_permissionGroupService,
-                episode.PodcastId) && !await HasAppPermissionAsync(_permissionGroupService,
+                episode.PodcastId) || !await HasAppPermissionAsync(_permissionGroupService,
                     ApplicationPermission.PodcastShowNotesManagement))
             {
                 return RedirectToUnauthorized();

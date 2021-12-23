@@ -308,7 +308,7 @@
                        disabled
                        value="@Model.ShowNotesSegmentName" />
                 <div class="input-group-append">
-                    @if (string.IsNullOrEmpty(Model.ShowNotesSegmentName))
+                    @if (string.IsNullOrEmpty(Model.ShowNotesSegmentName) && Model.CanEditShowNotes)
                     {
                         <button id="addShowNotesSegment"
                                 class="btn btn-outline-success"
