@@ -45,7 +45,7 @@ function initializePreview(target) {
         parseAndRender(target);
     });
 
-    textarea.bind('input propertychange', parseAndRender(target));
+    textarea.on('input propertychange', function () { parseAndRender(target) });
 }
 //End of dingus
 
