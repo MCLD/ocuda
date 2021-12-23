@@ -350,7 +350,12 @@
     <script src="~/js/md.min.js" asp-append-version="true"></script>
     <script>
         $(function () {
-            var segmentEditor = new Markdown.Editor($("#shownotes-segment-text"), { allowUploads: false });
+            var segmentEditor = new Markdown.Editor($("#shownotes-segment-text"), {
+                allowUploads: false,
+                allowImages: false,
+                allowCode: false,
+                allowHR: false
+            });
             if (segmentEditor) {
                 segmentEditor.run();
             }
