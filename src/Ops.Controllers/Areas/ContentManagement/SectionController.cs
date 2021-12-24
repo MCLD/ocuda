@@ -50,8 +50,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 ?? throw new ArgumentNullException(nameof(sectionService));
         }
 
-        public static string Area { get { return "ContentManagement"; } }
-        public static string Name { get { return "Section"; } }
+        public static string Area
+        { get { return "ContentManagement"; } }
+        public static string Name
+        { get { return "Section"; } }
 
         [HttpPost("[action]")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
@@ -334,7 +336,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 {
                     post = await _postService.CreatePostAsync(viewModel.Post);
 
-                    if(viewModel.Publish)
+                    if (viewModel.Publish)
                     {
                         ShowAlertSuccess($"Added post: {post.Title}");
                     }

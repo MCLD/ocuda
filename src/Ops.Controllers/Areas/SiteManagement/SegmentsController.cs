@@ -35,6 +35,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ILanguageService _languageService;
         private readonly ILocationService _locationService;
         private readonly IPermissionGroupService _permissionGroupService;
+        private readonly IProductService _productService;
         private readonly ISegmentService _segmentService;
 
         public SegmentsController(ServiceFacades.Controller<SegmentsController> context,
@@ -42,6 +43,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ILanguageService languageService,
             ILocationService locationService,
             IPermissionGroupService permissionGroupService,
+            IProductService productService,
             ISegmentService segmentService) : base(context)
         {
             _emediaService = emediaService
@@ -52,6 +54,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(locationService));
             _permissionGroupService = permissionGroupService
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
+            _productService = productService
+                ?? throw new ArgumentNullException(nameof(productService));
             _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
         }
@@ -273,6 +277,25 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     relationship = string.Format(CultureInfo.InvariantCulture,
                         "This segment is used for multiple locations: {0}",
                         string.Join(", ", locations.Select(_ => _.Name)));
+                }
+
+                var products = await _productService.GetBySegmentIdAsync(segment.Id);
+
+                if(products?.Count == 1)
+                {
+                    backLink = Url.Action(nameof(ProductsController.Details),
+                        ProductsController.Name,
+                        new
+                        {
+                            productSlug = products.First().Slug
+                        });
+                    relationship = $"This segment is used for product: {products.First().Name}";
+                }
+                else if(products?.Count > 1)
+                {
+                    relationship = string.Format(CultureInfo.InvariantCulture,
+                        "This segment is used for multiple products: {0}",
+                        string.Join(", ", products.Select(_ => _.Name)));
                 }
             }
 

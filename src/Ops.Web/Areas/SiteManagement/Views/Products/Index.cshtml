@@ -1,0 +1,99 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Products.IndexViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>Products</h1>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">Back</a>
+    </div>
+</div>
+
+@if (Model.Products.Count() == 0)
+{
+    <div class="alert alert-warning">No products found.</div>
+}
+else
+{
+    <div class="row">
+        <div class="col-12">
+            <div>
+                <table class="table table-sm table-bordered table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Active</th>
+                            <th>Shown to public</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var product in Model.Products)
+                        {
+                            <tr>
+                                <td class="align-middle">
+                                    <a asp-action="@nameof(ProductsController.Product)"
+                               asp-route-productSlug="@product.Slug">
+                                        @product.Name
+                                    </a>
+                                </td>
+                                <td class="align-middle">
+                                    @if (product.IsActive)
+                                    {
+                                        <span class="far fa-check-circle text-success"></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="far fa-times-circle text-danger"></span>
+                                    }
+                                </td>
+                                <td class="align-middle">
+                                    @if (product.IsVisibleToPublic == true)
+                                    {
+                                        <a class="btn btn-outline-success text-success"
+                                           target="_blank"
+                                           href="@Model.MakeLink(product.Slug)"
+                                           title="See public view">
+                                            <span class="fas fa-external-link-alt"></span>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="far fa-times-circle text-danger"></span>
+                                    }
+                                </td>
+                                <td class="align-middle text-nowrap">
+                                    @if (Model.IsSiteManager)
+                                    {
+                                        <a asp-action="@(nameof(ProductsController.Details))"
+                                           asp-route-productSlug="@product.Slug"
+                                           title="Configure product"
+                                           class="btn btn-outline-primary">
+                                            <span class="fas fa-cog" aria-hidden="true"></span>
+                                        </a>
+                                        <a asp-action="@(nameof(ProductsController.Mapping))"
+                                           asp-route-productSlug="@product.Slug"
+                                           title="Handle mappings"
+                                           class="btn btn-outline-primary">
+                                            <span class="fas fa-random" aria-hidden="true"></span>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        @:&nbsp;
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @if (Model.MaxPage > 1)
+    {
+        <paginate paginateModel="@Model"></paginate>
+    }
+}

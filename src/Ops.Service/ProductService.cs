@@ -6,12 +6,14 @@ using ExcelDataReader;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service
 {
@@ -117,6 +119,11 @@ namespace Ocuda.Ops.Service
             return issues;
         }
 
+        public async Task<ICollection<Product>> GetBySegmentIdAsync(int segmentId)
+        {
+            return await _productRepository.GetBySegmentIdAsync(segmentId);
+        }
+
         public async Task<Product> GetBySlugAsync(string slug)
         {
             if (string.IsNullOrEmpty(slug))
@@ -170,7 +177,24 @@ namespace Ocuda.Ops.Service
             return inventories;
         }
 
-        public async Task<IDictionary<int, int>> ParseInventory(int productId, string filename)
+        public async Task<ICollectionWithCount<Product>> GetPaginatedListAsync(BaseFilter filter)
+        {
+            return await _productRepository.GetPaginatedListAsync(filter);
+        }
+
+        public async Task LinkSegment(int productId, int segmentId)
+        {
+            var product = await _productRepository.GetByIdAsync(productId);
+            if (product == null)
+            {
+                throw new OcudaException($"Unable to find product id {productId}");
+            }
+            product.SegmentId = segmentId;
+            _productRepository.Update(product);
+            await _productRepository.SaveAsync();
+        }
+
+        public async Task<IDictionary<int, int>> ParseInventoryAsync(int productId, string filename)
         {
             var inventory = new Dictionary<int, int>();
 
@@ -285,6 +309,18 @@ namespace Ocuda.Ops.Service
             }
 
             return inventory;
+        }
+
+        public async Task UnlinkSegment(int productId)
+        {
+            var product = await _productRepository.GetByIdAsync(productId);
+            if (product == null)
+            {
+                throw new OcudaException($"Unable to find product id {productId}");
+            }
+            product.SegmentId = null;
+            _productRepository.Update(product);
+            await _productRepository.SaveAsync();
         }
 
         public async Task UpdateInventoryStatusAsync(int productId, int locationId, int itemCount)

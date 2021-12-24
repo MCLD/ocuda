@@ -1,6 +1,19 @@
 ﻿@model Ocuda.Promenade.Controllers.ViewModels.Status.ProductInventoryViewModel
-
+    
 <h1>@Model.Title</h1>
+
+@if (!string.IsNullOrEmpty(Model.SegmentHeader))
+{
+    <h2>@Model.SegmentHeader</h2>
+}
+
+@if(!string.IsNullOrEmpty(Model.SegmentText)) {
+    <div class="row">
+        <div class="col-12">
+            @Html.Raw(Model.SegmentText)
+        </div>
+    </div>
+}
 
 <table class="table table-sm table-bordered table-striped table-hover mt-2">
     <tr>
