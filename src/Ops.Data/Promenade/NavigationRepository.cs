@@ -16,12 +16,30 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
+        public async Task<Navigation> FindAsync(int id)
+        {
+            var entity = await DbSet.FindAsync(id);
+            if (entity != null)
+            {
+                _context.Entry(entity).State = EntityState.Detached;
+            }
+            return entity;
+        }
+
         public async Task<ICollection<Navigation>> GetTopLevelNavigationsAsync()
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => !_.NavigationId.HasValue)
                 .OrderBy(_ => _.Name)
+                .ToListAsync();
+        }
+
+        public async Task<ICollection<Navigation>> GetChildrenAsync(int id)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.NavigationId == id)
                 .ToListAsync();
         }
     }

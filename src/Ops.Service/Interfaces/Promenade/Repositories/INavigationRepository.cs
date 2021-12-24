@@ -6,6 +6,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 {
     public interface INavigationRepository : IGenericRepository<Navigation>
     {
+        Task<Navigation> FindAsync(int id);
+        Task<ICollection<Navigation>> GetChildrenAsync(int id);
         Task<ICollection<Navigation>> GetTopLevelNavigationsAsync();
     }
 }
