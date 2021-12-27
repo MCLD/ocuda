@@ -19,7 +19,8 @@
                         <a href="@Url.Action(nameof(PodcastsController.ShowNotes), new { podcastStub = Model.Podcast.Stub, episodeStub = Model.PodcastItem.Stub})"
                            target="_blank"
                            class="btn d-block d-md-inline-block btn-outline-primary">
-                            @Localizer[Promenade.ViewShowNotes]
+                           <span class="far fa-file-alt"></span>
+                           @Localizer[Promenade.ViewShowNotes]
                             <span class="sr-only">@Localizer[Promenade.NewWindow]</span>
                         </a>
                     </div>
