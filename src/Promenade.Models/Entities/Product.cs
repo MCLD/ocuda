@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -15,9 +16,16 @@ namespace Ocuda.Promenade.Models.Entities
 
         public bool IsActive { get; set; }
 
+        public bool IsVisibleToPublic { get; set; }
+
         [Required]
         [MaxLength(255)]
         public string Name { get; set; }
+
+        public int? SegmentId { get; set; }
+
+        [NotMapped]
+        public SegmentText SegmentText { get; set; }
 
         [Required]
         [MaxLength(255)]

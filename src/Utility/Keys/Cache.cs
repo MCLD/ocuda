@@ -192,6 +192,21 @@
         public static readonly string PromPodcastItems = "podcastitems.{0}.{1}";
 
         /// <summary>
+        /// Cached product, {0} is the product slug
+        /// </summary>
+        public static readonly string PromProduct = "product.{0}";
+
+        /// <summary>
+        /// Cached product inventory, {0} is the product id
+        /// </summary>
+        public static readonly string PromProductInventory = "productinventory.{0}";
+
+        /// <summary>
+        /// Caches set of product objects with just name and slug populated
+        /// </summary>
+        public static readonly string PromProductsSlugs = "productsslugs";
+
+        /// <summary>
         /// Cached redirect path, {0} is the requested path
         /// </summary>
         public static readonly string PromRedirectPath = "redir.{0}";

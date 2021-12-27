@@ -26,10 +26,25 @@
                 }
             </div>
         </div>
-        <audio controls class="mb-2 w-100">
+        <audio id="player" controls class="mb-2 w-100">
             <source src="@Model.PodcastItem.MediaUrl" type="@Model.PodcastItem.MediaType" />
         </audio>
         <p>@Model.PodcastItem.Description</p>
         <div><em>@Localizer[Promenade.KeywordsItem, Model.PodcastItem.Keywords]</em></div>
     </div>
 </div>
+
+@section scripts {
+    @if (Context.Items.ContainsKey(Ocuda.Promenade.Controllers.ItemKey.GoogleAnalyticsTrackingCode))
+    {
+        <script>
+        var player = document.getElementById("player");
+        player.addEventListener("play", function () {
+            gtag('event', 'Podcast play', {
+                'event_category': '@Html.Raw(Model.Podcast.Title.Replace("'", "\\'"))',
+                'event_label': '@Model.PodcastItem.Episode.Value'
+            });
+        });
+        </script>
+    }
+}

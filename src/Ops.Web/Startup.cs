@@ -194,9 +194,7 @@ namespace Ocuda.Ops.Web
                         DataProvider.SqlServer.Ops.Context>(_ => _.UseSqlServer(opsCs));
                     services.AddDbContextPool<PromenadeContext,
                         DataProvider.SqlServer.Promenade.Context>(_ => _.UseSqlServer(promCs));
-                    services.AddHealthChecks()
-                        .AddDbContextCheck<OpsContext>()
-                        .AddDbContextCheck<PromenadeContext>();
+                    services.AddHealthChecks();
                     break;
 
                 default:
@@ -403,6 +401,8 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.ImageFeatureTemplateRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILanguageRepository,
                 Data.Promenade.LanguageRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationProductMapRepository,
+                Data.Promenade.LocationProductMapRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationRepository,
                Data.Promenade.LocationRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ILocationFeatureRepository,

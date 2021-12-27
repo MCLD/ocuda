@@ -11,11 +11,17 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
     {
         Task<Location> AddLocationAsync(Location location);
 
+        Task AddLocationMappingAsync(int productId, string importLocation, int locationId);
+
         Task DeleteAsync(int id);
+
+        Task DeleteMappingAsync(int locationMapId);
 
         Task<Location> EditAlwaysOpenAsync(Location location);
 
         Task<Location> EditAsync(Location location);
+
+        Task<IEnumerable<LocationProductMap>> GetAllLocationProductMapsAsync(int productId);
 
         Task<List<Location>> GetAllLocationsAsync();
 
@@ -29,10 +35,14 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<string> GetLocationLinkAsync(string placeId);
 
+        Task<IDictionary<string, int>> GetLocationProductMapAsync(int productId);
+
         Task<ICollection<Location>> GetLocationsBySegment(int segmentId);
 
         Task<ICollection<LocationSummary>> GetLocationSummariesAsync(string address);
 
         Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(BaseFilter filter);
+
+        Task UpdateLocationMappingAsync(int locationMapId, string importLocation, int locationId);
     }
 }
