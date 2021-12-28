@@ -65,5 +65,8 @@ namespace Ocuda.Promenade.Models.Entities
 
         [MaxLength(255)]
         public string Subtitle { get; set; }
+
+        [DisplayName("Show Notes Segment")]
+        public int? ShowNotesSegmentId { get; set; }
     }
 }

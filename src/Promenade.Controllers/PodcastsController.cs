@@ -25,16 +25,20 @@ namespace Ocuda.Promenade.Controllers
     {
         private readonly IPathResolverService _pathResolverService;
         private readonly PodcastService _podcastService;
+        private readonly SegmentService _segmentService;
 
         public PodcastsController(ServiceFacades.Controller<PodcastsController> context,
             IPathResolverService pathResolverService,
-            PodcastService podcastService)
+            PodcastService podcastService,
+            SegmentService segmentService)
             : base(context)
         {
             _pathResolverService = pathResolverService
                 ?? throw new ArgumentNullException(nameof(pathResolverService));
             _podcastService = podcastService
                 ?? throw new ArgumentNullException(nameof(podcastService));
+            _segmentService = segmentService
+                ?? throw new ArgumentNullException(nameof(segmentService));
         }
 
         public static string Name { get { return "Podcasts"; } }
@@ -483,6 +487,51 @@ namespace Ocuda.Promenade.Controllers
                     .ToString("R", CultureInfo.InvariantCulture));
 
             return File(stream.ToArray(), "application/rss+xml; charset=utf-8");
+        }
+
+        [Route("{podcastStub}/{episodeStub}/[action]")]
+        public async Task<IActionResult> ShowNotes(string podcastStub, string episodeStub)
+        {
+            var podcast = await _podcastService.GetByStubAsync(podcastStub?.Trim());
+
+            if (podcast == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            var podcastItem = await _podcastService
+                .GetItemByStubAsync(podcast.Id, episodeStub?.Trim());
+
+            if (podcastItem == null)
+            {
+                return RedirectToAction(nameof(Podcast), new { stub = podcastStub });
+            }
+
+            if (podcastItem.ShowNotesSegmentId.HasValue)
+            {
+                var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
+                var segmentText = await _segmentService.GetSegmentTextBySegmentIdAsync(
+                    podcastItem.ShowNotesSegmentId.Value, forceReload);
+
+                segmentText.Text = CommonMark.CommonMarkConverter.Convert(
+                        segmentText.Text);
+
+                var viewModel = new ShowNotesViewModel
+                {
+                    Podcast = podcast,
+                    PodcastItem = podcastItem,
+                    ShowNotesSegment = segmentText
+                };
+
+                PageTitle = $"{_localizer[i18n.Keys.Promenade.ShowNotesFor, podcastItem.Title]} - {podcast.Title}";
+
+                return View(viewModel);
+            }
+            else
+            {
+                return NotFound();
+            }
         }
     }
 }

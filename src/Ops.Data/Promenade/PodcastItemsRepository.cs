@@ -58,5 +58,13 @@ namespace Ocuda.Ops.Data.Promenade
                     .ToListAsync()
             };
         }
+
+        public async Task<PodcastItem> GetUsingSegmentAsync(int segmentId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.ShowNotesSegmentId == segmentId)
+                .FirstOrDefaultAsync();
+        }
     }
 }

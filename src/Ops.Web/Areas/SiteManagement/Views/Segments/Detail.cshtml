@@ -1,7 +1,7 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment.DetailViewModel
 
 @section styles {
-    <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
 
 <div class="row mb-2">
@@ -15,22 +15,22 @@
         @if (!string.IsNullOrEmpty(Model.BackLink))
         {
             <a href="@Model.BackLink"
-               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
         }
         else
         {
             <a asp-action="Index"
-               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Cancel</a>
+           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Cancel</a>
         }
         @if (!Model.NewSegmentText && string.IsNullOrEmpty(Model.BackLink))
         {
             <button type="button"
-                    class="btn btn-outline-danger mt-2 mb-1 mr-2 float-right"
-                    data-toggle="modal"
-                    data-target="#deleteModal"
-                    data-segmentId="@Model.SegmentId"
-                    data-languageId="@Model.LanguageId"
-                    data-languageDescription="@Model.LanguageDescription">
+                class="btn btn-outline-danger mt-2 mb-1 mr-2 float-right"
+                data-toggle="modal"
+                data-target="#deleteModal"
+                data-segmentId="@Model.SegmentId"
+                data-languageId="@Model.LanguageId"
+                data-languageDescription="@Model.LanguageDescription">
                 <span class="fas fa-minus-circle"></span>
                 Delete Segment
             </button>
@@ -64,24 +64,42 @@
     </div>
 }
 
-<div class="row" style="padding-top: 1rem;">
+<div class="row py-2">
     <div class="col-12">
         <span class="d-none"><input asp-for="SegmentName" formgroup readonly /></span>
-        <input asp-for="SegmentStartDate"
+        @if (Model.SegmentStartDate.HasValue || Model.SegmentEndDate.HasValue)
+        {
+            <input asp-for="SegmentStartDate"
                formgroup
                value="@Model.SegmentStartDate?.ToString()"
                readonly />
-        <input asp-for="SegmentEndDate"
+            <input asp-for="SegmentEndDate"
                formgroup
                value="@Model.SegmentStartDate?.ToString()"
                readonly />
-        <select asp-for="SelectedLanguage" asp-items="Model.LanguageList" formgroup></select>
-    </div>
-</div>
-
-<div class="row" style="padding-bottom: 1rem;">
-    <div class="col-12 col-md-9 offset-md-3">
-        <hr />
+        }
+        @if (Model.LanguageList?.Count() > 1)
+        {
+            <div class="form-group row">
+                <div class="col-md-3 text-md-right">
+                    <label asp-for="SelectedLanguage" class="col-form-label"></label>
+                </div>
+                <div class="col-md-9">
+                    @foreach (var item in Model.LanguageList.Where(_ => !_.Disabled))
+                    {
+                        <a href="@Url.Action(nameof(SegmentsController.Detail), new { id = Model.SegmentId, language = item.Value })"
+                   class="btn btn-sm btn-outline-info mt-1 @(item.Selected ? "active" : null)">@item.Text</a>
+                    }
+                </div>
+            </div>
+            <div class="row d-none oc-save-warning">
+                <div class="offset-md-3 col-md-9">
+                    <div class="alert alert-warning">
+                        <span class="fas fa-arrow-circle-up"></span> Unsaved changes will be lost if you change languages.
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 </div>
 
@@ -89,7 +107,21 @@
     <input asp-for="SegmentId" type="hidden" />
     <input asp-for="LanguageId" type="hidden" />
 
-    <input asp-for="SegmentText.Header" formgroup />
+    @if (!string.IsNullOrEmpty(Model.AutomatedHeaderMarkup))
+    {
+        <div class="form-group row">
+            <div class="col-md-3 text-md-right">
+                <label asp-for="AutomatedHeaderMarkup" class="col-form-label"></label>
+            </div>
+            <div class="col-md-9" style="padding-top: 0.4rem;">
+                @Html.Raw(Model.AutomatedHeaderMarkup)
+            </div>
+        </div>
+    }
+    else
+    {
+        <input asp-for="SegmentText.Header" formgroup />
+    }
 
     <div class="form-group row">
         <div class="col-md-3 text-md-right">
@@ -104,37 +136,51 @@
 
     <div class="row">
         <div class="offset-md-3 col-md-9">
-            <button type="submit"
-                    class="btn btn-outline-success btn-lg"
-                    buttonspinner>
-                <span class="far fa-save"></span>
-                Save
-            </button>
+            <div class="d-flex">
+                <button type="submit"
+                        class="btn btn-outline-success btn-lg"
+                        buttonspinner>
+                    <span class="far fa-save"></span>
+                    Save
+                </button>
+                <div class="d-none oc-save-warning ml-3 flex-fill">
+                    <div class="alert alert-warning mb-0">
+                        <span class="fas fa-exclamation-triangle"></span>
+                        You have unsaved changes.
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </form>
 
 @section scripts {
-    <script src="~/js/md.min.js" asp-append-version="true"></script>
+<script src="~/js/md.min.js" asp-append-version="true"></script>
 
-    <script>
-        $(function () {
-            var editor = new Markdown.Editor($("#SegmentText_Text"), { allowUploads: false });
-            if (editor) {
-                editor.run();
-            }
+<script>
+    $(function () {
+        var editor = new Markdown.Editor($("#SegmentText_Text"), { 
+            allowUploads: false,
+            allowImages: false,
+            allowCode: @Json.Serialize(!Model.IsShowNotes),
+            allowHR: @Json.Serialize(!Model.IsShowNotes)
         });
+        if (editor) {
+            editor.run();
+        }
+    });
 
-        var segmentDetailsUrl
-            = "@Url.Action(nameof(SegmentsController.Detail), new { id = Model.SegmentId })";
+    $("#SegmentText_Text").keydown(function(event) {
+        $(".oc-save-warning").removeClass("d-none");
+    });
 
-        $("#SelectedLanguage").on("change", function () {
-            window.location.href = segmentDetailsUrl + "?language=" + $(this).val();
-        });
+    $("#SegmentText_Header").keydown(function(event) {
+        $(".oc-save-warning").removeClass("d-none");
+    });
 
-        $("#deleteModal").on("show.bs.modal", function (e) {
-            var languageDescription = $(e.relatedTarget).data("languagedescription");
-            $(this).find(".modal-text").text("Are you sure you want to delete the " + languageDescription + " text for this segment?");
-        });
-    </script>
+    $("#deleteModal").on("show.bs.modal", function (e) {
+        var languageDescription = $(e.relatedTarget).data("languagedescription");
+        $(this).find(".modal-text").text("Are you sure you want to delete the " + languageDescription + " text for this segment?");
+    });
+</script>
 }

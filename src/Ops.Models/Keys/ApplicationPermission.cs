@@ -13,5 +13,6 @@
         public static readonly string EmediaManagement = "EmediaManagement";
 
         public static readonly string IntranetFrontPageManagement = "IntranetFrontPageManagement";
+        public static readonly string PodcastShowNotesManagement = "PodcastShowNotesManagement";
     }
 }

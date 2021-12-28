@@ -717,4 +717,12 @@
     <value>{0} - Current Availability</value>
     <comment>Title of a product item page, {0} will be replaced with the item name</comment>
   </data>
+  <data name="Show notes for: {0}">
+    <value>Show notes for: {0}</value>
+    <comment>Header for a podcast's show notes; {0} is the episode title</comment>
+  </data>
+  <data name="View show notes">
+    <value>View show notes</value>
+    <comment>Label that links to a podcast's show notes</comment>
+  </data>
 </root>

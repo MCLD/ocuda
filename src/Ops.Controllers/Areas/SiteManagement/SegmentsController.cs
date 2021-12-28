@@ -35,6 +35,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ILanguageService _languageService;
         private readonly ILocationService _locationService;
         private readonly IPermissionGroupService _permissionGroupService;
+        private readonly IPodcastService _podcastService;
         private readonly IProductService _productService;
         private readonly ISegmentService _segmentService;
 
@@ -43,6 +44,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ILanguageService languageService,
             ILocationService locationService,
             IPermissionGroupService permissionGroupService,
+            IPodcastService podcastService,
             IProductService productService,
             ISegmentService segmentService) : base(context)
         {
@@ -54,14 +56,18 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(locationService));
             _permissionGroupService = permissionGroupService
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
+            _podcastService = podcastService
+                ?? throw new ArgumentNullException(nameof(podcastService));
             _productService = productService
                 ?? throw new ArgumentNullException(nameof(productService));
             _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
         }
 
-        public static string Area { get { return "SiteManagement"; } }
-        public static string Name { get { return "Segments"; } }
+        public static string Area
+        { get { return "SiteManagement"; } }
+        public static string Name
+        { get { return "Segments"; } }
 
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpPost]
@@ -92,7 +98,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (model.Segment.StartDate.HasValue && model.Segment.EndDate.HasValue
                 && model.Segment.StartDate > model.Segment.EndDate)
             {
-                ModelState.AddModelError("Segment.StartDate", "Start Date cannot be after the End Date.");
+                ModelState.AddModelError("Segment.StartDate", 
+                    "Start Date cannot be after the End Date.");
             }
 
             JsonResponse response;
@@ -229,21 +236,37 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var segmentText = await _segmentService
                 .GetBySegmentAndLanguageAsync(id, selectedLanguage.Id);
 
-            string backLink = null;
-            string relationship = null;
+            var viewModel = new DetailViewModel
+            {
+                LanguageDescription = selectedLanguage.Description,
+                LanguageId = selectedLanguage.Id,
+                LanguageList = new SelectList(languages,
+                    nameof(Language.Name),
+                    nameof(Language.Description),
+                    selectedLanguage.Name),
+                SegmentEndDate = segment.EndDate,
+                SegmentId = segment.Id,
+                SegmentName = segment.Name,
+                SegmentStartDate = segment.StartDate,
+                SegmentText = await _segmentService
+                    .GetBySegmentAndLanguageAsync(id, selectedLanguage.Id)
+            };
+
+            viewModel.NewSegmentText = viewModel.SegmentText == null;
 
             var pageLayoutId
                 = await _segmentService.GetPageLayoutIdForSegmentAsync(segment.Id);
 
             if (pageLayoutId.HasValue)
             {
-                backLink = Url.Action(nameof(PagesController.LayoutDetail),
+                viewModel.BackLink = Url.Action(nameof(PagesController.LayoutDetail),
                     PagesController.Name,
                     new
                     {
                         id = pageLayoutId.Value
                     });
-                relationship = "This segment is used page layout ID: " + pageLayoutId.Value;
+                viewModel.Relationship
+                    = $"This segment is used page layout ID: {pageLayoutId.Value}";
             }
             else
             {
@@ -251,71 +274,78 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                 if (emediaGroup != null)
                 {
-                    backLink = Url.Action(nameof(EmediaController.GroupDetails),
+                    viewModel.BackLink = Url.Action(nameof(EmediaController.GroupDetails),
                         EmediaController.Name,
                         new
                         {
                             id = emediaGroup.Id
                         });
-                    relationship = "This segment is used by emedia group: " + emediaGroup.Name;
+                    viewModel.Relationship
+                        = "This segment is used by emedia group: {emediaGroup.Name}";
                 }
-               
+
                 var locations = await _locationService.GetLocationsBySegment(segment.Id);
 
                 if (locations?.Count == 1)
                 {
-                    backLink = Url.Action(nameof(LocationsController.Location),
+                    viewModel.BackLink = Url.Action(nameof(LocationsController.Location),
                         LocationsController.Name,
                         new
                         {
                             locationStub = locations.First().Stub
                         });
-                    relationship = "This segment is used for location: " + locations.First().Name;
+                    viewModel.Relationship
+                        = "This segment is used for location: {locations.First().Name}";
                 }
                 if (locations?.Count > 1)
                 {
-                    relationship = string.Format(CultureInfo.InvariantCulture,
+                    viewModel.Relationship = string.Format(CultureInfo.InvariantCulture,
                         "This segment is used for multiple locations: {0}",
                         string.Join(", ", locations.Select(_ => _.Name)));
                 }
 
+                var episode = await _podcastService.GetEpisodeBySegmentIdAsync(segment.Id);
+
+                if (episode != null)
+                {
+                    viewModel.BackLink = Url.Action(nameof(PodcastsController.EditEpisode),
+                        PodcastsController.Name,
+                        new
+                        {
+                            episodeId = episode.Id
+                        });
+                    viewModel.Relationship
+                        = $"This segment is used for podcast '{episode.Podcast.Title}' episode #{episode.Episode.Value}";
+                    string published = episode.PublishDate.HasValue 
+                        ? $"published {episode.PublishDate.Value.ToLongDateString()}"
+                        : "not yet published";
+                    viewModel.AutomatedHeaderMarkup
+                        = $"<strong>Show notes for {episode.Title}</strong><br>{episode.Podcast.Title}. <em>Episode {episode.Episode}, {published}.</em>";
+                }
+                viewModel.IsShowNotes = episode != null;
+
                 var products = await _productService.GetBySegmentIdAsync(segment.Id);
 
-                if(products?.Count == 1)
+                if (products?.Count == 1)
                 {
-                    backLink = Url.Action(nameof(ProductsController.Details),
+                    viewModel.BackLink = Url.Action(nameof(ProductsController.Details),
                         ProductsController.Name,
                         new
                         {
                             productSlug = products.First().Slug
                         });
-                    relationship = $"This segment is used for product: {products.First().Name}";
+                    viewModel.Relationship
+                        = $"This segment is used for product: {products.First().Name}";
+                    viewModel.AutomatedHeaderMarkup
+                        = $"<strong>{products.First().Name} - Current Availability</strong>";
                 }
-                else if(products?.Count > 1)
+                else if (products?.Count > 1)
                 {
-                    relationship = string.Format(CultureInfo.InvariantCulture,
+                    viewModel.Relationship = string.Format(CultureInfo.InvariantCulture,
                         "This segment is used for multiple products: {0}",
                         string.Join(", ", products.Select(_ => _.Name)));
                 }
             }
-
-            var viewModel = new DetailViewModel
-            {
-                BackLink = backLink,
-                LanguageDescription = selectedLanguage.Description,
-                LanguageId = selectedLanguage.Id,
-                LanguageList = new SelectList(languages,
-                    nameof(Language.Name),
-                    nameof(Language.Description),
-                    selectedLanguage.Name),
-                NewSegmentText = segmentText == null,
-                Relationship = relationship,
-                SegmentEndDate = segment.EndDate,
-                SegmentId = segment.Id,
-                SegmentName = segment.Name,
-                SegmentStartDate = segment.StartDate,
-                SegmentText = segmentText
-            };
 
             return View(viewModel);
         }
@@ -495,6 +525,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     {
                         return await HasAppPermissionAsync(_permissionGroupService,
                             ApplicationPermission.EmediaManagement);
+                    }
+
+                    var podcast = await _podcastService.GetEpisodeBySegmentIdAsync(segmentId);
+                    if (podcast != null)
+                    {
+                        return await HasPermissionAsync<PermissionGroupPodcastItem>(_permissionGroupService,
+                            podcast.PodcastId) && await HasAppPermissionAsync(_permissionGroupService,
+                                ApplicationPermission.PodcastShowNotesManagement);
                     }
                 }
                 return false;

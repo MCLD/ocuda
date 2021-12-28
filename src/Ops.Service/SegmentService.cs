@@ -18,6 +18,7 @@ namespace Ocuda.Ops.Service
     {
         private readonly IEmediaGroupRepository _emediaGroupRepository;
         private readonly ILocationRepository _locationRepository;
+        private readonly IPodcastItemsRepository _podcastItemsRepository;
         private readonly IScheduleRequestSubjectRepository _scheduleRequestSubjectRepository;
         private readonly ISegmentRepository _segmentRepository;
         private readonly ISegmentTextRepository _segmentTextRepository;
@@ -26,6 +27,7 @@ namespace Ocuda.Ops.Service
             IHttpContextAccessor httpContextAccessor,
             IEmediaGroupRepository emediaGroupRepository,
             ILocationRepository locationRepository,
+            IPodcastItemsRepository podcastItemsRepository,
             IScheduleRequestSubjectRepository scheduleRequestSubjectRepository,
             ISegmentRepository segmentRepository,
             ISegmentTextRepository segmentTextRepository) : base(logger, httpContextAccessor)
@@ -34,6 +36,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(emediaGroupRepository));
             _locationRepository = locationRepository
                 ?? throw new ArgumentNullException(nameof(locationRepository));
+            _podcastItemsRepository = podcastItemsRepository
+                ?? throw new ArgumentException(nameof(podcastItemsRepository));
             _scheduleRequestSubjectRepository = scheduleRequestSubjectRepository
                 ?? throw new ArgumentNullException(nameof(scheduleRequestSubjectRepository));
             _segmentRepository = segmentRepository
@@ -170,6 +174,12 @@ namespace Ocuda.Ops.Service
             foreach (var scheduleRequestSubject in scheduleRequestSubjects)
             {
                 inUseBy.Add($"Schedule Request Subject: {scheduleRequestSubject.Subject}");
+            }
+
+            var episode = await _podcastItemsRepository.GetUsingSegmentAsync(id);
+            if (episode != null)
+            {
+                inUseBy.Add($"Podcast Episode: {episode.Title}");
             }
 
             return inUseBy;

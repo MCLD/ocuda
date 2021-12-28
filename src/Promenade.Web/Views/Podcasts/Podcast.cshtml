@@ -45,7 +45,9 @@
                             @item.Title
                         </a>
                     </h2>
-                    <div class="mb-2"><em>@Localizer[Promenade.PodcastEpisodePublished, item.Episode, item.PublishDate.Value.ToLongDateString()]</em></div>
+                    <div class="mb-2">
+                        <em>@Localizer[Promenade.PodcastEpisodePublished, item.Episode, item.PublishDate.Value.ToLongDateString()]</em>
+                    </div>
                 </div>
                 <div class="col-12 col-lg-6 col-xl-5 text-right">
                     <audio controls class="mb-2 w-100" data-episode="@item.Episode.Value">
@@ -56,6 +58,17 @@
         </div>
         <div class="col-12">
             <p>@item.Description</p>
+            @if (item.ShowNotesSegmentId.HasValue)
+            {
+                <a href="@Url.Action(nameof(PodcastsController.ShowNotes), new { podcastStub = Model.Podcast.Stub, episodeStub = item.Stub})"
+                   target="_blank"
+                   aria-label="@Localizer[Promenade.NewWindow]"
+                   title="@Localizer[Promenade.ShowNotesFor, item.Title]"
+                   class="btn d-block d-md-inline-block btn-outline-primary">
+                   <span class="far fa-file-alt"></span>
+                   @Localizer[Promenade.ViewShowNotes]
+                </a>
+            }
         </div>
     </div>
     <hr aria-hidden="true" />
