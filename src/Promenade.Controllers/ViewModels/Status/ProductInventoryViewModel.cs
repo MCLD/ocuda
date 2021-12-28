@@ -22,6 +22,8 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Status
         }
 
         public List<LocationInventory> LocationInventories { get; }
+        public string SegmentHeader { get; set; }
+        public string SegmentText { get; set; }
         public string Title { get; set; }
     }
 }

@@ -14,13 +14,16 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public int Id { get; set; }
 
+        [Display(Name = "Is it active?")]
         public bool IsActive { get; set; }
 
+        [Display(Name = "Visible to the public?")]
         public bool IsVisibleToPublic { get; set; }
 
         [Required]
         [MaxLength(255)]
         public string Name { get; set; }
+        [Display(Name = "Segment text")]
 
         public int? SegmentId { get; set; }
 

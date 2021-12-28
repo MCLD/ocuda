@@ -95,6 +95,19 @@ namespace Ocuda.Promenade.Controllers
                 Title = PageTitle,
             };
 
+            if (product.SegmentId.HasValue)
+            {
+                if (!string.IsNullOrEmpty(product.SegmentText.Header))
+                {
+                    viewModel.SegmentHeader = product.SegmentText.Header.Trim();
+                }
+                if (!string.IsNullOrEmpty(product.SegmentText.Text))
+                {
+                    viewModel.SegmentText
+                        = CommonMark.CommonMarkConverter.Convert(product.SegmentText.Text);
+                }
+            }
+
             viewModel.LocationInventories.AddRange(locationInventories.OrderBy(_ => _.Name));
 
             return View(viewModel);
