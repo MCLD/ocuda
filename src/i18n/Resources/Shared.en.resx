@@ -689,6 +689,34 @@
     <value>Enter a 5 digit ZIP code</value>
     <comment>Prompt to enter a five digit ZIP code to find the nearest locations</comment>
   </data>
+  <data name="Location">
+    <value>Location</value>
+    <comment>Column header for a location</comment>
+  </data>
+  <data name="Hours">
+    <value>Hours</value>
+    <comment>Column header describing when the location is open</comment>
+  </data>
+  <data name="Status">
+    <value>Status</value>
+    <comment>Column header with product inventory status</comment>
+  </data>
+  <data name="Last Update">
+    <value>Last Update</value>
+    <comment>Column header describing when data was last updated</comment>
+  </data>
+  <data name="Has {0}">
+    <value>Has {0}</value>
+    <comment>Text indicating that a location has an item. {0} will be replaced with the name of the item</comment>
+  </data>
+  <data name="Does not have {0}">
+    <value>Does not have {0}</value>
+    <comment>Text indicating that a location does not have an item. {0} will be replaced with the name of the item</comment>
+  </data>
+  <data name="{0} - Current Availability">
+    <value>{0} - Current Availability</value>
+    <comment>Title of a product item page, {0} will be replaced with the item name</comment>
+  </data>
   <data name="Show notes for: {0}">
     <value>Show notes for: {0}</value>
     <comment>Header for a podcast's show notes; {0} is the episode title</comment>

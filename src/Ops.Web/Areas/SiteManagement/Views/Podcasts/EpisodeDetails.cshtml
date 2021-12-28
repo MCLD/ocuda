@@ -323,6 +323,13 @@
                     }
                     else if (!string.IsNullOrEmpty(Model.ShowNotesSegmentName) && Model.CanEditShowNotes)
                     {
+                        <a class="btn btn-outline-danger"
+                           data-target="#deleteModal"
+                           data-toggle="modal">
+                            <span class="fas fa-minus-circle"
+                                  aria-hidden="true"
+                                  title="Delete segment"></span>
+                        </a>
                         <a class="btn btn-outline-primary"
                            asp-action="@nameof(SegmentsController.Detail)"
                            asp-controller="@SegmentsController.Name"
@@ -330,13 +337,6 @@
                             <span class="far fa-file-alt"
                                   aria-hidden="true"
                                   title="Edit segment"></span>
-                        </a>
-                        <a class="btn btn-danger"
-                           data-target="#deleteModal"
-                           data-toggle="modal">
-                            <span class="fas fa-minus-circle"
-                                  aria-hidden="true"
-                                  title="Delete segment"></span>
                         </a>
                     }
                 </div>
