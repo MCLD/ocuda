@@ -5,21 +5,10 @@
         <h1>Historical Incident Summary</h1>
     </div>
     <div class="col-sm-6">
-        @if (string.IsNullOrEmpty(Model.SearchText))
-        {
-            <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
-           asp-controller="@HistoricalController.Name"
-           asp-action="@(nameof(HistoricalController.Index))"
-           asp-route-page="@Model.Page">Back</a>
-        }
-        else
-        {
-            <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
-           asp-controller="@HistoricalController.Name"
-           asp-action="@(nameof(HistoricalController.Search))"
-           asp-route-SearchText="@Model.SearchText"
-           asp-route-page="@Model.Page">Back</a>
-        }
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-action="@Model.BackAction"
+           asp-route-searchText="@Model.SearchText"
+           asp-route-page="@(Model.Page > 1 ? Model.Page : null)">Back</a>
         <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
            asp-action="@nameof(HistoricalController.Download)"
            asp-route-historicalIncidentId="@Model.HistoricalIncident.Id">
