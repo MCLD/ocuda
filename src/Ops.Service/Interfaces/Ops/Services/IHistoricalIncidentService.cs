@@ -10,6 +10,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
     {
         public Task<HistoricalIncident> GetAsync(int id);
 
-        Task<DataWithCount<ICollection<HistoricalIncident>>> GetPaginatedAsync(SearchFilter filter);
+        Task<DataWithCount<ICollection<HistoricalIncident>>> 
+            GetPaginatedAsync(SearchFilter filter);
     }
 }

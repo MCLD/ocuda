@@ -1,0 +1,56 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.HistoricalIndexViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>Historical Incidents</h1>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HistoricalController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Incident.HistoricalController.Index))">Back</a>
+    </div>
+</div>
+
+@if (Model.HistoricalIncidents.Count() == 0)
+{
+    <div class="alert alert-warning">No historical incidents found.</div>
+}
+else
+{
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-sm table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>Date &amp; Time</th>
+                        <th>Branch</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var historicalIncident in Model.HistoricalIncidents)
+                    {
+                        <tr>
+                            <td class="align-middle">
+                                <a asp-action="@nameof(HistoricalController.Details)"
+                           asp-route-historicalIncidentId="@historicalIncident.Id">
+                                    @historicalIncident.IncidentAt.ToString("g")
+                                </a>
+                            </td>
+                            <td class="align-middle">
+                                @historicalIncident.Branch
+                            </td>
+                            <td class="align-middle">
+                                @historicalIncident.IncidentType
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @if (Model.MaxPage > 1)
+    {
+        <paginate paginateModel="@Model"></paginate>
+    }
+}

@@ -16,7 +16,8 @@ namespace Ocuda.Ops.Data.Ops
     public class HistoricalIncidentRepository
         : OpsRepository<OpsContext, HistoricalIncident, int>, IHistoricalIncidentRepository
     {
-        public HistoricalIncidentRepository(Repository<OpsContext> repositoryFacade, ILogger logger)
+        public HistoricalIncidentRepository(Repository<OpsContext> repositoryFacade,
+            ILogger<HistoricalIncidentRepository> logger)
             : base(repositoryFacade, logger)
         {
         }

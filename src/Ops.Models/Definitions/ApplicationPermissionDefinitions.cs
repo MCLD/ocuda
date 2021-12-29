@@ -36,6 +36,12 @@ namespace Ocuda.Ops.Models.Definitions
                 Id = ApplicationPermission.PodcastShowNotesManagement,
                 Name = "Podcast Show Notes Management",
                 Info = "Users with this permission can add and edit podcast show notes."
+            },
+            new ApplicationPermissionDefinition
+            {
+                Id = ApplicationPermission.ViewAllIncidentReports,
+                Name = "View All Incident Reports",
+                Info = "Users with this permission can view all incident reports, not just their own."
             }
         };
     }
