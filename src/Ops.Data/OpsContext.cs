@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +58,13 @@ namespace Ocuda.Ops.Data
         public DbSet<FileType> FileTypes { get; set; }
         public DbSet<HistoricalIncident> HistoricalIncidents { get; set; }
 
+        public DbSet<IncidentFollowup> IncidentFollowups { get; set; }
+        public DbSet<IncidentParticipant> IncidentParticipants { get; set; }
+        public DbSet<IncidentRelationship> IncidentRelationships { get; set; }
+        public DbSet<Incident> Incidents { get; set; }
+        public DbSet<IncidentStaff> IncidentStaffs { get; set; }
+        public DbSet<IncidentType> IncidentTypes { get; set; }
+
         public DbSet<LinkLibrary> LinkLibraries { get; set; }
 
         public DbSet<Link> Links { get; set; }
@@ -95,13 +103,12 @@ namespace Ocuda.Ops.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // turn off cascading deletes
-            foreach (var relationship in modelBuilder.Model
-                .GetEntityTypes()
-                .SelectMany(e => e.GetForeignKeys()))
+            if(modelBuilder == null)
             {
-                relationship.DeleteBehavior = DeleteBehavior.Restrict;
+                throw new ArgumentNullException(nameof(modelBuilder));
             }
+
+            base.OnModelCreating(modelBuilder);
 
             // configure composite keys
             // https://docs.microsoft.com/en-us/ef/core/modeling/keys
@@ -117,10 +124,8 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.EmailTemplateId, _.PromenadeLanguageName });
             modelBuilder.Entity<FileLibraryFileType>()
                 .HasKey(_ => new { _.FileLibraryId, _.FileTypeId });
-            modelBuilder.Entity<UserMetadata>()
-                .HasKey(_ => new { _.UserId, _.UserMetadataTypeId });
-            modelBuilder.Entity<SectionCategory>()
-                .HasKey(_ => new { _.SectionId, _.CategoryId });
+            modelBuilder.Entity<IncidentRelationship>()
+                .HasKey(_ => new { _.IncidentId, _.RelatedIncidentId });
             modelBuilder.Entity<PermissionGroupApplication>()
                 .HasKey(_ => new { _.PermissionGroupId, _.ApplicationPermission });
             modelBuilder.Entity<PermissionGroupPageContent>()
@@ -130,9 +135,13 @@ namespace Ocuda.Ops.Data
             modelBuilder.Entity<PermissionGroupReplaceFiles>()
                 .HasKey(_ => new { _.PermissionGroupId, _.FileLibraryId });
             modelBuilder.Entity<PermissionGroupSectionManager>()
-               .HasKey(_ => new { _.PermissionGroupId, _.SectionId });
+                .HasKey(_ => new { _.PermissionGroupId, _.SectionId });
             modelBuilder.Entity<PostCategory>()
                 .HasKey(_ => new { _.PostId, _.CategoryId });
+            modelBuilder.Entity<SectionCategory>()
+                .HasKey(_ => new { _.SectionId, _.CategoryId });
+            modelBuilder.Entity<UserMetadata>()
+                .HasKey(_ => new { _.UserId, _.UserMetadataTypeId });
         }
 
         #region IMigratableContext

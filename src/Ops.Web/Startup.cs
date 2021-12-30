@@ -324,6 +324,16 @@ namespace Ocuda.Ops.Web
                 Data.Ops.FileTypeRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IHistoricalIncidentRepository,
                 Data.Ops.HistoricalIncidentRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IIncidentFollowupRepository,
+                Data.Ops.IncidentFollowupRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IIncidentParticipantRepository,
+                Data.Ops.IncidentParticipantRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IIncidentRelationshipRepository,
+                Data.Ops.IncidentRelationshipRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IIncidentRepository,
+                Data.Ops.IncidentRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IIncidentStaffRepository,
+                Data.Ops.IncidentStaffRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkLibraryRepository,
                 Data.Ops.LinkLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository,
@@ -465,6 +475,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IHistoricalIncidentService, HistoricalIncidentService>();
             services.AddScoped<IImageFeatureService, ImageFeatureService>();
+            services.AddScoped<IIncidentService, IncidentService>();
             services.AddScoped<IInitialSetupService, InitialSetupService>();
             services.AddScoped<IInsertSampleDataService, InsertSampleDataService>();
             services.AddScoped<ILanguageService, LanguageService>();
