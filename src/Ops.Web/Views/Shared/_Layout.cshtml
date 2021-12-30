@@ -54,10 +54,10 @@
                         @foreach (var opsSection in (ICollection<Ocuda.Ops.Models.Entities.Section>)Context.Items[ItemKey.Sections])
                         {
                             <a class="dropdown-item"
-                               asp-area=""
-                               asp-route-slug="@opsSection.Slug"
-                               asp-controller="@HomeController.Name"
-                               asp-action="@(nameof(HomeController.SectionIndex))">
+                       asp-area=""
+                       asp-route-slug="@opsSection.Slug"
+                       asp-controller="@HomeController.Name"
+                       asp-action="@(nameof(HomeController.SectionIndex))">
                                 @if (!string.IsNullOrEmpty(opsSection.Icon))
                                 {
                                     <span class="@opsSection.Icon fa-fw"></span>
@@ -102,6 +102,13 @@
                             <span class="far fa-clock"></span>
                             Book a Librarian
                         </a>
+                        <a class="dropdown-item"
+                           asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
+                           asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.Incident))"
+                           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Index))">
+                            <span class="fas fa-user-injured"></span>
+                            Incident Reports
+                        </a>
                     </div>
                 </li>
             </ul>
@@ -135,28 +142,28 @@
         <div class="collapse navbar-collapse justify-content-end">
             <ul class="navbar-nav">
                 @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true
-                  || Context.User?.HasClaim(ClaimType.HasContentAdminRights, ClaimType.HasContentAdminRights) == true
-                  || Context.User?.HasClaim(ClaimType.HasSiteAdminRights, ClaimType.HasSiteAdminRights) == true)
+                || Context.User?.HasClaim(ClaimType.HasContentAdminRights, ClaimType.HasContentAdminRights) == true
+                || Context.User?.HasClaim(ClaimType.HasSiteAdminRights, ClaimType.HasSiteAdminRights) == true)
                 {
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-white"
-                           href="#"
-                           id="navbarManagementDropdown"
-                           role="button"
-                           data-toggle="dropdown"
-                           aria-haspopup="true"
-                           aria-expanded="false"
-                           title="Management">
+                       href="#"
+                       id="navbarManagementDropdown"
+                       role="button"
+                       data-toggle="dropdown"
+                       aria-haspopup="true"
+                       aria-expanded="false"
+                       title="Management">
                             <span class="fas fa-cog fa-fw"></span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right"
-                             aria-labelledby="navbarManagementDropdown">
+                         aria-labelledby="navbarManagementDropdown">
                             @if (Context.User?.HasClaim(ClaimType.HasContentAdminRights, ClaimType.HasContentAdminRights) == true)
                             {
                                 <a class="dropdown-item"
-                                   asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
-                                   asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement))"
-                                   asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">
+                           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
+                           asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement))"
+                           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">
                                     <span class="fas fa-network-wired fa-fw"></span>
                                     Intranet Management
                                 </a>
@@ -164,9 +171,9 @@
                             @if (Context.User?.HasClaim(ClaimType.HasSiteAdminRights, ClaimType.HasSiteAdminRights) == true)
                             {
                                 <a class="dropdown-item"
-                                   asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
-                                   asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement))"
-                                   asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">
+                           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
+                           asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement))"
+                           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">
                                     <span class="fas fa-globe-americas fa-fw"></span>
                                     Web Site Management
                                 </a>
@@ -178,11 +185,11 @@
                 {
                     <li class="nav-item" ActiveBy routeKey="Controller" value="Profile">
                         <a class="nav-link text-white"
-                           asp-controller="Profile"
-                           asp-action="@(nameof(ProfileController.Index))"
-                           asp-route-section=""
-                           asp-route-area=""
-                           asp-route-id="">
+                       asp-controller="Profile"
+                       asp-action="@(nameof(ProfileController.Index))"
+                       asp-route-section=""
+                       asp-route-area=""
+                       asp-route-id="">
                             <span class="fas fa-user-circle fa-fw"></span>
                             @Context.Items[ItemKey.Nickname]
                         </a>
@@ -218,7 +225,7 @@
                                             @if (childRow.Rows?.Count > 0 == false)
                                             {
                                                 <a class="navcolumn-item navcolumn-child"
-                                                   href="@childRow.Url">@Html.Raw(childRow.Name)</a>
+                               href="@childRow.Url">@Html.Raw(childRow.Name)</a>
                                             }
                                             else
                                             {
@@ -231,7 +238,7 @@
                                                     {
                                                         <div class="card">
                                                             <a class="navcolumn-item navcolumn-grandchild"
-                                                               href="@grandchildRow.Url">@Html.Raw(grandchildRow.Name)</a>
+                                       href="@grandchildRow.Url">@Html.Raw(grandchildRow.Name)</a>
                                                         </div>
                                                     }
                                                 </div>

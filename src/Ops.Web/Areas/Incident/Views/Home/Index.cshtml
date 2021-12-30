@@ -1,13 +1,29 @@
-﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.HistoricalIndexViewModel
+﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.IndexViewModel
 
 <div class="row mb-2">
     <div class="col-sm-6">
-        <h1>Historical Incidents</h1>
+        <h1>Incident Reports</h1>
     </div>
     <div class="col-sm-6">
         <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
-           asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
-           asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Index)">Back</a>
+           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+           asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Index)">Back</a>
+        @if (Model.CanViewAll)
+        {
+            <a class="btn btn-outline-info mt-2 mb-1 mr-2 float-right"
+           asp-controller="@HistoricalController.Name"
+           asp-action="@nameof(HistoricalController.Index)">
+                Historical
+            </a>
+            <a class="btn btn-outline-info mt-2 mb-1 mr-2 float-right"
+           asp-action="@nameof(HomeController.All)">
+                All
+            </a>
+            <a class="btn btn-outline-info mt-2 mb-1 mr-2 float-right"
+           asp-action="@nameof(HomeController.Index)">
+                Mine
+            </a>
+        }
     </div>
 </div>
 
@@ -27,6 +43,7 @@
     </div>
 
 }
+
 <form asp-controller="@HistoricalController.Name"
       asp-action="@nameof(HistoricalController.Index)"
       method="get"
@@ -49,9 +66,9 @@
     </div>
 </form>
 
-@if (!(Model.HistoricalIncidents?.Count() > 0))
+@if (!(Model.Incidents?.Count() > 1))
 {
-    <div class="alert alert-warning">No historical incidents found.</div>
+    <div class="alert alert-warning">No incidents found.</div>
 }
 else
 {
@@ -66,22 +83,22 @@ else
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var historicalIncident in Model.HistoricalIncidents)
+                    @foreach (var incident in Model.Incidents)
                     {
                         <tr>
                             <td class="align-middle">
                                 <a asp-action="@nameof(HistoricalController.Details)"
-                           asp-route-historicalIncidentId="@historicalIncident.Id"
+                           asp-route-historicalIncidentId="@incident.Id"
                            asp-route-page="@(Model.CurrentPage > 1 ? Model.CurrentPage : null)"
                            asp-route-searchText="@Model.SearchText">
-                                    @historicalIncident.IncidentAt.ToString("g")
+                                    @incident.IncidentAt.ToString("g")
                                 </a>
                             </td>
                             <td class="align-middle">
-                                @historicalIncident.Branch
+                                @incident.Branch
                             </td>
                             <td class="align-middle">
-                                @historicalIncident.IncidentType
+                                @incident.IncidentType
                             </td>
                         </tr>
                     }

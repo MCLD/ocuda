@@ -1,0 +1,38 @@
+﻿@model bool
+<div class="row mb-2">
+    <div class="col-12">
+        <ul class="nav nav-pills">
+            <li class="nav-item">
+                <a asp-action="@nameof(HomeController.Index)"
+                   asp-area="@nameof(Ocuda.Ops.Controllers.Areas.Incident)"
+                   asp-controller="@HomeController.Name"
+                   class="nav-link"
+                   auto-active>
+                    @nameof(HomeController.Index)
+                </a>
+            </li>
+            @if (Model == true)
+            {
+                <li class="nav-item">
+                    <a asp-action="@nameof(HomeController.All)"
+                   asp-area="@nameof(Ocuda.Ops.Controllers.Areas.Incident)"
+                   asp-controller="@HomeController.Name"
+                   class="nav-link"
+                   auto-active>
+                        @nameof(HomeController.All)
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-action="@nameof(HistoricalController.Index)"
+                   asp-area="@nameof(Ocuda.Ops.Controllers.Areas.Incident)"
+                   asp-controller="@HistoricalController.Name"
+                   class="nav-link"
+                   auto-active>
+                        Historical
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
