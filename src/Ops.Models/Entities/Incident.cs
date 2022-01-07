@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Ops.Models.Entities
 {
@@ -8,6 +10,8 @@ namespace Ocuda.Ops.Models.Entities
         [MaxLength(2500)]
         [Required]
         public string Description { get; set; }
+
+        public ICollection<IncidentFollowup> Followups { get; set; }
 
         [Required]
         public DateTime IncidentAt { get; set; }
@@ -33,5 +37,13 @@ namespace Ocuda.Ops.Models.Entities
 
         [Required]
         public int LocationId { get; set; }
+
+        [NotMapped]
+        public string LocationName { get; set; }
+
+        public ICollection<IncidentParticipant> Participants { get; set; }
+
+        [NotMapped]
+        public ICollection<IncidentRelationship> RelatedIncidents { get; set; }
     }
 }

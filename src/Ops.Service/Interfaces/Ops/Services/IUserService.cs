@@ -26,6 +26,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<User> LookupUserByEmailAsync(string email);
 
+        Task UpdateLocationAsync(int userId, int locationId);
+
         Task<User> UpdateRosterUserAsync(int rosterUserId, User user);
     }
 }

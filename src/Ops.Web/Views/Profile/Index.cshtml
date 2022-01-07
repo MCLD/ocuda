@@ -1,15 +1,33 @@
 ﻿@model Ocuda.Ops.Controllers.ViewModels.Profile.IndexViewModel
 
-<form asp-controller="@ProfileController.Name"
-      asp-action="@(nameof(ProfileController.EditNickname))"
+@if (Model.CanEdit)
+{
+    <form asp-action="@(nameof(ProfileController.EditNickname))"
       method="post"
       role="form">
-    <input id="editId" asp-for="User.Id" type="hidden" />
-    <input id="editUsername" asp-for="User.Username" type="hidden" />
-    <div modal id="editModal" name="Nickname" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
-        <input id="editName" asp-for="User.Nickname" formgroup />
-    </div>
-</form>
+        <input id="editId" asp-for="User.Id" type="hidden" />
+        <input id="editUsername" asp-for="User.Username" type="hidden" />
+        <div modal id="editModal" name="Nickname" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+            <input id="editName" asp-for="User.Nickname" formgroup />
+        </div>
+    </form>
+
+    <form asp-action="@(nameof(ProfileController.UpdateLocation))"
+      method="post"
+      role="form">
+        <input name="userId" value="@Model.User.Id" type="hidden" />
+        <div modal
+         modal-header="Update associated location"
+         id="editLocationModal"
+         name="Location"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+            <select name="locationId"
+                id="locationList"
+                asp-items="Model.Locations"
+                class="form-control"></select>
+        </div>
+    </form>
+}
 
 <div class="container-fluid">
     <div class="row">
@@ -21,30 +39,67 @@
                 <div class="card-body p-0">
                     <table class="table table-sm mb-0">
                         <tr>
-                            <th>Nickname</th>
-                            <td>
+                            <th class="align-middle">Nickname</th>
+                            <td class="align-middle">
                                 @(Model.User.Nickname ?? "None")
                                 @if (Model.CanEdit)
                                 {
                                     <a href="#"
-                                       class="float-right pr-2"
-                                       data-toggle="modal"
-                                       data-target="#editModal"
-                                       data-id="@Model.User.Id"
-                                       data-nickname="@Model.User.Nickname"
-                                       title="Edit nickname">
+                                   class="float-right pr-2"
+                                   data-toggle="modal"
+                                   data-target="#editModal"
+                                   data-id="@Model.User.Id"
+                                   data-nickname="@Model.User.Nickname"
+                                   title="Update nickname">
                                         <span class="fa fa-xs fa-edit"></span>
                                     </a>
                                 }
                             </td>
                         </tr>
                         <tr>
-                            <th>Title</th>
-                            <td>@Model.User.Title</td>
+                            <th class="align-middle">Title</th>
+                            <td class="align-middle">@Model.User.Title</td>
                         </tr>
                         <tr>
-                            <th>Supervisor</th>
-                            <td>
+                            <th class="align-middle">Associated location</th>
+                            <td class="align-middle">
+                                @if (Model.User.AssociatedLocation.HasValue)
+                                {
+                                    @Model.GetLocationById(Model.User.AssociatedLocation.Value)
+                                    @if (Model.CanEdit)
+                                    {
+                                        <a href="#"
+                                   class="float-right pr-2"
+                                   data-toggle="modal"
+                                   data-target="#editLocationModal"
+                                   data-id="@Model.User.Id"
+                                   data-locationid="@Model.User.AssociatedLocation.Value"
+                                   title="Update location">
+                                            <span class="fa fa-xs fa-edit"></span>
+                                        </a>
+                                    }
+                                }
+                                else
+                                {
+                                    @if (Model.CanEdit)
+                                    {
+                                        <button class="btn btn-sm btn-outline-primary"
+                                        data-toggle="modal"
+                                        data-target="#editLocationModal"
+                                        data-id="@Model.User.Id">
+                                            Choose a location
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        @:None assigned
+                                    }
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="align-middle">Supervisor</th>
+                            <td class="align-middle">
                                 @if (Model.User.Supervisor?.Name == null)
                                 {
                                     @:None
@@ -52,8 +107,8 @@
                                 else
                                 {
                                     <a asp-controller="@ProfileController.Name"
-                                       asp-action="@nameof(ProfileController.Index)"
-                                       asp-route-id="@Model.User.Supervisor.Username">@Model.User.Supervisor.Name</a>
+                                   asp-action="@nameof(ProfileController.Index)"
+                                   asp-route-id="@Model.User.Supervisor.Username">@Model.User.Supervisor.Name</a>
                                 }
                             </td>
                         </tr>
@@ -67,38 +122,43 @@
                                     {
                                         @if (string.IsNullOrEmpty(directReport.Username))
                                         {
-                                            @directReport.Name<br />
+                                            @directReport.Name
+
+                                            <br />
                                         }
                                         else
                                         {
                                             <a asp-controller="@ProfileController.Name"
-                                               asp-action="@nameof(ProfileController.Index)"
-                                               asp-route-id="@directReport.Username">@directReport.Name</a><br />
+                                   asp-action="@nameof(ProfileController.Index)"
+                                   asp-route-id="@directReport.Username">@directReport.Name</a>
+
+                                            <br />
                                         }
                                     }
                                 </td>
                             </tr>
                         }
                         <tr>
-                            <th>Email</th>
-                            <td><a href="mailto:@Model.User.Email">@Model.User.Email</a></td>
+                            <th class="align-middle">Email</th>
+                            <td class="align-middle"><a href="mailto:@Model.User.Email">@Model.User.Email</a></td>
                         </tr>
                         <tr>
-                            <th>Phone</th>
-                            <td>@Model.User.Phone</td>
+                            <th class="align-middle">Phone</th>
+                            <td class="align-middle">@Model.User.Phone</td>
                         </tr>
                         @if (Model.UserViewingSelf)
                         {
                             <tr>
-                                <th>Authenticated at</th>
-                                <td>
+                                <th class="align-middle">Authenticated at</th>
+                                <td class="align-middle">
                                     @Model.AuthenticatedAt
-                                    <a asp-action="Reauthenticate"
-                                       asp-controller="@ProfileController.Name"
-                                       class="float-right pr-2"
-                                       title="Reauthenticate">
-                                        <span class="fa fa-xs fa-redo-alt"></span>
-                                    </a>
+                                    <form asp-action="Reauthenticate" class="d-inline">
+                                        <button type="submit"
+                                            class="float-right p-0 mr-2 btn btn-link"
+                                            title="Reauthenticate">
+                                            <span class="fa fa-xs fa-redo-alt"></span>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         }
@@ -140,14 +200,21 @@
 
 @section scripts
     {
-    <script>
-        $("#editModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var nickname = button.data("nickname");
-            var modal = $(this);
-            $("#editId").val(id);
-            modal.find("#editName").val(nickname);
-        });
-    </script>
+<script>
+    $("#editModal").on("show.bs.modal", function (e) {
+        var button = $(e.relatedTarget);
+        var id = button.data("id");
+        var nickname = button.data("nickname");
+        var modal = $(this);
+        $("#editId").val(id);
+        modal.find("#editName").val(nickname);
+    });
+    $("#editLocationModal").on("show.bs.modal", function (e) {
+        var sender = $(e.relatedTarget);
+        var locationId = sender.data("locationid");
+        if(locationId) {
+           $("#locationList").val(locationId)
+        }
+    });
+</script>
 }

@@ -2,7 +2,12 @@
 
 <div class="row mb-2">
     <div class="col-sm-6">
-        <h1>Historical Incident Summary</h1>
+        <h1>@Model.Heading
+        @if(!string.IsNullOrEmpty(Model.SecondaryHeading))
+            {
+                <small class="text-muted">@Model.SecondaryHeading</small>
+            }
+        </h1>
     </div>
     <div class="col-sm-6">
         <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"

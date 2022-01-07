@@ -4,10 +4,13 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.Incident.ViewModel
 {
-    public class HistoricalIndexViewModel : PaginateModel
+    public class HistoricalIndexViewModel : IncidentViewModelBase
     {
-        public bool CanViewAll { get; set; }
+        public HistoricalIndexViewModel()
+        {
+            Heading = "Historical Incident Reports";
+        }
+
         public ICollection<HistoricalIncident> HistoricalIncidents { get; set; }
-        public string SearchText { get; set; }
     }
 }

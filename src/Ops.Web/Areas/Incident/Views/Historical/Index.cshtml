@@ -1,17 +1,6 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.HistoricalIndexViewModel
 
-<div class="row mb-2">
-    <div class="col-sm-6">
-        <h1>Historical Incidents</h1>
-    </div>
-    <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
-           asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
-           asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Index)">Back</a>
-    </div>
-</div>
-
-<partial name="_IncidentPartial" model="Model.CanViewAll" />
+<partial name="_IncidentPartial" model="Model" />
 
 @if (!string.IsNullOrEmpty(Model.SearchText))
 {

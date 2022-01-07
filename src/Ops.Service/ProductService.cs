@@ -177,7 +177,7 @@ namespace Ocuda.Ops.Service
             return inventories;
         }
 
-        public async Task<ICollectionWithCount<Product>> GetPaginatedListAsync(BaseFilter filter)
+        public async Task<CollectionWithCount<Product>> GetPaginatedListAsync(BaseFilter filter)
         {
             return await _productRepository.GetPaginatedListAsync(filter);
         }

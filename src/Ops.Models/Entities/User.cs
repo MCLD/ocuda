@@ -6,6 +6,7 @@ namespace Ocuda.Ops.Models.Entities
 {
     public class User
     {
+        public int? AssociatedLocation { get; set; }
         public DateTime CreatedAt { get; set; }
         public int CreatedBy { get; set; }
 
@@ -41,6 +42,7 @@ namespace Ocuda.Ops.Models.Entities
         [MaxLength(255)]
         public string Title { get; set; }
 
+        public int? Unit { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public int? UpdatedBy { get; set; }
 

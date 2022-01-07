@@ -29,12 +29,20 @@ namespace Ocuda.Ops.Data.Promenade
             return entity;
         }
 
-        public async Task<List<Location>> GeAllLocationsAsync()
+        public async Task<List<Location>> GetAllLocationsAsync()
         {
             return await DbSet
                 .AsNoTracking()
                 .OrderBy(_ => _.Name)
                 .ToListAsync();
+        }
+
+        public async Task<Dictionary<int, string>> GetAllLocationsIdNameAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .OrderBy(_ => _.Name)
+                .ToDictionaryAsync(k => k.Id, v => v.Name);
         }
 
         public async Task<Location> GetLocationByStub(string locationStub)
@@ -57,6 +65,7 @@ namespace Ocuda.Ops.Data.Promenade
                     .ToListAsync()
             };
         }
+
         public async Task<ICollection<Location>> GetUsingSegmentAsync(int segmentId)
         {
             return await DbSet
@@ -82,6 +91,15 @@ namespace Ocuda.Ops.Data.Promenade
                 .AsNoTracking()
                 .Where(_ => _.Id != location.Id && _.Stub == location.Stub)
                 .AnyAsync();
+        }
+
+        public async Task<IEnumerable<int>> SearchIdsByNameAsync(string searchText)
+        {
+            return await DbSet
+                 .AsNoTracking()
+                 .Where(_ => _.Name.Contains(searchText))
+                 .Select(_ => _.Id)
+                 .ToListAsync();
         }
     }
 }

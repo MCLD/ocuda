@@ -8,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Roster;
 using Ocuda.Ops.Controllers.Filters;
+using Ocuda.Ops.Models.Keys;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
 
@@ -18,30 +20,153 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
     [Route("[area]/[controller]")]
     public class RosterController : BaseController<RosterController>
     {
+        private readonly ILocationService _locationService;
+        private readonly IPermissionGroupService _permissionGroupService;
         private readonly IRosterService _rosterService;
 
-        public static string Name { get { return "Roster"; } }
-        public static string Area { get { return "ContentManagement"; } }
-
         public RosterController(ServiceFacades.Controller<RosterController> context,
+            ILocationService locationService,
+            IPermissionGroupService permissionGroupService,
             IRosterService rosterService) : base(context)
         {
+            _locationService = locationService
+                ?? throw new ArgumentNullException(nameof(locationService));
+            _permissionGroupService = permissionGroupService
+                ?? throw new ArgumentNullException(nameof(permissionGroupService));
             _rosterService = rosterService
                 ?? throw new ArgumentNullException(nameof(rosterService));
         }
 
-        [Route("[action]")]
-        [RestoreModelState]
-        public IActionResult Upload()
+        public static string Area
+        { get { return "ContentManagement"; } }
+
+        public static string Name
+        { get { return "Roster"; } }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> RemoveMap(int unitId, int page)
         {
-            return View();
+            if (!await HasRosterManagementRightsAsync())
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var result = await _rosterService.RemoveUnitMap(unitId);
+
+            if (!string.IsNullOrEmpty(result))
+            {
+                ShowAlertDanger($"There was an issue adding that mapping: {result}");
+            }
+
+            if(page > 1)
+            {
+                return RedirectToAction(nameof(UnitMapping), new { page });
+            }
+            else
+            {
+                return RedirectToAction(nameof(UnitMapping));
+            }
         }
 
-        [HttpPost]
-        [Route("[action]")]
-        [SaveModelState]
+        [HttpPost("[action]")]
+        public async Task<IActionResult> AddMap(int unitId, int locationId, int page)
+        {
+            if (!await HasRosterManagementRightsAsync())
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var result = await _rosterService.AddUnitMap(unitId, locationId);
+
+            if (!string.IsNullOrEmpty(result))
+            {
+                ShowAlertDanger($"There was an issue adding that mapping: {result}");
+            }
+
+            if (page > 1)
+            {
+                return RedirectToAction(nameof(UnitMapping), new { page });
+            }
+            else
+            {
+                return RedirectToAction(nameof(UnitMapping));
+            }
+        }
+
+        [HttpGet("")]
+        [HttpGet("[action]/{page}")]
+        [RestoreModelState(Key = "RosterUpload")]
+        public async Task<IActionResult> Index(int page)
+        {
+            if (!await HasRosterManagementRightsAsync())
+            {
+                return RedirectToUnauthorized();
+            }
+
+            int currentPage = page != 0 ? page : 1;
+
+            var filter = new BaseFilter(currentPage);
+
+            var rosterHeaders = await _rosterService
+                .GetPaginatedRosterHeadersAsync(filter);
+
+            var viewModel = new IndexViewModel
+            {
+                CurrentPage = currentPage,
+                ItemCount = rosterHeaders.Count,
+                ItemsPerPage = filter.Take.Value,
+                RosterHeaders = rosterHeaders.Data
+            };
+
+            if (viewModel.PastMaxPage)
+            {
+                return RedirectToRoute(new { page = viewModel.LastPage ?? 1 });
+            }
+
+            return View(viewModel);
+        }
+
+        [HttpGet("[action]")]
+        [HttpGet("[action]/{page}")]
+        public async Task<IActionResult> UnitMapping(int page)
+        {
+            if (!await HasRosterManagementRightsAsync())
+            {
+                return RedirectToUnauthorized();
+            }
+
+            int currentPage = page != 0 ? page : 1;
+
+            var filter = new BaseFilter(currentPage);
+
+            var unitLocations = await _rosterService.GetUnitLocationMapsAsync(filter);
+
+            var viewModel = new UnitMappingViewModel
+            {
+                CurrentPage = currentPage,
+                ItemCount = unitLocations.Count,
+                ItemsPerPage = filter.Take.Value,
+                Locations = await GetLocationsDropdownAsync(_locationService),
+                UnitLocationMaps = unitLocations.Data
+            };
+
+            if (viewModel.PastMaxPage)
+            {
+                return RedirectToRoute(new { page = viewModel.LastPage ?? 1 });
+            }
+
+            return View(viewModel);
+        }
+
+        [HttpPost("[action]")]
+        [SaveModelState(Key = "RosterUpload")]
         public async Task<IActionResult> Upload(UploadViewModel model)
         {
+            if (!await HasRosterManagementRightsAsync())
+            {
+                return RedirectToUnauthorized();
+            }
+
             if (ModelState.IsValid)
             {
                 _logger.LogInformation("Inserting roster {FileName}", model.FileName);
@@ -55,14 +180,15 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
                 try
                 {
-                    int insertedRecordCount
+                    var rosterResult
                         = await _rosterService.ImportRosterAsync(CurrentUserId, tempFile);
                     timer.Stop();
-                    _logger.LogInformation("Roster {FileName} inserted {Count} records in {ElapsedMs} ms",
+                    _logger.LogInformation("Roster {FileName} processed {Count} rows in {ElapsedMs} ms",
                         model.FileName,
-                        insertedRecordCount,
+                        rosterResult.TotalRows,
                         timer.ElapsedMilliseconds);
-                    AlertInfo = $"Successfully inserted {insertedRecordCount} roster records in {timer.Elapsed}";
+                    AlertInfo = $"Processed {rosterResult.TotalRows} roster rows in {timer.Elapsed:dd\\.hh\\:mm\\:ss}";
+                    return View("Changes", rosterResult);
                 }
                 catch (Exception ex)
                 {
@@ -74,7 +200,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                     System.IO.File.Delete(Path.Combine(Path.GetTempPath(), tempFile));
                 }
 
-                return RedirectToAction(nameof(Upload));
+                return RedirectToAction(nameof(Index));
             }
             else
             {
@@ -88,7 +214,14 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 }
             }
 
-            return RedirectToAction(nameof(Upload));
+            return RedirectToAction(nameof(Index));
+        }
+
+        private async Task<bool> HasRosterManagementRightsAsync()
+        {
+            return !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
+                || await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.DigitalDisplayContentManagement);
         }
     }
 }

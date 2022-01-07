@@ -68,7 +68,6 @@ namespace Ocuda.Ops.Data
         public DbSet<LinkLibrary> LinkLibraries { get; set; }
 
         public DbSet<Link> Links { get; set; }
-
         public DbSet<PermissionGroupApplication> PermissionGroupApplication { get; set; }
         public DbSet<PermissionGroupPageContent> PermissionGroupPageContents { get; set; }
         public DbSet<PermissionGroupPodcastItem> PermissionGroupPodcastItems { get; set; }
@@ -94,6 +93,7 @@ namespace Ocuda.Ops.Data
         public DbSet<Section> Sections { get; set; }
 
         public DbSet<SiteSetting> SiteSettings { get; set; }
+        public DbSet<UnitLocationMap> UnitLocationMaps { get; set; }
 
         public DbSet<UserMetadata> UserMetadata { get; set; }
 
@@ -103,7 +103,7 @@ namespace Ocuda.Ops.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            if(modelBuilder == null)
+            if (modelBuilder == null)
             {
                 throw new ArgumentNullException(nameof(modelBuilder));
             }

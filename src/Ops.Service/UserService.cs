@@ -7,6 +7,7 @@ using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
 {
@@ -131,6 +132,23 @@ namespace Ocuda.Ops.Service
         public async Task<User> LookupUserByEmailAsync(string email)
         {
             return await _userRepository.FindByEmailAsync(email?.Trim().ToLower());
+        }
+
+        public async Task UpdateLocationAsync(int userId, int locationId)
+        {
+            if(userId != GetCurrentUserId() && !IsSiteManager())
+            {
+                throw new OcudaException("Permission denied.");
+            }
+
+            var user = await _userRepository.FindAsync(userId);
+            if (user == null)
+            {
+                throw new OcudaException($"Cannot find user id {userId}");
+            }
+            user.AssociatedLocation = locationId;
+            _userRepository.Update(user);
+            await _userRepository.SaveAsync();
         }
 
         public async Task<User> UpdateRosterUserAsync(int rosterUserId, User user)

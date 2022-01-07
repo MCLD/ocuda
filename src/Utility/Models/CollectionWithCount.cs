@@ -2,7 +2,7 @@
 
 namespace Ocuda.Utility.Models
 {
-    public class ICollectionWithCount<TItem>
+    public class CollectionWithCount<TItem>
     {
         public int Count { get; set; }
         public ICollection<TItem> Data { get; set; }

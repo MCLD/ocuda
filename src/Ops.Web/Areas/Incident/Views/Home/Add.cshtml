@@ -1,0 +1,38 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.AddViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            @Model.Heading
+            @if (!string.IsNullOrEmpty(Model.SecondaryHeading))
+            {
+                <small class="text-muted">@Model.SecondaryHeading</small>
+            }
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-area=""
+           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+           asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Index)">Back</a>
+    </div>
+</div>
+
+<form asp-action="@nameof(HomeController.Add)"
+      method="post"
+      role="form">
+    <div class="row">
+        <div class="col">
+            <input asp-for="Incident.IncidentAt" formgroup type="datetime" />
+            <select asp-for="Incident.IncidentTypeId"
+                    asp-items="Model.IncidentTypes"
+                    formgroup></select>
+            <select asp-for="Incident.LocationId"
+                    asp-items="Model.Locations"
+                    formgroup></select>
+            <input asp-for="Incident.LocationDescription" formgroup type="text" />
+            <textarea asp-for="Incident.Description" formgroup></textarea>
+            <textarea asp-for="Incident.InjuriesDamages" formgroup></textarea>
+        </div>
+    </div>
+</form>

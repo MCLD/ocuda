@@ -1,33 +1,6 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.IndexViewModel
 
-<div class="row mb-2">
-    <div class="col-sm-6">
-        <h1>Incident Reports</h1>
-    </div>
-    <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
-           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
-           asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Index)">Back</a>
-        @if (Model.CanViewAll)
-        {
-            <a class="btn btn-outline-info mt-2 mb-1 mr-2 float-right"
-           asp-controller="@HistoricalController.Name"
-           asp-action="@nameof(HistoricalController.Index)">
-                Historical
-            </a>
-            <a class="btn btn-outline-info mt-2 mb-1 mr-2 float-right"
-           asp-action="@nameof(HomeController.All)">
-                All
-            </a>
-            <a class="btn btn-outline-info mt-2 mb-1 mr-2 float-right"
-           asp-action="@nameof(HomeController.Index)">
-                Mine
-            </a>
-        }
-    </div>
-</div>
-
-<partial name="_IncidentPartial" model="Model.CanViewAll" />
+<partial name="_IncidentPartial" model="Model" />
 
 @if (!string.IsNullOrEmpty(Model.SearchText))
 {
@@ -41,7 +14,6 @@
             </div>
         </div>
     </div>
-
 }
 
 <form asp-controller="@HistoricalController.Name"
@@ -95,7 +67,7 @@ else
                                 </a>
                             </td>
                             <td class="align-middle">
-                                @incident.Branch
+                                @Model.Locations[incident.LocationId]
                             </td>
                             <td class="align-middle">
                                 @incident.IncidentType

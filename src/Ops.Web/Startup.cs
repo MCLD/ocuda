@@ -334,6 +334,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.IncidentRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IIncidentStaffRepository,
                 Data.Ops.IncidentStaffRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IIncidentTypeRepository,
+                Data.Ops.IncidentTypeRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkLibraryRepository,
                 Data.Ops.LinkLibraryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ILinkRepository,
@@ -366,6 +368,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.SectionRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ISiteSettingRepository,
                 Data.Ops.SiteSettingRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IUnitLocationMapRepository,
+                Data.Ops.UnitLocatonMapRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserMetadataTypeRepository,
                 Data.Ops.UserMetadataTypeRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserRepository,

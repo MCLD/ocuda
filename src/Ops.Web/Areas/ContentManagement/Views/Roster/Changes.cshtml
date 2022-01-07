@@ -1,101 +1,107 @@
-﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Roster.ChangesViewModel
+﻿@model Ocuda.Ops.Models.RosterUpdate
 
-@if (Model.NewEmployees.Count() == 0)
-{
-    <div class="alert alert-warning">No Employee Records Added</div>
-}
-else
-{
-    <h2>New Employees</h2>
-    <table class="table table-sm table-bordered">
-        <thead>
-            <tr>
-                <th>Employee ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Job Title</th>
-                <th>&nbsp;</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var rosterEntry in Model.NewEmployees)
+<div class="row">
+    <div class="col-sm-7">
+        <h1>
+            Roster
+            <small class="text-muted">Changes</small>
+        </h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.RosterController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.RosterController.Index))">Back</a>
+        <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+           asp-action="@nameof(RosterController.UnitMapping)">
+            Unit/Location Mapping
+        </a>
+    </div>
+</div>
+
+<table class="table table-sm table-bordered">
+    <thead>
+        <tr>
+            <th colspan="6" class="@Model.NewClass">New users: @Model.New.Count</th>
+        </tr>
+        <tr>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Job Title</th>
+            <th>Created At</th>
+            <th>Service start date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.New.Count == 0)
+        {
+            <tr><td colspan="6">No new users.</tr>
+        }
+        else
+        {
+            @foreach (var user in Model.New)
             {
                 <tr>
-                    <td>@rosterEntry.Id</td>
-                    <td>@rosterEntry.Name</td>
-                    <td>@rosterEntry.EmailAddress</td>
-                    <td>@rosterEntry.JobTitle</td>
-                    <td align="center">
-                        <button type="button" class="btn btn-approve btn-xs" data-rosterid="@rosterEntry.Id">
-                            <div class="btn-approve-0">Approve <span class="fa fa-spinner fa-pulse fa-fw d-none"></span></div>
-                            <div class="btn-approve-1 d-none">Approved <span class="fa fa-check" aria-hidden="true"></span></div>
-                        </button>
-                    </td>
+                    <td>@user.Username</td>
+                    <td>@user.Name</td>
+                    <td>@user.Email</td>
+                    <td>@user.Title</td>
+                    <td>@user.CreatedAt</td>
+                    <td>@user.ServiceStartDate?.ToString("d")</td>
                 </tr>
             }
-        </tbody>
-    </table>
-}
+        }
+    </tbody>
+</table>
 
-@if (Model.RemovedEmployees.Count() == 0)
-{
-    <div class="alert alert-warning">No Employee Records Removed</div>
-}
-else
-{
-    <h2>Removed Employees</h2>
-    <table class="table table-sm table-bordered">
-        <thead>
-            <tr>
-                <th>Employee ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Job Title</th>
-                <th>&nbsp;</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var rosterEntry in Model.RemovedEmployees)
+<table class="table table-sm table-bordered">
+    <thead>
+        <tr>
+            <th colspan="6" class="@Model.DeactivatedClass">Deactivated users: @Model.Deactivated.Count</th>
+        </tr>
+        <tr>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Job Title</th>
+            <th>Created At</th>
+            <th>Service start date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Deactivated.Count == 0)
+        {
+            <tr><td colspan="6">No deactivated users.</tr>
+        }
+        else
+        {
+            @foreach (var user in Model.Deactivated)
             {
                 <tr>
-                    <td>@rosterEntry.Id</td>
-                    <td>@rosterEntry.Name</td>
-                    <td>@rosterEntry.EmailAddress</td>
-                    <td>@rosterEntry.JobTitle</td>
-                    <td align="center">
-                        <button type="button" class="btn btn-approve btn-xs" data-rosterid="@rosterEntry.Id">
-                            <div class="btn-approve-0">Approve <span class="fa fa-spinner fa-pulse fa-fw d-none"></span></div>
-                            <div class="btn-approve-1 d-none">Approved <span class="fa fa-check" aria-hidden="true"></span></div>
-                        </button>
-                    </td>
+                    <td>@user.Username</td>
+                    <td>@user.Name</td>
+                    <td>@user.Email</td>
+                    <td>@user.Title</td>
+                    <td>@user.CreatedAt</td>
+                    <td>@user.ServiceStartDate?.ToString("d")</td>
                 </tr>
             }
-        </tbody>
-    </table>
+        }
+    </tbody>
+</table>
 
-}
+<table class="table table-sm table-bordered">
+    <thead>
+        <tr>
+            <th class="@Model.VerifiedClass">Verified/updated: @(Model.Verified.Count - Model.Deactivated.Count)</th>
+        </tr>
+    </thead>
+</table>
 
-@section scripts
-    {
-    <script>
-            var approveUrl = "@(Url.Action("ApproveChange"))";
-
-            $(".btn-approve").on("click", function (e) {
-                var button = $(this);
-                button.children(".btn-approve-0").children(".fa-spinner").removeClass("d-none");
-                $.post(approveUrl, { rosterEntryId: button.data("rosterid") }, function (response) {
-                    setTimeout(function () {
-                        if (response.success) {
-                            button.addClass("btn-success");
-                            button.children(".btn-approve-0").addClass("d-none");
-                            button.children(".btn-approve-1").removeClass("d-none");
-                        }
-                        else {
-                            button.children(".btn-approve-0").children(".fa-spinner").addClass("d-none");
-                            alert(response.message);
-                        }
-                    }, 500);
-                });
-            });
-    </script>
-}
+<table class="table table-sm table-bordered">
+    <thead>
+        <tr>
+            <th class="@Model.VacantClass">Vacant positions: @Model.VacantCount</th>
+        </tr>
+    </thead>
+</table>

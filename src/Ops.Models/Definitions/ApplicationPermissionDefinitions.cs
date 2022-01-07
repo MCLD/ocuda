@@ -39,6 +39,12 @@ namespace Ocuda.Ops.Models.Definitions
             },
             new ApplicationPermissionDefinition
             {
+                Id = ApplicationPermission.RosterManagement,
+                Name = "Roster upload and unit mapping management",
+                Info = "Users with this permission can upload rosters and manage mapping units to locations."
+            },
+            new ApplicationPermissionDefinition
+            {
                 Id = ApplicationPermission.ViewAllIncidentReports,
                 Name = "View All Incident Reports",
                 Info = "Users with this permission can view all incident reports, not just their own."

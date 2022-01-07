@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -68,8 +69,9 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
                 FileExists = System.IO.File.Exists(filePath),
                 HistoricalIncident = historicalIncident,
                 Page = page,
-                SearchText = searchText
-            }); ;
+                SearchText = searchText,
+                SecondaryHeading = historicalIncident.Id.ToString(CultureInfo.CurrentCulture)
+            });
         }
 
         [HttpGet("[action]/{historicalIncidentId}")]

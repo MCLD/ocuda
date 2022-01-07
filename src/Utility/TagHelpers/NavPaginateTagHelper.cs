@@ -11,12 +11,12 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Utility.TagHelpers
 {
-    [HtmlTargetElement("paginate", Attributes = nameof(PaginateModel))]
-    public class PaginateTagHelper : TagHelper
+    [HtmlTargetElement("nav", Attributes = "paginate")]
+    public class NavPaginateTagHelper : TagHelper
     {
         private readonly IUrlHelperFactory _urlHelperFactory;
 
-        public PaginateTagHelper(IUrlHelperFactory urlHelperFactory)
+        public NavPaginateTagHelper(IUrlHelperFactory urlHelperFactory)
         {
             _urlHelperFactory = urlHelperFactory ??
                 throw new ArgumentNullException(nameof(urlHelperFactory));
@@ -25,7 +25,7 @@ namespace Ocuda.Utility.TagHelpers
         [HtmlAttributeName("asButtons")]
         public bool AsButtons { get; set; }
 
-        [HtmlAttributeName("paginateModel")]
+        [HtmlAttributeName("paginate")]
         public PaginateModel PaginateModel { get; set; }
 
         [ViewContext]
@@ -36,10 +36,7 @@ namespace Ocuda.Utility.TagHelpers
         {
             if (model == null) { throw new ArgumentNullException(nameof(model)); }
 
-            var liTag = new TagBuilder("li")
-            {
-                TagRenderMode = TagRenderMode.Normal
-            };
+            var liTag = new TagBuilder("li");
             liTag.MergeAttribute("class", "page-item");
 
             var formTag = new TagBuilder("form");
@@ -79,10 +76,7 @@ namespace Ocuda.Utility.TagHelpers
             }
 
             IUrlHelper url = _urlHelperFactory.GetUrlHelper(ViewContextData);
-            var ulTag = new TagBuilder("ul")
-            {
-                TagRenderMode = TagRenderMode.Normal
-            };
+            var ulTag = new TagBuilder("ul");
             ulTag.MergeAttribute("class", "pagination");
 
             string firstPage = PaginateModel.FirstPage == null

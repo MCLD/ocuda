@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models.Abstract;
@@ -99,8 +100,24 @@ namespace Ocuda.Ops.Controllers.Abstract
             }
         }
 
+        protected async Task<IEnumerable<SelectListItem>>
+            GetLocationsDropdownAsync(ILocationService locationService)
+        {
+            if (locationService == null)
+            {
+                throw new ArgumentNullException(nameof(locationService));
+            }
+
+            var locations = await locationService.GetAllLocationsIdNameAsync();
+            return locations.Select(_ => new SelectListItem
+            {
+                Value = _.Key.ToString(CultureInfo.InvariantCulture),
+                Text = _.Value
+            });
+        }
+
         protected async Task<bool> HasAppPermissionAsync(
-            IPermissionGroupService permissionGroupService,
+                    IPermissionGroupService permissionGroupService,
             string applicationPermission)
         {
             if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))

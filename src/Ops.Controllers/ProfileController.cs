@@ -17,26 +17,34 @@ namespace Ocuda.Ops.Controllers
     public class ProfileController : BaseController<ProfileController>
     {
         private readonly IHttpContextAccessor _httpContext;
+        private readonly ILocationService _locationService;
         private readonly IPermissionGroupService _permissionGroupService;
         private readonly IUserService _userService;
 
         public ProfileController(ServiceFacades.Controller<ProfileController> context,
             IHttpContextAccessor httpContext,
+            ILocationService locationService,
             IPermissionGroupService permissionGroupService,
             IUserService userService) : base(context)
         {
             _httpContext = httpContext ?? throw new ArgumentNullException(nameof(httpContext));
+            _locationService = locationService
+                ?? throw new ArgumentNullException(nameof(locationService));
             _permissionGroupService = permissionGroupService
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
-        public static string Name { get { return "Profile"; } }
+        public static string Name
+        { get { return "Profile"; } }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> EditNickname(IndexViewModel model)
         {
+            if (model?.User.Id != CurrentUserId)
+            {
+                return RedirectToUnauthorized();
+            }
             if (ModelState.IsValid && model != null)
             {
                 try
@@ -53,14 +61,15 @@ namespace Ocuda.Ops.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Route("")]
-        [Route("{id}")]
+        [HttpGet("")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> Index(string id)
         {
             var viewModel = new IndexViewModel
             {
                 UserViewingSelf = string.IsNullOrEmpty(id)
-                    || id == UserClaim(ClaimType.Username)
+                    || id == UserClaim(ClaimType.Username),
+                Locations = await GetLocationsDropdownAsync(_locationService)
             };
 
             if (!viewModel.UserViewingSelf)
@@ -127,10 +136,21 @@ namespace Ocuda.Ops.Controllers
             return View(viewModel);
         }
 
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> Reauthenticate()
         {
             await _httpContext.HttpContext.SignOutAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> UpdateLocation(int userId, int locationId)
+        {
+            if (userId != CurrentUserId)
+            {
+                return RedirectToUnauthorized();
+            }
+            await _userService.UpdateLocationAsync(userId, locationId);
             return RedirectToAction(nameof(Index));
         }
     }
