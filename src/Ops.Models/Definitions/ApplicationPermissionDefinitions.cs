@@ -36,6 +36,12 @@ namespace Ocuda.Ops.Models.Definitions
                 Id = ApplicationPermission.NavigationManagement,
                 Name = "Navigation Management",
                 Info = "Users with this permission can manage the Promenade navigations."
+            },
+            new ApplicationPermissionDefinition
+            {
+                Id = ApplicationPermission.PodcastShowNotesManagement,
+                Name = "Podcast Show Notes Management",
+                Info = "Users with this permission can add and edit podcast show notes."
             }
         };
     }

@@ -17,5 +17,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task AddPodcastItemAsync(PodcastItem podcastItem);
         Task<bool> HasEpisodeAsync(int podcastId, int episodeNumber);
         public PodcastItem GetFileInfo(string path);
+        Task<PodcastItem> GetEpisodeBySegmentIdAsync(int segmentId);
     }
 }

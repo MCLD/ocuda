@@ -16,6 +16,8 @@ namespace i18n.Test
     {
         private const string BasePathToResx = "..{0}..{0}..{0}..{0}..{0}..{0}src{0}i18n{0}Resources";
         private const char NonBreakingSpaceCharacter = (char)160;
+        private const string ResxFileEnglish = "Shared.en.resx";
+        private const string ResxFileSpanish = "Shared.es.resx";
         private const char SpaceCharacter = (char)32;
         private readonly string PathToResx;
 
@@ -27,16 +29,29 @@ namespace i18n.Test
         }
 
         [Fact]
-        public void TestEnglishResxHasAllItems() => TestResxHasItems("Shared.en.resx");
+        public void CheckUntranslatedItemsEnglish() => CheckUntranslatedItemsFile(ResxFileEnglish);
 
         [Fact]
-        public void TestSpanishResxHasAllItems() => TestResxHasItems("Shared.es.resx");
+        public void CheckUntranslatedItemsSpanish() => CheckUntranslatedItemsFile(ResxFileSpanish);
+
+        [Fact]
+        public void TestEnglishResxHasAllItems() => TestResxHasItems(ResxFileEnglish);
+
+        [Fact]
+        public void TestSpanishResxHasAllItems() => TestResxHasItems(ResxFileSpanish);
+
+        private void CheckUntranslatedItemsFile(string filename)
+        {
+            Assert.Empty(XmlHelper.ExtractDataNames(filename, PathToResx)
+                .Where(_ => _.Value == "{0}")
+                .Select(_ => _.Key.Replace(NonBreakingSpaceCharacter, SpaceCharacter)));
+        }
 
         private void TestResxHasItems(string filename)
         {
             var resourceFileKeys = XmlHelper.ExtractDataNames(filename, PathToResx)
-                .Keys
-                .Select(_ => _.Replace(NonBreakingSpaceCharacter, SpaceCharacter));
+                .Where(_ => !string.IsNullOrEmpty(_.Value))
+                .Select(_ => _.Key.Replace(NonBreakingSpaceCharacter, SpaceCharacter));
 
             var constStrings = typeof(Promenade).GetFields(BindingFlags.Public
                     | BindingFlags.Static
@@ -45,7 +60,7 @@ namespace i18n.Test
 
             var constValues = constStrings.Select(_ => (string)_.GetValue(null));
 
-            Assert.Empty(resourceFileKeys.Except(constValues));
+            Assert.Empty(constValues.Except(resourceFileKeys));
         }
     }
 }

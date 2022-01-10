@@ -12,11 +12,13 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Podcasts;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 
@@ -37,21 +39,29 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         };
 
         private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly ILanguageService _languageService;
         private readonly IPermissionGroupService _permissionGroupService;
         private readonly IPodcastService _podcastService;
+        private readonly ISegmentService _segmentService;
 
         public PodcastsController(ServiceFacades.Controller<PodcastsController> context,
             IDateTimeProvider dateTimeProvider,
+            ILanguageService languageService,
             IPermissionGroupService permissionGroupService,
-            IPodcastService podcastService)
+            IPodcastService podcastService,
+            ISegmentService segmentService)
             : base(context)
         {
             _dateTimeProvider = dateTimeProvider
                 ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+            _languageService = languageService
+                ?? throw new ArgumentNullException(nameof(languageService));
             _permissionGroupService = permissionGroupService
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
             _podcastService = podcastService
                 ?? throw new ArgumentNullException(nameof(podcastService));
+            _segmentService = segmentService
+                ?? throw new ArgumentNullException(nameof(segmentService));
         }
 
         public static string Area { get { return "SiteManagement"; } }
@@ -226,6 +236,39 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
         }
 
+        [Route("[action]")]
+        [HttpPost]
+        public async Task<IActionResult> DeleteEpisodeShowNotes(int segmentId)
+        {
+            try
+            {
+                var episode = await _podcastService.GetEpisodeBySegmentIdAsync(segmentId);
+                if (episode != null)
+                {
+                    if (!await HasPermissionAsync<PermissionGroupPodcastItem>(_permissionGroupService,
+                        episode.PodcastId))
+                    {
+                        return RedirectToUnauthorized();
+                    }
+                    episode.ShowNotesSegmentId = null;
+                    await _podcastService.UpdatePodcastItemAsync(episode);
+                    await _segmentService.DeleteAsync(segmentId);
+                    ShowAlertSuccess($"Deleted show notes for: {episode.Title}");
+                    return RedirectToAction(nameof(EditEpisode), new { episodeId = episode.Id });
+                }
+                else
+                {
+                    ShowAlertDanger($"Could not find podcast episode with segment ID: {segmentId}");
+                }
+            }
+            catch (OcudaException ex)
+            {
+                _logger.LogError(ex, "Error deleting segment: {Message}", ex.Message);
+                ShowAlertDanger($"Unable to delete podcast episode show notes: {ex.Message}");
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
         [Route("[action]/{podcastId}")]
         public async Task<IActionResult> Details(int podcastId)
         {
@@ -257,8 +300,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 EditEpisode = true,
                 Episode = episode,
                 PodcastTitle = episode.Podcast.Title,
-                MaximumFileSizeMB = $"{MaximumFileSizeBytes / 1024 / 1024}"
+                MaximumFileSizeMB = $"{MaximumFileSizeBytes / 1024 / 1024}",
+                CanEditShowNotes = await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.PodcastShowNotesManagement)
             };
+
+            if (episode.ShowNotesSegmentId.HasValue)
+            {
+                var segment = await _segmentService.GetByIdAsync(episode.ShowNotesSegmentId.Value);
+                viewModel.ShowNotesSegmentName = segment.Name;
+            }
 
             if (!string.IsNullOrEmpty(podcast.Stub)
                 && episode.Episode != null)
@@ -545,6 +596,63 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
 
             return RedirectToAction(nameof(EditEpisode), new { episodeId = viewModel.Episode.Id });
+        }
+
+        [HttpPost]
+        [Route("[action]/{episodeId}")]
+        public async Task<IActionResult> AddShowNotes(int episodeId, string segmentText)
+        {
+            if (episodeId == 0)
+            {
+                ShowAlertDanger("Invalid add segment request: no episode specified.");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var episode = await _podcastService.GetPodcastItemByIdAsync(episodeId);
+
+            if (episode == null)
+            {
+                ShowAlertDanger($"Podcast episode not found for id {episodeId}.");
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (!await HasPermissionAsync<PermissionGroupPodcastItem>(_permissionGroupService,
+                episode.PodcastId) || !await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.PodcastShowNotesManagement))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var languages = await _languageService.GetActiveAsync();
+
+            var defaultLanguage = languages.SingleOrDefault(_ => _.IsActive && _.IsDefault)
+                ?? languages.FirstOrDefault(_ => _.IsActive);
+
+            if (defaultLanguage == null)
+            {
+                ShowAlertDanger("No default language configured.");
+                return RedirectToAction(nameof(EditEpisode), new { episodeId });
+            }
+
+            var segment = await _segmentService.CreateAsync(new Segment
+            {
+                IsActive = true,
+                Name = $"Podcast - {episode.Podcast.Title} - Show notes #{episode.Episode.Value}",
+            });
+
+            await _segmentService.CreateSegmentTextAsync(new SegmentText
+            {
+                SegmentId = segment.Id,
+                LanguageId = defaultLanguage.Id,
+                Text = segmentText
+            });
+
+            episode.ShowNotesSegmentId = segment.Id;
+
+            await _podcastService.UpdatePodcastItemAsync(episode);
+
+            ShowAlertSuccess($"Added show notes for: {episode.Title}");
+            return RedirectToAction(nameof(EditEpisode), new { episodeId });
         }
 
         private string FilenameOfEpisode(string podcastStub, int? episodeNumber)

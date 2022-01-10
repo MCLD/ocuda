@@ -13,5 +13,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
             GetPaginatedListAsync(int podcastId, BaseFilter filter);
         Task<PodcastItem> GetByIdAsync(int podcastItemId);
         Task<bool> GetByPodcastEpisodeAsync(int podcastId, int episodeNumber);
+        Task<PodcastItem> GetUsingSegmentAsync(int segmentId);
     }
 }

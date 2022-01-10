@@ -1,0 +1,169 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Products.VerifyUploadViewModel
+
+@using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Products
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Verify @Model.UploadType Sheet
+            <small class="text-muted">@Model.Product.Name</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a asp-controller="@ProductsController.Name"
+           asp-action="@nameof(ProductsController.Product)"
+           asp-route-productSlug="@Model.Product.Slug"
+           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+        <a asp-controller="@ProductsController.Name"
+           asp-action="@nameof(ProductsController.UploadDistribution)"
+           asp-route-productSlug="@Model.Product.Slug"
+           class="btn btn-outline-info mt-2 mb-1 mr-2 float-right">
+            <span class="fas fa-file-upload"></span>
+            Upload Distribution
+        </a>
+        <a asp-controller="@ProductsController.Name"
+           asp-action="@nameof(ProductsController.UploadReplenishment)"
+           asp-route-productSlug="@Model.Product.Slug"
+           class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
+            <span class="fas fa-file-upload"></span>
+            Upload Replenishment
+        </a>
+    </div>
+</div>
+
+@if (Model.Issues?.Count > 0)
+{
+    <div class="row">
+        <div class="col-sm-6 offset-sm-3">
+            <div class="alert alert-warning">
+                <p>The following issues were encountered:</p>
+                <ul>
+                    @foreach (var issue in Model.Issues)
+                    {
+                        <li>
+                            @issue.Key
+                            @if (!string.IsNullOrEmpty(issue.Value))
+                            {
+                                <button type="button"
+                                        class="btn btn-sm my-1 btn-outline-success"
+                                        data-toggle="modal"
+                                        data-target="#mappingModal"
+                                        data-importlocation="@issue.Value">
+                                    <span class="fas fa-plus-circle"></span>
+                                    Add mapping
+                                </button>
+                            }
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+}
+
+@if (Model.Adjustments?.Count > 0)
+{
+    <div class="row">
+        <div class="col">
+            <table class="table table-sm table-striped table-hover table-bordered">
+                <tr>
+                    <th>Location</th>
+                    <th>Current count</th>
+                    <th>Current status</th>
+                    <th>Adjustment</th>
+                    <th>New count</th>
+                    <th>New status</th>
+                </tr>
+                @foreach(var location in Model.Locations)
+                {
+                    if (Model.Adjustments.ContainsKey(location.Id))
+                    {
+                        var adjustmentValue = Model.Adjustments[location.Id];
+                        <tr>
+                            <td>@(Model.LocationInventories.SingleOrDefault(_ => _.LocationId == location.Id)?.Location?.Name ?? "Unknown location id " + location.Id)</td>
+                            <td class="@Model.GetStatusClass(location.Id)"><strong>@Model.LocationInventories.SingleOrDefault(_ => _.LocationId == location.Id)?.ItemCount</strong></td>
+                            <td class="@Model.GetStatusClass(location.Id)"><strong>@Model.GetStatus(location.Id)</strong></td>
+                            <td>@(Model.IsReplenishment ? adjustmentValue : adjustmentValue * -1)</td>
+                            <td class="@Model.GetStatusClass(location.Id, Model.GetNewCount(location.Id, adjustmentValue))"><strong>@Model.GetNewCount(location.Id, adjustmentValue)</strong></td>
+                            <td class="@Model.GetStatusClass(location.Id, Model.GetNewCount(location.Id, adjustmentValue))"><strong>@Model.GetStatus(location.Id, Model.GetNewCount(location.Id, adjustmentValue))</strong></td>
+                        </tr>
+                    }
+                }
+            </table>
+        </div>
+    </div>
+}
+
+@if (Model.Issues == null || Model.Issues.Count == 0)
+{
+    <form asp-action="@nameof(ProductsController.Confirm)"
+      asp-route-productSlug="@Model.Product.Slug"
+      method="post"
+      role="form"
+      enctype="multipart/form-data">
+        <input asp-for="IsReplenishment" value="@Model.IsReplenishment" type="hidden">
+        <input type="hidden" name="adjustmentsJson" id="adjustmentsJson" value="@Model.AdjustmentsJson" />
+        <button type="submit"
+            class="btn btn-outline-success"
+            aria-label="Confirm"
+            button-spinner>
+            Apply @Model.UploadType Updates
+        </button>
+    </form>
+}
+else
+{
+    <p>Cannot apply changes until errors are fixed.</p>
+
+}
+
+
+<form asp-action="@nameof(ProductsController.EditMapping)"
+      asp-route-productSlug="@Model.Product.Slug"
+      method="post"
+      role="form"
+      enctype="multipart/form-data">
+    <input type="hidden" name="locationMapId" id="locationMapId" />
+    <div class="modal fade"
+         id="mappingModal"
+         tabindex="-1"
+         aria-labelledby="mappingModalLabel"
+         aria-hidden="true"
+         data-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mappingModalLabel">Mapping</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="importLocation">Spreadsheet text</label>
+                        <input type="text" class="form-control" name="importLocation" id="importLocation" />
+                    </div>
+                    <div class="form-group">
+                        <label for="locationId">Maps to location</label>
+                        <select class="form-control" id="locationId" name="locationId" asp-items="Model.LocationSelect"></select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-outline-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+<script>
+    $("#mappingModal").on("show.bs.modal", function (event) {
+        var sender = $(event.relatedTarget);
+        $("#locationMapId").val(sender.data("locationmapid"));
+        $("#importLocation").val(sender.data("importlocation"));
+        $("#locationId").val(sender.data("locationid"));
+    });
+</script>
+}

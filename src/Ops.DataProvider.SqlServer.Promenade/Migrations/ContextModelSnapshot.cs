@@ -16,7 +16,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.12")
+                .HasAnnotation("ProductVersion", "5.0.13")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
@@ -848,6 +848,32 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.ToTable("LocationHoursOverrides");
                 });
 
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.LocationProductMap", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ImportLocation")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LocationId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("LocationProductMaps");
+                });
+
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Navigation", b =>
                 {
                     b.Property<int>("Id")
@@ -1269,6 +1295,9 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Property<int?>("Season")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ShowNotesSegmentId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Stub")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -1309,10 +1338,16 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsVisibleToPublic")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<int?>("SegmentId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Slug")
                         .IsRequired()
@@ -1344,7 +1379,16 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<int>("InventoryStatus")
+                    b.Property<int?>("ItemCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ManyThreshhold")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ThreshholdUpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ThreshholdUpdatedBy")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -1939,6 +1983,25 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Location");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.LocationProductMap", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Location");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Navigation", b =>

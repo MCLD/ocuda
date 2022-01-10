@@ -1,0 +1,15 @@
+﻿@model Ocuda.Promenade.Controllers.ViewModels.Podcasts.ShowNotesViewModel
+
+<div class="row">
+    <div class="col-12">
+            <h1 class="mb-2">@Localizer[Promenade.ShowNotesFor, Model.PodcastItem.Title]</h1>
+        <div class="mb-4">
+            <em>
+                <a href="@Url.Action(nameof(PodcastsController.Podcast), new { stub = Model.Podcast.Stub })">@Localizer[Promenade.PodcastTitle, Model.Podcast.Title]</a>.
+                @Localizer[Promenade.PodcastEpisodePublished, Model.PodcastItem.Episode, Model.PodcastItem.PublishDate.Value.ToLongDateString()]
+            </em>
+        </div>
+        <div>@Html.Raw(Model.ShowNotesSegment.Text)</div>
+        <div><em>@Localizer[Promenade.KeywordsItem, Model.PodcastItem.Keywords]</em></div>
+    </div>
+</div>

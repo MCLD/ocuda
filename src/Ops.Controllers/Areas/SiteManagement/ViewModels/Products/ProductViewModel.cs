@@ -16,5 +16,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Products
                 ProductLocationInventory.Status.Many => "table-success",
                 _ => null
             };
+
+        public static string StatusTextClass(ProductLocationInventory.Status status) =>
+            status switch
+            {
+                ProductLocationInventory.Status.None => "text-danger",
+                ProductLocationInventory.Status.Few => "text-warning",
+                ProductLocationInventory.Status.Many => "text-success",
+                _ => null
+            };
     }
 }

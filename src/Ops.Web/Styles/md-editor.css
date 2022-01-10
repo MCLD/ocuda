@@ -11,10 +11,8 @@
     width: 100%;
 }
 
-    .md-preview blockquote {
-        border-left: 2px dotted #888;
-        padding-left: 5px;
-        background: #d0f0ff;
+    .md-preview > blockquote {
+        padding-left: 3rem !important;
     }
 
 .md-button-row {
@@ -68,7 +66,6 @@
     .md-prompt-dialog > div {
         font-size: 0.8em;
     }
-
 
     .md-prompt-dialog > form > input[type="text"] {
         border: 1px solid #999;

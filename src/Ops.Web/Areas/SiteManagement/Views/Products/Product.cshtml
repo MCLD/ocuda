@@ -10,20 +10,35 @@
         </h1>
     </div>
     <div class="col-sm-6">
-        <a asp-controller="@HomeController.Name"
-           asp-action="@(nameof(HomeController.Index))"
+        <a asp-controller="@ProductsController.Name"
+           asp-action="@nameof(ProductsController.Index)"
            class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+        <a asp-controller="@ProductsController.Name"
+           asp-action="@nameof(ProductsController.UploadDistribution)"
+           asp-route-productSlug="@Model.Product.Slug"
+           class="btn btn-outline-info mt-2 mb-1 mr-2 float-right">
+            <span class="fas fa-file-upload"></span>
+            Upload Distribution
+        </a>
+        <a asp-controller="@ProductsController.Name"
+           asp-action="@nameof(ProductsController.UploadReplenishment)"
+           asp-route-productSlug="@Model.Product.Slug"
+           class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
+            <span class="fas fa-file-upload"></span>
+            Upload Replenishment
+        </a>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-12 col-sm-8 offset-sm-2">
+    <div class="col-12 col-lg-10 offset-lg-1">
         <div>
-            <table class="table table-sm table-hover table-bordered">
+            <table class="table table-sm table-hover table-striped table-bordered">
                 <thead>
                     <tr>
                         <th>Location</th>
                         <th>On-hand count</th>
+                        <th>Quantity on-hand</th>
                         <th>Updated At</th>
                         <th>Updated By</th>
                         <th>Action</th>
@@ -32,9 +47,10 @@
                 <tbody>
                     @foreach (var inventory in Model.LocationInventories)
                     {
-                        <tr class="@ProductViewModel.StatusClass(inventory.InventoryStatus)">
+                        <tr>
                             <td class="align-middle">@inventory.Location.Name</td>
-                            <td class="align-middle"><strong>@inventory.InventoryStatus</strong></td>
+                            <td class="align-middle @ProductViewModel.StatusClass(inventory.InventoryStatus)"><strong>@inventory.InventoryStatus</strong></td>
+                            <td class="align-middle @ProductViewModel.StatusClass(inventory.InventoryStatus)"><strong>@inventory.ItemCount</strong></td>
                             <td class="align-middle">@inventory.UpdatedAt</td>
                             <td class="align-middle">
                                 <a asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
@@ -44,10 +60,10 @@
                                 </a>
                             </td>
                             <td class="align-middle">
-                                <a class="btn btn-sm btn-outline-dark"
+                                <a class="btn btn-sm btn-outline-primary"
                                    asp-action="@nameof(ProductsController.LocationInventory)"
-                                   asp-route-locationid="@inventory.LocationId"
-                                   asp-route-slug="@Model.Product.Slug">
+                                   asp-route-locationslug="@inventory.Location.Stub"
+                                   asp-route-productslug="@Model.Product.Slug">
                                     <span class="fas fa-edit"></span>
                                     Update
                                 </a>
