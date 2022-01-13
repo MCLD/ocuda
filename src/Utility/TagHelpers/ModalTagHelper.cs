@@ -30,7 +30,7 @@ namespace Ocuda.Utility.TagHelpers
         private const string dialogClass = "modal-dialog";
         private const string footerClass = "modal-footer";
         private const string footerDeleteIconClass = "fas fa-minus-circle mr-1";
-        private const string headerAttibuteName = "modal-header";
+        private const string headerAttributeName = "modal-header";
         private const string headerButtonClass = "close";
         private const string headerClass = "modal-header";
         private const string headerTitleClass = "modal-title";
@@ -42,6 +42,7 @@ namespace Ocuda.Utility.TagHelpers
         private const string nameAttributeName = "name";
         private const string saveButtonClass = "btn btn-outline-success btn-spinner";
         private const string saveIconClass = "far fa-save mr-1";
+        private const string suppressFooterAttributeName = "suppress-footer";
         private const string typeAttributeName = "type";
 
         [HtmlAttributeName(idAttributeName)]
@@ -53,11 +54,14 @@ namespace Ocuda.Utility.TagHelpers
         [HtmlAttributeName(isNonSubmitAttributeName)]
         public bool IsNonSubmit { get; set; }
 
-        [HtmlAttributeName(headerAttibuteName)]
+        [HtmlAttributeName(headerAttributeName)]
         public string ModalHeader { get; set; }
 
         [HtmlAttributeName(nameAttributeName)]
         public string Name { get; set; }
+
+        [HtmlAttributeName(suppressFooterAttributeName)]
+        public bool SuppressFooter { get; set; }
 
         [HtmlAttributeName(typeAttributeName)]
         public ModalTypes? Type { get; set; }
@@ -72,7 +76,14 @@ namespace Ocuda.Utility.TagHelpers
 
             var body = new TagBuilder("div");
             body.AddCssClass(bodyClass);
-            body.InnerHtml.AppendHtml(await output.GetChildContentAsync());
+            try
+            {
+                body.InnerHtml.AppendHtml(await output.GetChildContentAsync());
+            }
+            catch (NullReferenceException)
+            {
+                // probable nested formgroup tag helper in modal tag helper
+            }
 
             if (Type == ModalTypes.Delete)
             {
@@ -184,8 +195,12 @@ namespace Ocuda.Utility.TagHelpers
             var content = new TagBuilder("div");
             content.AddCssClass(contentClass);
             content.InnerHtml.AppendHtml(CreateHeader())
-                .AppendHtml(await CreateBody(output))
-                .AppendHtml(CreateFooter());
+                .AppendHtml(await CreateBody(output));
+
+            if (!SuppressFooter)
+            {
+                content.InnerHtml.AppendHtml(CreateFooter());
+            }
 
             var dialog = new TagBuilder("div");
             var appenededDialogClass = new StringBuilder(dialogClass);

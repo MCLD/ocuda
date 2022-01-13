@@ -2,9 +2,17 @@
 {
     public class SearchFilter : BaseFilter
     {
-        public SearchFilter() : base() { }
+        public SearchFilter() : base()
+        {
+        }
 
-        public SearchFilter(int page) : base(page) { }
+        public SearchFilter(int page) : base(page)
+        {
+        }
+
+        public SearchFilter(int page, int take) : base(page, take)
+        {
+        }
 
         public string SearchText { get; set; }
     }

@@ -3,8 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Data.Extensions;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
@@ -93,6 +96,22 @@ namespace Ocuda.Ops.Data.Ops
                          && !_.IsDeleted
                          && !_.IsSysadmin)
                 .AnyAsync();
+        }
+
+        public async Task<CollectionWithCount<User>> SearchAsync(SearchFilter searchFilter)
+        {
+            var query = DbSet
+                .AsNoTracking()
+                .Where(_ => !_.IsDeleted && (
+                        _.Name.Contains(searchFilter.SearchText)
+                        || _.Email.Contains(searchFilter.SearchText)
+                        || _.Username.Contains(searchFilter.SearchText)));
+
+            return new CollectionWithCount<User>
+            {
+                Count = await query.CountAsync(),
+                Data = await query.OrderBy(_ => _.Name).ApplyPagination(searchFilter).ToListAsync()
+            };
         }
 
         #region Initial setup methods

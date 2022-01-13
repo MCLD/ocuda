@@ -354,8 +354,9 @@ namespace Ocuda.Ops.Service
 
                     if (string.IsNullOrWhiteSpace(user.Username))
                     {
-                        _logger.LogWarning("Unable to find LDAP information for {UserEmail}",
-                            user.Email);
+                         _logger.LogWarning("Unable to find LDAP information employee {EmployeeId}, {Name}",
+                            user.EmployeeId,
+                            user.Name);
                     }
 
                     userAddList.Add(user);

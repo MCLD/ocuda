@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Service.Filters;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
@@ -11,6 +13,10 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         Task<User> EditNicknameAsync(User user);
 
         Task<User> EnsureSysadminUserAsync();
+
+        Task<CollectionWithCount<User>> FindAsync(SearchFilter filter);
+
+        Task<int?> GetAssociatedLocation(int userId);
 
         Task<User> GetByIdAsync(int id);
 

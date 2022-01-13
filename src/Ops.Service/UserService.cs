@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service
 {
@@ -80,6 +83,17 @@ namespace Ocuda.Ops.Service
                 await _userRepository.SaveAsync();
             }
             return sysadminUser;
+        }
+
+        public async Task<CollectionWithCount<User>> FindAsync(SearchFilter filter)
+        {
+            return await _userRepository.SearchAsync(filter);
+        }
+
+        public async Task<int?> GetAssociatedLocation(int userId)
+        {
+            var user = await _userRepository.FindAsync(userId);
+            return user?.AssociatedLocation;
         }
 
         public async Task<User> GetByIdAsync(int id)

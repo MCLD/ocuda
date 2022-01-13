@@ -7,5 +7,8 @@ namespace Ocuda.Ops.Models.Entities
         [Required]
         [MaxLength(50)]
         public string Description { get; set; }
+
+        [Required]
+        public bool IsActive { get; set; }
     }
 }

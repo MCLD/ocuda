@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models.Abstract;
+using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
@@ -120,7 +121,9 @@ namespace Ocuda.Ops.Controllers.Abstract
                     IPermissionGroupService permissionGroupService,
             string applicationPermission)
         {
-            if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
+            if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
+                && !applicationPermission.Equals(ApplicationPermission.MultiUserAccount,
+                    StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }

@@ -33,6 +33,12 @@ namespace Ocuda.Ops.Models.Definitions
             },
             new ApplicationPermissionDefinition
             {
+                Id = ApplicationPermission.MultiUserAccount,
+                Name = "Multi-user Account",
+                Info = "Users with this permission are accessing via a multi-user domain account."
+            },
+            new ApplicationPermissionDefinition
+            {
                 Id = ApplicationPermission.PodcastShowNotesManagement,
                 Name = "Podcast Show Notes Management",
                 Info = "Users with this permission can add and edit podcast show notes."

@@ -52,6 +52,10 @@ else
                         <th>Date &amp; Time</th>
                         <th>Branch</th>
                         <th>Type</th>
+                        @if (Model.ViewingAll)
+                        {
+                            <th>Submitted By</th>
+                        }
                     </tr>
                 </thead>
                 <tbody>
@@ -70,8 +74,17 @@ else
                                 @Model.Locations[incident.LocationId]
                             </td>
                             <td class="align-middle">
-                                @incident.IncidentType
+                                @Model.IncidentTypes[incident.IncidentTypeId]
                             </td>
+                            @if (Model.ViewingAll)
+                            {
+                                <td>
+                                    <a asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
+                           asp-area=""
+                           asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
+                           asp-route-id="@incident.CreatedByUser.Username">@incident.CreatedByUser.Name</a>
+                                </td>
+                            }
                         </tr>
                     }
                 </tbody>

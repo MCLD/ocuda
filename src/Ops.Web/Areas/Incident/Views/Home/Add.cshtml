@@ -12,18 +12,60 @@
     </div>
     <div class="col-sm-6">
         <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
-           asp-area=""
-           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
-           asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Index)">Back</a>
+           asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
+           asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine)"
+           asp-route-page="@(Model.Page > 1 ? Model.Page : null)">Back</a>
     </div>
 </div>
 
 <form asp-action="@nameof(HomeController.Add)"
       method="post"
       role="form">
+    <input type="hidden" id="witnessJson" asp-for="WitnessJson" />
+    <input type="hidden" id="affectedJson" asp-for="AffectedJson" />
     <div class="row">
         <div class="col">
-            <input asp-for="Incident.IncidentAt" formgroup type="datetime" />
+            @if (Model.MultiUserAccount)
+            {
+                <input asp-for="Incident.ReportedByName"
+                   formgroup
+                   type="text"
+                   data-val="true"
+                   data-val-required="Reported by name is required." />
+            }
+            <div class="row form-group">
+                <label class="col-form-label text-md-right col-md-3" for="IncidentDate">
+                    Date & time of incident
+                    <span class="fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker"></span>
+                </label>
+                <div class="form-group-inner col-md-9">
+                    <div class="d-flex flex-row">
+                        <div style="min-width: 13rem;">
+                            <input asp-for="IncidentDate"
+                                   type="date"
+                                   required
+                                   class="form-control"
+                                   data-val="true"
+                                   data-val-required="Incident date is required." />
+                            <span class="validation-message text-danger field-validation-valid"
+                                  data-valmsg-for="IncidentDate"
+                                  data-valmsg-replace="true"></span>
+                        </div>
+                        <div style="min-width: 13rem;">
+                            <input asp-for="IncidentTime"
+                                   type="time"
+                                   required
+                                   step="60"
+                                   class="form-control"
+                                   data-val="true"
+                                   data-val-required="Incident time is required." />
+                            <span class="validation-message text-danger field-validation-valid"
+                                  data-valmsg-for="IncidentTime"
+                                  data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <select asp-for="Incident.IncidentTypeId"
                     asp-items="Model.IncidentTypes"
                     formgroup></select>
@@ -31,8 +73,454 @@
                     asp-items="Model.Locations"
                     formgroup></select>
             <input asp-for="Incident.LocationDescription" formgroup type="text" />
-            <textarea asp-for="Incident.Description" formgroup></textarea>
-            <textarea asp-for="Incident.InjuriesDamages" formgroup></textarea>
+            <textarea asp-for="Incident.Description" formgroup rows="5"></textarea>
+            <div class="row form-group">
+                <label class="col-form-label text-md-right col-md-3">Witnesses</label>
+                <div class="form-group-inner col-md-9">
+                    <table class="table table-sm table-bordered table-striped table-hover d-none"
+                           id="witnessTable">
+                        <thead>
+                            <tr>
+                                <th class="button-column">Action</th>
+                                <th>Type</th>
+                                <th>Name</th>
+                                <th>Barcode</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody id="witnessTableContent">
+                        </tbody>
+                    </table>
+                    <button type="button"
+                            class="btn btn-outline-primary"
+                            data-toggle="modal"
+                            data-target="#addStaffModal"
+                            data-participanttype="@nameof(Ocuda.Ops.Models.Entities.IncidentParticipantType.Witness)"
+                            data-participanttypeid="@((int)Ocuda.Ops.Models.Entities.IncidentParticipantType.Witness)">
+                        <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                        Add staff witness
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline-primary"
+                            data-toggle="modal"
+                            data-target="#addPersonModal"
+                            data-participanttype="@nameof(Ocuda.Ops.Models.Entities.IncidentParticipantType.Witness)"
+                            data-participanttypeid="@((int)Ocuda.Ops.Models.Entities.IncidentParticipantType.Witness)">
+                        <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                        Add other witness
+                    </button>
+                </div>
+            </div>
+            <textarea asp-for="Incident.InjuriesDamages" formgroup rows="5"></textarea>
+            <div class="row form-group">
+                <label class="col-form-label text-md-right col-md-3">Affected parties</label>
+                <div class="form-group-inner col-md-9">
+                    <table class="table table-sm table-bordered table-striped table-hover d-none"
+                           id="publicTable">
+                        <thead>
+                            <tr>
+                                <th class="button-column">Action</th>
+                                <th>Type</th>
+                                <th>Name</th>
+                                <th>Barcode</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody id="publicTableContent">
+                        </tbody>
+                    </table>
+                    <button type="button"
+                            class="btn btn-outline-primary"
+                            data-toggle="modal"
+                            data-target="#addStaffModal"
+                            data-participanttype="@nameof(Ocuda.Ops.Models.Entities.IncidentParticipantType.Affected)"
+                            data-participanttypeid="@((int)Ocuda.Ops.Models.Entities.IncidentParticipantType.Affected)">
+                        <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                        Add staff affected
+                    </button>
+                    <button type="button"
+                            class="btn btn-outline-primary"
+                            data-toggle="modal"
+                            data-target="#addPersonModal"
+                            data-participanttype="@nameof(Ocuda.Ops.Models.Entities.IncidentParticipantType.Affected)"
+                            data-participanttypeid="@((int)Ocuda.Ops.Models.Entities.IncidentParticipantType.Affected)">
+                        <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                        Add other affected
+                    </button>
+                </div>
+            </div>
+            <select asp-for="Incident.LawEnforcementContacted"
+                    formgroup>
+                <option value="false">No</option>
+                <option value="true">Yes</option>
+            </select>
+            <div class="row">
+                <div class="col-md-9 offset-md-3">
+                    <button type="submit" class="btn btn-outline-success">
+                        <span class="far fa-save" aria-hidden="true"></span>
+                        Save Incident
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </form>
+
+<div modal
+     isLarge="true"
+     id="addStaffModal"
+     name="Staff Member"
+     type="Ocuda.Utility.TagHelpers.ModalTypes.Add"
+     suppress-footer="true"
+     data-backdrop="static">
+    <input type="hidden" id="staffParticipantTypeId" />
+    <div class="form-group">
+        <label for="publicBarcode">Search</label>
+        <div class="input-group">
+            <input type="text"
+                   id="staffSearchText"
+                   class="form-control"
+                   aria-label="Search text" />
+            <div class="input-group-append">
+                <button class="btn btn-outline-success"
+                        id="staffSearchGo"
+                        button-spinner>
+                    Go
+                </button>
+            </div>
+        </div>
+
+    </div>
+    <table class="table table-sm table-bordered table-hover table-striped">
+        <thead>
+            <tr>
+                <th>Action</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody id="searchResults">
+            <tr><td colspan="2">No staff members found.</td></tr>
+        </tbody>
+    </table>
+    <div id="pagination" class="d-none"></div>
+</div>
+
+<div modal
+     isLarge="true"
+     id="addPersonModal"
+     name="Non-staff"
+     type="Ocuda.Utility.TagHelpers.ModalTypes.Add"
+     data-backdrop="static">
+    <input type="hidden" id="personParticipantTypeId" />
+    <div class="form-group">
+        <label for="publicBarcode">Barcode</label>
+        <input type="number"
+               class="form-control"
+               id="publicBarcode"
+               name="publicBarcode"
+               maxlength="40" />
+    </div>
+    <div class="form-group">
+        <label for="publicName">Name</label>
+        <input type="text"
+               class="form-control"
+               id="publicName"
+               name="publicName"
+               maxlength="200" />
+    </div>
+    <div class="form-group">
+        <label for="publicDescription">Description</label>
+        <input type="text"
+               class="form-control"
+               maxlength="100"
+               name="publicDescription"
+               id="publicDescription" />
+    </div>
+</div>
+
+@section styles {
+<style type="text/css">
+    .tab-content {
+        border-left: solid 1px rgb(222, 226, 230);
+        border-right: solid 1px rgb(222, 226, 230);
+        border-bottom: solid 1px rgb(222, 226, 230);
+    }
+
+    .button-column {
+        width: 5rem;
+        text-align: center;
+    }
+</style>
+}
+
+@section scripts {
+<script type="text/javascript">
+    var currentPage = 1;
+    var users = [];
+    var affectedId = @((int)Ocuda.Ops.Models.Entities.IncidentParticipantType.Affected)
+
+    $().ready(function() {
+        $('#addPersonModal').find('button[type="submit"]').attr('onclick', 'addPublic();');
+        $('#staffSearchText').keyup(function(e) {
+            if(e.keyCode === 13) {
+                e.preventDefault();
+                $('#staffSearchGo').click();
+            }
+        });
+        updateTable(0);
+        updateTable(1);
+    })
+
+    $('#addPersonModal').on('show.bs.modal', function (event) {
+        let caller = $(event.relatedTarget);
+        let type = caller.data('participanttype');
+        $('#personParticipantTypeId').val(caller.data('participanttypeid'));
+        $('#addPersonModalLabel').html('Add ' + type + ': Non-staff');
+    })
+
+    $('#addStaffModal').on('show.bs.modal', function (event) {
+        let caller = $(event.relatedTarget);
+        let type = caller.data('participanttype');
+        $('#staffParticipantTypeId').val(caller.data('participanttypeid'));
+        $('#addStaffModalLabel').html('Add ' + type + ': Staff member');
+        currentPage = 1;
+        clearSearchResults('Enter text above to search for a staff member.');
+        $('#staffSearchText').val('')
+    })
+
+    $('#staffSearchGo').click(function() {
+        currentPage = 1;
+        performSearch();
+    });
+
+    function clearPublicForm() {
+        $('#publicBarcode').val('');
+        $('#publicName').val('');
+        $('#publicDescription').val('');
+    }
+
+    function clearSearchResults(message) {
+        if(message) {
+        $('#searchResults').html('<tr><td colspan="2">' + message + '</td></tr>');
+        }
+        else {
+        $('#searchResults').html('<tr><td colspan="2">No staff members found.</td></tr>');
+        }
+        $('#pagination').addClass('d-none');
+    }
+
+    function performSearch() {
+        let link = '@Url.Action(nameof(Ocuda.Ops.Controllers.ProfileController.SearchJson), Ocuda.Ops.Controllers.ProfileController.Name )';
+        let jqxhr = $.ajax({
+            url: link,
+            data: { searchText: $('#staffSearchText').val(), page: currentPage }
+        })
+        .done(function(data, textStatus, jqXHR) {
+            if(data && data.itemCount > 0) {
+                currentPage = data.currentPage;
+                let searchResult = [];
+                users =[];
+                $.each(data.users, function(index, value) {
+                    searchResult.push('<tr><td class="button-column">')
+                    searchResult.push('<button class="btn btn-sm btn-outline-success"')
+                    searchResult.push('onclick="addStaff(' + value.id + ')">')
+                    searchResult.push('<span class="fas fa-plus-circle"></span></button>')
+                    searchResult.push('</td><td class="align-middle">' + value.name +'</td></tr>');
+                    users[value.id] = value.name;
+                })
+                let pagination = [];
+                if(data.maxPage > 1) {
+                    if(data.currentPage == 1) {
+                        pagination.push('<button class="btn btn-sm btn-outline-primary" disabled>');
+                        pagination.push('<span class="fa fa-backward"></span></button>');
+                    } else {
+                        pagination.push('<button class="btn btn-sm btn-outline-primary"');
+                        pagination.push(' onclick="prevPage();">');
+                        pagination.push('<span class="fa fa-backward"></span></button>');
+                    }
+                    pagination.push('<span class="d-inline-block mx-2">')
+                    pagination.push(data.currentPage + '/' + data.maxPage);
+                    pagination.push('</span>')
+                    if(data.currentPage == data.maxPage) {
+                        pagination.push('<button class="btn btn-sm btn-outline-primary" disabled>');
+                        pagination.push('<span class="fa fa-forward"></span></button>');
+                    } else {
+                        pagination.push('<button class="btn btn-sm btn-outline-primary"');
+                        pagination.push(' onclick="nextPage();">')
+                        pagination.push('<span class="fa fa-forward"></span></button>');
+                    }
+                }
+                $('#searchResults').html(searchResult.join(''));
+                if(pagination.length > 0) {
+                    $('#pagination').removeClass('d-none');
+                }
+                else {
+                    $('#pagination').addClass('d-none');
+                }
+                $('#pagination').html(pagination.join(''));
+            } else {
+                clearSearchResults();
+            }
+        })
+        .fail(function(jqXhr, textStatus, errorThrown) {
+            console.error(textStatus);
+            console.error(errorThrown);
+            alert("Staff lookup failed.");
+        })
+        .always(function() {
+            ResetSpinners();
+        });
+    }
+
+    function nextPage() {
+        currentPage = currentPage + 1;
+        performSearch();
+    }
+
+    function prevPage() {
+        currentPage = Math.max(1, currentPage - 1);
+        performSearch();
+    }
+
+    function addPublic() {
+        let publicBarcode = $('#publicBarcode').val();
+        let publicName = $('#publicName').val();
+        let publicDescription = $('#publicDescription').val();
+
+        if(publicBarcode.trim().length == 0 && publicName.trim().length == 0) {
+            ResetSpinners();
+            alert("You must enter a barcode or name.");
+            return;
+        }
+
+        var field;
+        let typeId = $('#personParticipantTypeId').val();
+        console.info(typeId);
+        if(typeId == affectedId) {
+            field = $('#affectedJson')
+            console.info(field);
+        } else {
+            field = $('#witnessJson')
+            console.info(field);
+        }
+
+        var people;
+        if(field.val().length != 0) {
+            people = JSON.parse(field.val());
+        }
+        else
+        {
+            people = [];
+        }
+
+        people.push({barcode: publicBarcode, name: publicName, description: publicDescription });
+
+        field.val(JSON.stringify(people));
+        ResetSpinners();
+        clearPublicForm();
+        updateTable(typeId);
+        $('#addPersonModal').modal('hide');
+    }
+
+    function addStaff(staffId) {
+        var field;
+
+        let typeId = $('#staffParticipantTypeId').val();
+        if(typeId == affectedId) {
+            field = $('#affectedJson')
+        } else {
+            field = $('#witnessJson')
+        }
+
+        var people;
+        if(field.val().length != 0) {
+            people = JSON.parse(field.val());
+        }
+        else
+        {
+            people = [];
+        }
+        people.push({id: staffId, name: users[staffId] });
+
+        field.val(JSON.stringify(people));
+        updateTable(typeId);
+        $('#addStaffModal').modal('hide');
+    }
+
+    function remove(typeId, itemId) {
+        if(typeId == affectedId) {
+            field = $('#affectedJson')
+        } else {
+            field = $('#witnessJson')
+        }
+
+        var data = JSON.parse(field.val());
+        data.splice(itemId, 1);
+        field.val(JSON.stringify(data));
+
+        updateTable(typeId)
+    }
+
+    function updateTable(typeId) {
+        var field;
+        var table;
+        var tableContent;
+
+        if(typeId == affectedId) {
+            field = $('#affectedJson')
+            table = $('#publicTable')
+            tableContent = $('#publicTableContent')
+        } else {
+            field = $('#witnessJson')
+            table = $('#witnessTable')
+            tableContent = $('#witnessTableContent')
+        }
+
+        if(field.val().length == 0) {
+            table.addClass('d-none');
+        }
+        else
+        {
+            let content = [];
+            let people = JSON.parse(field.val());
+            if(people.length == 0) {
+                table.addClass('d-none');
+            }
+            else {
+                $.each(people, function(index, value) {
+                    if(value.id) {
+                        // staff
+                        content.push('<tr>');
+                        content.push('<td onclick="remove(' + typeId + ',' + index + ')"')
+                        content.push(' class="button-column align-middle">')
+                        content.push('<button class="btn btn-sm btn-outline-danger">')
+                        content.push('<span class="fas fa-minus-circle"></span></button>')
+                        content.push('</td><td class="align-middle">Staff</td>');
+                        content.push('<td class="align-middle">')
+                        content.push(value.name);
+                        content.push('</td><td>&nbsp;</td><td>&nbsp;</td></tr>');
+                    }
+                    else
+                    {
+                        content.push('<tr>');
+                        content.push('<td onclick="remove(' + typeId + ',' + index + ')"')
+                        content.push(' class="button-column align-middle">')
+                        content.push('<button class="btn btn-sm btn-outline-danger">')
+                        content.push('<span class="fas fa-minus-circle"></span></button>')
+                        content.push('</td><td class="align-middle">Non-staff</td>');
+                        content.push('<td class="align-middle">')
+                        content.push(value.name);
+                        content.push('</td><td class="align-middle">');
+                        content.push(value.barcode);
+                        content.push('</td><td class="align-middle">');
+                        content.push(value.description);
+                        content.push('</td></tr>');
+                    }
+                });
+                tableContent.html(content.join(''))
+                table.removeClass('d-none');
+            }
+        }
+    }
+</script>
+}

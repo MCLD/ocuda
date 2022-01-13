@@ -8,7 +8,24 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IIncidentService
     {
+        public Task<int> AddAsync(Incident incident,
+            ICollection<IncidentStaff> staffs,
+            ICollection<IncidentParticipant> participants);
+
+        public Task AddTypeAsync(string incidentTypeName);
+
+        public Task AdjustTypeStatus(int incidentTypeId, bool status);
+
+        public Task<IDictionary<int, string>> GetActiveIncidentTypesAsync();
+
+        public Task<Dictionary<int, string>> GetAllIncidentTypesAsync();
+
+        public Task<CollectionWithCount<IncidentType>> GetIncidentTypesAsync(BaseFilter filter);
+
         public Task<CollectionWithCount<Incident>> GetPaginatedAsync(IncidentFilter filter);
-        public Task<IDictionary<int, string>> GetIncidentTypesAsync();
+
+        public Task<IncidentType> GetTypeAsync(string incidentTypeDescription);
+
+        public Task UpdateIncidentType(int incidentTypeId, string incidentTypeDescription);
     }
 }

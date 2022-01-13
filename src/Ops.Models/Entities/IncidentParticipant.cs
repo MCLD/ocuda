@@ -7,7 +7,7 @@ namespace Ocuda.Ops.Models.Entities
         [MaxLength(40)]
         public string Barcode { get; set; }
 
-        [MaxLength(400)]
+        [MaxLength(100)]
         public string Description { get; set; }
 
         public Incident Incident { get; set; }
@@ -18,7 +18,7 @@ namespace Ocuda.Ops.Models.Entities
         [Required]
         public IncidentParticipantType IncidentParticipantType { get; set; }
 
-        [MaxLength(200)]
+        [MaxLength(50)]
         public string Name { get; set; }
     }
 }

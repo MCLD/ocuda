@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Profile;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
 
@@ -141,6 +142,39 @@ namespace Ocuda.Ops.Controllers
         {
             await _httpContext.HttpContext.SignOutAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> SearchJson(string searchText, int page)
+        {
+            int currentPage = page < 2 ? 1 : page;
+
+            var filter = new SearchFilter(currentPage, 5)
+            {
+                SearchText = searchText,
+            };
+
+            var users = await _userService.FindAsync(filter);
+
+            var result = new SearchViewModel
+            {
+                CurrentPage = currentPage,
+                ItemCount = users.Count,
+                ItemsPerPage = filter.Take.Value,
+                Users = users.Data.Select(_ => new Models.Entities.User
+                {
+                    Id = _.Id,
+                    Name = _.Name
+                }).ToList(),
+                SearchText = searchText
+            };
+
+            if (result.PastMaxPage)
+            {
+                result.CurrentPage = result.MaxPage;
+            }
+
+            return Json(result);
         }
 
         [HttpPost("[action]")]

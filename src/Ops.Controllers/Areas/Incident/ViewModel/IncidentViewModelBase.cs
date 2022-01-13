@@ -8,5 +8,6 @@ namespace Ocuda.Ops.Controllers.Areas.Incident.ViewModel
         public string Heading { get; set; }
         public string SearchText { get; set; }
         public string SecondaryHeading { get; set; }
+        public int Page { get; set; }
     }
 }

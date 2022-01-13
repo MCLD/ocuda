@@ -1,0 +1,98 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.DetailsViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            @Model.Heading
+            @if (!string.IsNullOrEmpty(Model.SecondaryHeading))
+            {
+                <small class="text-muted">@Model.SecondaryHeading</small>
+            }
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
+           asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine)"
+           asp-route-page="@(Model.Page > 1 ? Model.Page : null)">Back</a>
+    </div>
+</div>
+
+<div class="col-12 col-md-6">
+    <strong>Incident number</strong>
+</div>
+<div class="col-12 col-md-6">
+    @Model.Incident.Id
+</div>
+
+<div class="row">
+    <div class="col-12 col-md-6">
+        <strong>Date & time of incident</strong>
+    </div>
+    <div class="col-12 col-md-6">
+        @Model.Incident.IncidentAt
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-md-6">
+        <strong>Date & time report filed</strong>
+    </div>
+    <div class="col-12 col-md-6">
+        @Model.Incident.CreatedAt
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-md-6">
+        <strong>Report filed by</strong>
+    </div>
+    <div class="col-12 col-md-6">
+        @Model.Incident.CreatedByName
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-md-6">
+        <strong>Type of incident</strong>
+    </div>
+    <div class="col-12 col-md-6">
+        @Model.Incident.IncidentType.Description
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-md-6">
+        <strong>Location</strong>
+    </div>
+    <div class="col-12 col-md-6">
+        @Model.Incident.LocationName
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <strong>Location description</strong>
+    </div>
+    <div class="col-12">
+        @Model.Incident.LocationDescription
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <strong>Description</strong>
+    </div>
+    <div class="col-12">
+        @Model.Incident.Description
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <strong>Injuries/Damage</strong>
+    </div>
+    <div class="col-12">
+        @Model.Incident.InjuriesDamages
+    </div>
+</div>
