@@ -18,33 +18,44 @@ namespace Ocuda.Ops.Service
     public class IncidentService : BaseService<IncidentService>, IIncidentService
     {
         private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly IIncidentFollowupRepository _incidentFollowupRepository;
         private readonly IIncidentParticipantRepository _incidentParticipantRepository;
+        private readonly IIncidentRelationshipRepository _incidentRelationshipRepository;
         private readonly IIncidentRepository _incidentRepository;
-        private readonly IIncidentTypeRepository _incidentTypeRepository;
         private readonly IIncidentStaffRepository _incidentStaffRepository;
+        private readonly IIncidentTypeRepository _incidentTypeRepository;
         private readonly ILocationRepository _locationRepository;
+        private readonly IUserService _userService;
 
         public IncidentService(ILogger<IncidentService> logger,
             IHttpContextAccessor httpContextAccessor,
             IDateTimeProvider dateTimeProvider,
+            IIncidentFollowupRepository incidentFollowupRepository,
             IIncidentParticipantRepository incidentParticipantRepository,
+            IIncidentRelationshipRepository incidentRelationshipRepository,
             IIncidentRepository incidentRepository,
             IIncidentTypeRepository incidentTypeRepository,
             IIncidentStaffRepository incidentStaffRepository,
-            ILocationRepository locationRepository) : base(logger, httpContextAccessor)
+            ILocationRepository locationRepository,
+            IUserService userService) : base(logger, httpContextAccessor)
         {
             _dateTimeProvider = dateTimeProvider
                 ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+            _incidentFollowupRepository = incidentFollowupRepository
+                ?? throw new ArgumentNullException(nameof(incidentFollowupRepository));
             _incidentParticipantRepository = incidentParticipantRepository
                 ?? throw new ArgumentNullException(nameof(incidentParticipantRepository));
+            _incidentRelationshipRepository = incidentRelationshipRepository
+                ?? throw new ArgumentNullException(nameof(incidentRelationshipRepository));
             _incidentRepository = incidentRepository
                 ?? throw new ArgumentNullException(nameof(incidentRepository));
-            _incidentTypeRepository = incidentTypeRepository
-                ?? throw new ArgumentNullException(nameof(incidentTypeRepository));
             _incidentStaffRepository = incidentStaffRepository
                 ?? throw new ArgumentNullException(nameof(incidentStaffRepository));
+            _incidentTypeRepository = incidentTypeRepository
+                ?? throw new ArgumentNullException(nameof(incidentTypeRepository));
             _locationRepository = locationRepository
                 ?? throw new ArgumentNullException(nameof(locationRepository));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
         public async Task<int> AddAsync(Incident incident,
@@ -122,6 +133,73 @@ namespace Ocuda.Ops.Service
         {
             var incidentTypes = await _incidentTypeRepository.GetAllAsync();
             return incidentTypes.ToDictionary(k => k.Id, v => v.Description);
+        }
+
+        public async Task<Incident> GetAsync(int incidentId)
+        {
+            var incident = await _incidentRepository.FindAsync(incidentId);
+            if (incident == null)
+            {
+                return null;
+            }
+
+            incident.CreatedByUser = await _userService.GetByIdAsync(incident.CreatedBy);
+
+            var staffs = await _incidentStaffRepository.GetByIncidentIdAsync(incidentId);
+            if (staffs?.Count > 0)
+            {
+                if (incident.Staffs == null)
+                {
+                    incident.Staffs = new List<IncidentStaff>();
+                }
+                foreach (var staff in staffs)
+                {
+                    staff.User = await _userService.GetByIdAsync(staff.UserId);
+                    incident.Staffs.Add(staff);
+                }
+            }
+
+            var participants = await _incidentParticipantRepository
+                .GetByIncidentIdAsync(incidentId);
+            if (participants?.Count > 0)
+            {
+                if (incident.Participants == null)
+                {
+                    incident.Participants = new List<IncidentParticipant>();
+                }
+                foreach (var participant in participants)
+                {
+                    incident.Participants.Add(participant);
+                }
+            }
+
+            var followups = await _incidentFollowupRepository.GetByIncidentIdAsync(incidentId);
+            if (followups?.Count > 0)
+            {
+                incident.Followups = followups;
+            }
+
+            var relateds = await _incidentRelationshipRepository.GetByIncidentIdAsync(incidentId);
+            if (relateds?.Count > 0)
+            {
+                if (incident.RelatedIncidents == null)
+                {
+                    incident.RelatedIncidents = new List<Incident>();
+                }
+                foreach (var related in relateds)
+                {
+                    int relatedIncidentId = related.IncidentId != incidentId
+                        ? related.IncidentId
+                        : related.RelatedIncidentId;
+                    var relatedIncident = await _incidentRepository
+                        .GetRelatedAsync(relatedIncidentId);
+                    relatedIncident.CreatedByUser = await _userService
+                        .GetByIdAsync(relatedIncident.CreatedBy);
+                    incident.RelatedIncidents.Add(relatedIncident);
+                }
+            }
+
+            return incident;
         }
 
         public async Task<CollectionWithCount<IncidentType>> GetIncidentTypesAsync(BaseFilter filter)

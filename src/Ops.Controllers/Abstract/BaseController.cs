@@ -101,15 +101,21 @@ namespace Ocuda.Ops.Controllers.Abstract
             }
         }
 
-        protected async Task<IEnumerable<SelectListItem>>
-            GetLocationsDropdownAsync(ILocationService locationService)
+        protected async Task<IDictionary<int, string>>
+            GetLocationsAsync(ILocationService locationService)
         {
             if (locationService == null)
             {
                 throw new ArgumentNullException(nameof(locationService));
             }
 
-            var locations = await locationService.GetAllLocationsIdNameAsync();
+            return await locationService.GetAllLocationsIdNameAsync();
+        }
+
+        protected async Task<IEnumerable<SelectListItem>>
+            GetLocationsDropdownAsync(ILocationService locationService)
+        {
+            var locations = await GetLocationsAsync(locationService);
             return locations.Select(_ => new SelectListItem
             {
                 Value = _.Key.ToString(CultureInfo.InvariantCulture),

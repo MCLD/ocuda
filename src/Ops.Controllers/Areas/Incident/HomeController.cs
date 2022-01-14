@@ -10,6 +10,7 @@ using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.Incident.ViewModel;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Controllers.ServiceFacades;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Filters;
@@ -64,7 +65,7 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
         {
             var activeIncidentTypes = await _incidentService.GetActiveIncidentTypesAsync();
 
-            if (!activeIncidentTypes.Any())
+            if (activeIncidentTypes.Count == 0)
             {
                 ShowAlertWarning("You must configure incident types before you can enter an incident");
                 return RedirectToAction(nameof(Configuration));
@@ -259,6 +260,28 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             return View("Index", viewModel);
         }
 
+        [HttpGet("[action]/{id}")]
+        public async Task<IActionResult> Details(int id)
+        {
+            var incident = await _incidentService.GetAsync(id);
+
+            if (incident == null)
+            {
+                ShowAlertWarning($"Unable to find incident number {id}");
+                return RedirectToAction(nameof(Mine));
+            }
+
+            var viewModel = new DetailsViewModel
+            {
+                Incident = incident,
+                IncidentTypes = await _incidentService.GetActiveIncidentTypesAsync(),
+                Locations = await GetLocationsAsync(_locationService),
+                SecondaryHeading = $"#{incident.Id}"
+            };
+
+            return View(viewModel);
+        }
+
         [HttpPost("[action]")]
         public async Task<IActionResult> UpdateType(int incidentTypeId,
             string incidentTypeDescription)
@@ -311,7 +334,7 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             var staff = new List<IncidentStaff>();
             var people = new List<IncidentParticipant>();
 
-            var participants = JsonSerializer.Deserialize<StaffAndPublic[]>(jsonParticipants,
+            var participants = JsonSerializer.Deserialize<IncidentStaffPublic[]>(jsonParticipants,
                 new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -344,15 +367,6 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             }
 
             return (staff, people);
-        }
-
-        private class StaffAndPublic
-        {
-            public string Barcode { get; set; }
-            public string Description { get; set; }
-            public int Id { get; set; }
-            public string Name { get; set; }
-            public int UserId { get; set; }
         }
     }
 }

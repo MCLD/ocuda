@@ -8,5 +8,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
     public interface IIncidentRepository : IOpsRepository<Incident, int>
     {
         public Task<CollectionWithCount<Incident>> GetPaginatedAsync(IncidentFilter filter);
+
+        public Task<Incident> GetRelatedAsync(int incidentId);
     }
 }

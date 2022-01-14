@@ -46,5 +46,22 @@ namespace Ocuda.Ops.Data.Ops
                     .ToListAsync()
             };
         }
+
+        public async Task<Incident> GetRelatedAsync(int incidentId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Id == incidentId)
+                .Select(_ => new Incident
+                {
+                    CreatedBy = _.CreatedBy,
+                    Id = _.Id,
+                    IncidentAt = _.IncidentAt,
+                    IncidentTypeId = _.IncidentTypeId,
+                    LocationId = _.LocationId,
+                    ReportedByName = _.ReportedByName
+                })
+                .SingleOrDefaultAsync();
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.DetailsViewModel
 
-<div class="row mb-2">
+<div class="row mb-2 d-print-none">
     <div class="col-sm-6">
         <h1>
             @Model.Heading
@@ -18,81 +18,169 @@
     </div>
 </div>
 
-<div class="col-12 col-md-6">
-    <strong>Incident number</strong>
-</div>
-<div class="col-12 col-md-6">
-    @Model.Incident.Id
-</div>
+<h1 class="d-none d-print-block">@Model.Heading</h1>
 
 <div class="row">
-    <div class="col-12 col-md-6">
-        <strong>Date & time of incident</strong>
-    </div>
-    <div class="col-12 col-md-6">
-        @Model.Incident.IncidentAt
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-12 col-md-6">
-        <strong>Date & time report filed</strong>
-    </div>
-    <div class="col-12 col-md-6">
-        @Model.Incident.CreatedAt
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-12 col-md-6">
-        <strong>Report filed by</strong>
-    </div>
-    <div class="col-12 col-md-6">
-        @Model.Incident.CreatedByName
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-12 col-md-6">
-        <strong>Type of incident</strong>
-    </div>
-    <div class="col-12 col-md-6">
-        @Model.Incident.IncidentType.Description
+    <div class="col-12 col-md-8 offset-md-2">
+        <table class="table table-sm table-bordered">
+            <tr>
+                <th colspan="2" class="table-secondary">Incident report information</th>
+            </tr>
+            <tr>
+                <th class="fieldname">Incident number</th>
+                <td>@Model.Incident.Id</td>
+            </tr>
+            <tr>
+                <th>Date &amp; time report filed</th>
+                <td>@Model.Incident.CreatedAt</td>
+            </tr>
+            <tr>
+                <th>Report filed by</th>
+                <td>
+                    @if (!string.IsNullOrEmpty(Model.Incident.ReportedByName))
+                    {
+                        @Model.Incident.ReportedByName
+                    }
+                    else
+                    {
+                        @Model.Incident.CreatedByUser?.Name
+                    }
+                </td>
+            </tr>
+        </table>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-12 col-md-6">
-        <strong>Location</strong>
-    </div>
-    <div class="col-12 col-md-6">
-        @Model.Incident.LocationName
+
+<div class="row mt-2">
+    <div class="col-12 col-md-8 offset-md-2">
+        <table class="table table-sm table-bordered">
+            <tr>
+                <th colspan="2" class="table-secondary">Incident information</th>
+            </tr>
+            <tr>
+                <th class="fieldname">Date &amp; time of incident</th>
+                <td>@Model.Incident.IncidentAt</td>
+            </tr>
+            <tr>
+                <th>Incident type</th>
+                <td>@Model.IncidentTypes[Model.Incident.IncidentTypeId]</td>
+            </tr>
+            <tr>
+                <th>Location</th>
+                <td>
+                    @Model.Locations[Model.Incident.LocationId]
+                    <br />
+                    @Model.Incident.LocationDescription
+                </td>
+            </tr>
+        </table>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-12">
-        <strong>Location description</strong>
-    </div>
-    <div class="col-12">
-        @Model.Incident.LocationDescription
+<div class="row mt-2">
+    <div class="col-12 col-md-8 offset-md-2">
+        <table class="table table-sm table-bordered table-striped">
+            <tr>
+                <th colspan="3" class="table-secondary">Description</th>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    @Model.Incident.Description
+                </td>
+            </tr>
+            @if (Model.Witnesses?.Count > 0)
+            {
+                <tr>
+                    <th class="typefieldname">Type</th>
+                    <th class="namefieldname">Name/Barcode</th>
+                    <th>Description</th>
+                </tr>
+                @foreach (var witness in Model.Witnesses)
+                {
+                    <tr>
+                        @if (witness.Id == default)
+                        {
+                            <td>Non-staff</td>
+                        }
+                        else
+                        {
+                            <td>Staff</td>
+                        }
+                        <td>
+                            @witness.Name
+                            @if (!string.IsNullOrEmpty(witness.Name) && !string.IsNullOrEmpty(witness.Barcode))
+                            {
+                                <br />
+                            }
+                            @witness.Barcode
+                        </td>
+                        <td>@witness.Description</td>
+                    </tr>
+                }
+            }
+        </table>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-12">
-        <strong>Description</strong>
-    </div>
-    <div class="col-12">
-        @Model.Incident.Description
+<div class="row mt-2">
+    <div class="col-12 col-md-8 offset-md-2">
+        <table class="table table-sm table-bordered table-striped">
+            <tr>
+                <th colspan="3" class="table-secondary">Injuries/Damage</th>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    @Model.Incident.InjuriesDamages
+                </td>
+            </tr>
+            @if (Model.Witnesses?.Count > 0)
+            {
+                <tr>
+                    <th class="typefieldname">Type</th>
+                    <th class="namefieldname">Name/Barcode</th>
+                    <th>Description</th>
+                </tr>
+                @foreach (var participant in Model.Participants)
+                {
+                    <tr>
+                        @if (participant.Id == default)
+                        {
+                            <td>Non-staff</td>
+                        }
+                        else
+                        {
+                            <td>Staff</td>
+                        }
+                        <td>
+                            @participant.Name
+                            @if (!string.IsNullOrEmpty(participant.Name) && !string.IsNullOrEmpty(participant.Barcode))
+                            {
+                                <br />
+                            }
+                            @participant.Barcode
+                        </td>
+                        <td>@participant.Description</td>
+                    </tr>
+                }
+
+            }
+        </table>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-12">
-        <strong>Injuries/Damage</strong>
-    </div>
-    <div class="col-12">
-        @Model.Incident.InjuriesDamages
-    </div>
-</div>
+@section styles {
+<style type="text/css">
+    th.fieldname {
+        width: 13rem;
+    }
+
+    th.typefieldname {
+        width: 8rem;
+    }
+
+    th.namefieldname {
+        width: 10rem;
+    }
+</style>
+}

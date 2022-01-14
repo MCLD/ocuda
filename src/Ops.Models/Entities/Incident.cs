@@ -52,10 +52,12 @@ namespace Ocuda.Ops.Models.Entities
         public ICollection<IncidentParticipant> Participants { get; set; }
 
         [NotMapped]
-        public ICollection<IncidentRelationship> RelatedIncidents { get; set; }
+        public ICollection<Incident> RelatedIncidents { get; set; }
 
         [Display(Name = "Your name")]
         [MaxLength(50)]
         public string ReportedByName { get; set; }
+
+        public ICollection<IncidentStaff> Staffs { get; set; }
     }
 }

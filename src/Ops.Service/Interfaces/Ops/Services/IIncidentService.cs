@@ -20,6 +20,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         public Task<Dictionary<int, string>> GetAllIncidentTypesAsync();
 
+        public Task<Incident> GetAsync(int incidentId);
+
         public Task<CollectionWithCount<IncidentType>> GetIncidentTypesAsync(BaseFilter filter);
 
         public Task<CollectionWithCount<Incident>> GetPaginatedAsync(IncidentFilter filter);

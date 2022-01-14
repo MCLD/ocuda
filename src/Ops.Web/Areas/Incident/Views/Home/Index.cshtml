@@ -38,11 +38,7 @@
     </div>
 </form>
 
-@if (!(Model.Incidents?.Count() > 1))
-{
-    <div class="alert alert-warning">No incidents found.</div>
-}
-else
+@if (Model.Incidents?.Count() > 0)
 {
     <div class="row">
         <div class="col-12">
@@ -64,7 +60,7 @@ else
                         <tr>
                             <td class="align-middle">
                                 <a asp-action="@nameof(HistoricalController.Details)"
-                           asp-route-historicalIncidentId="@incident.Id"
+                           asp-route-id="@incident.Id"
                            asp-route-page="@(Model.CurrentPage > 1 ? Model.CurrentPage : null)"
                            asp-route-searchText="@Model.SearchText">
                                     @incident.IncidentAt.ToString("g")
@@ -95,4 +91,8 @@ else
     {
         <paginate paginateModel="@Model"></paginate>
     }
+}
+else
+{
+    <div class="alert alert-warning">No incidents found.</div>
 }
