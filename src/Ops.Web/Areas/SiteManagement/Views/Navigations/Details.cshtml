@@ -1,0 +1,422 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Navigations.DetailsViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Navigation
+            <small class="text-muted">@Model.Navigation.Name</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        @if (Model.Navigation.NavigationId.HasValue)
+        {
+            <a asp-controller="@NavigationsController.Name"
+               asp-action="@(nameof(NavigationsController.Details))"
+               asp-route-id="@Model.Navigation.NavigationId.Value"
+               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+        }
+        else
+        {
+            <a asp-controller="@NavigationsController.Name"
+               asp-action="@(nameof(NavigationsController.Index))"
+               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+        }
+
+        @if (Model.RoleProperties.CanHaveChildren)
+        {
+            <button data-toggle="modal"
+                    data-target="#addModal"
+                    class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
+                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                Add Navigation
+            </button>
+        }
+    </div>
+</div>
+
+@if (Model.RoleProperties.CanHaveText)
+{
+    <div class="row">
+        <div class="col-12">
+            @if (Model.LanguageList?.Count() > 1)
+            {
+                <div class="form-group row">
+                    <div class="col-md-3 text-md-right">
+                        <label asp-for="SelectedLanguage" class="col-form-label"></label>
+                    </div>
+                    <div class="col-md-9">
+                        @foreach (var item in Model.LanguageList.Where(_ => !_.Disabled))
+                        {
+                            <a href="@Url.Action(nameof(NavigationsController.Details), new { id = Model.Navigation.Id, language = item.Value })"
+                               class="btn btn-sm btn-outline-info mt-1 @(item.Selected ? "active" : null)">@item.Text</a>
+                        }
+                    </div>
+                </div>
+                <div class="row d-none oc-save-warning">
+                    <div class="offset-md-3 col-md-9">
+                        <div class="alert alert-warning">
+                            <span class="fas fa-arrow-circle-up"></span> Unsaved changes will be lost if you change languages.
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <form asp-action="@nameof(NavigationsController.Details)" method="post" role="form" class="mb-4">
+        <input asp-for="NavigationId" value="@Model.Navigation.Id" type="hidden" />
+        <input asp-for="LanguageId" type="hidden" />
+
+        <input asp-for="NavigationText.Label" class="oc-save-warning-field" formgroup />
+        <input asp-for="NavigationText.Link" class="oc-save-warning-field" formgroup />
+        <input asp-for="NavigationText.Title" class="oc-save-warning-field" formgroup />
+
+        <div class="row">
+            <div class="offset-md-3 col-md-9">
+                <div class="d-flex">
+                    <button type="submit"
+                            class="btn btn-outline-success btn-lg"
+                            buttonspinner>
+                        <span class="far fa-save"></span>
+                        Save
+                    </button>
+                    <div class="d-none oc-save-warning ml-3 flex-fill">
+                        <div class="alert alert-warning mb-0">
+                            <span class="fas fa-exclamation-triangle"></span>
+                            You have unsaved changes.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+}
+
+@if (Model.RoleProperties.CanHaveChildren)
+{
+    <div class="row">
+        <div class="col-12">
+            <div>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Languages</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Navigations.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="4" class="align-middle">
+                                    <em style="font-size: larger; color: #666;">
+                                        Navigation has no subnavigations.
+                                        <a href="#"
+                                           class="text-success"
+                                           data-toggle="modal"
+                                           data-target="#addModal">
+                                            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                                            Add a navigation.
+                                        </a>
+                                    </em>
+                                </td>
+                            </tr>
+                        }
+                        @foreach (var navigation in Model.Navigations)
+                        {
+                            <tr>
+                                <td class="align-middle">
+                                    <a asp-action="@nameof(NavigationsController.Details)"
+                                       asp-route-id="@navigation.Id">
+                                        @navigation.Name
+                                    </a>
+                                </td>
+                                <td class="align-middle">@string.Join(", ", navigation.NavigationLanguages)</td>
+                                <td class="align-middle">
+                                    <button type="button"
+                                            class="btn btn-outline-primary changeSort decreaseSortButton"
+                                            data-id="@navigation.Id"
+                                            data-increase="false"
+                                            disabled="@(navigation.Id == Model.Navigations.First().Id ? "disabled" : null)">
+                                        <span class="fas fa-arrow-up" aria-hidden="true"></span>
+                                    </button>
+                                    <button class="btn btn-outline-primary changeSort increaseSortButton"
+                                            data-id="@navigation.Id"
+                                            data-increase="true"
+                                            disabled="@(navigation.Id == Model.Navigations.Last().Id ? "disabled" : null)">
+                                        <span class="fas fa-arrow-down" aria-hidden="true"></span>
+                                    </button>
+                                    <button type="button"
+                                            class="btn btn-outline-primary"
+                                            data-toggle="modal"
+                                            data-target="#editModal"
+                                            data-id="@navigation.Id"
+                                            data-name="@navigation.Name"
+                                            data-nav-change="@navigation.ChangeToLinkWhenExtraSmall"
+                                            data-nav-hide="@navigation.HideTextWhenExtraSmall"
+                                            data-nav-icon="@navigation.Icon"
+                                            data-nav-target="@navigation.TargetNewWindow"
+                                            title="Edit Navigation">
+                                        <span class="fas fa-cog" aria-hidden="true"></span>
+                                    </button>
+                                    <a asp-controller="@NavigationsController.Name"
+                                       asp-action="@(nameof(NavigationsController.Details))"
+                                       asp-route-id="@navigation.Id"
+                                       class="btn btn-outline-primary"
+                                       title="Edit navigation details">
+                                        <span class="far fa-file-alt" aria-hidden="true"></span>
+                                    </a>
+                                    <button type="button"
+                                            class="btn btn-outline-danger"
+                                            data-toggle="modal"
+                                            data-target="#deleteModal"
+                                            data-id="@navigation.Id"
+                                            data-name="@navigation.Name">
+                                        <span class="fas fa-minus-circle" aria-hidden="true"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <form id="addForm" role="form">
+        <input id="addParentNavigation"
+               asp-for="Navigation.NavigationId"
+               value="@Model.Navigation.Id"
+               type="hidden" />
+
+        <div modal
+             id="addModal"
+             isLarge="true"
+             name="Navigation"
+             type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+            <input id="addName" asp-for="Navigation.Name" value="" formgroup />
+            @if (Model.RoleProperties.ChildrenCanDisplayIcon)
+            {
+                <input id="addIcon" asp-for="Navigation.Icon" value="" formgroup />
+            }
+            @if (Model.RoleProperties.ChildrenCanChangeToLink)
+            {
+                <select id="addChange"
+                        asp-for="Navigation.ChangeToLinkWhenExtraSmall"
+                        hide-required="true"
+                        formgroup>
+                    <option value="False" selected="selected">No</option>
+                    <option value="True">Yes</option>
+                </select>
+            }
+            @if (Model.RoleProperties.ChildrenCanHideText)
+            {
+                <select id="addHide"
+                        asp-for="Navigation.HideTextWhenExtraSmall"
+                        hide-required="true"
+                        formgroup>
+                    <option value="False" selected="selected">No</option>
+                    <option value="True">Yes</option>
+                </select>
+            }
+            @if (Model.RoleProperties.ChildrenCanTargetNewWindow)
+            {
+                <select id="addTarget"
+                        asp-for="Navigation.TargetNewWindow"
+                        hide-required="true"
+                        formgroup>
+                    <option value="False" selected="selected">No</option>
+                    <option value="True">Yes</option>
+                </select>
+            }
+        </div>
+    </form>
+
+    <form id="editForm" role="form">
+        <input id="editParentNavigation"
+               asp-for="Navigation.NavigationId"
+               value="@Model.Navigation.Id"
+               type="hidden" />
+
+        <input id="editId" asp-for="Navigation.Id" type="hidden" />
+
+        <div modal
+             id="editModal"
+             isLarge="true"
+             name="Navigation"
+             type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+            <input id="editName" asp-for="Navigation.Name" formgroup />
+            @if (Model.RoleProperties.ChildrenCanDisplayIcon)
+            {
+                <input id="editIcon" asp-for="Navigation.Icon" formgroup />
+            }
+            @if (Model.RoleProperties.ChildrenCanChangeToLink)
+            {
+                <select id="editChange"
+                        asp-for="Navigation.ChangeToLinkWhenExtraSmall"
+                        hide-required="true"
+                        formgroup>
+                    <option value="False">No</option>
+                    <option value="True">Yes</option>
+                </select>
+            }
+            @if (Model.RoleProperties.ChildrenCanHideText)
+            {
+                <select id="editHide"
+                        asp-for="Navigation.HideTextWhenExtraSmall"
+                        hide-required="true"
+                        formgroup>
+                    <option value="False">No</option>
+                    <option value="True">Yes</option>
+                </select>
+            }
+            @if (Model.RoleProperties.ChildrenCanTargetNewWindow)
+            {
+                <select id="editTarget"
+                        asp-for="Navigation.TargetNewWindow"
+                        hide-required="true"
+                        formgroup>
+                    <option value="False">No</option>
+                    <option value="True">Yes</option>
+                </select>
+            }
+        </div>
+    </form>
+
+    <form asp-controller="@NavigationsController.Name" asp-action="@(nameof(NavigationsController.DeleteNavigation))" method="post" role="form">
+        <input id="deleteParentNavigation"
+               asp-for="Navigation.NavigationId"
+               value="@Model.Navigation.Id"
+               type="hidden" />
+
+        <input id="deleteId" asp-for="Navigation.Id" type="hidden" />
+        <input id="deleteName" asp-for="Navigation.Name" type="hidden" />
+
+
+        <div modal
+             id="deleteModal"
+             name="Emedia Group"
+             type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
+        </div>
+    </form>
+}
+
+@section scripts {
+    <script>
+        $("#addForm").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.post("@(Url.Action(nameof(NavigationsController.CreateNavigation), NavigationsController.Name))",
+                form.serialize(),
+                function (response) {
+                    if (response.success == true) {
+                        location.href = response.url;
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+            });
+        });
+
+        $("#editModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+            var change = button.data("nav-change");
+            var hide = button.data("nav-hide");
+            var icon = button.data("nav-icon");
+            var target = button.data("nav-target");
+
+            $("#editId").val(id);
+            $("#editName").val(name);
+            $("#editChange").val(change);
+            $("#editHide").val(hide);
+            $("#editIcon").val(icon);
+            $("#editTarget").val(target);
+        });
+
+        $("#editForm").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.post("@(Url.Action(nameof(NavigationsController.EditNavigation), NavigationsController.Name))",
+                form.serialize(),
+                function (response) {
+                if (response.success == true) {
+                    location.reload();
+                }
+                else {
+                    alert(response.message);
+                    ResetSpinners(form.find(".btn-spinner"));
+                }
+            });
+        });
+
+
+        $(".changeSort").on("click", function () {
+            var button = $(this);
+            var id = button.data("id");
+            var increase = button.data("increase");
+            var icon = button.children("span");
+            if (icon.hasClass("fa-spinner") == false) {
+                icon.removeClass("fa-arrow-up fa-arrow-down").addClass("fa-spinner fa-pulse");
+                $.post("@Url.Action(nameof(NavigationsController.ChangeSort))", { id, increase }, function (response) {
+                    icon.removeClass("fa-spinner fa-pulse");
+                    if (increase) {
+                        icon.addClass("fa-arrow-down");
+                    }
+                    else {
+                        icon.addClass("fa-arrow-up");
+                    }
+                    if (response.success) {
+                        var row = button.parent().parent();
+                        if (increase) {
+                            nextRow = row.next();
+                            row.insertAfter(nextRow);
+                            row.find(".decreaseSortButton").removeAttr("disabled");
+                            if (row.next().length == 0) {
+                                row.find(".increaseSortButton").attr("disabled", "disabled");
+                            }
+                            nextRow.find(".increaseSortButton").removeAttr("disabled");
+                            if (nextRow.prev().length == 0) {
+                                nextRow.find(".decreaseSortButton").attr("disabled", "disabled");
+                            }
+                        }
+                        else {
+                            prevRow = row.prev();
+                            row.insertBefore(prevRow);
+                            row.find(".increaseSortButton").removeAttr("disabled");
+                            if (row.prev().length == 0) {
+                                row.find(".decreaseSortButton").attr("disabled", "disabled");
+                            }
+                            prevRow.find(".decreaseSortButton").removeAttr("disabled");
+                            if (prevRow.next().length == 0) {
+                                prevRow.find(".increaseSortButton").attr("disabled", "disabled");
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+            var modal = $(this);
+            $("#deleteId").val(id);
+            $("#deleteName").val(name);
+            modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
+        });
+
+        @if (Model.RoleProperties.CanHaveText)
+        {
+            <text>
+                $(".oc-save-warning-field").on("input propertychange", function () {
+                    $(".oc-save-warning").removeClass("d-none");
+                });
+            </text>
+        }
+    </script>
+}

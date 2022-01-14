@@ -12,6 +12,7 @@ using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Ops.Service.Models.Navigation;
+using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement
@@ -95,7 +96,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         [Route("{id}")]
-        public async Task<IActionResult> Detail(int id)
+        public async Task<IActionResult> Details(int id, string language)
         {
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.NavigationManagement))
@@ -103,24 +104,55 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToUnauthorized();
             }
 
-            var viewModel = new IndexViewModel();
+            var navigation = await _navigationService.GetByIdAsync(id);
 
-            viewModel.Navigation = await _navigationService.GetByIdAsync(id);
-
-            if (viewModel.Navigation == null)
+            if (navigation == null)
             {
                 return RedirectToAction(nameof(Index));
             }
 
-            viewModel.Navigations = await _navigationService
-                .GetNavigationChildrenAsync(id);
+            var languages = await _languageService.GetActiveAsync();
 
-            return View();
+            var selectedLanguage = languages
+                .FirstOrDefault(_ => _.Name.Equals(language, StringComparison.OrdinalIgnoreCase))
+                ?? languages.Single(_ => _.IsDefault);
+
+            var navigationText = await _navigationService.GetTextByNavigationAndLanguageAsync(id,
+                selectedLanguage.Id);
+
+            var viewModel = new DetailsViewModel
+            {
+                LanguageDescription = selectedLanguage.Description,
+                LanguageId = selectedLanguage.Id,
+                LanguageList = new SelectList(languages,
+                    nameof(Language.Name),
+                    nameof(Language.Description),
+                    selectedLanguage.Name),
+                Navigation = navigation,
+                NewNavigationText = navigationText == null,
+                RoleProperties = await _navigationService.GetRolePropertiesForNavigationAsync(id)
+            };
+
+            if (viewModel.RoleProperties.CanHaveChildren)
+            {
+                var childNavigations = await _navigationService
+                    .GetNavigationChildrenAsync(id);
+
+                foreach (var childNavigation in childNavigations)
+                {
+                    childNavigation.NavigationLanguages = await _navigationService
+                        .GetNavigationLanguagesByIdAsync(childNavigation.Id);
+                }
+
+                viewModel.Navigations = childNavigations;
+            }
+
+            return View(viewModel);
         }
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> CreatePrimaryNavigation(IndexViewModel model)
+        public async Task<IActionResult> CreateNavigation(Navigation navigation, string role)
         {
             JsonResponse response;
 
@@ -137,17 +169,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 try
                 {
-                    var navigation = model.Navigation;
-                    navigation.ChangeToLinkWhenExtraSmall = false;
-                    navigation.HideTextWhenExtraSmall = false;
-                    navigation.TargetNewWindow = false;
-                    navigation.Icon = null;
+                    navigation = await _navigationService.CreateAsync(navigation, role);
 
-                    navigation = await _navigationService.CreateAsync(model.Navigation, model.Role);
                     response = new JsonResponse
                     {
                         Success = true,
-                        Url = Url.Action(nameof(Index), new { id = navigation.Id })
+                        Url = Url.Action(nameof(Details), new { id = navigation.Id })
                     };
                 }
                 catch (OcudaException ex)
@@ -177,7 +204,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> EditTopLevelNavigation(IndexViewModel model)
+        public async Task<IActionResult> EditNavigation(Navigation navigation)
         {
             JsonResponse response;
 
@@ -194,17 +221,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 try
                 {
-                    var navigation = model.Navigation;
-                    navigation.ChangeToLinkWhenExtraSmall = false;
-                    navigation.HideTextWhenExtraSmall = false;
-                    navigation.TargetNewWindow = false;
-                    navigation.Icon = null;
-
-                    navigation = await _navigationService.EditAsync(model.Navigation);
+                    await _navigationService.EditAsync(navigation);
                     response = new JsonResponse
                     {
-                        Success = true,
-                        Url = Url.Action(nameof(Index), new { id = navigation.Id })
+                        Success = true
                     };
                 }
                 catch (OcudaException ex)
@@ -235,7 +255,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> DeleteNavigation(IndexViewModel model)
+        public async Task<IActionResult> DeleteNavigation(Navigation navigation)
         {
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.NavigationManagement))
@@ -245,8 +265,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             try
             {
-                await _navigationService.DeleteAsync(model.Navigation.Id);
-                ShowAlertSuccess($"Deleted navigation: {model.Navigation.Name}");
+                await _navigationService.DeleteAsync(navigation.Id);
+                ShowAlertSuccess($"Deleted navigation: {navigation.Name}");
             }
             catch (OcudaException ex)
             {
@@ -255,10 +275,56 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting navigation: {Message}", ex.Message);
-                ShowAlertDanger($"Error deleting navigation: {model.Navigation.Name}");
+                ShowAlertDanger($"Error deleting navigation: {navigation.Name}");
             }
 
-            return RedirectToAction(nameof(Index));
+            if (navigation.NavigationId.HasValue)
+            {
+                return RedirectToAction(nameof(Details),
+                    new { id = navigation.NavigationId.Value });
+            }
+            else
+            {
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<JsonResult> ChangeSort(int id, bool increase)
+        {
+            JsonResponse response;
+
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+               ApplicationPermission.NavigationManagement))
+            {
+                response = new JsonResponse
+                {
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+            else
+            {
+                try
+                {
+                    await _navigationService.UpdateSortOrder(id, increase);
+                    response = new JsonResponse
+                    {
+                        Success = true
+                    };
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Message = ex.Message,
+                        Success = false
+                    };
+                }
+            }
+
+            return Json(response);
         }
     }
 }

@@ -13,5 +13,27 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Navigations
 
         public Navigation Navigation { get; set; }
         public string Role { get; set; }
+
+        public static string NavigationRole(int navigationId, NavigationRoles roles)
+        {
+            if (navigationId == roles.Top)
+            {
+                return "Top";
+            }
+            else if (navigationId == roles.Middle)
+            {
+                return "Middle";
+            }
+            else if (navigationId == roles.Left)
+            {
+                return "Left";
+            }
+            else if (navigationId == roles.Footer)
+            {
+                return "Footer";
+            }
+
+            return string.Empty;
+        }
     }
 }

@@ -69,6 +69,66 @@ namespace Ocuda.Ops.Service
             return navigationRoles;
         }
 
+        public async Task<RoleProperties> GetRolePropertiesForNavigationAsync(int id)
+        {
+            // denotes if a navigation is a parent, child or grandchild
+            int depth = 0;
+
+            var navigation = await _navigationRepository.FindAsync(id);
+
+            while (navigation.NavigationId.HasValue)
+            {
+                // navigations past grandchild aren't allowed and should not be able to exist
+                if (depth >= 2)
+                {
+                    _logger.LogCritical("Invalid navigation depth for navigation {id}", id);
+                    throw new OcudaException("There is an invalid navigation setting, please contact a web administrator.");
+                }
+
+                navigation = await _navigationRepository.FindAsync(navigation.NavigationId.Value);
+                depth++;
+            }
+
+            var role = await GetNavigationRoleAsync(navigation.Id);
+
+            var roleProperties = new RoleProperties();
+
+            if (depth != 0)
+            {
+                roleProperties.CanHaveText = true;
+            }
+
+            if ((depth == 1 && role != Promenade.Models.Keys.SiteSetting.Site.NavigationIdFooter)
+                || depth == 0)
+            {
+                roleProperties.CanHaveChildren = true;
+
+                if (depth == 0 && (role == Promenade.Models.Keys.SiteSetting.Site.NavigationIdTop
+                    || role == Promenade.Models.Keys.SiteSetting.Site.NavigationIdMiddle))
+                {
+                    roleProperties.ChildrenCanChangeToLink = true;
+                }
+
+                if (depth == 0 && role == Promenade.Models.Keys.SiteSetting.Site.NavigationIdTop)
+                {
+                    roleProperties.ChildrenCanHideText = true;
+                }
+
+                if (depth == 1 && role != Promenade.Models.Keys.SiteSetting.Site.NavigationIdTop)
+                {
+                    roleProperties.ChildrenCanTargetNewWindow = true;
+                }
+
+                if ((depth == 0 && role != Promenade.Models.Keys.SiteSetting.Site.NavigationIdLeft)
+                    || depth == 1)
+                {
+                    roleProperties.ChildrenCanDisplayIcon = true;
+                }
+            }
+
+            return roleProperties;
+        }
+
         public async Task<Navigation> GetByIdAsync(int id)
         {
             return await _navigationRepository.FindAsync(id);
@@ -79,15 +139,69 @@ namespace Ocuda.Ops.Service
             return await _navigationRepository.GetChildrenAsync(id);
         }
 
+        public async Task<ICollection<string>> GetNavigationLanguagesByIdAsync(int id)
+        {
+            return await _navigationTextRepository.GetUsedLanguageNamesByNavigationId(id);
+        }
+
         public async Task<ICollection<Navigation>> GetTopLevelNavigationsAsync()
         {
             return await _navigationRepository.GetTopLevelNavigationsAsync();
         }
 
+        public async Task<NavigationText> GetTextByNavigationAndLanguageAsync(int navigationId,
+            int languageId)
+        {
+            return await _navigationTextRepository.GetByNavigationAndLanguageAsync(navigationId,
+                languageId);
+        }
+
         public async Task<Navigation> CreateAsync(Navigation navigation, string siteSetting = null)
         {
-            navigation.Icon = navigation.Icon?.Trim();
+            int? maxSortOrder = null;
+            RoleProperties parentRoleProperties = null;
+
+            if (navigation.NavigationId.HasValue)
+            {
+                parentRoleProperties = await GetRolePropertiesForNavigationAsync(
+                    navigation.NavigationId.Value);
+
+                maxSortOrder = await _navigationRepository.GetMaxSortOrderAsync(
+                    navigation.NavigationId.Value);
+            }
+
             navigation.Name = navigation.Name?.Trim();
+
+            if (parentRoleProperties?.ChildrenCanDisplayIcon == true)
+            {
+                navigation.Icon = navigation.Icon?.Trim();
+            }
+            else
+            {
+                navigation.Icon = null;
+            }
+
+            if (parentRoleProperties?.ChildrenCanChangeToLink != true)
+            {
+                navigation.ChangeToLinkWhenExtraSmall = false;
+            }
+            if (parentRoleProperties?.ChildrenCanHideText != true)
+            {
+                navigation.HideTextWhenExtraSmall = false;
+            }
+            if (parentRoleProperties?.ChildrenCanTargetNewWindow != true)
+            {
+                navigation.TargetNewWindow = false;
+            }
+
+            if (maxSortOrder.HasValue)
+            {
+                navigation.Order = maxSortOrder.Value + 1;
+            }
+            else
+            {
+                navigation.Order = 0;
+            }
 
             await _navigationRepository.AddAsync(navigation);
             await _navigationRepository.SaveAsync();
@@ -104,15 +218,36 @@ namespace Ocuda.Ops.Service
         {
             var currentNavigation = await _navigationRepository.FindAsync(navigation.Id);
 
-            currentNavigation.ChangeToLinkWhenExtraSmall = navigation.ChangeToLinkWhenExtraSmall;
-            currentNavigation.HideTextWhenExtraSmall = navigation.HideTextWhenExtraSmall;
-            currentNavigation.Icon = navigation.Icon?.Trim();
-            currentNavigation.Name = navigation.Name?.Trim();
-            currentNavigation.TargetNewWindow = navigation.TargetNewWindow;
+            RoleProperties parentRoleProperties = null;
 
-            _navigationRepository.Update(navigation);
+            if (currentNavigation.NavigationId.HasValue)
+            {
+                parentRoleProperties = await GetRolePropertiesForNavigationAsync(
+                    navigation.NavigationId.Value);
+            }
+
+            currentNavigation.Name = navigation.Name?.Trim();
+
+            if (parentRoleProperties?.ChildrenCanDisplayIcon == true)
+            {
+                currentNavigation.Icon = navigation.Icon?.Trim();
+            }
+            if (parentRoleProperties?.ChildrenCanChangeToLink == true)
+            {
+                currentNavigation.ChangeToLinkWhenExtraSmall = navigation.ChangeToLinkWhenExtraSmall;
+            }
+            if (parentRoleProperties?.ChildrenCanHideText == true)
+            {
+                currentNavigation.HideTextWhenExtraSmall = navigation.HideTextWhenExtraSmall;
+            }
+            if (parentRoleProperties?.ChildrenCanTargetNewWindow == true)
+            {
+                currentNavigation.TargetNewWindow = navigation.TargetNewWindow;
+            }
+
+            _navigationRepository.Update(currentNavigation);
             await _navigationRepository.SaveAsync();
-            return navigation;
+            return currentNavigation;
         }
 
         public async Task DeleteAsync(int id)
@@ -124,7 +259,7 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException("Navigation does not exist.");
             }
 
-            (var navigations, var navigationIds) = await GetFlattenedNavigationAsync(navigation);
+            (var navigations, var navigationIds) = await GetFlattenedNavigationsAsync(navigation);
 
             var navigationTexts = await _navigationTextRepository
                 .GetByNavigationIdsAsync(navigationIds);
@@ -132,7 +267,22 @@ namespace Ocuda.Ops.Service
             if (!navigation.NavigationId.HasValue)
             {
                 var role = await GetNavigationRoleAsync(navigation.Id);
-                await _siteSettingPromService.UpdateAsync(role, DefaultNavigationSiteSettingId);
+
+                if (!string.IsNullOrWhiteSpace(role))
+                {
+                    await _siteSettingPromService.UpdateAsync(role, DefaultNavigationSiteSettingId);
+                }
+            }
+            else
+            {
+                var subsequentNavigations = await _navigationRepository
+                    .GetSubsequentNavigationsAsync(navigation.Order, navigation.NavigationId.Value);
+
+                if (subsequentNavigations.Count > 0)
+                {
+                    subsequentNavigations.ForEach(_ => _.Order--);
+                    _navigationRepository.UpdateRange(subsequentNavigations);
+                }
             }
 
             _navigationTextRepository.RemoveRange(navigationTexts);
@@ -141,7 +291,47 @@ namespace Ocuda.Ops.Service
             await _navigationRepository.SaveAsync();
         }
 
-        private async Task<(List<Navigation>, List<int>)> GetFlattenedNavigationAsync(
+        public async Task UpdateSortOrder(int id, bool increase)
+        {
+            var navigation = await _navigationRepository.FindAsync(id);
+
+            if (!navigation.NavigationId.HasValue)
+            {
+                throw new OcudaException("Top level navigations cannot be sorted.");
+            }
+
+            int newSortOrder;
+            if (increase)
+            {
+                newSortOrder = navigation.Order + 1;
+            }
+            else
+            {
+                if (navigation.Order == 0)
+                {
+                    throw new OcudaException("Navigation is already in the first position");
+                }
+                newSortOrder = navigation.Order - 1;
+            }
+
+            var navigationInPosition = await _navigationRepository.GetByOrderAndParentAsync(
+                newSortOrder,
+                navigation.NavigationId.Value);
+
+            if (navigationInPosition == null)
+            {
+                throw new OcudaException("Navigation is already in the last position");
+            }
+
+            navigationInPosition.Order = navigation.Order;
+            navigation.Order = newSortOrder;
+
+            _navigationRepository.Update(navigation);
+            _navigationRepository.Update(navigationInPosition);
+            await _navigationRepository.SaveAsync();
+        }
+
+        private async Task<(List<Navigation>, List<int>)> GetFlattenedNavigationsAsync(
             Navigation navigation)
         {
             var navigations = new List<Navigation>() { navigation };
@@ -150,7 +340,7 @@ namespace Ocuda.Ops.Service
             var children = await _navigationRepository.GetChildrenAsync(navigation.Id);
             foreach (var child in children)
             {
-                (var childNavigations, var childIds) = await GetFlattenedNavigationAsync(child);
+                (var childNavigations, var childIds) = await GetFlattenedNavigationsAsync(child);
 
                 navigations.AddRange(childNavigations);
                 navigationIds.AddRange(childIds);
@@ -182,8 +372,7 @@ namespace Ocuda.Ops.Service
                 return Promenade.Models.Keys.SiteSetting.Site.NavigationIdFooter;
             }
 
-            _logger.LogError("Navigation {id} does not have a role and cannot be deleted.", id);
-            throw new OcudaException("Primary navigation does not belong to a role.");
+            return null;
         }
     }
 }

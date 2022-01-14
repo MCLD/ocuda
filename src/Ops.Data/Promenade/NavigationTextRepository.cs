@@ -16,12 +16,32 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
+        public async Task<NavigationText> GetByNavigationAndLanguageAsync(int navigationId,
+            int languageId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.NavigationId == navigationId && _.LanguageId == languageId)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<ICollection<NavigationText>> GetByNavigationIdsAsync(
             List<int> navigationIds)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => navigationIds.Contains(_.NavigationId))
+                .ToListAsync();
+        }
+
+        public async Task<List<string>> GetUsedLanguageNamesByNavigationId(int navigationId)
+        {
+            return await _context.NavigationTexts
+                .AsNoTracking()
+                .Where(_ => _.NavigationId == navigationId)
+                .OrderByDescending(_ => _.Language.IsDefault)
+                .ThenBy(_ => _.Language.Name)
+                .Select(_ => _.Language.Name)
                 .ToListAsync();
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -6,8 +7,10 @@ namespace Ocuda.Promenade.Models.Entities
 {
     public class Navigation
     {
+        [DisplayName("Change to Link When XS")]
         public bool ChangeToLinkWhenExtraSmall { get; set; }
 
+        [DisplayName("Hide Text When XS")]
         public bool HideTextWhenExtraSmall { get; set; }
 
         [MaxLength(255)]
@@ -23,10 +26,15 @@ namespace Ocuda.Promenade.Models.Entities
         public int? NavigationId { get; set; }
         public IEnumerable<Navigation> Navigations { get; set; }
 
+        public int Order { get; set; }
+
+        [DisplayName("Target New Window")]
+        public bool TargetNewWindow { get; set; }
+
         [NotMapped]
         public NavigationText NavigationText { get; set; }
 
-        public int Order { get; set; }
-        public bool TargetNewWindow { get; set; }
+        [NotMapped]
+        public ICollection<string> NavigationLanguages { get; set; }
     }
 }

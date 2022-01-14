@@ -12,7 +12,11 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<Navigation> EditAsync(Navigation navigation);
         Task<Navigation> GetByIdAsync(int id);
         Task<ICollection<Navigation>> GetNavigationChildrenAsync(int id);
+        Task<ICollection<string>> GetNavigationLanguagesByIdAsync(int id);
         Task<NavigationRoles> GetNavigationRolesAsync();
+        Task<RoleProperties> GetRolePropertiesForNavigationAsync(int id);
+        Task<NavigationText> GetTextByNavigationAndLanguageAsync(int navigationId, int languageId);
         Task<ICollection<Navigation>> GetTopLevelNavigationsAsync();
+        Task UpdateSortOrder(int id, bool increase);
     }
 }

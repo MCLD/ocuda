@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace Ocuda.Ops.Service.Models.Navigation
+﻿namespace Ocuda.Ops.Service.Models.Navigation
 {
     public class NavigationRoles
     {

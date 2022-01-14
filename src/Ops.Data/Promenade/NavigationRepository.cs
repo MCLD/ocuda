@@ -26,6 +26,14 @@ namespace Ocuda.Ops.Data.Promenade
             return entity;
         }
 
+        public async Task<Navigation> GetByOrderAndParentAsync(int order, int parentNav)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Order == order && _.NavigationId == parentNav)
+                .SingleOrDefaultAsync();
+        }
+
         public async Task<ICollection<Navigation>> GetTopLevelNavigationsAsync()
         {
             return await DbSet
@@ -40,6 +48,23 @@ namespace Ocuda.Ops.Data.Promenade
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.NavigationId == id)
+                .OrderBy(_ => _.Order)
+                .ToListAsync();
+        }
+
+        public async Task<int?> GetMaxSortOrderAsync(int parentNav)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.NavigationId == parentNav)
+                .MaxAsync(_ => (int?)_.Order);
+        }
+
+        public async Task<List<Navigation>> GetSubsequentNavigationsAsync(int order, int parentNav)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Order > order && _.NavigationId == parentNav)
                 .ToListAsync();
         }
     }

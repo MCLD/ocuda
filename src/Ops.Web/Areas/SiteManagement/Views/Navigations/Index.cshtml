@@ -36,36 +36,13 @@
                 <tbody>
                     @foreach (var navigation in Model.Navigations)
                     {
-                        string position;
-
-                        if (navigation.Id == Model.NavigationRoles.Top)
-                        {
-                            position = "Top";
-                        }
-                        else if (navigation.Id == Model.NavigationRoles.Middle)
-                        {
-                            position = "Middle";
-                        }
-                        else if (navigation.Id == Model.NavigationRoles.Left)
-                        {
-                            position = "Left";
-                        }
-                        else if (navigation.Id == Model.NavigationRoles.Footer)
-                        {
-                            position = "Footer";
-                        }
-                        else
-                        {
-                            position = string.Empty;
-                        }
-
                         <tr>
                             <td class="align-middle">
-                                <a asp-action="@(nameof(NavigationsController.Detail))" asp-route-id="@navigation.Id">
+                                <a asp-action="@(nameof(NavigationsController.Details))" asp-route-id="@navigation.Id">
                                     @navigation.Name
                                 </a>
                             </td>
-                            <td class="align-middle">@position</td>
+                            <td class="align-middle">@Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Navigations.IndexViewModel.NavigationRole(navigation.Id, Model.NavigationRoles)</td>
                             <td class="align-middle">
                                 <button type="button"
                                         class="btn btn-outline-primary"
@@ -77,7 +54,7 @@
                                     <span class="fas fa-cog" aria-hidden="true"></span>
                                 </button>
                                 <a asp-controller="@NavigationsController.Name"
-                                   asp-action="@(nameof(NavigationsController.Detail))"
+                                   asp-action="@(nameof(NavigationsController.Details))"
                                    asp-route-id="@navigation.Id"
                                    class="btn btn-outline-primary"
                                    title="Edit navigation details">
@@ -144,7 +121,7 @@
                 $("#addForm").submit(function (e) {
                     e.preventDefault();
                     var form = $(this);
-                    $.post("@(Url.Action(nameof(NavigationsController.CreatePrimaryNavigation), NavigationsController.Name))",
+                    $.post("@(Url.Action(nameof(NavigationsController.CreateNavigation), NavigationsController.Name))",
                         form.serialize(),
                         function (response) {
                             if (response.success == true) {
@@ -171,7 +148,7 @@
         $("#editForm").submit(function (e) {
             e.preventDefault();
             var form = $(this);
-            $.post("@(Url.Action(nameof(NavigationsController.EditTopLevelNavigation), NavigationsController.Name))",
+            $.post("@(Url.Action(nameof(NavigationsController.EditNavigation), NavigationsController.Name))",
                 form.serialize(),
                 function (response) {
                 if (response.success == true) {
