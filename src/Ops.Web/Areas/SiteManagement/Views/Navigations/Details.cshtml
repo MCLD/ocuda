@@ -1,5 +1,12 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Navigations.DetailsViewModel
 
+@section styles {
+    @if (Model.RoleProperties.CanHaveChildren)
+    {
+        <link rel="stylesheet" href="~/css/iconpicker.min.css" asp-append-version="true" />
+    }
+}
+
 <div class="row mb-2">
     <div class="col-sm-6">
         <h1>
@@ -64,8 +71,8 @@
     </div>
 
     <form asp-action="@nameof(NavigationsController.Details)" method="post" role="form" class="mb-4">
-        <input asp-for="NavigationId" value="@Model.Navigation.Id" type="hidden" />
-        <input asp-for="LanguageId" type="hidden" />
+        <input asp-for="NavigationText.NavigationId" value="@Model.Navigation.Id" type="hidden" />
+        <input asp-for="NavigationText.LanguageId" value="@Model.LanguageId" type="hidden" />
 
         <input asp-for="NavigationText.Label" class="oc-save-warning-field" formgroup />
         <input asp-for="NavigationText.Link" class="oc-save-warning-field" formgroup />
@@ -102,6 +109,10 @@
                         <tr>
                             <th>Name</th>
                             <th>Languages</th>
+                            @if (Model.RoleProperties.CanHaveGrandchildren)
+                            {
+                                <th>Subnavigations</th>
+                            }
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -133,6 +144,10 @@
                                     </a>
                                 </td>
                                 <td class="align-middle">@string.Join(", ", navigation.NavigationLanguages)</td>
+                                @if (Model.RoleProperties.CanHaveGrandchildren)
+                                {
+                                    <td class="align-middle">@navigation.SubnavigationCount</td>
+                                }
                                 <td class="align-middle">
                                     <button type="button"
                                             class="btn btn-outline-primary changeSort decreaseSortButton"
@@ -198,7 +213,7 @@
             <input id="addName" asp-for="Navigation.Name" value="" formgroup />
             @if (Model.RoleProperties.ChildrenCanDisplayIcon)
             {
-                <input id="addIcon" asp-for="Navigation.Icon" value="" formgroup />
+                <input id="addIcon" asp-for="Navigation.Icon" value="" class="icon-picker" formgroup />
             }
             @if (Model.RoleProperties.ChildrenCanChangeToLink)
             {
@@ -249,7 +264,7 @@
             <input id="editName" asp-for="Navigation.Name" formgroup />
             @if (Model.RoleProperties.ChildrenCanDisplayIcon)
             {
-                <input id="editIcon" asp-for="Navigation.Icon" formgroup />
+                <input id="editIcon" asp-for="Navigation.Icon" class="icon-picker" formgroup />
             }
             @if (Model.RoleProperties.ChildrenCanChangeToLink)
             {
@@ -303,118 +318,129 @@
 }
 
 @section scripts {
+    @if (Model.RoleProperties.CanHaveChildren)
+    {
+        <script src="~/js/iconpicker.min.js" asp-append-version="true"></script>
+    }
+
     <script>
-        $("#addForm").submit(function (e) {
-            e.preventDefault();
-            var form = $(this);
-            $.post("@(Url.Action(nameof(NavigationsController.CreateNavigation), NavigationsController.Name))",
-                form.serialize(),
-                function (response) {
-                    if (response.success == true) {
-                        location.href = response.url;
-                    }
-                    else {
-                        alert(response.message);
-                        ResetSpinners(form.find(".btn-spinner"));
-                    }
-            });
-        });
-
-        $("#editModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var name = button.data("name");
-            var change = button.data("nav-change");
-            var hide = button.data("nav-hide");
-            var icon = button.data("nav-icon");
-            var target = button.data("nav-target");
-
-            $("#editId").val(id);
-            $("#editName").val(name);
-            $("#editChange").val(change);
-            $("#editHide").val(hide);
-            $("#editIcon").val(icon);
-            $("#editTarget").val(target);
-        });
-
-        $("#editForm").submit(function (e) {
-            e.preventDefault();
-            var form = $(this);
-            $.post("@(Url.Action(nameof(NavigationsController.EditNavigation), NavigationsController.Name))",
-                form.serialize(),
-                function (response) {
-                if (response.success == true) {
-                    location.reload();
-                }
-                else {
-                    alert(response.message);
-                    ResetSpinners(form.find(".btn-spinner"));
-                }
-            });
-        });
-
-
-        $(".changeSort").on("click", function () {
-            var button = $(this);
-            var id = button.data("id");
-            var increase = button.data("increase");
-            var icon = button.children("span");
-            if (icon.hasClass("fa-spinner") == false) {
-                icon.removeClass("fa-arrow-up fa-arrow-down").addClass("fa-spinner fa-pulse");
-                $.post("@Url.Action(nameof(NavigationsController.ChangeSort))", { id, increase }, function (response) {
-                    icon.removeClass("fa-spinner fa-pulse");
-                    if (increase) {
-                        icon.addClass("fa-arrow-down");
-                    }
-                    else {
-                        icon.addClass("fa-arrow-up");
-                    }
-                    if (response.success) {
-                        var row = button.parent().parent();
-                        if (increase) {
-                            nextRow = row.next();
-                            row.insertAfter(nextRow);
-                            row.find(".decreaseSortButton").removeAttr("disabled");
-                            if (row.next().length == 0) {
-                                row.find(".increaseSortButton").attr("disabled", "disabled");
-                            }
-                            nextRow.find(".increaseSortButton").removeAttr("disabled");
-                            if (nextRow.prev().length == 0) {
-                                nextRow.find(".decreaseSortButton").attr("disabled", "disabled");
-                            }
-                        }
-                        else {
-                            prevRow = row.prev();
-                            row.insertBefore(prevRow);
-                            row.find(".increaseSortButton").removeAttr("disabled");
-                            if (row.prev().length == 0) {
-                                row.find(".decreaseSortButton").attr("disabled", "disabled");
-                            }
-                            prevRow.find(".decreaseSortButton").removeAttr("disabled");
-                            if (prevRow.next().length == 0) {
-                                prevRow.find(".increaseSortButton").attr("disabled", "disabled");
-                            }
-                        }
-                    }
-                });
-            }
-        });
-
-        $("#deleteModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var name = button.data("name");
-            var modal = $(this);
-            $("#deleteId").val(id);
-            $("#deleteName").val(name);
-            modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
-        });
-
         @if (Model.RoleProperties.CanHaveText)
         {
             <text>
                 $(".oc-save-warning-field").on("input propertychange", function () {
                     $(".oc-save-warning").removeClass("d-none");
+                });
+            </text>
+        }
+
+        @if (Model.RoleProperties.CanHaveChildren)
+        {
+            <text>
+                $(".icon-picker").iconpicker({ placement: "bottomLeft" });
+
+                $("#addForm").submit(function (e) {
+                    e.preventDefault();
+                    var form = $(this); 
+                    $.post("@(Url.Action(nameof(NavigationsController.CreateNavigation), NavigationsController.Name))",
+                        form.serialize(),
+                        function (response) {
+                            if (response.success == true) {
+                                location.href = response.url;
+                            }
+                            else {
+                                alert(response.message);
+                                ResetSpinners(form.find(".btn-spinner"));
+                            }
+                    });
+                });
+
+                $("#editModal").on("show.bs.modal", function (e) {
+                    var button = $(e.relatedTarget);
+                    var id = button.data("id");
+                    var name = button.data("name");
+                    var change = button.data("nav-change");
+                    var hide = button.data("nav-hide");
+                    var icon = button.data("nav-icon");
+                    var target = button.data("nav-target");
+
+                    $("#editId").val(id);
+                    $("#editName").val(name);
+                    $("#editChange").val(change);
+                    $("#editHide").val(hide);
+                    $("#editIcon").val(icon);
+                    $("#editTarget").val(target);
+                });
+
+                $("#editForm").submit(function (e) {
+                    e.preventDefault();
+                    var form = $(this);
+                    $.post("@(Url.Action(nameof(NavigationsController.EditNavigation), NavigationsController.Name))",
+                        form.serialize(),
+                        function (response) {
+                        if (response.success == true) {
+                            location.reload();
+                        }
+                        else {
+                            alert(response.message);
+                            ResetSpinners(form.find(".btn-spinner"));
+                        }
+                    });
+                });
+
+                $(".changeSort").on("click", function () {
+                    var button = $(this);
+                    var id = button.data("id");
+                    var increase = button.data("increase");
+                    var icon = button.children("span");
+                    if (icon.hasClass("fa-spinner") == false) {
+                        icon.removeClass("fa-arrow-up fa-arrow-down").addClass("fa-spinner fa-pulse");
+                        $.post("@Url.Action(nameof(NavigationsController.ChangeSort))", { id, increase }, function (response) {
+                            icon.removeClass("fa-spinner fa-pulse");
+                            if (increase) {
+                                icon.addClass("fa-arrow-down");
+                            }
+                            else {
+                                icon.addClass("fa-arrow-up");
+                            }
+                            if (response.success) {
+                                var row = button.parent().parent();
+                                if (increase) {
+                                    nextRow = row.next();
+                                    row.insertAfter(nextRow);
+                                    row.find(".decreaseSortButton").removeAttr("disabled");
+                                    if (row.next().length == 0) {
+                                        row.find(".increaseSortButton").attr("disabled", "disabled");
+                                    }
+                                    nextRow.find(".increaseSortButton").removeAttr("disabled");
+                                    if (nextRow.prev().length == 0) {
+                                        nextRow.find(".decreaseSortButton").attr("disabled", "disabled");
+                                    }
+                                }
+                                else {
+                                    prevRow = row.prev();
+                                    row.insertBefore(prevRow);
+                                    row.find(".increaseSortButton").removeAttr("disabled");
+                                    if (row.prev().length == 0) {
+                                        row.find(".decreaseSortButton").attr("disabled", "disabled");
+                                    }
+                                    prevRow.find(".decreaseSortButton").removeAttr("disabled");
+                                    if (prevRow.next().length == 0) {
+                                        prevRow.find(".increaseSortButton").attr("disabled", "disabled");
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+
+                $("#deleteModal").on("show.bs.modal", function (e) {
+                    var button = $(e.relatedTarget);
+                    var id = button.data("id");
+                    var name = button.data("name");
+                    var modal = $(this);
+                    $("#deleteId").val(id);
+                    $("#deleteName").val(name);
+                    modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
                 });
             </text>
         }

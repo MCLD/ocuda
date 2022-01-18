@@ -36,5 +36,8 @@ namespace Ocuda.Promenade.Models.Entities
 
         [NotMapped]
         public ICollection<string> NavigationLanguages { get; set; }
+
+        [NotMapped]
+        public int SubnavigationCount { get; set; }
     }
 }

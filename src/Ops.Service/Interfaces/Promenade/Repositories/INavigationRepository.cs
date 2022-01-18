@@ -10,6 +10,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
         Task<Navigation> GetByOrderAndParentAsync(int order, int parentNav);
         Task<ICollection<Navigation>> GetChildrenAsync(int id);
         Task<int?> GetMaxSortOrderAsync(int parentNav);
+        Task<int> GetSubnavigationCountAsync(int id);
         Task<List<Navigation>> GetSubsequentNavigationsAsync(int order, int parentNav);
         Task<ICollection<Navigation>> GetTopLevelNavigationsAsync();
     }

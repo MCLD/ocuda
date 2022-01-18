@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Navigations;
+using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
@@ -24,7 +25,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ILanguageService _languageService;
         private readonly INavigationService _navigationService;
         private readonly IPermissionGroupService _permissionGroupService;
-        private readonly ISiteSettingPromService _siteSettingPromService;
 
         public static string Name { get { return "Navigations"; } }
         public static string Area { get { return "SiteManagement"; } }
@@ -32,8 +32,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         public NavigationsController(ServiceFacades.Controller<NavigationsController> context,
             ILanguageService languageService,
             INavigationService navigationService,
-            IPermissionGroupService permissionGroupService,
-            ISiteSettingPromService siteSettingPromService)
+            IPermissionGroupService permissionGroupService)
             : base(context)
         {
             _languageService = languageService
@@ -42,8 +41,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(navigationService));
             _permissionGroupService = permissionGroupService
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
-            _siteSettingPromService = siteSettingPromService
-                ?? throw new ArgumentNullException(nameof(siteSettingPromService));
         }
 
         [Route("")]
@@ -67,6 +64,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 .ThenByDescending(_ => _.Id == viewModel.NavigationRoles.Left)
                 .ThenByDescending(_ => _.Id == viewModel.NavigationRoles.Footer)
                 .ToList();
+
+            foreach (var navigation in viewModel.Navigations)
+            {
+                navigation.SubnavigationCount = await _navigationService
+                    .GetSubnavigationCountAsnyc(navigation.Id);
+            }
 
             var openRoles = new List<SelectListItem>();
             if (!viewModel.NavigationRoles.Top.HasValue)
@@ -96,6 +99,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         [Route("{id}")]
+        [RestoreModelState]
         public async Task<IActionResult> Details(int id, string language)
         {
             if (!await HasAppPermissionAsync(_permissionGroupService,
@@ -129,6 +133,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     nameof(Language.Description),
                     selectedLanguage.Name),
                 Navigation = navigation,
+                NavigationText = navigationText,
                 NewNavigationText = navigationText == null,
                 RoleProperties = await _navigationService.GetRolePropertiesForNavigationAsync(id)
             };
@@ -142,12 +147,53 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     childNavigation.NavigationLanguages = await _navigationService
                         .GetNavigationLanguagesByIdAsync(childNavigation.Id);
+
+                    if (viewModel.RoleProperties.CanHaveGrandchildren)
+                    {
+                        childNavigation.SubnavigationCount = await _navigationService
+                            .GetSubnavigationCountAsnyc(childNavigation.Id);
+                    }
                 }
 
                 viewModel.Navigations = childNavigations;
             }
 
             return View(viewModel);
+        }
+
+        [HttpPost]
+        [Route("{id}")]
+        [SaveModelState]
+        public async Task<IActionResult> Details(DetailsViewModel model)
+        {
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.NavigationManagement))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _navigationService.SetNavigationTextAsync(model.NavigationText);
+                    ShowAlertSuccess("Updated navigation text");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error updating navigation text: {Message}", ex.Message);
+                    ShowAlertDanger("Error updating navigation text");
+                }
+            }
+
+            var language = await _languageService.GetActiveByIdAsync(
+                model.NavigationText.LanguageId);
+
+            return RedirectToAction(nameof(Details), new
+            {
+                id = model.NavigationText.NavigationId,
+                language = language.IsDefault ? null : language.Name
+            });
         }
 
         [HttpPost]

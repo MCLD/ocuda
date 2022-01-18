@@ -52,6 +52,14 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
+        public async Task<int> GetSubnavigationCountAsync(int id)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.NavigationId == id)
+                .CountAsync();
+        }
+
         public async Task<int?> GetMaxSortOrderAsync(int parentNav)
         {
             return await DbSet

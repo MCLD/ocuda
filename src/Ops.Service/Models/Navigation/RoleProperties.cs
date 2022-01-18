@@ -3,6 +3,7 @@
     public class RoleProperties
     {
         public bool CanHaveChildren { get; set; }
+        public bool CanHaveGrandchildren { get; set; }
         public bool CanHaveText { get; set; }
 
         public bool ChildrenCanChangeToLink { get; set; }

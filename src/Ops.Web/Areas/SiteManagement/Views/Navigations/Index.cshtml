@@ -30,6 +30,7 @@
                     <tr>
                         <th>Name</th>
                         <th>Role</th>
+                        <th>Subnavigations</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -43,6 +44,7 @@
                                 </a>
                             </td>
                             <td class="align-middle">@Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Navigations.IndexViewModel.NavigationRole(navigation.Id, Model.NavigationRoles)</td>
+                            <td class="align-middle">@navigation.SubnavigationCount</td>
                             <td class="align-middle">
                                 <button type="button"
                                         class="btn btn-outline-primary"
