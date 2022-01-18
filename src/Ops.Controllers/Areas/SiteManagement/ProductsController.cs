@@ -49,14 +49,19 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         public static string Name
         { get { return "Products"; } }
 
-
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpPost("[action]")]
-        public async Task<IActionResult> AddUpdate(DetailsViewModel viewModel)
+        public async Task<IActionResult> ActivateLocation(string productSlug, int locationId)
         {
-            throw new NotImplementedException();
+            await _productService.SetActiveLocation(productSlug, locationId, true);
+            var location = await _locationService.GetLocationByIdAsync(locationId);
+            ShowAlertSuccess("Location activated");
+            return RedirectToAction(nameof(LocationInventory), new
+            {
+                productSlug,
+                locationSlug = location.Stub
+            });
         }
-
 
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpPost]
@@ -117,59 +122,29 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        [HttpPost]
-        [Route("[action]/{productSlug}")]
-        public async Task<IActionResult> RemoveSegment(string productSlug)
+        [HttpPost("[action]")]
+        public async Task<IActionResult> AddUpdate(DetailsViewModel viewModel)
         {
-            if (string.IsNullOrEmpty(productSlug))
+            if (viewModel?.IsNew == true)
             {
-                ShowAlertDanger("Invalid remove segment request: no product specified.");
+                ShowAlertDanger("Unable to create new products at this time - not implemented.");
                 return RedirectToAction(nameof(Index));
             }
-
-            var product = await _productService.GetBySlugAsync(productSlug);
-
-            if (product == null)
+            else
             {
-                ShowAlertDanger($"Product not found for slug {productSlug}.");
-                return RedirectToAction(nameof(Index));
-            }
-
-            if (!product.SegmentId.HasValue)
-            {
-                ShowAlertDanger($"Segment not linked to product {product.Name}.");
-                return RedirectToAction(nameof(Details), new { productSlug });
-            }
-
-            try
-            {
-                await _productService.UnlinkSegment(product.Id);
-            }
-            catch (OcudaException oex)
-            {
-                ShowAlertWarning($"Unable to unlink segment from product: {oex.Message}");
-                return RedirectToAction(nameof(Details), new { productSlug });
-            }
-
-            try
-            {
-                await _segmentService.DeleteAsync(product.SegmentId.Value);
-                ShowAlertSuccess("Segment removed and deleted.");
-            }
-            catch (OcudaException oex)
-            {
-                string message = oex.Message;
-                if (oex.Data[OcudaExceptionData.SegmentInUseBy] is ICollection<string> inUseList)
+                if(viewModel.Product.CacheInventoryMinutes == 0)
                 {
-                    message = $"in use by {inUseList.Count} other locations";
+                    viewModel.Product.CacheInventoryMinutes = 5;
+                    ShowAlertWarning("Cache set to default of 5 minutes.");
                 }
-                ShowAlertWarning($"Segment removed from this product but not deleted: {message}");
+                var product = await _productService.UpdateProductAsync(viewModel.Product);
+                ShowAlertSuccess("Location updated.");
+                return RedirectToAction(nameof(Details), new
+                {
+                    productSlug = product.Slug
+                });
             }
-
-            return RedirectToAction(nameof(Details), new { productSlug });
         }
-
-
 
         [HttpPost("[action]/{productSlug}")]
         public async Task<IActionResult> Confirm(string productSlug,
@@ -204,12 +179,22 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpPost("[action]")]
+        public async Task<IActionResult> DeactivateLocation(string productSlug, int locationId)
+        {
+            await _productService.SetActiveLocation(productSlug, locationId, false);
+            ShowAlertWarning("Location deactivated.");
+            return RedirectToAction(nameof(Product), new { productSlug });
+        }
+
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpGet("[action]/{productSlug}")]
         public async Task<IActionResult> Details(string productSlug)
         {
             var viewModel = new DetailsViewModel
             {
-                Product = await _productService.GetBySlugAsync(productSlug)
+                IsProductManger = IsSiteManager(),
+                Product = await _productService.GetBySlugAsync(productSlug, true)
             };
 
             if (viewModel.Product == null)
@@ -417,8 +402,17 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var locationInventories = await _productService
                 .GetLocationInventoriesForProductAsync(product.Id);
 
+            var locations = await _locationService.GetAllLocationsAsync();
+
+            var locationIdsWithInventories = locationInventories.Select(_ => _.LocationId).ToList();
+
+            var excludedLocations = locations.Where(_ => !locationIdsWithInventories.Contains(_.Id))
+                .ToDictionary(k => k.Id, v => v.Name);
+
             var viewModel = new ProductViewModel
             {
+                ExcludedLocations = excludedLocations,
+                IsProductManager = IsSiteManager(),
                 Product = product,
                 LocationInventories = locationInventories
             };
@@ -433,6 +427,59 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             await _locationService.DeleteMappingAsync(locationMapId);
 
             return RedirectToAction(nameof(Mapping), new { productSlug });
+        }
+
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [HttpPost]
+        [Route("[action]/{productSlug}")]
+        public async Task<IActionResult> RemoveSegment(string productSlug)
+        {
+            if (string.IsNullOrEmpty(productSlug))
+            {
+                ShowAlertDanger("Invalid remove segment request: no product specified.");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var product = await _productService.GetBySlugAsync(productSlug);
+
+            if (product == null)
+            {
+                ShowAlertDanger($"Product not found for slug {productSlug}.");
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (!product.SegmentId.HasValue)
+            {
+                ShowAlertDanger($"Segment not linked to product {product.Name}.");
+                return RedirectToAction(nameof(Details), new { productSlug });
+            }
+
+            try
+            {
+                await _productService.UnlinkSegment(product.Id);
+            }
+            catch (OcudaException oex)
+            {
+                ShowAlertWarning($"Unable to unlink segment from product: {oex.Message}");
+                return RedirectToAction(nameof(Details), new { productSlug });
+            }
+
+            try
+            {
+                await _segmentService.DeleteAsync(product.SegmentId.Value);
+                ShowAlertSuccess("Segment removed and deleted.");
+            }
+            catch (OcudaException oex)
+            {
+                string message = oex.Message;
+                if (oex.Data[OcudaExceptionData.SegmentInUseBy] is ICollection<string> inUseList)
+                {
+                    message = $"in use by {inUseList.Count} other locations";
+                }
+                ShowAlertWarning($"Segment removed from this product but not deleted: {message}");
+            }
+
+            return RedirectToAction(nameof(Details), new { productSlug });
         }
 
         [HttpGet("[action]/{productSlug}")]
