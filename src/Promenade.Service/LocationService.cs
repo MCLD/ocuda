@@ -219,8 +219,8 @@ namespace Ocuda.Promenade.Service
                         nextDay,
                         opensAt];
 
-                    var nextOpenDayOfWeekDelta = Math.Abs((int)_dateTimeProvider.Now.DayOfWeek
-                        - (int)nextOpen.DayOfWeek);
+                    var nextOpenDayOfWeekDelta = ((int)nextOpen.DayOfWeek
+                        - (int)_dateTimeProvider.Now.DayOfWeek + DaysInWeek) % DaysInWeek;
 
                     var nextOpenDay = _dateTimeProvider.Now.Date.AddDays(nextOpenDayOfWeekDelta);
 
