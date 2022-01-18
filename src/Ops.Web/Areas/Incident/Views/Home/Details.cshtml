@@ -1,7 +1,7 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.DetailsViewModel
 
-<div class="row mb-2 d-print-none">
-    <div class="col-sm-6">
+<div class="row mb-2">
+    <div class="col-sm-8">
         <h1>
             @Model.Heading
             @if (!string.IsNullOrEmpty(Model.SecondaryHeading))
@@ -10,15 +10,13 @@
             }
         </h1>
     </div>
-    <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+    <div class="col-sm-4">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right d-print-none"
            asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
            asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine)"
            asp-route-page="@(Model.Page > 1 ? Model.Page : null)">Back</a>
     </div>
 </div>
-
-<h1 class="d-none d-print-block">@Model.Heading</h1>
 
 <div class="row">
     <div class="col-12 col-md-8 offset-md-2">
@@ -89,8 +87,19 @@
                     @Model.Incident.Description
                 </td>
             </tr>
-            @if (Model.Witnesses?.Count > 0)
-            {
+        </table>
+    </div>
+</div>
+
+
+@if (Model.Witnesses?.Count > 0)
+{
+    <div class="row mt-2">
+        <div class="col-12 col-md-8 offset-md-2">
+            <table class="table table-sm table-bordered table-striped">
+                <tr>
+                    <th colspan="3" class="table-secondary">Witnesses</th>
+                </tr>
                 <tr>
                     <th class="typefieldname">Type</th>
                     <th class="namefieldname">Name/Barcode</th>
@@ -118,10 +127,10 @@
                         <td>@witness.Description</td>
                     </tr>
                 }
-            }
-        </table>
+            </table>
+        </div>
     </div>
-</div>
+}
 
 <div class="row mt-2">
     <div class="col-12 col-md-8 offset-md-2">
@@ -134,8 +143,19 @@
                     @Model.Incident.InjuriesDamages
                 </td>
             </tr>
-            @if (Model.Witnesses?.Count > 0)
-            {
+        </table>
+    </div>
+</div>
+
+@if (Model.Witnesses?.Count > 0)
+{
+    <div class="row mt-2">
+        <div class="col-12 col-md-8 offset-md-2">
+            <table class="table table-sm table-bordered table-striped">
+                <tr>
+                    <th colspan="3" class="table-secondary">Affected People</th>
+                </tr>
+
                 <tr>
                     <th class="typefieldname">Type</th>
                     <th class="namefieldname">Name/Barcode</th>
@@ -163,11 +183,10 @@
                         <td>@participant.Description</td>
                     </tr>
                 }
-
-            }
-        </table>
+            </table>
+        </div>
     </div>
-</div>
+}
 
 @section styles {
 <style type="text/css">

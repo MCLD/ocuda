@@ -44,6 +44,7 @@
         {
             public const string ItemsPerPage = "UserInterface.ItemsPerPage";
             public const string ModelStateTimeoutMinutes = "UserInterface.TimeOutMinutes";
+            public const string PageTitleBase = "UserInterface.PageTitleBase";
         }
     }
 }

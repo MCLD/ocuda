@@ -213,6 +213,15 @@ namespace Ocuda.Ops.Models.Defaults
                 Category = "User Interface",
                 Value = "10",
                 Type = SiteSettingType.Int
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.UserInterface.PageTitleBase,
+                Name = "Page title base",
+                Description = "First part of page titles when viewing the intranet",
+                Category = "User Interface",
+                Value = "",
+                Type = SiteSettingType.StringNullable
             }
 
             #endregion UserInterface

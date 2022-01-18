@@ -29,6 +29,8 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
         private readonly IPermissionGroupService _permissionGroupService;
         private readonly IUserService _userService;
 
+        private const string PageTitle = "Incident Reports";
+
         public HomeController(Controller<HomeController> context,
             IIncidentService incidentService,
             ILocationService locationService,
@@ -42,6 +44,8 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             _permissionGroupService = permissionGroupService
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+
+            SetPageTitle(PageTitle);
         }
 
         public static string Name
@@ -257,6 +261,8 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
 
             viewModel.SecondaryHeading = nameof(Mine);
 
+            SetPageTitle($"{PageTitle}: {nameof(Mine)}");
+
             return View("Index", viewModel);
         }
 
@@ -278,6 +284,8 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
                 Locations = await GetLocationsAsync(_locationService),
                 SecondaryHeading = $"#{incident.Id}"
             };
+
+            SetPageTitle($"Incident Report #{incident.Id}");
 
             return View(viewModel);
         }
