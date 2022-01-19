@@ -145,6 +145,8 @@ namespace Ocuda.Promenade.Service
                     var opensAt = result.OpenTime.Value.ToString("t", CultureInfo.CurrentCulture);
                     result.StatusMessage = _localizer[i18n.Keys.Promenade.LocationOpensAtItem,
                         opensAt];
+                    result.NextStatusChange = new DateTime(_dateTimeProvider.Now.Date.Ticks 
+                        + result.OpenTime.Value.TimeOfDay.Ticks);
                 }
                 else if (result.CloseTime.Value.TimeOfDay > now.TimeOfDay)
                 {
@@ -153,6 +155,8 @@ namespace Ocuda.Promenade.Service
                     result.StatusMessage = _localizer[i18n.Keys.Promenade.LocationOpenUntilItem,
                         openUntil];
                     result.IsCurrentlyOpen = true;
+                    result.NextStatusChange = new DateTime(_dateTimeProvider.Now.Date.Ticks
+                        + result.CloseTime.Value.TimeOfDay.Ticks);
                 }
                 else
                 {
@@ -214,6 +218,14 @@ namespace Ocuda.Promenade.Service
                     result.StatusMessage = _localizer[i18n.Keys.Promenade.LocationOpensNextItem,
                         nextDay,
                         opensAt];
+
+                    var nextOpenDayOfWeekDelta = ((int)nextOpen.DayOfWeek
+                        - (int)_dateTimeProvider.Now.DayOfWeek + DaysInWeek) % DaysInWeek;
+
+                    var nextOpenDay = _dateTimeProvider.Now.Date.AddDays(nextOpenDayOfWeekDelta);
+
+                    result.NextStatusChange = nextOpenDay.Date + nextOpen.OpenTime.Value.TimeOfDay;
+                    result.NextOpenDateTime = result.NextStatusChange;
                 }
             }
 

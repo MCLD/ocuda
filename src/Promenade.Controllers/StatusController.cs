@@ -62,7 +62,9 @@ namespace Ocuda.Promenade.Controllers
                 return StatusCode(Microsoft.AspNetCore.Http.StatusCodes.Status404NotFound);
             }
 
-            var inventories = await _productService.GetInventoriesAsync(product.Id, forceReload);
+            var inventories = await _productService.GetInventoriesAsync(product.Id,
+                product.CacheInventoryMinutes,
+                forceReload);
             var locations = await _locationService.GetLocationsStatusAsync(null, null);
 
             var locationInventories = new List<LocationInventory>();

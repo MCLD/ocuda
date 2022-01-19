@@ -16,6 +16,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         Task<Product> GetBySlugAsync(string slug);
 
+        Task<Product> GetBySlugAsync(string slug, bool ignoreActiveFlag);
+
         Task<ProductLocationInventory> GetInventoryByProductAndLocationAsync(int productId, int locationId);
 
         Task<ICollection<ProductLocationInventory>> GetLocationInventoriesForProductAsync(int productId);
@@ -26,9 +28,13 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         Task<IDictionary<int, int>> ParseInventoryAsync(int productId, string filename);
 
+        Task SetActiveLocation(string productSlug, int locationId, bool isActive);
+
         Task UnlinkSegment(int productId);
 
         Task UpdateInventoryStatusAsync(int productId, int locationId, int itemCount);
+
+        Task<Product> UpdateProductAsync(Product product);
 
         Task UpdateThreshholdAsync(int productId, int locationId, int threshholdValue);
     }

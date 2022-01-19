@@ -126,6 +126,11 @@ namespace Ocuda.Ops.Service
 
         public async Task<Product> GetBySlugAsync(string slug)
         {
+            return await GetBySlugAsync(slug, false);
+        }
+
+        public async Task<Product> GetBySlugAsync(string slug, bool ignoreActiveFlag)
+        {
             if (string.IsNullOrEmpty(slug))
             {
                 throw new ArgumentNullException(nameof(slug));
@@ -135,7 +140,9 @@ namespace Ocuda.Ops.Service
                 .Trim()
                 .ToLower(System.Globalization.CultureInfo.CurrentCulture);
 
-            return await _productRepository.GetActiveBySlugAsync(formattedSlug);
+            return ignoreActiveFlag
+                ? await _productRepository.GetBySlugAsync(formattedSlug)
+                : await _productRepository.GetActiveBySlugAsync(formattedSlug);
         }
 
         public async Task<ProductLocationInventory> GetInventoryByProductAndLocationAsync(int productId,
@@ -311,6 +318,42 @@ namespace Ocuda.Ops.Service
             return inventory;
         }
 
+        public async Task SetActiveLocation(string productSlug, int locationId, bool isActive)
+        {
+            if (string.IsNullOrEmpty(productSlug))
+            {
+                throw new ArgumentNullException(nameof(productSlug));
+            }
+
+            var product = await _productRepository.GetBySlugAsync(productSlug);
+
+            if (product == null)
+            {
+                throw new OcudaException($"Can't find product: {productSlug}");
+            }
+
+            if (isActive)
+            {
+                await _productLocationInventoryRepository.AddAsync(new ProductLocationInventory
+                {
+                    CreatedAt = _dateTimeProvider.Now,
+                    CreatedBy = GetCurrentUserId(),
+                    ItemCount = 0,
+                    LocationId = locationId,
+                    ProductId = product.Id,
+                    UpdatedAt = _dateTimeProvider.Now,
+                    UpdatedBy = GetCurrentUserId()
+                });
+            }
+            else
+            {
+                var productLocationInventory = await _productLocationInventoryRepository
+                    .GetByProductAndLocationAsync(product.Id, locationId);
+                _productLocationInventoryRepository.Remove(productLocationInventory);
+            }
+            await _productLocationInventoryRepository.SaveAsync();
+        }
+
         public async Task UnlinkSegment(int productId)
         {
             var product = await _productRepository.GetByIdAsync(productId);
@@ -334,6 +377,28 @@ namespace Ocuda.Ops.Service
 
             _productLocationInventoryRepository.Update(currentStatus);
             await _productLocationInventoryRepository.SaveAsync();
+        }
+
+        public async Task<Product> UpdateProductAsync(Product product)
+        {
+            if (product == null) { throw new ArgumentNullException(nameof(product)); }
+            var currentProduct = await _productRepository.GetByIdAsync(product.Id);
+
+            if (currentProduct == null)
+            {
+                throw new OcudaException($"Unable to find product id {product.Id}");
+            }
+
+            currentProduct.CacheInventoryMinutes = product.CacheInventoryMinutes;
+            currentProduct.IsActive = product.IsActive;
+            currentProduct.IsVisibleToPublic = product.IsVisibleToPublic;
+            currentProduct.Name = product.Name?.Trim();
+            currentProduct.UpdatedAt = _dateTimeProvider.Now;
+            currentProduct.UpdatedBy = GetCurrentUserId();
+
+            _productRepository.Update(currentProduct);
+            await _productRepository.SaveAsync();
+            return currentProduct;
         }
 
         public async Task UpdateThreshholdAsync(int productId, int locationId, int threshholdValue)

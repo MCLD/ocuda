@@ -30,48 +30,107 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-12 col-lg-10 offset-lg-1">
-        <div>
-            <table class="table table-sm table-hover table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th>Location</th>
-                        <th>On-hand count</th>
-                        <th>Quantity on-hand</th>
-                        <th>Updated At</th>
-                        <th>Updated By</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var inventory in Model.LocationInventories)
-                    {
+                    @if (Model.LocationInventories.Count > 0)
+{
+
+    <div class="row">
+        <div class="col-12 col-lg-10 offset-lg-1">
+            <div>
+                <table class="table table-sm table-hover table-striped table-bordered">
+                    <thead>
                         <tr>
-                            <td class="align-middle">@inventory.Location.Name</td>
-                            <td class="align-middle @ProductViewModel.StatusClass(inventory.InventoryStatus)"><strong>@inventory.InventoryStatus</strong></td>
-                            <td class="align-middle @ProductViewModel.StatusClass(inventory.InventoryStatus)"><strong>@inventory.ItemCount</strong></td>
-                            <td class="align-middle">@inventory.UpdatedAt</td>
-                            <td class="align-middle">
-                                <a asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
-                                   asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
-                                   asp-route-id="@inventory.UpdatedByUsername">
-                                    @inventory.UpdatedByName
-                                </a>
-                            </td>
-                            <td class="align-middle">
-                                <a class="btn btn-sm btn-outline-primary"
-                                   asp-action="@nameof(ProductsController.LocationInventory)"
-                                   asp-route-locationslug="@inventory.Location.Stub"
-                                   asp-route-productslug="@Model.Product.Slug">
-                                    <span class="fas fa-edit"></span>
-                                    Update
-                                </a>
-                            </td>
+                            <th>Location</th>
+                            <th>On-hand count</th>
+                            <th>Quantity on-hand</th>
+                            <th>Updated At</th>
+                            <th>Updated By</th>
+                            <th>Action</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var inventory in Model.LocationInventories)
+                        {
+                            <tr>
+                                <td class="align-middle">@inventory.Location.Name</td>
+                                <td class="align-middle @ProductViewModel.StatusClass(inventory.InventoryStatus)"><strong>@inventory.InventoryStatus</strong></td>
+                                <td class="align-middle @ProductViewModel.StatusClass(inventory.InventoryStatus)"><strong>@inventory.ItemCount</strong></td>
+                                <td class="align-middle">@inventory.UpdatedAt</td>
+                                <td class="align-middle">
+                                    <a asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
+                               asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
+                               asp-route-id="@inventory.UpdatedByUsername">
+                                        @inventory.UpdatedByName
+                                    </a>
+                                </td>
+                                <td class="align-middle">
+                                    <a class="btn btn-sm btn-outline-primary"
+                               asp-action="@nameof(ProductsController.LocationInventory)"
+                               asp-route-locationslug="@inventory.Location.Stub"
+                               asp-route-productslug="@Model.Product.Slug">
+                                        <span class="fas fa-edit"></span>
+                                        Update
+                                    </a>
+                                    @if (Model.IsProductManager)
+                                    {
+                                        <form class="d-inline"
+                                  method="post"
+                                  asp-action="@nameof(ProductsController.DeactivateLocation)"
+                                  asp-route-productSlug="@Model.Product.Slug"
+                                  asp-route-locationId="@inventory.LocationId">
+                                            <button class="btn btn-sm btn-outline-warning"
+                                        type="submit">
+                                                Deactivate
+                                            </button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
+}
+
+@if (Model.ExcludedLocations?.Count > 0)
+{
+    <h2>Deactivated locations</h2>
+    <div class="row">
+        <div class="col-12 col-lg-10 offset-lg-1">
+            <div>
+                <table class="table table-sm table-hover table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Location</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var location in Model.ExcludedLocations)
+                        {
+                            <tr>
+                                <td class="align-middle">@location.Value</td>
+                                <td class="align-middle">
+                                    @if (Model.IsProductManager)
+                                    {
+                                        <form class="d-inline"
+                                  method="post"
+                                  asp-action="@nameof(ProductsController.ActivateLocation)"
+                                  asp-route-productSlug="@Model.Product.Slug"
+                                  asp-route-locationId="@location.Key">
+                                            <button class="btn btn-sm btn-outline-success"
+                                        type="submit">
+                                                Activate
+                                            </button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
