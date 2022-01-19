@@ -12,9 +12,13 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
             ICollection<IncidentStaff> staffs,
             ICollection<IncidentParticipant> participants);
 
+        public Task AddFollowupAsync(int incidentId, string followupText);
+
+        public Task AddRelationshipAsync(int incidentId, int relatedIncidentId);
+
         public Task AddTypeAsync(string incidentTypeName);
 
-        public Task AdjustTypeStatus(int incidentTypeId, bool status);
+        public Task AdjustTypeStatusAsync(int incidentTypeId, bool status);
 
         public Task<IDictionary<int, string>> GetActiveIncidentTypesAsync();
 
@@ -28,6 +32,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         public Task<IncidentType> GetTypeAsync(string incidentTypeDescription);
 
-        public Task UpdateIncidentType(int incidentTypeId, string incidentTypeDescription);
+        public Task UpdateIncidentTypeAsync(int incidentTypeId, string incidentTypeDescription);
     }
 }

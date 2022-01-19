@@ -58,7 +58,7 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
                 return RedirectToUnauthorized();
             }
 
-            await _incidentService.AdjustTypeStatus(typeId, true);
+            await _incidentService.AdjustTypeStatusAsync(typeId, true);
             return RedirectToAction(nameof(Configuration));
         }
 
@@ -145,13 +145,36 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
         [HttpPost("[action]")]
         public async Task<IActionResult> AddFollowup(int incidentId, string followupText)
         {
-            throw new NotImplementedException();
+            var incident = await _incidentService.GetAsync(incidentId);
+            if (incident == null)
+            {
+                ShowAlertDanger($"Unable to find incident id {incidentId}");
+                return RedirectToAction(nameof(Index));
+            }
+
+            await _incidentService.AddFollowupAsync(incidentId, followupText);
+            return RedirectToAction();
         }
 
         [HttpPost("[action]")]
         public async Task<IActionResult> AddRelationship(int incidentId, int relatedIncidentId)
         {
-            throw new NotImplementedException();
+            var incident = await _incidentService.GetAsync(incidentId);
+            if (incident == null)
+            {
+                ShowAlertDanger($"Unable to find incident id {incidentId}");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var relatedIncident = await _incidentService.GetAsync(relatedIncidentId);
+            if (relatedIncident == null)
+            {
+                ShowAlertDanger($"Unable to find related incident id {relatedIncidentId}");
+                return RedirectToAction(nameof(Index));
+            }
+
+            await _incidentService.AddRelationshipAsync(incidentId, relatedIncidentId);
+            return RedirectToAction();
         }
 
         [HttpPost("[action]")]
@@ -247,7 +270,7 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
                 return RedirectToUnauthorized();
             }
 
-            await _incidentService.AdjustTypeStatus(typeId, false);
+            await _incidentService.AdjustTypeStatusAsync(typeId, false);
             return RedirectToAction(nameof(Configuration));
         }
 
@@ -313,7 +336,7 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
 
             try
             {
-                await _incidentService.UpdateIncidentType(incidentTypeId, incidentTypeDescription);
+                await _incidentService.UpdateIncidentTypeAsync(incidentTypeId, incidentTypeDescription);
             }
             catch (OcudaException oex)
             {
@@ -322,33 +345,7 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             return RedirectToAction(nameof(Configuration));
         }
 
-        private async Task<bool> CanViewAllAsync()
-        {
-            return !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
-                || await HasAppPermissionAsync(_permissionGroupService,
-                    ApplicationPermission.ViewAllIncidentReports);
-        }
-
-        private async Task<IndexViewModel> GetIncidentsAsync(IncidentFilter filter, int currentPage)
-        {
-            var incidents = await _incidentService.GetPaginatedAsync(filter);
-
-            var allIncidentTypes = await _incidentService.GetAllIncidentTypesAsync();
-
-            return new IndexViewModel
-            {
-                CanViewAll = await CanViewAllAsync(),
-                CurrentPage = currentPage,
-                Incidents = incidents.Data,
-                IncidentTypes = allIncidentTypes,
-                ItemCount = incidents.Count,
-                ItemsPerPage = filter.Take.Value,
-                Locations = await _locationService.GetAllLocationsIdNameAsync(),
-                SearchText = filter.SearchText,
-            };
-        }
-
-        private (List<IncidentStaff>, List<IncidentParticipant>)
+        private static (List<IncidentStaff>, List<IncidentParticipant>)
             SortParticipants(string jsonParticipants, IncidentParticipantType type)
         {
             var staff = new List<IncidentStaff>();
@@ -387,6 +384,32 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             }
 
             return (staff, people);
+        }
+
+        private async Task<bool> CanViewAllAsync()
+        {
+            return !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
+                || await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.ViewAllIncidentReports);
+        }
+
+        private async Task<IndexViewModel> GetIncidentsAsync(IncidentFilter filter, int currentPage)
+        {
+            var incidents = await _incidentService.GetPaginatedAsync(filter);
+
+            var allIncidentTypes = await _incidentService.GetAllIncidentTypesAsync();
+
+            return new IndexViewModel
+            {
+                CanViewAll = await CanViewAllAsync(),
+                CurrentPage = currentPage,
+                Incidents = incidents.Data,
+                IncidentTypes = allIncidentTypes,
+                ItemCount = incidents.Count,
+                ItemsPerPage = filter.Take.Value,
+                Locations = await _locationService.GetAllLocationsIdNameAsync(),
+                SearchText = filter.SearchText,
+            };
         }
     }
 }

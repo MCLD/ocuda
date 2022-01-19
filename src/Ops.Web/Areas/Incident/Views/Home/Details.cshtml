@@ -1,7 +1,7 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.DetailsViewModel
 
 <div class="row mb-2">
-    <div class="col-sm-8">
+    <div class="col-sm-6">
         <h1>
             @Model.Heading
             @if (!string.IsNullOrEmpty(Model.SecondaryHeading))
@@ -10,20 +10,24 @@
             }
         </h1>
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-6">
         <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right d-print-none"
            asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
            asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine)"
            asp-route-page="@(Model.Page > 1 ? Model.Page : null)">Back</a>
         @if (Model.CanAdd)
         {
-            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
+            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right d-print-none"
+                data-toggle="modal"
+                data-target="#addFollowup">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
-                Add Follow-up
+                Follow-up
             </button>
-            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
+            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right d-print-none"
+                data-toggle="modal"
+                data-target="#addRelationship">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
-                Add Relationship
+                Relationship
             </button>
         }
     </div>
@@ -44,6 +48,8 @@
                 <textarea class="form-control"
                       name="followupText"
                       id="followupText"
+                      maxlength="500"
+                      rows="7"
                       required
                       data-val="true"
                       data-val-required="Please enter follow-up text."></textarea>
@@ -57,20 +63,19 @@
     <form asp-action="@nameof(HomeController.AddRelationship)" method="post" role="form">
         <input type="hidden" name="incidentId" value="@Model.Incident.Id" />
         <div modal
-         isLarge="true"
          id="addRelationship"
          name="Relationship"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add"
          data-backdrop="static">
             <div class="form-group">
                 <label for="relatedIncidentId">Incident id</label>
-                < type="number"
-            class="form-control"
-            name="relatedIncidentId"
-            id="relatedIncidentId"
-            required
-            data-val="true"
-            data-val-required="Please enter an Incident Report id." />
+                <input type="number"
+                   class="form-control"
+                   name="relatedIncidentId"
+                   id="relatedIncidentId"
+                   required
+                   data-val="true"
+                   data-val-required="Please enter an Incident Report id." />
                 <span class="validation-message text-danger field-validation-valid"
                   data-valmsg-for="relatedIncidentId"
                   data-valmsg-replace="true"></span>
@@ -83,7 +88,7 @@
     <div class="col-12 col-md-8 offset-md-2">
         <table class="table table-sm table-bordered">
             <tr>
-                <th colspan="2" class="table-secondary">Incident report information</th>
+                <th colspan="2" class="table-info">Incident report information</th>
             </tr>
             <tr>
                 <th class="fieldname">Incident number</th>
@@ -91,7 +96,7 @@
             </tr>
             <tr>
                 <th>Date &amp; time report filed</th>
-                <td>@Model.Incident.CreatedAt</td>
+                <td>@Model.Incident.CreatedAt.ToString("g")</td>
             </tr>
             <tr>
                 <th>Report filed by</th>
@@ -110,16 +115,15 @@
     </div>
 </div>
 
-
 <div class="row mt-2">
     <div class="col-12 col-md-8 offset-md-2">
         <table class="table table-sm table-bordered">
             <tr>
-                <th colspan="2" class="table-secondary">Incident information</th>
+                <th colspan="2" class="table-info">Incident information</th>
             </tr>
             <tr>
                 <th class="fieldname">Date &amp; time of incident</th>
-                <td>@Model.Incident.IncidentAt</td>
+                <td>@Model.Incident.IncidentAt.ToString("g")</td>
             </tr>
             <tr>
                 <th>Incident type</th>
@@ -141,7 +145,7 @@
     <div class="col-12 col-md-8 offset-md-2">
         <table class="table table-sm table-bordered table-striped">
             <tr>
-                <th colspan="3" class="table-secondary">Description</th>
+                <th colspan="3" class="table-info">Description</th>
             </tr>
             <tr>
                 <td colspan="3">
@@ -152,14 +156,13 @@
     </div>
 </div>
 
-
 @if (Model.Witnesses?.Count > 0)
 {
     <div class="row mt-2">
         <div class="col-12 col-md-8 offset-md-2">
             <table class="table table-sm table-bordered table-striped">
                 <tr>
-                    <th colspan="3" class="table-secondary">Witnesses</th>
+                    <th colspan="3" class="table-info">Witnesses</th>
                 </tr>
                 <tr>
                     <th class="typefieldname">Type</th>
@@ -197,7 +200,7 @@
     <div class="col-12 col-md-8 offset-md-2">
         <table class="table table-sm table-bordered table-striped">
             <tr>
-                <th colspan="3" class="table-secondary">Injuries/Damage</th>
+                <th colspan="3" class="table-info">Injuries/Damage</th>
             </tr>
             <tr>
                 <td colspan="3">
@@ -214,7 +217,7 @@
         <div class="col-12 col-md-8 offset-md-2">
             <table class="table table-sm table-bordered table-striped">
                 <tr>
-                    <th colspan="3" class="table-secondary">Affected People</th>
+                    <th colspan="3" class="table-info">Affected People</th>
                 </tr>
 
                 <tr>
@@ -255,19 +258,19 @@
         <div class="col-12 col-md-8 offset-md-2">
             <table class="table table-sm table-bordered table-striped">
                 <tr>
-                    <th colspan="3" class="table-secondary">Follow-ups</th>
+                    <th colspan="3" class="table-info">Follow-ups</th>
                 </tr>
 
                 <tr>
-                    <th class="namefieldname">Name &amp; Date</th>
+                    <th class="nameanddatetime">Name &amp; Date</th>
                     <th>Description</th>
                 </tr>
                 @foreach (var followup in Model.Incident.Followups)
                 {
                     <tr>
                         <td>
-                            @followup.CreatedByName
-                            <br />@followup.CreatedAt
+                            @followup.CreatedByUser.Name
+                            <br />@followup.CreatedAt.ToString("g")
                         </td>
                         <td>@followup.Description</td>
                     </tr>
@@ -283,10 +286,11 @@
         <div class="col-12 col-md-8 offset-md-2">
             <table class="table table-sm table-bordered table-striped">
                 <tr>
-                    <th colspan="3" class="table-secondary">Related incidents</th>
+                    <th colspan="5" class="table-info">Related incidents</th>
                 </tr>
                 <tr>
-                    <th class="namefieldname">Related By &amp; At</th>
+                    <th class="nameanddatetime">Related By &amp; On</th>
+                    <th>Incident Id</th>
                     <th>Incident At</th>
                     <th>Location</th>
                     <th>Type</th>
@@ -295,10 +299,14 @@
                 {
                     <tr>
                         <td>
-                            @relatedIncident.CreatedByName
-                            <br />@relatedIncident.CreatedAt
+                            @relatedIncident.CreatedByUser.Name
+                            <br />@relatedIncident.CreatedAt.ToString("d")
                         </td>
-                        <td>@relatedIncident.IncidentAt</td>
+                        <td>
+                            <a asp-action="@nameof(HomeController.Details)"
+                       asp-route-id="@relatedIncident.Id">@relatedIncident.Id</a>
+                        </td>
+                        <td>@relatedIncident.IncidentAt.ToString("g")</td>
                         <td>@Model.Locations[relatedIncident.LocationId]</td>
                         <td>@Model.IncidentTypes[relatedIncident.IncidentTypeId]</td>
                     </tr>
@@ -307,7 +315,6 @@
         </div>
     </div>
 }
-
 
 @section styles {
 <style type="text/css">
@@ -321,6 +328,10 @@
 
     th.namefieldname {
         width: 10rem;
+    }
+
+    th.nameanddatetime {
+        width: 11rem;
     }
 </style>
 }

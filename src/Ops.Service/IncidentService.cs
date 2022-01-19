@@ -11,6 +11,7 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service
@@ -101,6 +102,57 @@ namespace Ocuda.Ops.Service
             return incident.Id;
         }
 
+        public async Task AddFollowupAsync(int incidentId, string followupText)
+        {
+            await _incidentFollowupRepository.AddAsync(new IncidentFollowup
+            {
+                CreatedAt = _dateTimeProvider.Now,
+                CreatedBy = GetCurrentUserId(),
+                Description = followupText,
+                IncidentId = incidentId
+            });
+            await _incidentFollowupRepository.SaveAsync();
+        }
+
+        public async Task AddRelationshipAsync(int incidentId, int relatedIncidentId)
+        {
+            if (incidentId == relatedIncidentId)
+            {
+                throw new OcudaException("Cannot relate an incident to itself.");
+            }
+
+            var forwardRelationship = await _incidentRelationshipRepository
+                .GetByIncidentIdAsync(incidentId);
+
+            var forwardHasRelationship = forwardRelationship
+                .Any(_ => _.RelatedIncidentId == relatedIncidentId);
+            bool backwardHasRelationship = false;
+
+            if (!forwardHasRelationship)
+            {
+                var backwardRelationship = await _incidentRelationshipRepository
+                    .GetByIncidentIdAsync(relatedIncidentId);
+
+                backwardHasRelationship = backwardRelationship
+                    .Any(_ => _.RelatedIncidentId == incidentId);
+            }
+
+            if (forwardHasRelationship || backwardHasRelationship)
+            {
+                throw new OcudaException($"Incidents {incidentId} and {relatedIncidentId} are already related.");
+            }
+
+            await _incidentRelationshipRepository.AddAsync(new IncidentRelationship
+            {
+                CreatedAt = _dateTimeProvider.Now,
+                CreatedBy = GetCurrentUserId(),
+                IncidentId = Math.Min(incidentId, relatedIncidentId),
+                RelatedIncidentId = Math.Max(incidentId, relatedIncidentId)
+            });
+
+            await _incidentRelationshipRepository.SaveAsync();
+        }
+
         public async Task AddTypeAsync(string incidentTypeName)
         {
             await _incidentTypeRepository.AddAsync(new IncidentType
@@ -113,7 +165,7 @@ namespace Ocuda.Ops.Service
             await _incidentTypeRepository.SaveAsync();
         }
 
-        public async Task AdjustTypeStatus(int incidentTypeId, bool status)
+        public async Task AdjustTypeStatusAsync(int incidentTypeId, bool status)
         {
             var type = await _incidentTypeRepository.FindAsync(incidentTypeId);
             type.IsActive = status;
@@ -177,6 +229,15 @@ namespace Ocuda.Ops.Service
             if (followups?.Count > 0)
             {
                 incident.Followups = followups;
+                foreach (var followup in incident.Followups)
+                {
+                    followup.CreatedByUser = await _userService.GetByIdAsync(followup.CreatedBy);
+                    if (followup.UpdatedBy.HasValue)
+                    {
+                        followup.UpdatedByUser
+                            = await _userService.GetByIdAsync(followup.UpdatedBy.Value);
+                    }
+                }
             }
 
             var relateds = await _incidentRelationshipRepository.GetByIncidentIdAsync(incidentId);
@@ -195,6 +256,11 @@ namespace Ocuda.Ops.Service
                         .GetRelatedAsync(relatedIncidentId);
                     relatedIncident.CreatedByUser = await _userService
                         .GetByIdAsync(relatedIncident.CreatedBy);
+                    if (relatedIncident.UpdatedBy.HasValue)
+                    {
+                        relatedIncident.UpdatedByUser
+                            = await _userService.GetByIdAsync(relatedIncident.UpdatedBy.Value);
+                    }
                     incident.RelatedIncidents.Add(relatedIncident);
                 }
             }
@@ -225,7 +291,7 @@ namespace Ocuda.Ops.Service
             return await _incidentTypeRepository.GetAsync(incidentTypeName);
         }
 
-        public async Task UpdateIncidentType(int incidentTypeId, string incidentTypeDescription)
+        public async Task UpdateIncidentTypeAsync(int incidentTypeId, string incidentTypeDescription)
         {
             var type = await _incidentTypeRepository.FindAsync(incidentTypeId);
             if (type == null)
