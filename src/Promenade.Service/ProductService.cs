@@ -14,8 +14,8 @@ namespace Ocuda.Promenade.Service
 {
     public class ProductService : BaseService<ProductService>
     {
-        private readonly IConfiguration _config;
         private readonly IOcudaCache _cache;
+        private readonly IConfiguration _config;
         private readonly IProductInventoryRepository _productInventoryRepository;
         private readonly IProductRepository _productRepository;
         private readonly SegmentService _segmentService;
@@ -39,8 +39,10 @@ namespace Ocuda.Promenade.Service
         }
 
         public async Task<ICollection<ProductLocationInventory>>
-            GetInventoriesAsync(int productId, bool forceReload)
+            GetInventoriesAsync(int productId, int cacheInMinutes, bool forceReload)
         {
+            int cacheDurationMinutes = cacheInMinutes > 0 ? cacheInMinutes : 5;
+
             string cacheKey = string.Format(CultureInfo.InvariantCulture,
                 Utility.Keys.Cache.PromProductInventory,
                 productId);
@@ -56,7 +58,9 @@ namespace Ocuda.Promenade.Service
             if (inventory == null)
             {
                 inventory = await _productInventoryRepository.GetAsync(productId);
-                await _cache.SaveToCacheAsync(cacheKey, inventory, TimeSpan.FromMinutes(5));
+                await _cache.SaveToCacheAsync(cacheKey,
+                    inventory,
+                    TimeSpan.FromMinutes(cacheDurationMinutes));
             }
             return inventory;
         }

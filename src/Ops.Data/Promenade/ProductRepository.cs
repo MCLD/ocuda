@@ -40,6 +40,14 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
+        public async Task<Product> GetBySlugAsync(string slug)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Slug == slug)
+                .SingleOrDefaultAsync();
+        }
+
         public async Task<ICollectionWithCount<Product>> GetPaginatedListAsync(BaseFilter filter)
         {
             var query = DbSet.AsNoTracking();
