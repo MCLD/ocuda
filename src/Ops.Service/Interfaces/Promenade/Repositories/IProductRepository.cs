@@ -10,6 +10,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
     {
         Task<Product> GetActiveBySlugAsync(string slug);
 
+        Task<Product> GetBySlugAsync(string slug);
+
         Task<Product> GetByIdAsync(int productId);
 
         Task<ICollection<Product>> GetBySegmentIdAsync(int segmentId);

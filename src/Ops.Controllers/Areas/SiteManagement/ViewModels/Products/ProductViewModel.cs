@@ -5,6 +5,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Products
 {
     public class ProductViewModel
     {
+        public IDictionary<int, string> ExcludedLocations { get; set; }
+        public bool IsProductManager { get; set; }
         public ICollection<ProductLocationInventory> LocationInventories { get; set; }
         public Product Product { get; set; }
 

@@ -6,6 +6,10 @@ namespace Ocuda.Promenade.Models.Entities
 {
     public class Product
     {
+        [Required]
+        [Display(Name = "Minutes to cache inventory lookups")]
+        public int CacheInventoryMinutes { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
         public int CreatedBy { get; set; }
@@ -23,8 +27,8 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         [MaxLength(255)]
         public string Name { get; set; }
-        [Display(Name = "Segment text")]
 
+        [Display(Name = "Segment text")]
         public int? SegmentId { get; set; }
 
         [NotMapped]

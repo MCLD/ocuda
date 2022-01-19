@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Ocuda.Ops.DataProvider.SqlServer.Promenade;
 
 namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20220118164337_prom_v1.0.0.164")]
+    partial class prom_v100164
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -898,6 +900,9 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Property<int?>("NavigationId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("NavigationTextId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
@@ -913,7 +918,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.NavigationText", b =>
                 {
-                    b.Property<int>("NavigationId")
+                    b.Property<int>("Id")
                         .HasColumnType("int");
 
                     b.Property<int>("LanguageId")
@@ -931,9 +936,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.HasKey("NavigationId", "LanguageId");
-
-                    b.HasIndex("LanguageId");
+                    b.HasKey("Id", "LanguageId");
 
                     b.ToTable("NavigationTexts");
                 });
@@ -2013,25 +2016,6 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .WithMany("Navigations")
                         .HasForeignKey("NavigationId")
                         .OnDelete(DeleteBehavior.Restrict);
-                });
-
-            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.NavigationText", b =>
-                {
-                    b.HasOne("Ocuda.Promenade.Models.Entities.Language", "Language")
-                        .WithMany()
-                        .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Ocuda.Promenade.Models.Entities.Navigation", "Navigation")
-                        .WithMany()
-                        .HasForeignKey("NavigationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Language");
-
-                    b.Navigation("Navigation");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Page", b =>
