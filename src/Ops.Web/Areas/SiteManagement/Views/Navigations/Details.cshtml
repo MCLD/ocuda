@@ -52,7 +52,7 @@
     </div>
 </div>
 
-@if (Model.RoleProperties.CanHaveText)
+@if (Model.RoleProperties.MustHaveText)
 {
     <div class="row">
         <div class="col-12">
@@ -256,6 +256,16 @@
                     <option value="True">Yes</option>
                 </select>
             }
+
+            <br />
+
+            <div class="row">
+                <h5 class="col-12 col-md-9 offset-md-3 mb-3">Navigation Text</h5>
+            </div>
+
+            <input asp-for="Navigation.NavigationText.Label" formgroup />
+            <input asp-for="Navigation.NavigationText.Link" formgroup />
+            <input asp-for="Navigation.NavigationText.Title" formgroup />
         </div>
     </form>
 
@@ -354,7 +364,7 @@
     }
 
     <script>
-        @if (Model.RoleProperties.CanHaveText)
+        @if (Model.RoleProperties.MustHaveText)
         {
             <text>
                 $(".oc-save-warning-field").on("input propertychange", function () {

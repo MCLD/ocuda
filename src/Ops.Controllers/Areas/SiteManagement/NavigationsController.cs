@@ -121,7 +121,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 RoleProperties = await _navigationService.GetRolePropertiesForNavigationAsync(id)
             };
 
-            if (viewModel.RoleProperties.CanHaveText)
+            if (viewModel.RoleProperties.MustHaveText)
             {
                 var languages = await _languageService.GetActiveAsync();
 
@@ -185,6 +185,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     await _navigationService.SetNavigationTextAsync(model.NavigationText);
                     ShowAlertSuccess("Updated navigation text");
                 }
+                catch (OcudaException ex)
+                {
+                    ShowAlertDanger($"Unable to update navigation text: {ex.Message}");
+                }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error updating navigation text: {Message}", ex.Message);
@@ -215,25 +219,22 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var language = await _languageService
                 .GetActiveByIdAsync(model.NavigationText.LanguageId);
 
-            if (language.IsDefault)
+            try
             {
-                ShowAlertDanger("Cannot delete text for the default language");
-            }
-            else
-            {
-                try
-                {
-                    await _navigationService.DeleteNavigationTextAsync(
-                        model.NavigationText.NavigationId,
-                        model.NavigationText.LanguageId);
+                await _navigationService.DeleteNavigationTextAsync(
+                    model.NavigationText.NavigationId,
+                    model.NavigationText.LanguageId);
 
-                    ShowAlertSuccess($"Deleted {language.Description} navigation text");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error deleting navigation text: {Message}", ex.Message);
-                    ShowAlertDanger($"Error deleting {language.Description} navigation text");
-                }
+                ShowAlertSuccess($"Deleted {language.Description} navigation text");
+            }
+            catch (OcudaException ex)
+            {
+                ShowAlertDanger($"Unable to delete navigation text: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting navigation text: {Message}", ex.Message);
+                ShowAlertDanger($"Error deleting {language.Description} navigation text");
             }
 
             return RedirectToAction(nameof(Details), new

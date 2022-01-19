@@ -4,7 +4,7 @@
     {
         public bool CanHaveChildren { get; set; }
         public bool CanHaveGrandchildren { get; set; }
-        public bool CanHaveText { get; set; }
+        public bool MustHaveText { get; set; }
 
         public bool ChildrenCanChangeToLink { get; set; }
         public bool ChildrenCanDisplayIcon { get; set; }

@@ -16,17 +16,21 @@ namespace Ocuda.Ops.Service
     {
         private readonly string DefaultNavigationSiteSettingId = "-1";
 
+        private readonly ILanguageRepository _languageRepository;
         private readonly INavigationRepository _navigationRepository;
         private readonly INavigationTextRepository _navigationTextRepository;
         private readonly ISiteSettingPromService _siteSettingPromService;
 
         public NavigationService(ILogger<NavigationService> logger,
             IHttpContextAccessor httpContextAccessor,
+            ILanguageRepository languageRepository,
             INavigationRepository navigationRepository,
             INavigationTextRepository navigationTextRepository,
             ISiteSettingPromService siteSettingPromService)
             : base(logger, httpContextAccessor)
         {
+            _languageRepository = languageRepository
+                ?? throw new ArgumentNullException(nameof(languageRepository));
             _navigationRepository = navigationRepository
                 ?? throw new ArgumentNullException(nameof(navigationRepository));
             _navigationTextRepository = navigationTextRepository
@@ -95,7 +99,7 @@ namespace Ocuda.Ops.Service
 
             if (depth != 0)
             {
-                roleProperties.CanHaveText = true;
+                roleProperties.MustHaveText = true;
             }
 
             if ((depth == 1 && role != Promenade.Models.Keys.SiteSetting.Site.NavigationIdFooter)
@@ -181,6 +185,27 @@ namespace Ocuda.Ops.Service
             }
 
             navigation.Name = navigation.Name?.Trim();
+
+            if (parentRoleProperties != null)
+            {
+                if (string.IsNullOrWhiteSpace(navigation.NavigationText?.Label)
+                    && string.IsNullOrWhiteSpace(navigation.NavigationText?.Link)
+                    && string.IsNullOrWhiteSpace(navigation.NavigationText?.Title))
+                {
+                    throw new OcudaException("At least one text field must be filled.");
+                }
+
+                var navigationText = new NavigationText();
+
+                navigationText.Label = navigation.NavigationText.Label?.Trim();
+                navigationText.Link = navigation.NavigationText.Link?.Trim();
+                navigationText.Title = navigation.NavigationText.Title?.Trim();
+
+                navigationText.LanguageId = await _languageRepository.GetDefaultLanguageId();
+                navigationText.Navigation = navigation;
+
+                await _navigationTextRepository.AddAsync(navigationText);
+            }
 
             if (parentRoleProperties?.ChildrenCanDisplayIcon == true)
             {
@@ -346,9 +371,16 @@ namespace Ocuda.Ops.Service
             var roleProperties = await GetRolePropertiesForNavigationAsync(
                 navigationText.NavigationId);
 
-            if (!roleProperties.CanHaveText)
+            if (!roleProperties.MustHaveText)
             {
                 throw new OcudaException("Navigation cannot have text.");
+            }
+
+            if (string.IsNullOrWhiteSpace(navigationText.Label)
+                && string.IsNullOrWhiteSpace(navigationText.Link)
+                && string.IsNullOrWhiteSpace(navigationText.Title))
+            {
+                throw new OcudaException("At least one text field must be filled.");
             }
 
             var currentText = await _navigationTextRepository.GetByNavigationAndLanguageAsync(
@@ -376,6 +408,13 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteNavigationTextAsync(int navigationId, int languageId)
         {
+            var defaultLanguageId = await _languageRepository.GetDefaultLanguageId();
+
+            if (languageId == defaultLanguageId)
+            {
+                throw new OcudaException("Cannot delete text for the default language");
+            }
+
             var navigationText = await _navigationTextRepository.GetByNavigationAndLanguageAsync(
                 navigationId,
                 languageId);
