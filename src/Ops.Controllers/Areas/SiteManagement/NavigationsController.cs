@@ -115,28 +115,34 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToAction(nameof(Index));
             }
 
-            var languages = await _languageService.GetActiveAsync();
-
-            var selectedLanguage = languages
-                .FirstOrDefault(_ => _.Name.Equals(language, StringComparison.OrdinalIgnoreCase))
-                ?? languages.Single(_ => _.IsDefault);
-
-            var navigationText = await _navigationService.GetTextByNavigationAndLanguageAsync(id,
-                selectedLanguage.Id);
-
             var viewModel = new DetailsViewModel
             {
-                LanguageDescription = selectedLanguage.Description,
-                LanguageId = selectedLanguage.Id,
-                LanguageList = new SelectList(languages,
-                    nameof(Language.Name),
-                    nameof(Language.Description),
-                    selectedLanguage.Name),
                 Navigation = navigation,
-                NavigationText = navigationText,
-                NewNavigationText = navigationText == null,
                 RoleProperties = await _navigationService.GetRolePropertiesForNavigationAsync(id)
             };
+
+            if (viewModel.RoleProperties.CanHaveText)
+            {
+                var languages = await _languageService.GetActiveAsync();
+
+                var selectedLanguage = languages
+                    .FirstOrDefault(_ => _.Name.Equals(language, StringComparison.OrdinalIgnoreCase))
+                    ?? languages.Single(_ => _.IsDefault);
+
+                viewModel.LanguageDescription = selectedLanguage.Description;
+                viewModel.LanguageId = selectedLanguage.Id;
+
+                viewModel.LanguageList = new SelectList(languages,
+                    nameof(Language.Name),
+                    nameof(Language.Description),
+                    selectedLanguage.Name);
+
+                viewModel.NavigationText = await _navigationService
+                    .GetTextByNavigationAndLanguageAsync(id, selectedLanguage.Id);
+
+                viewModel.CanDeleteText = viewModel.NavigationText != null
+                    && !selectedLanguage.IsDefault;
+            }
 
             if (viewModel.RoleProperties.CanHaveChildren)
             {
@@ -193,6 +199,47 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 id = model.NavigationText.NavigationId,
                 language = language.IsDefault ? null : language.Name
+            });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeleteText(DetailsViewModel model)
+        {
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.NavigationManagement))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var language = await _languageService
+                .GetActiveByIdAsync(model.NavigationText.LanguageId);
+
+            if (language.IsDefault)
+            {
+                ShowAlertDanger("Cannot delete text for the default language");
+            }
+            else
+            {
+                try
+                {
+                    await _navigationService.DeleteNavigationTextAsync(
+                        model.NavigationText.NavigationId,
+                        model.NavigationText.LanguageId);
+
+                    ShowAlertSuccess($"Deleted {language.Description} navigation text");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error deleting navigation text: {Message}", ex.Message);
+                    ShowAlertDanger($"Error deleting {language.Description} navigation text");
+                }
+            }
+
+            return RedirectToAction(nameof(Details), new
+            {
+                id = model.NavigationText.NavigationId,
+                language = language.Name
             });
         }
 

@@ -12,12 +12,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Navigations
         public RoleProperties RoleProperties { get; set; }
         public ICollection<Navigation> Navigations { get; set; }
 
-        public int NavigationId { get; set; }
         public NavigationText NavigationText { get; set; }
-        public bool NewNavigationText { get; set; }
+        public bool CanDeleteText { get; set; }
 
-        public string LanguageDescription { get; set; }
         public int LanguageId { get; set; }
+        public string LanguageDescription { get; set; }
         public SelectList LanguageList { get; set; }
 
         [DisplayName("Language")]

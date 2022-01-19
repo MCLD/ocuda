@@ -374,6 +374,16 @@ namespace Ocuda.Ops.Service
             await _navigationTextRepository.SaveAsync();
         }
 
+        public async Task DeleteNavigationTextAsync(int navigationId, int languageId)
+        {
+            var navigationText = await _navigationTextRepository.GetByNavigationAndLanguageAsync(
+                navigationId,
+                languageId);
+
+            _navigationTextRepository.Remove(navigationText);
+            await _navigationTextRepository.SaveAsync();
+        }
+
         private async Task<(List<Navigation>, List<int>)> GetFlattenedNavigationsAsync(
             Navigation navigation)
         {

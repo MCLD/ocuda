@@ -9,6 +9,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
     {
         Task<Navigation> CreateAsync(Navigation navigation, string siteSetting = null);
         Task DeleteAsync(int id);
+        Task DeleteNavigationTextAsync(int navigationId, int languageId);
         Task<Navigation> EditAsync(Navigation navigation);
         Task<Navigation> GetByIdAsync(int id);
         Task<ICollection<Navigation>> GetNavigationChildrenAsync(int id);

@@ -28,6 +28,17 @@
                asp-action="@(nameof(NavigationsController.Index))"
                class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
         }
+        @if (Model.CanDeleteText)
+        {
+            <button type="button"
+                    class="btn btn-outline-danger mt-2 mb-1 mr-2 float-right"
+                    data-toggle="modal"
+                    data-target="#deleteTextModal"
+                    data-languageDescription="@Model.LanguageDescription">
+                <span class="fas fa-minus-circle"></span>
+                Delete Text
+            </button>
+        }
 
         @if (Model.RoleProperties.CanHaveChildren)
         {
@@ -299,7 +310,10 @@
         </div>
     </form>
 
-    <form asp-controller="@NavigationsController.Name" asp-action="@(nameof(NavigationsController.DeleteNavigation))" method="post" role="form">
+    <form asp-controller="@NavigationsController.Name"
+          asp-action="@(nameof(NavigationsController.DeleteNavigation))"
+          method="post"
+          role="form">
         <input id="deleteParentNavigation"
                asp-for="Navigation.NavigationId"
                value="@Model.Navigation.Id"
@@ -308,12 +322,28 @@
         <input id="deleteId" asp-for="Navigation.Id" type="hidden" />
         <input id="deleteName" asp-for="Navigation.Name" type="hidden" />
 
-
         <div modal
              id="deleteModal"
-             name="Emedia Group"
+             name="Navigation"
              type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
         </div>
+    </form>
+}
+
+@if (Model.CanDeleteText)
+{
+    <form asp-controller="@NavigationsController.Name"
+          asp-action="@(nameof(NavigationsController.DeleteText))"
+          method="post"
+          role="form">
+
+        <input id="deleteTextId" asp-for="NavigationText.NavigationId" type="hidden" />
+        <input id="deleteLanguageId" asp-for="NavigationText.LanguageId" type="hidden" />
+
+        <div modal
+             id="deleteTextModal"
+             name="Navigation text"
+             type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
     </form>
 }
 
@@ -331,6 +361,15 @@
                     $(".oc-save-warning").removeClass("d-none");
                 });
             </text>
+
+            @if (Model.CanDeleteText)
+            {
+                <text>
+                    $("#deleteTextModal").on("show.bs.modal", function (e) {
+                        $(this).find(".modal-text").text("Are you sure you want to delete the \"@Model.LanguageDescription\" text for this navigation?");
+                    });
+                </text>
+            }
         }
 
         @if (Model.RoleProperties.CanHaveChildren)
@@ -340,7 +379,7 @@
 
                 $("#addForm").submit(function (e) {
                     e.preventDefault();
-                    var form = $(this); 
+                    var form = $(this);
                     $.post("@(Url.Action(nameof(NavigationsController.CreateNavigation), NavigationsController.Name))",
                         form.serialize(),
                         function (response) {
