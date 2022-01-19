@@ -24,12 +24,11 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
     [Route("[area]")]
     public class HomeController : BaseController<HomeController>
     {
+        private const string PageTitle = "Incident Reports";
         private readonly IIncidentService _incidentService;
         private readonly ILocationService _locationService;
         private readonly IPermissionGroupService _permissionGroupService;
         private readonly IUserService _userService;
-
-        private const string PageTitle = "Incident Reports";
 
         public HomeController(Controller<HomeController> context,
             IIncidentService incidentService,
@@ -144,6 +143,18 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
         }
 
         [HttpPost("[action]")]
+        public async Task<IActionResult> AddFollowup(int incidentId, string followupText)
+        {
+            throw new NotImplementedException();
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> AddRelationship(int incidentId, int relatedIncidentId)
+        {
+            throw new NotImplementedException();
+        }
+
+        [HttpPost("[action]")]
         public async Task<IActionResult> AddType(string incidentTypeDescription)
         {
             if (!IsSiteManager())
@@ -240,6 +251,31 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             return RedirectToAction(nameof(Configuration));
         }
 
+        [HttpGet("[action]/{id}")]
+        public async Task<IActionResult> Details(int id)
+        {
+            var incident = await _incidentService.GetAsync(id);
+
+            if (incident == null)
+            {
+                ShowAlertWarning($"Unable to find incident number {id}");
+                return RedirectToAction(nameof(Mine));
+            }
+
+            var viewModel = new DetailsViewModel
+            {
+                CanAdd = incident.CreatedBy == CurrentUserId || await CanViewAllAsync(),
+                Incident = incident,
+                IncidentTypes = await _incidentService.GetActiveIncidentTypesAsync(),
+                Locations = await GetLocationsAsync(_locationService),
+                SecondaryHeading = $"#{incident.Id}"
+            };
+
+            SetPageTitle($"Incident Report #{incident.Id}");
+
+            return View(viewModel);
+        }
+
         [HttpGet("")]
         [HttpGet("[action]/{page}")]
         public async Task<IActionResult> Mine(int page, string searchText)
@@ -264,30 +300,6 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             SetPageTitle($"{PageTitle}: {nameof(Mine)}");
 
             return View("Index", viewModel);
-        }
-
-        [HttpGet("[action]/{id}")]
-        public async Task<IActionResult> Details(int id)
-        {
-            var incident = await _incidentService.GetAsync(id);
-
-            if (incident == null)
-            {
-                ShowAlertWarning($"Unable to find incident number {id}");
-                return RedirectToAction(nameof(Mine));
-            }
-
-            var viewModel = new DetailsViewModel
-            {
-                Incident = incident,
-                IncidentTypes = await _incidentService.GetActiveIncidentTypesAsync(),
-                Locations = await GetLocationsAsync(_locationService),
-                SecondaryHeading = $"#{incident.Id}"
-            };
-
-            SetPageTitle($"Incident Report #{incident.Id}");
-
-            return View(viewModel);
         }
 
         [HttpPost("[action]")]

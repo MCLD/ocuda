@@ -11,6 +11,7 @@ namespace Ocuda.Ops.Controllers.Areas.Incident.ViewModel
             Heading = "Incident Details";
         }
 
+        public bool CanAdd { get; set; }
         public Models.Entities.Incident Incident { get; set; }
         public IDictionary<int, string> IncidentTypes { get; set; }
         public IDictionary<int, string> Locations { get; set; }
@@ -27,10 +28,12 @@ namespace Ocuda.Ops.Controllers.Areas.Incident.ViewModel
                         .Participants
                         .Where(_ => _.IncidentParticipantType
                             == Models.Entities.IncidentParticipantType.Witness)
-                        .Select(_ => new IncidentStaffPublic {
+                        .Select(_ => new IncidentStaffPublic
+                        {
                             Barcode = _.Barcode,
                             Name = _.Name,
-                            Description = _.Description }))
+                            Description = _.Description
+                        }))
                     .OrderBy(_ => _.Name)
                     .ToList();
             }
