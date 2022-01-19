@@ -31,6 +31,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Add layout pages
 - Application permission handling and administration
 - Emedia management
+- Promenade navigation management
 
 ### Changed
 - Default to only logging Warnings for Microsoft and System namespaces
