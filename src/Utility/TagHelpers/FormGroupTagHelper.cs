@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -33,14 +35,19 @@ namespace Ocuda.Utility.TagHelpers
         private const string labelNameAttribute = "label-name";
         private const string onBlurJs = "on-blur-js";
         private const string requiredFieldClass = "fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker";
+        private const string showLengthAttributeName = "show-length";
         private const string validationIgnoreClass = "validation-ignore";
+
+        private readonly IHtmlHelper _htmlHelper;
         private readonly IHtmlGenerator _htmlGenerator;
         private readonly IStringLocalizer<i18n.Resources.Shared> _localizer;
         public FormGroupTagHelper(IHtmlGenerator htmlGenerator,
+            IHtmlHelper htmlHelper,
             IStringLocalizer<i18n.Resources.Shared> localizer)
         {
             _htmlGenerator = htmlGenerator
                 ?? throw new ArgumentNullException(nameof(htmlGenerator));
+            _htmlHelper = htmlHelper ?? throw new ArgumentNullException(nameof(htmlHelper));
             _localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
         }
 
@@ -68,34 +75,59 @@ namespace Ocuda.Utility.TagHelpers
         [HtmlAttributeName(onBlurJs)]
         public string OnBlurJs { get; set; }
 
+        [HtmlAttributeName(showLengthAttributeName)]
+        public bool ShowLength { get; set; }
+
         [ViewContext]
         [HtmlAttributeNotBound]
         public ViewContext ViewContext { get; set; }
 
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
+            if (output == null) { throw new ArgumentNullException(nameof(output)); }
+
             // Manually create each child asp form tag helper element
             TagHelperOutput labelElement = null;
             if (!HideLabel)
             {
                 labelElement = await CreateLabelElement(context, output);
             }
-            TagHelperOutput inputElement = await CreateInputElement(output);
-            TagHelperOutput validationMessageElement
-                = await CreateValidationMessageElement(context);
+
+            var innerDivElements = new List<IHtmlContent>
+            {
+                await CreateInputElement(output),
+            };
+
+            if (ShowLength)
+            {
+                var maxLengthAttribute = For?
+                    .Metadata?
+                    .ValidatorMetadata
+                    .OfType<MaxLengthAttribute>()
+                    .FirstOrDefault();
+
+                if (maxLengthAttribute != null)
+                {
+                    var smallTag = CreateTagHelperOutput("small", null);
+                    smallTag.AddClass("block", System.Text.Encodings.Web.HtmlEncoder.Default);
+                    smallTag.Content.AppendHtml($"Up to {maxLengthAttribute.Length} characters.");
+                    (_htmlHelper as IViewContextAware)?.Contextualize(ViewContext);
+                    smallTag.Attributes.Add("Id",
+                        _htmlHelper.GenerateIdFromName(For.Name + "_LengthDisplay"));
+                    innerDivElements.Add(smallTag);
+                }
+            }
+
+            innerDivElements.Add(await CreateValidationMessageElement(context));
 
             // Wrap input and validation with column div
-            IHtmlContent innerDiv = WrapElementsWithDiv(
-                    new List<IHtmlContent>
-                    {
-                        inputElement,
-                        validationMessageElement
-                    },
+            var innerDiv = WrapElementsWithDiv(
+                    innerDivElements,
                     HideLabel ? hideLabelInnerDivClass : defaultInnerDivClass
                 );
 
             // Wrap all elements with a form group div
-            IHtmlContent formGroupDiv = WrapElementsWithDiv(
+            var formGroupDiv = WrapElementsWithDiv(
                     new List<IHtmlContent>
                     {
                         labelElement,
@@ -115,11 +147,11 @@ namespace Ocuda.Utility.TagHelpers
         {
             var attributes = new TagHelperAttributeList(output.Attributes);
 
-            string inputId = null;
-            if (output.Attributes.TryGetAttribute("id", out var idAttribute))
-            {
-                inputId = idAttribute.Value.ToString();
-            }
+            //string inputId = null;
+            //if (output.Attributes.TryGetAttribute("id", out var idAttribute))
+            //{
+            //    inputId = idAttribute.Value.ToString();
+            //}
 
             attributes.AddCssClass(defaultInputClass);
             attributes.RemoveAll(attributeName);
@@ -155,7 +187,7 @@ namespace Ocuda.Utility.TagHelpers
                     ViewContext = ViewContext
                 };
 
-            TagHelperOutput labelOutput = CreateTagHelperOutput("label", null);
+            var labelOutput = CreateTagHelperOutput("label", null);
 
             if (!string.IsNullOrWhiteSpace(LabelName))
             {
@@ -198,7 +230,7 @@ namespace Ocuda.Utility.TagHelpers
             return labelOutput;
         }
 
-        private TagHelperOutput CreateTagHelperOutput(string tagName,
+        private static TagHelperOutput CreateTagHelperOutput(string tagName,
             TagHelperAttributeList attributes)
         {
             return new TagHelperOutput(
@@ -208,8 +240,7 @@ namespace Ocuda.Utility.TagHelpers
                 {
                     return Task.Factory.StartNew<TagHelperContent>(
                             () => new DefaultTagHelperContent());
-                }
-            );
+                });
         }
 
         private async Task<TagHelperOutput> CreateValidationMessageElement(TagHelperContext context)
@@ -221,7 +252,7 @@ namespace Ocuda.Utility.TagHelpers
                     ViewContext = ViewContext
                 };
 
-            TagHelperOutput validationMessageOutput = CreateTagHelperOutput("span", null);
+            var validationMessageOutput = CreateTagHelperOutput("div", null);
 
             var validatorClass = defaultValidationMessageClass;
 
@@ -238,7 +269,8 @@ namespace Ocuda.Utility.TagHelpers
             return validationMessageOutput;
         }
 
-        private IHtmlContent WrapElementsWithDiv(List<IHtmlContent> elements, string classValue)
+        private static IHtmlContent WrapElementsWithDiv(List<IHtmlContent> elements,
+            string classValue)
         {
             var div = new TagBuilder("div");
             div.AddCssClass(classValue);

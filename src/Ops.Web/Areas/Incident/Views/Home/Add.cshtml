@@ -72,8 +72,8 @@
             <select asp-for="Incident.LocationId"
                     asp-items="Model.Locations"
                     formgroup></select>
-            <input asp-for="Incident.LocationDescription" formgroup type="text" />
-            <textarea asp-for="Incident.Description" formgroup rows="5"></textarea>
+            <input asp-for="Incident.LocationDescription" formgroup show-length type="text" />
+            <textarea asp-for="Incident.Description" show-length formgroup rows="5"></textarea>
             <div class="row form-group">
                 <label class="col-form-label text-md-right col-md-3">Witnesses</label>
                 <div class="form-group-inner col-md-9">
@@ -111,7 +111,7 @@
                     </button>
                 </div>
             </div>
-            <textarea asp-for="Incident.InjuriesDamages" formgroup rows="5"></textarea>
+            <textarea asp-for="Incident.InjuriesDamages" formgroup show-length rows="5"></textarea>
             <div class="row form-group">
                 <label class="col-form-label text-md-right col-md-3">Affected parties</label>
                 <div class="form-group-inner col-md-9">
@@ -227,6 +227,7 @@
                id="publicName"
                name="publicName"
                maxlength="200" />
+        <small class="block" id="publicName_LengthDisplay">Up to 200 characters.</small>
     </div>
     <div class="form-group">
         <label for="publicDescription">Description</label>
@@ -235,6 +236,7 @@
                maxlength="100"
                name="publicDescription"
                id="publicDescription" />
+        <small class="block" id="publicDescription_LengthDisplay">Up to 100 characters.</small>
     </div>
 </div>
 
@@ -269,6 +271,19 @@
         });
         updateTable(0);
         updateTable(1);
+
+        $('[maxlength]').each(function(index) {
+            let fieldId = '#' + this.id;
+            let lengthField = $(fieldId + '_LengthDisplay');
+            if(lengthField.length) {
+                $(fieldId).on('input', function() {
+                    $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');
+                });
+                if($(fieldId).val()) {
+                    $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');
+                }
+            }
+        });
     })
 
     $('#addPersonModal').on('show.bs.modal', function (event) {

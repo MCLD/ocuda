@@ -97,10 +97,7 @@
             </table>
         </div>
     </div>
-    @if (Model.MaxPage > 1)
-    {
-        <paginate paginateModel="@Model"></paginate>
-    }
+    <nav paginate="@Model"></nav>
 }
 else
 {

@@ -44,7 +44,7 @@
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add"
          data-backdrop="static">
             <div class="form-group">
-                <label for="followupText">Incident follow-up</label>
+                <label for="followupText">Follow-up regarding this incident:</label>
                 <textarea class="form-control"
                       name="followupText"
                       id="followupText"
@@ -53,9 +53,10 @@
                       required
                       data-val="true"
                       data-val-required="Please enter follow-up text."></textarea>
-                <span class="validation-message text-danger field-validation-valid"
-                  data-valmsg-for="followupText"
-                  data-valmsg-replace="true"></span>
+                <small class="block" id="followupText_LengthDisplay">Up to 500 characters.</small>
+                <div class="validation-message text-danger field-validation-valid"
+                 data-valmsg-for="followupText"
+                 data-valmsg-replace="true"></div>
             </div>
         </div>
     </form>
@@ -68,7 +69,7 @@
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add"
          data-backdrop="static">
             <div class="form-group">
-                <label for="relatedIncidentId">Incident id</label>
+                <label for="relatedIncidentId">Relate this incident to incident id number:</label>
                 <input type="number"
                    class="form-control"
                    name="relatedIncidentId"
@@ -347,4 +348,23 @@
         width: 11rem;
     }
 </style>
+}
+
+@section scripts {
+<script>
+    $().ready(function() {
+        $('[maxlength]').each(function(index) {
+            let fieldId = '#' + this.id;
+            let lengthField = $(fieldId + '_LengthDisplay');
+            if(lengthField.length) {
+                $(fieldId).on('input', function() {
+                    $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');
+                });
+                if($(fieldId).val()) {
+                    $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');
+                }
+            }
+        });
+    })
+</script>
 }
