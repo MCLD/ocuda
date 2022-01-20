@@ -24,5 +24,14 @@ namespace Ocuda.Ops.Data.Ops
                 .Where(_ => _.IncidentId == incidentId)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<int>> IncidentIdsSearchAsync(IEnumerable<int> userIds)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => userIds.Contains(_.UserId))
+                .Select(_ => _.IncidentId)
+                .ToListAsync();
+        }
     }
 }

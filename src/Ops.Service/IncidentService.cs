@@ -281,6 +281,24 @@ namespace Ocuda.Ops.Service
             {
                 filter.LocationIds
                     = await _locationRepository.SearchIdsByNameAsync(filter.SearchText);
+
+                var idsFromFollowups = await _incidentFollowupRepository
+                    .IncidentIdsSearchAsync(filter.SearchText);
+
+                var idsFromParticipants = await _incidentParticipantRepository
+                    .IncidentIdsSearchAsync(filter.SearchText);
+
+                var userIds = await _userService.FindIdsAsync(new SearchFilter
+                {
+                    SearchText = filter.SearchText,
+                });
+
+                var idsFromStaff = await _incidentStaffRepository.IncidentIdsSearchAsync(userIds);
+
+                filter.IncludeIds = idsFromFollowups
+                    .Union(idsFromParticipants)
+                    .Union(idsFromStaff)
+                    .Distinct();
             }
 
             return await _incidentRepository.GetPaginatedAsync(filter);

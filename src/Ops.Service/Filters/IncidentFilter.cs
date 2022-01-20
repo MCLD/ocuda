@@ -14,6 +14,7 @@ namespace Ocuda.Ops.Service.Filters
 
         public int? CreatedById { get; set; }
 
+        public IEnumerable<int> IncludeIds { get; set; }
         public IEnumerable<int> LocationIds { get; set; }
     }
 }

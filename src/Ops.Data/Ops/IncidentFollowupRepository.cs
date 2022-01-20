@@ -21,5 +21,16 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet.AsNoTracking().Where(_ => _.IncidentId == incidentId).ToListAsync();
         }
+
+        public async Task<IEnumerable<int>> IncidentIdsSearchAsync(string searchText)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.CreatedByUser.Name.Contains(searchText)
+                    || _.Description.Contains(searchText)
+                    || _.UpdatedByUser.Name.Contains(searchText))
+                .Select(_ => _.IncidentId)
+                .ToListAsync();
+        }
     }
 }

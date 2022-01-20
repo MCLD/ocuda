@@ -34,7 +34,8 @@ namespace Ocuda.Ops.Data.Ops
                     || _.InjuriesDamages.Contains(filter.SearchText)
                     || _.LocationDescription.Contains(filter.SearchText)
                     || filter.LocationIds.Contains(_.LocationId)
-                    || _.CreatedByUser.Name.Contains(filter.SearchText));
+                    || _.CreatedByUser.Name.Contains(filter.SearchText)
+                    || filter.IncludeIds.Contains(_.Id));
             }
 
             return new CollectionWithCount<Incident>

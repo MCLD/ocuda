@@ -114,6 +114,18 @@ namespace Ocuda.Ops.Data.Ops
             };
         }
 
+        public async Task<IEnumerable<int>> SearchIdsAsync(SearchFilter searchFilter)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => !_.IsDeleted && (
+                        _.Name.Contains(searchFilter.SearchText)
+                        || _.Email.Contains(searchFilter.SearchText)
+                        || _.Username.Contains(searchFilter.SearchText)))
+                .Select(_ => _.Id)
+                .ToListAsync();
+        }
+
         #region Initial setup methods
 
         public async Task<User> GetSystemAdministratorAsync()

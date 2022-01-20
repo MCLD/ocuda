@@ -137,6 +137,19 @@
                     @Model.Incident.LocationDescription
                 </td>
             </tr>
+            <tr>
+                <th>Law enforcement</th>
+                <td>
+                    @if (Model.Incident.LawEnforcementContacted)
+                    {
+                        @:Contacted
+                    }
+                    else
+                    {
+                        @:Not contacted
+                    }
+                </td>
+            </tr>
         </table>
     </div>
 </div>

@@ -8,18 +8,28 @@
         <div class="col-12">
             <div class="alert alert-info">
                 Search results for: @Model.SearchText
-                <a asp-action="@nameof(HistoricalController.Index)"
+                @if (Model.ViewingAll)
+                {
+                    <a asp-action="@nameof(HomeController.All)"
                class="close"
                aria-label="Close">&times;</a>
+                }
+                else
+                {
+                    <a asp-action="@nameof(HomeController.Mine)"
+               class="close"
+               aria-label="Close">&times;</a>
+                }
             </div>
         </div>
     </div>
 }
 
-<form asp-controller="@HistoricalController.Name"
-      asp-action="@nameof(HistoricalController.Index)"
-      method="get"
-      role="form">
+<form method="get" role="form">
+    @if (Model.CurrentPage > 1)
+    {
+        <input type="hidden" name="page" value="Model.CurrentPage" />
+    }
     <div class="row mb-3">
         <div class="col-12">
             <div class="input-group">

@@ -27,5 +27,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         Task<bool> IsSupervisor(int userId);
 
         Task<CollectionWithCount<User>> SearchAsync(SearchFilter searchFilter);
+
+        Task<IEnumerable<int>> SearchIdsAsync(SearchFilter searchFilter);
     }
 }

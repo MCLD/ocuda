@@ -90,6 +90,11 @@ namespace Ocuda.Ops.Service
             return await _userRepository.SearchAsync(filter);
         }
 
+        public async Task<IEnumerable<int>> FindIdsAsync(SearchFilter filter)
+        {
+            return await _userRepository.SearchIdsAsync(filter);
+        }
+
         public async Task<int?> GetAssociatedLocation(int userId)
         {
             var user = await _userRepository.FindAsync(userId);

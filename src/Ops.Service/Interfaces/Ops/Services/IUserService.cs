@@ -16,6 +16,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<CollectionWithCount<User>> FindAsync(SearchFilter filter);
 
+        Task<IEnumerable<int>> FindIdsAsync(SearchFilter filter);
+
         Task<int?> GetAssociatedLocation(int userId);
 
         Task<User> GetByIdAsync(int id);

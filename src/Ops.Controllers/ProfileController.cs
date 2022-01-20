@@ -151,7 +151,7 @@ namespace Ocuda.Ops.Controllers
 
             var filter = new SearchFilter(currentPage, 5)
             {
-                SearchText = searchText,
+                SearchText = searchText
             };
 
             var users = await _userService.FindAsync(filter);
