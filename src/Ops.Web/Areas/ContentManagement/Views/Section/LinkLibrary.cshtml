@@ -1,6 +1,6 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section.LinkLibraryViewModel
 @section styles {
-    <link rel="stylesheet" href="~/css/iconpicker.min.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/iconpicker.min.css" asp-append-version="true" />
 }
 
 <div class="modal fade" id="listAddModal" tabindex="-1" role="dialog" aria-labelledby="listModalLabel">
@@ -172,41 +172,41 @@
                         {
                             <tr>
                                 <td class="mx-auto row-link"
-                                    data-id="@link.Id"
-                                    data-target="#listEditModal"
-                                    data-icon="@link.Icon"
-                                    data-name="@link.Name"
-                                    data-url="@link.Url"
-                                    style="transform: rotate(0);">
+                            data-id="@link.Id"
+                            data-target="#listEditModal"
+                            data-icon="@link.Icon"
+                            data-name="@link.Name"
+                            data-url="@link.Url"
+                            style="transform: rotate(0);">
                                     <span class="@link.Icon" style="font-size: 32px;"></span>
                                 </td>
                                 <td class="row-link"
-                                    data-id="@link.Id"
-                                    data-target="#listEditModal"
-                                    data-icon="@link.Icon"
-                                    data-name="@link.Name"
-                                    data-url="@link.Url"
-                                    style="transform: rotate(0);">
+                            data-id="@link.Id"
+                            data-target="#listEditModal"
+                            data-icon="@link.Icon"
+                            data-name="@link.Name"
+                            data-url="@link.Url"
+                            style="transform: rotate(0);">
                                     @link.Name
                                 </td>
                                 <td class="row-link"
-                                    data-id="@link.Id"
-                                    data-target="#listEditModal"
-                                    data-icon="@link.Icon"
-                                    data-name="@link.Name"
-                                    data-url="@link.Url"
-                                    style="transform: rotate(0);">
+                            data-id="@link.Id"
+                            data-target="#listEditModal"
+                            data-icon="@link.Icon"
+                            data-name="@link.Name"
+                            data-url="@link.Url"
+                            style="transform: rotate(0);">
                                     @link.Url
                                 </td>
                                 <td style="position: relative;">
                                     <button type="button"
-                                            class="btn btn-link text-danger"
-                                            data-toggle="modal"
-                                            data-target="#deleteModal"
-                                            data-id="@link.Id"
-                                            data-name="@link.Name">
+                                    class="btn btn-link text-danger"
+                                    data-toggle="modal"
+                                    data-target="#deleteModal"
+                                    data-id="@link.Id"
+                                    data-name="@link.Name">
                                         <span class="far fa-times-circle fa-lg"
-                                              aria-hidden="true"></span>
+                                      aria-hidden="true"></span>
                                     </button>
                                 </td>
                             </tr>
@@ -224,42 +224,42 @@
         @if (Model.PaginateModel.MaxPage > 1)
         {
             <div class="card-footer">
-                <paginate paginateModel="@Model.PaginateModel"></paginate>
+                <nav paginate="@Model.PaginateModel"></nav>
             </div>
         }
     </div>
 </div>
 
 @section scripts {
-    <script src="~/js/iconpicker.min.js" asp-append-version="true"></script>
-    <script>
-        $("#deleteModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var name = button.data("name");
-            var modal = $(this);
-            modal.find("#modal-text").text("Are you sure you want to delete the link \"" + name + "\"?");
-            modal.find("#Link_Id").val(id);
-        });
-        $(".row-link").on('click', function (e) {
-            $("#listEditModal").modal("show");
-            var row = $(this);
-            var id = row.data("id");
-            var name = row.data("name");
-            var icon = row.data("icon");
-            var url = row.data("url");
-            var modal = $("#listEditModal");
-            modal.find("#Link_Id").val(id);
-            modal.find("#Link_Icon").val(icon);
-            modal.find("#Link_Name").val(name);
-            modal.find("#Link_Url").val(url);
-        });
-        $("#addLinkButton").on('click', function (e) {
-            $("#listAddModal").modal("show");
-        });
-        $(document).ready(function () {
-            $('.icon-picker').iconpicker();
-            $('[data-toggle="tooltip"]').tooltip();
-        });
-    </script>
+<script src="~/js/iconpicker.min.js" asp-append-version="true"></script>
+<script>
+    $("#deleteModal").on("show.bs.modal", function (e) {
+        var button = $(e.relatedTarget);
+        var id = button.data("id");
+        var name = button.data("name");
+        var modal = $(this);
+        modal.find("#modal-text").text("Are you sure you want to delete the link \"" + name + "\"?");
+        modal.find("#Link_Id").val(id);
+    });
+    $(".row-link").on('click', function (e) {
+        $("#listEditModal").modal("show");
+        var row = $(this);
+        var id = row.data("id");
+        var name = row.data("name");
+        var icon = row.data("icon");
+        var url = row.data("url");
+        var modal = $("#listEditModal");
+        modal.find("#Link_Id").val(id);
+        modal.find("#Link_Icon").val(icon);
+        modal.find("#Link_Name").val(name);
+        modal.find("#Link_Url").val(url);
+    });
+    $("#addLinkButton").on('click', function (e) {
+        $("#listAddModal").modal("show");
+    });
+    $(document).ready(function () {
+        $('.icon-picker').iconpicker();
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
 }

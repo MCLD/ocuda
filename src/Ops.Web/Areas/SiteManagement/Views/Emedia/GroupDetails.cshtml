@@ -151,10 +151,7 @@
     </div>
 </div>
 
-@if (Model.PaginateModel.MaxPage > 1)
-{
-    <paginate paginateModel="@Model.PaginateModel"></paginate>
-}
+<nav paginate="@Model.PaginateModel"></nav>
 
 <form id="addForm" role="form">
     <input asp-for="Emedia.GroupId" value="@Model.EmediaGroup.Id" type="hidden" />

@@ -53,9 +53,9 @@ else
                                     @if (product.IsVisibleToPublic == true)
                                     {
                                         <a class="btn btn-outline-success text-success"
-                                           target="_blank"
-                                           href="@Model.MakeLink(product.Slug)"
-                                           title="See public view">
+                               target="_blank"
+                               href="@Model.MakeLink(product.Slug)"
+                               title="See public view">
                                             <span class="fas fa-external-link-alt"></span>
                                         </a>
                                     }
@@ -68,15 +68,15 @@ else
                                     @if (Model.IsSiteManager)
                                     {
                                         <a asp-action="@(nameof(ProductsController.Details))"
-                                           asp-route-productSlug="@product.Slug"
-                                           title="Configure product"
-                                           class="btn btn-outline-primary">
+                               asp-route-productSlug="@product.Slug"
+                               title="Configure product"
+                               class="btn btn-outline-primary">
                                             <span class="fas fa-cog" aria-hidden="true"></span>
                                         </a>
                                         <a asp-action="@(nameof(ProductsController.Mapping))"
-                                           asp-route-productSlug="@product.Slug"
-                                           title="Handle mappings"
-                                           class="btn btn-outline-primary">
+                               asp-route-productSlug="@product.Slug"
+                               title="Handle mappings"
+                               class="btn btn-outline-primary">
                                             <span class="fas fa-random" aria-hidden="true"></span>
                                         </a>
                                     }
@@ -92,8 +92,5 @@ else
             </div>
         </div>
     </div>
-    @if (Model.MaxPage > 1)
-    {
-        <paginate paginateModel="@Model"></paginate>
-    }
+    <nav paginate="@Model"></nav>
 }

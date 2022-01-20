@@ -37,7 +37,7 @@ else
                                     @if (Model.IsSiteManager)
                                     {
                                         <a asp-action="@nameof(PodcastsController.Details)"
-                                           asp-route-podcastId="@podcast.Id">
+                               asp-route-podcastId="@podcast.Id">
                                             @podcast.Title
                                         </a>
                                     }
@@ -52,24 +52,24 @@ else
                                     @if (Model.IsSiteManager)
                                     {
                                         <a asp-action="@(nameof(PodcastsController.Permissions))"
-                                           asp-route-podcastId="@podcast.Id"
-                                           title="Podcast episode permissions"
-                                           class="btn btn-outline-primary">
+                               asp-route-podcastId="@podcast.Id"
+                               title="Podcast episode permissions"
+                               class="btn btn-outline-primary">
                                             <span class="fas fa-user-plus" aria-hidden="true"></span>
                                         </a>
                                     }
                                     <a asp-action="@(nameof(PodcastsController.Details))"
-                                       asp-route-podcastId="@podcast.Id"
-                                       class="btn btn-outline-primary"
-                                       title="Podcast details">
+                               asp-route-podcastId="@podcast.Id"
+                               class="btn btn-outline-primary"
+                               title="Podcast details">
                                         <span class="far fa-file-alt" aria-hidden="true"></span>
                                     </a>
                                     @if (Model.IsSiteManager || Model.PermissionIds?.Any(_ => podcast.PermissionGroupIds.Contains(_)) == true)
                                     {
                                         <a asp-action="@(nameof(PodcastsController.Episodes))"
-                                           asp-route-podcastId="@podcast.Id"
-                                           class="btn btn-outline-primary"
-                                           title="Episodes">
+                               asp-route-podcastId="@podcast.Id"
+                               class="btn btn-outline-primary"
+                               title="Episodes">
                                             <span class="fas fa-list-ol" aria-hidden="true"></span>
                                         </a>
                                     }
@@ -82,8 +82,5 @@ else
         </div>
     </div>
 
-    @if (Model.PaginateModel.MaxPage > 1)
-    {
-        <paginate paginateModel="@Model.PaginateModel"></paginate>
-    }
+    <nav paginate="@Model.PaginateModel"></nav>
 }

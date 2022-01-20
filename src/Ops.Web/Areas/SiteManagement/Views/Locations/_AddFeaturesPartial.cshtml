@@ -46,9 +46,9 @@ else
                             </td>
                             <td class="align-middle">
                                 <button type="button"
-                                        class="btn btn-outline-primary additemButton"
-                                        data-itemtype="Feature"
-                                        data-itemid="@feature.Id">
+                                class="btn btn-outline-primary additemButton"
+                                data-itemtype="Feature"
+                                data-itemid="@feature.Id">
                                     <span class="fas fa-plus-circle" aria-hidden="true"></span>
                                 </button>
                             </td>
@@ -58,8 +58,5 @@ else
             </table>
         </div>
     </div>
-    @if (Model.PaginateModel.MaxPage > 1)
-    {
-        <paginate paginateModel="@Model.PaginateModel" asButtons="true"></paginate>
-    }
+    <nav paginate="@Model.PaginateModel"></nav>
 }

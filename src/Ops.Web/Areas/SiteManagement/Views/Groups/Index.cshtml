@@ -58,58 +58,62 @@
                 </div>
                 @if (Model.AllGroups.Count() == 0)
                 {
-                    <div class="alert alert-warning">No Groups found.</div>
+                            <div class="alert alert-warning">No Groups found.</div>
                 }
                 else
                 {
-                    <div class="card-body">
-                        <table class="table table-sm table-bordered link-table">
-                            <thead>
-                                <tr>
-                                    <th>GroupType</th>
-                                    <th>Stub</th>
-                                    <th>Location Region?</th>
-                                    <th>SubscriptionUrl</th>
-                                    <th>&nbsp;</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                            <div class="card-body">
+                                <table class="table table-sm table-bordered link-table">
+                                    <thead>
+                                        <tr>
+                                            <th>GroupType</th>
+                                            <th>Stub</th>
+                                            <th>Location Region?</th>
+                                            <th>SubscriptionUrl</th>
+                                            <th>&nbsp;</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
                                 @foreach (var group in Model.AllGroups)
                                 {
-                                    <tr>
-                                        <td class="td-class">
-                                            <a asp-action="@nameof(GroupsController.Groups)" asp-route-groupStub="@group.Stub" class="rowlink">
+                                                    <tr>
+                                                        <td class="td-class">
+                                                            <a asp-action="@nameof(GroupsController.Groups)" asp-route-groupStub="@group.Stub" class="rowlink">
                                                 @group.GroupType
-                                            </a>
-                                        </td>
-                                        <td>@group.Stub</td>
-                                        <td class="text-center" style="vertical-align:middle;">
+                                                            </a>
+                                                        </td>
+                                                        <td>@group.Stub</td>
+                                                        <td class="text-center" style="vertical-align:middle;">
                                             @if (group.IsLocationRegion)
-                                            {<text><span class="fas fa-check"></span></text>}
-                                        </td>
-                                        <td>@group.SubscriptionUrl</td>
-                                        <td class="on-top gra-mc-icon">
-                                            <button type="button"
+                                            {
+                                                
+                                                <text><span class="fas fa-check"></span></text>
+                                            
+                                            }
+                                                        </td>
+                                                        <td>@group.SubscriptionUrl</td>
+                                                        <td class="on-top gra-mc-icon">
+                                                            <button type="button"
                                                     class="btn btn-link text-danger"
                                                     data-toggle="modal"
                                                     data-target="#deleteModal"
                                                     data-id="@group.Id"
                                                     data-name="@group.GroupType">
-                                                <span class="far fa-times-circle fa-lg"
+                                                                <span class="far fa-times-circle fa-lg"
                                                       aria-hidden="true"></span>
-                                            </button>
-                                        </td>
-                                    </tr>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
                                 }
-                            </tbody>
-                        </table>
+                                    </tbody>
+                                </table>
                         @if (Model.PaginateModel.MaxPage > 1)
                         {
-                            <div class="card-footer">
-                                <paginate paginateModel="@Model.PaginateModel"></paginate>
-                            </div>
+                                            <div class="card-footer">                
+                                <nav paginate="@Model.PaginateModel"></nav>
+                                            </div>
                         }
-                    </div>
+                            </div>
                 }
             </div>
         </div>
