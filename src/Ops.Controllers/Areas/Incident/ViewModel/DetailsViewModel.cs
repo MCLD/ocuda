@@ -28,16 +28,16 @@ namespace Ocuda.Ops.Controllers.Areas.Incident.ViewModel
                     ?? Enumerable.Empty<IncidentStaffPublic>();
 
                 var participants = Incident
-                        .Participants
-                        .Where(_ => _.IncidentParticipantType
-                            == Models.Entities.IncidentParticipantType.Affected)
-                        .Select(_ => new IncidentStaffPublic
-                        {
-                            Barcode = _.Barcode,
-                            Name = _.Name,
-                            Description = _.Description
-                        })
-                                            ?? Enumerable.Empty<IncidentStaffPublic>();
+                    .Participants?
+                    .Where(_ => _.IncidentParticipantType
+                        == Models.Entities.IncidentParticipantType.Affected)
+                    .Select(_ => new IncidentStaffPublic
+                    {
+                        Barcode = _.Barcode,
+                        Name = _.Name,
+                        Description = _.Description
+                    })
+                    ?? Enumerable.Empty<IncidentStaffPublic>();
 
                 return staffs.Union(participants).OrderBy(_ => _.Name).ToList();
             }
@@ -55,16 +55,16 @@ namespace Ocuda.Ops.Controllers.Areas.Incident.ViewModel
                     ?? Enumerable.Empty<IncidentStaffPublic>();
 
                 var participants = Incident
-                        .Participants?
-                        .Where(_ => _.IncidentParticipantType
-                            == Models.Entities.IncidentParticipantType.Witness)
-                        .Select(_ => new IncidentStaffPublic
-                        {
-                            Barcode = _.Barcode,
-                            Name = _.Name,
-                            Description = _.Description
-                        })
-                        ?? Enumerable.Empty<IncidentStaffPublic>();
+                    .Participants?
+                    .Where(_ => _.IncidentParticipantType
+                        == Models.Entities.IncidentParticipantType.Witness)
+                    .Select(_ => new IncidentStaffPublic
+                    {
+                        Barcode = _.Barcode,
+                        Name = _.Name,
+                        Description = _.Description
+                    })
+                    ?? Enumerable.Empty<IncidentStaffPublic>();
 
                 return staffs.Union(participants).OrderBy(_ => _.Name).ToList();
             }

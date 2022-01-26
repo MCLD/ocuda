@@ -235,7 +235,7 @@ namespace Ocuda.Ops.Service
                     if (followup.UpdatedBy.HasValue)
                     {
                         followup.UpdatedByUser
-                            = await _userService.GetByIdAsync(followup.UpdatedBy.Value);
+                            = await _userService.GetByIdAsync(followup.UpdatedBy.Value);                       
                     }
                 }
             }
@@ -261,6 +261,8 @@ namespace Ocuda.Ops.Service
                         relatedIncident.UpdatedByUser
                             = await _userService.GetByIdAsync(relatedIncident.UpdatedBy.Value);
                     }
+                    relatedIncident.RelatedByUser = await _userService.GetByIdAsync(related.CreatedBy);
+                    relatedIncident.RelatedAt = related.CreatedAt;
                     incident.RelatedIncidents.Add(relatedIncident);
                 }
             }

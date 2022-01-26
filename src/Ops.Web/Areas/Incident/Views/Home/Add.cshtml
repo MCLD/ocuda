@@ -277,7 +277,12 @@
             let lengthField = $(fieldId + '_LengthDisplay');
             if(lengthField.length) {
                 $(fieldId).on('input', function() {
-                    $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');
+                    if(this.value.length == 0) {
+                        $(lengthField).text("Up to " + $(fieldId).attr('maxlength') + ' characters.')
+                    }
+                    else {
+                        $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');
+                    }
                 });
                 if($(fieldId).val()) {
                     $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');

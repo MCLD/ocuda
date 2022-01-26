@@ -149,11 +149,11 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             if (incident == null)
             {
                 ShowAlertDanger($"Unable to find incident id {incidentId}");
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Mine));
             }
 
             await _incidentService.AddFollowupAsync(incidentId, followupText);
-            return RedirectToAction();
+            return RedirectToAction(nameof(Details), new { id = incidentId });
         }
 
         [HttpPost("[action]")]
@@ -163,18 +163,18 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             if (incident == null)
             {
                 ShowAlertDanger($"Unable to find incident id {incidentId}");
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Mine));
             }
 
             var relatedIncident = await _incidentService.GetAsync(relatedIncidentId);
             if (relatedIncident == null)
             {
                 ShowAlertDanger($"Unable to find related incident id {relatedIncidentId}");
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = incidentId });
             }
 
             await _incidentService.AddRelationshipAsync(incidentId, relatedIncidentId);
-            return RedirectToAction();
+            return RedirectToAction(nameof(Details), new { id = incidentId });
         }
 
         [HttpPost("[action]")]
@@ -285,9 +285,16 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
                 return RedirectToAction(nameof(Mine));
             }
 
+            var hasPermission = incident.CreatedBy == CurrentUserId || await CanViewAllAsync();
+
+            if (!hasPermission)
+            {
+                return RedirectToUnauthorized();
+            }
+
             var viewModel = new DetailsViewModel
             {
-                CanAdd = incident.CreatedBy == CurrentUserId || await CanViewAllAsync(),
+                CanAdd = hasPermission,
                 Incident = incident,
                 IncidentTypes = await _incidentService.GetActiveIncidentTypesAsync(),
                 Locations = await GetLocationsAsync(_locationService),

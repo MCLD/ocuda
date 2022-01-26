@@ -52,6 +52,12 @@ namespace Ocuda.Ops.Models.Entities
         public ICollection<IncidentParticipant> Participants { get; set; }
 
         [NotMapped]
+        public DateTime RelatedAt { get; set; }
+
+        [NotMapped]
+        public User RelatedByUser { get; set; }
+
+        [NotMapped]
         public ICollection<Incident> RelatedIncidents { get; set; }
 
         [Display(Name = "Your name")]

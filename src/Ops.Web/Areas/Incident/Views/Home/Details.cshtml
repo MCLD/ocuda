@@ -225,7 +225,7 @@
     </div>
 </div>
 
-@if (Model.Witnesses?.Count > 0)
+@if (Model.Participants?.Count > 0)
 {
     <div class="row mt-2">
         <div class="col-12 col-md-8 offset-md-2">
@@ -313,8 +313,8 @@
                 {
                     <tr>
                         <td>
-                            @relatedIncident.CreatedByUser.Name
-                            <br />@relatedIncident.CreatedAt.ToString("d")
+                            @relatedIncident.RelatedByUser.Name
+                            <br />@relatedIncident.RelatedAt.ToString("d")
                         </td>
                         <td>
                             <a asp-action="@nameof(HomeController.Details)"
@@ -358,7 +358,12 @@
             let lengthField = $(fieldId + '_LengthDisplay');
             if(lengthField.length) {
                 $(fieldId).on('input', function() {
-                    $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');
+                    if(this.value.length == 0) {
+                        $(lengthField).text("Up to " + $(fieldId).attr('maxlength') + ' characters.')
+                    }
+                    else {
+                        $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');
+                    }
                 });
                 if($(fieldId).val()) {
                     $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');
