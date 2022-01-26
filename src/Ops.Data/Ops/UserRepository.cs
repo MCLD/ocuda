@@ -102,11 +102,13 @@ namespace Ocuda.Ops.Data.Ops
         {
             var query = DbSet
                 .AsNoTracking()
-                .Where(_ => !_.IsDeleted && (
-                        _.Name.Contains(searchFilter.SearchText)
-                        || _.Email.Contains(searchFilter.SearchText)
-                        || _.Username.Contains(searchFilter.SearchText)));
+                .Where(_ => !_.IsDeleted && _.IsInLatestRoster == true);
 
+            if (!string.IsNullOrEmpty(searchFilter.SearchText)) {
+                query = query.Where(_ => _.Name.Contains(searchFilter.SearchText)
+                || _.Email.Contains(searchFilter.SearchText)
+                || _.Username.Contains(searchFilter.SearchText));
+            }
             return new CollectionWithCount<User>
             {
                 Count = await query.CountAsync(),

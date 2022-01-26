@@ -325,7 +325,7 @@
     }
 
     function performSearch() {
-        let link = '@Url.Action(nameof(Ocuda.Ops.Controllers.ProfileController.SearchJson), Ocuda.Ops.Controllers.ProfileController.Name )';
+        let link = '@Url.Action(nameof(Ocuda.Ops.Controllers.StaffController.SearchJson), Ocuda.Ops.Controllers.StaffController.Name )';
         let jqxhr = $.ajax({
             url: link,
             data: { searchText: $('#staffSearchText').val(), page: currentPage }

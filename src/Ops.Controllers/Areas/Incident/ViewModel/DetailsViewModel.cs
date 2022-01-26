@@ -15,39 +15,19 @@ namespace Ocuda.Ops.Controllers.Areas.Incident.ViewModel
         public Models.Entities.Incident Incident { get; set; }
         public IDictionary<int, string> IncidentTypes { get; set; }
         public IDictionary<int, string> Locations { get; set; }
-        public IList<IncidentStaffPublic> Witnesses
-        {
-            get
-            {
-                return Incident
-                    .Staffs
-                    .Where(_ => _.IncidentParticipantType
-                        == Models.Entities.IncidentParticipantType.Witness)
-                    .Select(_ => new IncidentStaffPublic { Id = _.Id, Name = _.User.Name })
-                    .Union(Incident
-                        .Participants
-                        .Where(_ => _.IncidentParticipantType
-                            == Models.Entities.IncidentParticipantType.Witness)
-                        .Select(_ => new IncidentStaffPublic
-                        {
-                            Barcode = _.Barcode,
-                            Name = _.Name,
-                            Description = _.Description
-                        }))
-                    .OrderBy(_ => _.Name)
-                    .ToList();
-            }
-        }
+
         public IList<IncidentStaffPublic> Participants
         {
             get
             {
-                return Incident
-                    .Staffs
+                var staffs = Incident
+                    .Staffs?
                     .Where(_ => _.IncidentParticipantType
                         == Models.Entities.IncidentParticipantType.Affected)
                     .Select(_ => new IncidentStaffPublic { Id = _.Id, Name = _.User.Name })
-                    .Union(Incident
+                    ?? Enumerable.Empty<IncidentStaffPublic>();
+
+                var participants = Incident
                         .Participants
                         .Where(_ => _.IncidentParticipantType
                             == Models.Entities.IncidentParticipantType.Affected)
@@ -56,9 +36,37 @@ namespace Ocuda.Ops.Controllers.Areas.Incident.ViewModel
                             Barcode = _.Barcode,
                             Name = _.Name,
                             Description = _.Description
-                        }))
-                    .OrderBy(_ => _.Name)
-                    .ToList();
+                        })
+                                            ?? Enumerable.Empty<IncidentStaffPublic>();
+
+                return staffs.Union(participants).OrderBy(_ => _.Name).ToList();
+            }
+        }
+
+        public IList<IncidentStaffPublic> Witnesses
+        {
+            get
+            {
+                var staffs = Incident
+                    .Staffs?
+                    .Where(_ => _.IncidentParticipantType
+                        == Models.Entities.IncidentParticipantType.Witness)
+                    .Select(_ => new IncidentStaffPublic { Id = _.Id, Name = _.User.Name })
+                    ?? Enumerable.Empty<IncidentStaffPublic>();
+
+                var participants = Incident
+                        .Participants?
+                        .Where(_ => _.IncidentParticipantType
+                            == Models.Entities.IncidentParticipantType.Witness)
+                        .Select(_ => new IncidentStaffPublic
+                        {
+                            Barcode = _.Barcode,
+                            Name = _.Name,
+                            Description = _.Description
+                        })
+                        ?? Enumerable.Empty<IncidentStaffPublic>();
+
+                return staffs.Union(participants).OrderBy(_ => _.Name).ToList();
             }
         }
     }

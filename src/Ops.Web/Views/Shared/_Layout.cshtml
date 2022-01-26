@@ -181,6 +181,15 @@
                         </div>
                     </li>
                 }
+                <li class="nav-item" ActiveBy routeKey="Controller" value="Staff">
+                    <a asp-action="@nameof(StaffController.Index)"
+                       asp-area=""
+                       asp-controller="@StaffController.Name"
+                       class="nav-link text-white"
+                       title="@StaffController.Name">
+                        <span class="fas fa-id-card-alt"></span>
+                    </a>
+                </li>
                 @if (Context.Items[ItemKey.Nickname] != null)
                 {
                     <li class="nav-item" ActiveBy routeKey="Controller" value="Profile">

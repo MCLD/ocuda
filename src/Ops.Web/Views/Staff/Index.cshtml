@@ -1,0 +1,105 @@
+﻿@model Ocuda.Ops.Controllers.ViewModels.Staff.SearchViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Staff
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-area=""
+           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+           asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Index)">Back</a>
+    </div>
+</div>
+
+<form method="get" role="form">
+    @if (Model.CurrentPage > 1)
+    {
+        <input type="hidden" name="page" value="Model.CurrentPage" />
+    }
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Search:</span>
+                </div>
+                <input asp-for="SearchText"
+                       type="text"
+                       class="form-control"
+                       aria-label="Search text" />
+                <div class="input-group-append">
+                    <a class="btn btn-outline-secondary"
+                       asp-action=@nameof(Ocuda.Ops.Controllers.StaffController.Index)>
+                        Clear
+                    </a>
+                    <button class="btn btn-outline-success"
+                            id="goSearch">
+                        Go
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@if (Model.Users.Count() > 0)
+{
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-sm table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Title</th>
+                        <th>Location</th>
+                        <th>Contact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.Users)
+                    {
+                        <tr>
+                            <td class="align-middle">
+                                <a asp-action="@nameof(ProfileController.Index)"
+                           asp-controller="@ProfileController.Name"
+                           asp-route-id="@user.Username">
+                                    @user.Name
+                                    @if (!string.IsNullOrEmpty(user.Nickname) && !user.Name.StartsWith(user.Nickname))
+                                    {
+                                        @:(@user.Nickname)
+                                    }
+                                </a>
+                            </td>
+                            <td class="align-middle">@user.Title</td>
+                            <td class="align-middle">
+                                @if (user.AssociatedLocation.HasValue)
+                                {
+                                    @Model.Locations[user.AssociatedLocation.Value]
+                                }
+                                else
+                                {
+                                    @:None assigned
+                                }
+                            </td>
+                            <td class="align-middle">
+                                @if (!string.IsNullOrEmpty(user.Email))
+                                {
+                                    <a href="mailto:@user.Email">@user.Email</a>
+                                }
+                                <br>
+                                @user.Phone
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <nav paginate="@Model"></nav>
+}
+else
+{
+    <div class="alert alert-warning">No staff members found.</div>
+}
