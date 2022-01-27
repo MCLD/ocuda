@@ -65,6 +65,11 @@ namespace Ocuda.Promenade.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            if (modelBuilder == null)
+            {
+                throw new System.ArgumentNullException(nameof(modelBuilder));
+            }
+
             // configure composite keys
             // https://docs.microsoft.com/en-us/ef/core/modeling/keys
             modelBuilder.Entity<CarouselButtonLabelText>()
@@ -88,7 +93,7 @@ namespace Ocuda.Promenade.Data
             modelBuilder.Entity<LocationHours>()
                 .HasKey(_ => new { _.DayOfWeek, _.LocationId });
             modelBuilder.Entity<NavigationText>()
-                .HasKey(_ => new { _.Id, _.LanguageId });
+                .HasKey(_ => new { _.NavigationId, _.LanguageId });
             modelBuilder.Entity<Page>()
                 .HasKey(_ => new { _.LanguageId, _.PageHeaderId });
             modelBuilder.Entity<PageLayoutText>()

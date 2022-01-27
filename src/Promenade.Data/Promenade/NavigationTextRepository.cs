@@ -2,23 +2,17 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
-using Ocuda.Utility.Abstract;
 
 namespace Ocuda.Promenade.Data.Promenade
 {
     public class NavigationTextRepository : INavigationTextRepository
     {
-        protected readonly PromenadeContext _context;
-        protected readonly ILogger _logger;
-        protected readonly IDateTimeProvider _dateTimeProvider;
-
+        private readonly PromenadeContext _context;
         private DbSet<NavigationText> _dbSet;
 
-        public NavigationTextRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
-            ILogger<NavigationTextRepository> logger)
+        public NavigationTextRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade)
         {
             if (repositoryFacade == null || repositoryFacade.context == null)
             {
@@ -26,8 +20,6 @@ namespace Ocuda.Promenade.Data.Promenade
             }
 
             _context = repositoryFacade.context;
-            _dateTimeProvider = repositoryFacade.dateTimeProvider;
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         protected DbSet<NavigationText> DbSet
@@ -38,11 +30,11 @@ namespace Ocuda.Promenade.Data.Promenade
             }
         }
 
-        public async Task<NavigationText> FindAsync(int id, int languageId)
+        public async Task<NavigationText> GetByIdsAsync(int navigationId, int languageId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id == id && _.LanguageId == languageId)
+                .Where(_ => _.NavigationId == navigationId && _.LanguageId == languageId)
                 .SingleOrDefaultAsync();
         }
     }

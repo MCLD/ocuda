@@ -27,7 +27,8 @@ namespace Ocuda.Promenade.Service
             IHttpContextAccessor httpContextAccessor,
             LanguageService languageService,
             INavigationRepository navigationRepository,
-            INavigationTextRepository navigationTextRepository) : base(logger, dateTimeProvider)
+            INavigationTextRepository navigationTextRepository)
+            : base(logger, dateTimeProvider)
         {
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _httpContextAccessor = httpContextAccessor
@@ -74,19 +75,11 @@ namespace Ocuda.Promenade.Service
             {
                 nav = await _navigationRepository.FindAsync(navigationId);
 
-                if (nav.NavigationTextId != null)
-                {
-                    nav.NavigationText = await _navigationTextRepository
-                        .FindAsync((int)nav.NavigationTextId, currentLanguageId);
-
-                    if (nav.NavigationText == null)
-                    {
-                        nav.NavigationText = await _navigationTextRepository
-                            .FindAsync((int)nav.NavigationTextId, defaultLanguageId);
-                    }
-                }
-
                 nav.Navigations = await GetNavigationChildren(navigationId,
+                    currentLanguageId,
+                    defaultLanguageId);
+
+                nav.NavigationText = await GetNavigationTextAsync(nav.Id,
                     currentLanguageId,
                     defaultLanguageId);
 
@@ -107,18 +100,29 @@ namespace Ocuda.Promenade.Service
                     languageId,
                     defaultLanguageId);
 
-                if (child.NavigationTextId != null)
-                {
-                    child.NavigationText = await _navigationTextRepository
-                        .FindAsync((int)child.NavigationTextId, languageId);
-                    if (child.NavigationText == null)
-                    {
-                        child.NavigationText = await _navigationTextRepository
-                            .FindAsync((int)child.NavigationTextId, defaultLanguageId);
-                    }
-                }
+                child.NavigationText = await GetNavigationTextAsync(child.Id,
+                    languageId,
+                    defaultLanguageId);
             }
             return children;
+        }
+
+        private async Task<NavigationText> GetNavigationTextAsync(int navigationId,
+            int languageId,
+            int defaultLanguageId)
+        {
+            var navigationText = await _navigationTextRepository.GetByIdsAsync(
+                    navigationId,
+                    languageId);
+
+            if (navigationText == null)
+            {
+                navigationText = await _navigationTextRepository.GetByIdsAsync(
+                    navigationId,
+                    defaultLanguageId);
+            }
+
+            return navigationText;
         }
     }
 }

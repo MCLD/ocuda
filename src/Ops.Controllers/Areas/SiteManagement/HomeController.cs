@@ -18,8 +18,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     {
         private readonly IPermissionGroupService _permissionGroupService;
 
-        public static string Name { get { return "Home"; } }
-
         public HomeController(ServiceFacades.Controller<HomeController> context,
             IPermissionGroupService permissionGroupService)
             : base(context)
@@ -27,6 +25,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             _permissionGroupService = permissionGroupService
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
         }
+
+        public static string Name
+        { get { return "Home"; } }
 
         [Route("")]
         public async Task<IActionResult> Index()
@@ -44,6 +45,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     .Select(_ => int.Parse(_, CultureInfo.InvariantCulture));
                 viewModel.HasEmediaPermissions = await HasAppPermissionAsync(
                     _permissionGroupService, ApplicationPermission.EmediaManagement);
+                viewModel.HasNavigationPermissions = await HasAppPermissionAsync(
+                    _permissionGroupService, ApplicationPermission.NavigationManagement);
                 viewModel.HasPagePermissions = await _permissionGroupService
                     .HasAPermissionAsync<PermissionGroupPageContent>(numericPermissionIds);
                 viewModel.HasPodcastPermissions = await _permissionGroupService

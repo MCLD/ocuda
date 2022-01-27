@@ -117,6 +117,11 @@ namespace Ocuda.Ops.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            if (modelBuilder == null)
+            {
+                throw new System.ArgumentNullException(nameof(modelBuilder));
+            }
+
             // turn off cascading deletes
             foreach (var relationship in modelBuilder.Model
                 .GetEntityTypes()
@@ -146,7 +151,7 @@ namespace Ocuda.Ops.Data
             modelBuilder.Entity<LocationHours>()
                 .HasKey(_ => new { _.DayOfWeek, _.LocationId });
             modelBuilder.Entity<NavigationText>()
-                .HasKey(_ => new { _.Id, _.LanguageId });
+                .HasKey(_ => new { _.NavigationId, _.LanguageId });
             modelBuilder.Entity<Page>()
                 .HasKey(_ => new { _.LanguageId, _.PageHeaderId });
             modelBuilder.Entity<PageLayoutText>()

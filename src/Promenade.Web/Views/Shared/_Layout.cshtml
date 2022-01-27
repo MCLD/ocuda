@@ -245,6 +245,7 @@
                                                       && !string.IsNullOrEmpty(subItem.NavigationText.Title))
                                                     {
                                                         <a href="@subItem.NavigationText.Link"
+                                                           target="@(item.TargetNewWindow ? "_blank" : null)"
                                                            class="dropdown-item"
                                                            title="@subItem.NavigationText.Title"
                                                            aria-label="@subItem.NavigationText.Title">
@@ -254,6 +255,7 @@
                                                     else
                                                     {
                                                         <a href="@subItem.NavigationText.Link"
+                                                           target="@(item.TargetNewWindow ? "_blank" : null)"
                                                            class="dropdown-item">
                                                             @if (!string.IsNullOrEmpty(subItem.Icon))
                                                             {

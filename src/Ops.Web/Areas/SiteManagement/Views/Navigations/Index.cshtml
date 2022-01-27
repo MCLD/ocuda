@@ -1,0 +1,176 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Navigations.IndexViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Navigations
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a asp-controller="@HomeController.Name"
+           asp-action="@(nameof(HomeController.Index))"
+           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+        @if (Model.OpenRoles.Count > 0)
+        {
+            <button data-toggle="modal"
+                    data-target="#addModal"
+                    class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
+                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                Add Navigation
+            </button>
+        }
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div>
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Subnavigations</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var navigation in Model.Navigations)
+                    {
+                        <tr>
+                            <td class="align-middle">
+                                <a asp-action="@(nameof(NavigationsController.Details))" asp-route-id="@navigation.Id">
+                                    @navigation.Name
+                                </a>
+                            </td>
+                            <td class="align-middle">@Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Navigations.IndexViewModel.NavigationRole(navigation.Id, Model.NavigationRoles)</td>
+                            <td class="align-middle">@navigation.SubnavigationCount</td>
+                            <td class="align-middle">
+                                <button type="button"
+                                        class="btn btn-outline-primary"
+                                        data-toggle="modal"
+                                        data-target="#editModal"
+                                        data-id="@navigation.Id"
+                                        data-name="@navigation.Name"
+                                        title="Edit Navigation">
+                                    <span class="fas fa-cog" aria-hidden="true"></span>
+                                </button>
+                                <a asp-controller="@NavigationsController.Name"
+                                   asp-action="@(nameof(NavigationsController.Details))"
+                                   asp-route-id="@navigation.Id"
+                                   class="btn btn-outline-primary"
+                                   title="Edit navigation details">
+                                    <span class="far fa-file-alt" aria-hidden="true"></span>
+                                </a>
+                                <button type="button"
+                                        class="btn btn-outline-danger"
+                                        data-toggle="modal"
+                                        data-target="#deleteModal"
+                                        data-id="@navigation.Id"
+                                        data-name="@navigation.Name">
+                                    <span class="fas fa-minus-circle" aria-hidden="true"></span>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (Model.OpenRoles.Count > 0)
+{
+    <form id="addForm" role="form">
+        <div modal
+             id="addModal"
+             isLarge="true"
+             name="Navigation"
+             type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
+            <input id="addName" asp-for="Navigation.Name" formgroup />
+            <select id="addRole" asp-for="Role" asp-items="@Model.OpenRoles" formgroup></select>
+        </div>
+    </form>
+}
+
+<form id="editForm" role="form">
+    <input id="editNavigation" asp-for="Navigation.Id" type="hidden" />
+
+    <div modal
+         id="editModal"
+         isLarge="true"
+         name="Navigation"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <input id="editName" asp-for="Navigation.Name" formgroup />
+    </div>
+</form>
+
+<form asp-controller="@NavigationsController.Name" asp-action="@(nameof(NavigationsController.DeleteNavigation))" method="post" role="form">
+    <input id="deleteId" asp-for="Navigation.Id" type="hidden" />
+    <input id="deleteName" asp-for="Navigation.Name" type="hidden" />
+
+    <div modal
+         id="deleteModal"
+         name="Emedia Group"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
+    </div>
+</form>
+
+@section scripts {
+    <script>
+        @if (Model.OpenRoles.Count > 0) {
+            <text>
+                $("#addForm").submit(function (e) {
+                    e.preventDefault();
+                    var form = $(this);
+                    $.post("@(Url.Action(nameof(NavigationsController.CreateNavigation), NavigationsController.Name))",
+                        form.serialize(),
+                        function (response) {
+                            if (response.success == true) {
+                                location.href = response.url;
+                            }
+                            else {
+                                alert(response.message);
+                                ResetSpinners(form.find(".btn-spinner"));
+                            }
+                    });
+                });
+            </text>
+        }
+
+        $("#editModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+                
+            $("#editNavigation").val(id);
+            $("#editName").val(name);
+        });
+
+        $("#editForm").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.post("@(Url.Action(nameof(NavigationsController.EditNavigation), NavigationsController.Name))",
+                form.serialize(),
+                function (response) {
+                if (response.success == true) {
+                    location.reload();
+                }
+                else {
+                    alert(response.message);
+                    ResetSpinners(form.find(".btn-spinner"));
+                }
+            });
+        });
+
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+            var modal = $(this);
+            $("#deleteId").val(id);
+            $("#deleteName").val(name);
+            modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
+        });
+    </script>
+}
