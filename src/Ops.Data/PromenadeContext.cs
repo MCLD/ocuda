@@ -117,6 +117,11 @@ namespace Ocuda.Ops.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            if (modelBuilder == null)
+            {
+                throw new System.ArgumentNullException(nameof(modelBuilder));
+            }
+
             // turn off cascading deletes
             foreach (var relationship in modelBuilder.Model
                 .GetEntityTypes()

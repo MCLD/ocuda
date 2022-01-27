@@ -65,6 +65,11 @@ namespace Ocuda.Promenade.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            if (modelBuilder == null)
+            {
+                throw new System.ArgumentNullException(nameof(modelBuilder));
+            }
+
             // configure composite keys
             // https://docs.microsoft.com/en-us/ef/core/modeling/keys
             modelBuilder.Entity<CarouselButtonLabelText>()

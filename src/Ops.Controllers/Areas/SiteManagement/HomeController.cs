@@ -18,8 +18,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     {
         private readonly IPermissionGroupService _permissionGroupService;
 
-        public static string Name { get { return "Home"; } }
-
         public HomeController(ServiceFacades.Controller<HomeController> context,
             IPermissionGroupService permissionGroupService)
             : base(context)
@@ -27,6 +25,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             _permissionGroupService = permissionGroupService
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
         }
+
+        public static string Name
+        { get { return "Home"; } }
 
         [Route("")]
         public async Task<IActionResult> Index()

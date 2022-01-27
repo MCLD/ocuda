@@ -8,7 +8,7 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Ops.Data.Promenade
 {
-    public class NavigationRepository 
+    public class NavigationRepository
         : GenericRepository<PromenadeContext, Navigation>, INavigationRepository
     {
         public NavigationRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
@@ -34,15 +34,6 @@ namespace Ocuda.Ops.Data.Promenade
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<ICollection<Navigation>> GetTopLevelNavigationsAsync()
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => !_.NavigationId.HasValue)
-                .OrderBy(_ => _.Name)
-                .ToListAsync();
-        }
-
         public async Task<ICollection<Navigation>> GetChildrenAsync(int id)
         {
             return await DbSet
@@ -50,14 +41,6 @@ namespace Ocuda.Ops.Data.Promenade
                 .Where(_ => _.NavigationId == id)
                 .OrderBy(_ => _.Order)
                 .ToListAsync();
-        }
-
-        public async Task<int> GetSubnavigationCountAsync(int id)
-        {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.NavigationId == id)
-                .CountAsync();
         }
 
         public async Task<int?> GetMaxSortOrderAsync(int parentNav)
@@ -68,11 +51,28 @@ namespace Ocuda.Ops.Data.Promenade
                 .MaxAsync(_ => (int?)_.Order);
         }
 
+        public async Task<int> GetSubnavigationCountAsync(int id)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.NavigationId == id)
+                .CountAsync();
+        }
+
         public async Task<List<Navigation>> GetSubsequentNavigationsAsync(int order, int parentNav)
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.Order > order && _.NavigationId == parentNav)
+                .ToListAsync();
+        }
+
+        public async Task<ICollection<Navigation>> GetTopLevelNavigationsAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => !_.NavigationId.HasValue)
+                .OrderBy(_ => _.Name)
                 .ToListAsync();
         }
     }

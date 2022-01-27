@@ -55,6 +55,39 @@ namespace Ocuda.Ops.Service
             return await _siteSettingPromRepository.ToListAsync(_ => _.Category, _ => _.Name);
         }
 
+        public async Task<double> GetSettingDoubleAsync(string key)
+        {
+            var settingValue = await GetSettingValueAsync(key);
+
+            if (double.TryParse(settingValue, out double result))
+            {
+                return result;
+            }
+            else
+            {
+                throw new OcudaException($"Invalid value for double setting {key}: {settingValue}");
+            }
+        }
+
+        public async Task<int> GetSettingIntAsync(string key)
+        {
+            var settingValue = await GetSettingValueAsync(key);
+
+            if (int.TryParse(settingValue, out int result))
+            {
+                return result;
+            }
+            else
+            {
+                throw new OcudaException($"Invalid value for interger setting {key}: {settingValue}");
+            }
+        }
+
+        public async Task<string> GetSettingStringAsync(string key)
+        {
+            return await GetSettingValueAsync(key);
+        }
+
         public async Task<SiteSetting> UpdateAsync(string key, string value)
         {
             var currentSetting = await _siteSettingPromRepository.FindAsync(key);
@@ -117,39 +150,6 @@ namespace Ocuda.Ops.Service
                     siteSetting.Id,
                     siteSetting.Value);
                 throw new OcudaException($"{siteSetting.Name} requires a value of type {siteSetting.Type}.");
-            }
-        }
-
-        public async Task<string> GetSettingStringAsync(string key)
-        {
-            return await GetSettingValueAsync(key);
-        }
-
-        public async Task<double> GetSettingDoubleAsync(string key)
-        {
-            var settingValue = await GetSettingValueAsync(key);
-
-            if (double.TryParse(settingValue, out double result))
-            {
-                return result;
-            }
-            else
-            {
-                throw new OcudaException($"Invalid value for double setting {key}: {settingValue}");
-            }
-        }
-
-        public async Task<int> GetSettingIntAsync(string key)
-        {
-            var settingValue = await GetSettingValueAsync(key);
-
-            if (int.TryParse(settingValue, out int result))
-            {
-                return result;
-            }
-            else
-            {
-                throw new OcudaException($"Invalid value for interger setting {key}: {settingValue}");
             }
         }
 

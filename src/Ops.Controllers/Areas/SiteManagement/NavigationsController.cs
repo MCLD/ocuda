@@ -26,9 +26,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly INavigationService _navigationService;
         private readonly IPermissionGroupService _permissionGroupService;
 
-        public static string Name { get { return "Navigations"; } }
-        public static string Area { get { return "SiteManagement"; } }
-
         public NavigationsController(ServiceFacades.Controller<NavigationsController> context,
             ILanguageService languageService,
             INavigationService navigationService,
@@ -43,8 +40,104 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
         }
 
-        [Route("")]
-        public async Task<IActionResult> Index()
+        public static string Area
+        { get { return "SiteManagement"; } }
+        public static string Name
+        { get { return "Navigations"; } }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<JsonResult> ChangeSort(int id, bool increase)
+        {
+            JsonResponse response;
+
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+               ApplicationPermission.NavigationManagement))
+            {
+                response = new JsonResponse
+                {
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+            else
+            {
+                try
+                {
+                    await _navigationService.UpdateSortOrder(id, increase);
+                    response = new JsonResponse
+                    {
+                        Success = true
+                    };
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Message = ex.Message,
+                        Success = false
+                    };
+                }
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> CreateNavigation(Navigation navigation, string role)
+        {
+            JsonResponse response;
+
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.NavigationManagement))
+            {
+                response = new JsonResponse
+                {
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+            else if (ModelState.IsValid)
+            {
+                try
+                {
+                    navigation = await _navigationService.CreateAsync(navigation, role);
+
+                    response = new JsonResponse
+                    {
+                        Success = true,
+                        Url = Url.Action(nameof(Details), new { id = navigation.Id })
+                    };
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
+            }
+            else
+            {
+                var errors = ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage);
+
+                response = new JsonResponse
+                {
+                    Success = false,
+                    Message = string.Join(Environment.NewLine, errors)
+                };
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeleteNavigation(Navigation navigation)
         {
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.NavigationManagement))
@@ -52,50 +145,80 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToUnauthorized();
             }
 
-            var viewModel = new IndexViewModel
+            if(navigation == null)
             {
-                NavigationRoles = await _navigationService.GetNavigationRolesAsync()
-            };
-
-            var topLevelNavigations = await _navigationService.GetTopLevelNavigationsAsync();
-            viewModel.Navigations = topLevelNavigations
-                .OrderByDescending(_ => _.Id == viewModel.NavigationRoles.Top)
-                .ThenByDescending(_ => _.Id == viewModel.NavigationRoles.Middle)
-                .ThenByDescending(_ => _.Id == viewModel.NavigationRoles.Left)
-                .ThenByDescending(_ => _.Id == viewModel.NavigationRoles.Footer)
-                .ToList();
-
-            foreach (var navigation in viewModel.Navigations)
-            {
-                navigation.SubnavigationCount = await _navigationService
-                    .GetSubnavigationCountAsnyc(navigation.Id);
+                ShowAlertDanger("Unable to create navigation: navigation is null.");
+                return RedirectToAction(nameof(Index));
             }
 
-            var openRoles = new List<SelectListItem>();
-            if (!viewModel.NavigationRoles.Top.HasValue)
+            try
             {
-                openRoles.Add(new SelectListItem(nameof(NavigationRoles.Top),
-                    Promenade.Models.Keys.SiteSetting.Site.NavigationIdTop));
+                await _navigationService.DeleteAsync(navigation.Id);
+                ShowAlertSuccess($"Deleted navigation: {navigation.Name}");
             }
-            if (!viewModel.NavigationRoles.Middle.HasValue)
+            catch (OcudaException ex)
             {
-                openRoles.Add(new SelectListItem(nameof(NavigationRoles.Middle),
-                    Promenade.Models.Keys.SiteSetting.Site.NavigationIdMiddle));
+                ShowAlertDanger($"Unable to delete navigation: {ex.Message}");
             }
-            if (!viewModel.NavigationRoles.Left.HasValue)
+            catch (Exception ex)
             {
-                openRoles.Add(new SelectListItem(nameof(NavigationRoles.Left),
-                    Promenade.Models.Keys.SiteSetting.Site.NavigationIdLeft));
-            }
-            if (!viewModel.NavigationRoles.Footer.HasValue)
-            {
-                openRoles.Add(new SelectListItem(nameof(NavigationRoles.Footer),
-                    Promenade.Models.Keys.SiteSetting.Site.NavigationIdFooter));
+                _logger.LogError(ex, "Error deleting navigation: {Message}", ex.Message);
+                ShowAlertDanger($"Error deleting navigation: {navigation.Name}");
             }
 
-            viewModel.OpenRoles = openRoles;
+            if (navigation.NavigationId.HasValue)
+            {
+                return RedirectToAction(nameof(Details),
+                    new { id = navigation.NavigationId.Value });
+            }
+            else
+            {
+                return RedirectToAction(nameof(Index));
+            }
+        }
 
-            return View(viewModel);
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeleteText(DetailsViewModel model)
+        {
+            if(model == null)
+            {
+                ShowAlertDanger("Unable to delete empty navigation.");
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (!await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.NavigationManagement))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var language = await _languageService
+                .GetActiveByIdAsync(model.NavigationText.LanguageId);
+
+            try
+            {
+                await _navigationService.DeleteNavigationTextAsync(
+                    model.NavigationText.NavigationId,
+                    model.NavigationText.LanguageId);
+
+                ShowAlertSuccess($"Deleted {language.Description} navigation text");
+            }
+            catch (OcudaException ex)
+            {
+                ShowAlertDanger($"Unable to delete navigation text: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting navigation text: {Message}", ex.Message);
+                ShowAlertDanger($"Error deleting {language.Description} navigation text");
+            }
+
+            return RedirectToAction(nameof(Details), new
+            {
+                id = model.NavigationText.NavigationId,
+                language = language.Name
+            });
         }
 
         [Route("{id}")]
@@ -178,6 +301,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToUnauthorized();
             }
 
+            if(model == null)
+            {
+                ShowAlertDanger("Unable to save empty navigation.");
+                return RedirectToAction(nameof(Index));
+            }
+
             if (ModelState.IsValid)
             {
                 try
@@ -204,96 +333,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 id = model.NavigationText.NavigationId,
                 language = language.IsDefault ? null : language.Name
             });
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> DeleteText(DetailsViewModel model)
-        {
-            if (!await HasAppPermissionAsync(_permissionGroupService,
-                ApplicationPermission.NavigationManagement))
-            {
-                return RedirectToUnauthorized();
-            }
-
-            var language = await _languageService
-                .GetActiveByIdAsync(model.NavigationText.LanguageId);
-
-            try
-            {
-                await _navigationService.DeleteNavigationTextAsync(
-                    model.NavigationText.NavigationId,
-                    model.NavigationText.LanguageId);
-
-                ShowAlertSuccess($"Deleted {language.Description} navigation text");
-            }
-            catch (OcudaException ex)
-            {
-                ShowAlertDanger($"Unable to delete navigation text: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting navigation text: {Message}", ex.Message);
-                ShowAlertDanger($"Error deleting {language.Description} navigation text");
-            }
-
-            return RedirectToAction(nameof(Details), new
-            {
-                id = model.NavigationText.NavigationId,
-                language = language.Name
-            });
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> CreateNavigation(Navigation navigation, string role)
-        {
-            JsonResponse response;
-
-            if (!await HasAppPermissionAsync(_permissionGroupService,
-                ApplicationPermission.NavigationManagement))
-            {
-                response = new JsonResponse
-                {
-                    Message = "Unauthorized",
-                    Success = false
-                };
-            }
-            else if (ModelState.IsValid)
-            {
-                try
-                {
-                    navigation = await _navigationService.CreateAsync(navigation, role);
-
-                    response = new JsonResponse
-                    {
-                        Success = true,
-                        Url = Url.Action(nameof(Details), new { id = navigation.Id })
-                    };
-                }
-                catch (OcudaException ex)
-                {
-                    response = new JsonResponse
-                    {
-                        Success = false,
-                        Message = ex.Message
-                    };
-                }
-            }
-            else
-            {
-                var errors = ModelState.Values
-                    .SelectMany(_ => _.Errors)
-                    .Select(_ => _.ErrorMessage);
-
-                response = new JsonResponse
-                {
-                    Success = false,
-                    Message = string.Join(Environment.NewLine, errors)
-                };
-            }
-
-            return Json(response);
         }
 
         [HttpPost]
@@ -346,10 +385,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> DeleteNavigation(Navigation navigation)
+        [Route("")]
+        public async Task<IActionResult> Index()
         {
             if (!await HasAppPermissionAsync(_permissionGroupService,
                 ApplicationPermission.NavigationManagement))
@@ -357,68 +394,50 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToUnauthorized();
             }
 
-            try
+            var viewModel = new IndexViewModel
             {
-                await _navigationService.DeleteAsync(navigation.Id);
-                ShowAlertSuccess($"Deleted navigation: {navigation.Name}");
-            }
-            catch (OcudaException ex)
+                NavigationRoles = await _navigationService.GetNavigationRolesAsync()
+            };
+
+            var topLevelNavigations = await _navigationService.GetTopLevelNavigationsAsync();
+            viewModel.Navigations = topLevelNavigations
+                .OrderByDescending(_ => _.Id == viewModel.NavigationRoles.Top)
+                .ThenByDescending(_ => _.Id == viewModel.NavigationRoles.Middle)
+                .ThenByDescending(_ => _.Id == viewModel.NavigationRoles.Left)
+                .ThenByDescending(_ => _.Id == viewModel.NavigationRoles.Footer)
+                .ToList();
+
+            foreach (var navigation in viewModel.Navigations)
             {
-                ShowAlertDanger($"Unable to delete navigation: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting navigation: {Message}", ex.Message);
-                ShowAlertDanger($"Error deleting navigation: {navigation.Name}");
+                navigation.SubnavigationCount = await _navigationService
+                    .GetSubnavigationCountAsnyc(navigation.Id);
             }
 
-            if (navigation.NavigationId.HasValue)
+            var openRoles = new List<SelectListItem>();
+            if (!viewModel.NavigationRoles.Top.HasValue)
             {
-                return RedirectToAction(nameof(Details),
-                    new { id = navigation.NavigationId.Value });
+                openRoles.Add(new SelectListItem(nameof(NavigationRoles.Top),
+                    Promenade.Models.Keys.SiteSetting.Site.NavigationIdTop));
             }
-            else
+            if (!viewModel.NavigationRoles.Middle.HasValue)
             {
-                return RedirectToAction(nameof(Index));
+                openRoles.Add(new SelectListItem(nameof(NavigationRoles.Middle),
+                    Promenade.Models.Keys.SiteSetting.Site.NavigationIdMiddle));
             }
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<JsonResult> ChangeSort(int id, bool increase)
-        {
-            JsonResponse response;
-
-            if (!await HasAppPermissionAsync(_permissionGroupService,
-               ApplicationPermission.NavigationManagement))
+            if (!viewModel.NavigationRoles.Left.HasValue)
             {
-                response = new JsonResponse
-                {
-                    Message = "Unauthorized",
-                    Success = false
-                };
+                openRoles.Add(new SelectListItem(nameof(NavigationRoles.Left),
+                    Promenade.Models.Keys.SiteSetting.Site.NavigationIdLeft));
             }
-            else
+            if (!viewModel.NavigationRoles.Footer.HasValue)
             {
-                try
-                {
-                    await _navigationService.UpdateSortOrder(id, increase);
-                    response = new JsonResponse
-                    {
-                        Success = true
-                    };
-                }
-                catch (OcudaException ex)
-                {
-                    response = new JsonResponse
-                    {
-                        Message = ex.Message,
-                        Success = false
-                    };
-                }
+                openRoles.Add(new SelectListItem(nameof(NavigationRoles.Footer),
+                    Promenade.Models.Keys.SiteSetting.Site.NavigationIdFooter));
             }
 
-            return Json(response);
+            viewModel.OpenRoles = openRoles;
+
+            return View(viewModel);
         }
     }
 }

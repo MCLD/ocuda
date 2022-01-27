@@ -24,20 +24,21 @@ namespace Ocuda.Promenade.Models.Entities
         public string Name { get; set; }
 
         public int? NavigationId { get; set; }
-        public IEnumerable<Navigation> Navigations { get; set; }
-
-        public int Order { get; set; }
-
-        [DisplayName("Target New Window")]
-        public bool TargetNewWindow { get; set; }
-
-        [NotMapped]
-        public NavigationText NavigationText { get; set; }
 
         [NotMapped]
         public ICollection<string> NavigationLanguages { get; set; }
 
+        public IEnumerable<Navigation> Navigations { get; set; }
+
+        [NotMapped]
+        public NavigationText NavigationText { get; set; }
+
+        public int Order { get; set; }
+
         [NotMapped]
         public int SubnavigationCount { get; set; }
+
+        [DisplayName("Target New Window")]
+        public bool TargetNewWindow { get; set; }
     }
 }

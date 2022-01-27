@@ -7,15 +7,19 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Navigations
 {
     public class IndexViewModel
     {
-        public ICollection<Navigation> Navigations { get; set; }
-        public NavigationRoles NavigationRoles { get; set; }
-        public List<SelectListItem> OpenRoles { get; set; }
-
         public Navigation Navigation { get; set; }
+        public NavigationRoles NavigationRoles { get; set; }
+        public ICollection<Navigation> Navigations { get; set; }
+        public List<SelectListItem> OpenRoles { get; set; }
         public string Role { get; set; }
 
         public static string NavigationRole(int navigationId, NavigationRoles roles)
         {
+            if (roles == null)
+            {
+                return string.Empty;
+            }
+
             if (navigationId == roles.Top)
             {
                 return "Top";

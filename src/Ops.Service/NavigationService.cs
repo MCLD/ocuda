@@ -14,12 +14,11 @@ namespace Ocuda.Ops.Service
 {
     public class NavigationService : BaseService<NavigationService>, INavigationService
     {
-        private readonly string DefaultNavigationSiteSettingId = "-1";
-
         private readonly ILanguageRepository _languageRepository;
         private readonly INavigationRepository _navigationRepository;
         private readonly INavigationTextRepository _navigationTextRepository;
         private readonly ISiteSettingPromService _siteSettingPromService;
+        private readonly string DefaultNavigationSiteSettingId = "-1";
 
         public NavigationService(ILogger<NavigationService> logger,
             IHttpContextAccessor httpContextAccessor,
@@ -37,6 +36,204 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(navigationTextRepository));
             _siteSettingPromService = siteSettingPromService
                 ?? throw new ArgumentNullException(nameof(siteSettingPromService));
+        }
+
+        public async Task<Navigation> CreateAsync(Navigation navigation, string siteSetting = null)
+        {
+            if (navigation == null)
+            {
+                throw new ArgumentNullException(nameof(navigation));
+            }
+
+            int? maxSortOrder = null;
+            RoleProperties parentRoleProperties = null;
+
+            if (navigation.NavigationId.HasValue)
+            {
+                parentRoleProperties = await GetRolePropertiesForNavigationAsync(
+                    navigation.NavigationId.Value);
+
+                maxSortOrder = await _navigationRepository.GetMaxSortOrderAsync(
+                    navigation.NavigationId.Value);
+            }
+
+            navigation.Name = navigation.Name?.Trim();
+
+            if (parentRoleProperties != null)
+            {
+                if (string.IsNullOrWhiteSpace(navigation.NavigationText?.Label)
+                    && string.IsNullOrWhiteSpace(navigation.NavigationText?.Link)
+                    && string.IsNullOrWhiteSpace(navigation.NavigationText?.Title))
+                {
+                    throw new OcudaException("At least one text field must be filled.");
+                }
+
+                await _navigationTextRepository.AddAsync(new NavigationText
+                {
+                    Label = navigation.NavigationText.Label?.Trim(),
+                    Link = navigation.NavigationText.Link?.Trim(),
+                    Title = navigation.NavigationText.Title?.Trim(),
+
+                    LanguageId = await _languageRepository.GetDefaultLanguageId(),
+                    Navigation = navigation
+                });
+            }
+
+            if (parentRoleProperties?.ChildrenCanDisplayIcon == true)
+            {
+                navigation.Icon = navigation.Icon?.Trim();
+            }
+            else
+            {
+                navigation.Icon = null;
+            }
+
+            if (parentRoleProperties?.ChildrenCanChangeToLink != true)
+            {
+                navigation.ChangeToLinkWhenExtraSmall = false;
+            }
+            if (parentRoleProperties?.ChildrenCanHideText != true)
+            {
+                navigation.HideTextWhenExtraSmall = false;
+            }
+            if (parentRoleProperties?.ChildrenCanTargetNewWindow != true)
+            {
+                navigation.TargetNewWindow = false;
+            }
+
+            if (maxSortOrder.HasValue)
+            {
+                navigation.Order = maxSortOrder.Value + 1;
+            }
+            else
+            {
+                navigation.Order = 0;
+            }
+
+            await _navigationRepository.AddAsync(navigation);
+            await _navigationRepository.SaveAsync();
+
+            if (!string.IsNullOrWhiteSpace(siteSetting))
+            {
+                await _siteSettingPromService.UpdateAsync(siteSetting,
+                    navigation.Id.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            }
+
+            return navigation;
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var navigation = await _navigationRepository.FindAsync(id);
+
+            if (navigation == null)
+            {
+                throw new OcudaException("Navigation does not exist.");
+            }
+
+            (var navigations, var navigationIds) = await GetFlattenedNavigationsAsync(navigation);
+
+            var navigationTexts = await _navigationTextRepository
+                .GetByNavigationIdsAsync(navigationIds);
+
+            if (!navigation.NavigationId.HasValue)
+            {
+                var role = await GetNavigationRoleAsync(navigation.Id);
+
+                if (!string.IsNullOrWhiteSpace(role))
+                {
+                    await _siteSettingPromService.UpdateAsync(role, DefaultNavigationSiteSettingId);
+                }
+            }
+            else
+            {
+                var subsequentNavigations = await _navigationRepository
+                    .GetSubsequentNavigationsAsync(navigation.Order, navigation.NavigationId.Value);
+
+                if (subsequentNavigations.Count > 0)
+                {
+                    subsequentNavigations.ForEach(_ => _.Order--);
+                    _navigationRepository.UpdateRange(subsequentNavigations);
+                }
+            }
+
+            _navigationTextRepository.RemoveRange(navigationTexts);
+            _navigationRepository.RemoveRange(navigations);
+
+            await _navigationRepository.SaveAsync();
+        }
+
+        public async Task DeleteNavigationTextAsync(int navigationId, int languageId)
+        {
+            var defaultLanguageId = await _languageRepository.GetDefaultLanguageId();
+
+            if (languageId == defaultLanguageId)
+            {
+                throw new OcudaException("Cannot delete text for the default language");
+            }
+
+            var navigationText = await _navigationTextRepository.GetByNavigationAndLanguageAsync(
+                navigationId,
+                languageId);
+
+            _navigationTextRepository.Remove(navigationText);
+            await _navigationTextRepository.SaveAsync();
+        }
+
+        public async Task<Navigation> EditAsync(Navigation navigation)
+        {
+            if (navigation == null)
+            {
+                throw new ArgumentNullException(nameof(navigation));
+            }
+
+            var currentNavigation = await _navigationRepository.FindAsync(navigation.Id);
+
+            RoleProperties parentRoleProperties = null;
+
+            if (currentNavigation.NavigationId.HasValue)
+            {
+                parentRoleProperties = await GetRolePropertiesForNavigationAsync(
+                    navigation.NavigationId.Value);
+            }
+
+            currentNavigation.Name = navigation.Name?.Trim();
+
+            if (parentRoleProperties?.ChildrenCanDisplayIcon == true)
+            {
+                currentNavigation.Icon = navigation.Icon?.Trim();
+            }
+            if (parentRoleProperties?.ChildrenCanChangeToLink == true)
+            {
+                currentNavigation.ChangeToLinkWhenExtraSmall = navigation.ChangeToLinkWhenExtraSmall;
+            }
+            if (parentRoleProperties?.ChildrenCanHideText == true)
+            {
+                currentNavigation.HideTextWhenExtraSmall = navigation.HideTextWhenExtraSmall;
+            }
+            if (parentRoleProperties?.ChildrenCanTargetNewWindow == true)
+            {
+                currentNavigation.TargetNewWindow = navigation.TargetNewWindow;
+            }
+
+            _navigationRepository.Update(currentNavigation);
+            await _navigationRepository.SaveAsync();
+            return currentNavigation;
+        }
+
+        public async Task<Navigation> GetByIdAsync(int id)
+        {
+            return await _navigationRepository.FindAsync(id);
+        }
+
+        public async Task<ICollection<Navigation>> GetNavigationChildrenAsync(int id)
+        {
+            return await _navigationRepository.GetChildrenAsync(id);
+        }
+
+        public async Task<ICollection<string>> GetNavigationLanguagesByIdAsync(int id)
+        {
+            return await _navigationTextRepository.GetUsedLanguageNamesByNavigationId(id);
         }
 
         public async Task<NavigationRoles> GetNavigationRolesAsync()
@@ -138,26 +335,6 @@ namespace Ocuda.Ops.Service
             return roleProperties;
         }
 
-        public async Task<Navigation> GetByIdAsync(int id)
-        {
-            return await _navigationRepository.FindAsync(id);
-        }
-
-        public async Task<ICollection<Navigation>> GetNavigationChildrenAsync(int id)
-        {
-            return await _navigationRepository.GetChildrenAsync(id);
-        }
-
-        public async Task<ICollection<string>> GetNavigationLanguagesByIdAsync(int id)
-        {
-            return await _navigationTextRepository.GetUsedLanguageNamesByNavigationId(id);
-        }
-
-        public async Task<ICollection<Navigation>> GetTopLevelNavigationsAsync()
-        {
-            return await _navigationRepository.GetTopLevelNavigationsAsync();
-        }
-
         public async Task<int> GetSubnavigationCountAsnyc(int id)
         {
             return await _navigationRepository.GetSubnavigationCountAsync(id);
@@ -170,160 +347,54 @@ namespace Ocuda.Ops.Service
                 languageId);
         }
 
-        public async Task<Navigation> CreateAsync(Navigation navigation, string siteSetting = null)
+        public async Task<ICollection<Navigation>> GetTopLevelNavigationsAsync()
         {
-            int? maxSortOrder = null;
-            RoleProperties parentRoleProperties = null;
+            return await _navigationRepository.GetTopLevelNavigationsAsync();
+        }
 
-            if (navigation.NavigationId.HasValue)
+        public async Task SetNavigationTextAsync(NavigationText navigationText)
+        {
+            if (navigationText == null)
             {
-                parentRoleProperties = await GetRolePropertiesForNavigationAsync(
-                    navigation.NavigationId.Value);
-
-                maxSortOrder = await _navigationRepository.GetMaxSortOrderAsync(
-                    navigation.NavigationId.Value);
+                throw new ArgumentNullException(nameof(navigationText));
             }
 
-            navigation.Name = navigation.Name?.Trim();
+            var roleProperties = await GetRolePropertiesForNavigationAsync(
+                navigationText.NavigationId);
 
-            if (parentRoleProperties != null)
+            if (!roleProperties.MustHaveText)
             {
-                if (string.IsNullOrWhiteSpace(navigation.NavigationText?.Label)
-                    && string.IsNullOrWhiteSpace(navigation.NavigationText?.Link)
-                    && string.IsNullOrWhiteSpace(navigation.NavigationText?.Title))
-                {
-                    throw new OcudaException("At least one text field must be filled.");
-                }
+                throw new OcudaException("Navigation cannot have text.");
+            }
 
-                var navigationText = new NavigationText();
+            if (string.IsNullOrWhiteSpace(navigationText.Label)
+                && string.IsNullOrWhiteSpace(navigationText.Link)
+                && string.IsNullOrWhiteSpace(navigationText.Title))
+            {
+                throw new OcudaException("At least one text field must be filled.");
+            }
 
-                navigationText.Label = navigation.NavigationText.Label?.Trim();
-                navigationText.Link = navigation.NavigationText.Link?.Trim();
-                navigationText.Title = navigation.NavigationText.Title?.Trim();
+            var currentText = await _navigationTextRepository.GetByNavigationAndLanguageAsync(
+                navigationText.NavigationId, navigationText.LanguageId);
 
-                navigationText.LanguageId = await _languageRepository.GetDefaultLanguageId();
-                navigationText.Navigation = navigation;
+            if (currentText == null)
+            {
+                navigationText.Label = navigationText.Label?.Trim();
+                navigationText.Link = navigationText.Link?.Trim();
+                navigationText.Title = navigationText.Title?.Trim();
 
                 await _navigationTextRepository.AddAsync(navigationText);
             }
-
-            if (parentRoleProperties?.ChildrenCanDisplayIcon == true)
-            {
-                navigation.Icon = navigation.Icon?.Trim();
-            }
             else
             {
-                navigation.Icon = null;
+                currentText.Label = navigationText.Label?.Trim();
+                currentText.Link = navigationText.Link?.Trim();
+                currentText.Title = navigationText.Title?.Trim();
+
+                _navigationTextRepository.Update(currentText);
             }
 
-            if (parentRoleProperties?.ChildrenCanChangeToLink != true)
-            {
-                navigation.ChangeToLinkWhenExtraSmall = false;
-            }
-            if (parentRoleProperties?.ChildrenCanHideText != true)
-            {
-                navigation.HideTextWhenExtraSmall = false;
-            }
-            if (parentRoleProperties?.ChildrenCanTargetNewWindow != true)
-            {
-                navigation.TargetNewWindow = false;
-            }
-
-            if (maxSortOrder.HasValue)
-            {
-                navigation.Order = maxSortOrder.Value + 1;
-            }
-            else
-            {
-                navigation.Order = 0;
-            }
-
-            await _navigationRepository.AddAsync(navigation);
-            await _navigationRepository.SaveAsync();
-
-            if (!string.IsNullOrWhiteSpace(siteSetting))
-            {
-                await _siteSettingPromService.UpdateAsync(siteSetting, navigation.Id.ToString());
-            }
-
-            return navigation;
-        }
-
-        public async Task<Navigation> EditAsync(Navigation navigation)
-        {
-            var currentNavigation = await _navigationRepository.FindAsync(navigation.Id);
-
-            RoleProperties parentRoleProperties = null;
-
-            if (currentNavigation.NavigationId.HasValue)
-            {
-                parentRoleProperties = await GetRolePropertiesForNavigationAsync(
-                    navigation.NavigationId.Value);
-            }
-
-            currentNavigation.Name = navigation.Name?.Trim();
-
-            if (parentRoleProperties?.ChildrenCanDisplayIcon == true)
-            {
-                currentNavigation.Icon = navigation.Icon?.Trim();
-            }
-            if (parentRoleProperties?.ChildrenCanChangeToLink == true)
-            {
-                currentNavigation.ChangeToLinkWhenExtraSmall = navigation.ChangeToLinkWhenExtraSmall;
-            }
-            if (parentRoleProperties?.ChildrenCanHideText == true)
-            {
-                currentNavigation.HideTextWhenExtraSmall = navigation.HideTextWhenExtraSmall;
-            }
-            if (parentRoleProperties?.ChildrenCanTargetNewWindow == true)
-            {
-                currentNavigation.TargetNewWindow = navigation.TargetNewWindow;
-            }
-
-            _navigationRepository.Update(currentNavigation);
-            await _navigationRepository.SaveAsync();
-            return currentNavigation;
-        }
-
-        public async Task DeleteAsync(int id)
-        {
-            var navigation = await _navigationRepository.FindAsync(id);
-
-            if (navigation == null)
-            {
-                throw new OcudaException("Navigation does not exist.");
-            }
-
-            (var navigations, var navigationIds) = await GetFlattenedNavigationsAsync(navigation);
-
-            var navigationTexts = await _navigationTextRepository
-                .GetByNavigationIdsAsync(navigationIds);
-
-            if (!navigation.NavigationId.HasValue)
-            {
-                var role = await GetNavigationRoleAsync(navigation.Id);
-
-                if (!string.IsNullOrWhiteSpace(role))
-                {
-                    await _siteSettingPromService.UpdateAsync(role, DefaultNavigationSiteSettingId);
-                }
-            }
-            else
-            {
-                var subsequentNavigations = await _navigationRepository
-                    .GetSubsequentNavigationsAsync(navigation.Order, navigation.NavigationId.Value);
-
-                if (subsequentNavigations.Count > 0)
-                {
-                    subsequentNavigations.ForEach(_ => _.Order--);
-                    _navigationRepository.UpdateRange(subsequentNavigations);
-                }
-            }
-
-            _navigationTextRepository.RemoveRange(navigationTexts);
-            _navigationRepository.RemoveRange(navigations);
-
-            await _navigationRepository.SaveAsync();
+            await _navigationTextRepository.SaveAsync();
         }
 
         public async Task UpdateSortOrder(int id, bool increase)
@@ -364,63 +435,6 @@ namespace Ocuda.Ops.Service
             _navigationRepository.Update(navigation);
             _navigationRepository.Update(navigationInPosition);
             await _navigationRepository.SaveAsync();
-        }
-
-        public async Task SetNavigationTextAsync(NavigationText navigationText)
-        {
-            var roleProperties = await GetRolePropertiesForNavigationAsync(
-                navigationText.NavigationId);
-
-            if (!roleProperties.MustHaveText)
-            {
-                throw new OcudaException("Navigation cannot have text.");
-            }
-
-            if (string.IsNullOrWhiteSpace(navigationText.Label)
-                && string.IsNullOrWhiteSpace(navigationText.Link)
-                && string.IsNullOrWhiteSpace(navigationText.Title))
-            {
-                throw new OcudaException("At least one text field must be filled.");
-            }
-
-            var currentText = await _navigationTextRepository.GetByNavigationAndLanguageAsync(
-                navigationText.NavigationId, navigationText.LanguageId);
-
-            if (currentText == null)
-            {
-                navigationText.Label = navigationText.Label?.Trim();
-                navigationText.Link = navigationText.Link?.Trim();
-                navigationText.Title = navigationText.Title?.Trim();
-
-                await _navigationTextRepository.AddAsync(navigationText);
-            }
-            else
-            {
-                currentText.Label = navigationText.Label?.Trim();
-                currentText.Link = navigationText.Link?.Trim();
-                currentText.Title = navigationText.Title?.Trim();
-
-                _navigationTextRepository.Update(currentText);
-            }
-
-            await _navigationTextRepository.SaveAsync();
-        }
-
-        public async Task DeleteNavigationTextAsync(int navigationId, int languageId)
-        {
-            var defaultLanguageId = await _languageRepository.GetDefaultLanguageId();
-
-            if (languageId == defaultLanguageId)
-            {
-                throw new OcudaException("Cannot delete text for the default language");
-            }
-
-            var navigationText = await _navigationTextRepository.GetByNavigationAndLanguageAsync(
-                navigationId,
-                languageId);
-
-            _navigationTextRepository.Remove(navigationText);
-            await _navigationTextRepository.SaveAsync();
         }
 
         private async Task<(List<Navigation>, List<int>)> GetFlattenedNavigationsAsync(

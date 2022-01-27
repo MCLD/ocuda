@@ -2,9 +2,9 @@
 {
     public class NavigationRoles
     {
-        public int? Top { get; set; }
-        public int? Middle { get; set; }
-        public int? Left {get;set;}
         public int? Footer { get; set; }
+        public int? Left { get; set; }
+        public int? Middle { get; set; }
+        public int? Top { get; set; }
     }
 }

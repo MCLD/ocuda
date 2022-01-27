@@ -4,11 +4,10 @@
     {
         public bool CanHaveChildren { get; set; }
         public bool CanHaveGrandchildren { get; set; }
-        public bool MustHaveText { get; set; }
-
         public bool ChildrenCanChangeToLink { get; set; }
         public bool ChildrenCanDisplayIcon { get; set; }
         public bool ChildrenCanHideText { get; set; }
         public bool ChildrenCanTargetNewWindow { get; set; }
+        public bool MustHaveText { get; set; }
     }
 }

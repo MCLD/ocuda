@@ -9,6 +9,7 @@ namespace Ocuda.Promenade.Models.Defaults
         public static IEnumerable<SiteSetting> Get { get; } = new[]
         {
             #region Social
+
             new SiteSetting
             {
                 Category = "Social",
@@ -63,8 +64,11 @@ namespace Ocuda.Promenade.Models.Defaults
                 Value = string.Empty,
                 Type = SiteSettingType.StringNullable
             },
-            #endregion
+
+            #endregion Social
+
             #region Site
+
             new SiteSetting
             {
                 Id = Keys.SiteSetting.Site.BannerImage,
@@ -142,8 +146,11 @@ namespace Ocuda.Promenade.Models.Defaults
                 Category = "Site",
                 Type = SiteSettingType.StringNullable
             },
-            #endregion
+
+            #endregion Site
+
             #region Scheduling
+
             new SiteSetting
             {
                 Category = "Scheduling",
@@ -225,7 +232,8 @@ namespace Ocuda.Promenade.Models.Defaults
                 Type = SiteSettingType.StringNullable,
                 Value = "Sunday,Saturday"
             }
-            #endregion
+
+            #endregion Scheduling
         };
     }
 }
