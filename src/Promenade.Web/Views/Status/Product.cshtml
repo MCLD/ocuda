@@ -1,5 +1,5 @@
 ﻿@model Ocuda.Promenade.Controllers.ViewModels.Status.ProductInventoryViewModel
-    
+
 <h1>@Model.Title</h1>
 
 @if (!string.IsNullOrEmpty(Model.SegmentHeader))
@@ -7,7 +7,8 @@
     <h2>@Model.SegmentHeader</h2>
 }
 
-@if(!string.IsNullOrEmpty(Model.SegmentText)) {
+@if (!string.IsNullOrEmpty(Model.SegmentText))
+{
     <div class="row">
         <div class="col-12">
             @Html.Raw(Model.SegmentText)
@@ -15,24 +16,27 @@
     </div>
 }
 
-<table class="table table-sm table-bordered table-striped table-hover mt-2">
-    <tr>
-        <th>@Localizer[Promenade.ProductInventoryLocation]</th>
-        <th>@Localizer[Promenade.ProductInventoryHours]</th>
-        <th>@Localizer[Promenade.ProductInventoryStatus]</th>
-        <th>@Localizer[Promenade.ProductInventoryLastUpdate]</th>
-    </tr>
-    @foreach (var item in Model.LocationInventories)
-    {
+@if (Model.LocationInventories?.Count > 0)
+{
+    <table class="table table-sm table-bordered table-striped table-hover mt-2">
         <tr>
-            <td>
-                <a asp-action="@nameof(LocationsController.Locations)"
+            <th>@Localizer[Promenade.ProductInventoryLocation]</th>
+            <th>@Localizer[Promenade.ProductInventoryHours]</th>
+            <th>@Localizer[Promenade.ProductInventoryStatus]</th>
+            <th>@Localizer[Promenade.ProductInventoryLastUpdate]</th>
+        </tr>
+        @foreach (var item in Model.LocationInventories)
+        {
+            <tr>
+                <td>
+                    <a asp-action="@nameof(LocationsController.Locations)"
                asp-controller="@LocationsController.Name"
                asp-route-locationStub="@item.Stub">@item.Name</a>
-            </td>
-            <td class="@item.CurrentStatusClass">@item.CurrentStatus</td>
-            <td class="@item.InventoryStatusClass">@item.InventoryStatus</td>
-            <td>@item.UpdatedAt.ToString("g")</td>
-        </tr>
-    }
-</table>
+                </td>
+                <td class="@item.CurrentStatusClass">@item.CurrentStatus</td>
+                <td class="@item.InventoryStatusClass">@item.InventoryStatus</td>
+                <td>@item.UpdatedAt.ToString("g")</td>
+            </tr>
+        }
+    </table>
+}
