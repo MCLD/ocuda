@@ -33,6 +33,12 @@ namespace Ocuda.Ops.Models.Definitions
             },
             new ApplicationPermissionDefinition
             {
+                Id = ApplicationPermission.NavigationManagement,
+                Name = "Navigation Management",
+                Info = "Users with this permission can manage the Promenade navigations."
+            },
+            new ApplicationPermissionDefinition
+            {
                 Id = ApplicationPermission.MultiUserAccount,
                 Name = "Multi-user Account",
                 Info = "Users with this permission are accessing via a multi-user domain account."
