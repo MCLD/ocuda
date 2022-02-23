@@ -51,6 +51,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 - Site settings not being able to be updated
 - Empty site settings being set to a null value
 - Site manager permission not being listed if user belongs to other permission groups
+- Locations routing with empty feature stub
 
 ## 1.0.0
 ### Added
