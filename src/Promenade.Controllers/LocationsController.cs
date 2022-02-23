@@ -220,6 +220,14 @@ namespace Ocuda.Promenade.Controllers
             {
                 return RedirectToAction(nameof(Find));
             }
+            else if (string.IsNullOrEmpty(featureStub))
+            {
+                return RedirectToAction(nameof(Locations), new
+                {
+                    locationStub,
+                    featureStub = string.Empty
+                });
+            }
 
             var locationFeature
                 = await _locationService.GetLocationFullFeatureAsync(locationStub, featureStub);
