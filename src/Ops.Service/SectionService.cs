@@ -67,7 +67,8 @@ namespace Ocuda.Ops.Service
         public async Task<Section> GetBySlugAsync(string slug)
         {
             var sections = await GetAllAsync();
-            return sections.SingleOrDefault(_ => _.Slug == slug);
+            return sections
+                .SingleOrDefault(_ => _.Slug.ToUpperInvariant() == slug.ToUpperInvariant());
         }
 
         public async Task<int> GetHomeSectionIdAsync()
