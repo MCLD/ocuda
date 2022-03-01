@@ -15,7 +15,7 @@ RUN dotnet test
 RUN dotnet publish -c Release -o "/app/publish/ops" "src/Ops.Web"
 
 # Get runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:5.0@sha256:b1a4220f51956c24488f179e182b3dfc5ad67c7ba701ceca638b8a9f185798a9 as publish
+FROM mcr.microsoft.com/dotnet/aspnet:5.0@sha256:860fa76aa8a4d169d3e3d88f4191bd38f0eedc16692a50057a429d61d5e8d3cd as publish
 WORKDIR /app
 
 # Install curl for health monitoring
