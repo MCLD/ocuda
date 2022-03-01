@@ -1,5 +1,5 @@
 # Get build image
-FROM mcr.microsoft.com/dotnet/sdk:5.0@sha256:8208f4ffd69ff65fc7b3d925f21ce6332f8f7b93d49dfe13d771b9416996410d AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0@sha256:53a7500d5c022130705c87a49934a3fededd992417b1b92e90a295de53709ebe AS build
 WORKDIR /app
 
 # Copy source
