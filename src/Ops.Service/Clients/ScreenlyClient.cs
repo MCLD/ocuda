@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -150,10 +151,19 @@ namespace Ocuda.Ops.Service.Clients
 
             if (!uploadFileResponse.IsSuccessStatusCode)
             {
-                _logger.LogError("Http upload of {FilePath} to Screenly failed: {StatusCode} - {ReasonPhrase}",
-                    filePath,
-                    uploadFileResponse.StatusCode,
-                    uploadFileResponse.ReasonPhrase);
+                using (_logger.BeginScope(new Dictionary<string, object>
+                {
+                    ["FileName"] = file.Headers.ContentDisposition.FileName,
+                    ["HttpContent"] = uploadFileResponse.Content,
+                    ["RemoteUri"] = uploadFileRequest.RequestUri,
+                    ["Size"] = file.Headers.ContentDisposition.Size
+                }))
+                {
+                    _logger.LogError("Http upload of {FilePath} to Screenly failed: {StatusCode} - {ReasonPhrase}",
+                        filePath,
+                        uploadFileResponse.StatusCode,
+                        uploadFileResponse.ReasonPhrase);
+                }
                 throw new OcudaException($"Unable to upload file to Screenly: {uploadFileResponse.StatusCode} - {uploadFileResponse.ReasonPhrase}");
             }
 
