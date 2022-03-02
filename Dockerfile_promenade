@@ -1,5 +1,5 @@
 # Get build image
-FROM mcr.microsoft.com/dotnet/sdk:5.0@sha256:8208f4ffd69ff65fc7b3d925f21ce6332f8f7b93d49dfe13d771b9416996410d AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0@sha256:53a7500d5c022130705c87a49934a3fededd992417b1b92e90a295de53709ebe AS build
 WORKDIR /app
 
 # Copy source
@@ -15,7 +15,7 @@ RUN dotnet test
 RUN dotnet publish -c Release -o "/app/publish/promenade" "src/Promenade.Web"
 
 # Get runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:5.0@sha256:b1a4220f51956c24488f179e182b3dfc5ad67c7ba701ceca638b8a9f185798a9 as publish
+FROM mcr.microsoft.com/dotnet/aspnet:5.0@sha256:860fa76aa8a4d169d3e3d88f4191bd38f0eedc16692a50057a429d61d5e8d3cd as publish
 WORKDIR /app
 
 # Install curl for health monitoring
