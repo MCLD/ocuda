@@ -23,7 +23,7 @@
 <div class="row pt-1">
     <div class="col-12 col-sm-6">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header px-3">
                 Available Groups
             </div>
             <ul class="list-group list-group-flush">
@@ -31,13 +31,13 @@
                 {
                     foreach (var availableGroup in Model.AvailableGroups)
                     {
-                        <li class="list-group-item">
+                        <li class="list-group-item px-3 py-2">
                             <form asp-controller="@PodcastsController.Name"
                                   asp-action="@(nameof(PodcastsController.AddPermissionGroup))"
                                   asp-route-podcastId="@Model.PodcastId"
                                   asp-route-permissionGroupId="@availableGroup.Key">
-                                @availableGroup.Value
-                                <button class="btn btn-link text-success float-right">
+                                <span class="d-inline-block mt-1">@availableGroup.Value</span>
+                                <button class="btn btn-outline-success float-right">
                                     <span class="fa fa-plus-circle"></span>
                                 </button>
                             </form>
@@ -53,7 +53,7 @@
     </div>
     <div class="col-12 col-sm-6">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header px-3">
                 Assigned Groups
             </div>
             <ul class="list-group list-group-flush">
@@ -61,13 +61,13 @@
                 {
                     foreach (var availableGroup in Model.AssignedGroups)
                     {
-                        <li class="list-group-item">
+                        <li class="list-group-item px-3 py-2">
                             <form asp-controller="@PodcastsController.Name"
                                   asp-action="@(nameof(PodcastsController.RemovePermissionGroup))"
                                   asp-route-podcastId="@Model.PodcastId"
                                   asp-route-permissionGroupId="@availableGroup.Key">
-                                @availableGroup.Value
-                                <button class="btn btn-link text-danger float-right">
+                                <span class="d-inline-block mt-1">@availableGroup.Value</span>
+                                <button class="btn btn-outline-danger float-right">
                                     <span class="fa fa-minus-circle"></span>
                                 </button>
                             </form>
