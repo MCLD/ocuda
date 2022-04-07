@@ -20,17 +20,17 @@ namespace Ocuda.Ops.Service
 {
     public class RosterService : BaseService<RosterService>, IRosterService
     {
-        public const string AsOfHeading = "As Of Date";
-        public const string EmailHeading = "Email Address";
-        public const string EmployeeIdHeading = "ID";
-        public const string HireDateHeading = "Orig Hire Date";
-        public const string NameHeading = "Name";
-        public const string PositionHeading = "Position #";
-        public const string RehireDateHeading = "Rehire Date";
-        public const string ReportsToIdHeading = "Reports to ID";
-        public const string ReportsToPosHeading = "Reports to Position";
-        public const string TitleHeading = "Working Title";
-        public const string UnitHeading = "Unit";
+        private const string AsOfHeading = "As Of Date";
+        private const string EmailHeading = "Email Address";
+        private const string EmployeeIdHeading = "ID";
+        private const string HireDateHeading = "Orig Hire Date";
+        private const string NameHeading = "Name";
+        private const string PositionHeading = "Position #";
+        private const string RehireDateHeading = "Rehire Date";
+        private const string ReportsToIdHeading = "Reports to ID";
+        private const string ReportsToPosHeading = "Reports to Position";
+        private const string TitleHeading = "Working Title";
+        private const string UnitHeading = "Unit";
 
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly ILdapService _ldapService;

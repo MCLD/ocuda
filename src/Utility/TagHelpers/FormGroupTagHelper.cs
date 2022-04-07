@@ -146,13 +146,6 @@ namespace Ocuda.Utility.TagHelpers
         private async Task<TagHelperOutput> CreateInputElement(TagHelperOutput output)
         {
             var attributes = new TagHelperAttributeList(output.Attributes);
-
-            //string inputId = null;
-            //if (output.Attributes.TryGetAttribute("id", out var idAttribute))
-            //{
-            //    inputId = idAttribute.Value.ToString();
-            //}
-
             attributes.AddCssClass(defaultInputClass);
             attributes.RemoveAll(attributeName);
             var inputOutput = CreateTagHelperOutput(output.TagName, attributes);

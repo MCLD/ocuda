@@ -2,7 +2,7 @@
 {
     public class SearchFilter : BaseFilter
     {
-        public SearchFilter() : base()
+        public SearchFilter()
         {
         }
 

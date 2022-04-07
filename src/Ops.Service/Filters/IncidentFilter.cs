@@ -4,7 +4,7 @@ namespace Ocuda.Ops.Service.Filters
 {
     public class IncidentFilter : SearchFilter
     {
-        public IncidentFilter() : base()
+        public IncidentFilter()
         {
         }
 
