@@ -166,7 +166,8 @@ namespace Ocuda.Ops.Service
         {
             var hasSiteAdminRights = (
                 await HasAPermissionAsync<PermissionGroupPageContent>(permissionGroupIds)
-                || await HasAPermissionAsync<PermissionGroupPodcastItem>(permissionGroupIds));
+                || await HasAPermissionAsync<PermissionGroupPodcastItem>(permissionGroupIds)
+                || await HasAPermissionAsync<PermissionGroupProductManager>(permissionGroupIds));
 
             if (!hasSiteAdminRights)
             {
