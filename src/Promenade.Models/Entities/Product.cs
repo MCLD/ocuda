@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -27,6 +28,9 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         [MaxLength(255)]
         public string Name { get; set; }
+
+        [NotMapped]
+        public IEnumerable<string> PermissionGroupIds { get; set; }
 
         [Display(Name = "Segment text")]
         public int? SegmentId { get; set; }

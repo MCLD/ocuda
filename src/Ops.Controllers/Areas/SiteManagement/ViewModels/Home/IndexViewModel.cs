@@ -13,11 +13,13 @@
                 return IsSiteManager
                     || HasEmediaPermissions
                     || HasPagePermissions
-                    || HasPodcastPermissions;
+                    || HasPodcastPermissions
+                    || HasProductPermissions;
             }
         }
 
         public bool HasPodcastPermissions { get; set; }
+        public bool HasProductPermissions { get; set; }
         public bool IsSiteManager { get; set; }
     }
 }

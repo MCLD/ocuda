@@ -1,20 +1,21 @@
-﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Section.PermissionsViewModel
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Products.PermissionsViewModel
 
 <div class="row mb-2">
-    <div class="col-sm-7">
-        <h1>Section management permissions</h1>
+    <div class="col-sm-6">
+        <h1>
+            Product Permissions
+            <small class="text-muted">@Model.ProductName</small>
+        </h1>
     </div>
-    <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
-           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Section))"
-           asp-route-sectionSlug="@Model.Slug">Back</a>
+    <div class="col-sm-6">
+        <a class="btn btn-outline-dark mt-2 mb-1 float-right"
+           asp-action="@(nameof(ProductsController.Index))">Back</a>
     </div>
 </div>
 
 <div class="row pt-1">
     <div class="col-12">
-        <input asp-for="Name" formgroup readonly />
+        <input asp-for="ProductName" formgroup readonly />
         <input asp-for="Slug" formgroup readonly />
     </div>
 </div>
@@ -31,10 +32,10 @@
                     foreach (var availableGroup in Model.AvailableGroups)
                     {
                         <li class="list-group-item px-3 py-2">
-                            <form asp-controller="@SectionController.Name"
-                                  asp-action="@(nameof(SectionController.AddPermissionGroup))"
-                                  asp-route-slug="@Model.Slug"
-                                  asp-route-permissionGroupId="@availableGroup.Key">
+                            <form asp-controller="@ProductsController.Name"
+                          asp-action="@nameof(ProductsController.AddPermissionGroup)"
+                          asp-route-productId="@Model.ProductId"
+                          asp-route-permissionGroupId="@availableGroup.Key">
                                 <span class="d-inline-block mt-1">@availableGroup.Value</span>
                                 <button class="btn btn-outline-success float-right">
                                     <span class="fa fa-plus-circle"></span>
@@ -61,10 +62,10 @@
                     foreach (var availableGroup in Model.AssignedGroups)
                     {
                         <li class="list-group-item px-3 py-2">
-                            <form asp-controller="@SectionController.Name"
-                                  asp-action="@(nameof(SectionController.RemovePermissionGroup))"
-                                  asp-route-slug="@Model.Slug"
-                                  asp-route-permissionGroupId="@availableGroup.Key">
+                            <form asp-controller="@ProductsController.Name"
+                          asp-action="@nameof(ProductsController.RemovePermissionGroup)"
+                          asp-route-productId="@Model.ProductId"
+                          asp-route-permissionGroupId="@availableGroup.Key">
                                 <span class="d-inline-block mt-1">@availableGroup.Value</span>
                                 <button class="btn btn-outline-danger float-right">
                                     <span class="fa fa-minus-circle"></span>
