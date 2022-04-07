@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using ExcelDataReader;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
@@ -24,6 +26,10 @@ namespace Ocuda.Ops.Service
 
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly ILocationService _locationService;
+
+        private readonly IPermissionGroupProductManagerRepository
+            _permissionGroupProductManagerRepository;
+
         private readonly IProductLocationInventoryRepository _productLocationInventoryRepository;
         private readonly IProductRepository _productRepository;
         private readonly IUserService _userService;
@@ -32,6 +38,7 @@ namespace Ocuda.Ops.Service
             IHttpContextAccessor httpContextAccessor,
             IDateTimeProvider dateTimeProvider,
             ILocationService locationService,
+            IPermissionGroupProductManagerRepository permissionGroupProductManagerRepository,
             IProductLocationInventoryRepository productLocationInventoryRepository,
             IProductRepository productRepository,
             IUserService userService)
@@ -41,6 +48,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(dateTimeProvider));
             _locationService = locationService
                 ?? throw new ArgumentNullException(nameof(locationService));
+            _permissionGroupProductManagerRepository = permissionGroupProductManagerRepository
+                ?? throw new ArgumentNullException(nameof(permissionGroupProductManagerRepository));
             _productLocationInventoryRepository = productLocationInventoryRepository
                 ?? throw new ArgumentNullException(nameof(productLocationInventoryRepository));
             _productRepository = productRepository
@@ -119,6 +128,11 @@ namespace Ocuda.Ops.Service
             return issues;
         }
 
+        public async Task<Product> GetByIdAsync(int productId)
+        {
+            return await _productRepository.GetByIdAsync(productId);
+        }
+
         public async Task<ICollection<Product>> GetBySegmentIdAsync(int segmentId)
         {
             return await _productRepository.GetBySegmentIdAsync(segmentId);
@@ -126,7 +140,12 @@ namespace Ocuda.Ops.Service
 
         public async Task<Product> GetBySlugAsync(string slug)
         {
-            return await GetBySlugAsync(slug, false);
+            var product = await GetBySlugAsync(slug, false);
+            var perms = await _permissionGroupProductManagerRepository
+                .GetByProductIdAsync(product.Id);
+            product.PermissionGroupIds = perms.Select(_ => _.PermissionGroupId
+                .ToString(CultureInfo.InvariantCulture));
+            return product;
         }
 
         public async Task<Product> GetBySlugAsync(string slug, bool ignoreActiveFlag)
@@ -186,7 +205,16 @@ namespace Ocuda.Ops.Service
 
         public async Task<CollectionWithCount<Product>> GetPaginatedListAsync(BaseFilter filter)
         {
-            return await _productRepository.GetPaginatedListAsync(filter);
+            var products = await _productRepository.GetPaginatedListAsync(filter);
+            foreach (var product in products.Data)
+            {
+                var perms = await _permissionGroupProductManagerRepository
+                    .GetByProductIdAsync(product.Id);
+                product.PermissionGroupIds = perms.Select(_ => _.PermissionGroupId
+                    .ToString(CultureInfo.InvariantCulture));
+            }
+
+            return products;
         }
 
         public async Task LinkSegment(int productId, int segmentId)

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Products;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
@@ -23,12 +24,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     {
         private readonly ILanguageService _languageService;
         private readonly ILocationService _locationService;
+        private readonly IPermissionGroupService _permissionGroupService;
         private readonly IProductService _productService;
         private readonly ISegmentService _segmentService;
 
         public ProductsController(ServiceFacades.Controller<ProductsController> context,
             ILanguageService languageService,
             ILocationService locationService,
+            IPermissionGroupService permissionGroupService,
             IProductService productService,
             ISegmentService segmentService)
             : base(context)
@@ -37,6 +40,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(languageService));
             _locationService = locationService
                 ?? throw new ArgumentNullException(nameof(locationService));
+            _permissionGroupService = permissionGroupService
+                ?? throw new ArgumentNullException(nameof(permissionGroupService));
             _productService = productService
                 ?? throw new ArgumentNullException(nameof(productService));
             _segmentService = segmentService
@@ -49,13 +54,20 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         public static string Name
         { get { return "Products"; } }
 
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpPost("[action]")]
         public async Task<IActionResult> ActivateLocation(string productSlug, int locationId)
         {
+            var product = await _productService.GetBySlugAsync(productSlug);
+
+            if (!CanManage(product))
+            {
+                return RedirectToUnauthorized();
+            }
+
             await _productService.SetActiveLocation(productSlug, locationId, true);
             var location = await _locationService.GetLocationByIdAsync(locationId);
             ShowAlertSuccess("Location activated");
+
             return RedirectToAction(nameof(LocationInventory), new
             {
                 productSlug,
@@ -63,7 +75,25 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             });
         }
 
+        [HttpPost("[action]/{productId}/{permissionGroupId}")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        public async Task<IActionResult> AddPermissionGroup(int productId, int permissionGroupId)
+        {
+            try
+            {
+                await _permissionGroupService
+                    .AddToPermissionGroupAsync<PermissionGroupProductManager>(productId,
+                    permissionGroupId);
+                AlertInfo = "Product management permission added.";
+            }
+            catch (OcudaException oex)
+            {
+                AlertDanger = $"Problem adding permission: {oex.Message}";
+            }
+
+            return RedirectToAction(nameof(Permissions), new { productId });
+        }
+
         [HttpPost]
         [Route("[action]/{productSlug}")]
         public async Task<IActionResult> AddSegment(string productSlug,
@@ -81,6 +111,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 ShowAlertDanger($"Product not found for stub {productSlug}.");
                 return RedirectToAction(nameof(Index));
+            }
+
+            if (!CanManage(product))
+            {
+                return RedirectToUnauthorized();
             }
 
             var languages = await _languageService.GetActiveAsync();
@@ -121,7 +156,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return RedirectToAction(nameof(Details), new { productSlug });
         }
 
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpPost("[action]")]
         public async Task<IActionResult> AddUpdate(DetailsViewModel viewModel)
         {
@@ -132,12 +166,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             else
             {
-                if(viewModel.Product.CacheInventoryMinutes == 0)
+                var product = await _productService.UpdateProductAsync(viewModel.Product);
+                if (!CanManage(product))
+                {
+                    return RedirectToUnauthorized();
+                }
+                if (viewModel.Product.CacheInventoryMinutes == 0)
                 {
                     viewModel.Product.CacheInventoryMinutes = 5;
                     ShowAlertWarning("Cache set to default of 5 minutes.");
                 }
-                var product = await _productService.UpdateProductAsync(viewModel.Product);
                 ShowAlertSuccess("Location updated.");
                 return RedirectToAction(nameof(Details), new
                 {
@@ -178,29 +216,41 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return RedirectToAction(nameof(Product), new { productSlug });
         }
 
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpPost("[action]")]
         public async Task<IActionResult> DeactivateLocation(string productSlug, int locationId)
         {
+            var product = await _productService.GetBySlugAsync(productSlug);
+            if (!CanManage(product))
+            {
+                return RedirectToUnauthorized();
+            }
             await _productService.SetActiveLocation(productSlug, locationId, false);
             ShowAlertWarning("Location deactivated.");
             return RedirectToAction(nameof(Product), new { productSlug });
         }
 
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpGet("[action]/{productSlug}")]
         public async Task<IActionResult> Details(string productSlug)
         {
-            var viewModel = new DetailsViewModel
-            {
-                IsProductManger = IsSiteManager(),
-                Product = await _productService.GetBySlugAsync(productSlug, true)
-            };
+            var product = await _productService.GetBySlugAsync(productSlug, true);
 
-            if (viewModel.Product == null)
+            if (product == null)
             {
                 return RedirectToAction(nameof(ProductsController.Index), ProductsController.Name);
             }
+
+            var canManage = CanManage(product);
+
+            if (!canManage)
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var viewModel = new DetailsViewModel
+            {
+                IsProductManager = canManage,
+                Product = product
+            };
 
             if (viewModel.Product.SegmentId.HasValue)
             {
@@ -264,8 +314,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return RedirectToAction(nameof(Mapping), new { productSlug });
         }
 
-        [Route("")]
-        [Route("[action]/{page}")]
+        [HttpGet("")]
+        [HttpGet("[action]/{page}")]
         public async Task<IActionResult> Index(int page)
         {
             int currentPage = page != 0 ? page : 1;
@@ -274,15 +324,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var productList = await _productService.GetPaginatedListAsync(filter);
 
-            var viewModel = new IndexViewModel
+            var viewModel = new IndexViewModel(productList.Data, UserClaims(ClaimType.PermissionId))
             {
                 BaseLink = await _siteSettingService
                     .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.PromenadeUrl),
                 CurrentPage = currentPage,
                 IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
                 ItemCount = productList.Count,
-                ItemsPerPage = filter.Take.Value,
-                Products = productList.Data
+                ItemsPerPage = filter.Take.Value
             };
 
             if (viewModel.PastMaxPage)
@@ -377,6 +426,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 Product = await _productService.GetBySlugAsync(productSlug)
             };
 
+            if (!CanManage(viewmodel.Product))
+            {
+                return RedirectToUnauthorized();
+            }
+
             if (viewmodel.Product == null)
             {
                 AlertDanger = "Could not find that product.";
@@ -387,6 +441,44 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             viewmodel.Locations = await _locationService.GetAllLocationsAsync();
 
             return View(viewmodel);
+        }
+
+        [HttpGet("[action]/{productId}")]
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        public async Task<IActionResult> Permissions(int productId)
+        {
+            var product = await _productService.GetByIdAsync(productId);
+
+            var permissionGroups = await _permissionGroupService.GetAllAsync();
+            var permissions = await _permissionGroupService
+                .GetPermissionsAsync<PermissionGroupProductManager>(product.Id);
+
+            var viewModel = new PermissionsViewModel
+            {
+                ProductId = product.Id,
+                ProductName = product.Name,
+                Slug = product.Slug
+            };
+
+            foreach (var permissionGroup in permissionGroups)
+            {
+                var permission = permissions
+                    .SingleOrDefault(_ => _.PermissionGroupId == permissionGroup.Id);
+                if (permission == null)
+                {
+                    viewModel
+                        .AvailableGroups
+                        .Add(permissionGroup.Id, permissionGroup.PermissionGroupName);
+                }
+                else
+                {
+                    viewModel
+                        .AssignedGroups
+                        .Add(permissionGroup.Id, permissionGroup.PermissionGroupName);
+                }
+            }
+
+            return View(viewModel);
         }
 
         [HttpGet("{productSlug}")]
@@ -409,10 +501,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var excludedLocations = locations.Where(_ => !locationIdsWithInventories.Contains(_.Id))
                 .ToDictionary(k => k.Id, v => v.Name);
 
+            var productPermission = UserClaims(ClaimType.PermissionId)?
+                .Any(_ => product.PermissionGroupIds.Contains(_)) == true;
+
             var viewModel = new ProductViewModel
             {
                 ExcludedLocations = excludedLocations,
-                IsProductManager = IsSiteManager(),
+                IsProductManager = IsSiteManager() || productPermission,
                 Product = product,
                 LocationInventories = locationInventories
             };
@@ -424,12 +519,41 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         public async Task<IActionResult> RemoveMapping(string productSlug,
             int locationMapId)
         {
+            var product = await _productService.GetBySlugAsync(productSlug);
+            if (product == null)
+            {
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
+
+            if (!CanManage(product))
+            {
+                return RedirectToUnauthorized();
+            }
+
             await _locationService.DeleteMappingAsync(locationMapId);
 
             return RedirectToAction(nameof(Mapping), new { productSlug });
         }
 
+        [HttpPost("[action]/{productId}/{permissionGroupId}")]
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        public async Task<IActionResult> RemovePermissionGroup(int productId, int permissionGroupId)
+        {
+            try
+            {
+                await _permissionGroupService
+                    .RemoveFromPermissionGroupAsync<PermissionGroupProductManager>(productId,
+                    permissionGroupId);
+                AlertInfo = "Product management permission removed.";
+            }
+            catch (OcudaException oex)
+            {
+                AlertDanger = $"Problem removing permission: {oex.Message}";
+            }
+
+            return RedirectToAction(nameof(Permissions), new { productId });
+        }
+
         [HttpPost]
         [Route("[action]/{productSlug}")]
         public async Task<IActionResult> RemoveSegment(string productSlug)
@@ -446,6 +570,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 ShowAlertDanger($"Product not found for slug {productSlug}.");
                 return RedirectToAction(nameof(Index));
+            }
+
+            if (!CanManage(product))
+            {
+                return RedirectToUnauthorized();
             }
 
             if (!product.SegmentId.HasValue)
@@ -622,6 +751,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
 
             return View(verifyViewModel);
+        }
+
+        private bool CanManage(Product product)
+        {
+            return IsSiteManager() || UserClaims(ClaimType.PermissionId)?
+                .Any(_ => product.PermissionGroupIds.Contains(_)) == true;
         }
     }
 }

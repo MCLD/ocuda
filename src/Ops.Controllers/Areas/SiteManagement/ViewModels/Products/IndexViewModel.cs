@@ -6,9 +6,22 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Products
 {
     public class IndexViewModel : PaginateModel
     {
+        public IndexViewModel(ICollection<Product> products, ICollection<string> permissionIds)
+        {
+            PermissionIds = permissionIds;
+            Products = products;
+        }
+
+        public IndexViewModel()
+        {
+            PermissionIds = new List<string>();
+            Products = new List<Product>();
+        }
+
         public string BaseLink { get; set; }
         public bool IsSiteManager { get; set; }
-        public ICollection<Product> Products { get; set; }
+        public ICollection<string> PermissionIds { get; }
+        public ICollection<Product> Products { get; }
 
         public string MakeLink(string slug)
         {

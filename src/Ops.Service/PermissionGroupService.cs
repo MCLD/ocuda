@@ -32,11 +32,16 @@ namespace Ocuda.Ops.Service
         private readonly IPermissionGroupPodcastItemRepository
             _permissionGroupPodcastItemRepository;
 
+        private readonly IPermissionGroupProductManagerRepository
+            _permissionGroupProductManagerRepository;
+
         private readonly IPermissionGroupReplaceFilesRepository
-            _permissionGroupReplaceFilesRepository;
+                    _permissionGroupReplaceFilesRepository;
 
         private readonly IPermissionGroupRepository _permissionGroupRepository;
-        private readonly IPermissionGroupSectionManagerRepository _permissionGroupSectionManagerRepository;
+
+        private readonly IPermissionGroupSectionManagerRepository
+            _permissionGroupSectionManagerRepository;
 
         public PermissionGroupService(ILogger<PermissionGroupService> logger,
             IHttpContextAccessor httpContextAccessor,
@@ -44,25 +49,26 @@ namespace Ocuda.Ops.Service
             IPermissionGroupApplicationRepository permissionGroupApplicationRepository,
             IPermissionGroupPageContentRepository permissionGroupPageContentRepository,
             IPermissionGroupPodcastItemRepository permissionGroupPodcastItemRepository,
+            IPermissionGroupProductManagerRepository permissionGroupProductManagerRepository,
             IPermissionGroupReplaceFilesRepository permissionGroupReplaceFilesRepository,
-            IPermissionGroupSectionManagerRepository permissionGroupSectionManagerRepository,
-            IPermissionGroupRepository permissionGroupRepository)
+            IPermissionGroupRepository permissionGroupRepository,
+            IPermissionGroupSectionManagerRepository permissionGroupSectionManagerRepository)
             : base(logger, httpContextAccessor)
         {
             _dateTimeProvider = dateTimeProvider
                 ?? throw new ArgumentNullException(nameof(dateTimeProvider));
             _permissionGroupApplicationRepository = permissionGroupApplicationRepository
                 ?? throw new ArgumentNullException(nameof(permissionGroupApplicationRepository));
-            _permissionGroupPageContentRepository
-                = permissionGroupPageContentRepository
+            _permissionGroupPageContentRepository = permissionGroupPageContentRepository
                 ?? throw new ArgumentNullException(nameof(permissionGroupPageContentRepository));
-            _permissionGroupPodcastItemRepository
-                = permissionGroupPodcastItemRepository
+            _permissionGroupPodcastItemRepository = permissionGroupPodcastItemRepository
                 ?? throw new ArgumentNullException(nameof(permissionGroupPodcastItemRepository));
-            _permissionGroupRepository = permissionGroupRepository
-                ?? throw new ArgumentNullException(nameof(permissionGroupRepository));
+            _permissionGroupProductManagerRepository = permissionGroupProductManagerRepository
+                ?? throw new ArgumentNullException(nameof(permissionGroupProductManagerRepository));
             _permissionGroupReplaceFilesRepository = permissionGroupReplaceFilesRepository
                 ?? throw new ArgumentNullException(nameof(permissionGroupReplaceFilesRepository));
+            _permissionGroupRepository = permissionGroupRepository
+                ?? throw new ArgumentNullException(nameof(permissionGroupRepository));
             _permissionGroupSectionManagerRepository = permissionGroupSectionManagerRepository
                 ?? throw new ArgumentNullException(nameof(permissionGroupSectionManagerRepository));
         }
@@ -112,7 +118,7 @@ namespace Ocuda.Ops.Service
         {
             if (GetAddPermissionMap().TryGetValue(typeof(T), out var delegateMethod))
             {
-                delegateMethod(itemId, permissionGroupId);
+                await delegateMethod(itemId, permissionGroupId);
                 _logger.LogInformation("User {CurrentUser} just added permission group id {PermissionGroupId} to {ItemType} id {ItemId}",
                     GetCurrentUserId(),
                     permissionGroupId,
@@ -160,7 +166,8 @@ namespace Ocuda.Ops.Service
         {
             var hasSiteAdminRights = (
                 await HasAPermissionAsync<PermissionGroupPageContent>(permissionGroupIds)
-                || await HasAPermissionAsync<PermissionGroupPodcastItem>(permissionGroupIds));
+                || await HasAPermissionAsync<PermissionGroupPodcastItem>(permissionGroupIds)
+                || await HasAPermissionAsync<PermissionGroupProductManager>(permissionGroupIds));
 
             if (!hasSiteAdminRights)
             {
@@ -193,7 +200,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<ICollection<PermissionGroup>> GetAllAsync()
         {
-            return await _permissionGroupRepository.GetAllAsync();
+            var permissions = await _permissionGroupRepository.GetAllAsync();
+            return permissions.OrderBy(_ => _.PermissionGroupName).ToList();
         }
 
         public async Task<int> GetApplicationPermissionGroupCountAsync(string permission)
@@ -285,7 +293,7 @@ namespace Ocuda.Ops.Service
         {
             if (GetRemovePermissionMap().TryGetValue(typeof(T), out var delegateMethod))
             {
-                delegateMethod(itemId, permissionGroupId);
+                await delegateMethod(itemId, permissionGroupId);
                 _logger.LogInformation("User {CurrentUser} just added permission group id {PermissionGroupId} to {ItemType} id {ItemId}",
                     GetCurrentUserId(),
                     permissionGroupId,
@@ -298,9 +306,9 @@ namespace Ocuda.Ops.Service
             }
         }
 
-        private Dictionary<Type, Action<int, int>> GetAddPermissionMap()
+        private Dictionary<Type, Func<int, int, Task>> GetAddPermissionMap()
         {
-            return new Dictionary<Type, Action<int, int>>
+            return new Dictionary<Type, Func<int, int, Task>>
             {
                 { typeof(PermissionGroupPodcastItem), async (_, __)
                     => await _permissionGroupPodcastItemRepository.AddSaveAsync(_, __) },
@@ -308,8 +316,10 @@ namespace Ocuda.Ops.Service
                     => await _permissionGroupPageContentRepository.AddSaveAsync(_, __) },
                 { typeof(PermissionGroupReplaceFiles), async(_, __)
                     => await _permissionGroupReplaceFilesRepository.AddSaveAsync(_, __) },
+                { typeof(PermissionGroupProductManager), async(_, __)
+                    => await _permissionGroupProductManagerRepository.AddSaveAsync(_, __) },
                 { typeof(PermissionGroupSectionManager), async(_, __)
-                    => await _permissionGroupSectionManagerRepository.AddSaveAsync(_, __) }
+                    => await _permissionGroupSectionManagerRepository.AddSaveAsync(_, __) },
             };
         }
 
@@ -323,6 +333,8 @@ namespace Ocuda.Ops.Service
                     => await _permissionGroupPageContentRepository.AnyPermissionGroupIdAsync(_) },
                 { typeof(PermissionGroupReplaceFiles), async _
                     => await _permissionGroupReplaceFilesRepository.AnyPermissionGroupIdAsync(_) },
+                { typeof(PermissionGroupProductManager), async _
+                    => await _permissionGroupProductManagerRepository.AnyPermissionGroupIdAsync(_) },
                 { typeof(PermissionGroupSectionManager), async _
                     => await _permissionGroupSectionManagerRepository.AnyPermissionGroupIdAsync(_) }
             };
@@ -338,6 +350,8 @@ namespace Ocuda.Ops.Service
                     => await _permissionGroupPageContentRepository.GetByPermissionGroupIdsAsync(_) },
                 { typeof(PermissionGroupReplaceFiles), async _
                     => await _permissionGroupReplaceFilesRepository.GetByPermissionGroupIdsAsync(_) },
+                { typeof(PermissionGroupProductManager), async _
+                    => await _permissionGroupProductManagerRepository.GetByPermissionGroupIdsAsync(_) },
                 { typeof(PermissionGroupSectionManager), async _
                     => await _permissionGroupSectionManagerRepository.GetByPermissionGroupIdsAsync(_) }
             };
@@ -353,14 +367,16 @@ namespace Ocuda.Ops.Service
                     => await _permissionGroupPageContentRepository.GetByPageHeaderId(_) },
                 { typeof(PermissionGroupReplaceFiles), async _
                     => await _permissionGroupReplaceFilesRepository.GetByFileLibraryId(_) },
+                { typeof(PermissionGroupProductManager), async _
+                    => await _permissionGroupProductManagerRepository.GetByProductIdAsync(_) },
                 { typeof(PermissionGroupSectionManager), async _
                     => await _permissionGroupSectionManagerRepository.GetBySectionIdAsync(_) }
             };
         }
 
-        private Dictionary<Type, Action<int, int>> GetRemovePermissionMap()
+        private Dictionary<Type, Func<int, int, Task>> GetRemovePermissionMap()
         {
-            return new Dictionary<Type, Action<int, int>>
+            return new Dictionary<Type, Func<int, int, Task>>
             {
                 { typeof(PermissionGroupPodcastItem),async (_, __)
                     => await _permissionGroupPodcastItemRepository.RemoveSaveAsync(_, __) },
@@ -368,6 +384,8 @@ namespace Ocuda.Ops.Service
                     => await _permissionGroupPageContentRepository.RemoveSaveAsync(_, __) },
                 { typeof(PermissionGroupReplaceFiles), async(_, __)
                     => await _permissionGroupReplaceFilesRepository.RemoveSaveAsync(_, __) },
+                { typeof(PermissionGroupProductManager), async(_, __)
+                    => await _permissionGroupProductManagerRepository.RemoveSaveAsync(_, __) },
                 { typeof(PermissionGroupSectionManager), async(_, __)
                     => await _permissionGroupSectionManagerRepository.RemoveSaveAsync(_, __) }
             };

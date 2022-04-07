@@ -95,9 +95,9 @@
                 </div>
                 <div class="card-body">
                     <a asp-area="@NavigationsController.Area"
-                       asp-controller="@NavigationsController.Name"
-                       asp-action="@nameof(NavigationsController.Index)"
-                       class="btn btn-outline-info mt-1">View @NavigationsController.Name</a>
+                   asp-controller="@NavigationsController.Name"
+                   asp-action="@nameof(NavigationsController.Index)"
+                   class="btn btn-outline-info mt-1">View @NavigationsController.Name</a>
                 </div>
             </div>
         </div>
@@ -134,19 +134,22 @@
             </div>
         </div>
     }
-    <div class="col-12 col-md-4 my-2">
-        <div class="card">
-            <div class="card-header lead font-weight-bold">
-                @ProductsController.Name
-            </div>
-            <div class="card-body">
-                <a asp-area="@ProductsController.Area"
+    @if (Model.IsSiteManager || Model.HasProductPermissions)
+    {
+        <div class="col-12 col-md-4 my-2">
+            <div class="card">
+                <div class="card-header lead font-weight-bold">
+                    @ProductsController.Name
+                </div>
+                <div class="card-body">
+                    <a asp-area="@ProductsController.Area"
                    asp-controller="@ProductsController.Name"
                    asp-action="@nameof(ProductsController.Index)"
                    class="btn btn-outline-info mt-1">View @ProductsController.Name</a>
+                </div>
             </div>
         </div>
-    </div>
+    }
     @if (Model.IsSiteManager)
     {
         <div class="col-12 col-md-4 my-2">

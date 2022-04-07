@@ -51,6 +51,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     .HasAPermissionAsync<PermissionGroupPageContent>(numericPermissionIds);
                 viewModel.HasPodcastPermissions = await _permissionGroupService
                     .HasAPermissionAsync<PermissionGroupPodcastItem>(numericPermissionIds);
+                viewModel.HasProductPermissions = await _permissionGroupService
+                    .HasAPermissionAsync<PermissionGroupProductManager>(numericPermissionIds);
             }
 
             return View(viewModel);

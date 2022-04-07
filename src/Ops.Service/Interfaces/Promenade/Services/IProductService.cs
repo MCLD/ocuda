@@ -12,6 +12,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
             bool addValues,
             IDictionary<int, int> adjustments);
 
+        Task<Product> GetByIdAsync(int productId);
+
         Task<ICollection<Product>> GetBySegmentIdAsync(int segmentId);
 
         Task<Product> GetBySlugAsync(string slug);
