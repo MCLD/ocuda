@@ -13,7 +13,8 @@
                 return IsSiteManager
                     || HasEmediaPermissions
                     || HasPagePermissions
-                    || HasPodcastPermissions;
+                    || HasPodcastPermissions
+                    || HasProductPermissions;
             }
         }
 
