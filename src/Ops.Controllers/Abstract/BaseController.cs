@@ -89,7 +89,7 @@ namespace Ocuda.Ops.Controllers.Abstract
                 if (port.HasValue && (port != 80 && port != 443))
                 {
                     builder.Port = port.Value;
-                };
+                }
                 return builder;
             }
         }

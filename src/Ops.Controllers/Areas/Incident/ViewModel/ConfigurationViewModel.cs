@@ -10,12 +10,11 @@ namespace Ocuda.Ops.Controllers.Areas.Incident.ViewModel
             SecondaryHeading = "Configuration";
         }
 
+        public bool CanConfigureEmails { get; set; }
         public bool CanConfigureIncidents { get; set; }
+        public int EmailTemplateId { get; set; }
         public ICollection<Models.Entities.IncidentType> IncidentTypes { get; set; }
 
         public string LawEnforcementAddresses { get; set; }
-        public int EmailTemplateId { get; set; }
-
-        public bool CanConfigureEmails { get; set; }
     }
 }
