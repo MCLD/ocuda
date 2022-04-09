@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
@@ -117,6 +116,11 @@ namespace Ocuda.Ops.Service
             return await _userRepository.GetNameUsernameAsync(id);
         }
 
+        public async Task<User> GetSupervisorAsync(int userId)
+        {
+            return await _userRepository.GetSupervisorAsync(userId);
+        }
+
         public async Task<bool> IsSupervisor(int userId)
         {
             // TODO add caching
@@ -155,7 +159,7 @@ namespace Ocuda.Ops.Service
 
         public async Task UpdateLocationAsync(int userId, int locationId)
         {
-            if(userId != GetCurrentUserId() && !IsSiteManager())
+            if (userId != GetCurrentUserId() && !IsSiteManager())
             {
                 throw new OcudaException("Permission denied.");
             }

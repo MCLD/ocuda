@@ -10,7 +10,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
     {
         public Task<int> AddAsync(Incident incident,
             ICollection<IncidentStaff> staffs,
-            ICollection<IncidentParticipant> participants);
+            ICollection<IncidentParticipant> participants,
+            System.Uri baseUri);
 
         public Task AddFollowupAsync(int incidentId, string followupText);
 

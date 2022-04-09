@@ -34,6 +34,12 @@
             public static readonly string ThumbnailTypes = "FileManagement.ThumbnailTypes";
         }
 
+        public static class Incident
+        {
+            public static readonly string LawEnforcementAddresses = "Incident.LawEnforcementAddresses";
+            public static readonly string EmailTemplateId = "Incident.EmailTemplateId";
+        }
+
         public static class SiteManagement
         {
             public static readonly string PromenadePublicPath = "SiteManagement.PromenadePublicPath";

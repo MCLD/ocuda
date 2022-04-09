@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -19,6 +20,7 @@ namespace Ocuda.Ops.Service
     public class IncidentService : BaseService<IncidentService>, IIncidentService
     {
         private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly IEmailService _emailService;
         private readonly IIncidentFollowupRepository _incidentFollowupRepository;
         private readonly IIncidentParticipantRepository _incidentParticipantRepository;
         private readonly IIncidentRelationshipRepository _incidentRelationshipRepository;
@@ -26,11 +28,13 @@ namespace Ocuda.Ops.Service
         private readonly IIncidentStaffRepository _incidentStaffRepository;
         private readonly IIncidentTypeRepository _incidentTypeRepository;
         private readonly ILocationRepository _locationRepository;
+        private readonly ISiteSettingService _siteSettingService;
         private readonly IUserService _userService;
 
         public IncidentService(ILogger<IncidentService> logger,
             IHttpContextAccessor httpContextAccessor,
             IDateTimeProvider dateTimeProvider,
+            IEmailService emailService,
             IIncidentFollowupRepository incidentFollowupRepository,
             IIncidentParticipantRepository incidentParticipantRepository,
             IIncidentRelationshipRepository incidentRelationshipRepository,
@@ -38,10 +42,12 @@ namespace Ocuda.Ops.Service
             IIncidentTypeRepository incidentTypeRepository,
             IIncidentStaffRepository incidentStaffRepository,
             ILocationRepository locationRepository,
+            ISiteSettingService siteSettingService,
             IUserService userService) : base(logger, httpContextAccessor)
         {
             _dateTimeProvider = dateTimeProvider
                 ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+            _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
             _incidentFollowupRepository = incidentFollowupRepository
                 ?? throw new ArgumentNullException(nameof(incidentFollowupRepository));
             _incidentParticipantRepository = incidentParticipantRepository
@@ -56,16 +62,20 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(incidentTypeRepository));
             _locationRepository = locationRepository
                 ?? throw new ArgumentNullException(nameof(locationRepository));
+            _siteSettingService = siteSettingService
+                ?? throw new ArgumentNullException(nameof(siteSettingService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
         public async Task<int> AddAsync(Incident incident,
             ICollection<IncidentStaff> staffs,
-            ICollection<IncidentParticipant> participants)
+            ICollection<IncidentParticipant> participants,
+            Uri baseUri)
         {
             if (incident == null) { throw new ArgumentNullException(nameof(incident)); }
             if (staffs == null) { throw new ArgumentNullException(nameof(staffs)); }
             if (participants == null) { throw new ArgumentNullException(nameof(participants)); }
+            if (baseUri == null) { throw new ArgumentNullException(nameof(baseUri)); }
 
             var now = _dateTimeProvider.Now;
 
@@ -97,6 +107,50 @@ namespace Ocuda.Ops.Service
 
                 await _incidentParticipantRepository.AddRangeAsync(participants);
                 await _incidentParticipantRepository.SaveAsync();
+            }
+
+            var link = baseUri.AbsoluteUri.TrimEnd('0') + incident.Id;
+
+            var emailTemplateId = await _siteSettingService
+                .GetSettingIntAsync(Ops.Models.Keys.SiteSetting.Incident.EmailTemplateId);
+            if (emailTemplateId != default)
+            {
+                var currentUser = await _userService.GetByIdAsync(GetCurrentUserId());
+                var tags = await GetEmailTagsAsync(incident, currentUser.Name, link);
+
+                var details = await _emailService.GetDetailsAsync(emailTemplateId,
+                    CultureInfo.CurrentUICulture.Name,
+                    tags);
+
+                details.ToName = currentUser.Name;
+                details.ToEmailAddress = currentUser.Email;
+
+                var supervisor = await _userService.GetSupervisorAsync(incident.CreatedBy);
+                if (!string.IsNullOrEmpty(supervisor?.Email))
+                {
+                    details.Cc.Add(supervisor.Name, supervisor.Email);
+                }
+
+                if (incident.LawEnforcementContacted)
+                {
+                    var lawEnforcementAddresses = await _siteSettingService.GetSettingStringAsync(
+                        Ops.Models.Keys.SiteSetting.Incident.LawEnforcementAddresses);
+
+                    if (!string.IsNullOrEmpty(lawEnforcementAddresses))
+                    {
+                        var addresses = lawEnforcementAddresses.Contains(',',
+                            StringComparison.OrdinalIgnoreCase)
+                            ? lawEnforcementAddresses.Split(',')
+                            : new string[] { lawEnforcementAddresses };
+
+                        foreach (var address in addresses)
+                        {
+                            details.Cc.Add(address, address);
+                        }
+                    }
+                }
+
+                await _emailService.SendAsync(details);
             }
 
             return incident.Id;
@@ -235,7 +289,7 @@ namespace Ocuda.Ops.Service
                     if (followup.UpdatedBy.HasValue)
                     {
                         followup.UpdatedByUser
-                            = await _userService.GetByIdAsync(followup.UpdatedBy.Value);                       
+                            = await _userService.GetByIdAsync(followup.UpdatedBy.Value);
                     }
                 }
             }
@@ -261,7 +315,8 @@ namespace Ocuda.Ops.Service
                         relatedIncident.UpdatedByUser
                             = await _userService.GetByIdAsync(relatedIncident.UpdatedBy.Value);
                     }
-                    relatedIncident.RelatedByUser = await _userService.GetByIdAsync(related.CreatedBy);
+                    relatedIncident.RelatedByUser = await _userService
+                        .GetByIdAsync(related.CreatedBy);
                     relatedIncident.RelatedAt = related.CreatedAt;
                     incident.RelatedIncidents.Add(relatedIncident);
                 }
@@ -311,7 +366,8 @@ namespace Ocuda.Ops.Service
             return await _incidentTypeRepository.GetAsync(incidentTypeName);
         }
 
-        public async Task UpdateIncidentTypeAsync(int incidentTypeId, string incidentTypeDescription)
+        public async Task UpdateIncidentTypeAsync(int incidentTypeId, 
+            string incidentTypeDescription)
         {
             var type = await _incidentTypeRepository.FindAsync(incidentTypeId);
             if (type == null)
@@ -323,6 +379,26 @@ namespace Ocuda.Ops.Service
             type.UpdatedBy = GetCurrentUserId();
             _incidentTypeRepository.Update(type);
             await _incidentTypeRepository.SaveAsync();
+        }
+
+        private async Task<IDictionary<string, string>> GetEmailTagsAsync(Incident incident,
+            string submitterName,
+            string link)
+        {
+            var incidentTypes = await GetAllIncidentTypesAsync();
+
+            return new Dictionary<string, string>
+            {
+                { "IncidentId", incident.Id.ToString(CultureInfo.InvariantCulture) },
+                { "IncidentType", incidentTypes[incident.IncidentTypeId] },
+                { "LawEnforcementContacted", incident.LawEnforcementContacted
+                    ? "Law enforcement was contacted."
+                    : "Law enforcement was not contacted."},
+                { "Link", link },
+                { "ReportedBy", !string.IsNullOrEmpty(incident.ReportedByName)
+                    ? incident.ReportedByName
+                    : submitterName}
+            };
         }
     }
 }

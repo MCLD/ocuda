@@ -12,5 +12,10 @@ namespace Ocuda.Ops.Controllers.Areas.Incident.ViewModel
 
         public bool CanConfigureIncidents { get; set; }
         public ICollection<Models.Entities.IncidentType> IncidentTypes { get; set; }
+
+        public string LawEnforcementAddresses { get; set; }
+        public int EmailTemplateId { get; set; }
+
+        public bool CanConfigureEmails { get; set; }
     }
 }

@@ -153,6 +153,29 @@ namespace Ocuda.Ops.Models.Defaults
 
             #endregion FileManagement
 
+            #region Incident
+
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.Incident.LawEnforcementAddresses,
+                Name = "Law Enforcement addresses",
+                Description = "Comma-separated email addresses to email incident reports when law enforcement is contacted",
+                Category = "Incident",
+                Value = "",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.Incident.EmailTemplateId,
+                Name = "Email template id",
+                Description = "Email template id to use when sending a notificaton about a new incident report, 0 is disabled",
+                Category = "Incident",
+                Value = "0",
+                Type = SiteSettingType.Int
+            },
+
+            #endregion Incident
+
             #region SiteManagement
 
             new SiteSetting

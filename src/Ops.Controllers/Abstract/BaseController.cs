@@ -76,6 +76,24 @@ namespace Ocuda.Ops.Controllers.Abstract
             }
         }
 
+        protected UriBuilder BaseUriBuilder
+        {
+            get
+            {
+                var builder = new UriBuilder
+                {
+                    Scheme = HttpContext.Request.Scheme,
+                    Host = HttpContext.Request.Host.Host
+                };
+                var port = HttpContext.Request.Host.Port;
+                if (port.HasValue && (port != 80 && port != 443))
+                {
+                    builder.Port = port.Value;
+                };
+                return builder;
+            }
+        }
+
         protected int CurrentUserId
         {
             get

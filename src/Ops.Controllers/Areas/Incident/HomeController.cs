@@ -127,12 +127,16 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
                         IncidentParticipantType.Witness);
                 }
 
+                var baseUri = BaseUriBuilder;
+                baseUri.Path = Url.Action(nameof(Details), new { id = 0 });
+
                 var incidentId = await _incidentService.AddAsync(viewModel.Incident,
                     affectedStaff.Union(witnessStaff).ToList(),
-                    affectedPeople.Union(witnessPeople).ToList());
+                    affectedPeople.Union(witnessPeople).ToList(),
+                    baseUri.Uri);
 
-                // eventually redirect to the deatils page for this incident
                 ShowAlertSuccess($"Incident {incidentId} created.");
+                return RedirectToAction(nameof(Details), new { id = incidentId });
             }
             else
             {
@@ -248,10 +252,15 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
 
             var viewModel = new ConfigurationViewModel
             {
+                CanConfigureEmails = IsSiteManager(),
                 CanConfigureIncidents = IsSiteManager(),
+                EmailTemplateId = await _siteSettingService
+                    .GetSettingIntAsync(Models.Keys.SiteSetting.Incident.EmailTemplateId),
                 IncidentTypes = incidentTypes.Data,
                 ItemCount = incidentTypes.Count,
-                ItemsPerPage = filter.Take.Value
+                ItemsPerPage = filter.Take.Value,
+                LawEnforcementAddresses = await _siteSettingService
+                    .GetSettingStringAsync(Models.Keys.SiteSetting.Incident.LawEnforcementAddresses),
             };
 
             if (viewModel.PastMaxPage)
@@ -330,6 +339,42 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             SetPageTitle($"{PageTitle}: {nameof(Mine)}");
 
             return View("Index", viewModel);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> UpdateEmailSettings(int emailTemplateId,
+            string lawEnforcementAddresses)
+        {
+            var issues = new List<string>();
+            if (emailTemplateId == default)
+            {
+                issues.Add("No email template set, emails will not be sent.");
+            }
+            await _siteSettingService
+                .UpdateAsync(Models.Keys.SiteSetting.Incident.EmailTemplateId,
+                    emailTemplateId.ToString(CultureInfo.InvariantCulture));
+
+            if (string.IsNullOrEmpty(lawEnforcementAddresses))
+            {
+                issues.Add("No law enforcement destination email addresses set, emails will not be sent.");
+            }
+            await _siteSettingService
+                .UpdateAsync(Models.Keys.SiteSetting.Incident.LawEnforcementAddresses,
+                    lawEnforcementAddresses);
+
+            if (issues.Any())
+            {
+                var sb = new System.Text.StringBuilder("Some issues were encountered:<ul>");
+                issues.ForEach(_ => sb.Append("<li>").Append(_).AppendLine("</li>"));
+                sb.Append("</ul>");
+                ShowAlertWarning(sb.ToString());
+            }
+            else
+            {
+                ShowAlertSuccess("Updated incident email configuration.");
+            }
+
+            return RedirectToAction(nameof(Configuration));
         }
 
         [HttpPost("[action]")]

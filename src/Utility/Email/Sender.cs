@@ -79,9 +79,10 @@ namespace Ocuda.Utility.Email
             if (details.Tags?.Count > 0)
             {
                 var stubble = new StubbleBuilder().Build();
-                details.BodyText = await stubble.RenderAsync(details.BodyText, details.Tags);
                 details.BodyHtml = await stubble.RenderAsync(details.BodyHtml, details.Tags);
+                details.BodyText = await stubble.RenderAsync(details.BodyText, details.Tags);
                 details.Preview = await stubble.RenderAsync(details.Preview, details.Tags);
+                details.Subject = await stubble.RenderAsync(details.Subject, details.Tags);
             }
 
             // apply the sections to the HTML template
@@ -106,7 +107,7 @@ namespace Ocuda.Utility.Email
                     StringComparison.OrdinalIgnoreCase);
             }
 
-            var message = new MimeMessage
+            using var message = new MimeMessage
             {
                 Subject = details.Subject,
                 Body = new BodyBuilder
@@ -132,6 +133,28 @@ namespace Ocuda.Utility.Email
             if (!string.IsNullOrWhiteSpace(details.BccEmailAddress))
             {
                 message.Bcc.Add(MailboxAddress.Parse(details.BccEmailAddress));
+            }
+
+            if (details.Cc?.Count > 0)
+            {
+                foreach (var item in details.Cc)
+                {
+                    if (!string.IsNullOrWhiteSpace(details.OverrideEmailToAddress))
+                    {
+                        message.Cc.Add(MailboxAddress.Parse(details.OverrideEmailToAddress));
+                    }
+                    else
+                    {
+                        if (item.Key == item.Value)
+                        {
+                            message.Cc.Add(MailboxAddress.Parse(item.Key));
+                        }
+                        else
+                        {
+                            message.Cc.Add(new MailboxAddress(item.Key, item.Value));
+                        }
+                    }
+                }
             }
 
             using var client = new SmtpClient
@@ -190,10 +213,11 @@ namespace Ocuda.Utility.Email
                 using (LogContext.PushProperty("EmailToAddressOverride", details.OverrideEmailToAddress))
                 using (LogContext.PushProperty("EmailServerResponse", details.SentResponse))
                 {
-                    _logger.LogInformation("Email sent to: {EmailAddress} in {Elapsed} ms",
+                    _logger.LogInformation("Email sent to {EmailAddress} subject {EmailSubject} in {Elapsed} ms",
                         string.IsNullOrWhiteSpace(details.OverrideEmailToAddress)
                             ? details.ToEmailAddress
                             : details.OverrideEmailToAddress,
+                        details.Subject,
                         sendTimer.ElapsedMilliseconds);
                 }
 

@@ -18,6 +18,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 
         Task<(string name, string username)> GetNameUsernameAsync(int id);
 
+        Task<User> GetSupervisorAsync(int userId);
+
         Task<User> GetSystemAdministratorAsync();
 
         Task<bool> IsDuplicateEmail(User user);

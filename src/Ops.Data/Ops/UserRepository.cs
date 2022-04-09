@@ -76,6 +76,15 @@ namespace Ocuda.Ops.Data.Ops
             return (name: userDetails.Name, username: userDetails.Username);
         }
 
+        public async Task<User> GetSupervisorAsync(int userId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Id == userId)
+                .Select(_ => _.Supervisor)
+                .SingleOrDefaultAsync();
+        }
+
         public async Task<bool> IsDuplicateEmail(User user)
         {
             return await DbSet
@@ -104,7 +113,8 @@ namespace Ocuda.Ops.Data.Ops
                 .AsNoTracking()
                 .Where(_ => !_.IsDeleted && _.IsInLatestRoster == true);
 
-            if (!string.IsNullOrEmpty(searchFilter.SearchText)) {
+            if (!string.IsNullOrEmpty(searchFilter.SearchText))
+            {
                 query = query.Where(_ => _.Name.Contains(searchFilter.SearchText)
                 || _.Email.Contains(searchFilter.SearchText)
                 || _.Username.Contains(searchFilter.SearchText));

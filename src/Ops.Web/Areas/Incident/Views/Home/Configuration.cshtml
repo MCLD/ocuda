@@ -105,6 +105,57 @@ else
         </div>
     </div>
 }
+
+<form asp-action="@nameof(HomeController.UpdateEmailSettings)">
+    <table class="table table-sm table-bordered table-hover table-striped">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="align-middle">
+                    <label for="emailTemplateId">Incident email template id</label>
+                </td>
+                <td class="align-middle">
+                    <input class="form-control"
+                           disabled="@(Model.CanConfigureEmails ? null : "disabled")"
+                           id="emailTemplateId"
+                           name="emailTemplateId"
+                           value="@Model.EmailTemplateId"
+                           type="number" />
+                </td>
+            </tr>
+            <tr>
+                <td class="align-middle">
+                    <label for="lawEnforcementAddresses">Law Enforcement email destinations</label>
+                    <br /><em><small>(comma separated)</small></em>
+                </td>
+                <td class="align-middle">
+                    <input class="form-control"
+                           disabled="@(Model.CanConfigureEmails ? null : "disabled")"
+                           id="lawEnforcementAddresses"
+                           name="lawEnforcementAddresses"
+                           value="@Model.LawEnforcementAddresses"
+                           type="text" />
+                </td>
+            </tr>
+        </tbody>
+        @if (Model.CanConfigureEmails)
+        {
+            <tfoot>
+                <tr>
+                    <td colspan="2" class="align-middle text-right">
+                        <button type="submit" class="btn btn-outline-dark">Update email settings</button>
+                    </td>
+                </tr>
+            </tfoot>
+        }
+    </table>
+</form>
+
 @if (Model.CanConfigureIncidents)
 {
     <form asp-action="@nameof(HomeController.AddType)" method="post" role="form">
