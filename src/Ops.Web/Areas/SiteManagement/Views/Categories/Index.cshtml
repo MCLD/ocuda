@@ -77,10 +77,7 @@
     </div>
 </div>
 
-@if (Model.PaginateModel.MaxPage > 1)
-{
-    <paginate paginateModel="@Model.PaginateModel"></paginate>
-}
+<nav paginate="@Model.PaginateModel"></nav>
 
 <form id="addForm" role="form">
     <div modal

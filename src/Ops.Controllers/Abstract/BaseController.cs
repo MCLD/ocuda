@@ -6,9 +6,12 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models.Abstract;
+using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
@@ -24,6 +27,7 @@ namespace Ocuda.Ops.Controllers.Abstract
         protected readonly ILogger _logger;
         protected readonly ISiteSettingService _siteSettingService;
         protected readonly IUserContextProvider _userContextProvider;
+        private string _pageTitle;
 
         protected BaseController(ServiceFacades.Controller<T> context)
         {
@@ -72,6 +76,24 @@ namespace Ocuda.Ops.Controllers.Abstract
             }
         }
 
+        protected UriBuilder BaseUriBuilder
+        {
+            get
+            {
+                var builder = new UriBuilder
+                {
+                    Scheme = HttpContext.Request.Scheme,
+                    Host = HttpContext.Request.Host.Host
+                };
+                var port = HttpContext.Request.Host.Port;
+                if (port.HasValue && (port != 80 && port != 443))
+                {
+                    builder.Port = port.Value;
+                }
+                return builder;
+            }
+        }
+
         protected int CurrentUserId
         {
             get
@@ -99,11 +121,60 @@ namespace Ocuda.Ops.Controllers.Abstract
             }
         }
 
+        public override async Task OnActionExecutionAsync(ActionExecutingContext context,
+            ActionExecutionDelegate next)
+        {
+            if (context == null) { throw new ArgumentNullException(nameof(context)); }
+            if (next == null) { throw new ArgumentNullException(nameof(next)); }
+
+            await base.OnActionExecutionAsync(context, next);
+
+            var titleBase = await _siteSettingService.GetSettingStringAsync(Models
+                .Keys.SiteSetting.UserInterface.PageTitleBase);
+
+            var title = new System.Text.StringBuilder(titleBase?.Trim());
+
+            if (title.Length > 0 && !string.IsNullOrEmpty(_pageTitle))
+            {
+                title.Append(" - ");
+            }
+            if (!string.IsNullOrEmpty(_pageTitle))
+            {
+                title.Append(_pageTitle);
+            }
+
+            ViewData[Utility.Keys.ViewData.Title] = title.ToString();
+        }
+
+        protected async Task<IDictionary<int, string>>
+                    GetLocationsAsync(ILocationService locationService)
+        {
+            if (locationService == null)
+            {
+                throw new ArgumentNullException(nameof(locationService));
+            }
+
+            return await locationService.GetAllLocationsIdNameAsync();
+        }
+
+        protected async Task<IEnumerable<SelectListItem>>
+            GetLocationsDropdownAsync(ILocationService locationService)
+        {
+            var locations = await GetLocationsAsync(locationService);
+            return locations.Select(_ => new SelectListItem
+            {
+                Value = _.Key.ToString(CultureInfo.InvariantCulture),
+                Text = _.Value
+            });
+        }
+
         protected async Task<bool> HasAppPermissionAsync(
-            IPermissionGroupService permissionGroupService,
+                    IPermissionGroupService permissionGroupService,
             string applicationPermission)
         {
-            if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
+            if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
+                && !applicationPermission.Equals(ApplicationPermission.MultiUserAccount,
+                    StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
@@ -169,6 +240,11 @@ namespace Ocuda.Ops.Controllers.Abstract
             return RedirectToAction(nameof(HomeController.Unauthorized),
                HomeController.Name,
                new { area = "", returnUrl = new Uri(Request.GetDisplayUrl()) });
+        }
+
+        protected void SetPageTitle(string pageTitle)
+        {
+            _pageTitle = pageTitle?.Trim();
         }
 
         protected void ShowAlertDanger(string message, string details = null)

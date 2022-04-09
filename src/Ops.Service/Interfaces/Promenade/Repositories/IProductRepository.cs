@@ -16,6 +16,6 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 
         Task<ICollection<Product>> GetBySegmentIdAsync(int segmentId);
 
-        Task<ICollectionWithCount<Product>> GetPaginatedListAsync(BaseFilter filter);
+        Task<CollectionWithCount<Product>> GetPaginatedListAsync(BaseFilter filter);
     }
 }

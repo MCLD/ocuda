@@ -1,54 +1,128 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ExcelDataReader;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Abstract;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service
 {
     public class RosterService : BaseService<RosterService>, IRosterService
     {
-        public const string NameHeading = "Name";
-        public const string EmployeeIdHeading = "ID";
-        public const string PositionHeading = "Position #";
-        public const string TitleHeading = "Working Title";
-        public const string HireDateHeading = "Orig Hire Date";
-        public const string RehireDateHeading = "Rehire Date";
-        public const string ReportsToIdHeading = "Reports to ID";
-        public const string ReportsToPosHeading = "Reports to Position";
-        public const string EmailHeading = "Email Address";
-        public const string AsOfHeading = "As Of Date";
+        private const string AsOfHeading = "As Of Date";
+        private const string EmailHeading = "Email Address";
+        private const string EmployeeIdHeading = "ID";
+        private const string HireDateHeading = "Orig Hire Date";
+        private const string NameHeading = "Name";
+        private const string PositionHeading = "Position #";
+        private const string RehireDateHeading = "Rehire Date";
+        private const string ReportsToIdHeading = "Reports to ID";
+        private const string ReportsToPosHeading = "Reports to Position";
+        private const string TitleHeading = "Working Title";
+        private const string UnitHeading = "Unit";
 
+        private readonly IDateTimeProvider _dateTimeProvider;
         private readonly ILdapService _ldapService;
+        private readonly ILocationService _locationService;
         private readonly IRosterDetailRepository _rosterDetailRepository;
         private readonly IRosterHeaderRepository _rosterHeaderRepository;
+        private readonly IUnitLocationMapRepository _unitLocationMapRepository;
         private readonly IUserRepository _userRepository;
 
         public RosterService(ILogger<RosterService> logger,
             IHttpContextAccessor httpContextAccessor,
+            IDateTimeProvider dateTimeProvider,
             ILdapService ldapService,
+            ILocationService locationService,
             IRosterDetailRepository rosterDetailRepository,
             IRosterHeaderRepository rosterHeaderRepository,
+            IUnitLocationMapRepository unitLocationMapRepository,
             IUserRepository userRepository)
             : base(logger, httpContextAccessor)
         {
+            _dateTimeProvider = dateTimeProvider
+                ?? throw new ArgumentNullException(nameof(dateTimeProvider));
             _ldapService = ldapService ?? throw new ArgumentNullException(nameof(ldapService));
+            _locationService = locationService
+                ?? throw new ArgumentNullException(nameof(locationService));
             _rosterDetailRepository = rosterDetailRepository
                 ?? throw new ArgumentNullException(nameof(rosterDetailRepository));
             _rosterHeaderRepository = rosterHeaderRepository
                 ?? throw new ArgumentNullException(nameof(rosterHeaderRepository));
+            _unitLocationMapRepository = unitLocationMapRepository
+                ?? throw new ArgumentNullException(nameof(unitLocationMapRepository));
             _userRepository = userRepository
                 ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
-        public async Task<int> ImportRosterAsync(int currentUserId, string filename)
+        public async Task<string> AddUnitMap(int unitId, int locationId)
+        {
+            var location = await _locationService.GetLocationByIdAsync(locationId);
+
+            if (location == null)
+            {
+                return $"Unable to find location id {locationId}.";
+            }
+
+            var existingMap = await _unitLocationMapRepository.FindAsync(unitId);
+
+            if (existingMap != null)
+            {
+                var mappedLocation = await _locationService
+                    .GetLocationByIdAsync(existingMap.LocationId);
+
+                if (mappedLocation == null)
+                {
+                    return $"Unit {unitId} is mapped to invalid location {existingMap.LocationId}.";
+                }
+                else
+                {
+                    return $"Unit {unitId} is already mapped to location {mappedLocation.Name}.";
+                }
+            }
+
+            await _unitLocationMapRepository.AddAsync(new UnitLocationMap
+            {
+                CreatedBy = GetCurrentUserId(),
+                CreatedAt = _dateTimeProvider.Now,
+                UnitId = unitId,
+                LocationId = locationId
+            });
+
+            await _unitLocationMapRepository.SaveAsync();
+
+            return null;
+        }
+
+        public async Task<CollectionWithCount<RosterHeader>>
+            GetPaginatedRosterHeadersAsync(BaseFilter filter)
+        {
+            var headers = await _rosterHeaderRepository.GetPaginatedAsync(filter);
+            foreach (var item in headers.Data)
+            {
+                item.DetailCount = await _rosterDetailRepository.GetCountAsync(item.Id);
+            }
+            return headers;
+        }
+
+        public async Task<CollectionWithCount<UnitLocationMap>>
+            GetUnitLocationMapsAsync(BaseFilter filter)
+        {
+            return await _unitLocationMapRepository.GetPaginatedAsync(filter);
+        }
+
+        public async Task<RosterUpdate> ImportRosterAsync(int currentUserId, string filename)
         {
             var now = DateTime.Now;
             var rosterHeader = new RosterHeader
@@ -59,19 +133,27 @@ namespace Ocuda.Ops.Service
 
             var rosterDetails = new List<RosterDetail>();
             string filePath = Path.Combine(Path.GetTempPath(), filename);
+
+            int vacancies = 0;
+
+            var unitLocationMap = await _unitLocationMapRepository.GetAllAsync();
+
             using (var stream = new FileStream(filePath, FileMode.Open))
             {
-                int nameColId = 0;
+                int asOfColId = 0;
+                int emailColId = 0;
                 int employeeIdColId = 0;
-                int positionColId = 0;
-                int titleColId = 0;
                 int hireDateColId = 0;
+                int nameColId = 0;
+                int positionColId = 0;
                 int rehireDateColId = 0;
                 int reportToIdColId = 0;
                 int reportToPosColId = 0;
-                int emailColId = 0;
-                int asOfColId = 0;
+                int titleColId = 0;
+                int unitColId = 0;
+
                 int rows = 0;
+
                 using var excelReader = ExcelReaderFactory.CreateReader(stream);
                 while (excelReader.Read())
                 {
@@ -82,35 +164,48 @@ namespace Ocuda.Ops.Service
                         {
                             switch (excelReader.GetString(i).Trim() ?? $"Column{i}")
                             {
-                                case NameHeading:
-                                    nameColId = i;
+                                case AsOfHeading:
+                                    asOfColId = i;
                                     break;
-                                case EmployeeIdHeading:
-                                    employeeIdColId = i;
-                                    break;
-                                case PositionHeading:
-                                    positionColId = i;
-                                    break;
-                                case TitleHeading:
-                                    titleColId = i;
-                                    break;
-                                case HireDateHeading:
-                                    hireDateColId = i;
-                                    break;
-                                case RehireDateHeading:
-                                    rehireDateColId = i;
-                                    break;
-                                case ReportsToIdHeading:
-                                    reportToIdColId = i;
-                                    break;
-                                case ReportsToPosHeading:
-                                    reportToPosColId = i;
-                                    break;
+
                                 case EmailHeading:
                                     emailColId = i;
                                     break;
-                                case AsOfHeading:
-                                    asOfColId = i;
+
+                                case EmployeeIdHeading:
+                                    employeeIdColId = i;
+                                    break;
+
+                                case HireDateHeading:
+                                    hireDateColId = i;
+                                    break;
+
+                                case NameHeading:
+                                    nameColId = i;
+                                    break;
+
+                                case PositionHeading:
+                                    positionColId = i;
+                                    break;
+
+                                case RehireDateHeading:
+                                    rehireDateColId = i;
+                                    break;
+
+                                case ReportsToIdHeading:
+                                    reportToIdColId = i;
+                                    break;
+
+                                case ReportsToPosHeading:
+                                    reportToPosColId = i;
+                                    break;
+
+                                case TitleHeading:
+                                    titleColId = i;
+                                    break;
+
+                                case UnitHeading:
+                                    unitColId = i;
                                     break;
                             }
                         }
@@ -127,13 +222,18 @@ namespace Ocuda.Ops.Service
                                 {
                                     RosterHeader = rosterHeader,
                                     Name = name,
-                                    PositionNum = int.Parse(excelReader.GetString(positionColId)),
+                                    PositionNum = int.Parse(excelReader.GetString(positionColId),
+                                        CultureInfo.InvariantCulture),
                                     JobTitle = excelReader.GetString(titleColId)?.Trim(),
                                     ReportsToPos
-                                        = int.Parse(excelReader.GetString(reportToPosColId)),
-                                    AsOf = DateTime.Parse(excelReader.GetString(asOfColId)),
+                                        = int.Parse(excelReader.GetString(reportToPosColId),
+                                            CultureInfo.InvariantCulture),
+                                    AsOf = DateTime.Parse(excelReader.GetString(asOfColId),
+                                        CultureInfo.InvariantCulture),
                                     IsVacant = string.Equals(name, "Vacant",
                                         StringComparison.OrdinalIgnoreCase),
+                                    Unit = int.Parse(excelReader.GetString(unitColId),
+                                        CultureInfo.InvariantCulture),
                                     CreatedAt = now,
                                     CreatedBy = currentUserId
                                 };
@@ -141,9 +241,11 @@ namespace Ocuda.Ops.Service
                                 if (!entry.IsVacant)
                                 {
                                     entry.ReportsToId
-                                        = int.Parse(excelReader.GetString(reportToIdColId));
+                                        = int.Parse(excelReader.GetString(reportToIdColId),
+                                            CultureInfo.InvariantCulture);
                                     entry.EmployeeId
-                                        = int.Parse(excelReader.GetString(employeeIdColId));
+                                        = int.Parse(excelReader.GetString(employeeIdColId),
+                                            CultureInfo.InvariantCulture);
                                     entry.EmailAddress = excelReader.GetString(emailColId)?.Trim();
 
                                     var hireDate = excelReader.GetString(hireDateColId);
@@ -156,6 +258,10 @@ namespace Ocuda.Ops.Service
                                     {
                                         entry.RehireDate = rehireDateTime;
                                     }
+                                }
+                                else
+                                {
+                                    vacancies++;
                                 }
 
                                 // Check if position has already been added to the list
@@ -185,6 +291,7 @@ namespace Ocuda.Ops.Service
             var userAddList = new List<User>();
             var userUpdateList = new List<User>();
             var nonVacantRosterDetails = rosterDetails.Where(_ => !_.IsVacant);
+
             foreach (var rosterDetail in nonVacantRosterDetails)
             {
                 // Check if user exists with the employee id
@@ -203,10 +310,19 @@ namespace Ocuda.Ops.Service
                 {
                     if (!user.ExcludeFromRoster)
                     {
+                        user.Unit = rosterDetail.Unit;
+                        user.IsInLatestRoster = true;
+                        user.LastRosterUpdate = now;
                         user.ServiceStartDate = rosterDetail.RehireDate ?? rosterDetail.HireDate;
                         user.Title = rosterDetail.JobTitle;
-                        user.LastRosterUpdate = now;
-                        user.IsInLatestRoster = true;
+
+                        if (!user.AssociatedLocation.HasValue
+                            && unitLocationMap != null
+                            && user.Unit.HasValue
+                            && unitLocationMap.ContainsKey(user.Unit.Value))
+                        {
+                            user.AssociatedLocation = unitLocationMap[user.Unit.Value];
+                        }
 
                         userUpdateList.Add(user);
                     }
@@ -217,21 +333,30 @@ namespace Ocuda.Ops.Service
                     {
                         CreatedAt = now,
                         CreatedBy = currentUserId,
+                        Unit = rosterDetail.Unit,
                         Email = rosterDetail.EmailAddress,
                         EmployeeId = rosterDetail.EmployeeId,
+                        IsInLatestRoster = true,
                         LastRosterUpdate = now,
                         Name = rosterDetail.Name,
                         ServiceStartDate = rosterDetail.RehireDate ?? rosterDetail.HireDate,
-                        Title = rosterDetail.JobTitle,
-                        IsInLatestRoster = true
+                        Title = rosterDetail.JobTitle
                     };
+
+                    if (unitLocationMap != null
+                        && user.Unit.HasValue
+                        && unitLocationMap.ContainsKey(user.Unit.Value))
+                    {
+                        user.AssociatedLocation = unitLocationMap[user.Unit.Value];
+                    }
 
                     user = _ldapService.LookupByEmail(user);
 
                     if (string.IsNullOrWhiteSpace(user.Username))
                     {
-                        _logger.LogWarning("Unable to find LDAP information for {UserEmail}",
-                            user.Email);
+                         _logger.LogWarning("Unable to find LDAP information employee {EmployeeId}, {Name}",
+                            user.EmployeeId,
+                            user.Name);
                     }
 
                     userAddList.Add(user);
@@ -311,7 +436,28 @@ namespace Ocuda.Ops.Service
             _userRepository.UpdateRange(rosterUsers);
             await _userRepository.SaveAsync();
 
-            return rosterDetails.Count;
+            return new RosterUpdate
+            {
+                Deactivated = userRemoveList,
+                New = userAddList,
+                TotalRows = rosterDetails.Count,
+                VacantCount = vacancies,
+                Verified = userUpdateList,
+            };
+        }
+
+        public async Task<string> RemoveUnitMap(int unitId)
+        {
+            var existingMap = await _unitLocationMapRepository.FindAsync(unitId);
+
+            if (existingMap == null)
+            {
+                return $"Unable to find mapping for Unit {unitId}";
+            }
+
+            _unitLocationMapRepository.Remove(unitId);
+            await _unitLocationMapRepository.SaveAsync();
+            return null;
         }
     }
 }

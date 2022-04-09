@@ -21,6 +21,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<Location> EditAsync(Location location);
 
+        Task<Dictionary<int, string>> GetAllLocationsIdNameAsync();
+
         Task<IEnumerable<LocationProductMap>> GetAllLocationProductMapsAsync(int productId);
 
         Task<List<Location>> GetAllLocationsAsync();

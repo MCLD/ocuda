@@ -1,0 +1,100 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.HistoricalDetailsViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>@Model.Heading
+        @if(!string.IsNullOrEmpty(Model.SecondaryHeading))
+            {
+                <small class="text-muted">@Model.SecondaryHeading</small>
+            }
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-action="@nameof(HistoricalController.Index)"
+           asp-route-searchText="@Model.SearchText"
+           asp-route-page="@(Model.Page > 1 ? Model.Page : null)">Back</a>
+        @if (Model.FileExists)
+        {
+            <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+           asp-action="@nameof(HistoricalController.Download)"
+           asp-route-historicalIncidentId="@Model.HistoricalIncident.Id">
+                <span class="fas fa-file-download" aria-hidden="true"></span>
+                Download Original PDF
+            </a>
+        }
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <strong>Type of incident</strong>
+        @Model.HistoricalIncident.IncidentType
+    </div>
+    <div class="col-12 mt-2">
+        <strong>Date/time of incident</strong>
+        @Model.HistoricalIncident.IncidentAtString
+    </div>
+    <div class="col-sm-6 mt-2">
+        <strong>Branch</strong>
+        @Model.HistoricalIncident.Branch
+    </div>
+    <div class="col-sm-6 mt-2">
+        <strong>Phone Number</strong>
+        @Model.HistoricalIncident.PhoneNumber
+    </div>
+    <div class="col-12 mt-2">
+        <strong>Location where incident occurred</strong>
+    </div>
+    <div class="col-12 mt-2">
+        @Model.HistoricalIncident.Location
+    </div>
+    <div class="col-12 mt-2">
+        <strong>Describe the incident (i.e., what occurred) as reported by:</strong>
+        @Model.HistoricalIncident.DescribedBy
+    </div>
+    <div class="col-12 mt-2">
+        @Model.HistoricalIncident.Description
+    </div>
+    <div class="col-12 mt-2">
+        <strong>Names, addresses and phone numbers of persons injured and/or description of property damaged</strong>
+    </div>
+    <div class="col-12">
+        @Model.HistoricalIncident.PeopleInvolved
+    </div>
+    <div class="col-12 mt-2">
+        <strong>Witnesses (include addresses)</strong>
+    </div>
+    <div class="col-12">
+        @Model.HistoricalIncident.Witnesses
+    </div>
+    <div class="col-12 mt-2">
+        <strong>Action taken (first aid, called police, etc.)</strong>
+    </div>
+    <div class="col-12">
+        @Model.HistoricalIncident.ActionTaken
+    </div>
+    <div class="col-12 mt-2">
+        <strong>Comments</strong>
+    </div>
+    <div class="col-12">
+        @Model.HistoricalIncident.Comments
+    </div>
+    <div class="col-12 mt-2">
+        <strong>
+            Your name
+        </strong>
+        @Model.HistoricalIncident.ReportedBy
+    </div>
+    <div class="col-12">
+        <strong>
+            Your job title
+        </strong>
+        @Model.HistoricalIncident.ReportedByTitle
+    </div>    <div class="col-12">
+        <strong>
+            Date Incident Reported
+        </strong>
+        @Model.HistoricalIncident.DateReportedString
+    </div>
+</div>

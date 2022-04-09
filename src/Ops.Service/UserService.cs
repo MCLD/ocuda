@@ -5,8 +5,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service
 {
@@ -81,6 +84,22 @@ namespace Ocuda.Ops.Service
             return sysadminUser;
         }
 
+        public async Task<CollectionWithCount<User>> FindAsync(SearchFilter filter)
+        {
+            return await _userRepository.SearchAsync(filter);
+        }
+
+        public async Task<IEnumerable<int>> FindIdsAsync(SearchFilter filter)
+        {
+            return await _userRepository.SearchIdsAsync(filter);
+        }
+
+        public async Task<int?> GetAssociatedLocation(int userId)
+        {
+            var user = await _userRepository.FindAsync(userId);
+            return user?.AssociatedLocation;
+        }
+
         public async Task<User> GetByIdAsync(int id)
         {
             return await _userRepository.FindAsync(id);
@@ -95,6 +114,11 @@ namespace Ocuda.Ops.Service
         {
             // TODO add caching
             return await _userRepository.GetNameUsernameAsync(id);
+        }
+
+        public async Task<User> GetSupervisorAsync(int userId)
+        {
+            return await _userRepository.GetSupervisorAsync(userId);
         }
 
         public async Task<bool> IsSupervisor(int userId)
@@ -131,6 +155,23 @@ namespace Ocuda.Ops.Service
         public async Task<User> LookupUserByEmailAsync(string email)
         {
             return await _userRepository.FindByEmailAsync(email?.Trim().ToLower());
+        }
+
+        public async Task UpdateLocationAsync(int userId, int locationId)
+        {
+            if (userId != GetCurrentUserId() && !IsSiteManager())
+            {
+                throw new OcudaException("Permission denied.");
+            }
+
+            var user = await _userRepository.FindAsync(userId);
+            if (user == null)
+            {
+                throw new OcudaException($"Cannot find user id {userId}");
+            }
+            user.AssociatedLocation = locationId;
+            _userRepository.Update(user);
+            await _userRepository.SaveAsync();
         }
 
         public async Task<User> UpdateRosterUserAsync(int rosterUserId, User user)

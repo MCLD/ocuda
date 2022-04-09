@@ -135,6 +135,11 @@ namespace Ocuda.Ops.Service
             return location;
         }
 
+        public async Task<Dictionary<int, string>> GetAllLocationsIdNameAsync()
+        {
+            return await _locationRepository.GetAllLocationsIdNameAsync();
+        }
+
         public async Task<IEnumerable<LocationProductMap>> GetAllLocationProductMapsAsync(int productId)
         {
             return await _locationProductMapRepository.GetByProductAsync(productId);
@@ -142,7 +147,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<List<Location>> GetAllLocationsAsync()
         {
-            return await _locationRepository.GeAllLocationsAsync();
+            return await _locationRepository.GetAllLocationsAsync();
         }
 
         public async Task<(double? Latitude, double? Longitude)>

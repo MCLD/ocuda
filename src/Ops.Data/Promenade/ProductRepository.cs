@@ -48,11 +48,11 @@ namespace Ocuda.Ops.Data.Promenade
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<ICollectionWithCount<Product>> GetPaginatedListAsync(BaseFilter filter)
+        public async Task<CollectionWithCount<Product>> GetPaginatedListAsync(BaseFilter filter)
         {
             var query = DbSet.AsNoTracking();
 
-            return new ICollectionWithCount<Product>
+            return new CollectionWithCount<Product>
             {
                 Count = await query.CountAsync(),
                 Data = await query

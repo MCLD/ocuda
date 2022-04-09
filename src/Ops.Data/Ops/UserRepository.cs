@@ -3,8 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Data.Extensions;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
@@ -73,6 +76,15 @@ namespace Ocuda.Ops.Data.Ops
             return (name: userDetails.Name, username: userDetails.Username);
         }
 
+        public async Task<User> GetSupervisorAsync(int userId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Id == userId)
+                .Select(_ => _.Supervisor)
+                .SingleOrDefaultAsync();
+        }
+
         public async Task<bool> IsDuplicateEmail(User user)
         {
             return await DbSet
@@ -93,6 +105,37 @@ namespace Ocuda.Ops.Data.Ops
                          && !_.IsDeleted
                          && !_.IsSysadmin)
                 .AnyAsync();
+        }
+
+        public async Task<CollectionWithCount<User>> SearchAsync(SearchFilter searchFilter)
+        {
+            var query = DbSet
+                .AsNoTracking()
+                .Where(_ => !_.IsDeleted && _.IsInLatestRoster == true);
+
+            if (!string.IsNullOrEmpty(searchFilter.SearchText))
+            {
+                query = query.Where(_ => _.Name.Contains(searchFilter.SearchText)
+                || _.Email.Contains(searchFilter.SearchText)
+                || _.Username.Contains(searchFilter.SearchText));
+            }
+            return new CollectionWithCount<User>
+            {
+                Count = await query.CountAsync(),
+                Data = await query.OrderBy(_ => _.Name).ApplyPagination(searchFilter).ToListAsync()
+            };
+        }
+
+        public async Task<IEnumerable<int>> SearchIdsAsync(SearchFilter searchFilter)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => !_.IsDeleted && (
+                        _.Name.Contains(searchFilter.SearchText)
+                        || _.Email.Contains(searchFilter.SearchText)
+                        || _.Username.Contains(searchFilter.SearchText)))
+                .Select(_ => _.Id)
+                .ToListAsync();
         }
 
         #region Initial setup methods

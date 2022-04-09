@@ -55,20 +55,20 @@ else
                     <td>@metadataType.Name</td>
                     <td align="center">
                         <button type="button"
-                                class="btn btn-info btn-xs"
-                                data-toggle="modal"
-                                data-target="#editModal"
-                                data-id="@metadataType.Id"
-                                data-name="@metadataType.Name"
-                                data-public="@metadataType.IsPublic">
+                        class="btn btn-info btn-xs"
+                        data-toggle="modal"
+                        data-target="#editModal"
+                        data-id="@metadataType.Id"
+                        data-name="@metadataType.Name"
+                        data-public="@metadataType.IsPublic">
                             <span class="fa fa-pencil-alt" aria-hidden="true"></span>
                         </button>
                         <button type="button"
-                                class="btn btn-danger btn-xs"
-                                data-toggle="modal"
-                                data-target="#deleteModal"
-                                data-id="@metadataType.Id"
-                                data-name="@metadataType.Name">
+                        class="btn btn-danger btn-xs"
+                        data-toggle="modal"
+                        data-target="#deleteModal"
+                        data-id="@metadataType.Id"
+                        data-name="@metadataType.Name">
                             <span class="fa fa-times" aria-hidden="true"></span>
                         </button>
                     </td>
@@ -77,92 +77,89 @@ else
         </tbody>
     </table>
 
-    @if (Model.PaginateModel.MaxPage > 1)
-    {
-        <paginate paginateModel="@Model.PaginateModel"></paginate>
-    }
+    <nav paginate="@Model.PaginateModel"></nav>
 }
 
 @section scripts {
-    <script>
-        var addUrl = "@Url.Action(nameof(UsersController.CreateMetadataType))";
-        var editUrl = "@Url.Action(nameof(UsersController.EditMetadataType))";
-        var deleteUrl = "@Url.Action(nameof(UsersController.DeleteMetadataType))";
+<script>
+    var addUrl = "@Url.Action(nameof(UsersController.CreateMetadataType))";
+    var editUrl = "@Url.Action(nameof(UsersController.EditMetadataType))";
+    var deleteUrl = "@Url.Action(nameof(UsersController.DeleteMetadataType))";
 
-        $("#addModal").on("click", ".modal-btn-confirm", function (e) {
-            var button = $(this);
-            var modal = $(e.delegateTarget);
-            var name = modal.find("#addName").val();
-            var isPublic = modal.find("#addPublic").val();
-            $.post(addUrl, { name, isPublic }, function (response) {
-                setTimeout(function () {
-                    if (response.success) {
-                        location.reload();
-                    }
-                    else {
-                        ResetSpinners(button);
-                        SetValidation(modal.find("#addName"), response.message);
-                    }
-                }, 500);
-            });
+    $("#addModal").on("click", ".modal-btn-confirm", function (e) {
+        var button = $(this);
+        var modal = $(e.delegateTarget);
+        var name = modal.find("#addName").val();
+        var isPublic = modal.find("#addPublic").val();
+        $.post(addUrl, { name, isPublic }, function (response) {
+            setTimeout(function () {
+                if (response.success) {
+                    location.reload();
+                }
+                else {
+                    ResetSpinners(button);
+                    SetValidation(modal.find("#addName"), response.message);
+                }
+            }, 500);
         });
+    });
 
-        $("#editModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var modal = $(this);
-            var id = button.data("id");
-            var name = button.data("name");
-            var isPublic = button.data("public");
-            modal.find("#editId").val(id);
-            modal.find("#editName").val(name);
-            modal.find("#editPublic").val(isPublic);
+    $("#editModal").on("show.bs.modal", function (e) {
+        var button = $(e.relatedTarget);
+        var modal = $(this);
+        var id = button.data("id");
+        var name = button.data("name");
+        var isPublic = button.data("public");
+        modal.find("#editId").val(id);
+        modal.find("#editName").val(name);
+        modal.find("#editPublic").val(isPublic);
+    });
+
+    $("#editModal").on("click", ".modal-btn-confirm", function (e) {
+        var button = $(this);
+        var modal = $(e.delegateTarget);
+        var id = modal.find("#editId").val();
+        var name = modal.find("#editName").val();
+        var isPublic = modal.find("#editPublic").val();
+        $.post(editUrl, { id, name, isPublic }, function (response) {
+            setTimeout(function () {
+                if (response.success) {
+                    location.reload();
+                }
+                else {
+                    ResetSpinners(button);
+                    SetValidation(modal.find("#editName"), response.message);
+                }
+            }, 500);
         });
+    });
 
-        $("#editModal").on("click", ".modal-btn-confirm", function (e) {
-            var button = $(this);
-            var modal = $(e.delegateTarget);
-            var id = modal.find("#editId").val();
-            var name = modal.find("#editName").val();
-            var isPublic = modal.find("#editPublic").val();
-            $.post(editUrl, { id, name, isPublic }, function (response) {
-                setTimeout(function () {
-                    if (response.success) {
-                        location.reload();
-                    }
-                    else {
-                        ResetSpinners(button);
-                        SetValidation(modal.find("#editName"), response.message);
-                    }
-                }, 500);
-            });
+    $("#deleteModal").on("show.bs.modal", function (e) {
+        var button = $(e.relatedTarget);
+        var modal = $(this);
+        var id = button.data("id");
+        var name = button.data("name");
+        modal.find("#deleteId").val(id);
+        modal.find("#deleteName").val(name);
+        modal.find(".modal-text").text("Are you sure you want to delete '" + name + "'?");
+    });
+
+    $("#deleteModal").on("click", ".modal-btn-confirm", function (e) {
+        var button = $(this);
+        var modal = $(e.delegateTarget);
+        var id = modal.find("#deleteId").val();
+        var name = modal.find("#deleteName").val();
+        $.post(deleteUrl, { id, name }, function (response) {
+            setTimeout(function () {
+                if (response.success) {
+                    location.reload();
+                }
+                else {
+                    ResetSpinners(button);
+                }
+            }, 500);
         });
+    });
 
-        $("#deleteModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var modal = $(this);
-            var id = button.data("id");
-            var name = button.data("name");
-            modal.find("#deleteId").val(id);
-            modal.find("#deleteName").val(name);
-            modal.find(".modal-text").text("Are you sure you want to delete '" + name + "'?");
-        });
-
-        $("#deleteModal").on("click", ".modal-btn-confirm", function (e) {
-            var button = $(this);
-            var modal = $(e.delegateTarget);
-            var id = modal.find("#deleteId").val();
-            var name = modal.find("#deleteName").val();
-            $.post(deleteUrl, { id, name }, function (response) {
-                setTimeout(function () {
-                    if (response.success) {
-                        location.reload();
-                    }
-                    else {
-                        ResetSpinners(button);
-                    }
-                }, 500);
-            });
-        });
-
-    </script>
+</script>
 }

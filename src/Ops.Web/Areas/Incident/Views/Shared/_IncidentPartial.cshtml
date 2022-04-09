@@ -1,0 +1,67 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.IncidentViewModelBase
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            @Model.Heading
+            @if (!string.IsNullOrEmpty(Model.SecondaryHeading))
+            {
+                <small class="text-muted">@Model.SecondaryHeading</small>
+            }
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-area=""
+           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+           asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Index)">Back</a>
+        <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+           asp-action="@nameof(HomeController.Add)"
+           asp-route-page="@(Model.Page > 1 ? Model.Page : null)">
+            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            Add Report
+        </a>
+        <a class="btn btn-outline-primary mt-2 mb-1 mr-2 float-right"
+           asp-action="@nameof(HomeController.Configuration)">
+            Configuration
+        </a>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-12">
+        <ul class="nav nav-pills">
+            <li class="nav-item">
+                <a asp-action="@nameof(HomeController.Mine)"
+                   asp-area="@nameof(Ocuda.Ops.Controllers.Areas.Incident)"
+                   asp-controller="@HomeController.Name"
+                   class="nav-link"
+                   auto-active>
+                    @nameof(HomeController.Mine)
+                </a>
+            </li>
+            @if (Model.CanViewAll == true)
+            {
+                <li class="nav-item">
+                    <a asp-action="@nameof(HomeController.All)"
+                   asp-area="@nameof(Ocuda.Ops.Controllers.Areas.Incident)"
+                   asp-controller="@HomeController.Name"
+                   class="nav-link"
+                   auto-active>
+                        @nameof(HomeController.All)
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-action="@nameof(HistoricalController.Index)"
+                   asp-area="@nameof(Ocuda.Ops.Controllers.Areas.Incident)"
+                   asp-controller="@HistoricalController.Name"
+                   class="nav-link"
+                   auto-active>
+                        Historical
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+

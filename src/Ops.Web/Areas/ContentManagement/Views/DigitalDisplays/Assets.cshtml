@@ -13,9 +13,9 @@
         @if (Model.HasPermissions)
         {
             <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
-                    type="button"
-                    data-toggle="modal"
-                    data-target="#uploadAsset">
+                type="button"
+                data-toggle="modal"
+                data-target="#uploadAsset">
                 <span class="fas fa-file-upload" aria-hidden="true"></span>
                 Upload Image
             </button>
@@ -63,25 +63,25 @@
                     <td class="align-middle">
                         Uploaded by:
                         <a asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
-                           asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
-                           asp-route-id="@asset.CreatedByUser.Username"
-                           target="_blank">@asset.CreatedByUser.Name</a><br />
+                   asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
+                   asp-route-id="@asset.CreatedByUser.Username"
+                   target="_blank">@asset.CreatedByUser.Name</a><br />
                         Uploaded at: @asset.CreatedAt
                     </td>
                     <td class="align-middle">
                         @if (Model.HasPermissions)
                         {
                             <a asp-action="@nameof(DigitalDisplaysController.AssetAssociations)"
-                               asp-route-digitalDisplayAssetId="@asset.Id"
-                               class="btn btn-outline-primary my-1"><span class="fas fa-paperclip"></span></a>
+                   asp-route-digitalDisplayAssetId="@asset.Id"
+                   class="btn btn-outline-primary my-1"><span class="fas fa-paperclip"></span></a>
                             @if (Model.GetSetCount(asset.Id) == "0")
                             {
                                 <button type="button"
-                                        data-toggle="modal"
-                                        data-target="#deleteAsset"
-                                        data-id="@asset.Id"
-                                        data-name="@asset.Name"
-                                        class="btn btn-outline-danger my-1">
+                        data-toggle="modal"
+                        data-target="#deleteAsset"
+                        data-id="@asset.Id"
+                        data-name="@asset.Name"
+                        class="btn btn-outline-danger my-1">
                                     <span class="fas fa-minus-circle"></span>
                                 </button>
                             }
@@ -101,10 +101,7 @@
     </tbody>
 </table>
 
-@if (Model.PaginateModel.MaxPage > 1)
-{
-    <paginate paginateModel="@Model.PaginateModel"></paginate>
-}
+<nav paginate="@Model.PaginateModel"></nav>
 
 <form asp-action="@(nameof(DigitalDisplaysController.DeleteAsset))">
     <div class="modal fade"
@@ -192,11 +189,11 @@
 </form>
 
 @section Scripts {
-    <script>
-        $('#deleteAsset').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget)
-            $(this).find('#digitalDisplayAssetName').text(button.data('name'))
-            $(this).find('#digitalDisplayAssetId').val(button.data('id'));
-        })
-    </script>
+<script>
+    $('#deleteAsset').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget)
+        $(this).find('#digitalDisplayAssetName').text(button.data('name'))
+        $(this).find('#digitalDisplayAssetId').val(button.data('id'));
+    })
+</script>
 }

@@ -24,7 +24,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         Task<ICollection<ProductLocationInventory>> GetLocationInventoriesForProductAsync(int productId);
 
-        Task<ICollectionWithCount<Product>> GetPaginatedListAsync(BaseFilter filter);
+        Task<CollectionWithCount<Product>> GetPaginatedListAsync(BaseFilter filter);
 
         Task LinkSegment(int productId, int segmentId);
 

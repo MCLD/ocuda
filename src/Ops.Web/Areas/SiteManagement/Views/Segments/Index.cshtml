@@ -143,7 +143,7 @@ else
                             <tr class="@Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment.IndexViewModel.RowClass(segment)">
                                 <td class="td-class align-middle">
                                     <a asp-action="@(nameof(SegmentsController.Detail))"
-                                       asp-route-id="@segment.Id">
+                               asp-route-id="@segment.Id">
                                         @segment.Name
                                     </a>
                                 </td>
@@ -153,24 +153,24 @@ else
                                 </td>
                                 <td class="align-middle text-center on-top">
                                     <button type="button"
-                                            class="btn btn-outline-primary"
-                                            data-toggle="modal"
-                                            data-target="#editModal"
-                                            data-id="@segment.Id"
-                                            data-name="@segment.Name"
-                                            data-startdate="@segment.StartDate?.ToString("yyyy-MM-dd")"
-                                            data-starttime="@segment.StartDate?.ToString("HH:mm")"
-                                            data-enddate="@segment.EndDate?.ToString("yyyy-MM-dd")"
-                                            data-endtime="@segment.EndDate?.ToString("HH:mm")"
-                                            data-active="@segment.IsActive">
+                                    class="btn btn-outline-primary"
+                                    data-toggle="modal"
+                                    data-target="#editModal"
+                                    data-id="@segment.Id"
+                                    data-name="@segment.Name"
+                                    data-startdate="@segment.StartDate?.ToString("yyyy-MM-dd")"
+                                    data-starttime="@segment.StartDate?.ToString("HH:mm")"
+                                    data-enddate="@segment.EndDate?.ToString("yyyy-MM-dd")"
+                                    data-endtime="@segment.EndDate?.ToString("HH:mm")"
+                                    data-active="@segment.IsActive">
                                         <span class="fas fa-edit" aria-hidden="true"></span>
                                     </button>
                                     <button type="button"
-                                            class="btn btn-outline-danger"
-                                            data-toggle="modal"
-                                            data-target="#deleteModal"
-                                            data-id="@segment.Id"
-                                            data-name="@segment.Name">
+                                    class="btn btn-outline-danger"
+                                    data-toggle="modal"
+                                    data-target="#deleteModal"
+                                    data-id="@segment.Id"
+                                    data-name="@segment.Name">
                                         <span class="fas fa-minus-circle" aria-hidden="true"></span>
                                     </button>
                                 </td>
@@ -182,66 +182,63 @@ else
         </div>
     </div>
 
-    @if (Model.PaginateModel.MaxPage > 1)
-    {
-        <paginate paginateModel="@Model.PaginateModel"></paginate>
-    }
+    <nav paginate="@Model.PaginateModel"></nav>
 }
 
 @section scripts {
-    <script>
-        $("#addForm").submit(function (e) {
-            e.preventDefault();
-            var form = $(this);
+<script>
+    $("#addForm").submit(function (e) {
+        e.preventDefault();
+        var form = $(this);
 
-            $.post("@(Url.Action(nameof(SegmentsController.Create), SegmentsController.Name))",
-                form.serialize(),
-                function (response) {
-                    if (response.success == true) {
-                        location.href = response.url;
-                    }
-                    else {
-                        alert(response.message);
-                        ResetSpinners(form.find(".btn-spinner"));
-                    }
-                });
-        });
+        $.post("@(Url.Action(nameof(SegmentsController.Create), SegmentsController.Name))",
+            form.serialize(),
+            function (response) {
+                if (response.success == true) {
+                    location.href = response.url;
+                }
+                else {
+                    alert(response.message);
+                    ResetSpinners(form.find(".btn-spinner"));
+                }
+            });
+    });
 
-        $("#editModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            $("#editId").val(button.data("id"));
-            $("#editName").val(button.data("name"));
-            $("#editStartDate").val(button.data("startdate"));
-            $("#editStartTime").val(button.data("starttime"));
-            $("#editEndDate").val(button.data("enddate"));
-            $("#editEndTime").val(button.data("endtime"));
-            $("#editIsActive").val(button.data("active").toLowerCase());
-        });
+    $("#editModal").on("show.bs.modal", function (e) {
+        var button = $(e.relatedTarget);
+        $("#editId").val(button.data("id"));
+        $("#editName").val(button.data("name"));
+        $("#editStartDate").val(button.data("startdate"));
+        $("#editStartTime").val(button.data("starttime"));
+        $("#editEndDate").val(button.data("enddate"));
+        $("#editEndTime").val(button.data("endtime"));
+        $("#editIsActive").val(button.data("active").toLowerCase());
+    });
 
-        $("#editForm").submit(function (e) {
-            e.preventDefault();
-            var form = $(this);
-            $.post("@(Url.Action(nameof(SegmentsController.Edit), SegmentsController.Name))",
-                form.serialize(),
-                function (response) {
-                    if (response.success == true) {
-                        location.reload();
-                    }
-                    else {
-                        alert(response.message);
-                        ResetSpinners(form.find(".btn-spinner"));
-                    }
-                });
-        });
+    $("#editForm").submit(function (e) {
+        e.preventDefault();
+        var form = $(this);
+        $.post("@(Url.Action(nameof(SegmentsController.Edit), SegmentsController.Name))",
+            form.serialize(),
+            function (response) {
+                if (response.success == true) {
+                    location.reload();
+                }
+                else {
+                    alert(response.message);
+                    ResetSpinners(form.find(".btn-spinner"));
+                }
+            });
+    });
 
-        $("#deleteModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var name = button.data("name");
-            var modal = $(this);
-            $("#deleteId").val(id);
-            $("#deleteName").val(name);
-            modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
-        });
-    </script>
+    $("#deleteModal").on("show.bs.modal", function (e) {
+        var button = $(e.relatedTarget);
+        var id = button.data("id");
+        var name = button.data("name");
+        var modal = $(this);
+        $("#deleteId").val(id);
+        $("#deleteName").val(name);
+        modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
+    });
+</script>
 }

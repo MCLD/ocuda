@@ -1,0 +1,375 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.DetailsViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            @Model.Heading
+            @if (!string.IsNullOrEmpty(Model.SecondaryHeading))
+            {
+                <small class="text-muted">@Model.SecondaryHeading</small>
+            }
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right d-print-none"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
+           asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine)"
+           asp-route-page="@(Model.Page > 1 ? Model.Page : null)">Back</a>
+        @if (Model.CanAdd)
+        {
+            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right d-print-none"
+                data-toggle="modal"
+                data-target="#addFollowup">
+                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                Follow-up
+            </button>
+            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right d-print-none"
+                data-toggle="modal"
+                data-target="#addRelationship">
+                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                Relationship
+            </button>
+        }
+    </div>
+</div>
+
+@if (Model.CanAdd)
+{
+    <form asp-action="@nameof(HomeController.AddFollowup)" method="post" role="form">
+        <input type="hidden" name="incidentId" value="@Model.Incident.Id" />
+        <div modal
+         isLarge="true"
+         id="addFollowup"
+         name="Follow-up"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Add"
+         data-backdrop="static">
+            <div class="form-group">
+                <label for="followupText">Follow-up regarding this incident:</label>
+                <textarea class="form-control"
+                      name="followupText"
+                      id="followupText"
+                      maxlength="500"
+                      rows="7"
+                      required
+                      data-val="true"
+                      data-val-required="Please enter follow-up text."></textarea>
+                <small class="block" id="followupText_LengthDisplay">Up to 500 characters.</small>
+                <div class="validation-message text-danger field-validation-valid"
+                 data-valmsg-for="followupText"
+                 data-valmsg-replace="true"></div>
+            </div>
+        </div>
+    </form>
+
+    <form asp-action="@nameof(HomeController.AddRelationship)" method="post" role="form">
+        <input type="hidden" name="incidentId" value="@Model.Incident.Id" />
+        <div modal
+         id="addRelationship"
+         name="Relationship"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Add"
+         data-backdrop="static">
+            <div class="form-group">
+                <label for="relatedIncidentId">Relate this incident to incident id number:</label>
+                <input type="number"
+                   class="form-control"
+                   name="relatedIncidentId"
+                   id="relatedIncidentId"
+                   required
+                   data-val="true"
+                   data-val-required="Please enter an Incident Report id." />
+                <span class="validation-message text-danger field-validation-valid"
+                  data-valmsg-for="relatedIncidentId"
+                  data-valmsg-replace="true"></span>
+            </div>
+        </div>
+    </form>
+}
+
+<div class="row">
+    <div class="col-12 col-md-8 offset-md-2">
+        <table class="table table-sm table-bordered">
+            <tr>
+                <th colspan="2" class="table-info">Incident report information</th>
+            </tr>
+            <tr>
+                <th class="fieldname">Incident number</th>
+                <td>@Model.Incident.Id</td>
+            </tr>
+            <tr>
+                <th>Date &amp; time report filed</th>
+                <td>@Model.Incident.CreatedAt.ToString("g")</td>
+            </tr>
+            <tr>
+                <th>Report filed by</th>
+                <td>
+                    @if (!string.IsNullOrEmpty(Model.Incident.ReportedByName))
+                    {
+                        @Model.Incident.ReportedByName
+                    }
+                    else
+                    {
+                        @Model.Incident.CreatedByUser?.Name
+                    }
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-12 col-md-8 offset-md-2">
+        <table class="table table-sm table-bordered">
+            <tr>
+                <th colspan="2" class="table-info">Incident information</th>
+            </tr>
+            <tr>
+                <th class="fieldname">Date &amp; time of incident</th>
+                <td>@Model.Incident.IncidentAt.ToString("g")</td>
+            </tr>
+            <tr>
+                <th>Incident type</th>
+                <td>@Model.IncidentTypes[Model.Incident.IncidentTypeId]</td>
+            </tr>
+            <tr>
+                <th>Location</th>
+                <td>
+                    @Model.Locations[Model.Incident.LocationId]
+                    <br />
+                    @Model.Incident.LocationDescription
+                </td>
+            </tr>
+            <tr>
+                <th>Law enforcement</th>
+                <td>
+                    @if (Model.Incident.LawEnforcementContacted)
+                    {
+                        @:Contacted
+                    }
+                    else
+                    {
+                        @:Not contacted
+                    }
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-12 col-md-8 offset-md-2">
+        <table class="table table-sm table-bordered table-striped">
+            <tr>
+                <th colspan="3" class="table-info">Description</th>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    @Model.Incident.Description
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+@if (Model.Witnesses?.Count > 0)
+{
+    <div class="row mt-2">
+        <div class="col-12 col-md-8 offset-md-2">
+            <table class="table table-sm table-bordered table-striped">
+                <tr>
+                    <th colspan="3" class="table-info">Witnesses</th>
+                </tr>
+                <tr>
+                    <th class="typefieldname">Type</th>
+                    <th class="namefieldname">Name/Barcode</th>
+                    <th>Description</th>
+                </tr>
+                @foreach (var witness in Model.Witnesses)
+                {
+                    <tr>
+                        @if (witness.Id == default)
+                        {
+                            <td>Non-staff</td>
+                        }
+                        else
+                        {
+                            <td>Staff</td>
+                        }
+                        <td>
+                            @witness.Name
+                            @if (!string.IsNullOrEmpty(witness.Name) && !string.IsNullOrEmpty(witness.Barcode))
+                            {
+                                <br />
+                            }
+                            @witness.Barcode
+                        </td>
+                        <td>@witness.Description</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+}
+
+<div class="row mt-2">
+    <div class="col-12 col-md-8 offset-md-2">
+        <table class="table table-sm table-bordered table-striped">
+            <tr>
+                <th colspan="3" class="table-info">Injuries/Damage</th>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    @Model.Incident.InjuriesDamages
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+@if (Model.Participants?.Count > 0)
+{
+    <div class="row mt-2">
+        <div class="col-12 col-md-8 offset-md-2">
+            <table class="table table-sm table-bordered table-striped">
+                <tr>
+                    <th colspan="3" class="table-info">Affected People</th>
+                </tr>
+
+                <tr>
+                    <th class="typefieldname">Type</th>
+                    <th class="namefieldname">Name/Barcode</th>
+                    <th>Description</th>
+                </tr>
+                @foreach (var participant in Model.Participants)
+                {
+                    <tr>
+                        @if (participant.Id == default)
+                        {
+                            <td>Non-staff</td>
+                        }
+                        else
+                        {
+                            <td>Staff</td>
+                        }
+                        <td>
+                            @participant.Name
+                            @if (!string.IsNullOrEmpty(participant.Name) && !string.IsNullOrEmpty(participant.Barcode))
+                            {
+                                <br />
+                            }
+                            @participant.Barcode
+                        </td>
+                        <td>@participant.Description</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+}
+
+@if (Model.Incident.Followups?.Count > 0)
+{
+    <div class="row mt-2">
+        <div class="col-12 col-md-8 offset-md-2">
+            <table class="table table-sm table-bordered table-striped">
+                <tr>
+                    <th colspan="3" class="table-info">Follow-ups</th>
+                </tr>
+
+                <tr>
+                    <th class="nameanddatetime">Name &amp; Date</th>
+                    <th>Description</th>
+                </tr>
+                @foreach (var followup in Model.Incident.Followups)
+                {
+                    <tr>
+                        <td>
+                            @followup.CreatedByUser.Name
+                            <br />@followup.CreatedAt.ToString("g")
+                        </td>
+                        <td>@followup.Description</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+}
+
+@if (Model.Incident.RelatedIncidents?.Count > 0)
+{
+    <div class="row mt-2">
+        <div class="col-12 col-md-8 offset-md-2">
+            <table class="table table-sm table-bordered table-striped">
+                <tr>
+                    <th colspan="5" class="table-info">Related incidents</th>
+                </tr>
+                <tr>
+                    <th class="nameanddatetime">Related By &amp; On</th>
+                    <th>Incident Id</th>
+                    <th>Incident At</th>
+                    <th>Location</th>
+                    <th>Type</th>
+                </tr>
+                @foreach (var relatedIncident in Model.Incident.RelatedIncidents)
+                {
+                    <tr>
+                        <td>
+                            @relatedIncident.RelatedByUser.Name
+                            <br />@relatedIncident.RelatedAt.ToString("d")
+                        </td>
+                        <td>
+                            <a asp-action="@nameof(HomeController.Details)"
+                       asp-route-id="@relatedIncident.Id">@relatedIncident.Id</a>
+                        </td>
+                        <td>@relatedIncident.IncidentAt.ToString("g")</td>
+                        <td>@Model.Locations[relatedIncident.LocationId]</td>
+                        <td>@Model.IncidentTypes[relatedIncident.IncidentTypeId]</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+}
+
+@section styles {
+<style type="text/css">
+    th.fieldname {
+        width: 13rem;
+    }
+
+    th.typefieldname {
+        width: 8rem;
+    }
+
+    th.namefieldname {
+        width: 10rem;
+    }
+
+    th.nameanddatetime {
+        width: 11rem;
+    }
+</style>
+}
+
+@section scripts {
+<script>
+    $().ready(function() {
+        $('[maxlength]').each(function(index) {
+            let fieldId = '#' + this.id;
+            let lengthField = $(fieldId + '_LengthDisplay');
+            if(lengthField.length) {
+                $(fieldId).on('input', function() {
+                    if(this.value.length == 0) {
+                        $(lengthField).text("Up to " + $(fieldId).attr('maxlength') + ' characters.')
+                    }
+                    else {
+                        $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');
+                    }
+                });
+                if($(fieldId).val()) {
+                    $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');
+                }
+            }
+        });
+    })
+</script>
+}

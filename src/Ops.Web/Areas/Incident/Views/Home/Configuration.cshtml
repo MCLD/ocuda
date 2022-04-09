@@ -1,0 +1,218 @@
+﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.ConfigurationViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            @Model.Heading
+            @if (!string.IsNullOrEmpty(Model.SecondaryHeading))
+            {
+                <small class="text-muted">@Model.SecondaryHeading</small>
+            }
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
+           asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine)"
+           asp-route-page="@(Model.Page > 1 ? Model.Page : null)">Back</a>
+        @if (Model.CanConfigureIncidents)
+        {
+            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+                data-toggle="modal"
+                data-target="#addTypeModal">
+                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                Add Incident Type
+            </button>
+        }
+    </div>
+</div>
+
+@if (Model.IncidentTypes?.Count > 0)
+{
+    <table class="table table-sm table-bordered table-hover table-striped">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var incidentType in Model.IncidentTypes)
+            {
+                <tr>
+                    <td class="align-middle">@incidentType.Description</td>
+                    <td class="align-middle text-center">
+                        @if (incidentType.IsActive)
+                        {
+                            <span class="far fa-check-circle text-success" title="Active"></span>
+                        }
+                        else
+                        {
+                            <span class="far fa-times-circle text-danger" title="Inactive"></span>
+                        }
+                    </td>
+                    <td class="align-middle text-center">
+                        @if (Model.CanConfigureIncidents)
+                        {
+                            if (incidentType.IsActive)
+                            {
+                                <form asp-action="@nameof(HomeController.DeactivateType)"
+                      method="post" role="form" class="d-inline-block">
+                                    <input type="hidden" name="typeId" value="@incidentType.Id" />
+                                    <button class="btn btn-outline-danger btn-sm"
+                            title="Deactivate"
+                            type="submit">
+                                        <span class="far fa-times-circle"></span>
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="@nameof(HomeController.ActivateType)"
+                      method="post" role="form" class="d-inline-block">
+                                    <input type="hidden" name="typeId" value="@incidentType.Id" />
+                                    <button class="btn btn-outline-success btn-sm"
+                            title="Activate"
+                            type="submit">
+                                        <span class="far fa-check-circle"></span>
+                                    </button>
+                                </form>
+                            }
+                            <button class="btn btn-sm btn-outline-primary"
+                        data-toggle="modal"
+                        data-target="#updateTypeModal"
+                        data-id="@incidentType.Id"
+                        data-description="@incidentType.Description">
+                                <span class="fas fa-edit"></span>
+                            </button>
+                        }
+                        else
+                        {
+                            @:&nbsp;
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="row">
+        <div class="col-12 col-md-6 offset-md-3">
+            <div class="alert alert-warning">No incident types configured.</div>
+        </div>
+    </div>
+}
+
+<form asp-action="@nameof(HomeController.UpdateEmailSettings)">
+    <table class="table table-sm table-bordered table-hover table-striped">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="align-middle">
+                    <label for="emailTemplateId">Incident email template id</label>
+                </td>
+                <td class="align-middle">
+                    <input class="form-control"
+                           disabled="@(Model.CanConfigureEmails ? null : "disabled")"
+                           id="emailTemplateId"
+                           name="emailTemplateId"
+                           value="@Model.EmailTemplateId"
+                           type="number" />
+                </td>
+            </tr>
+            <tr>
+                <td class="align-middle">
+                    <label for="lawEnforcementAddresses">Law Enforcement email destinations</label>
+                    <br /><em><small>(comma separated)</small></em>
+                </td>
+                <td class="align-middle">
+                    <input class="form-control"
+                           disabled="@(Model.CanConfigureEmails ? null : "disabled")"
+                           id="lawEnforcementAddresses"
+                           name="lawEnforcementAddresses"
+                           value="@Model.LawEnforcementAddresses"
+                           type="text" />
+                </td>
+            </tr>
+        </tbody>
+        @if (Model.CanConfigureEmails)
+        {
+            <tfoot>
+                <tr>
+                    <td colspan="2" class="align-middle text-right">
+                        <button type="submit" class="btn btn-outline-dark">Update email settings</button>
+                    </td>
+                </tr>
+            </tfoot>
+        }
+    </table>
+</form>
+
+@if (Model.CanConfigureIncidents)
+{
+    <form asp-action="@nameof(HomeController.AddType)" method="post" role="form">
+        <div modal
+         isLarge="true"
+         id="addTypeModal"
+         name="Incident Type"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Add"
+         data-backdrop="static">
+            <div class="form-group">
+                <label for="incidentTypeDescription">Incident Type Description</label>
+                <input type="text"
+                   class="form-control"
+                   name="incidentTypeDescription"
+                   required
+                   data-val="true"
+                   data-val-required="You must enter an incident type description." />
+                <span class="validation-message text-danger field-validation-valid"
+                  data-valmsg-for="incidentTypeDescription"
+                  data-valmsg-replace="true"></span>
+            </div>
+        </div>
+    </form>
+
+    <form asp-action="@nameof(HomeController.UpdateType)" method="post" role="form">
+        <input type="hidden" name="incidentTypeId" id="updateIncidentTypeId" />
+        <div modal
+         isLarge="true"
+         id="updateTypeModal"
+         name="Incident Type"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Edit"
+         data-backdrop="static">
+            <div class="form-group">
+                <label for="incidentTypeDescription">Incident Type Description</label>
+                <input type="text"
+                   class="form-control"
+                   id="updateIncidentTypeDescription"
+                   name="incidentTypeDescription"
+                   required
+                   data-val="true"
+                   data-val-required="You must enter an incident type description." />
+                <span class="validation-message text-danger field-validation-valid"
+                  data-valmsg-for="incidentTypeDescription"
+                  data-valmsg-replace="true"></span>
+            </div>
+        </div>
+    </form>
+}
+
+@section scripts {
+<script>
+     $('#updateTypeModal').on('show.bs.modal', function (event) {
+         let caller = $(event.relatedTarget);
+         $('#updateIncidentTypeId').val(caller.data('id'));
+         $('#updateIncidentTypeDescription').val(caller.data('description'));
+         console.info(caller.data('id'));
+         console.info(caller.data('description'));
+    })
+</script>
+}

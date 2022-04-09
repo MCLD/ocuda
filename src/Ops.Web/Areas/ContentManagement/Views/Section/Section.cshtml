@@ -221,8 +221,8 @@
         @if (false)
         {
             <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
-                    data-toggle="modal"
-                    data-target="#addModal">
+                data-toggle="modal"
+                data-target="#addModal">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Add Post
             </button>
@@ -236,10 +236,10 @@
         {
             <div class="col-9">
                 <iframe width="590"
-                        height="332"
-                        src="@Model.Section.EmbedVideoUrl"
-                        frameborder="0"
-                        allowfullscreen=""></iframe>
+                    height="332"
+                    src="@Model.Section.EmbedVideoUrl"
+                    frameborder="0"
+                    allowfullscreen=""></iframe>
             </div>
         }
         @if (!Model.AllPosts.Any())
@@ -256,9 +256,9 @@
                             <div class="card-header p-4" style="transform: rotate(0);">
                                 <div class="float-left align-middle">
                                     <a class="float-left align-middle"
-                                       asp-action="@nameof(SectionController.PostDetails)"
-                                       asp-route-sectionSlug="@Model.Section.Slug"
-                                       asp-route-postSlug="@post.Slug">
+                               asp-action="@nameof(SectionController.PostDetails)"
+                               asp-route-sectionSlug="@Model.Section.Slug"
+                               asp-route-postSlug="@post.Slug">
                                         <h5>
                                             @post.Title
                                         </h5>
@@ -266,8 +266,8 @@
                                 </div>
                                 <div class="float-right align-middle h4">
                                     <a asp-action="@nameof(SectionController.EditPost)"
-                                       asp-route-sectionSlug="@Model.Section.Slug"
-                                       asp-route-postSlug="@post.Slug">
+                               asp-route-sectionSlug="@Model.Section.Slug"
+                               asp-route-postSlug="@post.Slug">
                                         <span class="far fa-edit float-right"></span>
                                     </a>
                                 </div>
@@ -292,11 +292,11 @@
                                         Category:&nbsp;
                                         <span>
                                             @foreach (var category in Model.PostCategories
-                                             .Where(_ => _.PostId == post.Id)
-                                             .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
+                                           .Where(_ => _.PostId == post.Id)
+                                           .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
                                             {
                                                 <a class="badge badge-pill badge-info"
-                                                   href="@Url.Action(nameof(SectionController.Posts),
+                                   href="@Url.Action(nameof(SectionController.Posts),
                                         new { sectionSlug = Model.Section.Slug,
                                             categorySlug = category.Stub, page = 1})">
                                                     @category.Name
@@ -310,10 +310,7 @@
                     </div>
                 </div>
             }
-            @if (Model.PaginateModel.MaxPage > 1)
-            {
-                <paginate paginateModel="@Model.PaginateModel"></paginate>
-            }
+            <nav paginate="@Model.PaginateModel"></nav>
         }
     </div>
     <div class="col-3">
@@ -345,25 +342,25 @@
                             </td>
                             <td style="position: relative;" class="text-center">
                                 <a role="button"
-                                   class="text-danger h4 editfile text-center"
-                                   data-toggle="modal"
-                                   data-target="#editLibModal"
-                                   data-id="@library.Id"
-                                   data-name="@library.Name"
-                                   data-slug="@library.Slug"
-                                   data-type="file">
+                           class="text-danger h4 editfile text-center"
+                           data-toggle="modal"
+                           data-target="#editLibModal"
+                           data-id="@library.Id"
+                           data-name="@library.Name"
+                           data-slug="@library.Slug"
+                           data-type="file">
                                     <span class="far fa-edit float-right"></span>
                                 </a>
                             </td>
                             <td style="position: relative;" class="text-center">
                                 <button type="button"
-                                        class="btn btn-danger"
-                                        data-toggle="modal"
-                                        data-target="#deleteModal"
-                                        data-id="@library.Id"
-                                        data-name="@library.Name"
-                                        data-slug="@library.Slug"
-                                        data-type="file">
+                                class="btn btn-danger"
+                                data-toggle="modal"
+                                data-target="#deleteModal"
+                                data-id="@library.Id"
+                                data-name="@library.Name"
+                                data-slug="@library.Slug"
+                                data-type="file">
                                     Delete
                                 </button>
                             </td>
@@ -408,25 +405,25 @@
                             </td>
                             <td style="position: relative;" class="text-center align-middle">
                                 <a role="button"
-                                   class="text-danger h4 editlink"
-                                   data-toggle="modal"
-                                   data-target="#editLibModal"
-                                   data-id="@library.Id"
-                                   data-name="@library.Name"
-                                   data-slug="@library.Slug"
-                                   data-type="link">
+                           class="text-danger h4 editlink"
+                           data-toggle="modal"
+                           data-target="#editLibModal"
+                           data-id="@library.Id"
+                           data-name="@library.Name"
+                           data-slug="@library.Slug"
+                           data-type="link">
                                     <span class="far fa-edit float-right"></span>
                                 </a>
                             </td>
                             <td style="position: relative;" class="text-center">
                                 <button type="button"
-                                        class="btn btn-danger"
-                                        data-toggle="modal"
-                                        data-target="#deleteModal"
-                                        data-id="@library.Id"
-                                        data-name="@library.Name"
-                                        data-slug="@library.Slug"
-                                        data-type="link">
+                                class="btn btn-danger"
+                                data-toggle="modal"
+                                data-target="#deleteModal"
+                                data-id="@library.Id"
+                                data-name="@library.Name"
+                                data-slug="@library.Slug"
+                                data-type="link">
                                     Delete
                                 </button>
                             </td>
@@ -446,110 +443,110 @@
     </div>
 </div>
 @section scripts {
-    <script>
-        $(".row-link.file-item").on("click", function () {
-            var link = "@Url.Action(nameof(SectionController.FileLibrary), new { sectionSlug = Model.Section.Slug, fileLibrarySlug = 0 })";
-            link = link.replace("0", $(this).data("slug"));
-            window.location.href = link;
-        });
+<script>
+    $(".row-link.file-item").on("click", function () {
+        var link = "@Url.Action(nameof(SectionController.FileLibrary), new { sectionSlug = Model.Section.Slug, fileLibrarySlug = 0 })";
+        link = link.replace("0", $(this).data("slug"));
+        window.location.href = link;
+    });
 
-        $(".row-link.link-item").on("click", function () {
-            var link = "@Url.Action(nameof(SectionController.LinkLibrary), new { sectionSlug = Model.Section.Slug, linkLibSlug = 0 })";
-            link = link.replace("0", $(this).data("slug"));
-            window.location.href = link;
-        });
-        $(".editfile").on("click", function () {
-            var button = $(this);
-            var id = button.data("id");
-            var name = button.data("name");
-            var modal = $("#editLibModal");
-            modal.find("#FileLibrary_Name").parent().parent().show();
-            modal.find("#LinkLibrary_Name").parent().parent().hide();
-            modal.find("#addModalTitle").text("Edit File Library "+name);
-            modal.find("#FileLibrary_Id").val(id);
-            modal.find("#FileLibrary_Name").val(name);
-            modal.find("#editForm").attr("action", "@nameof(SectionController.UpdateFileLibrary)");
-        });
-        $(".editlink").on("click", function () {
-            var button = $(this);
-            var id = button.data("id");
-            var name = button.data("name");
-            var modal = $("#editLibModal");
-            modal.find("#LinkLibrary_Name").parent().parent().show();
-            modal.find("#FileLibrary_Name").parent().parent().hide();
-            modal.find("#addModalTitle").text("Edit Link Library "+name);
-            modal.find("#LinkLibrary_Id").val(id);
-            modal.find("#LinkLibrary_Name").val(name);
-            modal.find("#editForm").attr("action", "@nameof(SectionController.UpdateLinkLibrary)");
+    $(".row-link.link-item").on("click", function () {
+        var link = "@Url.Action(nameof(SectionController.LinkLibrary), new { sectionSlug = Model.Section.Slug, linkLibSlug = 0 })";
+        link = link.replace("0", $(this).data("slug"));
+        window.location.href = link;
+    });
+    $(".editfile").on("click", function () {
+        var button = $(this);
+        var id = button.data("id");
+        var name = button.data("name");
+        var modal = $("#editLibModal");
+        modal.find("#FileLibrary_Name").parent().parent().show();
+        modal.find("#LinkLibrary_Name").parent().parent().hide();
+        modal.find("#addModalTitle").text("Edit File Library "+name);
+        modal.find("#FileLibrary_Id").val(id);
+        modal.find("#FileLibrary_Name").val(name);
+        modal.find("#editForm").attr("action", "@nameof(SectionController.UpdateFileLibrary)");
+    });
+    $(".editlink").on("click", function () {
+        var button = $(this);
+        var id = button.data("id");
+        var name = button.data("name");
+        var modal = $("#editLibModal");
+        modal.find("#LinkLibrary_Name").parent().parent().show();
+        modal.find("#FileLibrary_Name").parent().parent().hide();
+        modal.find("#addModalTitle").text("Edit Link Library "+name);
+        modal.find("#LinkLibrary_Id").val(id);
+        modal.find("#LinkLibrary_Name").val(name);
+        modal.find("#editForm").attr("action", "@nameof(SectionController.UpdateLinkLibrary)");
 
-        });
-        $("#editForm").submit(function () {
-            if ($("#editForm").find("#LinkLibrary_Name").val()) {
-                linkslug = $("#editForm").find("#LinkLibrary_Name").val().toLowerCase().replace(/[^a-zA-Z0-9]/g, '').replace(/ /g,"-");
-                $("#editForm").find("#LinkLibrary_Slug").val(linkslug);
-                $("#editForm").find("#FileLibrary_Name").remove();
-                $("#editForm").find("#FileLibrary_Slug").remove();
+    });
+    $("#editForm").submit(function () {
+        if ($("#editForm").find("#LinkLibrary_Name").val()) {
+            linkslug = $("#editForm").find("#LinkLibrary_Name").val().toLowerCase().replace(/[^a-zA-Z0-9]/g, '').replace(/ /g,"-");
+            $("#editForm").find("#LinkLibrary_Slug").val(linkslug);
+            $("#editForm").find("#FileLibrary_Name").remove();
+            $("#editForm").find("#FileLibrary_Slug").remove();
+        }
+        else {
+            fileslug =  $("#editForm").find("#FileLibrary_Name").val().toLowerCase().replace(/[^a-zA-Z0-9]/g, '').replace(/ /g,"-");
+            $("#editForm").find("#FileLibrary_Slug").val(fileslug);
+            $("#editForm").find("#LinkLibrary_Name").remove();
+            $("#editForm").find("#LinkLibrary_Slug").remove();
+        }
+    });
+    $("#addLinkLibModal").submit(function (event) {
+        slug = $("#addLinkLibModal").find("#LinkLibrary_Name").val().toLowerCase().replace(/ /g,"-").replace(/[^a-zA-Z0-9]/g, '');
+        $("#addLinkLibModal").find("#LinkLibrary_Slug").val(slug);
+    });
+    $("#addFileLibModal").submit(function (event) {
+        slug = $("#addFileLibModal").find("#FileLibrary_Name").val().toLowerCase().replace(/ /g, "-").replace(/[^a-zA-Z0-9]/g, '');
+        $("#addFileLibModal").find("#FileLibrary_Slug").val(slug);
+    });
+    $("#deleteModal").on("show.bs.modal", function (e) {
+        var button = $(e.relatedTarget);
+        var id = button.data("id");
+        var name = button.data("name");
+        var modal = $(this);
+        var linklib = $("#deleteModal").find('#LinkLibrary_Id');
+        var filelib = $("#deleteModal").find('#FileLibrary_Id');
+        if (button.data("type") == "link") {
+            if (filelib.length) {
+                filelib.remove();
+            }
+            if (linklib.length) {
+                linklib.val(id);
             }
             else {
-                fileslug =  $("#editForm").find("#FileLibrary_Name").val().toLowerCase().replace(/[^a-zA-Z0-9]/g, '').replace(/ /g,"-");
-                $("#editForm").find("#FileLibrary_Slug").val(fileslug);
-                $("#editForm").find("#LinkLibrary_Name").remove();
-                $("#editForm").find("#LinkLibrary_Slug").remove();
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'LinkLibrary_Id',
+                    name: 'LinkLibrary.Id',
+                    value: id,
+                    class: "input-validation-error"
+                }).attr("aria-describedby", "LinkLibrary_Id-error").appendTo('#deleteForm');
             }
-        });
-        $("#addLinkLibModal").submit(function (event) {
-            slug = $("#addLinkLibModal").find("#LinkLibrary_Name").val().toLowerCase().replace(/ /g,"-").replace(/[^a-zA-Z0-9]/g, '');
-            $("#addLinkLibModal").find("#LinkLibrary_Slug").val(slug);
-        });
-        $("#addFileLibModal").submit(function (event) {
-            slug = $("#addFileLibModal").find("#FileLibrary_Name").val().toLowerCase().replace(/ /g, "-").replace(/[^a-zA-Z0-9]/g, '');
-            $("#addFileLibModal").find("#FileLibrary_Slug").val(slug);
-        });
-        $("#deleteModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var name = button.data("name");
-            var modal = $(this);
-            var linklib = $("#deleteModal").find('#LinkLibrary_Id');
-            var filelib = $("#deleteModal").find('#FileLibrary_Id');
-            if (button.data("type") == "link") {
-                if (filelib.length) {
-                    filelib.remove();
-                }
-                if (linklib.length) {
-                    linklib.val(id);
-                }
-                else {
-                    $('<input>').attr({
-                        type: 'hidden',
-                        id: 'LinkLibrary_Id',
-                        name: 'LinkLibrary.Id',
-                        value: id,
-                        class: "input-validation-error"
-                    }).attr("aria-describedby", "LinkLibrary_Id-error").appendTo('#deleteForm');
-                }
-                modal.find("#deleteForm").attr("action", "@Url.Action(nameof(SectionController.DeleteLinkLibrary))");
-                modal.find("#modal-text").text("Are you sure you want to delete the link library \"" + name + "\"?");
+            modal.find("#deleteForm").attr("action", "@Url.Action(nameof(SectionController.DeleteLinkLibrary))");
+            modal.find("#modal-text").text("Are you sure you want to delete the link library \"" + name + "\"?");
+        }
+        else {
+            if (linklib.length) {
+                linklib.remove();
+            }
+            if (filelib.length) {
+                filelib.val(id);
             }
             else {
-                if (linklib.length) {
-                    linklib.remove();
-                }
-                if (filelib.length) {
-                    filelib.val(id);
-                }
-                else {
-                    $('<input>').attr({
-                        type: 'hidden',
-                        id: 'FileLibrary_Id',
-                        name: 'FileLibrary.Id',
-                        value: id,
-                        class: "input-validation-error"
-                    }).attr("aria-describedby", "FileLibrary_Id-error").appendTo('#deleteForm');
-                }
-                modal.find("#deleteForm").attr("action","@Url.Action(nameof(SectionController.DeleteFileLibrary))");
-                modal.find("#modal-text").text("Are you sure you want to delete the file library \"" + name + "\"?");
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'FileLibrary_Id',
+                    name: 'FileLibrary.Id',
+                    value: id,
+                    class: "input-validation-error"
+                }).attr("aria-describedby", "FileLibrary_Id-error").appendTo('#deleteForm');
             }
-        });
-    </script>
+            modal.find("#deleteForm").attr("action","@Url.Action(nameof(SectionController.DeleteFileLibrary))");
+            modal.find("#modal-text").text("Are you sure you want to delete the file library \"" + name + "\"?");
+        }
+    });
+</script>
 }

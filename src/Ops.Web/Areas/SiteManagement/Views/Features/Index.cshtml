@@ -99,13 +99,13 @@
                                         </td>
                                         <td class="on-top gra-mc-icon">
                                             <button type="button"
-                                                    class="btn btn-link text-danger"
-                                                    data-toggle="modal"
-                                                    data-target="#deleteModal"
-                                                    data-id="@feature.Id"
-                                                    data-name="@feature.Name">
+                                            class="btn btn-link text-danger"
+                                            data-toggle="modal"
+                                            data-target="#deleteModal"
+                                            data-id="@feature.Id"
+                                            data-name="@feature.Name">
                                                 <span class="far fa-times-circle fa-lg"
-                                                      aria-hidden="true"></span>
+                                              aria-hidden="true"></span>
                                             </button>
                                         </td>
                                     </tr>
@@ -116,7 +116,7 @@
                     @if (Model.PaginateModel.MaxPage > 1)
                     {
                         <div class="card-footer">
-                            <paginate paginateModel="@Model.PaginateModel"></paginate>
+                            <nav paginate="@Model.PaginateModel"></nav>
                         </div>
                     }
                 }
@@ -127,25 +127,25 @@
 
 @section scripts
     {
-    <script>
-        $("#deleteModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var name = button.data("name");
-            var modal = $(this);
-            modal.find("#modal-text").text("Are you sure you want to delete the feature \"" + name + "\"?");
-            modal.find("#Feature_Id").val(id);
-            modal.find("#Feature_Name").val(name);
+<script>
+    $("#deleteModal").on("show.bs.modal", function (e) {
+        var button = $(e.relatedTarget);
+        var id = button.data("id");
+        var name = button.data("name");
+        var modal = $(this);
+        modal.find("#modal-text").text("Are you sure you want to delete the feature \"" + name + "\"?");
+        modal.find("#Feature_Id").val(id);
+        modal.find("#Feature_Name").val(name);
+    });
+    $(window).on("load", function () {
+        $(".td-class").each(function () {
+            $(this).children("a.rowlink").height($(this).height() + 11);
         });
-        $(window).on("load", function () {
-            $(".td-class").each(function () {
-                $(this).children("a.rowlink").height($(this).height() + 11);
-            });
+    });
+    $(window).resize(function () {
+        $(".td-class").each(function () {
+            $(this).children("a.rowlink").height($(this).height() + 11);
         });
-        $(window).resize(function () {
-            $(".td-class").each(function () {
-                $(this).children("a.rowlink").height($(this).height() + 11);
-            });
-        });
-    </script>
+    });
+</script>
 }

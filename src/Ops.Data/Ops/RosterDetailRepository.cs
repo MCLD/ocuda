@@ -28,5 +28,10 @@ namespace Ocuda.Ops.Data.Ops
                 .Where(_ => _.RosterHeaderId == rosterId && _.EmailAddress == email)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<int> GetCountAsync(int rosterHeaderId)
+        {
+            return await DbSet.AsNoTracking().CountAsync(_ => _.RosterHeaderId == rosterHeaderId);
+        }
     }
 }

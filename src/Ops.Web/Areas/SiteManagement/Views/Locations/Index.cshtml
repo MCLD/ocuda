@@ -18,57 +18,57 @@
 
 @if (!Model.AllLocations.Any())
 {
-    <div class="row">
-        <div class="col">
-            <div class="alert alert-warning">No locations found.</div>
+        <div class="row">
+            <div class="col">
+                <div class="alert alert-warning">No locations found.</div>
+            </div>
         </div>
-    </div>
 }
 else
 {
-    <table class="table table-sm table-bordered">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Address</th>
-                <th>Phone</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
+        <table class="table table-sm table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Phone</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
             @foreach (var location in Model.AllLocations)
             {
-                <tr>
-                    <td class="align-middle">
-                        <a asp-action="@nameof(LocationsController.Location)"
+                        <tr>
+                            <td class="align-middle">
+                                <a asp-action="@nameof(LocationsController.Location)"
                            asp-route-locationStub="@location.Stub">
                             @location.Name
-                        </a>
-                    </td>
-                    <td class="align-middle">
+                                </a>
+                            </td>
+                            <td class="align-middle">
                         @location.Address
-                        <br />
+                                <br />
                         @location.City,
                         @location.State
                         @location.Zip
-                    </td>
-                    <td class="align-middle">@location.Phone</td>
-                    <td class="align-middle">
-                        <button type="button"
+                            </td>
+                            <td class="align-middle">@location.Phone</td>
+                            <td class="align-middle">
+                                <button type="button"
                                 class="btn btn-outline-danger"
                                 data-toggle="modal"
                                 data-target="#deleteModal"
                                 data-id="@location.Id"
                                 data-name="@location.Name">
-                            <span class="fas fa-minus-circle"
+                                    <span class="fas fa-minus-circle"
                                   aria-hidden="true"></span>
-                        </button>
-                    </td>
-                </tr>
+                                </button>
+                            </td>
+                        </tr>
             }
-        </tbody>
-    </table>
-    <paginate paginateModel="@Model.PaginateModel"></paginate>
+            </tbody>
+        </table>
+        <nav paginate="@Model.PaginateModel"></nav>
 }
 
 <div class="modal fade"
