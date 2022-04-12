@@ -17,12 +17,14 @@
            asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Index)">Back</a>
         <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
            asp-action="@nameof(HomeController.Add)"
+           asp-controller="@HomeController.Name"
            asp-route-page="@(Model.Page > 1 ? Model.Page : null)">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
             Add Report
         </a>
         <a class="btn btn-outline-primary mt-2 mb-1 mr-2 float-right"
-           asp-action="@nameof(HomeController.Configuration)">
+           asp-action="@nameof(HomeController.Configuration)"
+           asp-controller="@HomeController.Name">
             Configuration
         </a>
     </div>
