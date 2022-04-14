@@ -166,7 +166,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             else
             {
-                var product = await _productService.UpdateProductAsync(viewModel.Product);
+                var updated = await _productService.UpdateProductAsync(viewModel.Product);
+                var product = await _productService.GetBySlugAsync(updated.Slug);
                 if (!CanManage(product))
                 {
                     return RedirectToUnauthorized();
@@ -755,8 +756,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         private bool CanManage(Product product)
         {
-            return IsSiteManager() || UserClaims(ClaimType.PermissionId)?
-                .Any(_ => product.PermissionGroupIds.Contains(_)) == true;
+            return IsSiteManager() 
+                || product.PermissionGroupIds != null
+                && UserClaims(ClaimType.PermissionId)?
+                    .Any(_ => product.PermissionGroupIds.Contains(_)) == true;
+
         }
     }
 }
