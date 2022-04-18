@@ -2,12 +2,12 @@
 
 ## Framework
 
-Ocuda targets the ASP.NET 5 framework. For that to work currently
+Ocuda targets the ASP.NET 6 framework. For that to work currently
 you must:
 
-- Install the [.NET 5
-SDK](https://dotnet.microsoft.com/download/dotnet/5.0)
-- [Visual Studio 2019](https://visualstudio.microsoft.com/vs/)
+- Install the [.NET 6
+SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
+- [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
 
 ## Project layout
 
