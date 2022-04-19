@@ -48,7 +48,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
         }
 
-        public static string Name { get { return "DigitalDisplays"; } }
+        public static string Name
+        { get { return "DigitalDisplays"; } }
 
         [HttpGet]
         [Route("[action]")]

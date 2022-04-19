@@ -41,10 +41,17 @@
                 <tr class="@DisplayListViewModel.RowClass(display)" data-displayId="@display.Id">
                     <td class="align-middle">@display.Name</td>
                     <td class="align-middle">
-                        <a asp-action="AssignSets"
+                        @if (Model.HasPermissions)
+                        {
+                            <a asp-action="AssignSets"
                            asp-route-displayId="@display.Id">
+                                @Model.ShowSets(display.Id)
+                            </a>
+                        }
+                        else
+                        {
                             @Model.ShowSets(display.Id)
-                        </a>
+                        }
                     </td>
                     <td class="align-middle">
                         <span title="@display.LocationDescription">
@@ -55,19 +62,13 @@
                         Last verification: @(display.LastContentVerification?.ToString() ?? "none")
                         @if (!string.IsNullOrEmpty(display.Status.Message))
                         {
-                            @:<br />Status:
+                            <br /><small><em>
                             <span class="oc-status-message">@display.Status.Message</span>
                             @if (display.Status.AsOf != default)
                             {
-                                <small>
-                                    <em>
-                                        (as of
-                                        <span class="oc-status-asof">
-                                            @display.Status.AsOf)
-                                        </span>
-                                    </em>
-                                </small>
+                                <span class="oc-status-asof">at @display.Status.AsOf</span>
                             }
+                            </em></small>
                         }
                     </td>
                     <td class="align-middle">
