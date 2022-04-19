@@ -2,18 +2,17 @@
 {
     public class IndexViewModel
     {
-        public bool HasDigitalDisplayPermissions { get; set; }
-
         public bool HasPermissions
         {
             get
             {
-                return HasSectionManagerPermissions
-                    || IsSiteManager
-                    || HasDigitalDisplayPermissions;
+                return IsSiteManager
+                    || HasRosterPermissions
+                    || HasSectionManagerPermissions;
             }
         }
 
+        public bool HasRosterPermissions { get; set; }
         public bool HasSectionManagerPermissions { get; set; }
         public bool IsSiteManager { get; set; }
     }

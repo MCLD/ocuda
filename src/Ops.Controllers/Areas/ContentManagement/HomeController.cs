@@ -26,7 +26,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
         }
 
-        public static string Name { get { return "Home"; } }
+        public static string Name
+        { get { return "Home"; } }
 
         [Route("")]
         public async Task<IActionResult> Index()
@@ -34,8 +35,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             var viewModel = new IndexViewModel
             {
                 IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
-                HasDigitalDisplayPermissions = await HasAppPermissionAsync(_permissionGroupService,
-                    ApplicationPermission.DigitalDisplayContentManagement),
+                HasRosterPermissions = await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.RosterManagement)
             };
 
             var claimPermissionIds = UserClaims(ClaimType.PermissionId);
