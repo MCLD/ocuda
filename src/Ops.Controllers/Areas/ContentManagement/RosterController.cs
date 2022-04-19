@@ -221,7 +221,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         {
             return !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
                 || await HasAppPermissionAsync(_permissionGroupService,
-                    ApplicationPermission.DigitalDisplayContentManagement);
+                    ApplicationPermission.RosterManagement);
         }
     }
 }
