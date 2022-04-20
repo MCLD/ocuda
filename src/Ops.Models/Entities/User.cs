@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Ops.Models.Entities
 {
@@ -30,6 +31,9 @@ namespace Ocuda.Ops.Models.Entities
 
         [MaxLength(255)]
         public string Nickname { get; set; }
+
+        [NotMapped]
+        public string Notes { get; set; }
 
         [MaxLength(255)]
         public string Phone { get; set; }

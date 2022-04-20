@@ -354,9 +354,9 @@ namespace Ocuda.Ops.Service
 
                     if (string.IsNullOrWhiteSpace(user.Username))
                     {
-                         _logger.LogWarning("Unable to find LDAP information employee {EmployeeId}, {Name}",
-                            user.EmployeeId,
-                            user.Name);
+                        _logger.LogWarning("Unable to find LDAP information employee {EmployeeId}, {Name}",
+                           user.EmployeeId,
+                           user.Name);
                     }
 
                     userAddList.Add(user);
@@ -385,6 +385,13 @@ namespace Ocuda.Ops.Service
                     if (userRemoveList[i].LastLdapCheck != userRemoveList[i].LastLdapUpdate)
                     {
                         userRemoveList[i].IsDeleted = true;
+                    }
+                    else
+                    {
+                        userRemoveList[i].Notes = $"User account is still present in Active Directory. Last seen in roster: {userRemoveList[i].LastRosterUpdate}";
+                        _logger.LogInformation("Not deleting user: {User} account still present in Active Directory, last seen in roster: {LastSeen}",
+                            userRemoveList[i].Username,
+                            userRemoveList[i].LastRosterUpdate);
                     }
                 }
             }
