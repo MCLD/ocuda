@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
@@ -41,31 +40,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         public static string Name
         { get { return "Roster"; } }
-
-        [HttpPost("[action]")]
-        public async Task<IActionResult> RemoveMap(int unitId, int page)
-        {
-            if (!await HasRosterManagementRightsAsync())
-            {
-                return RedirectToUnauthorized();
-            }
-
-            var result = await _rosterService.RemoveUnitMap(unitId);
-
-            if (!string.IsNullOrEmpty(result))
-            {
-                ShowAlertDanger($"There was an issue adding that mapping: {result}");
-            }
-
-            if(page > 1)
-            {
-                return RedirectToAction(nameof(UnitMapping), new { page });
-            }
-            else
-            {
-                return RedirectToAction(nameof(UnitMapping));
-            }
-        }
 
         [HttpPost("[action]")]
         public async Task<IActionResult> AddMap(int unitId, int locationId, int page)
@@ -125,6 +99,31 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             return View(viewModel);
         }
 
+        [HttpPost("[action]")]
+        public async Task<IActionResult> RemoveMap(int unitId, int page)
+        {
+            if (!await HasRosterManagementRightsAsync())
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var result = await _rosterService.RemoveUnitMap(unitId);
+
+            if (!string.IsNullOrEmpty(result))
+            {
+                ShowAlertDanger($"There was an issue adding that mapping: {result}");
+            }
+
+            if (page > 1)
+            {
+                return RedirectToAction(nameof(UnitMapping), new { page });
+            }
+            else
+            {
+                return RedirectToAction(nameof(UnitMapping));
+            }
+        }
+
         [HttpGet("[action]")]
         [HttpGet("[action]/{page}")]
         public async Task<IActionResult> UnitMapping(int page)
@@ -166,39 +165,41 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 return RedirectToUnauthorized();
             }
 
-            if (ModelState.IsValid)
+            if (model != null && ModelState.IsValid)
             {
-                _logger.LogInformation("Inserting roster {FileName}", model.FileName);
-                var timer = new System.Diagnostics.Stopwatch();
-                timer.Start();
-                var tempFile = Path.GetTempFileName();
-                using (var fileStream = new FileStream(tempFile, FileMode.Create))
+                using (Serilog.Context.LogContext.PushProperty("RosterFileName", model.FileName))
                 {
-                    await model.Roster.CopyToAsync(fileStream);
-                }
+                    _logger.LogInformation("Inserting roster {FileName}", model.FileName);
+                    var timer = new System.Diagnostics.Stopwatch();
+                    timer.Start();
+                    var tempFile = Path.GetTempFileName();
+                    using (var fileStream = new FileStream(tempFile, FileMode.Create))
+                    {
+                        await model.Roster.CopyToAsync(fileStream);
+                    }
 
-                try
-                {
-                    var rosterResult
-                        = await _rosterService.ImportRosterAsync(CurrentUserId, tempFile);
-                    timer.Stop();
-                    _logger.LogInformation("Roster {FileName} processed {Count} rows in {ElapsedMs} ms",
-                        model.FileName,
-                        rosterResult.TotalRows,
-                        timer.ElapsedMilliseconds);
-                    AlertInfo = $"Processed {rosterResult.TotalRows} roster rows in {timer.Elapsed:dd\\.hh\\:mm\\:ss}";
-                    return View("Changes", rosterResult);
+                    try
+                    {
+                        var rosterResult
+                            = await _rosterService.ImportRosterAsync(CurrentUserId, tempFile);
+                        timer.Stop();
+                        _logger.LogInformation("Roster {FileName} processed {Count} rows in {ElapsedMs} ms",
+                            model.FileName,
+                            rosterResult.TotalRows,
+                            timer.ElapsedMilliseconds);
+                        AlertInfo = $"Processed {rosterResult.TotalRows} roster rows in {timer.Elapsed:dd\\.hh\\:mm\\:ss}";
+                        return View("Changes", rosterResult);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error inserting roster data: {Message}", ex.Message);
+                        AlertDanger = "An error occured while uploading the roster.";
+                    }
+                    finally
+                    {
+                        System.IO.File.Delete(Path.Combine(Path.GetTempPath(), tempFile));
+                    }
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error inserting roster data: {Message}", ex.Message);
-                    AlertDanger = "An error occured while uploading the roster.";
-                }
-                finally
-                {
-                    System.IO.File.Delete(Path.Combine(Path.GetTempPath(), tempFile));
-                }
-
                 return RedirectToAction(nameof(Index));
             }
             else

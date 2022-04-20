@@ -85,6 +85,13 @@
                     <td>@user.CreatedAt</td>
                     <td>@user.ServiceStartDate?.ToString("d")</td>
                 </tr>
+                @if(!string.IsNullOrEmpty(user.Notes))
+                {
+                    <tr class="table-warning">
+                        <td>@user.Username</td>
+                        <td colspan="5"><small><em>@user.Notes</em></small></td>
+                    </tr>
+                }
             }
         }
     </tbody>
