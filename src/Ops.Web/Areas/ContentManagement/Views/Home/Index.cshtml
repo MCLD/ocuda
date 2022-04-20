@@ -35,7 +35,6 @@
     }
     @if (Model.IsSiteManager)
     {
-
         <div class="col-12 col-md-4 my-2">
             <div class="card">
                 <div class="card-header lead font-weight-bold">
@@ -57,32 +56,33 @@
                 </div>
             </div>
         </div>
-        @if (Model.IsSiteManager || Model.HasRosterPermissions)
-        {
-            <div class="col-12 col-md-4 my-2">
-                <div class="card">
-                    <div class="card-header lead font-weight-bold">
-                        User Management
-                    </div>
-                    <div class="card-body">
-                        @if (Model.IsSiteManager)
-                        {
-                            <a asp-area="@UsersController.Area"
+    }
+    @if (Model.IsSiteManager || Model.HasRosterPermissions)
+    {
+        <div class="col-12 col-md-4 my-2">
+            <div class="card">
+                <div class="card-header lead font-weight-bold">
+                    User Management
+                </div>
+                <div class="card-body">
+                    @if (Model.IsSiteManager)
+                    {
+                        <a asp-area="@UsersController.Area"
                    asp-controller="@UsersController.Name"
                    asp-action="@nameof(UsersController.Metadata)"
                    class="btn btn-outline-primary mt-1">User Metadata Types</a>
-                            <a asp-area="@UsersController.Area"
+                        <a asp-area="@UsersController.Area"
                    asp-controller="@UsersController.Name"
                    asp-action="@nameof(UsersController.Permissions)"
                    class="btn btn-outline-primary mt-1">Permission Groups</a>
-                        }
-                        <a asp-area="@RosterController.Area"
+                    }
+                    <a asp-area="@RosterController.Area"
                    asp-controller="@RosterController.Name"
                    asp-action="@nameof(RosterController.Index)"
                    class="btn btn-outline-primary mt-1">Roster Management</a>
-                    </div>
                 </div>
             </div>
-        }
+        </div>
     }
+
 </div>
