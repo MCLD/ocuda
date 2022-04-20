@@ -16,7 +16,6 @@ using Ocuda.Utility.Keys;
 namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 {
     [Area("ContentManagement")]
-    [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]/[controller]")]
     public class RosterController : BaseController<RosterController>
     {
