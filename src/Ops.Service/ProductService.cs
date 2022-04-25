@@ -279,8 +279,14 @@ namespace Ocuda.Ops.Service
                     {
                         try
                         {
-                            var count = excelReader.GetDouble(numberOfItemsColId);
                             var location = excelReader.GetString(locationNameColId);
+
+                            if (string.IsNullOrWhiteSpace(location))
+                            {
+                                continue;
+                            }
+
+                            var count = excelReader.GetDouble(numberOfItemsColId);
 
                             if (string.IsNullOrEmpty(location))
                             {
