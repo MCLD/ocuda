@@ -26,7 +26,11 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<(string name, string username)> GetNameUsernameAsync(int id);
 
+        Task<IDictionary<TitleClass, ICollection<User>>> GetRelatedTitleClassificationsAsync(int userId);
+
         Task<User> GetSupervisorAsync(int userId);
+
+        Task<ICollection<string>> GetTitlesAsync();
 
         Task<bool> IsSupervisor(int supervisorId);
 

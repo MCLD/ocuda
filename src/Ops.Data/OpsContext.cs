@@ -64,6 +64,8 @@ namespace Ocuda.Ops.Data
         public DbSet<SectionCategory> SectionCategories { get; set; }
         public DbSet<Section> Sections { get; set; }
         public DbSet<SiteSetting> SiteSettings { get; set; }
+        public DbSet<TitleClass> TitleClasses { get; set; }
+        public DbSet<TitleClassMapping> TitleClassMappings { get; set; }
         public DbSet<UnitLocationMap> UnitLocationMaps { get; set; }
 
         public DbSet<UserMetadata> UserMetadata { get; set; }
@@ -111,6 +113,8 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.PostId, _.CategoryId });
             modelBuilder.Entity<SectionCategory>()
                 .HasKey(_ => new { _.SectionId, _.CategoryId });
+            modelBuilder.Entity<TitleClassMapping>()
+                .HasKey(_ => new { _.TitleClassId, _.UserTitle });
             modelBuilder.Entity<UserMetadata>()
                 .HasKey(_ => new { _.UserId, _.UserMetadataTypeId });
         }

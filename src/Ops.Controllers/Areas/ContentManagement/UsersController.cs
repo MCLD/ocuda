@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,48 +20,81 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
     public class UsersController : BaseController<UsersController>
     {
         private readonly IPermissionGroupService _permissionGroupService;
+        private readonly ITitleClassService _titleClassService;
         private readonly IUserMetadataTypeService _userMetadataTypeService;
-
-        public static string Name { get { return "Users"; } }
-        public static string Area { get { return "ContentManagement"; } }
+        private readonly IUserService _userService;
 
         public UsersController(ServiceFacades.Controller<UsersController> context,
             IPermissionGroupService permissionGroupService,
-            IUserMetadataTypeService userMetadataTypeService) : base(context)
+            ITitleClassService titleClassService,
+            IUserMetadataTypeService userMetadataTypeService,
+            IUserService userService) : base(context)
         {
             _permissionGroupService = permissionGroupService
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
+            _titleClassService = titleClassService
+                ?? throw new ArgumentNullException(nameof(titleClassService));
             _userMetadataTypeService = userMetadataTypeService
                 ?? throw new ArgumentNullException(nameof(userMetadataTypeService));
+            _userService = userService
+                ?? throw new ArgumentNullException(nameof(userService));
         }
 
-        [Route("[action]")]
-        public async Task<IActionResult> Metadata(int page = 1)
+        public static string Area
+        { get { return "ContentManagement"; } }
+
+        public static string Name
+        { get { return "Users"; } }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> AddTitle(int titleClassId,
+            string titleClassName,
+            string titleIsUpdate,
+            string title)
         {
-            var itemsPerPage = await _siteSettingService
-                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
-
-            var filter = new BaseFilter(page, itemsPerPage);
-
-            var metadataTypeList = await _userMetadataTypeService.GetPaginatedListAsync(filter);
-
-            var paginateModel = new PaginateModel
+            if (string.IsNullOrEmpty(titleIsUpdate))
             {
-                ItemCount = metadataTypeList.Count,
-                CurrentPage = page,
-                ItemsPerPage = filter.Take.Value
-            };
+                if (string.IsNullOrEmpty(titleClassName))
+                {
+                    ShowAlertWarning("Unable to add title classification: you must specify a name.");
+                    return RedirectToAction(nameof(TitleClassList));
+                }
 
-            if (paginateModel.PastMaxPage)
+                if (string.IsNullOrEmpty(title))
+                {
+                    ShowAlertWarning("Unable to add title classification: you must select a title.");
+                    return RedirectToAction(nameof(TitleClassList));
+                }
+
+                titleClassId = await _titleClassService
+                    .NewTitleClassificationAsync(titleClassName, title);
+            }
+            else
             {
-                return RedirectToRoute(new { page = paginateModel.LastPage ?? 1 });
+                if (string.IsNullOrEmpty(title))
+                {
+                    ShowAlertWarning("Unable to add title classification: you must select a title.");
+                    return RedirectToAction(nameof(TitleClassList));
+                }
+
+                var titleClass = await _titleClassService.GetAsync(titleClassId);
+                if (titleClass == null)
+                {
+                    ShowAlertWarning($"Unable to find title classification id {titleClassId}.");
+                    return RedirectToAction(nameof(TitleClassList));
+                }
+
+                try
+                {
+                    await _titleClassService.AddTitleAsync(titleClassId, title);
+                }
+                catch (OcudaException oex)
+                {
+                    ShowAlertDanger(oex.Message);
+                }
             }
 
-            return View(new MetadataViewModel
-            {
-                MetadataTypes = metadataTypeList.Data,
-                PaginateModel = paginateModel
-            });
+            return RedirectToAction(nameof(TitleClassDetails), new { titleClassId });
         }
 
         [HttpPost]
@@ -79,6 +113,84 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             {
                 var newMetadataType = await _userMetadataTypeService.AddAsync(metadataType);
                 ShowAlertSuccess($"Added user metadata type: {newMetadataType.Name}");
+                success = true;
+            }
+            catch (OcudaException ex)
+            {
+                message = ex.Message;
+            }
+
+            return Json(new { success, message });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<JsonResult> CreatePermissionGroup(PermissionGroup permissionGroup)
+        {
+            if (permissionGroup == null)
+            {
+                throw new ArgumentNullException(nameof(permissionGroup));
+            }
+
+            var success = false;
+            var message = string.Empty;
+
+            try
+            {
+                var newPermissionGroup = await _permissionGroupService.AddAsync(permissionGroup);
+                ShowAlertSuccess($"Added new permission group: {newPermissionGroup.PermissionGroupName}");
+                success = true;
+            }
+            catch (OcudaException ex)
+            {
+                message = ex.Message;
+            }
+
+            return Json(new { success, message });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<JsonResult> DeleteMetadataType(UserMetadataType metadataType)
+        {
+            if (metadataType == null)
+            {
+                throw new ArgumentNullException(nameof(metadataType));
+            }
+
+            var success = false;
+            var message = string.Empty;
+
+            try
+            {
+                await _userMetadataTypeService.DeleteAsync(metadataType.Id);
+                ShowAlertSuccess($"Deleted user metadata type: {metadataType.Name}");
+                success = true;
+            }
+            catch (OcudaException ex)
+            {
+                message = ex.Message;
+            }
+
+            return Json(new { success, message });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<JsonResult> DeletePermissionGroup(PermissionGroup permissionGroup)
+        {
+            if (permissionGroup == null)
+            {
+                throw new ArgumentNullException(nameof(permissionGroup));
+            }
+
+            var success = false;
+            var message = string.Empty;
+
+            try
+            {
+                await _permissionGroupService.DeleteAsync(permissionGroup.Id);
+                ShowAlertSuccess($"Deleted permission group: {permissionGroup.PermissionGroupName}");
                 success = true;
             }
             catch (OcudaException ex)
@@ -117,11 +229,11 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<JsonResult> DeleteMetadataType(UserMetadataType metadataType)
+        public async Task<JsonResult> EditPermissionGroup(PermissionGroup permissionGroup)
         {
-            if (metadataType == null)
+            if (permissionGroup == null)
             {
-                throw new ArgumentNullException(nameof(metadataType));
+                throw new ArgumentNullException(nameof(permissionGroup));
             }
 
             var success = false;
@@ -129,8 +241,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             try
             {
-                await _userMetadataTypeService.DeleteAsync(metadataType.Id);
-                ShowAlertSuccess($"Deleted user metadata type: {metadataType.Name}");
+                var updatedPermissionGroup
+                    = await _permissionGroupService.EditAsync(permissionGroup);
+                ShowAlertSuccess($"Edited permission group: {updatedPermissionGroup.PermissionGroupName}");
                 success = true;
             }
             catch (OcudaException ex)
@@ -139,6 +252,35 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
 
             return Json(new { success, message });
+        }
+
+        [Route("[action]")]
+        public async Task<IActionResult> Metadata(int page = 1)
+        {
+            var itemsPerPage = await _siteSettingService
+                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
+
+            var filter = new BaseFilter(page, itemsPerPage);
+
+            var metadataTypeList = await _userMetadataTypeService.GetPaginatedListAsync(filter);
+
+            var paginateModel = new PaginateModel
+            {
+                ItemCount = metadataTypeList.Count,
+                CurrentPage = page,
+                ItemsPerPage = filter.Take.Value
+            };
+
+            if (paginateModel.PastMaxPage)
+            {
+                return RedirectToRoute(new { page = paginateModel.LastPage ?? 1 });
+            }
+
+            return View(new MetadataViewModel
+            {
+                MetadataTypes = metadataTypeList.Data,
+                PaginateModel = paginateModel
+            });
         }
 
         [Route("[action]")]
@@ -170,83 +312,70 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             });
         }
 
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<JsonResult> CreatePermissionGroup(PermissionGroup permissionGroup)
+        [HttpPost("[action]")]
+        public async Task<IActionResult> RemoveTitle(int titleClassId, string title)
         {
-            if (permissionGroup == null)
+            if (string.IsNullOrEmpty(title))
             {
-                throw new ArgumentNullException(nameof(permissionGroup));
+                ShowAlertWarning("Unable to add title classification: you must select a title.");
+                return RedirectToAction(nameof(TitleClassList));
             }
 
-            var success = false;
-            var message = string.Empty;
-
-            try
+            var titleClass = await _titleClassService.GetAsync(titleClassId);
+            if (titleClass == null)
             {
-                var newPermissionGroup = await _permissionGroupService.AddAsync(permissionGroup);
-                ShowAlertSuccess($"Added new permission group: {newPermissionGroup.PermissionGroupName}");
-                success = true;
-            }
-            catch (OcudaException ex)
-            {
-                message = ex.Message;
+                ShowAlertWarning($"Unable to find title classification id {titleClassId}.");
+                return RedirectToAction(nameof(TitleClassList));
             }
 
-            return Json(new { success, message });
+            var titleRemoved = await _titleClassService.RemoveTitleAsync(titleClassId, title);
+
+            if (titleRemoved)
+            {
+                ShowAlertInfo($"Removed title classification: {titleClass.Name}.");
+                return RedirectToAction(nameof(TitleClassList));
+            }
+
+            return RedirectToAction(nameof(TitleClassDetails), new { titleClassId });
         }
 
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<JsonResult> EditPermissionGroup(PermissionGroup permissionGroup)
+        [HttpGet("[action]/{titleClassId}")]
+        public async Task<IActionResult> TitleClassDetails(int titleClassId)
         {
-            if (permissionGroup == null)
+            var viewModel = new TitleClassViewModel
             {
-                throw new ArgumentNullException(nameof(permissionGroup));
-            }
-
-            var success = false;
-            var message = string.Empty;
-
-            try
-            {
-                var updatedPermissionGroup
-                    = await _permissionGroupService.EditAsync(permissionGroup);
-                ShowAlertSuccess($"Edited permission group: {updatedPermissionGroup.PermissionGroupName}");
-                success = true;
-            }
-            catch (OcudaException ex)
-            {
-                message = ex.Message;
-            }
-
-            return Json(new { success, message });
+                TitleClass = await _titleClassService.GetAsync(titleClassId)
+            };
+            var allTitles = await _userService.GetTitlesAsync();
+            var titleList = viewModel.TitleClass.TitleClassMappings.Select(_ => _.UserTitle);
+            viewModel.Titles.AddRange(allTitles.Where(_ => !titleList.Contains(_)));
+            return View(viewModel);
         }
 
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<JsonResult> DeletePermissionGroup(PermissionGroup permissionGroup)
+        [HttpGet("[action]")]
+        public async Task<IActionResult> TitleClassList(int page)
         {
-            if (permissionGroup == null)
-            {
-                throw new ArgumentNullException(nameof(permissionGroup));
-            }
+            int currentPage = page < 2 ? 1 : page;
 
-            var success = false;
-            var message = string.Empty;
+            var filter = new BaseFilter(currentPage);
 
-            try
-            {
-                await _permissionGroupService.DeleteAsync(permissionGroup.Id);
-                ShowAlertSuccess($"Deleted permission group: {permissionGroup.PermissionGroupName}");
-                success = true;
-            }
-            catch (OcudaException ex)
-            {
-                message = ex.Message;
-            }
+            var titleClasses = await _titleClassService.GetPaginatedAsync(filter);
 
-            return Json(new { success, message });
+            var viewModel = new TitleClassesViewModel
+            {
+                CurrentPage = currentPage,
+                ItemCount = titleClasses.Count,
+                ItemsPerPage = filter.Take.Value
+            };
+
+            viewModel.TitleClasses.AddRange(titleClasses.Data);
+
+            if (viewModel.PastMaxPage)
+            {
+                viewModel.CurrentPage = viewModel.MaxPage;
+            }
+            viewModel.Titles.AddRange(await _userService.GetTitlesAsync());
+            return View(viewModel);
         }
     }
 }

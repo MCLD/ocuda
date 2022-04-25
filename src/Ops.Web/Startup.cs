@@ -370,6 +370,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.SectionRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ISiteSettingRepository,
                 Data.Ops.SiteSettingRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.ITitleClassRepository,
+                Data.Ops.TitleClassRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUnitLocationMapRepository,
                 Data.Ops.UnitLocatonMapRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserMetadataTypeRepository,
@@ -521,6 +523,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ISiteSettingPromService, SiteSettingPromService>();
             services.AddScoped<ISiteSettingService, SiteSettingService>();
             services.AddScoped<ISocialCardService, SocialCardService>();
+            services.AddScoped<ITitleClassService, TitleClassService>();
             services.AddScoped<Service.Abstract.IUserContextProvider, UserContextProvider>();
             services.AddScoped<IUserMetadataTypeService, UserMetadataTypeService>();
             services.AddScoped<IUserService, UserService>();

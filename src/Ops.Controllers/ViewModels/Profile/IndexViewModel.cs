@@ -14,6 +14,7 @@ namespace Ocuda.Ops.Controllers.ViewModels.Profile
         public ICollection<User> DirectReports { get; set; }
         public IEnumerable<SelectListItem> Locations { get; set; }
         public IList<string> Permissions { get; set; }
+        public IDictionary<TitleClass, ICollection<User>> RelatedTitleClassifications { get; set; }
         public User User { get; set; }
         public bool UserViewingSelf { get; set; }
 

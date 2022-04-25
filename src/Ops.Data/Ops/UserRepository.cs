@@ -140,12 +140,40 @@ namespace Ocuda.Ops.Data.Ops
 
         #region Initial setup methods
 
+        public async Task<User> GetNonSupervisorAsync(int locationId)
+        {
+            var supervisorIds = DbSet
+                .AsNoTracking()
+                .Where(_ => !_.IsDeleted && !_.IsSysadmin && _.SupervisorId != null)
+                .Select(_ => _.SupervisorId)
+                .Distinct();
+
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => !_.IsDeleted
+                   && !_.IsSysadmin
+                   && _.AssociatedLocation == locationId
+                   && !supervisorIds.Contains(_.Id))
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<User> GetSystemAdministratorAsync()
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.IsSysadmin)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<ICollection<string>> GetTitlesAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => !string.IsNullOrEmpty(_.Title))
+                .OrderBy(_ => _.Title)
+                .Select(_ => _.Title)
+                .Distinct()
+                .ToListAsync();
         }
 
         public async Task<bool> IsSupervisor(int userId)

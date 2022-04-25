@@ -1,0 +1,96 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Users.TitleClassesViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-7">
+        <h1>Title Classifications</h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
+        <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+                data-toggle="modal"
+                data-target="#addModal">
+            <span class="fa fa-plus-circle"></span>
+            Add Title Classification
+        </button>
+    </div>
+</div>
+
+<form asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.UsersController.AddTitle)"
+      method="post">
+    <div class="modal" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addModalTitle">
+                        Add Title Classification Mapping
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="titleIsUpdate" id="titleIsUpdate" />
+                    <input type="hidden" name="titleClassId" id="titleClassId" />
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label">Title Classification Name:</label>
+                        <input type="text" class="form-control" id="titleClassName" name="titleClassName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="message-text" class="col-form-label">Title:</label>
+                        <select name="title" class="form-control">
+                            @foreach (var title in Model.Titles)
+                            {
+                                <option value="@title">@title</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-outline-success">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<table class="table table-sm table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Title Class</th>
+            <th>Titles</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.TitleClasses.Any())
+        {
+            <tr>
+                <td colspan="3">
+                    No title classifications found.
+                </td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var titleClass in Model.TitleClasses)
+            {
+                <tr>
+                    <td class="align-middle">@titleClass.Name</td>
+                    <td class="align-middle">@string.Join(", ", titleClass.TitleClassMappings.Select(_ => _.UserTitle))</td>
+                    <td align="center">
+                        <a asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.UsersController.TitleClassDetails)"
+                   asp-route-titleClassId="@titleClass.Id"
+                   class="btn btn-outline-primary">
+                            <span class="fa fa-fw fa-edit" aria-hidden="true"></span>
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<nav paginate="@Model"></nav>

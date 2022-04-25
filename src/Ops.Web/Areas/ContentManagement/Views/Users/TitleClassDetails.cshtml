@@ -1,0 +1,98 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Users.TitleClassViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-7">
+        <h1>
+            Titles
+            <small class="text-muted">@Model.TitleClass.Name</small>
+        </h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.UsersController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.UsersController.TitleClassList))">Back</a>
+        <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+                data-toggle="modal"
+                data-target="#addModal">
+            <span class="fa fa-plus-circle"></span>
+            Add Title
+        </button>
+    </div>
+</div>
+
+<form asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.UsersController.AddTitle)"
+      method="post">
+    <div class="modal" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addModalTitle">
+                        Add Title Classification Mapping
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="titleIsUpdate" id="titleIsUpdate" value="true" />
+                    <input type="hidden" name="titleClassId" id="titleClassId" value="@Model.TitleClass.Id" />
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label">Title Classification Name:</label>
+                        <input type="text" class="form-control" disabled="disabled" value="@Model.TitleClass.Name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="message-text" class="col-form-label">Title:</label>
+                        <select name="title" class="form-control">
+                            @foreach (var title in Model.Titles)
+                            {
+                                <option value="@title">@title</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-outline-success">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<table class="table table-sm table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.TitleClass.TitleClassMappings.Any())
+        {
+            <tr>
+                <td colspan="3">
+                    No titles found.
+                </td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var titleClassMapping in Model.TitleClass.TitleClassMappings)
+            {
+                <tr>
+                    <td class="align-middle">@titleClassMapping.UserTitle</td>
+                    <td align="center">
+                        <form asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.UsersController.RemoveTitle)">
+                            <input type="hidden" name="titleClassId" value="@titleClassMapping.TitleClassId">
+                            <input type="hidden" name="title" value="@titleClassMapping.UserTitle">
+                            <button type="submit"
+                            class="btn btn-outline-danger">
+                                <span class="fa fa-fw fa-minus-circle" aria-hidden="true"></span>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
