@@ -279,8 +279,14 @@ namespace Ocuda.Ops.Service
                     {
                         try
                         {
-                            var count = excelReader.GetDouble(numberOfItemsColId);
                             var location = excelReader.GetString(locationNameColId);
+
+                            if (string.IsNullOrWhiteSpace(location))
+                            {
+                                continue;
+                            }
+
+                            var count = excelReader.GetDouble(numberOfItemsColId);
 
                             if (string.IsNullOrEmpty(location))
                             {
@@ -323,6 +329,10 @@ namespace Ocuda.Ops.Service
                         }
                         catch (Exception ex)
                         {
+                            _logger.LogError(ex,
+                                "Unable to import row {Row}: {ErrorMessage}",
+                                rows,
+                                ex.Message);
                             issues.Add($"Unable to import row {rows}: {ex.Message}", null);
                         }
                     }
