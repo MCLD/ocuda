@@ -329,6 +329,10 @@ namespace Ocuda.Ops.Service
                         }
                         catch (Exception ex)
                         {
+                            _logger.LogError(ex,
+                                "Unable to import row {Row}: {ErrorMessage}",
+                                rows,
+                                ex.Message);
                             issues.Add($"Unable to import row {rows}: {ex.Message}", null);
                         }
                     }

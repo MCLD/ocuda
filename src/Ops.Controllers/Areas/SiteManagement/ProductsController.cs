@@ -733,6 +733,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 try
                 {
                     verifyViewModel.Adjustments = await _productService.ParseInventoryAsync(product.Id, tempFile);
+                    _logger.LogInformation("Imported {Adjustments} inventory adjustments",
+                        verifyViewModel?.Adjustments?.Count ?? 0);
                 }
                 catch (OcudaException oex)
                 {
@@ -743,6 +745,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         verifyViewModel.Adjustments = oex.Data["Inventory"] as IDictionary<int, int>;
                         verifyViewModel.Issues = oex.Data["Issues"] as IDictionary<string, string>;
                     }
+                    _logger.LogError(oex,
+                        "Import failed: {ErrorMessage}, updated records: {Updated}",
+                        oex.Message,
+                        oex?.Data?.Count ?? 0);
                 }
             }
 
