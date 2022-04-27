@@ -15,15 +15,19 @@ namespace Ocuda.Ops.Service
 {
     public class UserService : BaseService<UserService>, IUserService
     {
+        private readonly ITitleClassService _titleClassService;
         private readonly IUserRepository _userRepository;
 
         public UserService(ILogger<UserService> logger,
             IHttpContextAccessor httpContextAccessor,
-            IUserRepository userRepository)
+            ITitleClassService titleClassService,
+        IUserRepository userRepository)
             : base(logger, httpContextAccessor)
         {
+            _titleClassService = titleClassService
+                ?? throw new ArgumentNullException(nameof(titleClassService));
             _userRepository = userRepository
-                ?? throw new ArgumentNullException(nameof(userRepository));
+                    ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
         public async Task<User> AddUser(User user, int? createdById = null)
@@ -116,9 +120,43 @@ namespace Ocuda.Ops.Service
             return await _userRepository.GetNameUsernameAsync(id);
         }
 
+        public async Task<IDictionary<TitleClass, ICollection<User>>>
+            GetRelatedTitleClassificationsAsync(int userId)
+
+        {
+            var result = new Dictionary<TitleClass, ICollection<User>>();
+            var supervisor = await GetSupervisorAsync(userId);
+            while (supervisor != null)
+            {
+                var titles = await _titleClassService.GetTitleClassByTitleAsync(supervisor.Title);
+                foreach (var title in titles)
+                {
+                    if (!result.ContainsKey(title))
+                    {
+                        result[title] = new List<User>();
+                    }
+                    result[title].Add(new User
+                    {
+                        Email = supervisor.Email,
+                        Id = supervisor.Id,
+                        Name = supervisor.Name,
+                        Username = supervisor.Username
+                    });
+                }
+                supervisor = await GetSupervisorAsync(supervisor.Id);
+            }
+            return result;
+        }
+
         public async Task<User> GetSupervisorAsync(int userId)
         {
             return await _userRepository.GetSupervisorAsync(userId);
+        }
+
+        public async Task<ICollection<string>> GetTitlesAsync()
+        {
+            // TODO add caching
+            return await _userRepository.GetTitlesAsync();
         }
 
         public async Task<bool> IsSupervisor(int userId)

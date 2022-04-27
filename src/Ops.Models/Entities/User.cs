@@ -39,6 +39,7 @@ namespace Ocuda.Ops.Models.Entities
         public string Phone { get; set; }
 
         public bool ReauthenticateUser { get; set; }
+
         public DateTime? ServiceStartDate { get; set; }
         public User Supervisor { get; set; }
         public int? SupervisorId { get; set; }

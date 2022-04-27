@@ -14,6 +14,7 @@ using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
+using Serilog.Context;
 
 namespace Ocuda.Ops.Service
 {
@@ -78,79 +79,159 @@ namespace Ocuda.Ops.Service
             if (baseUri == null) { throw new ArgumentNullException(nameof(baseUri)); }
 
             var now = _dateTimeProvider.Now;
+            var currentUserId = GetCurrentUserId();
 
             incident.CreatedAt = now;
-            incident.CreatedBy = GetCurrentUserId();
+            incident.CreatedBy = currentUserId;
             await _incidentRepository.AddAsync(incident);
             await _incidentRepository.SaveAsync();
 
-            if (staffs.Count > 0)
+            using (LogContext.PushProperty("IncidentId", incident.Id))
+            using (LogContext.PushProperty("IncidentCreatedBy", currentUserId))
             {
-                foreach (var staff in staffs)
+                if (staffs.Count > 0)
                 {
-                    staff.CreatedAt = now;
-                    staff.CreatedBy = GetCurrentUserId();
-                    staff.IncidentId = incident.Id;
-                }
-                await _incidentStaffRepository.AddRangeAsync(staffs);
-                await _incidentStaffRepository.SaveAsync();
-            }
-
-            if (participants.Count > 0)
-            {
-                foreach (var participant in participants)
-                {
-                    participant.CreatedAt = now;
-                    participant.CreatedBy = GetCurrentUserId();
-                    participant.IncidentId = incident.Id;
-                }
-
-                await _incidentParticipantRepository.AddRangeAsync(participants);
-                await _incidentParticipantRepository.SaveAsync();
-            }
-
-            var link = baseUri.AbsoluteUri.TrimEnd('0') + incident.Id;
-
-            var emailTemplateId = await _siteSettingService
-                .GetSettingIntAsync(Ops.Models.Keys.SiteSetting.Incident.EmailTemplateId);
-            if (emailTemplateId != default)
-            {
-                var currentUser = await _userService.GetByIdAsync(GetCurrentUserId());
-                var tags = await GetEmailTagsAsync(incident, currentUser.Name, link);
-
-                var details = await _emailService.GetDetailsAsync(emailTemplateId,
-                    CultureInfo.CurrentUICulture.Name,
-                    tags);
-
-                details.ToName = currentUser.Name;
-                details.ToEmailAddress = currentUser.Email;
-
-                var supervisor = await _userService.GetSupervisorAsync(incident.CreatedBy);
-                if (!string.IsNullOrEmpty(supervisor?.Email))
-                {
-                    details.Cc.Add(supervisor.Name, supervisor.Email);
-                }
-
-                if (incident.LawEnforcementContacted)
-                {
-                    var lawEnforcementAddresses = await _siteSettingService.GetSettingStringAsync(
-                        Ops.Models.Keys.SiteSetting.Incident.LawEnforcementAddresses);
-
-                    if (!string.IsNullOrEmpty(lawEnforcementAddresses))
+                    foreach (var staff in staffs)
                     {
-                        var addresses = lawEnforcementAddresses.Contains(',',
-                            StringComparison.OrdinalIgnoreCase)
-                            ? lawEnforcementAddresses.Split(',')
-                            : new string[] { lawEnforcementAddresses };
+                        staff.CreatedAt = now;
+                        staff.CreatedBy = currentUserId;
+                        staff.IncidentId = incident.Id;
+                    }
+                    await _incidentStaffRepository.AddRangeAsync(staffs);
+                    await _incidentStaffRepository.SaveAsync();
+                }
 
-                        foreach (var address in addresses)
+                if (participants.Count > 0)
+                {
+                    foreach (var participant in participants)
+                    {
+                        participant.CreatedAt = now;
+                        participant.CreatedBy = currentUserId;
+                        participant.IncidentId = incident.Id;
+                    }
+
+                    await _incidentParticipantRepository.AddRangeAsync(participants);
+                    await _incidentParticipantRepository.SaveAsync();
+                }
+
+                var link = baseUri.AbsoluteUri.TrimEnd('0') + incident.Id;
+
+                var emailTemplateId = await _siteSettingService
+                    .GetSettingIntAsync(Ops.Models.Keys.SiteSetting.Incident.EmailTemplateId);
+                if (emailTemplateId != default)
+                {
+                    var currentUser = await _userService.GetByIdAsync(currentUserId);
+                    var tags = await GetEmailTagsAsync(incident, currentUser.Name, link);
+
+                    var details = await _emailService.GetDetailsAsync(emailTemplateId,
+                        CultureInfo.CurrentUICulture.Name,
+                        tags);
+
+                    details.ToName = currentUser.Name;
+                    details.ToEmailAddress = currentUser.Email;
+
+                    var supervisor = await _userService.GetSupervisorAsync(incident.CreatedBy);
+                    if (!string.IsNullOrEmpty(supervisor?.Email))
+                    {
+                        _logger.LogInformation("Incident email CC: {Name} <{Email}> is the supervisor",
+                            supervisor.Name ?? supervisor.Email,
+                            supervisor.Email);
+                        details.Cc.Add(supervisor.Email, supervisor.Name);
+                    }
+
+                    var notifyTitleClassIds = await _siteSettingService.GetSettingStringAsync(
+                        Ops.Models.Keys.SiteSetting.Incident.NotifyTitleClassificationIds);
+
+                    if (!string.IsNullOrEmpty(notifyTitleClassIds))
+                    {
+                        var titleClassIds = notifyTitleClassIds.Contains(',',
+                            StringComparison.OrdinalIgnoreCase)
+                            ? notifyTitleClassIds.Split(',')
+                            : new string[] { notifyTitleClassIds };
+
+                        var relatedTitleClassifications = await _userService
+                            .GetRelatedTitleClassificationsAsync(currentUserId);
+
+                        foreach (var titleClassId in titleClassIds)
                         {
-                            details.Cc.Add(address, address);
+                            if (int.TryParse(titleClassId, out int numericTitleClassId))
+                            {
+                                var titleClass = relatedTitleClassifications
+                                    .Where(_ => _.Key.Id == numericTitleClassId)
+                                    .SingleOrDefault();
+
+                                if (titleClass.Value != null)
+                                {
+                                    foreach (var user in titleClass.Value)
+                                    {
+                                        if (!string.IsNullOrEmpty(user.Email)
+                                            && !details.Cc.ContainsKey(user.Email))
+                                        {
+                                            _logger.LogInformation("Incident email CC: {Name} <{Email}> is classification {TitleClassification}",
+                                                user.Name ?? user.Email,
+                                                user.Email,
+                                                titleClass.Key.Name);
+                                            details.Cc.Add(user.Email, user.Name ?? user.Email);
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
-                }
 
-                await _emailService.SendAsync(details);
+                    var notifyUserIds = await _siteSettingService.GetSettingStringAsync(
+                        Ops.Models.Keys.SiteSetting.Incident.NotifyUserIds);
+
+                    if (!string.IsNullOrEmpty(notifyUserIds))
+                    {
+                        var userIds = notifyUserIds.Contains(',',
+                            StringComparison.OrdinalIgnoreCase)
+                            ? notifyUserIds.Split(',')
+                            : new string[] { notifyUserIds };
+
+                        foreach (var userId in userIds)
+                        {
+                            if (int.TryParse(userId, out int numericUserId))
+                            {
+                                var user = await _userService.GetByIdAsync(numericUserId);
+                                if (!string.IsNullOrEmpty(user.Email)
+                                    && !details.Cc.ContainsKey(user.Email))
+                                {
+                                    _logger.LogInformation("Incident email: {Name} <{Email}> receives all incidents",
+                                        user.Name ?? user.Email,
+                                        user.Email);
+                                    details.Cc.Add(user.Email, user.Name ?? user.Email);
+                                }
+                            }
+                        }
+                    }
+
+                    if (incident.LawEnforcementContacted)
+                    {
+                        var lawEnforcementAddresses = await _siteSettingService.GetSettingStringAsync(
+                            Ops.Models.Keys.SiteSetting.Incident.LawEnforcementAddresses);
+
+                        if (!string.IsNullOrEmpty(lawEnforcementAddresses))
+                        {
+                            var addresses = lawEnforcementAddresses.Contains(',',
+                                StringComparison.OrdinalIgnoreCase)
+                                ? lawEnforcementAddresses.Split(',')
+                                : new string[] { lawEnforcementAddresses };
+
+                            foreach (var address in addresses)
+                            {
+                                if (!details.Cc.ContainsKey(address))
+                                {
+                                    _logger.LogInformation("Incident email CC: {Email} receives all law enforcement involvement",
+                                        address);
+                                    details.Cc.Add(address, address);
+                                }
+                            }
+                        }
+                    }
+
+                    await _emailService.SendAsync(details);
+                }
             }
 
             return incident.Id;
@@ -366,7 +447,7 @@ namespace Ocuda.Ops.Service
             return await _incidentTypeRepository.GetAsync(incidentTypeName);
         }
 
-        public async Task UpdateIncidentTypeAsync(int incidentTypeId, 
+        public async Task UpdateIncidentTypeAsync(int incidentTypeId,
             string incidentTypeDescription)
         {
             var type = await _incidentTypeRepository.FindAsync(incidentTypeId);

@@ -157,6 +157,15 @@ namespace Ocuda.Ops.Models.Defaults
 
             new SiteSetting
             {
+                Id = Keys.SiteSetting.Incident.EmailTemplateId,
+                Name = "Email template id",
+                Description = "Email template id to use when sending a notificaton about a new incident report, 0 is disabled",
+                Category = "Incident",
+                Value = "0",
+                Type = SiteSettingType.Int
+            },
+            new SiteSetting
+            {
                 Id = Keys.SiteSetting.Incident.LawEnforcementAddresses,
                 Name = "Law Enforcement addresses",
                 Description = "Comma-separated email addresses to email incident reports when law enforcement is contacted",
@@ -166,12 +175,21 @@ namespace Ocuda.Ops.Models.Defaults
             },
             new SiteSetting
             {
-                Id = Keys.SiteSetting.Incident.EmailTemplateId,
-                Name = "Email template id",
-                Description = "Email template id to use when sending a notificaton about a new incident report, 0 is disabled",
+                Id = Keys.SiteSetting.Incident.NotifyTitleClassificationIds,
+                Name = "Notify TitleClassifciationIds",
+                Description = "Comma-separated list of title classification ids to notify for the submitting user's management chain",
                 Category = "Incident",
-                Value = "0",
-                Type = SiteSettingType.Int
+                Value = "",
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.Incident.NotifyUserIds,
+                Name = "Notify user ids",
+                Description = "Comma-separated list of user ids to notify for each incident submission",
+                Category = "Incident",
+                Value = "",
+                Type = SiteSettingType.StringNullable
             },
 
             #endregion Incident

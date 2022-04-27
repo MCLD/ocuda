@@ -151,7 +151,7 @@ namespace Ocuda.Utility.Email
                         }
                         else
                         {
-                            message.Cc.Add(new MailboxAddress(item.Key, item.Value));
+                            message.Cc.Add(new MailboxAddress(item.Value, item.Key));
                         }
                     }
                 }

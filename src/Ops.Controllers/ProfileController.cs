@@ -133,6 +133,9 @@ namespace Ocuda.Ops.Controllers
                 }
             }
 
+            viewModel.RelatedTitleClassifications
+                = await _userService.GetRelatedTitleClassificationsAsync(viewModel.User.Id);
+
             return View(viewModel);
         }
 

@@ -75,6 +75,11 @@
                    asp-controller="@UsersController.Name"
                    asp-action="@nameof(UsersController.Permissions)"
                    class="btn btn-outline-primary mt-1">Permission Groups</a>
+                        <a asp-area="@UsersController.Area"
+                   asp-controller="@UsersController.Name"
+                   asp-action="@nameof(UsersController.TitleClassList)"
+                   class="btn btn-outline-primary mt-1">Title Classifications</a>
+
                     }
                     <a asp-area="@RosterController.Area"
                    asp-controller="@RosterController.Name"

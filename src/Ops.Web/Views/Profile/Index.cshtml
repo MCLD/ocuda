@@ -162,6 +162,35 @@
                                 </td>
                             </tr>
                         }
+                        @if (Model.RelatedTitleClassifications?.Any() == true)
+                        {
+                            <tr>
+                                <th class="align-middle table-light" colspan="2">Related staff</th>
+                            </tr>
+                            @foreach (var key in Model.RelatedTitleClassifications.Keys)
+                            {
+                                <tr>
+                                    <th class="align-middle">@key.Name</th>
+                                    <td class="align-middle">
+                                        @foreach (var user in Model.RelatedTitleClassifications[key])
+                                        {
+                                            @if (string.IsNullOrEmpty(user.Username))
+                                            {
+                                                @user.Name
+                                                <br />
+                                            }
+                                            else
+                                            {
+                                                <a asp-controller="@ProfileController.Name"
+                                   asp-action="@nameof(ProfileController.Index)"
+                                   asp-route-id="@user.Username">@user.Name</a>
+                                                <br />
+                                            }
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
                     </table>
                 </div>
             </div>
