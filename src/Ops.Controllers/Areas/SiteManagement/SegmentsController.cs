@@ -281,7 +281,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             id = emediaGroup.Id
                         });
                     viewModel.Relationship
-                        = "This segment is used by emedia group: {emediaGroup.Name}";
+                        = $"This segment is used by emedia group: {emediaGroup.Name}";
                 }
 
                 var locations = await _locationService.GetLocationsBySegment(segment.Id);
@@ -295,7 +295,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             locationStub = locations.First().Stub
                         });
                     viewModel.Relationship
-                        = "This segment is used for location: {locations.First().Name}";
+                        = $"This segment is used for location: {locations.First().Name}";
                 }
                 if (locations?.Count > 1)
                 {
