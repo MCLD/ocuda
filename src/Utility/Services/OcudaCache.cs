@@ -217,7 +217,7 @@ namespace Ocuda.Utility.Services
             }
             if (item == null)
             {
-                _logger.LogError("Ignoring attempt to cache null object with key {CacheKey}",
+                _logger.LogTrace("Ignoring attempt to cache null object with key {CacheKey}",
                     cacheKey);
                 return Task.CompletedTask;
             }
