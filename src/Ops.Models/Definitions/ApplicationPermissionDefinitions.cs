@@ -57,6 +57,12 @@ namespace Ocuda.Ops.Models.Definitions
             },
             new ApplicationPermissionDefinition
             {
+                Id = ApplicationPermission.UpdateProfilePictures,
+                Name = "Update Profile Pictures",
+                Info = "Users with this permission can update profile pictures for all users."
+            },
+            new ApplicationPermissionDefinition
+            {
                 Id = ApplicationPermission.ViewAllIncidentReports,
                 Name = "View All Incident Reports",
                 Info = "Users with this permission can view all incident reports, not just their own."

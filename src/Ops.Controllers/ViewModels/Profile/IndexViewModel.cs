@@ -11,6 +11,8 @@ namespace Ocuda.Ops.Controllers.ViewModels.Profile
     {
         public DateTime AuthenticatedAt { get; set; }
         public bool CanEdit { get; set; }
+        public bool CanUpdatePicture { get; set; }
+        public string PicturePath { get; set; }
         public ICollection<User> DirectReports { get; set; }
         public IEnumerable<SelectListItem> Locations { get; set; }
         public IList<string> Permissions { get; set; }

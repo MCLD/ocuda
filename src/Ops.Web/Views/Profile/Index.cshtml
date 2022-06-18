@@ -31,6 +31,14 @@
 
 <div class="container-fluid">
     <div class="row">
+        @if (string.IsNullOrEmpty(Model.PicturePath))
+        {
+            <div class="col-12 col-md-6 order-md-1 mb-2">
+                <img src="/profile.png" class="img-fluid rounded mx-auto d-block img-thumbnail" style="max-width: 350px;">
+                <img src="@Model.PicturePath" class="img-fluid rounded">
+                PICTURE
+            </div>
+        }
         <div class="col-12 col-md-6">
             <div class="card mb-2">
                 <div class="card-header">
@@ -191,6 +199,15 @@
                                 </tr>
                             }
                         }
+                        @if(Model.CanUpdatePicture)
+                        {
+                            <tr>
+                                <th class="align-middle">Update photo</th>
+                                <td class="align-middle">
+                                    <a href="#" class="btn btn-sm btn-outline-primary">Upload new photo...</a>
+                                </td>
+                            </tr>
+                        }
                     </table>
                 </div>
             </div>
@@ -198,7 +215,7 @@
 
         @if (Model?.Permissions?.Count() > 0)
         {
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-md-6 order-md-1">
                 <div class="card mb-2">
                     <div class="card-header">
                         <span class="h5">Permission Groups</span>
@@ -229,21 +246,21 @@
 
 @section scripts
     {
-<script>
-    $("#editModal").on("show.bs.modal", function (e) {
-        var button = $(e.relatedTarget);
-        var id = button.data("id");
-        var nickname = button.data("nickname");
-        var modal = $(this);
-        $("#editId").val(id);
-        modal.find("#editName").val(nickname);
-    });
-    $("#editLocationModal").on("show.bs.modal", function (e) {
-        var sender = $(e.relatedTarget);
-        var locationId = sender.data("locationid");
-        if(locationId) {
-           $("#locationList").val(locationId)
-        }
-    });
-</script>
+    <script>
+        $("#editModal").on("show.bs.modal", function(e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var nickname = button.data("nickname");
+            var modal = $(this);
+            $("#editId").val(id);
+            modal.find("#editName").val(nickname);
+        });
+        $("#editLocationModal").on("show.bs.modal", function(e) {
+            var sender = $(e.relatedTarget);
+            var locationId = sender.data("locationid");
+            if (locationId) {
+                $("#locationList").val(locationId)
+            }
+        });
+    </script>
 }
