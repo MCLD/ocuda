@@ -49,6 +49,18 @@
     }
   },
   {
+    "outputFileName": "wwwroot/js/crop.min.js",
+    "inputFiles": [
+      "node_modules/smartcrop/smartcrop.js",
+      "node_modules/cropperjs/dist/cropper.js",
+      "Scripts/image-crop.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals":  true
+    }
+  },
+  {
     "outputFileName": "wwwroot/css/main.min.css",
     "inputFiles": [
       "node_modules/bootstrap/dist/css/bootstrap.css",
@@ -81,4 +93,13 @@
       "enabled": true
     }
   },
+  {
+    "outputFileName": "wwwroot/css/crop.min.css",
+    "inputFiles": [
+      "node_modules/cropperjs/dist/cropper.css"
+    ],
+    "minify": {
+      "enabled": true
+    }
+  }
 ]
