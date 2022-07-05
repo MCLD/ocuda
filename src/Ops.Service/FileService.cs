@@ -527,7 +527,7 @@ namespace Ocuda.Ops.Service
                             string oldFilePath = null)
         {
             string filePath = GetPrivateFilePath(file);
-            byte[] fileBytes = IFormFileHelper.GetFileBytes(fileData);
+            byte[] fileBytes = await FormFileHelper.GetFileBytesAsync(fileData);
 
             if (!string.IsNullOrWhiteSpace(oldFilePath) && System.IO.File.Exists(oldFilePath))
             {
@@ -541,7 +541,7 @@ namespace Ocuda.Ops.Service
             string oldFilePath = null)
         {
             string filePath = GetPublicFilePath(file);
-            byte[] fileBytes = IFormFileHelper.GetFileBytes(fileData);
+            byte[] fileBytes = await FormFileHelper.GetFileBytesAsync(fileData);
 
             if (!string.IsNullOrWhiteSpace(oldFilePath) && System.IO.File.Exists(oldFilePath))
             {

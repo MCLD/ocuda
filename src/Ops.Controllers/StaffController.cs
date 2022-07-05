@@ -12,6 +12,8 @@ namespace Ocuda.Ops.Controllers
     [Route("[controller]")]
     public class StaffController : BaseController<StaffController>
     {
+        private const int PerPage = 10;
+
         private readonly ILocationService _locationService;
         private readonly IUserService _userService;
 
@@ -34,9 +36,9 @@ namespace Ocuda.Ops.Controllers
         {
             int currentPage = page < 2 ? 1 : page;
 
-            var filter = new SearchFilter(currentPage)
+            var filter = new SearchFilter(currentPage, PerPage)
             {
-                SearchText = searchText
+                SearchText = searchText,
             };
 
             var users = await _userService.FindAsync(filter);

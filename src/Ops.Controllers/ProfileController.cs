@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Profile;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers
@@ -52,9 +53,9 @@ namespace Ocuda.Ops.Controllers
                     var user = await _userService.EditNicknameAsync(model.User);
                     ShowAlertSuccess($"Updated nickname: {user.Nickname}");
                 }
-                catch (Exception ex)
+                catch (OcudaException oex)
                 {
-                    ShowAlertDanger("Unable to update nickname: ", ex.Message);
+                    ShowAlertDanger("Unable to update nickname: ", oex.Message);
                 }
             }
 
@@ -67,9 +68,10 @@ namespace Ocuda.Ops.Controllers
         {
             var viewModel = new IndexViewModel
             {
+                CanUpdatePicture = IsSiteManager(),
+                Locations = await GetLocationsDropdownAsync(_locationService),
                 UserViewingSelf = string.IsNullOrEmpty(id)
-                    || id == UserClaim(ClaimType.Username),
-                Locations = await GetLocationsDropdownAsync(_locationService)
+                    || id == UserClaim(ClaimType.Username)
             };
 
             if (!viewModel.UserViewingSelf)
@@ -89,6 +91,12 @@ namespace Ocuda.Ops.Controllers
             else
             {
                 viewModel.User = await _userService.GetByIdAsync(CurrentUserId);
+            }
+
+            if (!string.IsNullOrEmpty(viewModel.User.PictureFilename))
+            {
+                viewModel.PicturePath = Url.Action(nameof(Picture),
+                    new { id = id ?? UserClaim(ClaimType.Username) });
             }
 
             if (viewModel.User.SupervisorId.HasValue)
@@ -139,11 +147,32 @@ namespace Ocuda.Ops.Controllers
             return View(viewModel);
         }
 
+        [HttpGet("[action]/{id}")]
+        public async Task<IActionResult> Picture(string id)
+        {
+            var picture = await _userService.GetProfilePictureAsync(id);
+
+            if (picture == null)
+            {
+                return StatusCode(StatusCodes.Status404NotFound);
+            }
+
+            Response.Headers.Add("Content-Disposition", "inline; filename=" + picture.Filename);
+            return File(picture.FileData, picture.FileType);
+        }
+
         [HttpPost("[action]")]
         public async Task<IActionResult> Reauthenticate()
         {
             await _httpContext.HttpContext.SignOutAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> RemovePicture(int userId, string username)
+        {
+            await _userService.RemoveProfilePictureAsync(userId);
+            return RedirectToAction(nameof(Index), new { id = username });
         }
 
         [HttpPost("[action]")]
@@ -155,6 +184,61 @@ namespace Ocuda.Ops.Controllers
             }
             await _userService.UpdateLocationAsync(userId, locationId);
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet("[action]/{id}")]
+        public async Task<IActionResult> UpdatePicture(int id)
+        {
+            var user = await _userService.GetByIdAsync(id);
+            if (user == null)
+            {
+                ShowAlertDanger("Unable to find that user.");
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(new UpdatePictureViewModel
+            {
+                CropHeight = 700,
+                CropWidth = 700,
+                DisplayDimension = 700,
+                User = user
+            });
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult>
+            UploadPicture(UpdatePictureViewModel updatePictureViewModel)
+        {
+            if (updatePictureViewModel == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            var user = await _userService.GetByIdAsync(updatePictureViewModel.UserId);
+
+            if (user == null)
+            {
+                ShowAlertDanger("Unable to find that user.");
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (string.IsNullOrEmpty(updatePictureViewModel.ProfilePicture))
+            {
+                ShowAlertWarning("You must upload a file to replace a profile image.");
+                return RedirectToAction(nameof(Index), new { id = user.Username });
+            }
+
+            try
+            {
+                await _userService
+                    .UploadProfilePictureAsync(user, updatePictureViewModel.ProfilePicture);
+            }
+            catch (OcudaException oex)
+            {
+                ShowAlertDanger("Problem with upload: " + oex.Message);
+            }
+
+            return RedirectToAction(nameof(Index), new { id = user.Username });
         }
     }
 }

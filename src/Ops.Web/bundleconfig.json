@@ -53,7 +53,7 @@
     "inputFiles": [
       "node_modules/smartcrop/smartcrop.js",
       "node_modules/cropperjs/dist/cropper.js",
-      "Scripts/image-crop.js"
+      "Scripts/localcrop.js"
     ],
     "minify": {
       "enabled": true,
