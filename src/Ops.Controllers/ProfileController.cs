@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Profile;
+using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
@@ -73,6 +74,12 @@ namespace Ocuda.Ops.Controllers
                 UserViewingSelf = string.IsNullOrEmpty(id)
                     || id == UserClaim(ClaimType.Username)
             };
+
+            if (!viewModel.CanUpdatePicture)
+            {
+                viewModel.CanUpdatePicture = await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.UpdateProfilePictures);
+            }
 
             if (!viewModel.UserViewingSelf)
             {
@@ -171,6 +178,16 @@ namespace Ocuda.Ops.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> RemovePicture(int userId, string username)
         {
+            if (!IsSiteManager())
+            {
+                var picturePermission = await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.UpdateProfilePictures);
+                if (!picturePermission)
+                {
+                    return RedirectToUnauthorized();
+                }
+            }
+
             await _userService.RemoveProfilePictureAsync(userId);
             return RedirectToAction(nameof(Index), new { id = username });
         }
@@ -189,6 +206,16 @@ namespace Ocuda.Ops.Controllers
         [HttpGet("[action]/{id}")]
         public async Task<IActionResult> UpdatePicture(int id)
         {
+            if (!IsSiteManager())
+            {
+                var picturePermission = await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.UpdateProfilePictures);
+                if (!picturePermission)
+                {
+                    return RedirectToUnauthorized();
+                }
+            }
+
             var user = await _userService.GetByIdAsync(id);
             if (user == null)
             {
@@ -209,6 +236,16 @@ namespace Ocuda.Ops.Controllers
         public async Task<IActionResult>
             UploadPicture(UpdatePictureViewModel updatePictureViewModel)
         {
+            if (!IsSiteManager())
+            {
+                var picturePermission = await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.UpdateProfilePictures);
+                if (!picturePermission)
+                {
+                    return RedirectToUnauthorized();
+                }
+            }
+
             if (updatePictureViewModel == null)
             {
                 return RedirectToAction(nameof(Index));
