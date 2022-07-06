@@ -97,7 +97,7 @@ function initCrop(parameters) {
                     let cropWidthRequested = Math.min(width, maxWidth);
                     let cropHeightRequested = Math.min(height, maxHeight);
 
-                    if (maxWidth == maxHeight) {
+                    if (maxWidth === maxHeight) {
                         cropWidthRequested = Math.max(cropWidthRequested, cropHeightRequested);
                         cropHeightRequested = cropWidthRequested;
                     }
@@ -125,10 +125,10 @@ function initCrop(parameters) {
                             ruleOfThirds: false,
                         })
                         .then(function (cropResult) {
-                            let cropX = parseInt(cropResult.topCrop.x);
-                            let cropY = parseInt(cropResult.topCrop.y);
-                            let cropWidth = parseInt(cropResult.topCrop.width);
-                            let cropHeight = parseInt(cropResult.topCrop.height);
+                            let cropX = parseInt(cropResult.topCrop.x, 10);
+                            let cropY = parseInt(cropResult.topCrop.y, 10);
+                            let cropWidth = parseInt(cropResult.topCrop.width, 10);
+                            let cropHeight = parseInt(cropResult.topCrop.height, 10);
 
                             cropCropper = new Cropper(parameters.previewCanvas, {
                                 aspectRatio: cropHeight / cropWidth,
