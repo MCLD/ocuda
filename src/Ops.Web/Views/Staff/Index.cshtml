@@ -51,6 +51,7 @@
             <table class="table table-sm table-bordered table-hover table-striped">
                 <thead>
                     <tr>
+                        <th class="oc-staff-picture-column">Picture</th>
                         <th>Name</th>
                         <th>Title</th>
                         <th>Location</th>
@@ -61,6 +62,21 @@
                     @foreach (var user in Model.Users)
                     {
                         <tr>
+                            <td class="align-middle oc-staff-picture-row">
+                                @if (!string.IsNullOrEmpty(user.PictureFilename))
+                                {
+                                    <a asp-action="@nameof(ProfileController.Index)"
+                           asp-controller="@ProfileController.Name"
+                           asp-route-id="@user.Username">
+                                        <img src="@Url.Action(nameof(ProfileController.Picture), ProfileController.Name,  new { id =  user.Username })"
+                                 class="img-fluid rounded mx-auto d-block img-thumbnail oc-staff-index-picture">
+                                    </a>
+                                }
+                                else
+                                {
+                                    @:&nbsp;
+                                }
+                            </td>
                             <td class="align-middle">
                                 <a asp-action="@nameof(ProfileController.Index)"
                            asp-controller="@ProfileController.Name"

@@ -157,6 +157,15 @@ namespace Ocuda.Ops.Data.Ops
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<string> GetProfilePictureFilenameAsync(string username)
+        {
+            return await DbSet
+                 .AsNoTracking()
+                 .Where(_ => _.Username == username)
+                 .Select(_ => _.PictureFilename)
+                 .SingleOrDefaultAsync();
+        }
+
         public async Task<User> GetSystemAdministratorAsync()
         {
             return await DbSet

@@ -260,3 +260,21 @@ a.rowlink {
     vertical-align: middle;
     margin-bottom: 0.25rem;
 }
+
+.oc-profile-picture {
+    max-width: 350px;
+}
+
+.oc-staff-picture-row {
+    max-height: 110px;
+    max-width: 110px;
+}
+
+.oc-staff-picture-column {
+    max-width: 110px;
+    width: 110px;
+}
+
+.oc-staff-index-picture {
+    max-width: 100px;
+}

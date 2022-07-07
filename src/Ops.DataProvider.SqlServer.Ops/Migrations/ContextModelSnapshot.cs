@@ -16,7 +16,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.16")
+                .HasAnnotation("ProductVersion", "5.0.17")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
@@ -1779,6 +1779,13 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Ops.Migrations
                     b.Property<string>("Phone")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("PictureFilename")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int?>("PictureUpdatedBy")
+                        .HasColumnType("int");
 
                     b.Property<bool>("ReauthenticateUser")
                         .HasColumnType("bit");

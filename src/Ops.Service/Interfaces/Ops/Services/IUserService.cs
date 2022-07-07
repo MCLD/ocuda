@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Utility.Models;
@@ -26,6 +27,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<(string name, string username)> GetNameUsernameAsync(int id);
 
+        Task<FileDownload> GetProfilePictureAsync(string username);
+
         Task<IDictionary<TitleClass, ICollection<User>>> GetRelatedTitleClassificationsAsync(int userId);
 
         Task<User> GetSupervisorAsync(int userId);
@@ -40,8 +43,12 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<User> LookupUserByEmailAsync(string email);
 
+        Task RemoveProfilePictureAsync(int userId);
+
         Task UpdateLocationAsync(int userId, int locationId);
 
         Task<User> UpdateRosterUserAsync(int rosterUserId, User user);
+
+        Task UploadProfilePictureAsync(User user, string profilePictureBase64);
     }
 }

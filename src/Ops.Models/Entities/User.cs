@@ -38,6 +38,11 @@ namespace Ocuda.Ops.Models.Entities
         [MaxLength(255)]
         public string Phone { get; set; }
 
+        [MaxLength(255)]
+        public string PictureFilename { get; set; }
+
+        public int? PictureUpdatedBy { get; set; }
+
         public bool ReauthenticateUser { get; set; }
 
         public DateTime? ServiceStartDate { get; set; }

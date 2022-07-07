@@ -1,0 +1,125 @@
+﻿@model Ocuda.Ops.Controllers.ViewModels.Profile.UpdatePictureViewModel
+
+@section styles {
+    <link rel="stylesheet" href="~/css/crop.min.css" asp-append-version="true" />
+}
+
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>
+                Update Picture
+                <small class="text-muted">@Model.User.Name</small>
+            </h1>
+        </div>
+        <div class="col-sm-6">
+            <a class="btn btn-outline-dark mt-2 mb-1 float-right"
+           asp-action="@nameof(ProfileController.Index)"
+           asp-controller="@ProfileController.Name"
+           asp-route-Id="@Model.User.Username">Back</a>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-12">
+            <div class="alert alert-danger d-none" id="alertItem">
+                The cropped image is too small. It must be at least
+                <strong>@Model.CropWidth pixels wide by @Model.CropWidth pixels high</strong>.
+                <span class="alertDetails"></span>
+            </div>
+            <p>
+                Use this form to upload a new profile picture for
+                <strong>@Model.User.Name</strong>. The uploaded file should be a JPEG or PNG image
+                at least
+                <strong>@Model.CropWidth pixels wide by @Model.CropWidth pixels high</strong>.
+                Once you select a file you will be able to crop it square before saving it.
+            </p>
+            <div class="input-group">
+                <label class="input-group-btn">
+                    <span class="btn btn-light btn-file">
+                        <span class="far fa-file-image"></span> Select file...
+                        <input type="file"
+                           id="uploadedImage"
+                           accept="image/*"
+                           style="display: none;" />
+                    </span>
+                </label>
+                <input type="text"
+                   disabled="disabled"
+                   id="File_Name"
+                   class="form-control" />
+            </div>
+        </div>
+        <div class="col-12 mb-2">
+            <div id="previewContainer">
+                <canvas id="previewCanvas"></canvas>
+            </div>
+        </div>
+        <div class="col-12">
+            <form method="post" asp-action="@nameof(ProfileController.UploadPicture)">
+                <input type="hidden" asp-for="ProfilePictureMetadata" />
+                <input type="hidden" asp-for="ProfilePicture" />
+                <input type="hidden" asp-for="UserId" value="@Model.User.Id" />
+                <button type="submit"
+                    class="btn btn-primary d-none"
+                    disabled="disabled"
+                    id="submitButton"
+                    button-spinner>
+                    <span class="fas fa-file-upload"></span>
+                    Upload profile picture
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <img id="baseImage" style="display: none" />
+
+    @section scripts {
+    <script src="~/js/crop.min.js" asp-append-version="true"></script>
+    <script>
+        const dataDivider = ";base64,";
+        const necessaryCropWidth = @Model.CropWidth;
+        const necessaryCropHeight = @Model.CropHeight;
+        const necessaryDisplayDimension = @Model.DisplayDimension;
+
+        var alertVisible = false;
+
+        var params = {
+            cropWidth: necessaryCropWidth,
+            cropHeight: necessaryCropHeight,
+            displayDimension: necessaryDisplayDimension,
+            uploadControl: document.getElementById("uploadedImage"),
+            previewCanvas: document.getElementById("previewCanvas"),
+            onCropLoad: function() {
+                $("#previewRow").removeClass("d-none");
+                $("#submitButton").removeClass("d-none");
+                alertVisible = true;
+            },
+            onCropResize: function(imageDataUrl, cropFailure, cropWidth, cropHeight) {
+                if (imageDataUrl) {
+                    let dataDividerLocation = imageDataUrl.indexOf(dataDivider);
+                    document.getElementById("ProfilePictureMetadata").value
+                        = imageDataUrl.substring(0, dataDividerLocation);
+                    document.getElementById("ProfilePicture").value
+                        = imageDataUrl.substring(dataDividerLocation + dataDivider.length);
+                }
+                let width = Math.floor(cropWidth);
+                let height = Math.floor(cropHeight);
+                if (width < necessaryCropWidth || height < necessaryCropHeight) {
+                    $("#alertDetails").value = width + " x " + height + " pixels.";
+                    $("#submitButton").prop("disabled", true);
+                    $("#alertItem").removeClass("d-none");
+                    alertVisible = true;
+                }
+                else if (alertVisible) {
+                    $("#alertItem").addClass("d-none");
+                    $("submitButton").disabled
+                    $("#submitButton").prop("disabled", false);
+                    alertVisible = false;
+                }
+            },
+        };
+
+        if (initCrop) {
+            initCrop(params);
+        }
+    </script>
+}

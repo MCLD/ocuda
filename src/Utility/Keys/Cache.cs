@@ -66,6 +66,11 @@
         public static readonly string OpsUsername = "auth.{0}.username";
 
         /// <summary>
+        /// The filename of the user's profile picture
+        /// </summary>
+        public static readonly string OpsUserProfilePicture = "user.picture.{0}";
+
+        /// <summary>
         /// Cached carousel, {0} is the carousel id
         /// </summary>
         public static readonly string PromCarousel = "carousel.{0}";
