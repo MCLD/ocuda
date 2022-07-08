@@ -66,6 +66,12 @@ namespace Ocuda.Ops.Models.Definitions
                 Id = ApplicationPermission.ViewAllIncidentReports,
                 Name = "View All Incident Reports",
                 Info = "Users with this permission can view all incident reports, not just their own."
+            },
+            new ApplicationPermissionDefinition
+            {
+                Id = ApplicationPermission.WebPageContentManagement,
+                Name = "Web Page Content Management",
+                Info = "Users with this permission can edit all pages."
             }
         };
     }

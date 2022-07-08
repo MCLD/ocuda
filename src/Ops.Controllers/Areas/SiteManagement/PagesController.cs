@@ -13,6 +13,7 @@ using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
@@ -60,8 +61,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(imageFeatureService));
         }
 
-        public static string Area { get { return "SiteManagement"; } }
-        public static string Name { get { return "Pages"; } }
+        public static string Area
+        { get { return "SiteManagement"; } }
+
+        public static string Name
+        { get { return "Pages"; } }
 
         [HttpPost]
         [Route("[action]/{headerId}/{permissionGroupId}")]
@@ -91,8 +95,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var layout = await _pageService.GetLayoutForItemAsync(id);
 
-            if (await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
-                layout.PageHeaderId))
+            if (await HasPagePermissionsAsync(layout.PageHeaderId))
             {
                 try
                 {
@@ -125,13 +128,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> CloneLayout(int clonePageHeaderId,
             int cloneLayoutId,
             string clonedName)
         {
-            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
-                    clonePageHeaderId))
+            if (!await HasPagePermissionsAsync(clonePageHeaderId))
             {
                 return RedirectToUnauthorized();
             }
@@ -280,9 +281,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             JsonResponse response;
 
-            if (model != null &&
-                await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
-                    model.PageLayout.PageHeaderId))
+            if (model != null && await HasPagePermissionsAsync(model.PageLayout.PageHeaderId))
             {
                 if (ModelState.IsValid)
                 {
@@ -347,8 +346,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var layout = await _pageService.GetLayoutByIdAsync(model.PageItem.PageLayoutId);
 
-            if (await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
-                layout.PageHeaderId))
+            if (await HasPagePermissionsAsync(layout.PageHeaderId))
             {
                 if (model.Carousel == null
                     && model.PageFeature == null
@@ -481,8 +479,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             var pageLayout = await _pageService.GetLayoutByIdAsync(model.PageLayout.Id);
 
-            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
-                pageLayout.PageHeaderId))
+            if (!await HasPagePermissionsAsync(pageLayout.PageHeaderId))
             {
                 return RedirectToUnauthorized();
             }
@@ -533,8 +530,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             var layout = await _pageService.GetLayoutForItemAsync(model.PageItem.Id);
 
-            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
-                layout.PageHeaderId))
+            if (!await HasPagePermissionsAsync(layout.PageHeaderId))
             {
                 return RedirectToUnauthorized();
             }
@@ -563,7 +559,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [RestoreModelState]
         public async Task<IActionResult> Detail(int id, string language)
         {
-            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService, id))
+            if (!await HasPagePermissionsAsync(id))
             {
                 return RedirectToUnauthorized();
             }
@@ -624,8 +620,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 return RedirectToAction(nameof(Index));
             }
 
-            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
-                model.HeaderId))
+            if (!await HasPagePermissionsAsync(model.HeaderId))
             {
                 return RedirectToUnauthorized();
             }
@@ -711,8 +706,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var pageLayout = await _pageService.GetLayoutByIdAsync(model.PageLayout.Id);
 
             if (model != null
-                && await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
-                    pageLayout.PageHeaderId))
+                && await HasPagePermissionsAsync(pageLayout.PageHeaderId))
             {
                 if (ModelState.IsValid)
                 {
@@ -776,8 +770,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var layout = await _pageService.GetLayoutForItemAsync(model.PageItem.Id);
 
-            if (await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
-                layout.PageHeaderId))
+            if (await HasPagePermissionsAsync(layout.PageHeaderId))
             {
                 var pageItem = await _pageService.GetItemByIdAsync(model.PageItem.Id);
 
@@ -927,8 +920,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             var pageLayout = await _pageService.GetLayoutDetailsAsync(id);
 
-            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
-                pageLayout.PageHeaderId))
+            if (!await HasPagePermissionsAsync(pageLayout.PageHeaderId))
             {
                 return RedirectToUnauthorized();
             }
@@ -990,8 +982,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var pageLayout = await _pageService.GetLayoutByIdAsync(
                 model.PageLayoutText.PageLayoutId);
 
-            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
-                pageLayout.PageHeaderId))
+            if (!await HasPagePermissionsAsync(pageLayout.PageHeaderId))
             {
                 return RedirectToUnauthorized();
             }
@@ -1016,7 +1007,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [RestoreModelState]
         public async Task<IActionResult> Layouts(int id, int page)
         {
-            if (!await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService, id))
+            if (!await HasPagePermissionsAsync(id))
             {
                 return RedirectToUnauthorized();
             }
@@ -1126,6 +1117,15 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
 
             return Json(response);
+        }
+
+        private async Task<bool> HasPagePermissionsAsync(int pageHeaderId)
+        {
+            return await HasPermissionAsync<PermissionGroupPageContent>(_permissionGroupService,
+                    pageHeaderId)
+                || await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.WebPageContentManagement)
+                || IsSiteManager();
         }
     }
 }
