@@ -83,8 +83,21 @@ namespace Ocuda.Ops.Service
             {
                 Name = clonedName?.Trim(),
                 PageHeaderId = layout.PageHeaderId,
-                SocialCardId = layout.SocialCardId,
+                SocialCardId = layout.SocialCardId
             });
+
+            var pageLayouts = await _pageLayoutTextRepository.GetAllForLayoutAsync(layout.Id);
+
+            foreach(var pageLayout in pageLayouts)
+            {
+                await _pageLayoutTextRepository.AddAsync(new PageLayoutText
+                {
+                    IsTitleHidden = pageLayout.IsTitleHidden,
+                    LanguageId = pageLayout.LanguageId,
+                    PageLayoutId = newLayout.Id,
+                    Title = pageLayout.Title
+                });
+            }
 
             _logger.LogDebug("Layout {NewLayoutId}: created {ClonedName} based on id {LayoutId}",
                 newLayout.Id,
