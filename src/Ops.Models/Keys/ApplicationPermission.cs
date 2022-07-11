@@ -18,5 +18,6 @@
         public static readonly string RosterManagement = "RosterManagement";
         public static readonly string UpdateProfilePictures = "UpdateProfilePictures";
         public static readonly string ViewAllIncidentReports = "ViewAllIncidentReports";
+        public static readonly string WebPageContentManagement = "WebPageContentManagement";
     }
 }
