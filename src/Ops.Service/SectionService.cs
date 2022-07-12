@@ -91,28 +91,5 @@ namespace Ocuda.Ops.Service
 
             return sections;
         }
-
-        public async Task<bool> IsManagerAsync(int sectionId)
-        {
-            var access = IsSiteManager();
-
-            if (!access)
-            {
-                var permissionGroups = await _permissionGroupService
-                    .GetPermissionsAsync<PermissionGroupSectionManager>(sectionId);
-
-                access = permissionGroups.Any(_ => _.SectionId == sectionId);
-            }
-
-            if(!access)
-            {
-                return false;
-            }
-
-            // check supervisory access
-            var section = await GetByIdAsync(sectionId);
-
-            return section != null;
-        }
     }
 }

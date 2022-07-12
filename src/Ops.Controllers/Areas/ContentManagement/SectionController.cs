@@ -52,6 +52,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         public static string Area
         { get { return "ContentManagement"; } }
+
         public static string Name
         { get { return "Section"; } }
 
@@ -675,7 +676,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
             return View(new FileLibraryViewModel
             {
-                HasAdminRights = IsSiteManager() || await _sectionService.IsManagerAsync(section.Id),
+                HasAdminRights = IsSiteManager()
+                    || await HasPermissionAsync<PermissionGroupSectionManager>(_permissionGroupService,
+                        section.Id),
                 CurrentPage = page,
                 FileLibraryId = fileLibrary.Id,
                 FileLibraryName = fileLibrary.Name,
@@ -1238,7 +1241,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         private async Task<Section> GetSectionAsManagerAsync(int sectionId)
         {
             var section = await _sectionService.GetByIdAsync(sectionId);
-            return await _sectionService.IsManagerAsync(section.Id)
+            return await HasPermissionAsync<PermissionGroupSectionManager>(_permissionGroupService,
+                section.Id)
                 ? section
                 : null;
         }
@@ -1251,7 +1255,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
 
             var section = await _sectionService.GetBySlugAsync(sectionSlug);
-            return await _sectionService.IsManagerAsync(section.Id)
+            return await HasPermissionAsync<PermissionGroupSectionManager>(_permissionGroupService,
+                section.Id)
                 ? section
                 : null;
         }

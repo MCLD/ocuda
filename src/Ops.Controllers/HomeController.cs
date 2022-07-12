@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Home;
 using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Keys;
@@ -18,6 +19,7 @@ namespace Ocuda.Ops.Controllers
     {
         private readonly IFileService _fileService;
         private readonly ILinkService _linkService;
+        private readonly IPermissionGroupService _permissionGroupService;
         private readonly IPostService _postService;
         private readonly ISectionService _sectionService;
         private readonly IUserService _userService;
@@ -25,19 +27,23 @@ namespace Ocuda.Ops.Controllers
         public HomeController(ServiceFacades.Controller<HomeController> context,
             IFileService fileService,
             ILinkService linkService,
+            IPermissionGroupService permissionGroupService,
             IPostService postService,
             ISectionService sectionService,
             IUserService userService) : base(context)
         {
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _linkService = linkService ?? throw new ArgumentNullException(nameof(linkService));
+            _permissionGroupService = permissionGroupService
+                ?? throw new ArgumentNullException(nameof(permissionGroupService));
             _postService = postService ?? throw new ArgumentNullException(nameof(postService));
             _sectionService = sectionService
                 ?? throw new ArgumentNullException(nameof(sectionService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
-        public static string Name { get { return "Home"; } }
+        public static string Name
+        { get { return "Home"; } }
 
         [HttpGet("[action]")]
         public IActionResult Authenticate(Uri returnUrl)
@@ -141,7 +147,9 @@ namespace Ocuda.Ops.Controllers
                 SectionId = section.Id
             };
 
-            var isAdmin = await _sectionService.IsManagerAsync(section.Id);
+            var isAdmin
+                = await HasPermissionAsync<PermissionGroupSectionManager>(_permissionGroupService,
+                    section.Id);
 
             return await ShowPostsAsync(filter, showPage, isAdmin);
         }
@@ -186,7 +194,6 @@ namespace Ocuda.Ops.Controllers
         {
             return await ShowPostsAsync(filter, page, false);
         }
-
 
         private async Task<IActionResult> ShowPostsAsync(BlogFilter filter, int page, bool isAdmin)
         {
