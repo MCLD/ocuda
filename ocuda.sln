@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.2.32602.215
+VisualStudioVersion = 17.1.32407.343
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{53256F5C-24FD-48B1-9419-14FBC4C45348}"
 	ProjectSection(SolutionItems) = preProject
@@ -9,10 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
-		.travis.yml = .travis.yml
+		build.bash = build.bash
 		CHANGELOG.md = CHANGELOG.md
 		contributing.json = contributing.json
-		docker-build.bash = docker-build.bash
 		Dockerfile_ops = Dockerfile_ops
 		Dockerfile_promenade = Dockerfile_promenade
 		LICENSE = LICENSE
@@ -60,6 +59,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Promenade.DataProvider.SqlS
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dev", "dev", "{CA08B556-6562-42AB-9568-B27BE3A43D7C}"
 	ProjectSection(SolutionItems) = preProject
+		dev\accessibility.md = dev\accessibility.md
+		dev\docker-yarn-update.sh = dev\docker-yarn-update.sh
+		dev\markdown-editor.md = dev\markdown-editor.md
+		dev\migration.ps1 = dev\migration.ps1
 		dev\README.md = dev\README.md
 	EndProjectSection
 EndProject
