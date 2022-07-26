@@ -230,7 +230,7 @@ else
                                             <span class="fas fa-cog" aria-hidden="true"></span>
                                         </button>
                                     }
-                                    @if (Model.IsSiteManager || Model.PermissionIds.Any(_ => header.PermissionGroupIds.Contains(_)))
+                                    @if (Model.IsSiteManager || Model.IsWebContentManager || Model.PermissionIds.Any(_ => header.PermissionGroupIds.Contains(_)))
                                     {
                                         <a asp-action="@(nameof(PagesController.Detail))"
                                asp-route-id="@header.Id"

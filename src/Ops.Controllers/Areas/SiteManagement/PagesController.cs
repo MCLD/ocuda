@@ -895,6 +895,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 PaginateModel = paginateModel,
                 PageType = filter.PageType.Value,
                 IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
+                IsWebContentManager = await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.WebPageContentManagement),
                 PermissionIds = UserClaims(ClaimType.PermissionId),
                 CarouselTemplates = new SelectList(await _carouselService.GetAllTemplatesAsync(),
                     nameof(CarouselTemplate.Id),
