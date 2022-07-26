@@ -7,9 +7,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
 {
     public class IndexViewModel
     {
+        public string BaseLink { get; set; }
         public SelectList CarouselTemplates { get; set; }
         public SelectList ImageFeatureTemplates { get; set; }
         public bool IsSiteManager { get; set; }
+        public bool IsWebContentManager { get; set; }
         public PageHeader PageHeader { get; set; }
         public ICollection<PageHeader> PageHeaders { get; set; }
         public PageType PageType { get; set; }
@@ -25,7 +27,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
                     && PageHeaders?.Count > 0;
             }
         }
-        public string BaseLink { get; set; }
+
         public string MakeLink(PageHeader pageHeader)
         {
             string type = pageHeader.Type.ToString().Trim('/').ToLowerInvariant();

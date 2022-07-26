@@ -48,7 +48,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 viewModel.HasNavigationPermissions = await HasAppPermissionAsync(
                     _permissionGroupService, ApplicationPermission.NavigationManagement);
                 viewModel.HasPagePermissions = await _permissionGroupService
-                    .HasAPermissionAsync<PermissionGroupPageContent>(numericPermissionIds);
+                    .HasAPermissionAsync<PermissionGroupPageContent>(numericPermissionIds)
+                    || await HasAppPermissionAsync(_permissionGroupService,
+                        ApplicationPermission.WebPageContentManagement);
                 viewModel.HasPodcastPermissions = await _permissionGroupService
                     .HasAPermissionAsync<PermissionGroupPodcastItem>(numericPermissionIds);
                 viewModel.HasProductPermissions = await _permissionGroupService
