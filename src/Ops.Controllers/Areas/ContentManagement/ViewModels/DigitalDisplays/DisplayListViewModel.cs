@@ -21,18 +21,14 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDispla
 
         public static string RowClass(Models.Entities.DigitalDisplay display)
         {
-            if (display != null)
+            if (display?.LastContentVerification.HasValue == true
+                && display.LastContentVerification.Value.AddHours(4) >= System.DateTime.Now)
             {
-                if (System.DateTime.Now.AddHours(-2) > display.LastContentVerification)
-                {
-                    return "table-warning";
-                }
-                else if (System.DateTime.Now.AddHours(-4) > display.LastContentVerification)
-                {
-                    return "table-danger";
-                }
+                return display.LastContentVerification.Value.AddHours(2) >= System.DateTime.Now
+                    ? "table-warning"
+                    : string.Empty;
             }
-            return string.Empty;
+            return "table-danger";
         }
 
         public bool HasSets(int displayId)
