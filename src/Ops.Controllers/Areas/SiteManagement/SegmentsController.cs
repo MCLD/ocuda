@@ -66,6 +66,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         public static string Area
         { get { return "SiteManagement"; } }
+
         public static string Name
         { get { return "Segments"; } }
 
@@ -98,7 +99,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             if (model.Segment.StartDate.HasValue && model.Segment.EndDate.HasValue
                 && model.Segment.StartDate > model.Segment.EndDate)
             {
-                ModelState.AddModelError("Segment.StartDate", 
+                ModelState.AddModelError("Segment.StartDate",
                     "Start Date cannot be after the End Date.");
             }
 
@@ -316,7 +317,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         });
                     viewModel.Relationship
                         = $"This segment is used for podcast '{episode.Podcast.Title}' episode #{episode.Episode.Value}";
-                    string published = episode.PublishDate.HasValue 
+                    string published = episode.PublishDate.HasValue
                         ? $"published {episode.PublishDate.Value.ToLongDateString()}"
                         : "not yet published";
                     viewModel.AutomatedHeaderMarkup
@@ -499,7 +500,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         private async Task<bool> HasSegmentPermissionAsync(int segmentId)
         {
-            if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
+            if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
+                || await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.WebPageContentManagement))
             {
                 return true;
             }

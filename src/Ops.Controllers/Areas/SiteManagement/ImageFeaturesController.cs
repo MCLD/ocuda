@@ -11,6 +11,7 @@ using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.ImageFeatures;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
@@ -53,8 +54,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
         }
 
-        public static string Area { get { return "SiteManagement"; } }
-        public static string Name { get { return "ImageFeatures"; } }
+        public static string Area
+        { get { return "SiteManagement"; } }
+        public static string Name
+        { get { return "ImageFeatures"; } }
 
         [HttpPost]
         [Route("[action]")]
@@ -78,7 +81,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     {
                         try
                         {
-                            if(model.ImageFeatureStartDate.HasValue 
+                            if (model.ImageFeatureStartDate.HasValue
                                 && model.ImageFeatureStartTime.HasValue)
                             {
                                 model.ImageFeatureItem.StartDate =
@@ -482,7 +485,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         private async Task<bool> HasPageContentPermissionAsync(int featureId)
         {
-            if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
+            if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
+                || await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.WebPageContentManagement))
             {
                 return true;
             }

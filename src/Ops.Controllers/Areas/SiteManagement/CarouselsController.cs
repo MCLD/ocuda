@@ -11,6 +11,7 @@ using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Carousels;
 using Ocuda.Ops.Controllers.Filters;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
@@ -32,9 +33,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly ILanguageService _languageService;
         private readonly IPermissionGroupService _permissionGroupService;
 
-        public static string Area { get { return "SiteManagement"; } }
-        public static string Name { get { return "Carousels"; } }
-
         public CarouselsController(ServiceFacades.Controller<CarouselsController> context,
             ICarouselService carouselService,
             ILanguageService languageService,
@@ -49,43 +47,194 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
         }
 
-        [Authorize(Policy = nameof(ClaimType.SiteManager))]
-        [Route("")]
-        [Route("[action]/{page}")]
-        public async Task<IActionResult> Index(int page = 1)
+        public static string Area
+        { get { return "SiteManagement"; } }
+        public static string Name
+        { get { return "Carousels"; } }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> AddCarouselItem(DetailViewModel model)
         {
-            var filter = new BaseFilter(page);
+            JsonResponse response;
 
-            var carouselList = await _carouselService.GetPaginatedListAsync(filter);
-
-            var paginateModel = new PaginateModel
+            if (await HasCarouselPermissionAsync(model.CarouselItem.CarouselId))
             {
-                ItemCount = carouselList.Count,
-                CurrentPage = page,
-                ItemsPerPage = filter.Take.Value
-            };
-            if (paginateModel.PastMaxPage)
-            {
-                return RedirectToRoute(
-                    new
+                if (ModelState.IsValid)
+                {
+                    try
                     {
-                        page = paginateModel.LastPage ?? 1
-                    });
+                        var carouselItem = await _carouselService.CreateItemAsync(
+                            model.CarouselItem);
+
+                        var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
+
+                        response = new JsonResponse
+                        {
+                            Success = true,
+                            Url = Url.Action(nameof(Detail), new
+                            {
+                                id = carouselItem.CarouselId,
+                                language = language.IsDefault ? null : language.Name,
+                                item = carouselItem.Id
+                            })
+                        };
+
+                        ShowAlertSuccess($"Created item: {carouselItem.CarouselItemText.Label}");
+                    }
+                    catch (OcudaException ex)
+                    {
+                        response = new JsonResponse
+                        {
+                            Success = false,
+                            Message = ex.Message
+                        };
+                    }
+                }
+                else
+                {
+                    var errors = ModelState.Values
+                        .SelectMany(_ => _.Errors)
+                        .Select(_ => _.ErrorMessage);
+
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = string.Join(Environment.NewLine, errors)
+                    };
+                }
+            }
+            else
+            {
+                response = new JsonResponse
+                {
+                    Message = "Unauthorized",
+                    Success = false
+                };
             }
 
-            foreach (var carousel in carouselList.Data)
+            return Json(response);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> AddItemButton(DetailViewModel model)
+        {
+            JsonResponse response;
+
+            var carouselItem = await _carouselService
+                .GetItemByIdAsync(model.CarouselButton.CarouselItemId);
+
+            if (await HasCarouselPermissionAsync(carouselItem.CarouselId))
             {
-                carousel.Name = await _carouselService.GetDefaultNameForCarouselAsync(
-                    carousel.Id);
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        var carouselButton = await _carouselService.CreateButtonAsync(
+                            model.CarouselButton);
+
+                        var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
+
+                        response = new JsonResponse
+                        {
+                            Success = true,
+                            Url = Url.Action(nameof(Detail), new
+                            {
+                                id = model.CarouselId,
+                                language = language.IsDefault ? null : language.Name,
+                                item = carouselButton.CarouselItemId
+                            })
+                        };
+
+                        ShowAlertSuccess("Added button");
+                    }
+                    catch (OcudaException ex)
+                    {
+                        response = new JsonResponse
+                        {
+                            Success = false,
+                            Message = ex.Message
+                        };
+                    }
+                }
+                else
+                {
+                    var errors = ModelState.Values
+                        .SelectMany(_ => _.Errors)
+                        .Select(_ => _.ErrorMessage);
+
+                    response = new JsonResponse
+                    {
+                        Success = false,
+                        Message = string.Join(Environment.NewLine, errors)
+                    };
+                }
+            }
+            else
+            {
+                response = new JsonResponse
+                {
+                    Message = "Unauthorized",
+                    Success = false
+                };
             }
 
-            var viewModel = new IndexViewModel
-            {
-                Carousels = carouselList.Data,
-                PaginateModel = paginateModel
-            };
+            return Json(response);
+        }
 
-            return View(viewModel);
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<JsonResult> ChangeSort(int id, bool increase, bool item)
+        {
+            JsonResponse response;
+
+            int carouselId;
+            if (item)
+            {
+                carouselId = (await _carouselService.GetItemByIdAsync(id)).CarouselId;
+            }
+            else
+            {
+                carouselId = await _carouselService.GetCarouselIdForButtonAsync(id);
+            }
+
+            if (await HasCarouselPermissionAsync(carouselId))
+            {
+                try
+                {
+                    if (item)
+                    {
+                        await _carouselService.UpdateItemSortOrder(id, increase);
+                    }
+                    else
+                    {
+                        await _carouselService.UpdateButtonSortOrder(id, increase);
+                    }
+                    response = new JsonResponse
+                    {
+                        Success = true
+                    };
+                }
+                catch (OcudaException ex)
+                {
+                    response = new JsonResponse
+                    {
+                        Message = ex.Message,
+                        Success = false
+                    };
+                }
+            }
+            else
+            {
+                response = new JsonResponse
+                {
+                    Message = "Unauthorized",
+                    Success = false
+                };
+            }
+
+            return Json(response);
         }
 
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
@@ -151,11 +300,76 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return RedirectToAction(nameof(Index), new { page = model.PaginateModel.CurrentPage });
         }
 
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeleteCarouselItem(DetailViewModel model)
+        {
+            var carouselItem = await _carouselService.GetItemByIdAsync(model.CarouselItem.Id);
+
+            if (!await HasCarouselPermissionAsync(carouselItem.CarouselId))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            try
+            {
+                await _carouselService.DeleteItemAsync(model.CarouselItem.Id);
+                ShowAlertSuccess($"Deleted item: {model.CarouselItem.Name}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting carousel item: {Message}", ex.Message);
+                ShowAlertDanger($"Error deleting item: {model.CarouselItem.Name}");
+            }
+
+            var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
+
+            return RedirectToAction(nameof(Detail), new
+            {
+                id = model.CarouselId,
+                language = language.IsDefault ? null : language.Name
+            });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeleteItemButton(DetailViewModel model)
+        {
+            var carouselId = await _carouselService
+                .GetCarouselIdForButtonAsync(model.CarouselButton.Id);
+
+            if (!await HasCarouselPermissionAsync(carouselId))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            try
+            {
+                await _carouselService.DeleteButtonAsync(model.CarouselButton.Id);
+
+                ShowAlertSuccess("Deleted button");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting carousel button: {Message}", ex.Message);
+                ShowAlertDanger("Error deleting button.");
+            }
+
+            var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
+
+            return RedirectToAction(nameof(Detail), new
+            {
+                id = model.CarouselId,
+                language = language.IsDefault ? null : language.Name,
+                item = model.CarouselButton.CarouselItemId
+            });
+        }
+
         [Route("[action]/{id}")]
         [RestoreModelState(Key = DetailModelStateKey)]
         public async Task<IActionResult> Detail(int id, string language, int? item)
         {
-            if (!await HasCaroseulPermissionAsync(id))
+            if (!await HasCarouselPermissionAsync(id))
             {
                 return RedirectToUnauthorized();
             }
@@ -220,186 +434,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
-        [SaveModelState(Key = DetailModelStateKey)]
-        public async Task<IActionResult> EditCarouselText(DetailViewModel model)
-        {
-            if (!await HasCaroseulPermissionAsync(model.CarouselText.CarouselId))
-            {
-                return RedirectToUnauthorized();
-            }
-
-            if (ModelState.IsValid)
-            {
-                await _carouselService.SetCarouselTextAsync(model.CarouselText);
-                ShowAlertSuccess("Updated carousel text.");
-            }
-
-            var language = await _languageService.GetActiveByIdAsync(model.CarouselText.LanguageId);
-
-            return RedirectToAction(nameof(Detail), new
-            {
-                id = model.CarouselText.CarouselId,
-                language = language.IsDefault ? null : language.Name
-            });
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> AddCarouselItem(DetailViewModel model)
-        {
-            JsonResponse response;
-
-            if (await HasCaroseulPermissionAsync(model.CarouselItem.CarouselId))
-            {
-                if (ModelState.IsValid)
-                {
-                    try
-                    {
-                        var carouselItem = await _carouselService.CreateItemAsync(
-                            model.CarouselItem);
-
-                        var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
-
-                        response = new JsonResponse
-                        {
-                            Success = true,
-                            Url = Url.Action(nameof(Detail), new
-                            {
-                                id = carouselItem.CarouselId,
-                                language = language.IsDefault ? null : language.Name,
-                                item = carouselItem.Id
-                            })
-                        };
-
-                        ShowAlertSuccess($"Created item: {carouselItem.CarouselItemText.Label}");
-                    }
-                    catch (OcudaException ex)
-                    {
-                        response = new JsonResponse
-                        {
-                            Success = false,
-                            Message = ex.Message
-                        };
-                    }
-                }
-                else
-                {
-                    var errors = ModelState.Values
-                        .SelectMany(_ => _.Errors)
-                        .Select(_ => _.ErrorMessage);
-
-                    response = new JsonResponse
-                    {
-                        Success = false,
-                        Message = string.Join(Environment.NewLine, errors)
-                    };
-                }
-            }
-            else
-            {
-                response = new JsonResponse
-                {
-                    Message = "Unauthorized",
-                    Success = false
-                };
-            }
-
-            return Json(response);
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> DeleteCarouselItem(DetailViewModel model)
-        {
-            var carouselItem = await _carouselService.GetItemByIdAsync(model.CarouselItem.Id);
-
-            if (!await HasCaroseulPermissionAsync(carouselItem.CarouselId))
-            {
-                return RedirectToUnauthorized();
-            }
-
-            try
-            {
-                await _carouselService.DeleteItemAsync(model.CarouselItem.Id);
-                ShowAlertSuccess($"Deleted item: {model.CarouselItem.Name}");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting carousel item: {Message}", ex.Message);
-                ShowAlertDanger($"Error deleting item: {model.CarouselItem.Name}");
-            }
-
-            var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
-
-            return RedirectToAction(nameof(Detail), new
-            {
-                id = model.CarouselId,
-                language = language.IsDefault ? null : language.Name
-            });
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<JsonResult> ChangeSort(int id, bool increase, bool item)
-        {
-            JsonResponse response;
-
-            int carouselId;
-            if (item)
-            {
-                carouselId = (await _carouselService.GetItemByIdAsync(id)).CarouselId;
-            }
-            else
-            {
-                carouselId = await _carouselService.GetCarouselIdForButtonAsync(id);
-            }
-
-            if (await HasCaroseulPermissionAsync(carouselId))
-            {
-                try
-                {
-                    if (item)
-                    {
-                        await _carouselService.UpdateItemSortOrder(id, increase);
-                    }
-                    else
-                    {
-                        await _carouselService.UpdateButtonSortOrder(id, increase);
-                    }
-                    response = new JsonResponse
-                    {
-                        Success = true
-                    };
-                }
-                catch (OcudaException ex)
-                {
-                    response = new JsonResponse
-                    {
-                        Message = ex.Message,
-                        Success = false
-                    };
-                }
-            }
-            else
-            {
-                response = new JsonResponse
-                {
-                    Message = "Unauthorized",
-                    Success = false
-                };
-            }
-
-            return Json(response);
-        }
-
-        [HttpPost]
-        [Route("[action]")]
         public async Task<IActionResult> EditCarouselItemText(DetailViewModel model)
         {
             var carouselItem = await _carouselService
                 .GetItemByIdAsync(model.CarouselItemText.CarouselItemId);
 
-            if (!await HasCaroseulPermissionAsync(carouselItem.CarouselId))
+            if (!await HasCarouselPermissionAsync(carouselItem.CarouselId))
             {
                 return RedirectToUnauthorized();
             }
@@ -430,69 +470,27 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> AddItemButton(DetailViewModel model)
+        [SaveModelState(Key = DetailModelStateKey)]
+        public async Task<IActionResult> EditCarouselText(DetailViewModel model)
         {
-            JsonResponse response;
-
-            var carouselItem = await _carouselService
-                .GetItemByIdAsync(model.CarouselButton.CarouselItemId);
-
-            if (await HasCaroseulPermissionAsync(carouselItem.CarouselId))
+            if (!await HasCarouselPermissionAsync(model.CarouselText.CarouselId))
             {
-                if (ModelState.IsValid)
-                {
-                    try
-                    {
-                        var carouselButton = await _carouselService.CreateButtonAsync(
-                            model.CarouselButton);
-
-                        var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
-
-                        response = new JsonResponse
-                        {
-                            Success = true,
-                            Url = Url.Action(nameof(Detail), new
-                            {
-                                id = model.CarouselId,
-                                language = language.IsDefault ? null : language.Name,
-                                item = carouselButton.CarouselItemId
-                            })
-                        };
-
-                        ShowAlertSuccess("Added button");
-                    }
-                    catch (OcudaException ex)
-                    {
-                        response = new JsonResponse
-                        {
-                            Success = false,
-                            Message = ex.Message
-                        };
-                    }
-                }
-                else
-                {
-                    var errors = ModelState.Values
-                        .SelectMany(_ => _.Errors)
-                        .Select(_ => _.ErrorMessage);
-
-                    response = new JsonResponse
-                    {
-                        Success = false,
-                        Message = string.Join(Environment.NewLine, errors)
-                    };
-                }
-            }
-            else
-            {
-                response = new JsonResponse
-                {
-                    Message = "Unauthorized",
-                    Success = false
-                };
+                return RedirectToUnauthorized();
             }
 
-            return Json(response);
+            if (ModelState.IsValid)
+            {
+                await _carouselService.SetCarouselTextAsync(model.CarouselText);
+                ShowAlertSuccess("Updated carousel text.");
+            }
+
+            var language = await _languageService.GetActiveByIdAsync(model.CarouselText.LanguageId);
+
+            return RedirectToAction(nameof(Detail), new
+            {
+                id = model.CarouselText.CarouselId,
+                language = language.IsDefault ? null : language.Name
+            });
         }
 
         [HttpPost]
@@ -504,7 +502,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var carouselId = await _carouselService
                 .GetCarouselIdForButtonAsync(model.CarouselButton.Id);
 
-            if (await HasCaroseulPermissionAsync(carouselId))
+            if (await HasCarouselPermissionAsync(carouselId))
             {
                 if (ModelState.IsValid)
                 {
@@ -561,43 +559,50 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return Json(response);
         }
 
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> DeleteItemButton(DetailViewModel model)
+        [Authorize(Policy = nameof(ClaimType.SiteManager))]
+        [Route("")]
+        [Route("[action]/{page}")]
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var carouselId = await _carouselService
-                .GetCarouselIdForButtonAsync(model.CarouselButton.Id);
+            var filter = new BaseFilter(page);
 
-            if (!await HasCaroseulPermissionAsync(carouselId))
+            var carouselList = await _carouselService.GetPaginatedListAsync(filter);
+
+            var paginateModel = new PaginateModel
             {
-                return RedirectToUnauthorized();
+                ItemCount = carouselList.Count,
+                CurrentPage = page,
+                ItemsPerPage = filter.Take.Value
+            };
+            if (paginateModel.PastMaxPage)
+            {
+                return RedirectToRoute(
+                    new
+                    {
+                        page = paginateModel.LastPage ?? 1
+                    });
             }
 
-            try
+            foreach (var carousel in carouselList.Data)
             {
-                await _carouselService.DeleteButtonAsync(model.CarouselButton.Id);
-
-                ShowAlertSuccess("Deleted button");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting carousel button: {Message}", ex.Message);
-                ShowAlertDanger("Error deleting button.");
+                carousel.Name = await _carouselService.GetDefaultNameForCarouselAsync(
+                    carousel.Id);
             }
 
-            var language = await _languageService.GetActiveByIdAsync(model.LanguageId);
-
-            return RedirectToAction(nameof(Detail), new
+            var viewModel = new IndexViewModel
             {
-                id = model.CarouselId,
-                language = language.IsDefault ? null : language.Name,
-                item = model.CarouselButton.CarouselItemId
-            });
+                Carousels = carouselList.Data,
+                PaginateModel = paginateModel
+            };
+
+            return View(viewModel);
         }
 
-        private async Task<bool> HasCaroseulPermissionAsync(int carouselId)
+        private async Task<bool> HasCarouselPermissionAsync(int carouselId)
         {
-            if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)))
+            if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
+                || await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.WebPageContentManagement))
             {
                 return true;
             }
