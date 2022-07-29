@@ -37,7 +37,8 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
-        public static string Name { get { return "Schedule"; } }
+        public static string Name
+        { get { return "Schedule"; } }
 
         [HttpPost]
         [Route("[action]")]
@@ -121,7 +122,7 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
                 viewModel.ScheduleLogs
                     = await _scheduleService.GetLogAsync(viewModel.ScheduleRequest.Id);
 
-                var users = new Dictionary<int, (string name, string username)>();
+                var users = new Dictionary<int, Models.Entities.User>();
                 foreach (int userId in viewModel.ScheduleLogs.Select(_ => _.UserId).Distinct())
                 {
                     if (userId != 0)
@@ -138,8 +139,10 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
                     }
                     else
                     {
-                        scheduleLog.Name = users[scheduleLog.UserId].Item1;
-                        scheduleLog.Username = users[scheduleLog.UserId].Item2;
+                        scheduleLog.Name = users[scheduleLog.UserId].Name;
+                        scheduleLog.Username = users[scheduleLog.UserId].IsDeleted
+                            ? null
+                            : users[scheduleLog.UserId].Username;
                     }
                 }
             }

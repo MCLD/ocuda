@@ -330,7 +330,8 @@ namespace Ocuda.Ops.Service
                 return null;
             }
 
-            incident.CreatedByUser = await _userService.GetByIdAsync(incident.CreatedBy);
+            incident.CreatedByUser = await _userService
+                .GetByIdIncludeDeletedAsync(incident.CreatedBy);
 
             var staffs = await _incidentStaffRepository.GetByIncidentIdAsync(incidentId);
             if (staffs?.Count > 0)
@@ -341,7 +342,7 @@ namespace Ocuda.Ops.Service
                 }
                 foreach (var staff in staffs)
                 {
-                    staff.User = await _userService.GetByIdAsync(staff.UserId);
+                    staff.User = await _userService.GetByIdIncludeDeletedAsync(staff.UserId);
                     incident.Staffs.Add(staff);
                 }
             }
@@ -366,11 +367,13 @@ namespace Ocuda.Ops.Service
                 incident.Followups = followups;
                 foreach (var followup in incident.Followups)
                 {
-                    followup.CreatedByUser = await _userService.GetByIdAsync(followup.CreatedBy);
+                    followup.CreatedByUser = await _userService
+                        .GetByIdIncludeDeletedAsync(followup.CreatedBy);
                     if (followup.UpdatedBy.HasValue)
                     {
                         followup.UpdatedByUser
-                            = await _userService.GetByIdAsync(followup.UpdatedBy.Value);
+                            = await _userService
+                                .GetByIdIncludeDeletedAsync(followup.UpdatedBy.Value);
                     }
                 }
             }
@@ -390,14 +393,15 @@ namespace Ocuda.Ops.Service
                     var relatedIncident = await _incidentRepository
                         .GetRelatedAsync(relatedIncidentId);
                     relatedIncident.CreatedByUser = await _userService
-                        .GetByIdAsync(relatedIncident.CreatedBy);
+                        .GetByIdIncludeDeletedAsync(relatedIncident.CreatedBy);
                     if (relatedIncident.UpdatedBy.HasValue)
                     {
                         relatedIncident.UpdatedByUser
-                            = await _userService.GetByIdAsync(relatedIncident.UpdatedBy.Value);
+                            = await _userService
+                                .GetByIdIncludeDeletedAsync(relatedIncident.UpdatedBy.Value);
                     }
                     relatedIncident.RelatedByUser = await _userService
-                        .GetByIdAsync(related.CreatedBy);
+                        .GetByIdIncludeDeletedAsync(related.CreatedBy);
                     relatedIncident.RelatedAt = related.CreatedAt;
                     incident.RelatedIncidents.Add(relatedIncident);
                 }

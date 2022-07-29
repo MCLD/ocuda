@@ -12,11 +12,13 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 
         Task<User> FindByUsernameAsync(string username);
 
+        Task<User> FindIncludeDeletedAsync(int id);
+
         Task<ICollection<User>> GetAllAsync();
 
         Task<ICollection<User>> GetDirectReportsAsync(int userId);
 
-        Task<(string name, string username)> GetNameUsernameAsync(int id);
+        Task<User> GetNameUsernameAsync(int id);
 
         Task<string> GetProfilePictureFilenameAsync(string username);
 

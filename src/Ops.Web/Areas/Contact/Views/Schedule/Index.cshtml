@@ -50,9 +50,9 @@
                 <tr class="@Model.GetRowClass(request)">
                     <td>
                         <a asp-action="details"
-                           asp-controller="Schedule"
-                           asp-area="contact"
-                           asp-route-requestId="@request.Id">@request.RequestedTime</a>
+                   asp-controller="Schedule"
+                   asp-area="contact"
+                   asp-route-requestId="@request.Id">@request.RequestedTime</a>
                     </td>
                     <td>@request.Name</td>
                     <td>@(new System.Globalization.CultureInfo(request.Language).EnglishName)</td>
@@ -61,12 +61,19 @@
                         @Html.Raw(Model.GetStatusTag(request))
                         @if (Model.Claims.Any(_ => _.ScheduleRequestId == request.Id))
                         {
-                            <a asp-controller="Profile"
-                               asp-area=""
-                               asp-action="Index"
-                               asp-route-id="@Model.Claims.SingleOrDefault(_ => _.ScheduleRequestId == request.Id)?.User.Username">
+                            @if (@Model.Claims.SingleOrDefault(_ => _.ScheduleRequestId == request.Id)?.User.IsDeleted == false)
+                            {
+                                <a asp-controller="Profile"
+                   asp-area=""
+                   asp-action="Index"
+                   asp-route-id="@Model.Claims.SingleOrDefault(_ => _.ScheduleRequestId == request.Id)?.User.Username">
+                                    @Model.Claims.SingleOrDefault(_ => _.ScheduleRequestId == request.Id)?.User.Name
+                                </a>
+                            }
+                            else
+                            {
                                 @Model.Claims.SingleOrDefault(_ => _.ScheduleRequestId == request.Id)?.User.Name
-                            </a>
+                            }
                         }
                         else
                         {
