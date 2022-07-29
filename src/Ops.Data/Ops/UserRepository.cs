@@ -43,6 +43,14 @@ namespace Ocuda.Ops.Data.Ops
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<User> FindIncludeDeletedAsync(int id)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.Id == id)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<ICollection<User>> GetAllAsync()
         {
             return await DbSet
@@ -65,15 +73,19 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
-        public async Task<(string name, string username)> GetNameUsernameAsync(int id)
+        public async Task<User> GetNameUsernameAsync(int id)
         {
-            var userDetails = await DbSet
+            return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.Id == id)
-                .Select(_ => new { _.Name, _.Username })
+                .Select(_ => new User
+                {
+                    Id = _.Id,
+                    IsDeleted = _.IsDeleted,
+                    Name = _.Name,
+                    Username = _.Username
+                })
                 .FirstOrDefaultAsync();
-
-            return (name: userDetails.Name, username: userDetails.Username);
         }
 
         public async Task<User> GetSupervisorAsync(int userId)

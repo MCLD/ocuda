@@ -85,10 +85,17 @@
                             @if (Model.ViewingAll)
                             {
                                 <td>
+                                    @if (incident.CreatedByUser.IsDeleted)
+                                    {
+                                        @incident.CreatedByUser.Name
+                                    }
+                                    else
+                                    {
                                     <a asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
                            asp-area=""
                            asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
                            asp-route-id="@incident.CreatedByUser.Username">@incident.CreatedByUser.Name</a>
+                                    }
                                 </td>
                             }
                         </tr>

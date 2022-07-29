@@ -231,7 +231,7 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
 
             foreach (var incident in viewModel.Incidents)
             {
-                incident.CreatedByUser = await _userService.GetByIdAsync(incident.CreatedBy);
+                incident.CreatedByUser = await _userService.GetByIdIncludeDeletedAsync(incident.CreatedBy);
             }
 
             return View("Index", viewModel);

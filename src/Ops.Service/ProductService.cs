@@ -172,14 +172,19 @@ namespace Ocuda.Ops.Service
 
             if (inventory.UpdatedBy.HasValue)
             {
-                (inventory.UpdatedByName, inventory.UpdatedByUsername) =
-                    await _userService.GetNameUsernameAsync(inventory.UpdatedBy.Value);
+                var updatedBy = await _userService.GetNameUsernameAsync(inventory.UpdatedBy.Value);
+                inventory.UpdatedByName = updatedBy.Name;
+                inventory.UpdatedByUsername = updatedBy.IsDeleted ? null : updatedBy.Username;
             }
 
             if (inventory.ThreshholdUpdatedBy.HasValue)
             {
-                (inventory.ThreshholdUpdatedByName, inventory.ThreshholdUpdatedByUsername) =
-                    await _userService.GetNameUsernameAsync(inventory.ThreshholdUpdatedBy.Value);
+                var threshholdUpdatedBy = await _userService
+                    .GetNameUsernameAsync(inventory.ThreshholdUpdatedBy.Value);
+                inventory.ThreshholdUpdatedByName = threshholdUpdatedBy.Name;
+                inventory.ThreshholdUpdatedByUsername = threshholdUpdatedBy.IsDeleted
+                    ? null
+                    : threshholdUpdatedBy.Username;
             }
 
             return inventory;
@@ -195,8 +200,10 @@ namespace Ocuda.Ops.Service
             {
                 if (inventory.UpdatedBy.HasValue)
                 {
-                    (inventory.UpdatedByName, inventory.UpdatedByUsername) =
-                        await _userService.GetNameUsernameAsync(inventory.UpdatedBy.Value);
+                    var updatedBy = await _userService
+                        .GetNameUsernameAsync(inventory.UpdatedBy.Value);
+                    inventory.UpdatedByName = updatedBy.Name;
+                    inventory.UpdatedByUsername = updatedBy.IsDeleted ? null : updatedBy.Username;
                 }
             }
 

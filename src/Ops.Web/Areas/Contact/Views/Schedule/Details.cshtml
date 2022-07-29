@@ -16,21 +16,21 @@
                 </div>
                 <div class="modal-footer">
                     <form asp-controller="Schedule"
-                          asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Unclaim))"
-                          method="post"
-                          role="form"
-                          style="display: inline;">
+                      asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Unclaim))"
+                      method="post"
+                      role="form"
+                      style="display: inline;">
                         <input type="hidden"
-                               name="RequestId"
-                               value="@Model.ScheduleRequest.Id" />
+                           name="RequestId"
+                           value="@Model.ScheduleRequest.Id" />
                         <button type="button"
-                                data-dismiss="modal"
-                                class="btn btn-outline-dark">
+                            data-dismiss="modal"
+                            class="btn btn-outline-dark">
                             Cancel
                         </button>
                         <button type="submit"
-                                class="btn btn-outline-danger"
-                                button-spinner>
+                            class="btn btn-outline-danger"
+                            button-spinner>
                             Unclaim
                         </button>
                     </form>
@@ -52,21 +52,21 @@
                 </div>
                 <div class="modal-footer">
                     <form asp-controller="Schedule"
-                          asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Cancel))"
-                          method="post"
-                          role="form"
-                          style="display: inline;">
+                      asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Cancel))"
+                      method="post"
+                      role="form"
+                      style="display: inline;">
                         <input type="hidden"
-                               name="RequestId"
-                               value="@Model.ScheduleRequest.Id" />
+                           name="RequestId"
+                           value="@Model.ScheduleRequest.Id" />
                         <button type="button"
-                                data-dismiss="modal"
-                                class="btn btn-outline-dark">
+                            data-dismiss="modal"
+                            class="btn btn-outline-dark">
                             Never mind
                         </button>
                         <button type="submit"
-                                class="btn btn-outline-danger"
-                                button-spinner>
+                            class="btn btn-outline-danger"
+                            button-spinner>
                             Cancel Appointment
                         </button>
                     </form>
@@ -85,38 +85,38 @@
             @if (Model.ScheduleClaim == null)
             {
                 <form asp-controller="Schedule"
-                      asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Claim))"
-                      method="post"
-                      role="form"
-                      style="display: inline;">
+              asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Claim))"
+              method="post"
+              role="form"
+              style="display: inline;">
                     <input type="hidden"
-                           name="RequestId"
-                           value="@Model.ScheduleRequest.Id" />
+                   name="RequestId"
+                   value="@Model.ScheduleRequest.Id" />
                     <input type="submit"
-                           class="btn btn-outline-info mt-2 mb-1 mr-1 float-right"
-                           value="Claim" />
+                   class="btn btn-outline-info mt-2 mb-1 mr-1 float-right"
+                   value="Claim" />
                 </form>
             }
             else if (!Model.ScheduleLogs.Where(_ => _.IsComplete == true).Any()
-                && !Model.ScheduleRequest.IsCancelled)
+            && !Model.ScheduleRequest.IsCancelled)
             {
                 <button type="button"
-                        class="btn btn-outline-warning mt-2 mb-1 mr-1 float-right"
-                        data-toggle="modal"
-                        data-target="#unclaimModal">
+                class="btn btn-outline-warning mt-2 mb-1 mr-1 float-right"
+                data-toggle="modal"
+                data-target="#unclaimModal">
                     Unclaim
                 </button>
                 <button type="button"
-                        class="btn btn-outline-danger mt-2 mb-1 mr-4 float-right"
-                        data-toggle="modal"
-                        data-target="#cancelModal">
+                class="btn btn-outline-danger mt-2 mb-1 mr-4 float-right"
+                data-toggle="modal"
+                data-target="#cancelModal">
                     Cancel Appointment
                 </button>
             }
             <a class="btn btn-outline-dark mt-2 mb-1 mr-4 float-right"
-               asp-controller="Schedule"
-               asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Index))"
-               asp-route-requestedDate="@Model.RequestedDate">Back</a>
+           asp-controller="Schedule"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Index))"
+           asp-route-requestedDate="@Model.RequestedDate">Back</a>
         </div>
     </div>
 
@@ -163,10 +163,17 @@
         <div class="row mt-4">
             <div class="col-sm-3 text-sm-right"><strong>Claimed by</strong></div>
             <div class="col-sm-9">
-                <a asp-controller="Profile"
-                   asp-area=""
-                   asp-action="Index"
-                   asp-route-id="@Model.ScheduleClaim.User.Username">@Model.ScheduleClaim.User.Name</a>
+                @if (Model.ScheduleClaim.User.IsDeleted == false)
+                {
+                    <a asp-controller="Profile"
+           asp-area=""
+           asp-action="Index"
+           asp-route-id="@Model.ScheduleClaim.User.Username">@Model.ScheduleClaim.User.Name</a>
+                }
+                else
+                {
+                    @Model.ScheduleClaim.User.Name
+                }
             </div>
         </div>
         <div class="row mt-2">
@@ -179,18 +186,18 @@
                 <div class="col-sm-9 offset-md-3 h4">Add log entry</div>
             </div>
             <form asp-controller="Schedule"
-                  asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.AddLog))"
-                  method="post"
-                  role="form">
+      asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.AddLog))"
+      method="post"
+      role="form">
                 <input type="hidden"
-                       asp-for="AddLog.ScheduleRequestId"
-                       value="@Model.ScheduleRequest.Id" />
+           asp-for="AddLog.ScheduleRequestId"
+           value="@Model.ScheduleRequest.Id" />
                 <select asp-for="AddLog.ScheduleLogCallDispositionId"
-                        asp-items="Model.CallDispositions" formgroup></select>
+            asp-items="Model.CallDispositions" formgroup></select>
                 <input type="number"
-                       asp-for="AddLog.DurationMinutes" formgroup />
+           asp-for="AddLog.DurationMinutes" formgroup />
                 <textarea asp-for="AddLog.Notes"
-                          maxlength="1000" formgroup></textarea>
+              maxlength="1000" formgroup></textarea>
                 @if (!Model.ScheduleLogs.Where(_ => _.IsComplete == true).Any())
                 {
                     <select asp-for="AddLog.IsComplete" formgroup>
@@ -200,8 +207,8 @@
                 }
                 <div class="offset-md-3 col-md-9">
                     <input type="submit"
-                           class="btn btn-outline-primary"
-                           value="Save log entry" />
+               class="btn btn-outline-primary"
+               value="Save log entry" />
                 </div>
             </form>
         }
@@ -229,9 +236,9 @@
                                 @if (!string.IsNullOrEmpty(log.Username))
                                 {
                                     <a asp-controller="Profile"
-                                       asp-area=""
-                                       asp-action="Index"
-                                       asp-route-id="@log.Username">@log.Name</a>
+                       asp-area=""
+                       asp-action="Index"
+                       asp-route-id="@log.Username">@log.Name</a>
                                 }
                                 else
                                 {
@@ -260,7 +267,9 @@
                                 {
                                     @if (log.ShowNotesHeader)
                                     {
-                                        <strong>Notes:</strong><br />
+                                        <strong>Notes:</strong>
+
+                                        <br />
                                     }
                                     @if (log.UserId == 0)
                                     {

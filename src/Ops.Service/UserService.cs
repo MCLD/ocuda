@@ -128,12 +128,17 @@ namespace Ocuda.Ops.Service
             return await _userRepository.FindAsync(id);
         }
 
+        public async Task<User> GetByIdIncludeDeletedAsync(int id)
+        {
+            return await _userRepository.FindIncludeDeletedAsync(id);
+        }
+
         public async Task<ICollection<User>> GetDirectReportsAsync(int userId)
         {
             return await _userRepository.GetDirectReportsAsync(userId);
         }
 
-        public async Task<(string name, string username)> GetNameUsernameAsync(int id)
+        public async Task<User> GetNameUsernameAsync(int id)
         {
             // TODO add caching
             return await _userRepository.GetNameUsernameAsync(id);

@@ -23,9 +23,11 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<User> GetByIdAsync(int id);
 
+        Task<User> GetByIdIncludeDeletedAsync(int id);
+
         Task<ICollection<User>> GetDirectReportsAsync(int supervisorId);
 
-        Task<(string name, string username)> GetNameUsernameAsync(int id);
+        Task<User> GetNameUsernameAsync(int id);
 
         Task<FileDownload> GetProfilePictureAsync(string username);
 

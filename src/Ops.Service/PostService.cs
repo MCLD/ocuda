@@ -76,13 +76,16 @@ namespace Ocuda.Ops.Service
                 {
                     if (post.CreatedByUser == null)
                     {
-                        (post.CreatedByName, post.CreatedByUsername)
-                            = await _userService.GetNameUsernameAsync(post.CreatedBy);
+                        var createdBy = await _userService.GetNameUsernameAsync(post.CreatedBy);
+                        post.CreatedByName = createdBy.Name;
+                        post.CreatedByUsername = createdBy.IsDeleted ? null : createdBy.Username;
                     }
                     if (post.UpdatedBy.HasValue && post.UpdatedByUser == null)
                     {
-                        (post.UpdatedByName, post.UpdatedByUsername)
-                            = await _userService.GetNameUsernameAsync(post.UpdatedBy.Value);
+                        var updatedBy = await _userService
+                            .GetNameUsernameAsync(post.UpdatedBy.Value);
+                        post.UpdatedByName = updatedBy.Name;
+                        post.UpdatedByUsername = updatedBy.IsDeleted ? null : updatedBy.Username;
                     }
                     if (string.IsNullOrEmpty(post.SectionName))
                     {
