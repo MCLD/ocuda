@@ -16,7 +16,7 @@ RUN dotnet test
 RUN dotnet publish -c Release -o "/app/publish/promenade" "src/Promenade.Web"
 
 # Get runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:6.0@sha256:d8b274c1ac356a3bbea84204d20e99046ce5eae20cfa7fbcf703e5aa034cb36b as publish
+FROM mcr.microsoft.com/dotnet/aspnet:6.0@sha256:55973d59f8ffd46af48ee247c847ec97ab04ae12d09f178720d615a62faa363c as publish
 
 WORKDIR /app
 
