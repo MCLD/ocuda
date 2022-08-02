@@ -8,6 +8,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
     {
         public Task<ICollection<DigitalDisplaySet>> GetAllAsync();
 
-        public Task<DigitalDisplaySet> GetByName(string setName);
+        public Task<DigitalDisplaySet> GetByNameAsync(string setName);
+
+        public Task<IDictionary<int, string>> GetNamesByIdsAsync(IEnumerable<int> setIds);
     }
 }

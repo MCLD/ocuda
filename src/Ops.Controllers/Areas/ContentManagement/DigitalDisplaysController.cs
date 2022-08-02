@@ -232,6 +232,25 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             return RedirectToAction(nameof(Sets));
         }
 
+        [HttpGet]
+        [Route("[action]/{displayId}")]
+        public async Task<IActionResult> DisplayAssets(int displayId)
+        {
+            var display = await _digitalDisplayService.GetDisplayAsync(displayId);
+            if (display == null)
+            {
+                ShowAlertWarning($"Unable to find display id {displayId}");
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View("CurrentDisplayAssets", new CurrentDisplayAssetsViewModel
+            {
+                Assets = await _digitalDisplayService.GetNonExpiredAssetsAsync(displayId),
+                Display = display,
+                HasPermissions = await HasContentManagementRightsAsync()
+            });
+        }
+
         [Route("")]
         public async Task<IActionResult> Index()
         {
@@ -242,6 +261,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 .GetDisplaysSetsAsync(displays.Select(_ => _.Id));
 
             var displaySetNames = new Dictionary<int, string>();
+            var setActiveElements = await _digitalDisplayService.GetSetsAssetCountsActiveAsync();
+            var displayActiveElements = new Dictionary<int, int>();
+
             foreach (var display in displays)
             {
                 var setIds = displaysSets.Where(_ => _.DigitalDisplayId == display.Id)
@@ -249,11 +271,16 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 displaySetNames.Add(display.Id,
                     string.Join(", ",
                         sets.Where(_ => setIds.Contains(_.Id)).Select(_ => _.Name)));
+                displayActiveElements.Add(display.Id, setActiveElements
+                    .Where(_ => setIds.Contains(_.Key))
+                    .Select(_ => _.Value)
+                    .Sum());
             }
 
             return View(new DisplayListViewModel
             {
                 DigitalDisplays = displays,
+                DisplayActiveElements = displayActiveElements,
                 DisplaySetNames = displaySetNames,
                 HasDigitalDisplayPermissions = await HasAppPermissionAsync(_permissionGroupService,
                     ApplicationPermission.DigitalDisplayContentManagement),
@@ -305,10 +332,12 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         {
             return View(new SetListViewModel
             {
-                DigitalDisplaySets = await _digitalDisplayService.GetSetsAsync(),
                 DigitalDisplaySetAssets = await _digitalDisplayService.GetSetsAssetCountsAsync(),
+                DigitalDisplaySetAssetsActive
+                    = await _digitalDisplayService.GetSetsAssetCountsActiveAsync(),
                 DigitalDisplaySetDisplays
                     = await _digitalDisplayService.GetSetsDisplaysCountsAsync(),
+                DigitalDisplaySets = await _digitalDisplayService.GetSetsAsync(),
                 HasDigitalDisplayPermissions = await HasAppPermissionAsync(_permissionGroupService,
                     ApplicationPermission.DigitalDisplayContentManagement),
                 IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),

@@ -10,7 +10,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
     {
         public Task<DigitalDisplayAsset> FindByChecksumAsync(byte[] checksum);
 
+        public Task<IDictionary<int, DigitalDisplayAsset>> GetByIdsAsync(IEnumerable<int> assetIds);
+
         public Task<DataWithCount<ICollection<DigitalDisplayAsset>>>
-            GetPaginatedListAsync(BaseFilter filter);
+                    GetPaginatedListAsync(BaseFilter filter);
     }
 }

@@ -27,6 +27,14 @@ namespace Ocuda.Ops.Data.Ops
                 .SingleOrDefaultAsync(_ => _.Checksum == checksum);
         }
 
+        public async Task<IDictionary<int, DigitalDisplayAsset>> GetByIdsAsync(IEnumerable<int> assetIds)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => assetIds.Contains(_.Id))
+                .ToDictionaryAsync(k => k.Id, v => v);
+        }
+
         public async Task<DataWithCount<ICollection<DigitalDisplayAsset>>>
             GetPaginatedListAsync(BaseFilter filter)
         {

@@ -50,6 +50,18 @@ namespace Ocuda.Ops.Data.Ops
                 .CountAsync(_ => _.DigitalDisplayAssetId == assetId);
         }
 
+        public async Task<IDictionary<int, int>> GetSetsAssetCountsActiveAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.IsEnabled
+                    && _.StartDate <= System.DateTime.Now
+                    && _.EndDate >= System.DateTime.Now)
+                .GroupBy(_ => _.DigitalDisplaySetId)
+                .Select(_ => new { _.Key, Count = _.Count() })
+                .ToDictionaryAsync(k => k.Key, v => v.Count);
+        }
+
         public async Task<IDictionary<int, int>> GetSetsAssetCountsAsync()
         {
             return await DbSet

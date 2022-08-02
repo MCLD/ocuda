@@ -5,11 +5,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
 using Ocuda.Utility.Services.Interfaces;
@@ -22,6 +24,7 @@ namespace Ocuda.Ops.Service
         private const string BaseFilePath = "digitaldisplay";
 
         private readonly IOcudaCache _cache;
+        private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IDigitalDisplayAssetRepository _digitalDisplayAssetRepository;
         private readonly IDigitalDisplayAssetSetRepository _digitalDisplayAssetSetRepository;
         private readonly IDigitalDisplayDisplaySetRepository _digitalDisplayDisplaySetRepository;
@@ -33,18 +36,21 @@ namespace Ocuda.Ops.Service
 
         public DigitalDisplayService(ILogger<DigitalDisplayService> logger,
             IHttpContextAccessor httpContextAccessor,
-            IOcudaCache cache,
+            IDateTimeProvider dateTimeProvider,
             IDigitalDisplayAssetRepository digitalDisplayAssetRepository,
             IDigitalDisplayAssetSetRepository digitalDisplayAssetSetRepository,
-            IDigitalDisplayItemRepository digitalDisplayItemRepository,
             IDigitalDisplayDisplaySetRepository digitalDisplayDisplaySetRepository,
+            IDigitalDisplayItemRepository digitalDisplayItemRepository,
             IDigitalDisplayRepository digitalDisplayRepository,
             IDigitalDisplaySetRepository digitalDisplaySetRepository,
+            IOcudaCache cache,
             IPathResolverService pathResolver,
             IUserRepository userRepository)
             : base(logger, httpContextAccessor)
         {
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            _dateTimeProvider = dateTimeProvider
+                ?? throw new ArgumentNullException(nameof(dateTimeProvider));
             _digitalDisplayAssetRepository = digitalDisplayAssetRepository
                 ?? throw new ArgumentNullException(nameof(digitalDisplayAssetRepository));
             _digitalDisplayAssetSetRepository = digitalDisplayAssetSetRepository
@@ -285,6 +291,40 @@ namespace Ocuda.Ops.Service
             return (asOf, message);
         }
 
+        public async Task<IEnumerable<DigitalDisplayCurrentAsset>> GetNonExpiredAssetsAsync(int displayId)
+        {
+            var displaySets = await _digitalDisplayDisplaySetRepository
+                .GetByDisplayIdsAsync(new[] { displayId });
+
+            var setIds = displaySets.Select(_ => _.DigitalDisplaySetId).Distinct();
+
+            var setNames = await _digitalDisplaySetRepository.GetNamesByIdsAsync(setIds);
+
+            var allAssetSets = await _digitalDisplayAssetSetRepository.GetAssetsBySetsAsync(setIds);
+
+            var assetSets = allAssetSets.Where(_ => _.EndDate >= _dateTimeProvider.Now);
+
+            var assets = await _digitalDisplayAssetRepository
+                .GetByIdsAsync(assetSets.Select(_ => _.DigitalDisplayAssetId));
+
+            var items = new List<DigitalDisplayCurrentAsset>();
+
+            foreach (var assetSet in assetSets)
+            {
+                items.Add(new DigitalDisplayCurrentAsset
+                {
+                    Asset = assets[assetSet.DigitalDisplayAssetId],
+                    AssetLink = GetAssetWebPath(assets[assetSet.DigitalDisplayAssetId]),
+                    EndDate = assetSet.EndDate,
+                    IsEnabled = assetSet.IsEnabled,
+                    SetName = setNames[assetSet.DigitalDisplaySetId],
+                    StartDate = assetSet.StartDate
+                });
+            }
+
+            return items.OrderBy(_ => _.SetName).ThenBy(_ => _.EndDate).ThenBy(_ => _.Asset.Name);
+        }
+
         public Task<DataWithCount<ICollection<DigitalDisplayAsset>>>
             GetPaginatedAssetsAsync(BaseFilter filter)
         {
@@ -298,7 +338,12 @@ namespace Ocuda.Ops.Service
 
         public async Task<DigitalDisplaySet> GetSetAsync(string setName)
         {
-            return await _digitalDisplaySetRepository.GetByName(setName);
+            return await _digitalDisplaySetRepository.GetByNameAsync(setName);
+        }
+
+        public async Task<IDictionary<int, int>> GetSetsAssetCountsActiveAsync()
+        {
+            return await _digitalDisplayAssetSetRepository.GetSetsAssetCountsActiveAsync();
         }
 
         public async Task<IDictionary<int, int>> GetSetsAssetCountsAsync()

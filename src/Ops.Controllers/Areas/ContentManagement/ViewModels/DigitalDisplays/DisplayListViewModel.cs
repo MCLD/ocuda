@@ -5,6 +5,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDispla
     public class DisplayListViewModel
     {
         public ICollection<Models.Entities.DigitalDisplay> DigitalDisplays { get; set; }
+        public IDictionary<int, int> DisplayActiveElements { get; set; }
         public IDictionary<int, string> DisplaySetNames { get; set; }
         public bool HasDigitalDisplayPermissions { get; set; }
 

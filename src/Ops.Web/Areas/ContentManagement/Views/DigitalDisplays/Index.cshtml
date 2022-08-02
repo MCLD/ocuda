@@ -13,7 +13,7 @@
         @if (Model.IsSiteManager)
         {
             <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
-               asp-action="@nameof(DigitalDisplaysController.Provision)">
+           asp-action="@nameof(DigitalDisplaysController.Provision)">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 @nameof(DigitalDisplaysController.Provision)
             </a>
@@ -29,6 +29,7 @@
             <th>Name</th>
             <th>Display Set</th>
             <th>Location</th>
+            <th>Active Assets</th>
             <th>Status</th>
             <th>Actions</th>
         </tr>
@@ -44,7 +45,7 @@
                         @if (Model.HasPermissions)
                         {
                             <a asp-action="AssignSets"
-                           asp-route-displayId="@display.Id">
+                   asp-route-displayId="@display.Id">
                                 @Model.ShowSets(display.Id)
                             </a>
                         }
@@ -58,33 +59,42 @@
                             @Model.ShowLocation(display.LocationId)
                         </span>
                     </td>
+                    <td class="align-middle">
+                        <a asp-action="DisplayAssets" asp-route-displayId="@display.Id">
+                            @(Model.DisplayActiveElements.ContainsKey(display.Id) ? Model.DisplayActiveElements[display.Id] : 0)
+                        </a>
+                    </td>
                     <td class="align-middle oc-display-cell">
                         Last verification: @(display.LastContentVerification?.ToString() ?? "none")
                         @if (!string.IsNullOrEmpty(display.Status.Message))
                         {
-                            <br /><small><em>
-                            <span class="oc-status-message">@display.Status.Message</span>
-                            @if (display.Status.AsOf != default)
-                            {
-                                <span class="oc-status-asof">at @display.Status.AsOf</span>
-                            }
-                            </em></small>
+                            <br />
+
+                            <small>
+                                <em>
+                                    <span class="oc-status-message">@display.Status.Message</span>
+                                    @if (display.Status.AsOf != default)
+                                    {
+                                        <span class="oc-status-asof">at @display.Status.AsOf</span>
+                                    }
+                                </em>
+                            </small>
                         }
                     </td>
                     <td class="align-middle">
                         @if (Model.IsSiteManager)
                         {
                             <a asp-action="@nameof(DigitalDisplaysController.UpdateDisplay)"
-                               asp-route-displayId="@display.Id"
-                               class="btn btn-outline-primary my-1"><span class="fas fa-edit"></span></a>
+                   asp-route-displayId="@display.Id"
+                   class="btn btn-outline-primary my-1"><span class="fas fa-edit"></span></a>
                             @if (!Model.HasSets(display.Id))
                             {
                                 <button type="button"
-                                        data-toggle="modal"
-                                        data-target="#deleteDisplay"
-                                        data-id="@display.Id"
-                                        data-name="@display.Name"
-                                        class="btn btn-outline-danger my-1">
+                        data-toggle="modal"
+                        data-target="#deleteDisplay"
+                        data-id="@display.Id"
+                        data-name="@display.Name"
+                        class="btn btn-outline-danger my-1">
                                     <span class="fas fa-minus-circle"></span>
                                 </button>
                             }
@@ -138,7 +148,7 @@
 
 @section Scripts {
     <script>
-        $('#deleteDisplay').on('show.bs.modal', function (event) {
+        $('#deleteDisplay').on('show.bs.modal', function(event) {
             var button = $(event.relatedTarget)
             $(this).find('#digitalDisplayName').text(button.data('name'))
             $(this).find('#digitalDisplayId').val(button.data('id'));
