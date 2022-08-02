@@ -15,6 +15,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 
         public Task<int> GetSetCountContainingAsset(int assetId);
 
+        public Task<IDictionary<int, int>> GetSetsAssetCountsActiveAsync();
+
         public Task<IDictionary<int, int>> GetSetsAssetCountsAsync();
     }
 }

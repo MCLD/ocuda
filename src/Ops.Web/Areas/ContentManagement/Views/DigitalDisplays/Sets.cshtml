@@ -29,7 +29,7 @@
             <th>Name</th>
             <th>Last Content Update</th>
             <th>Displays</th>
-            <th>Assets</th>
+            <th>Active/Total Assets</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -42,7 +42,7 @@
                     <td class="align-middle">@set.Name</td>
                     <td class="align-middle">@(set.LastContentUpdate != DateTime.MinValue ? set.LastContentUpdate : "None yet")</td>
                     <td class="align-middle">@Model.DisplayCount(set.Id)</td>
-                    <td class="align-middle">@Model.AssetCount(set.Id)</td>
+                    <td class="align-middle">@Model.ActiveAssetCount(set.Id)/@Model.AssetCount(set.Id)</td>
                     <td class="align-middle">
                         @if (Model.IsSiteManager)
                         {

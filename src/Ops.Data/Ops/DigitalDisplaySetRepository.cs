@@ -22,9 +22,17 @@ namespace Ocuda.Ops.Data.Ops
             return await DbSet.AsNoTracking().OrderBy(_ => _.Name).ToListAsync();
         }
 
-        public async Task<DigitalDisplaySet> GetByName(string setName)
+        public async Task<DigitalDisplaySet> GetByNameAsync(string setName)
         {
             return await DbSet.AsNoTracking().SingleOrDefaultAsync(_ => _.Name == setName);
+        }
+
+        public async Task<IDictionary<int, string>> GetNamesByIdsAsync(IEnumerable<int> setIds)
+        {
+            return await DbSet.AsNoTracking()
+                .Where(_ => setIds.Contains(_.Id))
+                .OrderBy(_ => _.Name)
+                .ToDictionaryAsync(k => k.Id, v => v.Name);
         }
     }
 }

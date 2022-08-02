@@ -1,0 +1,70 @@
+﻿@model CurrentDisplayAssetsViewModel
+
+@using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDisplays
+
+<div class="row">
+    <div class="col-sm-7">
+        <h1>
+            Current Display Assets
+            <small class="text-muted">@Model.Display.Name</small>
+        </h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Index))">Back</a>
+    </div>
+</div>
+
+@await Html.PartialAsync("_DigitalDisplaysPartial")
+
+<p><em>Last verification: @(Model.Display.LastContentVerification?.ToString() ?? "none")</em></p>
+
+<table class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>Display Set</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Enabled</th>
+            <th>Image</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Assets?.Any() != true)
+        {
+            <tr class="table-warning">
+                <td colspan="5">
+                    No current assets for display <strong>@Model.Display.Name</strong> found.
+                </td>
+            </tr>
+
+        }
+        else
+        {
+            @foreach (var assetInfo in Model.Assets)
+            {
+                <tr>
+                    <td class="align-middle">@assetInfo.SetName</td>
+                    <td class="align-middle">@assetInfo.StartDate</td>
+                    <td class="align-middle">@assetInfo.EndDate</td>
+                    <td class="align-middle text-center @CurrentDisplayAssetsViewModel.CssIsEnabled(assetInfo.IsEnabled)">@Html.Raw(CurrentDisplayAssetsViewModel.HtmlIsEnabled(assetInfo.IsEnabled))</td>
+                    <td class="align-middle">
+                        <a href="@assetInfo.AssetLink"
+                   target="_blank"><img src="@assetInfo.AssetLink" style="max-height: 100px;" /></a>
+                    </td>
+                    <td>
+                        @if (Model.HasPermissions)
+                        {
+                            <a asp-action="@nameof(DigitalDisplaysController.AssetAssociations)"
+                   asp-route-digitalDisplayAssetId="@assetInfo.Asset.Id"
+                   class="btn btn-outline-primary my-1"><span class="fas fa-paperclip"></span></a>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+

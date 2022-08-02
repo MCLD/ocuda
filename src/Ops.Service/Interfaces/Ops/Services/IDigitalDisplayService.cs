@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Utility.Models;
@@ -48,12 +49,17 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         public Task<(DateTime AsOf, string Message)> GetDisplayStatusAsync(int displayId);
 
+        public Task<IEnumerable<DigitalDisplayCurrentAsset>>
+            GetNonExpiredAssetsAsync(int displayId);
+
         public Task<DataWithCount<ICollection<DigitalDisplayAsset>>>
             GetPaginatedAssetsAsync(BaseFilter filter);
 
         public Task<DigitalDisplaySet> GetSetAsync(int setId);
 
         public Task<DigitalDisplaySet> GetSetAsync(string setName);
+
+        public Task<IDictionary<int, int>> GetSetsAssetCountsActiveAsync();
 
         public Task<IDictionary<int, int>> GetSetsAssetCountsAsync();
 
