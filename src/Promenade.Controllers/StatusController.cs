@@ -37,17 +37,16 @@ namespace Ocuda.Promenade.Controllers
 
             var products = await _productService.GetProductsAsync(forceReload);
 
-            if (products.Count == 1)
-            {
-                return RedirectToAction(nameof(Product), new { slug = products.First().Slug });
-            }
-            else if (products.Count == 0)
+            if(products?.Any() != true)
             {
                 return StatusCode(Microsoft.AspNetCore.Http.StatusCodes.Status404NotFound);
             }
+            else if (products.Count == 1)
+            {
+                return RedirectToAction(nameof(Product), new { slug = products.First().Slug });
+            }
 
-            throw new NotImplementedException();
-            return View();
+            return View(products);
         }
 
         [Route("{slug}")]
