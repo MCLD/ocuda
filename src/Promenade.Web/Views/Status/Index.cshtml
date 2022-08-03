@@ -1,0 +1,17 @@
+﻿@model ICollection<Ocuda.Promenade.Models.Entities.Product>
+
+<h1>Available Items</h1>
+
+<ul class="lead">
+    @if (Model?.Any() != true)
+    {
+        <li>No items available.</li>
+    }
+    else
+    {
+        @foreach (var item in Model)
+        {
+            <li><a asp-action="Product" asp-route-slug="@item.Slug">@item.Name</a></li>
+        }
+    }
+</ul>
