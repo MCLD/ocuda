@@ -49,6 +49,39 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(siteSettingService));
         }
 
+        public async Task<ImageFeatureTemplate> AddTemplateAsync(int imageFeatureId,
+            int pageLayoutId,
+            ImageFeatureTemplate imageFeatureTemplate)
+        {
+            if (imageFeatureTemplate == null)
+            {
+                throw new ArgumentNullException(nameof(imageFeatureTemplate));
+            }
+
+            if (!imageFeatureTemplate.Height.HasValue
+                && !imageFeatureTemplate.ItemsToDisplay.HasValue
+                && !imageFeatureTemplate.MaximumFileSizeBytes.HasValue
+                && !imageFeatureTemplate.Width.HasValue)
+            {
+                throw new OcudaException("Cannot create a template with all empty values.");
+            }
+
+            await _imageFeatureTemplateRepository.AddAsync(imageFeatureTemplate);
+            await _imageFeatureTemplateRepository.SaveAsync();
+
+            await _imageFeatureTemplateRepository.AssociateWithPageAsync(imageFeatureId,
+                pageLayoutId,
+                imageFeatureTemplate.Id);
+
+            return imageFeatureTemplate;
+        }
+
+        public async Task ClearTemplateForImageFeatureAsync(int imageFeatureTemplateId)
+        {
+            await _imageFeatureTemplateRepository
+                .UnassignAndRemoveFeatureAsync(imageFeatureTemplateId);
+        }
+
         public async Task<ImageFeatureItem> CreateItemAsync(ImageFeatureItem imageFeatureItem)
         {
             imageFeatureItem.Name = imageFeatureItem.Name?.Trim();
@@ -304,6 +337,44 @@ namespace Ocuda.Ops.Service
             _imageFeatureItemRepository.Update(item);
             _imageFeatureItemRepository.Update(itemInPosition);
             await _imageFeatureItemRepository.SaveAsync();
+        }
+
+        public async Task UpdateTemplateAsync(ImageFeatureTemplate imageFeatureTemplate)
+        {
+            if (imageFeatureTemplate == null)
+            {
+                throw new ArgumentNullException(nameof(imageFeatureTemplate));
+            }
+
+            if (imageFeatureTemplate.Id == default)
+            {
+                throw new OcudaException("No valid image feature template ID provided.");
+            }
+
+            if (!imageFeatureTemplate.Height.HasValue
+                && !imageFeatureTemplate.ItemsToDisplay.HasValue
+                && !imageFeatureTemplate.MaximumFileSizeBytes.HasValue
+                && !imageFeatureTemplate.Width.HasValue)
+            {
+                throw new OcudaException("Cannot update a template with all empty values, please delete.");
+            }
+
+            var currentTemplate = await _imageFeatureTemplateRepository
+                .FindAsync(imageFeatureTemplate.Id);
+
+            if (currentTemplate == null)
+            {
+                throw new OcudaException($"Unable to find template ID {imageFeatureTemplate.Id}");
+            }
+
+            currentTemplate.Height = imageFeatureTemplate.Height;
+            currentTemplate.ItemsToDisplay = imageFeatureTemplate.ItemsToDisplay;
+            currentTemplate.MaximumFileSizeBytes = imageFeatureTemplate.MaximumFileSizeBytes;
+            currentTemplate.Name = imageFeatureTemplate.Name;
+            currentTemplate.Width = imageFeatureTemplate.Width;
+
+            _imageFeatureTemplateRepository.Update(currentTemplate);
+            await _imageFeatureTemplateRepository.SaveAsync();
         }
 
         private async Task<IDictionary<string, string>> DeleteImage(ImageFeatureItemText itemTexts)

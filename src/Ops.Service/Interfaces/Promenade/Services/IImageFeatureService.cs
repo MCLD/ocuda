@@ -6,6 +6,12 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 {
     public interface IImageFeatureService
     {
+        Task<ImageFeatureTemplate> AddTemplateAsync(int imageFeatureId,
+            int pageLayoutId,
+            ImageFeatureTemplate imageFeatureTemplate);
+
+        Task ClearTemplateForImageFeatureAsync(int imageFeatureId);
+
         Task<ImageFeatureItem> CreateItemAsync(ImageFeatureItem imageFeatureItem);
 
         Task<ImageFeature> CreateNoSaveAsync(ImageFeature imageFeature);
@@ -37,5 +43,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<ImageFeatureItemText> SetItemTextAsync(ImageFeatureItemText itemText);
 
         Task UpdateItemSortOrder(int id, bool increase);
+
+        Task UpdateTemplateAsync(ImageFeatureTemplate imageFeatureTemplate);
     }
 }
