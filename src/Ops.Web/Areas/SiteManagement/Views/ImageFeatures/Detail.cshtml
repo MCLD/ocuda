@@ -1,29 +1,5 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.ImageFeatures.DetailViewModel
 
-@{
-    string imageAltText = string.Empty;
-
-    if (Model.ImageFeatureTemplate?.Height.HasValue == true
-        || Model.ImageFeatureTemplate?.Width.HasValue == true)
-    {
-        imageAltText = "Feature images need to have ";
-
-        if (Model.ImageFeatureTemplate.Height.HasValue)
-        {
-            imageAltText += $"a height of {Model.ImageFeatureTemplate.Height}px";
-
-            if (Model.ImageFeatureTemplate.Width.HasValue)
-            {
-                imageAltText += " and ";
-            }
-        }
-        if (Model.ImageFeatureTemplate.Width.HasValue)
-        {
-            imageAltText += $"a width of {Model.ImageFeatureTemplate.Width}px";
-        }
-    }
-}
-
 <div class="row mb-2">
     <div class="col-sm-6">
         <h1>
@@ -161,17 +137,66 @@
     </div>
 </div>
 
-<div class="row pb-1">
-    <div class="col-12 col-md-9 offset-md-3">
-        <hr />
-    </div>
-</div>
-
-@if (Model.ImageFeatureTemplate?.ItemsToDisplay.HasValue == true)
+@if (Model.ImageFeatureTemplate != null)
 {
-    <div class="row">
-        <div class="col-12 col-md-9 offset-md-3">
-            <em>Only the first @Model.ImageFeatureTemplate?.ItemsToDisplay items will be displayed.</em>
+    <div class="row mb-2">
+        <div class="col-12">
+            <div class="accordion" id="accordionTemplate">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <div class="card-title h5 mb-0"
+                         data-toggle="collapse"
+                         data-target="#accordionTemplateContent"
+                         aria-expanded="false"
+                         aria-controls="accordionTemplateContent">
+                            Template: @Model.ImageTemplateDescription
+
+                        </div>
+                    </div>
+                    <div id="accordionTemplateContent" class="collapse" data-parent="#accordionTemplate">
+                        <div class="card-body">
+                            <form asp-action="@nameof(ImageFeaturesController.UpdateTemplate)">
+                                <input type="hidden" asp-for="PageLayoutId">
+                                <input type="hidden" asp-for="ImageFeatureId">
+                                <input type="hidden" asp-for="ImageFeatureTemplate.Id">
+                                <input type="hidden"
+                                   asp-for="ImageFeatureTemplate.Name"
+                                   value="@Model.ImageFeature.Name">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <input disabled="@Model.EditTemplateDisabled"
+                                           asp-for="ImageFeatureTemplate.MaximumFileSizeBytes" formgroup>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <input disabled="@Model.EditTemplateDisabled"
+                                           asp-for="ImageFeatureTemplate.Width" formgroup>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <input disabled="@Model.EditTemplateDisabled"
+                                           asp-for="ImageFeatureTemplate.Height" formgroup>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <input disabled="@Model.EditTemplateDisabled"
+                                           asp-for="ImageFeatureTemplate.ItemsToDisplay" formgroup>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5 offset-md-3">
+                                        <input type="submit" class="btn btn-outline-success" value="Update Template">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 }
@@ -192,12 +217,12 @@
                     <div class="card">
                         <div class="card-header d-flex" id="heading@(item.Id)">
                             <div class="card-title h5 mb-0 flex-grow-1"
-                                 data-toggle="collapse"
-                                 data-target="#collapse@(item.Id)"
-                                 aria-controls="collapse@(item.Id)"
-                                 aria-expanded="@(Model.FocusItemId == item.Id ? "true" : "false")">
+                         data-toggle="collapse"
+                         data-target="#collapse@(item.Id)"
+                         aria-controls="collapse@(item.Id)"
+                         aria-expanded="@(Model.FocusItemId == item.Id ? "true" : "false")">
                                 <span id="disclosure@(item.Id)"
-                                      class="fas fa-caret-right mr-1"></span>
+                              class="fas fa-caret-right mr-1"></span>
                                 @item.Name &ndash;
                                 @if (!(item.StartDate > Model.CurrentDateTime) && !(item.EndDate < Model.CurrentDateTime))
                                 {
@@ -210,43 +235,43 @@
                             </div>
                             <div>
                                 <button class="btn btn-sm btn-outline-primary changeSort decreaseSortButton"
-                                        data-id="@item.Id"
-                                        data-increase="false"
-                                        disabled="@(item.Id == Model.ImageFeature.Items.First().Id ? "disabled" : null)">
+                                data-id="@item.Id"
+                                data-increase="false"
+                                disabled="@(item.Id == Model.ImageFeature.Items.First().Id ? "disabled" : null)">
                                     <span class="fas fa-arrow-up"></span>
                                 </button>
                                 <button class="btn btn-sm btn-outline-primary changeSort increaseSortButton"
-                                        data-id="@item.Id"
-                                        data-increase="true"
-                                        disabled="@(item.Id == Model.ImageFeature.Items.Last().Id ? "disabled" : null)">
+                                data-id="@item.Id"
+                                data-increase="true"
+                                disabled="@(item.Id == Model.ImageFeature.Items.Last().Id ? "disabled" : null)">
                                     <span class="fas fa-arrow-down"></span>
                                 </button>
                                 <button type="button"
-                                        class="btn btn-sm btn-outline-primary"
-                                        data-toggle="modal"
-                                        data-target="#editItemModal"
-                                        data-id="@item.Id"
-                                        data-name="@item.Name"
-                                        data-startdate="@item.StartDate?.ToString("yyyy-MM-dd")"
-                                        data-starttime="@item.StartDate?.ToString("HH:mm")"
-                                        data-enddate="@item.EndDate?.ToString("yyyy-MM-dd")"
-                                        data-endtime="@item.EndDate?.ToString("HH:mm")"
-                                        title="Edit item details">
+                                class="btn btn-sm btn-outline-primary"
+                                data-toggle="modal"
+                                data-target="#editItemModal"
+                                data-id="@item.Id"
+                                data-name="@item.Name"
+                                data-startdate="@item.StartDate?.ToString("yyyy-MM-dd")"
+                                data-starttime="@item.StartDate?.ToString("HH:mm")"
+                                data-enddate="@item.EndDate?.ToString("yyyy-MM-dd")"
+                                data-endtime="@item.EndDate?.ToString("HH:mm")"
+                                title="Edit item details">
                                     <span class="fas fa-cog" aria-hidden="true"></span>
                                 </button>
                                 <button class="btn btn-sm btn-outline-danger"
-                                        data-toggle="modal"
-                                        data-target="#deleteItemModal"
-                                        data-id="@item.Id"
-                                        data-name="@item.Name">
+                                data-toggle="modal"
+                                data-target="#deleteItemModal"
+                                data-id="@item.Id"
+                                data-name="@item.Name">
                                     <span class="fas fa-minus-circle"></span>
                                 </button>
                             </div>
                         </div>
                         <div id="collapse@(item.Id)"
-                             class="collapse @(Model.FocusItemId == item.Id ? "show" : null)"
-                             data-parent="#accordion@(item.Id)"
-                             aria-labelledby="heading@(item.Id)">
+                     class="collapse @(Model.FocusItemId == item.Id ? "show" : null)"
+                     data-parent="#accordion@(item.Id)"
+                     aria-labelledby="heading@(item.Id)">
                             <div class="card-body">
                                 @if (Model.FocusItemId == item.Id && !string.IsNullOrWhiteSpace(Model.ItemErrorMessage))
                                 {
@@ -257,26 +282,22 @@
                                     </div>
                                 }
                                 <form asp-controller="@ImageFeaturesController.Name"
-                                      asp-action="@nameof(ImageFeaturesController.EditImageFeatureItemText)"
-                                      enctype="multipart/form-data">
+                              asp-action="@nameof(ImageFeaturesController.EditImageFeatureItemText)"
+                              enctype="multipart/form-data">
                                     <input id="featureItem@(item.Id)Feature"
-                                           asp-for="ImageFeatureId"
-                                           type="hidden" />
+                                   asp-for="ImageFeatureId"
+                                   type="hidden" />
                                     <input id="featureItem@(item.Id)Id"
-                                           asp-for="ImageFeatureItemText.ImageFeatureItemId"
-                                           value="@item.Id"
-                                           type="hidden" />
+                                   asp-for="ImageFeatureItemText.ImageFeatureItemId"
+                                   value="@item.Id"
+                                   type="hidden" />
                                     <input id="featureItem@(item.Id)Language"
-                                           asp-for="ImageFeatureItemText.LanguageId"
-                                           value="@(item.ImageFeatureItemText?.LanguageId ?? Model.LanguageId)"
-                                           type="hidden" />
+                                   asp-for="ImageFeatureItemText.LanguageId"
+                                   value="@(item.ImageFeatureItemText?.LanguageId ?? Model.LanguageId)"
+                                   type="hidden" />
                                     <div class="row form-group">
                                         <label class="col-form-label text-md-right col-md-3" asp-for="ItemImage">
                                             Image
-                                            @if (!string.IsNullOrWhiteSpace(imageAltText))
-                                            {
-                                                <span class="fas fa-info-circle" data-toggle="tooltip" href="#" onclick="alert('@imageAltText');" title="@imageAltText"></span>
-                                            }
                                             <span class="fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker"></span>
                                         </label>
                                         <div class="col-md-9">
@@ -285,9 +306,9 @@
                                                     <label class="btn btn-outline-secondary btn-file form-control">
                                                         <span class="far fa-file"></span> Select a File
                                                         <input type="file"
-                                                               asp-for="ItemImage"
-                                                               accept=".jpg,.png"
-                                                               hidden />
+                                                       asp-for="ItemImage"
+                                                       accept=".jpg,.png"
+                                                       hidden />
                                                     </label>
                                                 </div>
                                                 <div class="custom-file">
@@ -298,18 +319,18 @@
                                         </div>
                                     </div>
                                     <input id="featureItem@(item.Id)Link"
-                                           asp-for="ImageFeatureItemText.Link"
-                                           value="@item.ImageFeatureItemText?.Link"
-                                           formgroup />
+                                   asp-for="ImageFeatureItemText.Link"
+                                   value="@item.ImageFeatureItemText?.Link"
+                                   formgroup />
                                     <input id="featureItem@(item.Id)AltText"
-                                           asp-for="ImageFeatureItemText.AltText"
-                                           value="@item.ImageFeatureItemText?.AltText"
-                                           formgroup />
+                                   asp-for="ImageFeatureItemText.AltText"
+                                   value="@item.ImageFeatureItemText?.AltText"
+                                   formgroup />
                                     <div class="row">
                                         <div class="offset-md-3 col-md-9">
                                             <button type="submit"
-                                                    class="btn btn-outline-success"
-                                                    button-spinner>
+                                            class="btn btn-outline-success"
+                                            button-spinner>
                                                 <span class="far fa-save"></span>
                                                 Save
                                             </button>
@@ -330,18 +351,18 @@
         @if (Model.FocusItemId.HasValue)
         {
             <text>
-            $(function () {
-                var focusAccordion = $("#accordion@(Model.FocusItemId.Value)");
-                if (focusAccordion.length > 0) {
-                    $("#accordion@(Model.FocusItemId.Value)")[0].scrollIntoView();
-                }
-            });
+                $(function () {
+                    var focusAccordion = $("#accordion@(Model.FocusItemId.Value)");
+                    if (focusAccordion.length > 0) {
+                        $("#accordion@(Model.FocusItemId.Value)")[0].scrollIntoView();
+                    }
+                });
             </text>
         }
 
-        $("#SelectLanguage").on("change", function () {
-            window.location.href = "@Url.Action(nameof(ImageFeaturesController.Detail), new { id = Model.ImageFeatureId})" + "?language=" + $(this).val();
-        });
+            $("#SelectLanguage").on("change", function () {
+                window.location.href = "@Url.Action(nameof(ImageFeaturesController.Detail), new { id = Model.ImageFeatureId})" + "?language=" + $(this).val();
+            });
 
         $("#addItemForm").submit(function (e) {
             e.preventDefault();
@@ -349,14 +370,14 @@
             $.post("@(Url.Action(nameof(ImageFeaturesController.AddImageFeatureItem), ImageFeaturesController.Name))",
                 form.serialize(),
                 function (response) {
-                if (response.success == true) {
-                    location.href = response.url;
-                }
-                else {
-                    alert(response.message);
-                    ResetSpinners(form.find(".btn-spinner"));
-                }
-            });
+                    if (response.success == true) {
+                        location.href = response.url;
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
         });
 
         $("#editItemModal").on("show.bs.modal", function (e) {
@@ -376,14 +397,14 @@
             $.post("@(Url.Action(nameof(ImageFeaturesController.EditImageFeatureItem), ImageFeaturesController.Name))",
                 form.serialize(),
                 function (response) {
-                if (response.success == true) {
-                    location.href = response.url;
-                }
-                else {
-                    alert(response.message);
-                    ResetSpinners(form.find(".btn-spinner"));
-                }
-            });
+                    if (response.success == true) {
+                        location.href = response.url;
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
         });
 
         $("#deleteItemModal").on("show.bs.modal", function (e) {
@@ -445,17 +466,17 @@
                         else {
                             alert(response.message);
                         }
-                });
+                    });
             }
         });
 
-        @foreach(var item in Model.ImageFeature.Items)
+        @foreach (var item in Model.ImageFeature.Items)
         {
             <text>
-            $('#collapse@(item.Id)').on('show.bs.collapse', function () {
-                $('#disclosure@(item.Id)').addClass('rotate90');
-            });
-            $('#collapse@(item.Id)').on('hide.bs.collapse', function() {
+                $('#collapse@(item.Id)').on('show.bs.collapse', function () {
+                    $('#disclosure@(item.Id)').addClass('rotate90');
+                });
+            $('#collapse@(item.Id)').on('hide.bs.collapse', function () {
                 $('#disclosure@(item.Id)').removeClass('rotate90');
             });
             </text>

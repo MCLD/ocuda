@@ -29,7 +29,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     {
         private const string DetailModelStateKey = "ImageFeatures.Detail";
         private const string ItemErrorMessageKey = "ImageFeatures.ItemErrorMessage";
-
+        private const int MaximumFileSizeBytes = 200 * 1024;
         private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".png" };
 
         private readonly IDateTimeProvider _dateTimeProvider;
@@ -56,6 +56,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         public static string Area
         { get { return "SiteManagement"; } }
+
         public static string Name
         { get { return "ImageFeatures"; } }
 
@@ -251,11 +252,21 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     nameof(Language.Description), selectedLanguage.Name),
                 PageLayoutId = await _imageFeatureService
                     .GetPageLayoutIdForImageFeatureAsync(feature.Id),
-                CurrentDateTime = _dateTimeProvider.Now
+                CurrentDateTime = _dateTimeProvider.Now,
+                HasEditTemplatePermissions = IsSiteManager(),
+                ImageFeatureTemplate = await _imageFeatureService
+                    .GetTemplateForImageFeatureAsync(feature.Id)
             };
 
-            viewModel.ImageFeatureTemplate = await _imageFeatureService
-                .GetTemplateForImageFeatureAsync(feature.Id);
+            if (viewModel.ImageFeatureTemplate == null)
+            {
+                viewModel.ImageFeatureTemplate = new ImageFeatureTemplate();
+            }
+
+            if (viewModel.ImageFeatureTemplate.MaximumFileSizeBytes.HasValue != true)
+            {
+                viewModel.ImageFeatureTemplate.MaximumFileSizeBytes = MaximumFileSizeBytes;
+            }
 
             return View(viewModel);
         }
@@ -387,6 +398,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     var template = await _imageFeatureService
                         .GetTemplateForImageFeatureAsync(featureItem.ImageFeatureId);
 
+                    var maxFileSize = template?.MaximumFileSizeBytes ?? MaximumFileSizeBytes;
+
+                    if (imageBytes.Length > maxFileSize)
+                    {
+                        ModelState.AddModelError("ItemImage", $"Image must be smaller than {maxFileSize / 1024} KB");
+                    }
+
                     if (template?.Height.HasValue == true || template?.Width.HasValue == true)
                     {
                         using var image = Image.Load(imageBytes);
@@ -481,6 +499,61 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 language = language.IsDefault ? null : language.Name,
                 item = model.ImageFeatureItemText.ImageFeatureItemId
             });
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> UpdateTemplate(DetailViewModel viewModel)
+        {
+            if (viewModel?.ImageFeatureTemplate == null)
+            {
+                ShowAlertWarning("Could not find template to update.");
+            }
+            else
+            {
+                if (viewModel.ImageFeatureTemplate.Id == default)
+                {
+                    if (viewModel.ImageFeatureTemplate.Height == null
+                        && viewModel.ImageFeatureTemplate.ItemsToDisplay == null
+                        && viewModel.ImageFeatureTemplate.MaximumFileSizeBytes == null
+                        && viewModel.ImageFeatureTemplate.Width == null)
+                    {
+                        // nothing to update
+                        ShowAlertWarning("No template restrictions to add.");
+                    }
+                    else
+                    {
+                        try
+                        {
+                            await _imageFeatureService.AddTemplateAsync(viewModel.ImageFeatureId,
+                                viewModel.PageLayoutId,
+                                viewModel.ImageFeatureTemplate);
+                        }
+                        catch (OcudaException oex)
+                        {
+                            _logger.LogError(oex, "Error updating image feature template: {Message}", oex.Message);
+                            ShowAlertDanger("Error updating record: {oex.Message}");
+                        }
+                    }
+                }
+                else
+                {
+                    if (viewModel.ImageFeatureTemplate.Height == null
+                        && viewModel.ImageFeatureTemplate.ItemsToDisplay == null
+                        && viewModel.ImageFeatureTemplate.MaximumFileSizeBytes == null
+                        && viewModel.ImageFeatureTemplate.Width == null)
+                    {
+                        await _imageFeatureService
+                            .ClearTemplateForImageFeatureAsync(viewModel.ImageFeatureTemplate.Id);
+                    }
+                    else
+                    {
+                        await _imageFeatureService
+                            .UpdateTemplateAsync(viewModel.ImageFeatureTemplate);
+                    }
+                }
+            }
+
+            return RedirectToAction(nameof(Detail), new { id = viewModel?.ImageFeatureId });
         }
 
         private async Task<bool> HasPageContentPermissionAsync(int featureId)

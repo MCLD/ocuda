@@ -4,9 +4,9 @@
     <AssemblyName>Ocuda.Promenade.Web</AssemblyName>
     <Authors>Maricopa County Library District Web developers</Authors>
     <CodeAnalysisRuleSet>../../OcudaRuleSet.ruleset</CodeAnalysisRuleSet>
-    <Company>Maricopa Coun/ty Library District</Company>
+    <Company>Maricopa County Library District</Company>
     <Copyright>Copyright 2018 Maricopa County Library District</Copyright>
-    <FileVersion>1.0.0.200</FileVersion>
+    <FileVersion>1.0.0.201</FileVersion>
     <LangVersion>Latest</LangVersion>
     <PackageLicenseUrl>https://github.com/MCLD/ocuda/blob/develop/LICENSE</PackageLicenseUrl>
     <Product>Ocuda</Product>
