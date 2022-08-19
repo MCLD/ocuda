@@ -553,7 +553,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 }
             }
 
-            return RedirectToAction(nameof(Detail), new { id = viewModel.ImageFeatureId });
+            return RedirectToAction(nameof(Detail), new { id = viewModel?.ImageFeatureId });
         }
 
         private async Task<bool> HasPageContentPermissionAsync(int featureId)
