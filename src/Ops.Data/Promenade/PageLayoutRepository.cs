@@ -53,6 +53,12 @@ namespace Ocuda.Ops.Data.Promenade
             return await DbSet
                 .Where(_ => _.Id == id)
                 .Include(_ => _.Items)
+                    .ThenInclude(_ => _.BannerFeature)
+                        .ThenInclude(_ => _.Items)
+                .Include(_ => _.Items)
+                    .ThenInclude(_ => _.Deck)
+                        .ThenInclude(_ => _.Cards)
+                .Include(_ => _.Items)
                     .ThenInclude(_ => _.Carousel)
                         .ThenInclude(_ => _.Items)
                 .Include(_ => _.Items)

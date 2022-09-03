@@ -22,6 +22,11 @@ namespace Ocuda.Promenade.Models.Entities
         [DisplayName("Layout Page?")]
         public bool IsLayoutPage { get; set; }
 
+        public ImageFeatureTemplate LayoutBannerTemplate { get; set; }
+
+        [DisplayName("Banner Template")]
+        public int? LayoutBannerTemplateId { get; set; }
+
         public CarouselTemplate LayoutCarouselTemplate { get; set; }
 
         [DisplayName("Carousel Template")]

@@ -17,7 +17,7 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.8")
+                .HasAnnotation("ProductVersion", "6.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -39,6 +39,61 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("DataProtectionKeys");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Card", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("DeckId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeckId");
+
+                    b.ToTable("Cards");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CardDetail", b =>
+                {
+                    b.Property<int>("CardId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AltText")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Filename")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Header")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Link")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CardId", "LanguageId");
+
+                    b.HasIndex("LanguageId");
+
+                    b.ToTable("CardDetails");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Carousel", b =>
@@ -268,6 +323,24 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.HasIndex("LanguageId");
 
                     b.ToTable("CategoryTexts");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Deck", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Decks");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Emedia", b =>
@@ -1006,6 +1079,9 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.Property<bool>("IsLayoutPage")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("LayoutBannerTemplateId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("LayoutCarouselTemplateId")
                         .HasColumnType("int");
 
@@ -1030,6 +1106,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("LayoutBannerTemplateId");
+
                     b.HasIndex("LayoutCarouselTemplateId");
 
                     b.HasIndex("LayoutFeatureTemplateId");
@@ -1047,7 +1125,13 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int?>("BannerFeatureId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("CarouselId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DeckId")
                         .HasColumnType("int");
 
                     b.Property<int>("Order")
@@ -1067,7 +1151,11 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BannerFeatureId");
+
                     b.HasIndex("CarouselId");
+
+                    b.HasIndex("DeckId");
 
                     b.HasIndex("PageFeatureId");
 
@@ -1757,6 +1845,36 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                     b.ToTable("UrlRedirectAccesses");
                 });
 
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Card", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Deck", "Deck")
+                        .WithMany("Cards")
+                        .HasForeignKey("DeckId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Deck");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CardDetail", b =>
+                {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Card", "Card")
+                        .WithMany()
+                        .HasForeignKey("CardId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Card");
+
+                    b.Navigation("Language");
+                });
+
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselButton", b =>
                 {
                     b.HasOne("Ocuda.Promenade.Models.Entities.CarouselItem", "CarouselItem")
@@ -2102,6 +2220,11 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageHeader", b =>
                 {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.ImageFeatureTemplate", "LayoutBannerTemplate")
+                        .WithMany()
+                        .HasForeignKey("LayoutBannerTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Ocuda.Promenade.Models.Entities.CarouselTemplate", "LayoutCarouselTemplate")
                         .WithMany()
                         .HasForeignKey("LayoutCarouselTemplateId")
@@ -2117,6 +2240,8 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("LayoutWebslideTemplateId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.Navigation("LayoutBannerTemplate");
+
                     b.Navigation("LayoutCarouselTemplate");
 
                     b.Navigation("LayoutFeatureTemplate");
@@ -2126,9 +2251,19 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.PageItem", b =>
                 {
+                    b.HasOne("Ocuda.Promenade.Models.Entities.ImageFeature", "BannerFeature")
+                        .WithMany()
+                        .HasForeignKey("BannerFeatureId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Ocuda.Promenade.Models.Entities.Carousel", "Carousel")
                         .WithMany()
                         .HasForeignKey("CarouselId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Ocuda.Promenade.Models.Entities.Deck", "Deck")
+                        .WithMany()
+                        .HasForeignKey("DeckId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Ocuda.Promenade.Models.Entities.ImageFeature", "PageFeature")
@@ -2152,7 +2287,11 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
                         .HasForeignKey("WebslideId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.Navigation("BannerFeature");
+
                     b.Navigation("Carousel");
+
+                    b.Navigation("Deck");
 
                     b.Navigation("PageFeature");
 
@@ -2306,6 +2445,11 @@ namespace Ocuda.Ops.DataProvider.SqlServer.Promenade.Migrations
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.CarouselItem", b =>
                 {
                     b.Navigation("Buttons");
+                });
+
+            modelBuilder.Entity("Ocuda.Promenade.Models.Entities.Deck", b =>
+                {
+                    b.Navigation("Cards");
                 });
 
             modelBuilder.Entity("Ocuda.Promenade.Models.Entities.EmediaGroup", b =>

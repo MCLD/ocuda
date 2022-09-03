@@ -47,7 +47,8 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await _context.PageItems
                 .AsNoTracking()
-                .Where(_ => _.WebslideId == id || _.PageFeatureId == id)
+                .Where(_ => _.WebslideId == id || _.PageFeatureId == id || _.BannerFeatureId == id)
+                .OrderByDescending(_ => _.PageLayoutId)
                 .Select(_ => _.PageLayoutId)
                 .FirstOrDefaultAsync();
         }

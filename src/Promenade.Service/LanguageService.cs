@@ -209,6 +209,23 @@ namespace Ocuda.Promenade.Service
                 });
             }
 
+            foreach (var siteCulture in siteCultures)
+            {
+                var databaseCulture = databaseCultures
+                    .SingleOrDefault(_ => _.Name == siteCulture.Name);
+
+                if (databaseCulture != null
+                    && databaseCulture.Description != siteCulture.DisplayName)
+                {
+                    _logger.LogInformation("Fixing description for culture {Culture} in database from {OldDescription} to {NewDescription}",
+                        siteCulture.Name,
+                        databaseCulture.Description,
+                        siteCulture.Name);
+                    databaseCulture.Description = siteCulture.DisplayName;
+                    _languageRepository.Update(databaseCulture);
+                }
+            }
+
             await _languageRepository.SaveAsync();
         }
     }

@@ -186,7 +186,7 @@ namespace Ocuda.Ops.Service
                 string cacheKey = string.Format(CultureInfo.InvariantCulture,
                     Utility.Keys.Cache.OpsSiteSetting,
                     key);
-                var value = await _cache.GetStringFromCache(key);
+                var value = await _cache.GetStringFromCache(cacheKey);
                 if (value == null)
                 {
                     var siteSetting = await _siteSettingRepository.FindAsync(key);

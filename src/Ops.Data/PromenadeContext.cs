@@ -13,6 +13,8 @@ namespace Ocuda.Ops.Data
         {
         }
 
+        public DbSet<CardDetail> CardDetails { get; set; }
+        public DbSet<Card> Cards { get; set; }
         public DbSet<CarouselButtonLabel> CarouselButtonLabels { get; set; }
 
         public DbSet<CarouselButtonLabelText> CarouselButtonLabelTexts { get; set; }
@@ -35,6 +37,7 @@ namespace Ocuda.Ops.Data
 
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 
+        public DbSet<Deck> Decks { get; set; }
         public DbSet<Emedia> Emedia { get; set; }
 
         public DbSet<EmediaCategory> EmediaCategories { get; set; }
@@ -132,6 +135,8 @@ namespace Ocuda.Ops.Data
 
             // configure composite keys
             // https://docs.microsoft.com/en-us/ef/core/modeling/keys
+            modelBuilder.Entity<CardDetail>()
+                .HasKey(_ => new { _.CardId, _.LanguageId });
             modelBuilder.Entity<CarouselButtonLabelText>()
                 .HasKey(_ => new { _.CarouselButtonLabelId, _.LanguageId });
             modelBuilder.Entity<CarouselItemText>()
@@ -144,6 +149,8 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.CategoryId, _.EmediaId });
             modelBuilder.Entity<EmediaText>()
                 .HasKey(_ => new { _.EmediaId, _.LanguageId });
+            modelBuilder.Entity<ImageFeatureItemText>()
+                .HasKey(_ => new { _.LanguageId, _.ImageFeatureItemId });
             modelBuilder.Entity<LocationFeature>()
                 .HasKey(_ => new { _.FeatureId, _.LocationId });
             modelBuilder.Entity<LocationGroup>()
@@ -166,8 +173,6 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.ScheduleRequestSubjectId, _.LanguageId });
             modelBuilder.Entity<SegmentText>()
                 .HasKey(_ => new { _.LanguageId, _.SegmentId });
-            modelBuilder.Entity<ImageFeatureItemText>()
-                .HasKey(_ => new { _.LanguageId, _.ImageFeatureItemId });
         }
 
         #region IMigratableContext

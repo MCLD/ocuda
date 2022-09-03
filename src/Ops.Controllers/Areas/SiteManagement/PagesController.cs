@@ -30,6 +30,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     public class PagesController : BaseController<PagesController>
     {
         private readonly ICarouselService _carouselService;
+        private readonly IDeckService _deckService;
         private readonly IImageFeatureService _imageFeatureService;
         private readonly ILanguageService _languageService;
         private readonly IPageService _pageService;
@@ -39,6 +40,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         public PagesController(ServiceFacades.Controller<PagesController> context,
             ICarouselService carouselService,
+            IDeckService deckService,
             ILanguageService languageService,
             IPageService pageService,
             IPermissionGroupService permissionGroupService,
@@ -48,6 +50,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             _carouselService = carouselService
                 ?? throw new ArgumentNullException(nameof(carouselService));
+            _deckService = deckService
+                ?? throw new ArgumentNullException(nameof(deckService));
             _languageService = languageService
                 ?? throw new ArgumentNullException(nameof(languageService));
             _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
@@ -228,6 +232,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     if (!model.PageHeader.IsLayoutPage)
                     {
+                        model.PageHeader.LayoutBannerTemplate = null;
                         model.PageHeader.LayoutCarouselTemplateId = null;
                         model.PageHeader.LayoutFeatureTemplateId = null;
                         model.PageHeader.LayoutWebslideTemplateId = null;
@@ -348,7 +353,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             if (await HasPagePermissionsAsync(layout.PageHeaderId))
             {
-                if (model.Carousel == null
+                if (model.BannerFeature == null
+                    && model.Carousel == null
+                    && model.Deck == null
                     && model.PageFeature == null
                     && model.Segment == null
                     && model.Webslide == null)
@@ -360,37 +367,98 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     try
                     {
-                        if (model.Carousel != null)
+                        if (!string.IsNullOrEmpty(model.BannerFeature?.Name))
+                        {
+                            model.PageItem.BannerFeature = model.BannerFeature;
+                        }
+                        else if (!string.IsNullOrEmpty(model.Carousel?.Name))
                         {
                             model.PageItem.Carousel = model.Carousel;
                         }
-                        else if (model.PageFeature != null)
+                        else if (!string.IsNullOrEmpty(model.Deck?.Name))
+                        {
+                            model.PageItem.Deck = model.Deck;
+                        }
+                        else if (!string.IsNullOrEmpty(model.PageFeature?.Name))
                         {
                             model.PageItem.PageFeature = model.PageFeature;
                         }
-                        else if (model.Segment != null)
+                        else if (!string.IsNullOrEmpty(model.Segment?.Name))
                         {
                             model.Segment.IsActive = true;
                             model.Segment.EndDate = null;
                             model.Segment.StartDate = null;
                             model.PageItem.Segment = model.Segment;
                         }
-                        else if (model.Webslide != null)
+                        else if (!string.IsNullOrEmpty(model.Webslide?.Name))
                         {
                             model.PageItem.Webslide = model.Webslide;
+                        }
+                        else
+                        {
+                            return Json(new JsonResponse
+                            {
+                                Success = false,
+                                Message = "You must supply an item name."
+                            });
                         }
 
                         var pageItem = await _pageService.CreateItemAsync(model.PageItem);
 
                         string url = null;
-                        if (pageItem.Carousel != null)
+                        if (pageItem.BannerFeature != null)
+                        {
+                            var header = await _pageService.GetHeaderByIdAsync(layout.PageHeaderId);
+                            if (!header.LayoutBannerTemplateId.HasValue
+                                && pageItem.BannerFeatureId.HasValue)
+                            {
+                                var template = await _imageFeatureService
+                                    .AddTemplateAsync(pageItem.BannerFeatureId.Value,
+                                        pageItem.PageLayoutId,
+                                        new ImageFeatureTemplate
+                                        {
+                                            ItemsToDisplay = 1,
+                                            MaximumFileSizeBytes = 200 * 1024,
+                                            Name = "Banner template",
+                                            Width = 2128,
+                                        });
+                            }
+                            
+                            url = Url.Action(nameof(ImageFeaturesController.Detail),
+                                ImageFeaturesController.Name,
+                                new { id = pageItem.BannerFeature.Id });
+                        }
+                        else if (pageItem.Carousel != null)
                         {
                             url = Url.Action(nameof(CarouselsController.Detail),
                                 CarouselsController.Name,
                                 new { id = pageItem.Carousel.Id });
                         }
+                        else if (pageItem.Deck != null)
+                        {
+                            url = Url.Action(nameof(DecksController.Detail),
+                                DecksController.Name,
+                                new { deckId = pageItem.Deck.Id });
+                        }
                         else if (pageItem.PageFeature != null)
                         {
+                            var header = await _pageService.GetHeaderByIdAsync(layout.PageHeaderId);
+                            if (!header.LayoutFeatureTemplateId.HasValue
+                                && pageItem.PageFeatureId.HasValue)
+                            {
+                                var template = await _imageFeatureService
+                                    .AddTemplateAsync(pageItem.PageFeatureId.Value,
+                                        pageItem.PageLayoutId,
+                                        new ImageFeatureTemplate
+                                        {
+                                            Height = 400,
+                                            ItemsToDisplay = 4,
+                                            MaximumFileSizeBytes = 100 * 1024,
+                                            Name = "Image feature template",
+                                            Width = 364,
+                                        });
+                            }
+
                             url = Url.Action(nameof(ImageFeaturesController.Detail),
                                 ImageFeaturesController.Name,
                                 new { id = pageItem.PageFeature.Id });
@@ -403,6 +471,23 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         }
                         else if (pageItem.Webslide != null)
                         {
+                            var header = await _pageService.GetHeaderByIdAsync(layout.PageHeaderId);
+                            if (!header.LayoutWebslideTemplateId.HasValue
+                                && pageItem.WebslideId.HasValue)
+                            {
+                                var template = _imageFeatureService
+                                    .AddTemplateAsync(pageItem.WebslideId.Value,
+                                        pageItem.PageLayoutId,
+                                        new ImageFeatureTemplate
+                                        {
+                                            Height = 500,
+                                            ItemsToDisplay = 4,
+                                            MaximumFileSizeBytes = 250 * 1024,
+                                            Name = "Image feature template",
+                                            Width = 1480,
+                                        });
+                            }
+
                             url = Url.Action(nameof(ImageFeaturesController.Detail),
                                 ImageFeaturesController.Name,
                                 new { id = pageItem.Webslide.Id });
@@ -778,6 +863,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     ModelState.AddModelError("PageItem", "Carousels can only be edited from the carousel page");
                 }
+                else if (pageItem.BannerFeatureId.HasValue && model.BannerFeature == null)
+                {
+                    ModelState.AddModelError("PageItem", "No banner submitted");
+                }
+                else if (pageItem.DeckId.HasValue && model.Deck == null)
+                {
+                    ModelState.AddModelError("PageItem", "No deck submitted");
+                }
                 else if (pageItem.PageFeatureId.HasValue && model.PageFeature == null)
                 {
                     ModelState.AddModelError("PageItem", "No feature submitted");
@@ -795,7 +888,17 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 {
                     try
                     {
-                        if (pageItem.PageFeatureId.HasValue)
+                        if (pageItem.BannerFeatureId.HasValue)
+                        {
+                            model.BannerFeature.Id = pageItem.BannerFeatureId.Value;
+                            await _imageFeatureService.EditAsync(model.BannerFeature);
+                        }
+                        else if (pageItem.DeckId.HasValue)
+                        {
+                            model.Deck.Id = pageItem.DeckId.Value;
+                            await _deckService.EditAsync(model.Deck);
+                        }
+                        else if (pageItem.PageFeatureId.HasValue)
                         {
                             model.PageFeature.Id = pageItem.PageFeatureId.Value;
                             await _imageFeatureService.EditAsync(model.PageFeature);

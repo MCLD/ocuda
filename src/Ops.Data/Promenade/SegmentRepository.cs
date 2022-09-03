@@ -28,6 +28,14 @@ namespace Ocuda.Ops.Data.Promenade
             return entity;
         }
 
+        public async Task<ICollection<Segment>> GetAllActiveSegmentsAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.IsActive)
+                .ToListAsync();
+        }
+
         public async Task<Segment> GetIncludingChildrenAsync(int id)
         {
             return await DbSet
@@ -37,25 +45,12 @@ namespace Ocuda.Ops.Data.Promenade
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<ICollection<Segment>> GetAllActiveSegmentsAsync()
+        public async Task<IDictionary<int, string>> GetNamesByIdsAsync(IEnumerable<int> ids)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.IsActive)
-                .ToListAsync();
-        }
-
-        public async Task<DataWithCount<ICollection<Segment>>> GetPaginatedListAsync(
-            BaseFilter filter)
-        {
-            return new DataWithCount<ICollection<Segment>>
-            {
-                Count = await DbSet.AsNoTracking().CountAsync(),
-                Data = await DbSet.AsNoTracking()
-                    .OrderBy(_ => _.Name)
-                    .ApplyPagination(filter)
-                    .ToListAsync()
-            };
+                .Where(_ => ids.Contains(_.Id))
+                .ToDictionaryAsync(k => k.Id, v => v.Name);
         }
 
         public async Task<int?> GetPageHeaderIdForSegmentAsync(int id)
@@ -76,12 +71,17 @@ namespace Ocuda.Ops.Data.Promenade
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<IDictionary<int, string>> GetNamesByIdsAsync(IEnumerable<int> ids)
+        public async Task<DataWithCount<ICollection<Segment>>> GetPaginatedListAsync(
+                                    BaseFilter filter)
         {
-            return await DbSet
-                .AsNoTracking()
-                .Where(_ => ids.Contains(_.Id))
-                .ToDictionaryAsync(k => k.Id, v => v.Name);
+            return new DataWithCount<ICollection<Segment>>
+            {
+                Count = await DbSet.AsNoTracking().CountAsync(),
+                Data = await DbSet.AsNoTracking()
+                    .OrderBy(_ => _.Name)
+                    .ApplyPagination(filter)
+                    .ToListAsync()
+            };
         }
     }
 }

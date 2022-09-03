@@ -352,6 +352,10 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<Controllers.Filters.LayoutFilter>();
 
             // repositories
+            services.AddScoped<Service.Interfaces.Repositories.ICardDetailRepository,
+                Data.Promenade.CardDetailRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ICardRepository,
+                Data.Promenade.CardRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ICarouselButtonLabelTextRepository,
                 Data.Promenade.CarouselButtonLabelTextRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ICarouselItemRepository,
@@ -460,6 +464,7 @@ namespace Ocuda.Promenade.Web
             // promenade servicews
             services.AddScoped<CarouselService>();
             services.AddScoped<CategoryService>();
+            services.AddScoped<DeckService>();
             services.AddScoped<EmediaService>();
             services.AddScoped<ExternalResourceService>();
             services.AddScoped<LanguageService>();

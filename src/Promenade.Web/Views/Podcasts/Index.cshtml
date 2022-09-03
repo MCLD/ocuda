@@ -4,7 +4,7 @@
 <div class="row">
     @foreach (var podcast in Model.Podcasts)
     {
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-sm-6 col-md-4 mb-3">
             <div class="card">
                 <a href="@Url.Action(nameof(PodcastsController.Podcast), new { stub = podcast.Stub})">
                     <img class="card-img-top"

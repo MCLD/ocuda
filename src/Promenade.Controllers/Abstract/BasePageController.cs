@@ -13,14 +13,18 @@ namespace Ocuda.Promenade.Controllers.Abstract
     {
         protected BasePageController(ServiceFacades.Controller<T> context,
             CarouselService carouselService,
+            DeckService deckService,
+            ImageFeatureService imageFeatureService,
             PageService pageService,
             RedirectService redirectService,
             SegmentService segmentService,
-            SocialCardService socialCardService,
-            ImageFeatureService imageFeatureService) : base(context)
+            SocialCardService socialCardService) : base(context)
         {
             CarouselService = carouselService
                 ?? throw new ArgumentNullException(nameof(carouselService));
+            DeckService = deckService ?? throw new ArgumentNullException(nameof(deckService));
+            ImageFeatureService = imageFeatureService
+                ?? throw new ArgumentNullException(nameof(imageFeatureService));
             PageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
             RedirectService = redirectService
                 ?? throw new ArgumentNullException(nameof(redirectService));
@@ -28,11 +32,10 @@ namespace Ocuda.Promenade.Controllers.Abstract
                 ?? throw new ArgumentNullException(nameof(segmentService));
             SocialCardService = socialCardService
                 ?? throw new ArgumentNullException(nameof(socialCardService));
-            ImageFeatureService = imageFeatureService
-                ?? throw new ArgumentNullException(nameof(imageFeatureService));
         }
 
         protected CarouselService CarouselService { get; }
+        protected DeckService DeckService { get; }
         protected ImageFeatureService ImageFeatureService { get; }
         protected PageService PageService { get; }
         protected abstract PageType PageType { get; }
@@ -174,10 +177,24 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
             foreach (var item in pageLayout?.Items)
             {
-                if (item.CarouselId.HasValue)
+                if (item.BannerFeatureId.HasValue)
+                {
+                    item.BannerFeature = await ImageFeatureService.GetByIdAsync(
+                        item.BannerFeatureId.Value,
+                        forceReload);
+                }
+                else if (item.CarouselId.HasValue)
                 {
                     item.Carousel = await CarouselService.GetByIdAsync(item.CarouselId.Value,
                         forceReload);
+                }
+                else if (item.DeckId.HasValue)
+                {
+                    item.CardDetails = await DeckService.GetByIdAsync(item.DeckId.Value, forceReload);
+                    foreach(var cardDetail in item.CardDetails)
+                    {
+                        cardDetail.Text = CommonMark.CommonMarkConverter.Convert(cardDetail.Text);
+                    }
                 }
                 else if (item.PageFeatureId.HasValue)
                 {
