@@ -25,17 +25,12 @@ namespace Ocuda.Ops.Data.Promenade
                 throw new ArgumentNullException(nameof(card));
             }
 
-            int largestOrder = 0;
-            try
-            {
-                largestOrder = await DbSet
-                   .AsNoTracking()
-                   .Where(_ => _.DeckId == card.DeckId)
-                   .MaxAsync(_ => _.Order);
-            }
-            catch { }
+            var largestOrder = await DbSet
+                  .AsNoTracking()
+                  .Where(_ => _.DeckId == card.DeckId)
+                  .MaxAsync(_ => (int?)_.Order);
 
-            card.Order = largestOrder + 1;
+            card.Order = largestOrder ?? 0 + 1;
 
             await DbSet.AddAsync(card);
             return card;

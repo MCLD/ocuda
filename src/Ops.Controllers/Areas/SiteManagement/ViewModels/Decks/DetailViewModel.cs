@@ -8,7 +8,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Decks
 {
     public class DetailViewModel
     {
-        private int? _totalLanguages;
         public string BackLink { get; set; }
         public ICollection<CardDetail> CardDetails { get; set; }
         public int DeckId { get; set; }

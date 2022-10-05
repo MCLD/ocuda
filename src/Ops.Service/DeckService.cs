@@ -159,54 +159,6 @@ namespace Ocuda.Ops.Service
             return deck;
         }
 
-        public Task RemoveCardImageAsync(int cardId)
-        {
-            return RemoveCardImageInternalAsync(cardId, null);
-        }
-
-        public Task RemoveCardImageAsync(int cardId, int languageId)
-        {
-            return RemoveCardImageInternalAsync(cardId, languageId);
-        }
-
-        private async Task RemoveCardImageInternalAsync(int cardId, int? languageId)
-        {
-            ICollection<CardDetail> cards;
-            var languages = await _languageService.GetActiveAsync();
-            if (languageId.HasValue)
-            {
-                cards = new List<CardDetail> {
-                   await _cardDetailRepository.GetByIds(cardId, languageId.Value)
-                };
-            }
-            else
-            {
-                cards = await _cardDetailRepository.GetByCardId(cardId);
-            }
-            foreach (var card in cards)
-            {
-                if (!string.IsNullOrEmpty(card.Filename))
-                {
-                    var languageName = languages
-                        .Where(_ => _.Id == card.LanguageId)
-                        .Select(_ => _.Name)
-                        .SingleOrDefault();
-                    if (languageName == null)
-                    {
-                        _logger.LogError("Unable to find language {LanguageId} even though it is associated with card {CardId}",
-                            languageId,
-                            cardId);
-                    }
-                    else
-                    {
-                        var cardPath = Path.Combine(await GetFullImageDirectoryPath(languageName),
-                            card.Filename);
-                        File.Delete(cardPath);
-                    }
-                }
-            }
-        }
-
         public async Task<(int deckId, int pageLayoutId)> DeleteCardAsync(int cardId)
         {
             await RemoveCardImageAsync(cardId);
@@ -269,7 +221,7 @@ namespace Ocuda.Ops.Service
         public async Task<CardDetail> GetCardDetailsAsync(int cardId, int languageId)
         {
             var cardDetail = await _cardDetailRepository.GetByIds(cardId, languageId);
-            if (!string.IsNullOrEmpty(cardDetail?.Filename))
+            if (cardDetail != null && !string.IsNullOrEmpty(cardDetail?.Filename))
             {
                 var language = await _languageService.GetActiveByIdAsync(languageId);
                 cardDetail.ImagePath = Path.Combine(await GetFullImageDirectoryPath(language.Name),
@@ -288,6 +240,35 @@ namespace Ocuda.Ops.Service
             return await _cardRepository.GetDeckIdAsync(cardId);
         }
 
+        public async Task<string> GetFullImageDirectoryPath(string languageName)
+        {
+            string basePath = await _siteSettingService.GetSettingStringAsync(
+                Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
+
+            var filePath = Path.Combine(basePath,
+                ImagesFilePath,
+                languageName,
+                CardsFilePath);
+
+            if (!Directory.Exists(filePath))
+            {
+                _logger.LogInformation("Creating image card directory: {Path}",
+                    filePath);
+                Directory.CreateDirectory(filePath);
+            }
+
+            return filePath;
+        }
+
+        public async Task<int?> GetPageHeaderIdAsync(int deckId)
+        {
+            return await _deckRepository.GetPageHeaderIdAsync(deckId);
+        }
+
+        public async Task<int?> GetPageLayoutIdAsync(int deckId)
+        {
+            return await _deckRepository.GetPageLayoutIdAsync(deckId);
+        }
 
         public async Task<string> GetUploadImageFilePathAsync(string languageName,
             string filename,
@@ -318,14 +299,14 @@ namespace Ocuda.Ops.Service
             return fullFilePath;
         }
 
-        public async Task<int?> GetPageHeaderIdAsync(int deckId)
+        public Task RemoveCardImageAsync(int cardId)
         {
-            return await _deckRepository.GetPageHeaderIdAsync(deckId);
+            return RemoveCardImageInternalAsync(cardId, null);
         }
 
-        public async Task<int?> GetPageLayoutIdAsync(int deckId)
+        public Task RemoveCardImageAsync(int cardId, int languageId)
         {
-            return await _deckRepository.GetPageLayoutIdAsync(deckId);
+            return RemoveCardImageInternalAsync(cardId, languageId);
         }
 
         public async Task UpdateCardAsync(int cardId, int languageId, CardDetail cardDetail)
@@ -363,24 +344,42 @@ namespace Ocuda.Ops.Service
             await _cardDetailRepository.SaveAsync();
         }
 
-        public async Task<string> GetFullImageDirectoryPath(string languageName)
+        private async Task RemoveCardImageInternalAsync(int cardId, int? languageId)
         {
-            string basePath = await _siteSettingService.GetSettingStringAsync(
-                Ops.Models.Keys.SiteSetting.SiteManagement.PromenadePublicPath);
-
-            var filePath = Path.Combine(basePath,
-                ImagesFilePath,
-                languageName,
-                CardsFilePath);
-
-            if (!Directory.Exists(filePath))
+            ICollection<CardDetail> cards;
+            var languages = await _languageService.GetActiveAsync();
+            if (languageId.HasValue)
             {
-                _logger.LogInformation("Creating image card directory: {Path}",
-                    filePath);
-                Directory.CreateDirectory(filePath);
+                cards = new List<CardDetail> {
+                   await _cardDetailRepository.GetByIds(cardId, languageId.Value)
+                };
             }
-
-            return filePath;
+            else
+            {
+                cards = await _cardDetailRepository.GetByCardId(cardId);
+            }
+            foreach (var card in cards)
+            {
+                if (!string.IsNullOrEmpty(card.Filename))
+                {
+                    var languageName = languages
+                        .Where(_ => _.Id == card.LanguageId)
+                        .Select(_ => _.Name)
+                        .SingleOrDefault();
+                    if (languageName == null)
+                    {
+                        _logger.LogError("Unable to find language {LanguageId} even though it is associated with card {CardId}",
+                            languageId,
+                            cardId);
+                    }
+                    else
+                    {
+                        var cardPath = Path.Combine(await GetFullImageDirectoryPath(languageName),
+                            card.Filename);
+                        File.Delete(cardPath);
+                    }
+                }
+            }
         }
     }
 }

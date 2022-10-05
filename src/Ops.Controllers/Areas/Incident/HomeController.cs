@@ -143,7 +143,6 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
                 ShowAlertDanger($"Could not add incident report: {ModelState.ErrorCount} validation errors.");
                 return RedirectToAction(nameof(Add));
             }
-            return RedirectToAction(nameof(Mine));
         }
 
         [HttpPost("[action]")]

@@ -77,7 +77,7 @@ namespace Ocuda.Promenade.Service.Abstract
                 ? nextUpIn
                 : cacheSpan;
         }
-        
+
         /// <summary>
         /// Returns a list of language ids in the preferred order for content.
         /// </summary>
@@ -115,7 +115,7 @@ namespace Ocuda.Promenade.Service.Abstract
                     currentCultureName);
             }
 
-            return new int[]
+            return new[]
             {
                 currentLanguageId ?? defaultLanguageId,
                 defaultLanguageId

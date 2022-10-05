@@ -412,7 +412,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             if (!header.LayoutBannerTemplateId.HasValue
                                 && pageItem.BannerFeatureId.HasValue)
                             {
-                                var template = await _imageFeatureService
+                                await _imageFeatureService
                                     .AddTemplateAsync(pageItem.BannerFeatureId.Value,
                                         pageItem.PageLayoutId,
                                         new ImageFeatureTemplate
@@ -423,7 +423,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                                             Width = 2128,
                                         });
                             }
-                            
+
                             url = Url.Action(nameof(ImageFeaturesController.Detail),
                                 ImageFeaturesController.Name,
                                 new { id = pageItem.BannerFeature.Id });
@@ -446,17 +446,17 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             if (!header.LayoutFeatureTemplateId.HasValue
                                 && pageItem.PageFeatureId.HasValue)
                             {
-                                var template = await _imageFeatureService
-                                    .AddTemplateAsync(pageItem.PageFeatureId.Value,
-                                        pageItem.PageLayoutId,
-                                        new ImageFeatureTemplate
-                                        {
-                                            Height = 400,
-                                            ItemsToDisplay = 4,
-                                            MaximumFileSizeBytes = 100 * 1024,
-                                            Name = "Image feature template",
-                                            Width = 364,
-                                        });
+                                await _imageFeatureService
+                                   .AddTemplateAsync(pageItem.PageFeatureId.Value,
+                                       pageItem.PageLayoutId,
+                                       new ImageFeatureTemplate
+                                       {
+                                           Height = 400,
+                                           ItemsToDisplay = 4,
+                                           MaximumFileSizeBytes = 100 * 1024,
+                                           Name = "Image feature template",
+                                           Width = 364,
+                                       });
                             }
 
                             url = Url.Action(nameof(ImageFeaturesController.Detail),
@@ -475,17 +475,17 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                             if (!header.LayoutWebslideTemplateId.HasValue
                                 && pageItem.WebslideId.HasValue)
                             {
-                                var template = _imageFeatureService
-                                    .AddTemplateAsync(pageItem.WebslideId.Value,
-                                        pageItem.PageLayoutId,
-                                        new ImageFeatureTemplate
-                                        {
-                                            Height = 500,
-                                            ItemsToDisplay = 4,
-                                            MaximumFileSizeBytes = 250 * 1024,
-                                            Name = "Image feature template",
-                                            Width = 1480,
-                                        });
+                                await _imageFeatureService
+                                     .AddTemplateAsync(pageItem.WebslideId.Value,
+                                         pageItem.PageLayoutId,
+                                         new ImageFeatureTemplate
+                                         {
+                                             Height = 500,
+                                             ItemsToDisplay = 4,
+                                             MaximumFileSizeBytes = 250 * 1024,
+                                             Name = "Image feature template",
+                                             Width = 1480,
+                                         });
                             }
 
                             url = Url.Action(nameof(ImageFeaturesController.Detail),

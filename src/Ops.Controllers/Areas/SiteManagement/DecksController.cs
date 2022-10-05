@@ -26,8 +26,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     [Route("[area]/[controller]")]
     public class DecksController : BaseController<DecksController>
     {
-        public const int CardImageWidth = 666;
-        public const int MaximumFileSizeBytes = 200 * 1024;
+        public static readonly int CardImageWidth = 666;
+        public static readonly int MaximumFileSizeBytes = 200 * 1024;
         private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".png" };
 
         private readonly IDeckService _deckService;
@@ -85,9 +85,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             if (viewModel == null)
             {
-                issues.Add("Invalid request");
+                return Json(new JsonResponse
+                {
+                    Message = "Invalid request",
+                    Success = false
+                });
             }
-            else if (!await HasDeckPermissionAsync(viewModel.DeckId))
+
+            if (!await HasDeckPermissionAsync(viewModel.DeckId))
             {
                 issues.Add("Permission denied");
             }
@@ -101,7 +106,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 issues.Add("You must supply an image to upload.");
             }
-            else if (!ValidImageExtensions.Contains(Path.GetExtension(viewModel.CardImage.FileName))) {
+            else if (!ValidImageExtensions.Contains(Path.GetExtension(viewModel.CardImage.FileName)))
+            {
                 issues.Add($"Image type must be one of: {ValidImageExtensions}");
             }
             else if (viewModel.CardImage.Length > MaximumFileSizeBytes)
