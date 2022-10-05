@@ -10,6 +10,8 @@ namespace Ocuda.Promenade.Data
         {
         }
 
+        public DbSet<CardDetail> CardDetails { get; }
+        public DbSet<Card> Cards { get; }
         public DbSet<CarouselButtonLabel> CarouselButtonLabels { get; }
         public DbSet<CarouselButtonLabelText> CarouselButtonLabelTexts { get; }
         public DbSet<CarouselButton> CarouselButtons { get; }
@@ -21,6 +23,7 @@ namespace Ocuda.Promenade.Data
         public DbSet<Category> Categories { get; }
         public DbSet<CategoryText> CategoryTexts { get; }
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
+        public DbSet<Deck> Decks { get; }
         public DbSet<Emedia> Emedia { get; set; }
         public DbSet<EmediaCategory> EmediaCategories { get; set; }
         public DbSet<EmediaGroup> EmediaGroups { get; }
@@ -72,6 +75,8 @@ namespace Ocuda.Promenade.Data
 
             // configure composite keys
             // https://docs.microsoft.com/en-us/ef/core/modeling/keys
+            modelBuilder.Entity<CardDetail>()
+                .HasKey(_ => new { _.CardId, _.LanguageId });
             modelBuilder.Entity<CarouselButtonLabelText>()
                 .HasKey(_ => new { _.CarouselButtonLabelId, _.LanguageId });
             modelBuilder.Entity<CarouselItemText>()

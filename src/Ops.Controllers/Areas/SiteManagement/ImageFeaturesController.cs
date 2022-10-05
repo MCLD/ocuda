@@ -224,8 +224,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         }
 
         [Route("[action]/{id}")]
+        [Route("[action]/feature/{id}/item/{item}")]
+        [Route("[action]/layout/{pageLayoutId}/feature/{id}")]
+        [Route("[action]/layout/{pageLayoutId}/feature/{id}/item/{item}")]
         [RestoreModelState(Key = DetailModelStateKey)]
-        public async Task<IActionResult> Detail(int id, string language, int? item)
+        public async Task<IActionResult> Detail(int id, string language, int? item, int? pageLayoutId)
         {
             if (!await HasPageContentPermissionAsync(id))
             {
@@ -250,7 +253,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 LanguageId = selectedLanguage.Id,
                 LanguageList = new SelectList(languages, nameof(Language.Name),
                     nameof(Language.Description), selectedLanguage.Name),
-                PageLayoutId = await _imageFeatureService
+                PageLayoutId = pageLayoutId ?? await _imageFeatureService
                     .GetPageLayoutIdForImageFeatureAsync(feature.Id),
                 CurrentDateTime = _dateTimeProvider.Now,
                 HasEditTemplatePermissions = IsSiteManager(),
@@ -531,7 +534,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         catch (OcudaException oex)
                         {
                             _logger.LogError(oex, "Error updating image feature template: {Message}", oex.Message);
-                            ShowAlertDanger("Error updating record: {oex.Message}");
+                            ShowAlertDanger($"Error updating record: {oex.Message}");
                         }
                     }
                 }

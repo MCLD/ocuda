@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
@@ -114,21 +113,14 @@ namespace Ocuda.Promenade.Service
 
             if (carousel != null)
             {
-                var currentCultureName = _httpContextAccessor
-                    .HttpContext
-                    .Features
-                    .Get<IRequestCultureFeature>()
-                    .RequestCulture
-                    .UICulture?
-                    .Name;
+                var languageIds = await GetCurrentDefaultLanguageIdAsync(
+                        _httpContextAccessor,
+                        _languageService);
 
-                int defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync();
-                int? currentLanguageId = null;
-                if (!string.IsNullOrWhiteSpace(currentCultureName))
-                {
-                    currentLanguageId = await _languageService.GetLanguageIdAsync(
-                        currentCultureName);
-                }
+                // TODO fix this logic
+
+                int? currentLanguageId = languageIds.First();
+                var defaultLanguageId = languageIds.Last();
 
                 if (currentLanguageId.HasValue)
                 {
@@ -273,21 +265,12 @@ namespace Ocuda.Promenade.Service
 
             if (carouselItem != null)
             {
-                var currentCultureName = _httpContextAccessor
-                    .HttpContext
-                    .Features
-                    .Get<IRequestCultureFeature>()
-                    .RequestCulture
-                    .UICulture?
-                    .Name;
+                var languageIds = await GetCurrentDefaultLanguageIdAsync(
+                        _httpContextAccessor,
+                        _languageService);
 
-                int defaultLanguageId = await _languageService.GetDefaultLanguageIdAsync();
-                int? currentLanguageId = null;
-                if (!string.IsNullOrWhiteSpace(currentCultureName))
-                {
-                    currentLanguageId = await _languageService.GetLanguageIdAsync(
-                        currentCultureName);
-                }
+                int? currentLanguageId = languageIds.First();
+                var defaultLanguageId = languageIds.Last();
 
                 carouselItem.CarouselItemText = await GetItemTextAsync(carouselItem.Id,
                     defaultLanguageId,

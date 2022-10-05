@@ -71,6 +71,11 @@
         public static readonly string OpsUserProfilePicture = "user.picture.{0}";
 
         /// <summary>
+        /// Cached card, {0} is the language id and {1} is the card id
+        /// </summary>
+        public static readonly string PromCardDetail = "card.{0}.{1}";
+
+        /// <summary>
         /// Cached carousel, {0} is the carousel id
         /// </summary>
         public static readonly string PromCarousel = "carousel.{0}";
@@ -105,6 +110,11 @@
         /// Cached emedia text, {0} is the language id, {1} is the id
         /// </summary>
         public static readonly string PromCategoryText = "categorytext.{0}.{1}";
+
+        /// <summary>
+        /// A list of card IDs associated with a deck, in order
+        /// </summary>
+        public static readonly string PromDeckCardIds = "deck-cardids.{0}";
 
         /// <summary>
         /// Default language ID

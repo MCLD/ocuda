@@ -21,9 +21,9 @@
         @if (!string.IsNullOrEmpty(Model.PreviewLink))
         {
             <form action="@Model.PreviewLink"
-                  method="post"
-                  role="form"
-                  target="_blank">
+              method="post"
+              role="form"
+              target="_blank">
                 <input type="hidden" name="PreviewId" value="@Model.PageLayout.PreviewId" />
                 <button class="btn btn-outline-info mt-2 mb-1 mr-2 float-right">
                     <span class="fas fa-file-alt"></span>
@@ -50,15 +50,23 @@
             <label class="col-form-label text-md-right col-md-3">Item Type</label>
             <div class="form-group-inner col-md-9">
                 <select id="addType" class="form-control">
+                    <option value="banner">Banner</option>
                     <option value="carousel">Carousel</option>
+                    <option value="deck">Deck</option>
                     <option value="feature">Feature</option>
                     <option value="segment">Segment</option>
                     <option value="webslide">Webslide</option>
                 </select>
             </div>
         </div>
-        <div id="addCarouselFields">
-            <input id="addCarouselTitle" asp-for="Carousel.CarouselText.Title" formgroup />
+        <div id="addBannerFields">
+            <input id="addBannerName" asp-for="BannerFeature.Name" formgroup />
+        </div>
+        <div id="addCarouselFields" class="d-none">
+            <input id="addCarouselTitle" asp-for="Carousel.CarouselText.Title" formgroup disabled />
+        </div>
+        <div id="addDeckFields" class="d-none">
+            <input id="addDeckName" asp-for="Deck.Name" formgroup disabled />
         </div>
         <div id="addFeatureFields" class="d-none">
             <input id="addFeatureName" asp-for="PageFeature.Name" formgroup disabled />
@@ -82,6 +90,32 @@
     <div modal id="deleteModal"
          name="Layout Item"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Delete"></div>
+</form>
+
+<form id="editBannerForm" role="form">
+    <input id="editBannerLanguage" asp-for="LanguageId" type="hidden" />
+    <input id="editBannerItem" asp-for="PageItem.Id" type="hidden" />
+
+    <div modal
+         id="editBannerModal"
+         isLarge="true"
+         name="Banner"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <input id="editBannerName" asp-for="BannerFeature.Name" formgroup />
+    </div>
+</form>
+
+<form id="editDeckForm" role="form">
+    <input id="editDeckLanguage" asp-for="LanguageId" type="hidden" />
+    <input id="editDeckItem" asp-for="PageItem.Id" type="hidden" />
+
+    <div modal
+         id="editDeckModal"
+         isLarge="true"
+         name="Deck"
+         type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+        <input id="editDeckName" asp-for="Deck.Name" formgroup />
+    </div>
 </form>
 
 <form id="editFeatureForm" role="form">
@@ -199,9 +233,9 @@
                             <em style="font-size: larger; color: #666;">
                                 Layout has no items.
                                 <a href="#"
-                                   class="text-success"
-                                   data-toggle="modal"
-                                   data-target="#addModal">
+                               class="text-success"
+                               data-toggle="modal"
+                               data-target="#addModal">
                                     <span class="fas fa-plus-circle" aria-hidden="true"></span>
                                     Add a layout item.
                                 </a>
@@ -214,7 +248,19 @@
                     @foreach (var item in Model.PageLayout.Items)
                     {
                         <tr>
-                            @if (item.CarouselId.HasValue)
+                            @if (item.BannerFeatureId.HasValue)
+                            {
+                                <td class="align-middle">@item.BannerFeature.Name</td>
+                                <td class="align-middle">Banner</td>
+                                <td class="align-middle">@item.BannerFeature.Items.Count</td>
+                            }
+                            else if (item.DeckId.HasValue)
+                            {
+                                <td class="align-middle">@item.Deck.Name</td>
+                                <td class="align-middle">Deck</td>
+                                <td class="align-middle">@item.Deck.Cards.Count</td>
+                            }
+                            else if (item.CarouselId.HasValue)
                             {
                                 <td class="align-middle">@item.Carousel.Name</td>
                                 <td class="align-middle">Carousel</td>
@@ -232,109 +278,159 @@
                                 <td class="align-middle">Segment</td>
                                 <td class="align-middle">&nbsp;</td>
                             }
-                            else
+                            else if (item.WebslideId.HasValue)
                             {
                                 <td class="align-middle">@item.Webslide.Name</td>
                                 <td class="align-middle">Webslide</td>
                                 <td class="align-middle">@item.Webslide.Items.Count</td>
                             }
+                            else
+                            {
+                                <td class="align-middle text-danger"><strong>Unknown Content</strong></td>
+                                <td class="align-middle text-danger"><strong>Unknown</strong></td>
+                                <td class="align-middle">&nbsp;</td>
+                            }
                             <td class="align-middle">
                                 <button type="button"
-                                        class="btn btn-outline-primary changeSort decreaseSortButton"
-                                        data-id="@item.Id"
-                                        data-increase="false"
-                                        data-item="true"
-                                        disabled="@(item.Id == Model.PageLayout.Items.First().Id ? "disabled" : null)">
+                                class="btn btn-outline-primary changeSort decreaseSortButton"
+                                data-id="@item.Id"
+                                data-increase="false"
+                                data-item="true"
+                                disabled="@(item.Id == Model.PageLayout.Items.First().Id ? "disabled" : null)">
                                     <span class="fas fa-arrow-up" aria-hidden="true"></span>
                                 </button>
                                 <button class="btn btn-outline-primary changeSort increaseSortButton"
-                                        data-id="@item.Id"
-                                        data-increase="true"
-                                        data-item="true"
-                                        disabled="@(item.Id == Model.PageLayout.Items.Last().Id ? "disabled" : null)">
+                                data-id="@item.Id"
+                                data-increase="true"
+                                data-item="true"
+                                disabled="@(item.Id == Model.PageLayout.Items.Last().Id ? "disabled" : null)">
                                     <span class="fas fa-arrow-down" aria-hidden="true"></span>
                                 </button>
-                                @if (item.CarouselId.HasValue)
+                                @if (item.BannerFeatureId.HasValue)
+                                {
+                                    <button type="button"
+                                class="btn btn-outline-primary"
+                                data-toggle="modal"
+                                data-target="#editBannerModal"
+                                data-id="@item.Id"
+                                data-name="@item.BannerFeature.Name"
+                                title="Edit banner name">
+                                        <span class="fas fa-cog" aria-hidden="true"></span>
+                                    </button>
+                                    <a asp-controller="@ImageFeaturesController.Name"
+                           asp-action="@(nameof(ImageFeaturesController.Detail))"
+                           asp-route-id="@item.BannerFeatureId.Value"
+                           asp-route-pageLayoutId=@Model.PageLayoutId
+                           class="btn btn-outline-primary"
+                           title="Edit banner content">
+                                        <span class="far fa-file-alt" aria-hidden="true"></span>
+                                    </a>
+                                }
+                                else if (item.CarouselId.HasValue)
                                 {
                                     <button type="button" class="btn btn-outline-primary invisible">
                                         <span class="fas fa-cog" aria-hidden="true"></span>
                                     </button>
                                     <a asp-controller="@CarouselsController.Name"
-                                       asp-action="@(nameof(CarouselsController.Detail))"
-                                       asp-route-id="@item.CarouselId.Value"
-                                       class="btn btn-outline-primary"
-                                       title="Edit carousel content">
+                           asp-action="@(nameof(CarouselsController.Detail))"
+                           asp-route-id="@item.CarouselId.Value"
+                           class="btn btn-outline-primary"
+                           title="Edit carousel content">
                                         <span class="far fa-file-alt" aria-hidden="true"></span>
                                     </a>
+                                }
+                                else if (item.DeckId.HasValue)
+                                {
+                                    <button type="button"
+                                class="btn btn-outline-primary"
+                                data-toggle="modal"
+                                data-target="#editDeckModal"
+                                data-id="@item.Id"
+                                data-name="@item.Deck.Name"
+                                title="Edit segment name">
+                                        <span class="fas fa-cog" aria-hidden="true"></span>
+                                    </button>
+                                    <a asp-controller="@DecksController.Name"
+                           asp-action="@(nameof(DecksController.Detail))"
+                           asp-route-deckId="@item.DeckId.Value"
+                           class="btn btn-outline-primary"
+                           title="Edit deck content">
+                                        <span class="far fa-file-alt" aria-hidden="true"></span>
+                                    </a>
+
                                 }
                                 else if (item.PageFeatureId.HasValue)
                                 {
                                     <button type="button"
-                                            class="btn btn-outline-primary"
-                                            data-toggle="modal"
-                                            data-target="#editFeatureModal"
-                                            data-id="@item.Id"
-                                            data-name="@item.PageFeature.Name"
-                                            title="Edit feature">
+                                class="btn btn-outline-primary"
+                                data-toggle="modal"
+                                data-target="#editFeatureModal"
+                                data-id="@item.Id"
+                                data-name="@item.PageFeature.Name"
+                                title="Edit feature">
                                         <span class="fas fa-cog" aria-hidden="true"></span>
                                     </button>
                                     <a asp-controller="@ImageFeaturesController.Name"
-                                       asp-action="@(nameof(ImageFeaturesController.Detail))"
-                                       asp-route-id="@item.PageFeatureId.Value"
-                                       class="btn btn-outline-primary"
-                                       title="Edit feature content">
+                           asp-action="@(nameof(ImageFeaturesController.Detail))"
+                           asp-route-id="@item.PageFeatureId.Value"
+                           asp-route-pageLayoutId=@Model.PageLayoutId
+                           class="btn btn-outline-primary"
+                           title="Edit feature content">
                                         <span class="far fa-file-alt" aria-hidden="true"></span>
                                     </a>
                                 }
                                 else if (item.SegmentId.HasValue)
                                 {
                                     <button type="button"
-                                            class="btn btn-outline-primary"
-                                            data-toggle="modal"
-                                            data-target="#editSegmentModal"
-                                            data-id="@item.Id"
-                                            data-name="@item.Segment.Name"
-                                            title="Edit segment name">
+                                class="btn btn-outline-primary"
+                                data-toggle="modal"
+                                data-target="#editSegmentModal"
+                                data-id="@item.Id"
+                                data-name="@item.Segment.Name"
+                                title="Edit segment name">
                                         <span class="fas fa-cog" aria-hidden="true"></span>
                                     </button>
                                     <a asp-controller="@SegmentsController.Name"
-                                       asp-action="@(nameof(SegmentsController.Detail))"
-                                       asp-route-id="@item.SegmentId.Value"
-                                       class="btn btn-outline-primary"
-                                       title="Edit segment content">
+                           asp-action="@(nameof(SegmentsController.Detail))"
+                           asp-route-id="@item.SegmentId.Value"
+                           class="btn btn-outline-primary"
+                           title="Edit segment content">
                                         <span class="far fa-file-alt" aria-hidden="true"></span>
                                     </a>
                                 }
                                 else if (item.WebslideId.HasValue)
                                 {
                                     <button type="button"
-                                            class="btn btn-outline-primary"
-                                            data-toggle="modal"
-                                            data-target="#editWebslideModal"
-                                            data-id="@item.Id"
-                                            data-name="@item.Webslide.Name"
-                                            title="Edit webslide">
+                                class="btn btn-outline-primary"
+                                data-toggle="modal"
+                                data-target="#editWebslideModal"
+                                data-id="@item.Id"
+                                data-name="@item.Webslide.Name"
+                                title="Edit webslide">
                                         <span class="fas fa-cog" aria-hidden="true"></span>
                                     </button>
                                     <a asp-controller="@ImageFeaturesController.Name"
-                                       asp-action="@(nameof(ImageFeaturesController.Detail))"
-                                       asp-route-id="@item.WebslideId.Value"
-                                       class="btn btn-outline-primary"
-                                       title="Edit webslide content">
+                           asp-action="@(nameof(ImageFeaturesController.Detail))"
+                           asp-route-id="@item.WebslideId.Value"
+                           asp-route-pageLayoutId=@Model.PageLayoutId
+                           class="btn btn-outline-primary"
+                           title="Edit webslide content">
                                         <span class="far fa-file-alt" aria-hidden="true"></span>
                                     </a>
                                 }
                                 <button type="button"
-                                        class="btn btn-outline-danger"
-                                        data-toggle="modal"
-                                        data-target="#deleteModal"
-                                        data-id="@item.Id"
-                                        data-name="@(item.Carousel?.Name ?? item.PageFeature?.Name ?? item.Segment?.Name ?? item.Webslide?.Name)"
-                                        data-carousel="@item.CarouselId"
-                                        data-feature="@item.PageFeatureId"
-                                        data-segment="@item.SegmentId"
-                                        data-webslide="@item.WebslideId"
-                                        title="Delete layout item">
+                                class="btn btn-outline-danger"
+                                data-toggle="modal"
+                                data-target="#deleteModal"
+                                data-id="@item.Id"
+                                data-name="@(item.BannerFeature?.Name ?? item.Carousel?.Name ?? item.Deck?.Name ?? item.PageFeature?.Name ?? item.Segment?.Name ?? item.Webslide?.Name)"
+                                data-banner="@item.BannerFeatureId"
+                                data-carousel="@item.CarouselId"
+                                data-deck="@item.DeckId"
+                                data-feature="@item.PageFeatureId"
+                                data-segment="@item.SegmentId"
+                                data-webslide="@item.WebslideId"
+                                title="Delete layout item">
                                     <span class="fas fa-times-circle" aria-hidden="true"></span>
                                 </button>
                             </td>
@@ -348,43 +444,29 @@
 
 @section Scripts {
     <script>
+        function activateFields(itemType) {
+            $("#addBannerFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
+            $("#addCarouselFields").addClass("d-none").find("input").attr("disabled", "disabled");
+            $("#addDeckFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
+            $("#addFeatureFields").addClass("d-none").find("input, select").removeAttr("disabled");
+            $("#addSegmentFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
+            $("#addWebslideFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
+            let itemTitleCase = itemType.charAt(0).toUpperCase() + itemType.slice(1);
+            $("#add" + itemTitleCase + "Fields").removeClass("d-none").find("input, select").removeAttr("disabled");
+        }
+
         $("#SelectLanguage").on("change", function () {
             window.location.href = "@Url.Action(nameof(PagesController.LayoutDetail), new { id = Model.PageLayoutId})" + "?language=" + $(this).val();
         });
 
         $("#addType").on("change", function () {
-            var type = $(this).val();
-
-            if (type == "carousel") {
-                $("#addFeatureFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
-                $("#addSegmentFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
-                $("#addWebslideFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
-                $("#addCarouselFields").removeClass("d-none").find("input").removeAttr("disabled");
-            }
-            else if (type == "feature") {
-                $("#addCarouselFields").addClass("d-none").find("input").attr("disabled", "disabled");
-                $("#addSegmentFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
-                $("#addWebslideFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
-                $("#addFeatureFields").removeClass("d-none").find("input, select").removeAttr("disabled");
-            }
-            else if (type == "segment") {
-                $("#addCarouselFields").addClass("d-none").find("input").attr("disabled", "disabled");
-                $("#addFeatureFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
-                $("#addWebslideFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
-                $("#addSegmentFields").removeClass("d-none").find("input, select").removeAttr("disabled");
-            }
-            else {
-                $("#addCarouselFields").addClass("d-none").find("input").attr("disabled", "disabled");
-                $("#addFeatureFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
-                $("#addSegmentFields").addClass("d-none").find("input, select").attr("disabled", "disabled");
-                $("#addWebslideFields").removeClass("d-none").find("input").removeAttr("disabled");
-            }
+            activateFields($(this).val());
         });
 
         $("#addForm").submit(function (e) {
             e.preventDefault();
-            var form = $(this);
-            $.post("@(Url.Action(nameof(PagesController.CreatePageItem), PagesController.Name))",
+            let form = $(this);
+            $.post("@Url.Action(nameof(PagesController.CreatePageItem), PagesController.Name)",
                 form.serialize(),
                 function (response) {
                     if (response.success == true) {
@@ -397,19 +479,32 @@
                 });
         });
 
+        $("#addModal").on("show.bs.modal", function (e) {
+            activateFields($('#addType').val());
+        });
+
         $("#deleteModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var name = button.data("name");
-            var carousel = button.data("carousel");
-            var feature = button.data("feature");
-            var segment = button.data("segment");
-            var webslide = button.data("webslide");
-            var modal = $(this);
+            let button = $(e.relatedTarget);
+            let id = button.data("id");
+            let name = button.data("name");
+            let banner = button.data("banner");
+            let carousel = button.data("carousel");
+            let deck = button.data("deck");
+            let feature = button.data("feature");
+            let segment = button.data("segment");
+            let webslide = button.data("webslide");
+            let modal = $(this);
+            let hasName = true;
 
             var type;
-            if (carousel) {
+            if (banner) {
+                type = "banner"
+            }
+            else if (carousel) {
                 type = "carousel";
+            }
+            else if (deck) {
+                type = "deck";
             }
             else if (feature) {
                 type = "feature";
@@ -419,93 +514,97 @@
             }
             else if (webslide) {
                 type = "webslide";
+            } else {
+                hasName = false;
+                type = "unknown content"
             }
 
             $("#deleteId").val(id);
             $("#deleteName").val(name);
-            modal.find(".modal-text").text("Are you sure you want to delete the " + type +  " \"" + name + "\"?");
+            if (hasName) {
+                modal.find(".modal-text").text("Are you sure you want to delete the " + type + " \"" + name + "\"?");
+            }
+            else {
+                modal.find(".modal-text").text("Are you sure you want to delete the " + type + "?");
+            }
         });
 
+        $("#editBannerModal").on("show.bs.modal", function (e) {
+            let button = $(e.relatedTarget);
+            let id = button.data("id");
+            let name = button.data("name");
+
+            $("#editBannerItem").val(id);
+            $("#editBannerName").val(name);
+        });
+
+        function editItem(e) {
+            e.preventDefault();
+            let form = $(this);
+            $.post("@(Url.Action(nameof(PagesController.EditPageItem), PagesController.Name))",
+                form.serialize(),
+                function (response) {
+                    if (response.success == true) {
+                        location.href = response.url;
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
+        }
+
+        $("#editBannerForm").submit(editItem);
+
+        $("#editDeckModal").on("show.bs.modal", function (e) {
+            let button = $(e.relatedTarget);
+            let id = button.data("id");
+            let name = button.data("name");
+
+            $("#editDeckItem").val(id);
+            $("#editDeckName").val(name);
+        });
+
+        $("#editDeckForm").submit(editItem);
+
         $("#editFeatureModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var name = button.data("name");
+            let button = $(e.relatedTarget);
+            let id = button.data("id");
+            let name = button.data("name");
 
             $("#editFeatureItem").val(id);
             $("#editFeatureName").val(name);
         });
 
-        $("#editFeatureForm").submit(function (e) {
-            e.preventDefault();
-            var form = $(this);
-            $.post("@(Url.Action(nameof(PagesController.EditPageItem), PagesController.Name))",
-                form.serialize(),
-                function (response) {
-                if (response.success == true) {
-                    location.href = response.url;
-                }
-                else {
-                    alert(response.message);
-                    ResetSpinners(form.find(".btn-spinner"));
-                }
-            });
-        });
+        $("#editFeatureForm").submit(editItem);
 
         $("#editSegmentModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var name = button.data("name");
+            let button = $(e.relatedTarget);
+            let id = button.data("id");
+            let name = button.data("name");
 
             $("#editSegmentItem").val(id);
             $("#editSegmentName").val(name);
         });
 
-        $("#editSegmentForm").submit(function (e) {
-            e.preventDefault();
-            var form = $(this);
-            $.post("@(Url.Action(nameof(PagesController.EditPageItem), PagesController.Name))",
-                form.serialize(),
-                function (response) {
-                if (response.success == true) {
-                    location.href = response.url;
-                }
-                else {
-                    alert(response.message);
-                    ResetSpinners(form.find(".btn-spinner"));
-                }
-            });
-        });
+        $("#editSegmentForm").submit(editItem);
 
         $("#editWebslideModal").on("show.bs.modal", function (e) {
-            var button = $(e.relatedTarget);
-            var id = button.data("id");
-            var name = button.data("name");
+            let button = $(e.relatedTarget);
+            let id = button.data("id");
+            let name = button.data("name");
 
             $("#editWebslideItem").val(id);
             $("#editWebslideName").val(name);
         });
 
-        $("#editWebslideForm").submit(function (e) {
-            e.preventDefault();
-            var form = $(this);
-            $.post("@(Url.Action(nameof(PagesController.EditPageItem), PagesController.Name))",
-                form.serialize(),
-                function (response) {
-                if (response.success == true) {
-                    location.href = response.url;
-                }
-                else {
-                    alert(response.message);
-                    ResetSpinners(form.find(".btn-spinner"));
-                }
-            });
-        });
+        $("#editWebslideForm").submit(editItem);
 
         $(".changeSort").on("click", function () {
-            var button = $(this);
-            var id = button.data("id");
-            var increase = button.data("increase");
-            var icon = button.children("span");
+            let button = $(this);
+            let id = button.data("id");
+            let increase = button.data("increase");
+            let icon = button.children("span");
             if (icon.hasClass("fa-spinner") == false) {
                 icon.removeClass("fa-arrow-up fa-arrow-down").addClass("fa-spinner fa-pulse");
                 $.post("@Url.Action(nameof(PagesController.ChangeSort))",
@@ -548,7 +647,7 @@
                         else {
                             alert(response.message);
                         }
-                });
+                    });
             }
         });
     </script>

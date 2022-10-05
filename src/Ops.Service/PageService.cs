@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
@@ -19,6 +20,7 @@ namespace Ocuda.Ops.Service
     public class PageService : BaseService<PageService>, IPageService
     {
         private readonly ICarouselService _carouselService;
+        private readonly IDeckService _deckService;
         private readonly IImageFeatureService _imageFeatureService;
         private readonly ILanguageService _languageService;
         private readonly IPageHeaderRepository _pageHeaderRepository;
@@ -34,18 +36,26 @@ namespace Ocuda.Ops.Service
 
         public PageService(ILogger<PageService> logger,
             IHttpContextAccessor httpContextAccessor,
+            ICarouselService carouselService,
+            IDeckService deckService,
+            IImageFeatureService imageFeatureService,
+            ILanguageService languageService,
             IPageHeaderRepository pageHeaderRepository,
             IPageItemRepository pageItemRepository,
             IPageLayoutRepository pageLayoutRepository,
             IPageLayoutTextRepository pageLayoutTextRepository,
             IPageRepository pageRepository,
             IPermissionGroupPageContentRepository permissionGroupPageContentRepository,
-            ICarouselService carouselService,
-            ILanguageService languageService,
-            ISegmentService segmentService,
-            IImageFeatureService imageFeatureService)
+            ISegmentService segmentService)
             : base(logger, httpContextAccessor)
         {
+            _carouselService = carouselService
+                ?? throw new ArgumentNullException(nameof(carouselService));
+            _deckService = deckService ?? throw new ArgumentNullException(nameof(deckService));
+            _imageFeatureService = imageFeatureService
+                ?? throw new ArgumentNullException(nameof(imageFeatureService));
+            _languageService = languageService
+                ?? throw new ArgumentNullException(nameof(languageService));
             _pageHeaderRepository = pageHeaderRepository
                 ?? throw new ArgumentNullException(nameof(pageRepository));
             _pageItemRepository = pageItemRepository
@@ -58,14 +68,8 @@ namespace Ocuda.Ops.Service
                 ?? throw new ArgumentNullException(nameof(pageRepository));
             _permissionGroupPageContentRepository = permissionGroupPageContentRepository
                 ?? throw new ArgumentNullException(nameof(permissionGroupPageContentRepository));
-            _carouselService = carouselService
-                ?? throw new ArgumentNullException(nameof(carouselService));
-            _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
             _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
-            _imageFeatureService = imageFeatureService
-                ?? throw new ArgumentNullException(nameof(imageFeatureService));
         }
 
         public async Task<PageLayout> CloneLayoutAsync(int pageHeaderId,
@@ -88,7 +92,7 @@ namespace Ocuda.Ops.Service
 
             var pageLayouts = await _pageLayoutTextRepository.GetAllForLayoutAsync(layout.Id);
 
-            foreach(var pageLayout in pageLayouts)
+            foreach (var pageLayout in pageLayouts)
             {
                 await _pageLayoutTextRepository.AddAsync(new PageLayoutText
                 {
@@ -150,10 +154,11 @@ namespace Ocuda.Ops.Service
                         item.SegmentId,
                         languageIds);
                 }
-                else if (item.PageFeatureId.HasValue || item.WebslideId.HasValue)
+                else if (item.PageFeatureId.HasValue || item.WebslideId.HasValue || item.BannerFeatureId.HasValue)
                 {
                     var newItem = await ConnectImageFeatureAsync(new PageItem
                     {
+                        BannerFeatureId = item.BannerFeatureId,
                         Order = item.Order,
                         PageLayoutId = newLayout.Id,
                         PageFeatureId = item.PageFeatureId,
@@ -163,8 +168,32 @@ namespace Ocuda.Ops.Service
                     _logger.LogDebug("Layout {NewLayoutId}: created item id {ItemId}, linked to {ImageFeatureType} {ImageFeatureId}",
                         newLayout.Id,
                         newItem.Id,
-                        newItem.PageFeatureId.HasValue ? "page feature" : "Web slide",
-                        newItem.PageFeatureId ?? newItem.WebslideId.Value);
+                        newItem.BannerFeatureId.HasValue ? "banner feature"
+                            : newItem.PageFeatureId.HasValue ? "page feature" : "Web slide",
+                        newItem.BannerFeatureId
+                            ?? newItem.PageFeatureId
+                            ?? newItem.WebslideId.Value);
+                }
+                else if (item.DeckId.HasValue)
+                {
+                    var newItem = await CreateItemAsync(new PageItem
+                    {
+                        Order = item.Order,
+                        PageLayoutId = newLayout.Id,
+                        Deck = new Deck
+                        {
+                            Name = item.Deck.Name
+                        }
+                    });
+
+                    (var cardCount, var cardDetailCount) = await _deckService
+                        .CloneAsync(item.DeckId.Value, newItem.Deck.Id);
+
+                    _logger.LogDebug("Layout {NewLayoutId}: cloned deck to new deck id {ItemId}: {CardCount} cards, {CardDetailCount} card details",
+                        newLayout.Id,
+                        newItem.Id,
+                        cardCount,
+                        cardDetailCount);
                 }
             }
 
@@ -222,42 +251,61 @@ namespace Ocuda.Ops.Service
 
         public async Task<PageItem> CreateItemAsync(PageItem pageItem)
         {
+            if (pageItem == null)
+            {
+                throw new OcudaException("No type selected");
+            }
+
+            pageItem.BannerFeatureId = null;
             pageItem.CarouselId = null;
+            pageItem.DeckId = null;
             pageItem.PageFeatureId = null;
             pageItem.SegmentId = null;
             pageItem.WebslideId = null;
 
-            if (pageItem.Carousel != null)
+            ImageFeature bannerFeature = null;
+            Carousel carousel = null;
+            Deck deck = null;
+            ImageFeature pageFeature = null;
+            Segment segment = null;
+            ImageFeature webslide = null;
+
+            if (pageItem.BannerFeature != null)
             {
-                pageItem.PageFeature = null;
-                pageItem.Segment = null;
-                pageItem.Webslide = null;
-                pageItem.Carousel = await _carouselService.CreateNoSaveAsync(pageItem.Carousel);
+                bannerFeature = await _imageFeatureService
+                    .CreateNoSaveAsync(pageItem.BannerFeature);
+            }
+            else if (pageItem.Carousel != null)
+            {
+                carousel = await _carouselService.CreateNoSaveAsync(pageItem.Carousel);
+            }
+            else if (pageItem.Deck != null)
+            {
+                deck = await _deckService.CreateNoSaveAsync(pageItem.Deck);
             }
             else if (pageItem.PageFeature != null)
             {
-                pageItem.Carousel = null;
-                pageItem.Segment = null;
-                pageItem.Webslide = null;
-                pageItem.PageFeature = await _imageFeatureService
-                    .CreateNoSaveAsync(pageItem.PageFeature);
+                pageFeature = await _imageFeatureService.CreateNoSaveAsync(pageItem.PageFeature);
             }
             else if (pageItem.Segment != null)
             {
-                pageItem.Carousel = null;
-                pageItem.PageFeature = null;
-                pageItem.Webslide = null;
-                pageItem.Segment = await _segmentService.CreateNoSaveAsync(pageItem.Segment);
+                segment = await _segmentService.CreateNoSaveAsync(pageItem.Segment);
             }
             else if (pageItem.Webslide != null)
             {
-                pageItem.Carousel = null;
-                pageItem.PageFeature = null;
-                pageItem.Segment = null;
-                pageItem.Webslide = await _imageFeatureService.CreateNoSaveAsync(pageItem.Webslide);
+                webslide = await _imageFeatureService.CreateNoSaveAsync(pageItem.Webslide);
             }
 
-            if (pageItem.Carousel == null
+            pageItem.BannerFeature = bannerFeature;
+            pageItem.Carousel = carousel;
+            pageItem.Deck = deck;
+            pageItem.PageFeature = pageFeature;
+            pageItem.Segment = segment;
+            pageItem.Webslide = webslide;
+
+            if (pageItem.BannerFeature == null
+                && pageItem.Carousel == null
+                && pageItem.Deck == null
                 && pageItem.PageFeature == null
                 && pageItem.Segment == null
                 && pageItem.Webslide == null)
@@ -346,13 +394,17 @@ namespace Ocuda.Ops.Service
             {
                 await _carouselService.DeleteNoSaveAsync(pageItem.CarouselId.Value);
             }
+            if (pageItem.DeckId.HasValue)
+            {
+                await _deckService.DeleteDeckNoSaveAsync(pageItem.DeckId.Value);
+            }
             if (pageItem.SegmentId.HasValue)
             {
                 await _segmentService.DeleteNoSaveAsync(pageItem.SegmentId.Value);
             }
-            if (pageItem.PageFeatureId.HasValue || pageItem.WebslideId.HasValue)
+            if (pageItem.BannerFeatureId.HasValue || pageItem.PageFeatureId.HasValue || pageItem.WebslideId.HasValue)
             {
-                var imageFeatureId = pageItem.PageFeatureId ?? pageItem.WebslideId;
+                var imageFeatureId = pageItem.BannerFeatureId ?? pageItem.PageFeatureId ?? pageItem.WebslideId;
                 var usage = await _pageItemRepository
                     .GetImageFeatureUseCountAsync(imageFeatureId.Value);
                 if (usage <= 1)

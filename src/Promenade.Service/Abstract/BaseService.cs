@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ocuda.Utility.Abstract;
@@ -71,6 +76,50 @@ namespace Ocuda.Promenade.Service.Abstract
             return nextUpIn.Ticks < cacheSpan.Ticks
                 ? nextUpIn
                 : cacheSpan;
+        }
+
+        /// <summary>
+        /// Returns a list of language ids in the preferred order for content.
+        /// </summary>
+        /// <param name="httpContextAccessor"></param>
+        /// <param name="languageService"></param>
+        /// <returns>A list of language ids in the preferred order.</returns>
+        /// <exception cref="ArgumentNullException">A required argument was not specified.</exception>
+        protected async Task<IEnumerable<int>> GetCurrentDefaultLanguageIdAsync(
+            IHttpContextAccessor httpContextAccessor,
+            LanguageService languageService)
+        {
+            if (httpContextAccessor == null)
+            {
+                throw new ArgumentNullException(nameof(httpContextAccessor));
+            }
+
+            if (languageService == null)
+            {
+                throw new ArgumentNullException(nameof(languageService));
+            }
+
+            var currentCultureName = httpContextAccessor
+                .HttpContext
+                .Features
+                .Get<IRequestCultureFeature>()
+                .RequestCulture
+                .UICulture?
+                .Name;
+
+            int defaultLanguageId = await languageService.GetDefaultLanguageIdAsync();
+            int? currentLanguageId = null;
+            if (!string.IsNullOrWhiteSpace(currentCultureName))
+            {
+                currentLanguageId = await languageService.GetLanguageIdAsync(
+                    currentCultureName);
+            }
+
+            return new[]
+            {
+                currentLanguageId ?? defaultLanguageId,
+                defaultLanguageId
+            }.Distinct();
         }
     }
 }

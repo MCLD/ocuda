@@ -26,7 +26,10 @@ namespace Ocuda.Ops.Data.Promenade
                 .PageItems
                 .Include(_ => _.PageLayout)
                 .AsNoTracking()
-                .Where(_ => _.PageFeatureId == imageFeatureId && _.PageLayoutId == pageLayoutId)
+                .Where(_ => _.PageLayoutId == pageLayoutId
+                    && (_.BannerFeatureId == imageFeatureId
+                        || _.PageFeatureId == imageFeatureId
+                        || _.WebslideId == imageFeatureId))
                 .SingleOrDefaultAsync();
 
             if (pageItem == null)
@@ -44,7 +47,11 @@ namespace Ocuda.Ops.Data.Promenade
                 throw new OcudaException("Cannot find page header to update.");
             }
 
-            if (pageItem.PageFeatureId.HasValue)
+            if (pageItem.BannerFeatureId.HasValue)
+            {
+                pageHeader.LayoutBannerTemplateId = imageFeatureTemplateId;
+            }
+            else if (pageItem.PageFeatureId.HasValue)
             {
                 pageHeader.LayoutFeatureTemplateId = imageFeatureTemplateId;
             }
@@ -79,28 +86,37 @@ namespace Ocuda.Ops.Data.Promenade
 
         public async Task<ImageFeatureTemplate> GetForImageFeatureAsync(int imageFeatureId)
         {
-            var webslideTemplate = await _context.PageLayouts
+            return await _context.PageLayouts
                 .AsNoTracking()
-                .Where(_ => _.Items.Any(_ => _.WebslideId == imageFeatureId))
-                .Select(_ => _.PageHeader.LayoutWebslideTemplate)
-                .FirstOrDefaultAsync();
-
-            return webslideTemplate ?? await _context.PageLayouts
-                .AsNoTracking()
-                .Where(_ => _.Items.Any(_ => _.PageFeatureId == imageFeatureId))
-                .Select(_ => _.PageHeader.LayoutFeatureTemplate)
-                .FirstOrDefaultAsync();
+                .Where(_ => _.Items.Any(_ => _.BannerFeatureId == imageFeatureId))
+                .Select(_ => _.PageHeader.LayoutBannerTemplate)
+                .FirstOrDefaultAsync()
+                ?? await _context.PageLayouts
+                    .AsNoTracking()
+                    .Where(_ => _.Items.Any(_ => _.PageFeatureId == imageFeatureId))
+                    .Select(_ => _.PageHeader.LayoutFeatureTemplate)
+                    .FirstOrDefaultAsync()
+                    ?? await _context.PageLayouts
+                        .AsNoTracking()
+                        .Where(_ => _.Items.Any(_ => _.WebslideId == imageFeatureId))
+                        .Select(_ => _.PageHeader.LayoutWebslideTemplate)
+                        .FirstOrDefaultAsync();
         }
 
         public async Task UnassignAndRemoveFeatureAsync(int imageFeatureTemplateId)
         {
             var headersUsing = _context
                 .PageHeaders
-                .Where(_ => _.LayoutFeatureTemplateId == imageFeatureTemplateId
+                .Where(_ => _.LayoutBannerTemplateId == imageFeatureTemplateId
+                    || _.LayoutFeatureTemplateId == imageFeatureTemplateId
                     || _.LayoutWebslideTemplateId == imageFeatureTemplateId);
 
             foreach (var header in headersUsing)
             {
+                if (header.LayoutBannerTemplateId == imageFeatureTemplateId)
+                {
+                    header.LayoutBannerTemplate = null;
+                }
                 if (header.LayoutFeatureTemplateId == imageFeatureTemplateId)
                 {
                     header.LayoutFeatureTemplateId = null;

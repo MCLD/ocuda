@@ -1,0 +1,483 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.Logging;
+using Ocuda.Ops.Controllers.Abstract;
+using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Decks;
+using Ocuda.Ops.Models;
+using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Models.Keys;
+using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Ops.Service.Interfaces.Promenade.Services;
+using Ocuda.Promenade.Models.Entities;
+using Ocuda.Utility.Exceptions;
+using Ocuda.Utility.Keys;
+
+namespace Ocuda.Ops.Controllers.Areas.SiteManagement
+{
+    [Area("SiteManagement")]
+    [Route("[area]/[controller]")]
+    public class DecksController : BaseController<DecksController>
+    {
+        public static readonly int CardImageWidth = 666;
+        public static readonly int MaximumFileSizeBytes = 200 * 1024;
+        private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".png" };
+
+        private readonly IDeckService _deckService;
+        private readonly ILanguageService _languageService;
+        private readonly IPermissionGroupService _permissionGroupService;
+
+        public DecksController(ServiceFacades.Controller<DecksController> context,
+            IDeckService deckService,
+            ILanguageService languageService,
+            IPermissionGroupService permissionGroupService) : base(context)
+        {
+            _deckService = deckService
+                ?? throw new ArgumentNullException(nameof(deckService));
+            _languageService = languageService
+                ?? throw new ArgumentNullException(nameof(languageService));
+            _permissionGroupService = permissionGroupService
+                ?? throw new ArgumentNullException(nameof(permissionGroupService));
+        }
+
+        public static string Area
+        { get { return "SiteManagement"; } }
+
+        public static string Name
+        { get { return "Decks"; } }
+
+        [HttpGet("[action]/{deckId}")]
+        public async Task<IActionResult> AddCard(int deckId, CardViewModel viewModel)
+        {
+            if (!await HasDeckPermissionAsync(deckId))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var deck = await _deckService.GetByIdAsync(deckId);
+
+            var languages = await _languageService.GetActiveAsync();
+
+            viewModel ??= new CardViewModel();
+
+            viewModel.SelectedLanguage = languages.Single(_ => _.IsDefault);
+            viewModel.BackLink = Url.Action(nameof(Detail), new { deckId });
+            viewModel.DeckId = deckId;
+            viewModel.DeckName = deck.Name;
+            viewModel.LanguageDescription = viewModel.SelectedLanguage.Description;
+            viewModel.LanguageId = viewModel.SelectedLanguage.Id;
+
+            return View("Card", viewModel);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> AddUpdateImage(CardViewModel viewModel)
+        {
+            var issues = new List<string>();
+            string languageName = null;
+
+            if (viewModel == null)
+            {
+                return Json(new JsonResponse
+                {
+                    Message = "Invalid request",
+                    Success = false
+                });
+            }
+
+            if (!await HasDeckPermissionAsync(viewModel.DeckId))
+            {
+                issues.Add("Permission denied");
+            }
+            else if (!ModelState.IsValid)
+            {
+                issues.AddRange(ModelState.Values
+                    .SelectMany(_ => _.Errors)
+                    .Select(_ => _.ErrorMessage));
+            }
+            else if (viewModel.CardImage == null)
+            {
+                issues.Add("You must supply an image to upload.");
+            }
+            else if (!ValidImageExtensions.Contains(Path.GetExtension(viewModel.CardImage.FileName)))
+            {
+                issues.Add($"Image type must be one of: {ValidImageExtensions}");
+            }
+            else if (viewModel.CardImage.Length > MaximumFileSizeBytes)
+            {
+                issues.Add($"Image must be smaller than {MaximumFileSizeBytes / 1024} KB");
+            }
+            else
+            {
+                using var ms = new MemoryStream();
+                await viewModel.CardImage.CopyToAsync(ms);
+                var imageBytes = ms.ToArray();
+
+                using var image = SixLabors.ImageSharp.Image.Load(imageBytes);
+                if (image.Width != CardImageWidth)
+                {
+                    issues.Add($"Card images must be {CardImageWidth} pixels wide.");
+                }
+                else
+                {
+                    var language = await _languageService
+                        .GetActiveByIdAsync(viewModel.CardDetail.LanguageId);
+                    languageName = language.Name;
+
+                    var currentCard = await _deckService
+                        .GetCardDetailsAsync(viewModel.CardDetail.CardId,
+                            viewModel.CardDetail.LanguageId);
+
+                    var currentFilename = Path.GetFileName(currentCard.Filename);
+
+                    // file is the same then replace the old one
+                    bool replaceImage = currentFilename?.Equals(viewModel.CardImage.FileName,
+                        StringComparison.OrdinalIgnoreCase) == true;
+
+                    // filename is different but there is an old image, delete it
+                    if (!replaceImage && !string.IsNullOrEmpty(currentFilename))
+                    {
+                        var cardsUsingImage = await _deckService
+                            .CardsUsingImageAsync(currentCard.Filename);
+
+                        if (cardsUsingImage == 1)
+                        {
+                            _logger.LogInformation("Removing card image file {Filename} as it is no longer used.",
+                                currentFilename);
+                            await _deckService.RemoveCardImageAsync(currentCard.CardId,
+                                currentCard.LanguageId);
+                        }
+                    }
+
+                    // get an approved filename with path
+                    var filename = await _deckService.GetUploadImageFilePathAsync(languageName,
+                        viewModel.CardImage.FileName,
+                        replaceImage);
+
+                    // copy file
+                    await System.IO.File.WriteAllBytesAsync(filename, ms.ToArray());
+
+                    // update detail
+                    currentCard.Filename = Path.GetFileName(filename);
+                    currentCard.AltText = viewModel.AltText;
+                    await _deckService.UpdateCardAsync(currentCard.CardId,
+                        currentCard.LanguageId,
+                        currentCard);
+                }
+            }
+
+            if (issues.Count > 0)
+            {
+                return Json(new JsonResponse
+                {
+                    Message = string.Concat(issues.Select(_ => "<li>" + _ + "</li>")),
+                    Success = false
+                });
+            }
+            else
+            {
+                return Json(new JsonResponse
+                {
+                    Success = true,
+                    Url = Url.Action(nameof(UpdateCard), new
+                    {
+                        cardId = viewModel.CardDetail.CardId,
+                        language = languageName
+                    })
+                });
+            }
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> CardOrderDecrement(int cardId)
+        {
+            int? deckId = null;
+            try
+            {
+                deckId = await _deckService.CardOrderAsync(cardId, true);
+            }
+            catch (OcudaException oex)
+            {
+                ShowAlertWarning(oex.Message);
+            }
+            return deckId.HasValue
+                ? RedirectToAction(nameof(Detail), new { deckId })
+                : RedirectToAction(nameof(PagesController.Index), PagesController.Name);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> CardOrderIncrement(int cardId)
+        {
+            int? deckId = null;
+            try
+            {
+                deckId = await _deckService.CardOrderAsync(cardId, false);
+            }
+            catch (OcudaException oex)
+            {
+                ShowAlertWarning(oex.Message);
+            }
+            return deckId.HasValue
+                ? RedirectToAction(nameof(Detail), new { deckId })
+                : RedirectToAction(nameof(PagesController.Index), PagesController.Name);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> DeleteCard(int cardId)
+        {
+            (int deckId, int pageLayoutId) = await _deckService.DeleteCardAsync(cardId);
+
+            if (deckId == 0 && pageLayoutId == 0)
+            {
+                return RedirectToAction(nameof(PagesController.Index), PagesController.Name);
+            }
+            else if (deckId == 0)
+            {
+                return RedirectToAction(
+                nameof(PagesController.LayoutDetail),
+                    PagesController.Name,
+                    new
+                    {
+                        id = pageLayoutId
+                    });
+            }
+            else
+            {
+                return RedirectToAction(nameof(Detail), new { deckId });
+            }
+        }
+
+        [HttpGet("[action]/{deckId}")]
+        public async Task<IActionResult> Detail(int deckId, string language)
+        {
+            if (!await HasDeckPermissionAsync(deckId))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            var deck = await _deckService.GetByIdAsync(deckId);
+
+            var languages = await _languageService.GetActiveAsync();
+
+            var selectedLanguage = languages
+                .FirstOrDefault(_ => _.Name.Equals(language, StringComparison.OrdinalIgnoreCase))
+                ?? languages.Single(_ => _.IsDefault);
+
+            var cards = await _deckService.GetCardDetailsByDeckAsync(deckId, selectedLanguage.Id);
+
+            return View(new DetailViewModel
+            {
+                BackLink = Url.Action(nameof(PagesController.LayoutDetail),
+                    PagesController.Name,
+                    new
+                    {
+                        id = await _deckService.GetPageLayoutIdAsync(deckId)
+                    }),
+                CardDetails = cards,
+                DeckId = deckId,
+                DeckName = deck.Name,
+                SelectedLanguage = selectedLanguage,
+                LanguageList = new SelectList(languages,
+                    nameof(Language.Name),
+                    nameof(Language.Description),
+                    selectedLanguage.Name)
+            });
+        }
+
+        [HttpGet("[action]/{language}/{filename}")]
+        public async Task<IActionResult> Image(string language, string filename)
+        {
+            var basePath = await _deckService.GetFullImageDirectoryPath(language);
+            var filePath = Path.Combine(basePath, filename);
+            if (!System.IO.File.Exists(filePath))
+            {
+                return StatusCode(404);
+            }
+            else
+            {
+                new FileExtensionContentTypeProvider()
+                    .TryGetContentType(filePath, out string fileType);
+
+                return PhysicalFile(filePath, fileType
+                    ?? System.Net.Mime.MediaTypeNames.Application.Octet);
+            }
+        }
+
+        [HttpPost("[action]/{language}/{cardId}")]
+        public async Task<IActionResult> UpdateCard(string language,
+            int cardId,
+            CardViewModel viewModel)
+        {
+            // update
+            if (viewModel == null
+                || !await HasDeckPermissionAsync(viewModel.DeckId))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            if (string.IsNullOrEmpty(viewModel.CardDetail.AltText?.Trim())
+                && string.IsNullOrEmpty(viewModel.CardDetail.Header?.Trim())
+                && string.IsNullOrEmpty(viewModel.CardDetail.Link?.Trim())
+                && string.IsNullOrEmpty(viewModel.CardDetail.Text?.Trim()))
+            {
+                ShowAlertWarning("Cannot update empty card.");
+                return RedirectToAction(nameof(Detail), new
+                {
+                    deckId = viewModel.DeckId
+                });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var sb = new StringBuilder();
+                foreach (var item in ModelState.Values)
+                {
+                    foreach (var error in item.Errors)
+                    {
+                        sb.AppendLine(error.ErrorMessage);
+                    }
+                }
+                ShowAlertWarning(sb.ToString());
+                return RedirectToAction(nameof(AddCard), new
+                {
+                    deckId = viewModel.DeckId,
+                    viewModel
+                });
+            }
+
+            var languages = await _languageService.GetActiveAsync();
+
+            var selectedLanguage = languages
+                .FirstOrDefault(_ => _.Name.Equals(language, StringComparison.OrdinalIgnoreCase))
+                ?? languages.Single(_ => _.IsDefault);
+
+            await _deckService.UpdateCardAsync(cardId,
+                selectedLanguage.Id,
+                viewModel.CardDetail);
+
+            return RedirectToAction(nameof(Detail), new { deckId = viewModel.DeckId });
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> UpdateCard(CardViewModel viewModel)
+        {
+            if (viewModel == null
+                || !await HasDeckPermissionAsync(viewModel.DeckId))
+            {
+                return RedirectToUnauthorized();
+            }
+
+            if (string.IsNullOrEmpty(viewModel.CardDetail.AltText?.Trim())
+                && string.IsNullOrEmpty(viewModel.CardDetail.Header?.Trim())
+                && string.IsNullOrEmpty(viewModel.CardDetail.Link?.Trim())
+                && string.IsNullOrEmpty(viewModel.CardDetail.Text?.Trim()))
+            {
+                ShowAlertWarning("Cannot create empty card.");
+                return RedirectToAction(nameof(Detail), new
+                {
+                    deckId = viewModel.DeckId
+                });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var sb = new StringBuilder();
+                foreach (var item in ModelState.Values)
+                {
+                    foreach (var error in item.Errors)
+                    {
+                        sb.AppendLine(error.ErrorMessage);
+                    }
+                }
+                ShowAlertWarning(sb.ToString());
+                return RedirectToAction(nameof(AddCard), new
+                {
+                    deckId = viewModel.DeckId,
+                    viewModel
+                });
+            }
+
+            await _deckService.AddCardAndDetailAsync(viewModel.DeckId,
+                viewModel.LanguageId,
+                viewModel.CardDetail);
+
+            return RedirectToAction(nameof(Detail), new { deckId = viewModel.DeckId });
+        }
+
+        [HttpGet("[action]/{language}/{cardId}")]
+        public async Task<IActionResult> UpdateCard(string language, int cardId)
+        {
+            var languages = await _languageService.GetActiveAsync();
+
+            var selectedLanguage = languages
+                .FirstOrDefault(_ => _.Name.Equals(language, StringComparison.OrdinalIgnoreCase))
+                ?? languages.Single(_ => _.IsDefault);
+
+            var card = await _deckService.GetCardDetailsAsync(cardId, selectedLanguage.Id);
+
+            int deckId = card?.Card?.DeckId
+                ?? await _deckService.GetDeckIdAsync(cardId);
+
+            bool isUpdate = card != null;
+
+            card ??= new CardDetail
+            {
+                CardId = cardId,
+                LanguageId = selectedLanguage.Id
+            };
+
+            var cardCount = await _deckService.GetCardCountAsync(deckId);
+
+            return View("Card", new CardViewModel
+            {
+                BackLink = Url.Action(nameof(Detail), new { deckId }),
+                CardDetail = card,
+                DeckId = deckId,
+                IsOnlyCard = cardCount == 1,
+                IsUpdate = isUpdate,
+                LanguageDescription = selectedLanguage.Description,
+                LanguageId = selectedLanguage.Id,
+                LanguageList = new SelectList(languages,
+                    nameof(Language.Name),
+                    nameof(Language.Description),
+                    selectedLanguage.Name),
+                SelectedLanguage = selectedLanguage
+            });
+        }
+
+        private async Task<bool> HasDeckPermissionAsync(int deckId)
+        {
+            if (!string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager))
+                || await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.WebPageContentManagement))
+            {
+                return true;
+            }
+            else
+            {
+                var permissionClaims = UserClaims(ClaimType.PermissionId);
+                if (permissionClaims.Count > 0)
+                {
+                    var pageHeaderId = await _deckService.GetPageHeaderIdAsync(deckId);
+                    if (pageHeaderId.HasValue)
+                    {
+                        var permissionGroups = await _permissionGroupService
+                            .GetPermissionsAsync<PermissionGroupPageContent>(pageHeaderId.Value);
+                        var permissionGroupsStrings = permissionGroups
+                            .Select(_ => _.PermissionGroupId.ToString(CultureInfo.InvariantCulture));
+
+                        return permissionClaims.Any(_ => permissionGroupsStrings.Contains(_));
+                    }
+                }
+                return false;
+            }
+        }
+    }
+}

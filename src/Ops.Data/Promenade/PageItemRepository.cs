@@ -38,7 +38,9 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.PageFeatureId == imageFeatureId || _.WebslideId == imageFeatureId)
+                .Where(_ => _.BannerFeatureId == imageFeatureId
+                    || _.PageFeatureId == imageFeatureId
+                    || _.WebslideId == imageFeatureId)
                 .CountAsync();
         }
 
@@ -65,6 +67,15 @@ namespace Ocuda.Ops.Data.Promenade
                 .AsNoTracking()
                 .Where(_ => _.PageLayoutId == layoutId)
                 .MaxAsync(_ => (int?)_.Order);
+        }
+
+        public async Task<int> RemoveByDeckIdAsync(int deckId)
+        {
+            var pageItems = DbSet.Where(_ => _.DeckId == deckId);
+            var pageLayoutId = pageItems.FirstOrDefault()?.PageLayoutId ?? 0;
+            DbSet.RemoveRange(pageItems);
+            await _context.SaveChangesAsync();
+            return pageLayoutId;
         }
     }
 }

@@ -6,7 +6,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
 {
     public class LayoutDetailViewModel
     {
+        public ImageFeature BannerFeature { get; set; }
         public Carousel Carousel { get; set; }
+        public Deck Deck { get; set; }
         public int LanguageId { get; set; }
         public SelectList LanguageList { get; set; }
         public ImageFeature PageFeature { get; set; }

@@ -379,6 +379,10 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserRepository,
                 Data.Ops.UserRepository>();
 
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ICardDetailRepository,
+                Data.Promenade.CardDetailRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.ICardRepository,
+                Data.Promenade.CardRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselButtonLabelRepository,
                 Data.Promenade.CarouselButtonLabelRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICarouselButtonRepository,
@@ -397,6 +401,8 @@ namespace Ocuda.Ops.Web
                 Data.Promenade.CategoryRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICategoryTextRepository,
                 Data.Promenade.CategoryTextRepository>();
+            services.AddScoped<Service.Interfaces.Promenade.Repositories.IDeckRepository,
+                Data.Promenade.DeckRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaCategoryRepository,
                 Data.Promenade.EmediaCategoryRepository>();
             services.AddScoped<Service.Interfaces.Promenade.Repositories.IEmediaGroupRepository,
@@ -477,6 +483,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ICarouselService, CarouselService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<ICoverIssueService, CoverIssueService>();
+            services.AddScoped<IDeckService, DeckService>();
             services.AddScoped<IDigitalDisplayService, DigitalDisplayService>();
             services.AddScoped<IDigitalDisplaySyncService, DigitalDisplaySyncService>();
             services.AddScoped<IEmediaService, EmediaService>();

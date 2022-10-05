@@ -47,6 +47,12 @@
                     formgroup>
                 <option></option>
             </select>
+            <select id="addBannerTemplate"
+                    asp-for="PageHeader.LayoutBannerTemplateId"
+                    asp-items="@Model.ImageFeatureTemplates"
+                    formgroup>
+                <option></option>
+            </select>
             <select id="addFeatureTemplate"
                     asp-for="PageHeader.LayoutFeatureTemplateId"
                     asp-items="@Model.ImageFeatureTemplates"
@@ -86,6 +92,13 @@
             <select id="editCarouselTemplate"
                     asp-for="PageHeader.LayoutCarouselTemplateId"
                     asp-items="@Model.CarouselTemplates"
+                    formgroup
+                    disabled>
+                <option></option>
+            </select>
+            <select id="editBannerTemplate"
+                    asp-for="PageHeader.LayoutBannerTemplateId"
+                    asp-items="@Model.ImageFeatureTemplates"
                     formgroup
                     disabled>
                 <option></option>
@@ -223,6 +236,7 @@ else
                                     data-name="@header.PageName"
                                     data-stub="@header.Stub"
                                     data-type="@((int)header.Type)"
+                                    data-bannertemplate="@header.LayoutBannerTemplateId"
                                     data-carouseltemplate="@header.LayoutCarouselTemplateId"
                                     data-featuretemplate="@header.LayoutFeatureTemplateId"
                                     data-webslidetemplate="@header.LayoutWebslideTemplateId"
@@ -285,12 +299,12 @@ else
         });
     });
 
-    var addStub = $("#addStub");
+    let addStub = $("#addStub");
 
     addStub.on("blur", function () {
         if (addStub.valid()) {
             updateStub(addStub, addStub.val());
-            var addType = $("#addType");
+            let addType = $("#addType");
             if (addType.val() != "") {
                 setTimeout(function () {
                     ValidateField(addStub,
@@ -303,7 +317,7 @@ else
 
     $("#addForm").submit(function (e) {
         e.preventDefault();
-        var form = $(this);
+        let form = $(this);
         if (addStub.valid()) {
             updateStub(addStub, addStub.val());
         }
@@ -321,21 +335,23 @@ else
     });
 
     $("#editModal").on("show.bs.modal", function (e) {
-        var button = $(e.relatedTarget);
-        var id = button.data("id");
-        var layout = button.data("layout");
-        var name = button.data("name");
-        var stub = button.data("stub");
-        var type = button.data("type");
-        var carouselTemplate = button.data("carouseltemplate");
-        var featureTemplate = button.data("featuretemplate");
-        var webslideTeplate = button.data("webslidetemplate");
+        let button = $(e.relatedTarget);
+        let id = button.data("id");
+        let layout = button.data("layout");
+        let name = button.data("name");
+        let stub = button.data("stub");
+        let type = button.data("type");
+        let carouselTemplate = button.data("carouseltemplate");
+        let bannerTemplate = button.data("bannertemplate");
+        let featureTemplate = button.data("featuretemplate");
+        let webslideTeplate = button.data("webslidetemplate");
 
         $("#editId").val(id);
         $("#editLayout").val(layout);
         $("#editName").val(name);
         $("#editStub").val(stub);
         $("#editType").val(type);
+        $("#editBannerTemplate").val(bannerTemplate);
         $("#editCarouselTemplate").val(carouselTemplate);
         $("#editFeatureTemplate").val(featureTemplate);
         $("#editWebslideTemplate").val(webslideTeplate);
@@ -350,7 +366,7 @@ else
 
     $("#editForm").submit(function (e) {
         e.preventDefault();
-        var form = $(this);
+        let form = $(this);
         $.post("@(Url.Action(nameof(PagesController.Edit), PagesController.Name))",
             form.serialize(),
             function (response) {
@@ -365,10 +381,10 @@ else
     });
 
     $("#deleteModal").on("show.bs.modal", function (e) {
-        var button = $(e.relatedTarget);
-        var id = button.data("id");
-        var name = button.data("name");
-        var modal = $(this);
+        let button = $(e.relatedTarget);
+        let id = button.data("id");
+        let name = button.data("name");
+        let modal = $(this);
         $("#deleteId").val(id);
         $("#deleteName").val(name);
         modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");

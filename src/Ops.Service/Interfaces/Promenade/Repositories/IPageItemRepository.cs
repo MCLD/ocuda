@@ -17,5 +17,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
         Task<List<PageItem>> GetLayoutSubsequentAsync(int layoutId, int order);
 
         Task<int?> GetMaxSortOrderForLayoutAsync(int layoutId);
+
+        Task<int> RemoveByDeckIdAsync(int deckId);
     }
 }

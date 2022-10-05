@@ -13,18 +13,21 @@ namespace Ocuda.Promenade.Controllers
     {
         public HomeController(ServiceFacades.Controller<HomeController> context,
             CarouselService carouselService,
+            DeckService deckService,
+            ImageFeatureService imageFeatureService,
             PageService pageService,
             RedirectService redirectService,
             SegmentService segmentService,
-            SocialCardService socialCardService,
-            ImageFeatureService webslideService)
-            : base(context, carouselService, pageService, redirectService,
-                  segmentService, socialCardService, webslideService)
+            SocialCardService socialCardService)
+            : base(context, carouselService, deckService, imageFeatureService,
+                  pageService, redirectService, segmentService, socialCardService)
         {
         }
 
-        public static string Name { get { return "Home"; } }
-        protected override PageType PageType { get { return PageType.Home; } }
+        public static string Name
+        { get { return "Home"; } }
+        protected override PageType PageType
+        { get { return PageType.Home; } }
 
         [HttpGet("{stub?}/item/{id}")]
         public async Task<IActionResult> CarouselItem(string stub, int id)

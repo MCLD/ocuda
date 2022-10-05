@@ -1,0 +1,153 @@
+﻿@using Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Decks
+@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Decks.DetailViewModel
+
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Deck
+            <small class="text-muted">@Model.DeckName</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        @if (!string.IsNullOrEmpty(Model.BackLink))
+        {
+            <a href="@Model.BackLink"
+           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+        }
+        else
+        {
+            <a asp-action="Index"
+           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Cancel</a>
+        }
+        <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+           asp-action="AddCard"
+           asp-route-deckid="@Model.DeckId">
+            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            Add Card
+        </a>
+    </div>
+</div>
+
+<div class="row py-2">
+    <div class="col-12">
+        <span class="d-none"><input asp-for="DeckName" formgroup readonly /></span>
+        @if (Model.LanguageList?.Count() > 1)
+        {
+            <div class="form-group row">
+                <div class="col-md-3 text-md-right">
+                    <label asp-for="SelectedLanguage" class="col-form-label"></label>
+                </div>
+                <div class="col-md-9">
+                    @foreach (var item in Model.LanguageList.Where(_ => !_.Disabled))
+                    {
+                        <a href="@Url.Action(nameof(SegmentsController.Detail), new { id = Model.DeckId, language = item.Value })"
+                   class="btn btn-sm btn-outline-info mt-1 @(item.Selected ? "active" : null)">@item.Text</a>
+                    }
+                </div>
+            </div>
+            <div class="row d-none oc-save-warning">
+                <div class="offset-md-3 col-md-9">
+                    <div class="alert alert-warning">
+                        <span class="fas fa-arrow-circle-up"></span> Unsaved changes will be lost if you change languages.
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@if (Model.CardDetails?.Count > 0)
+{
+    var cardNumber = 0;
+    <div class="row">
+        @foreach (var cardDetail in Model.CardDetails)
+        {
+            <div class="col-12 col-sm-6 col-md-4 mb-3">
+                <div class="card" style="max-width: 333px">
+                    @if (!string.IsNullOrEmpty(cardDetail.Filename))
+                    {
+                        @if (!string.IsNullOrEmpty(cardDetail.Link))
+                        {
+                            <a href="@cardDetail.Link">
+                                <img class="card-img-top"
+                     alt="@cardDetail.AltText"
+                     src="@Url.Action(nameof(DecksController.Image), DecksController.Name, new {
+language = Model.SelectedLanguage.Name,
+filename = cardDetail.Filename
+})" />
+                            </a>
+                        }
+                        else
+                        {
+                            <img class="card-img-top"
+                 alt="@cardDetail.AltText"
+                 src="@Url.Action(nameof(DecksController.Image), DecksController.Name, new {
+language = Model.SelectedLanguage.Name,
+filename = cardDetail.Filename
+})" />
+                        }
+                    }
+                    <div class="card-body">
+                        @if (!string.IsNullOrEmpty(cardDetail.Header))
+                        {
+                            if (!string.IsNullOrEmpty(cardDetail.Link))
+                            {
+                                <div class="card-title h5"><a href="@cardDetail.Link">@cardDetail.Header</a></div>
+                            }
+                            else
+                            {
+                                <div class="card-title h5">@cardDetail.Header</div>
+                            }
+                        }
+                        <p class="card-text">@cardDetail.Text</p>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <div>
+                            <a class="btn btn-sm btn-outline-dark"
+                       asp-action="UpdateCard"
+                       asp-route-language="@Model.SelectedLanguage.Name"
+                       asp-route-cardId="@cardDetail.CardId">Edit Card</a>
+                        </div>
+                        <div class="d-inline-block fa-fw @Model.LanguageCssClass(cardDetail.LanguageCount)"
+                     style="font-size: 1.5rem;"
+                     title="@DetailViewModel.LanguageTitle(cardDetail.LanguageCount)">
+                            <span class="fas fa-language"></span>
+                        </div>
+                        <div>
+                            <form method="post"
+                          class="d-inline-block"
+                          asp-controller="@DecksController.Name"
+                          asp-action="@(nameof(DecksController.CardOrderDecrement))">
+                                <input type="hidden" name="cardId" value="@cardDetail.CardId">
+                                <button class="btn btn-sm btn-outline-info"
+                                @(cardNumber == 0 ? "disabled=disabled" : null)>
+                                    <span class="fas fa-arrow-up"></span>
+                                </button>
+                            </form>
+                            <form method="post"
+                          class="d-inline-block"
+                          asp-controller="@DecksController.Name"
+                          asp-action="@(nameof(DecksController.CardOrderIncrement))">
+                                <input type="hidden" name="cardId" value="@cardDetail.CardId">
+                                <button class="btn btn-sm btn-outline-info"
+                                @(cardNumber == Model.CardDetails.Count - 1 ? "disabled=disabled" : null)>
+                                    <span class="fas fa-arrow-down"></span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            cardNumber++;
+        }
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-8 offset-2 alert alert-info">
+            This Deck currently has no cards.
+            <a asp-action="AddCard" asp-route-deckid="@Model.DeckId">Add a Card...</a>
+        </div>
+    </div>
+}

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -6,10 +7,21 @@ namespace Ocuda.Promenade.Models.Entities
 {
     public class PageItem
     {
+        public ImageFeature BannerFeature { get; set; }
+
+        [DisplayName("Banner")]
+        public int? BannerFeatureId { get; set; }
+
+        [NotMapped]
+        public IEnumerable<CardDetail> CardDetails { get; set; }
+
         public Carousel Carousel { get; set; }
 
         [DisplayName("Carousel")]
         public int? CarouselId { get; set; }
+
+        public Deck Deck { get; set; }
+        public int? DeckId { get; set; }
 
         [Key]
         [Required]
@@ -17,6 +29,7 @@ namespace Ocuda.Promenade.Models.Entities
 
         public int Order { get; set; }
         public ImageFeature PageFeature { get; set; }
+
         [DisplayName("Feature")]
         public int? PageFeatureId { get; set; }
 
@@ -26,6 +39,7 @@ namespace Ocuda.Promenade.Models.Entities
 
         [DisplayName("Segment")]
         public int? SegmentId { get; set; }
+
         [NotMapped]
         public SegmentText SegmentText { get; set; }
 
