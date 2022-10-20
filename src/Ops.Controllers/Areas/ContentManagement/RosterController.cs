@@ -1,15 +1,19 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Roster;
 using Ocuda.Ops.Controllers.Filters;
+using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Areas.ContentManagement
@@ -42,28 +46,92 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
         { get { return "Roster"; } }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> AddMap(int unitId, int locationId, int page)
+        public async Task<IActionResult> AdjustMapping(MappingViewModel viewModel)
         {
-            if (!await HasRosterManagementRightsAsync())
+            if (viewModel == null)
             {
-                return RedirectToUnauthorized();
+                return RedirectToAction(nameof(Index));
             }
 
-            var result = await _rosterService.AddUnitMap(unitId, locationId);
+            int mappingId = viewModel.IsClear ? viewModel.ClearId : viewModel.UpdateId;
+            int? locationId = viewModel.IsClear ? null : viewModel.SelectedLocation;
 
-            if (!string.IsNullOrEmpty(result))
+            if (viewModel.IsDivision)
             {
-                ShowAlertDanger($"There was an issue adding that mapping: {result}");
-            }
-
-            if (page > 1)
-            {
-                return RedirectToAction(nameof(UnitMapping), new { page });
+                await _rosterService.UpdateDivisionMappingAsync(mappingId, locationId);
+                return RedirectToAction(nameof(MapDivisions));
             }
             else
             {
-                return RedirectToAction(nameof(UnitMapping));
+                await _rosterService.UpdateLocationMappingAsync(mappingId, locationId);
+                return RedirectToAction(nameof(MapLocations));
             }
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> ApplyChanges(int rosterHeaderId)
+        {
+            RosterComparison changes = null;
+            var timer = Stopwatch.StartNew();
+            try
+            {
+                changes = await _rosterService.CompareAsync(rosterHeaderId, true);
+                ShowAlertSuccess("Applied this roster to the user database");
+            }
+            catch (OcudaException oex)
+            {
+                _logger.LogError(oex, "Error applying roster: {ErrorMessage}", oex.Message);
+                ShowAlertDanger($"One or more errors occurred applying the roster: {oex.Message}.");
+            }
+            timer.Stop();
+            var viewModel = new ChangesViewModel
+            {
+                Deactivated = changes?.RemovedUsers,
+                Elapsed = timer.Elapsed,
+                Locations = await _locationService.GetAllLocationsIdNameAsync(),
+                New = changes?.NewUsers,
+                RosterHeader = changes?.RosterHeader,
+                TotalRows = changes?.TotalRecords ?? 0,
+                Verified = changes?.UpdatedUsers
+            };
+            return RedirectToAction(nameof(Changes), new { rosterHeaderId });
+        }
+
+        [HttpGet("[action]/{rosterHeaderId}")]
+        public async Task<IActionResult> Changes(int rosterHeaderId)
+        {
+            RosterComparison changes = null;
+            var timer = Stopwatch.StartNew();
+            try
+            {
+                changes = await _rosterService.CompareAsync(rosterHeaderId, false);
+            }
+            catch (OcudaException oex)
+            {
+                _logger.LogWarning(oex, "Error comparing roster: {ErrorMessage}", oex.Message);
+                ShowAlertWarning($"One or more errors occurred comparing the roster: {oex.Message}");
+            }
+
+            timer.Stop();
+            var viewModel = new ChangesViewModel
+            {
+                Deactivated = changes.RemovedUsers,
+                Elapsed = timer.Elapsed,
+                Locations = await _locationService.GetAllLocationsIdNameAsync(),
+                New = changes.NewUsers,
+                RosterHeader = changes.RosterHeader,
+                TotalRows = changes.TotalRecords,
+                Verified = changes.UpdatedUsers
+            };
+            return View(viewModel);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> DisableHeader(int rosterHeaderId)
+        {
+            await _rosterService.DisableHeaderAsync(rosterHeaderId);
+
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet("")]
@@ -99,61 +167,27 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             return View(viewModel);
         }
 
-        [HttpPost("[action]")]
-        public async Task<IActionResult> RemoveMap(int unitId, int page)
+        [HttpGet("[action]")]
+        public async Task<IActionResult> MapDivisions()
         {
-            if (!await HasRosterManagementRightsAsync())
+            return View("Mapping", new MappingViewModel
             {
-                return RedirectToUnauthorized();
-            }
-
-            var result = await _rosterService.RemoveUnitMap(unitId);
-
-            if (!string.IsNullOrEmpty(result))
-            {
-                ShowAlertDanger($"There was an issue adding that mapping: {result}");
-            }
-
-            if (page > 1)
-            {
-                return RedirectToAction(nameof(UnitMapping), new { page });
-            }
-            else
-            {
-                return RedirectToAction(nameof(UnitMapping));
-            }
+                IsDivision = true,
+                Locations = await _locationService.GetAllLocationsIdNameAsync(),
+                Mapping = await _rosterService.GetDivisionsAsync(),
+                Summary = "Divisions"
+            });
         }
 
         [HttpGet("[action]")]
-        [HttpGet("[action]/{page}")]
-        public async Task<IActionResult> UnitMapping(int page)
+        public async Task<IActionResult> MapLocations()
         {
-            if (!await HasRosterManagementRightsAsync())
+            return View("Mapping", new MappingViewModel
             {
-                return RedirectToUnauthorized();
-            }
-
-            int currentPage = page != 0 ? page : 1;
-
-            var filter = new BaseFilter(currentPage);
-
-            var unitLocations = await _rosterService.GetUnitLocationMapsAsync(filter);
-
-            var viewModel = new UnitMappingViewModel
-            {
-                CurrentPage = currentPage,
-                ItemCount = unitLocations.Count,
-                ItemsPerPage = filter.Take.Value,
-                Locations = await GetLocationsDropdownAsync(_locationService),
-                UnitLocationMaps = unitLocations.Data
-            };
-
-            if (viewModel.PastMaxPage)
-            {
-                return RedirectToRoute(new { page = viewModel.LastPage ?? 1 });
-            }
-
-            return View(viewModel);
+                Locations = await _locationService.GetAllLocationsIdNameAsync(),
+                Mapping = await _rosterService.GetLocationsAsync(),
+                Summary = "Locations"
+            });
         }
 
         [HttpPost("[action]")]
@@ -170,8 +204,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 using (Serilog.Context.LogContext.PushProperty("RosterFileName", model.FileName))
                 {
                     _logger.LogInformation("Inserting roster {FileName}", model.FileName);
-                    var timer = new System.Diagnostics.Stopwatch();
-                    timer.Start();
+                    var timer = System.Diagnostics.Stopwatch.StartNew();
                     var tempFile = Path.GetTempFileName();
                     using (var fileStream = new FileStream(tempFile, FileMode.Create))
                     {
@@ -187,8 +220,22 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                             model.FileName,
                             rosterResult.TotalRows,
                             timer.ElapsedMilliseconds);
-                        AlertInfo = $"Processed {rosterResult.TotalRows} roster rows in {timer.Elapsed:dd\\.hh\\:mm\\:ss}";
-                        return View("Changes", rosterResult);
+                        var alert = new StringBuilder($"Imported {rosterResult.TotalRows} rows in {timer.Elapsed} ms");
+                        if (rosterResult.Issues?.Count > 0)
+                        {
+                            alert.Append("<ul>");
+                            foreach (var item in rosterResult.Issues)
+                            {
+                                alert.Append("<li>").Append(item).Append("</li>");
+                            }
+                            alert.Append("</ul>");
+                            ShowAlertWarning(alert.ToString());
+                        }
+                        else
+                        {
+                            ShowAlertInfo(alert.ToString());
+                        }
+                        return RedirectToAction(nameof(Changes), new { rosterHeaderId = rosterResult.RosterHeaderId });
                     }
                     catch (Exception ex)
                     {

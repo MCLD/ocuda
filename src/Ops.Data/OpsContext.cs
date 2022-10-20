@@ -37,14 +37,12 @@ namespace Ocuda.Ops.Data
         public DbSet<File> Files { get; set; }
         public DbSet<FileType> FileTypes { get; set; }
         public DbSet<HistoricalIncident> HistoricalIncidents { get; set; }
-
         public DbSet<IncidentFollowup> IncidentFollowups { get; set; }
         public DbSet<IncidentParticipant> IncidentParticipants { get; set; }
         public DbSet<IncidentRelationship> IncidentRelationships { get; set; }
         public DbSet<Incident> Incidents { get; set; }
         public DbSet<IncidentStaff> IncidentStaffs { get; set; }
         public DbSet<IncidentType> IncidentTypes { get; set; }
-
         public DbSet<LinkLibrary> LinkLibraries { get; set; }
         public DbSet<Link> Links { get; set; }
         public DbSet<PermissionGroupApplication> PermissionGroupApplication { get; set; }
@@ -57,7 +55,9 @@ namespace Ocuda.Ops.Data
         public DbSet<PostCategory> PostCategories { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<RosterDetail> RosterDetails { get; set; }
+        public DbSet<RosterDivision> RosterDivisions { get; set; }
         public DbSet<RosterHeader> RosterHeaders { get; set; }
+        public DbSet<RosterLocation> RosterLocations { get; set; }
         public DbSet<ScheduleClaim> ScheduleClaims { get; set; }
         public DbSet<ScheduleLogCallDisposition> ScheduleLogCallDispositions { get; set; }
         public DbSet<ScheduleLog> ScheduleLogs { get; set; }
@@ -66,8 +66,6 @@ namespace Ocuda.Ops.Data
         public DbSet<SiteSetting> SiteSettings { get; set; }
         public DbSet<TitleClass> TitleClasses { get; set; }
         public DbSet<TitleClassMapping> TitleClassMappings { get; set; }
-        public DbSet<UnitLocationMap> UnitLocationMaps { get; set; }
-
         public DbSet<UserMetadata> UserMetadata { get; set; }
         public DbSet<UserMetadataType> UserMetadataTypes { get; set; }
         public DbSet<User> Users { get; set; }

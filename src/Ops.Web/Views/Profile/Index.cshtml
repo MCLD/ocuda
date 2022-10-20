@@ -191,7 +191,7 @@
                             @foreach (var key in Model.RelatedTitleClassifications.Keys)
                             {
                                 <tr>
-                                    <th class="align-middle">@key.Name</th>
+                                    <th class="align-middle">&ndash; @key.Name</th>
                                     <td class="align-middle">
                                         @foreach (var user in Model.RelatedTitleClassifications[key])
                                         {
