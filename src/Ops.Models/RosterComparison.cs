@@ -5,8 +5,10 @@ namespace Ocuda.Ops.Models
 {
     public class RosterComparison
     {
+        public IDictionary<int, string> NewDivisions { get; set; }
         public IDictionary<int, string> NewLocations { get; set; }
         public ICollection<User> NewUsers { get; set; }
+        public IEnumerable<RosterDivision> RemovedDivisions { get; set; }
         public IEnumerable<RosterLocation> RemovedLocations { get; set; }
         public ICollection<User> RemovedUsers { get; set; }
         public RosterHeader RosterHeader { get; set; }

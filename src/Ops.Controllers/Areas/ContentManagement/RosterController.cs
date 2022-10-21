@@ -84,16 +84,6 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 ShowAlertDanger($"One or more errors occurred applying the roster: {oex.Message}.");
             }
             timer.Stop();
-            var viewModel = new ChangesViewModel
-            {
-                Deactivated = changes?.RemovedUsers,
-                Elapsed = timer.Elapsed,
-                Locations = await _locationService.GetAllLocationsIdNameAsync(),
-                New = changes?.NewUsers,
-                RosterHeader = changes?.RosterHeader,
-                TotalRows = changes?.TotalRecords ?? 0,
-                Verified = changes?.UpdatedUsers
-            };
             return RedirectToAction(nameof(Changes), new { rosterHeaderId });
         }
 
@@ -119,6 +109,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
                 Elapsed = timer.Elapsed,
                 Locations = await _locationService.GetAllLocationsIdNameAsync(),
                 New = changes.NewUsers,
+                NewDivisions = changes.NewDivisions,
+                NewLocations = changes.NewLocations,
+                RemovedDivisions = changes.RemovedDivisions,
+                RemovedLocations = changes.RemovedLocations,
                 RosterHeader = changes.RosterHeader,
                 TotalRows = changes.TotalRecords,
                 Verified = changes.UpdatedUsers

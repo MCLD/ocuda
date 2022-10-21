@@ -255,7 +255,7 @@ namespace Ocuda.Ops.Service
 
                 if (!string.IsNullOrEmpty(jobTitle))
                 {
-                    int vacateIndex = jobTitle.IndexOf(VacateText);
+                    int vacateIndex = jobTitle.IndexOf(VacateText, StringComparison.OrdinalIgnoreCase);
                     if (vacateIndex > 0)
                     {
                         jobTitle = jobTitle[..vacateIndex];
@@ -294,15 +294,11 @@ namespace Ocuda.Ops.Service
                         user.LastRosterUpdate = rosterHeader.CreatedAt;
 
                         user.PriorName = user.Name;
-                        if (user.Name != rosterDetail.Name.Trim())
-                        {
-                            user.Name = rosterDetail.Name.Trim();
-                        }
+                        user.Name = rosterDetail.Name.Trim();
+
                         user.PriorVacateDate = user.VacateDate;
-                        if (user.VacateDate != setVacateDate)
-                        {
-                            user.VacateDate = setVacateDate;
-                        }
+                        user.VacateDate = setVacateDate;
+
                         user.PriorTitle = user.Title;
                         if (!string.IsNullOrEmpty(jobTitle) && user.Title != jobTitle.Trim())
                         {
@@ -587,12 +583,19 @@ namespace Ocuda.Ops.Service
 
             return new RosterComparison
             {
+                NewDivisions = rosterDetails
+                    .Where(_ => newDivisionIds.Contains(_.DivisionId))
+                    .Select(_ => new { _.DivisionId, _.DivisionName })
+                    .Distinct()
+                    .ToDictionary(k => k.DivisionId, v => v.DivisionName),
                 NewLocations = rosterDetails
-                    .Where(_ => newLocationIds.Contains(_.LocationId))
+                    .Where(_ => newLocationIds.Contains(_.LocationId) && _.LocationId != 0)
                     .Select(_ => new { _.LocationId, _.LocationName })
                     .Distinct()
                     .ToDictionary(k => k.LocationId, v => v.LocationName),
                 NewUsers = userAddList,
+                RemovedDivisions = databaseDivisions
+                    .Where(_ => removedDivisionIds.Contains(_.Id)),
                 RemovedLocations = databaseLocations
                     .Where(_ => removedLocationIds.Contains(_.Id)),
                 RemovedUsers = userRemoveList,

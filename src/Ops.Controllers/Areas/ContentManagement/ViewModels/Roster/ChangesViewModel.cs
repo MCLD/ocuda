@@ -28,6 +28,10 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Roster
             }
         }
 
+        public IDictionary<int, string> NewDivisions { get; set; }
+        public IDictionary<int, string> NewLocations { get; set; }
+        public IEnumerable<RosterDivision> RemovedDivisions { get; set; }
+        public IEnumerable<RosterLocation> RemovedLocations { get; set; }
         public RosterHeader RosterHeader { get; set; }
         public int TotalRows { get; set; }
         public ICollection<User> Verified { get; set; }

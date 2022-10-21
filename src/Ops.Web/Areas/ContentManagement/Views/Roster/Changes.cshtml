@@ -33,6 +33,103 @@
     }
 </div>
 
+@if (Model.NewLocations?.Count > 0)
+{
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th colspan="2" class="table-success">New locations: @Model.NewLocations.Count</th>
+            </tr>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var location in Model.NewLocations)
+            {
+                <tr>
+                    <td>@location.Key</td>
+                    <td>@location.Value</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (Model.RemovedLocations?.Count() > 0)
+{
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th colspan="2" class="table-danger">New divisions: @Model.NewDivisions.Count()</th>
+            </tr>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var location in Model.RemovedLocations)
+            {
+                <tr>
+                    <td>@location.IdInRoster</td>
+                    <td>@location.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (Model.NewDivisions?.Count > 0)
+{
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th colspan="2" class="table-success">New divisions: @Model.NewDivisions.Count</th>
+            </tr>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var division in Model.NewDivisions)
+            {
+                <tr>
+                    <td>@division.Key</td>
+                    <td>@division.Value</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (Model.RemovedDivisions?.Count() > 0)
+{
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th colspan="2" class="table-danger">Removed divisions: @Model.RemovedDivisions.Count()</th>
+            </tr>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var division in Model.RemovedDivisions)
+            {
+                <tr>
+                    <td>@division.IdInRoster</td>
+                    <td>@division.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
 <table class="table table-sm table-bordered">
     <thead>
         <tr>
@@ -108,7 +205,7 @@
     </tbody>
 </table>
 
-<table class="table table-sm table-bordered accordion" id="accordionUpdated">
+<table class="table table-sm table-bordered">
     <thead>
         <tr>
             <th colspan="7" class="@Model.VerifiedClass">
