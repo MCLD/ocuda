@@ -29,6 +29,14 @@ namespace Ocuda.Ops.Data.Ops
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<ICollection<RosterDetail>> GetByHeaderIdAsync(int rosterHeaderId)
+        {
+            return await DbSet
+                 .AsNoTracking()
+                 .Where(_ => _.RosterHeaderId == rosterHeaderId)
+                 .ToListAsync();
+        }
+
         public async Task<int> GetCountAsync(int rosterHeaderId)
         {
             return await DbSet.AsNoTracking().CountAsync(_ => _.RosterHeaderId == rosterHeaderId);

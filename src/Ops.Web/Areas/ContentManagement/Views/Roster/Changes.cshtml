@@ -1,22 +1,134 @@
-﻿@model Ocuda.Ops.Models.RosterUpdate
+﻿@using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Roster
+@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Roster.ChangesViewModel
 
-<div class="row">
-    <div class="col-sm-7">
-        <h1>
-            Roster
-            <small class="text-muted">Changes</small>
-        </h1>
-    </div>
-    <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+<div class="d-flex justify-content-between">
+    <h1>
+        Roster Changes
+        <small class="text-muted">Roster id @Model.RosterHeader.Id</small>
+    </h1>
+    <div class="pt-2">
+        <a class="btn btn-outline-dark"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.RosterController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.RosterController.Index))">Back</a>
-        <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
-           asp-action="@nameof(RosterController.UnitMapping)">
-            Unit/Location Mapping
-        </a>
     </div>
 </div>
+
+<div class="alert alert-info d-flex justify-content-between mt-2">
+    <span style="font-size: larger; font-weight: bold;">Total Records: @Model.TotalRows; Changes computed in @Model.Elapsed.ToString("mm\\:ss")</span>
+    @if (!Model.RosterHeader.IsImported && !Model.RosterHeader.IsDisabled)
+    {
+        <div>
+            <button class="btn btn-sm btn-warning"
+                type="button"
+                data-toggle="modal"
+                data-target="#disableRosterModal">
+                Disable Roster
+            </button>
+            <form class="d-inline"
+              asp-action="@nameof(RosterController.ApplyChanges)"
+              asp-route-rosterHeaderId="@Model.RosterHeader.Id">
+                <button class="btn btn-sm btn-info" button-spinner>Apply Updates</button>
+            </form>
+        </div>
+    }
+</div>
+
+@if (Model.NewLocations?.Count > 0)
+{
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th colspan="2" class="table-success">New locations: @Model.NewLocations.Count</th>
+            </tr>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var location in Model.NewLocations)
+            {
+                <tr>
+                    <td>@location.Key</td>
+                    <td>@location.Value</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (Model.RemovedLocations?.Count() > 0)
+{
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th colspan="2" class="table-danger">New divisions: @Model.NewDivisions.Count()</th>
+            </tr>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var location in Model.RemovedLocations)
+            {
+                <tr>
+                    <td>@location.IdInRoster</td>
+                    <td>@location.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (Model.NewDivisions?.Count > 0)
+{
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th colspan="2" class="table-success">New divisions: @Model.NewDivisions.Count</th>
+            </tr>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var division in Model.NewDivisions)
+            {
+                <tr>
+                    <td>@division.Key</td>
+                    <td>@division.Value</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (Model.RemovedDivisions?.Count() > 0)
+{
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th colspan="2" class="table-danger">Removed divisions: @Model.RemovedDivisions.Count()</th>
+            </tr>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var division in Model.RemovedDivisions)
+            {
+                <tr>
+                    <td>@division.IdInRoster</td>
+                    <td>@division.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
 
 <table class="table table-sm table-bordered">
     <thead>
@@ -29,7 +141,6 @@
             <th>Email</th>
             <th>Job Title</th>
             <th>Created At</th>
-            <th>Service start date</th>
         </tr>
     </thead>
     <tbody>
@@ -47,7 +158,6 @@
                     <td>@user.Email</td>
                     <td>@user.Title</td>
                     <td>@user.CreatedAt</td>
-                    <td>@user.ServiceStartDate?.ToString("d")</td>
                 </tr>
             }
         }
@@ -65,7 +175,6 @@
             <th>Email</th>
             <th>Job Title</th>
             <th>Created At</th>
-            <th>Service start date</th>
         </tr>
     </thead>
     <tbody>
@@ -83,9 +192,8 @@
                     <td>@user.Email</td>
                     <td>@user.Title</td>
                     <td>@user.CreatedAt</td>
-                    <td>@user.ServiceStartDate?.ToString("d")</td>
                 </tr>
-                @if(!string.IsNullOrEmpty(user.Notes))
+                @if (!string.IsNullOrEmpty(user.Notes))
                 {
                     <tr class="table-warning">
                         <td>@user.Username</td>
@@ -100,15 +208,184 @@
 <table class="table table-sm table-bordered">
     <thead>
         <tr>
-            <th class="@Model.VerifiedClass">Verified/updated: @(Model.Verified.Count - Model.Deactivated.Count)</th>
+            <th colspan="7" class="@Model.VerifiedClass">
+                Verified @Model.Verified.Count total;
+                Updated @Model.Verified.Count(_ => _.HasUpdates) (updated shown below)
+            </th>
+        </tr>
+        <tr>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Job Title</th>
+            <th>Location</th>
+            <th>Vacate Date</th>
+            <th>Supervisor</th>
         </tr>
     </thead>
+    <tbody>
+        @if (Model.Verified.Count == 0)
+        {
+            <tr><td colspan="7">No verified users.</tr>
+        }
+        else
+        {
+            @foreach (var user in Model.Verified.Where(_ => _.HasUpdates))
+            {
+                <tr>
+                    <td>@user.Username</td>
+                    <td>
+                        @if (user.UpdatedName)
+                        {
+                            <strong>
+                                <span class="text-danger">@user.PriorName</span>
+                                <br />
+                                <span class="text-success">@user.Name</span>
+                            </strong>
+                        }
+                        else
+                        {
+                            @user.Name
+                        }
+                    </td>
+                    <td>
+                        @if (user.UpdatedEmail)
+                        {
+                            <strong>
+                                <span class="text-danger">@user.PriorEmail</span>
+                                <br />
+                                <span class="text-success">@user.Email</span>
+                            </strong>
+                        }
+                        else
+                        {
+                            @user.Email
+                        }
+                    </td>
+                    <td>
+                        @if (user.UpdatedTitle)
+                        {
+                            <strong>
+                                <span class="text-danger">@user.PriorTitle</span>
+                                <br />
+                                <span class="text-success">@user.Title</span>
+                            </strong>
+                        }
+                        else
+                        {
+                            @user.Title
+                        }
+                    </td>
+                    <td>
+                        @if (user.UpdatedAssociatedLocation)
+                        {
+                            <strong>
+                                <span class="text-danger">
+                                    @if (user.PriorAssociatedLocation.HasValue)
+                                    {
+                                        @Model.GetLocation(user.PriorAssociatedLocation.Value)
+                                    }
+                                    else
+                                    {
+                                        <em>none</em>
+                                    }
+                                </span>
+                                <br />
+                                <span class="text-success">
+                                    @if (user.AssociatedLocation.HasValue)
+                                    {
+                                        @Model.GetLocation(user.AssociatedLocation.Value)
+                                    }
+                                    else
+                                    {
+                                        <em>none</em>
+                                    }
+                                </span>
+                            </strong>
+                        }
+                        else
+                        {
+                            @if (user.AssociatedLocation.HasValue)
+                            {
+                                @Model.GetLocation(user.AssociatedLocation.Value)
+                            }
+                            else
+                            {
+                                <em>none</em>
+                            }
+                        }
+                    </td>
+                    <td>
+                        @if (user.UpdatedVacateDate)
+                        {
+                            <strong>
+                                <span class="text-danger">@(user.PriorVacateDate?.ToString("d") ?? "none")</span>
+                                <br />
+                                <span class="text-success">@(user.VacateDate?.ToString("d") ?? "none")</span>
+                            </strong>
+                        }
+                        else
+                        {
+                            @user.VacateDate?.ToString("d")
+                        }
+                    </td>
+                    <td>
+                        @if (user.UpdatedSupervisor)
+                        {
+                            <strong>
+                                <span class="text-danger">
+                                    @user.PriorSupervisorName
+                                </span>
+                                <br>
+                                <span class="text-success">
+                                    @user.SupervisorName
+                                </span>
+                            </strong>
+                        }
+                        else
+                        {
+                            @(Model.Verified.SingleOrDefault(_ => _.Id == user.SupervisorId)?.Name ?? user.SupervisorId?.ToString() ?? "none")
+                        }
+                    </td>
+                </tr>
+                @if (!string.IsNullOrEmpty(user.Notes))
+                {
+                    <tr class="table-warning">
+                        <td>@user.Username</td>
+                        <td colspan="6"><small><em>@user.Notes</em></small></td>
+                    </tr>
+                }
+            }
+        }
+    </tbody>
 </table>
 
-<table class="table table-sm table-bordered">
-    <thead>
-        <tr>
-            <th class="@Model.VacantClass">Vacant positions: @Model.VacantCount</th>
-        </tr>
-    </thead>
-</table>
+<div class="modal fade"
+     id="disableRosterModal"
+     tabindex="-1"
+     aria-labelledby="disableRosterModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="disableRosterModalLabel">Disable roster</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Are you sure that you want to disable this roster so that it cannot be imported?
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <form class="d-inline"
+                      asp-action="@nameof(RosterController.DisableHeader)"
+                      asp-route-rosterHeaderId="@Model.RosterHeader.Id">
+                    <button type="submit" class="btn btn-warning">Disable roster</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

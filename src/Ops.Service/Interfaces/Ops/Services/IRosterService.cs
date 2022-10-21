@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
+using Ocuda.Ops.Models.Interfaces;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Utility.Models;
 
@@ -8,14 +10,20 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IRosterService
     {
-        Task<string> AddUnitMap(int unitId, int locationId);
+        Task<RosterComparison> CompareAsync(int rosterHeaderId, bool applyChanges);
+
+        Task DisableHeaderAsync(int rosterHeaderId);
+
+        Task<IEnumerable<IRosterLocationMapping>> GetDivisionsAsync();
+
+        Task<IEnumerable<IRosterLocationMapping>> GetLocationsAsync();
 
         Task<CollectionWithCount<RosterHeader>> GetPaginatedRosterHeadersAsync(BaseFilter filter);
 
-        Task<CollectionWithCount<UnitLocationMap>> GetUnitLocationMapsAsync(BaseFilter filter);
-
         Task<RosterUpdate> ImportRosterAsync(int currentUserId, string filename);
 
-        Task<string> RemoveUnitMap(int unitId);
+        Task UpdateDivisionMappingAsync(int divisionId, int? mappingId);
+
+        Task UpdateLocationMappingAsync(int locationId, int? mappingId);
     }
 }

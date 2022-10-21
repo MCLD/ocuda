@@ -6,5 +6,17 @@ namespace Ocuda.Ops.Models.Entities
     {
         [NotMapped]
         public int DetailCount { get; set; }
+
+        public bool IsDisabled { get; set; }
+        public bool IsImported { get; set; }
+
+        [NotMapped]
+        public string Status
+        {
+            get
+            {
+                return IsImported ? "Imported" : IsDisabled ? "Disabled" : "Ready for import";
+            }
+        }
     }
 }

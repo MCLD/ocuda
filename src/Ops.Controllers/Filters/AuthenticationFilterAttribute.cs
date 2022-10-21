@@ -162,7 +162,7 @@ namespace Ocuda.Ops.Controllers.Filters
                         if (!string.IsNullOrEmpty(domainName)
                             && username.StartsWith(domainName, StringComparison.OrdinalIgnoreCase))
                         {
-                            username = username.Substring(domainName.Length + 1);
+                            username = username[(domainName.Length + 1)..];
                         }
 
                         var user = await _userService.LookupUserAsync(username);
@@ -185,11 +185,15 @@ namespace Ocuda.Ops.Controllers.Filters
                             var rosterUser = await _userService.LookupUserByEmailAsync(user.Email);
                             if (rosterUser != null)
                             {
+                                _logger.LogInformation("New user {Username} detected, found in database with email {Email}",
+                                    user.Username,
+                                    user.Email);
                                 user = await _userService
                                     .UpdateRosterUserAsync(rosterUser.Id, user);
                             }
                             else
                             {
+                                _logger.LogInformation("New user {Username} detected, inserting into database", user.Username);
                                 user = await _userService.AddUser(user);
                             }
                         }

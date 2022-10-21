@@ -1,0 +1,166 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Roster.MappingViewModel
+
+<div class="d-flex justify-content-between">
+    <h1>
+        Mapping
+        <small class="text-muted">@Model.Summary</small>
+    </h1>
+    <div class="pt-2">
+        <a class="btn btn-outline-dark"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.RosterController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.RosterController.Index))">Back</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-md-10 offset-md-1">
+        <table class="table table-striped table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th>Id in Roster</th>
+                    <th>Name in Roster</th>
+                    <th>Mapped to location</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Mapping?.Any() != true)
+                {
+                    <tr>
+                        <td colspan="5">
+                            No items found.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var mapping in Model.Mapping)
+                    {
+                        <tr>
+                            <td class="align-middle">@mapping.IdInRoster</td>
+                            <td class="align-middle">@mapping.Name</td>
+                            <td class="align-middle">
+                                @Model.GetLocation(mapping.MapToLocationId)
+                            </td>
+                            <td class="align-middle">
+                                <button class="btn btn-sm btn-outline-primary"
+                                data-toggle="modal"
+                                data-target="#adjustMapping"
+                                data-id="@mapping.Id"
+                                data-name="@mapping.Name"
+                                data-locationid="@mapping.MapToLocationId">
+                                    Adjust mapping
+                                </button>
+                                @if (mapping.MapToLocationId.HasValue)
+                                {
+                                    <button class="btn btn-sm btn-outline-dark"
+                                data-toggle="modal"
+                                data-target="#clearMapping"
+                                data-id="@mapping.Id"
+                                data-name="@mapping.Name">
+                                        Clear mapping
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<form class="d-inline" asp-action="@nameof(RosterController.AdjustMapping)">
+    <div class="modal fade"
+         id="adjustMapping"
+         data-backdrop="static"
+         data-keyboard="false"
+         tabindex="-1"
+         aria-labelledby="adjustMappingLabel"
+         aria-hidden="true">
+        <input type="hidden" asp-for="UpdateId" />
+        <input type="hidden" asp-for="IsDivision" />
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="adjustMappingLabel">Adjust mapping</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <span id="adjustMappingPrompt"></span>
+                    <select class="form-control mt-2" asp-for="SelectedLocation"
+                            asp-items="Model.LocationsSelectList"></select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="submit" class="btn btn-outline-success">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form class="d-inline" asp-action="@nameof(RosterController.AdjustMapping)">
+    <div class="modal fade"
+         id="clearMapping"
+         data-backdrop="static"
+         data-keyboard="false"
+         tabindex="-1"
+         aria-labelledby="clearMappingLabel"
+         aria-hidden="true">
+        <input type="hidden" asp-for="ClearId" />
+        <input type="hidden" asp-for="IsDivision" />
+        <input type="hidden" asp-for="IsClear" value="true" />
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="clearMappingLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="clearMappingBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="submit" class="btn btn-outline-danger">Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section scripts {
+    <script>
+        $('#adjustMapping').on('show.bs.modal', function (event) {
+            let dataName = $(event.relatedTarget).data('name');
+            let dataLocationId = $(event.relatedTarget).data('locationid');
+            let dataId = $(event.relatedTarget).data('id');
+            $(this).find('#adjustMappingPrompt').html('Change mapping for <strong>' + dataName + '</strong>?');
+            $(this).find('#UpdateId').val(dataId);
+            if (dataLocationId) {
+                $('#SelectedLocation').val(dataLocationId);
+            }
+            else {
+                $('#SelectedLocation').val(@Model.Locations.First().Key);
+            }
+        });
+
+        $('#clearMapping').on('show.bs.modal', function (event) {
+            let dataName = $(event.relatedTarget).data('name');
+            let dataId = $(event.relatedTarget).data('id');
+            $(this).find('#clearMappingBody').html('Clear mapping for <strong>' + dataName + '</strong>?');
+            $(this).find('#ClearId').val(dataId);
+        });
+    </script>
+}

@@ -1,19 +1,19 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Roster.IndexViewModel
 
-<div class="row">
-    <div class="col-sm-7">
-        <h1>
-            Rosters
-        </h1>
-    </div>
-    <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+<div class="d-flex justify-content-between">
+    <h1>
+        Rosters
+    </h1>
+    <div class="pt-2">
+        <a class="btn btn-outline-primary"
+           asp-controller="@RosterController.Name"
+           asp-action="@nameof(RosterController.MapDivisions)">Map Divisions</a>
+        <a class="btn btn-outline-primary"
+           asp-controller="@RosterController.Name"
+           asp-action="@nameof(RosterController.MapLocations)">Map Locations</a>
+        <a class="btn btn-outline-dark"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
-        <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
-           asp-action="@nameof(RosterController.UnitMapping)">
-            Unit/Location Mapping
-        </a>
+           asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index)">Back</a>
     </div>
 </div>
 
@@ -61,6 +61,7 @@ else
                 <thead>
                     <tr>
                         <th>Uploaded</th>
+                        <th>Status</th>
                         <th>Imported By</th>
                         <th>Rows</th>
                     </tr>
@@ -70,7 +71,20 @@ else
                     {
                         <tr>
                             <td class="align-middle">
-                                @roster.CreatedAt.ToString("g")
+                                @if (roster.IsImported || roster.IsDisabled)
+                                {
+                                    @roster.CreatedAt.ToString("g")
+                                }
+                                else
+                                {
+                                    <a asp-action="@nameof(RosterController.Changes)"
+                           asp-route-rosterHeaderId="@roster.Id">
+                                        @roster.CreatedAt.ToString("g")
+                                    </a>
+                                }
+                            </td>
+                            <td class="align-middle">
+                                @roster.Status
                             </td>
                             <td class="align-middle">
                                 <a asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"

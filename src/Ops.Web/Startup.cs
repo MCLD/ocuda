@@ -358,8 +358,12 @@ namespace Ocuda.Ops.Web
                 Data.Ops.PostRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterDetailRepository,
                 Data.Ops.RosterDetailRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterDivisionRepository,
+                Data.Ops.RosterDivisionRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterHeaderRepository,
                 Data.Ops.RosterHeaderRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IRosterLocationRepository,
+                Data.Ops.RosterLocationRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IScheduleClaimRepository,
                 Data.Ops.ScheduleClaimRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IScheduleLogCallDispositionRepository,
@@ -372,8 +376,6 @@ namespace Ocuda.Ops.Web
                 Data.Ops.SiteSettingRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.ITitleClassRepository,
                 Data.Ops.TitleClassRepository>();
-            services.AddScoped<Service.Interfaces.Ops.Repositories.IUnitLocationMapRepository,
-                Data.Ops.UnitLocatonMapRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserMetadataTypeRepository,
                 Data.Ops.UserMetadataTypeRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserRepository,
