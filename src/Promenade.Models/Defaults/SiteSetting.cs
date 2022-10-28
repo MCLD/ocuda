@@ -48,6 +48,15 @@ namespace Ocuda.Promenade.Models.Defaults
             },
             new SiteSetting
             {
+                Id = Keys.SiteSetting.Social.TikTokUrl,
+                Name = "TikTok URL",
+                Description = "The URL to a TikTok profile",
+                Category = "Social",
+                Value = string.Empty,
+                Type = SiteSettingType.StringNullable
+            },
+            new SiteSetting
+            {
                 Id = Keys.SiteSetting.Social.TwitterUrl,
                 Name = "Twitter URL",
                 Description = "The URL to a Twitter profile",
