@@ -83,6 +83,8 @@ namespace Ocuda.Ops.Service
 
             incident.CreatedAt = now;
             incident.CreatedBy = currentUserId;
+            incident.IsVisible = true;
+
             await _incidentRepository.AddAsync(incident);
             await _incidentRepository.SaveAsync();
 
@@ -157,8 +159,7 @@ namespace Ocuda.Ops.Service
                             if (int.TryParse(titleClassId, out int numericTitleClassId))
                             {
                                 var titleClass = relatedTitleClassifications
-                                    .Where(_ => _.Key.Id == numericTitleClassId)
-                                    .SingleOrDefault();
+                                    .SingleOrDefault(_ => _.Key.Id == numericTitleClassId);
 
                                 if (titleClass.Value != null)
                                 {
@@ -336,10 +337,7 @@ namespace Ocuda.Ops.Service
             var staffs = await _incidentStaffRepository.GetByIncidentIdAsync(incidentId);
             if (staffs?.Count > 0)
             {
-                if (incident.Staffs == null)
-                {
-                    incident.Staffs = new List<IncidentStaff>();
-                }
+                incident.Staffs ??= new List<IncidentStaff>();
                 foreach (var staff in staffs)
                 {
                     staff.User = await _userService.GetByIdIncludeDeletedAsync(staff.UserId);
@@ -351,10 +349,7 @@ namespace Ocuda.Ops.Service
                 .GetByIncidentIdAsync(incidentId);
             if (participants?.Count > 0)
             {
-                if (incident.Participants == null)
-                {
-                    incident.Participants = new List<IncidentParticipant>();
-                }
+                incident.Participants ??= new List<IncidentParticipant>();
                 foreach (var participant in participants)
                 {
                     incident.Participants.Add(participant);
@@ -381,10 +376,7 @@ namespace Ocuda.Ops.Service
             var relateds = await _incidentRelationshipRepository.GetByIncidentIdAsync(incidentId);
             if (relateds?.Count > 0)
             {
-                if (incident.RelatedIncidents == null)
-                {
-                    incident.RelatedIncidents = new List<Incident>();
-                }
+                incident.RelatedIncidents ??= new List<Incident>();
                 foreach (var related in relateds)
                 {
                     int relatedIncidentId = related.IncidentId != incidentId
@@ -417,7 +409,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<CollectionWithCount<Incident>> GetPaginatedAsync(IncidentFilter filter)
         {
-            if (filter == null) { filter = new IncidentFilter(); }
+            filter ??= new IncidentFilter();
 
             if (!string.IsNullOrEmpty(filter.SearchText))
             {
@@ -446,9 +438,14 @@ namespace Ocuda.Ops.Service
             return await _incidentRepository.GetPaginatedAsync(filter);
         }
 
-        public async Task<IncidentType> GetTypeAsync(string incidentTypeName)
+        public async Task<IncidentType> GetTypeAsync(string incidentTypeDescription)
         {
-            return await _incidentTypeRepository.GetAsync(incidentTypeName);
+            return await _incidentTypeRepository.GetAsync(incidentTypeDescription);
+        }
+
+        public async Task SetVisibilityAsync(int incidentId, bool isVisible)
+        {
+            await _incidentRepository.SetVisibilityAsync(incidentId, GetCurrentUserId(), isVisible);
         }
 
         public async Task UpdateIncidentTypeAsync(int incidentTypeId,

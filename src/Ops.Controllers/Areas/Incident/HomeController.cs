@@ -15,6 +15,7 @@ using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Models.Keys;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
 
@@ -25,17 +26,21 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
     public class HomeController : BaseController<HomeController>
     {
         private const string PageTitle = "Incident Reports";
+        private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IIncidentService _incidentService;
         private readonly ILocationService _locationService;
         private readonly IPermissionGroupService _permissionGroupService;
         private readonly IUserService _userService;
 
         public HomeController(Controller<HomeController> context,
+            IDateTimeProvider dateTimeProvider,
             IIncidentService incidentService,
             ILocationService locationService,
             IPermissionGroupService permissionGroupService,
             IUserService userService) : base(context)
         {
+            _dateTimeProvider = dateTimeProvider
+                ?? throw new ArgumentNullException(nameof(dateTimeProvider));
             _incidentService = incidentService
                 ?? throw new ArgumentNullException(nameof(incidentService));
             _locationService = locationService
@@ -101,7 +106,11 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
         {
             if (viewModel == null) { return RedirectToAction(nameof(Add)); }
 
-            if (viewModel.IncidentDate.HasValue && viewModel.IncidentTime.HasValue)
+            if (viewModel.IncidentDate < _dateTimeProvider.Now.AddDays(-14))
+            {
+                ModelState.AddModelError(nameof(viewModel.IncidentDate), "Please choose a date in the last 2 weeks");
+            }
+            else if (viewModel.IncidentDate.HasValue && viewModel.IncidentTime.HasValue)
             {
                 viewModel.Incident.IncidentAt = viewModel.IncidentDate.Value
                     + viewModel.IncidentTime.Value.TimeOfDay;
@@ -140,7 +149,6 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             }
             else
             {
-                ShowAlertDanger($"Could not add incident report: {ModelState.ErrorCount} validation errors.");
                 return RedirectToAction(nameof(Add));
             }
         }
@@ -300,9 +308,15 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
                 return RedirectToUnauthorized();
             }
 
+            if (!incident.IsVisible && !IsSiteManager())
+            {
+                return StatusCode(404);
+            }
+
             var viewModel = new DetailsViewModel
             {
                 CanAdd = hasPermission,
+                CanHide = IsSiteManager(),
                 Incident = incident,
                 IncidentTypes = await _incidentService.GetActiveIncidentTypesAsync(),
                 Locations = await GetLocationsAsync(_locationService),
@@ -312,6 +326,17 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
             SetPageTitle($"Incident Report #{incident.Id}");
 
             return View(viewModel);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> HideIncident(int incidentId)
+        {
+            if (!IsSiteManager())
+            {
+                return RedirectToUnauthorized();
+            }
+            await _incidentService.SetVisibilityAsync(incidentId, false);
+            return RedirectToAction(nameof(Details), new { id = incidentId });
         }
 
         [HttpGet("")]
@@ -341,6 +366,17 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
         }
 
         [HttpPost("[action]")]
+        public async Task<IActionResult> ShowIncident(int incidentId)
+        {
+            if (!IsSiteManager())
+            {
+                return RedirectToUnauthorized();
+            }
+            await _incidentService.SetVisibilityAsync(incidentId, true);
+            return RedirectToAction(nameof(Details), new { id = incidentId });
+        }
+
+        [HttpPost("[action]")]
         public async Task<IActionResult> UpdateEmailSettings(int emailTemplateId,
             string lawEnforcementAddresses)
         {
@@ -361,7 +397,7 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
                 .UpdateAsync(Models.Keys.SiteSetting.Incident.LawEnforcementAddresses,
                     lawEnforcementAddresses);
 
-            if (issues.Any())
+            if (issues.Count > 0)
             {
                 var sb = new System.Text.StringBuilder("Some issues were encountered:<ul>");
                 issues.ForEach(_ => sb.Append("<li>").Append(_).AppendLine("</li>"));

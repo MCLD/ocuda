@@ -8,24 +8,32 @@ using Ocuda.Ops.Data.ServiceFacade;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
     public class IncidentRepository : OpsRepository<OpsContext, Incident, int>, IIncidentRepository
     {
+        private readonly IDateTimeProvider _dateTimeProvider;
+
         public IncidentRepository(Repository<OpsContext> repositoryFacade,
-            ILogger<IncidentRepository> logger) : base(repositoryFacade, logger)
+            ILogger<IncidentRepository> logger,
+            IDateTimeProvider dateTimeProvider) : base(repositoryFacade, logger)
         {
+            _dateTimeProvider = dateTimeProvider
+                ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         }
 
         public async Task<CollectionWithCount<Incident>> GetPaginatedAsync(IncidentFilter filter)
         {
             if (filter == null) { throw new ArgumentNullException(nameof(filter)); }
 
+            var incidents = DbSet.Where(_ => _.IsVisible);
+
             var query = filter.CreatedById.HasValue
-                ? DbSet.Where(_ => _.CreatedBy == filter.CreatedById.Value)
-                : DbSet;
+                ? incidents.Where(_ => _.CreatedBy == filter.CreatedById.Value)
+                : incidents;
 
             if (!string.IsNullOrEmpty(filter.SearchText))
             {
@@ -52,7 +60,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id == incidentId)
+                .Where(_ => _.Id == incidentId && _.IsVisible)
                 .Select(_ => new Incident
                 {
                     CreatedBy = _.CreatedBy,
@@ -63,6 +71,21 @@ namespace Ocuda.Ops.Data.Ops
                     ReportedByName = _.ReportedByName
                 })
                 .SingleOrDefaultAsync();
+        }
+
+        public async Task SetVisibilityAsync(int incidentId, int userId, bool isVisible)
+        {
+            var incident = await DbSet
+                .SingleOrDefaultAsync(_ => _.Id == incidentId);
+
+            if (incident != null)
+            {
+                incident.IsVisible = isVisible;
+                incident.UpdatedBy = userId;
+                incident.UpdatedAt = _dateTimeProvider.Now;
+                _context.Update(incident);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ namespace Ocuda.Ops.Controllers.Areas.Incident.ViewModel
         }
 
         public bool CanAdd { get; set; }
+        public bool CanHide { get; set; }
         public Models.Entities.Incident Incident { get; set; }
         public IDictionary<int, string> IncidentTypes { get; set; }
         public IDictionary<int, string> Locations { get; set; }
