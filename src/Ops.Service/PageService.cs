@@ -277,6 +277,10 @@ namespace Ocuda.Ops.Service
             }
             else if (pageItem.Carousel != null)
             {
+                pageItem.Carousel.CarouselText ??= new CarouselText
+                {
+                    Title = pageItem.Carousel.Name
+                };
                 carousel = await _carouselService.CreateNoSaveAsync(pageItem.Carousel);
             }
             else if (pageItem.Deck != null)

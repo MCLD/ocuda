@@ -1,36 +1,34 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages.LayoutDetailViewModel
 
-<div class="row mb-2">
-    <div class="col-sm-8">
-        <h1>
-            Page Layout
-            <small class="text-muted">@Model.PageLayout.Name</small>
-        </h1>
-    </div>
-    <div class="col-sm-4">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
-           asp-action="@(nameof(PagesController.Layouts))"
-           asp-route-id="@Model.PageLayout.PageHeaderId">Back</a>
-
-        <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
-                data-toggle="modal"
-                data-target="#addModal">
-            <span class="fas fa-plus-circle" aria-hidden="true"></span>
-            Add Item
-        </button>
+<div class="d-flex justify-content-between">
+    <h1>
+        Page Layout
+        <small class="text-muted">@Model.PageLayout.Name</small>
+    </h1>
+    <div class="pt-2">
         @if (!string.IsNullOrEmpty(Model.PreviewLink))
         {
             <form action="@Model.PreviewLink"
+              class="d-inline"
               method="post"
               role="form"
               target="_blank">
                 <input type="hidden" name="PreviewId" value="@Model.PageLayout.PreviewId" />
-                <button class="btn btn-outline-info mt-2 mb-1 mr-2 float-right">
+                <button class="btn btn-outline-info">
                     <span class="fas fa-file-alt"></span>
                     Preview
                 </button>
             </form>
         }
+        <button class="btn btn-outline-success"
+                data-toggle="modal"
+                data-target="#addModal">
+            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            Add Item
+        </button>
+        <a class="btn btn-outline-dark ml-2"
+           asp-action="@(nameof(PagesController.Layouts))"
+           asp-route-id="@Model.PageLayout.PageHeaderId">Back</a>
     </div>
 </div>
 
@@ -63,7 +61,7 @@
             <input id="addBannerName" asp-for="BannerFeature.Name" formgroup />
         </div>
         <div id="addCarouselFields" class="d-none">
-            <input id="addCarouselTitle" asp-for="Carousel.CarouselText.Title" formgroup disabled />
+            <input id="addCarouselTitle" asp-for="Carousel.Name" formgroup disabled />
         </div>
         <div id="addDeckFields" class="d-none">
             <input id="addDeckName" asp-for="Deck.Name" formgroup disabled />
