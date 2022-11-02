@@ -42,6 +42,11 @@
             public static readonly string NotifyUserIds = "Incident.NotifyUserIds";
         }
 
+        public static class Scheduling
+        {
+            public static readonly string Documentation = "Scheduling.Documentation";
+        }
+
         public static class SiteManagement
         {
             public static readonly string PromenadePublicPath = "SiteManagement.PromenadePublicPath";

@@ -14,7 +14,6 @@ using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 {
-
     [Area("SiteManagement")]
     [Authorize(Policy = nameof(ClaimType.SiteManager))]
     [Route("[area]/[controller]")]
@@ -24,9 +23,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         private readonly IScheduleRequestLimitService _scheduleRequestLimitService;
         private readonly ISiteSettingPromService _siteSettingPromService;
-
-        public static string Area { get { return "SiteManagement"; } }
-        public static string Name { get { return "Schedule"; } }
 
         public ScheduleController(ServiceFacades.Controller<ScheduleController> context,
             IScheduleRequestLimitService scheduleRequestLimitService,
@@ -38,6 +34,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             _siteSettingPromService = siteSettingPromService
                 ?? throw new ArgumentNullException(nameof(siteSettingPromService));
         }
+
+        public static string Area
+        { get { return "SiteManagement"; } }
+
+        public static string Name
+        { get { return "Schedule"; } }
 
         [Route("")]
         [Route("{day}")]
@@ -109,8 +111,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var viewModel = new LimitsViewModel
             {
                 AvailableDays = availableDays,
-                SelectedDay = selectedDay,
-                DayLimits = dayLimits
+                DayLimits = dayLimits,
+                SelectedDay = selectedDay
             };
 
             return View(viewModel);

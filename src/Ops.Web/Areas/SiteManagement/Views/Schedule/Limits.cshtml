@@ -1,24 +1,32 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Schedule.LimitsViewModel
 
-<div class="row">
-    <div class="col-12">
+<div class="d-flex justify-content-between">
+    <h1>
+        Scheduling Limits
+    </h1>
+    <div class="pt-2">
         <a class="btn btn-outline-dark float-right"
            asp-controller="@(HomeController.Name)"
            asp-action="@(nameof(HomeController.Index))">
             <span class="fa fa-backward"></span>
             Back
         </a>
-        <h1>Scheduling Limits</h1>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-12">
         <ul class="nav nav-pills">
             @foreach (var day in Model.AvailableDays)
             {
                 <li class="nav-item">
                     <a asp-action="@nameof(ScheduleController.Limits)"
-                       asp-route-day="@day"
-                       class="nav-link"
-                       ActiveBy
-                       routeKey="day"
-                       value="@(day == Model.AvailableDays.First() ? "," : null)@day">
+                   asp-route-day="@day"
+                   class="nav-link"
+                   ActiveBy
+                   routeKey="day"
+                   value="@(day == Model.AvailableDays.First() ? "," : null)@day">
                         @day
                     </a>
                 </li>
@@ -39,12 +47,12 @@
                     <label class="col-md-2 col-form-label text-md-right">@DateTime.Now.Date.AddHours(limit.Key).ToShortTimeString()</label>
                     <div class="form-group-inner col-md-9">
                         <input name="DayLimits.@limit.Key"
-                               value="@(ViewData.ModelState[$"DayLimits.{limit.Key}"]?.RawValue ?? limit.Value)"
-                               class="form-control"
-                               type="number" />
+                           value="@(ViewData.ModelState[$"DayLimits.{limit.Key}"]?.RawValue ?? limit.Value)"
+                           class="form-control"
+                           type="number" />
                         <span class="validation-message text-danger"
-                              data-valmsg-for="DayLimits.@limit.Key"
-                              data-valmsg-replace="true"></span>
+                          data-valmsg-for="DayLimits.@limit.Key"
+                          data-valmsg-replace="true"></span>
                     </div>
                 </div>
             }
