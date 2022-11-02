@@ -194,6 +194,20 @@ namespace Ocuda.Ops.Models.Defaults
 
             #endregion Incident
 
+            #region Scheduling
+
+            new SiteSetting
+            {
+                Id = Keys.SiteSetting.Scheduling.Documentation,
+                Name = "Link to scheduling documentation",
+                Description = "A link to documentation about scheduling",
+                Category = "Scheduling",
+                 Value = "",
+                 Type = SiteSettingType.StringNullable
+            },
+
+            #endregion Scheduling
+
             #region SiteManagement
 
             new SiteSetting

@@ -8,10 +8,6 @@ namespace Ocuda.Ops.Controllers.ViewModels.Contact
 {
     public class ScheduleIndexViewModel
     {
-        public string ViewDescription { get; set; }
-        public IEnumerable<ScheduleRequest> Requests { get; set; }
-        public IEnumerable<ScheduleClaim> Claims { get; set; }
-        public DateTime RequestedDate { get; set; }
         public string ActiveToday
         {
             get
@@ -32,6 +28,12 @@ namespace Ocuda.Ops.Controllers.ViewModels.Contact
                     : null;
             }
         }
+
+        public IEnumerable<ScheduleClaim> Claims { get; set; }
+        public DateTime RequestedDate { get; set; }
+        public IEnumerable<ScheduleRequest> Requests { get; set; }
+        public string ScheduleDocumentLink { get; set; }
+        public string ViewDescription { get; set; }
 
         public string GetRowClass(ScheduleRequest request)
         {
@@ -96,7 +98,6 @@ namespace Ocuda.Ops.Controllers.ViewModels.Contact
                     ? "<span class=\"fas fa-user mr-1\" title=\"Claimed, underway\"></span>"
                     : "<span class=\"far fa-user mr-1\" title=\"Claimed, not started\"></span>";
             }
-
 
             if (request.RequestedTime.AddHours(1) < DateTime.Now
                 && request?.IsClaimed != true

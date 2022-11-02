@@ -192,12 +192,12 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
 
             return View(new ScheduleIndexViewModel
             {
-                ViewDescription = date == DateTime.MinValue
-                    ? "Unclaimed"
-                    : date.ToShortDateString(),
+                Claims = claims,
                 RequestedDate = date == DateTime.MinValue ? DateTime.Now : date,
                 Requests = requests,
-                Claims = claims
+                ScheduleDocumentLink = await _siteSettingService
+                    .GetSettingStringAsync(Models.Keys.SiteSetting.Scheduling.Documentation),
+                ViewDescription = date == DateTime.MinValue ? "Unclaimed" : date.ToShortDateString()
             });
         }
 
