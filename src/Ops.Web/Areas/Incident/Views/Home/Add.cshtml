@@ -1,16 +1,14 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.AddViewModel
 
-<div class="row mb-2">
-    <div class="col-sm-6">
-        <h1>
-            @Model.Heading
-            @if (!string.IsNullOrEmpty(Model.SecondaryHeading))
-            {
-                <small class="text-muted">@Model.SecondaryHeading</small>
-            }
-        </h1>
-    </div>
-    <div class="col-sm-6">
+<div class="d-flex justify-content-between">
+    <h1>
+        @Model.Heading
+        @if (!string.IsNullOrEmpty(Model.SecondaryHeading))
+        {
+            <small class="text-muted">@Model.SecondaryHeading</small>
+        }
+    </h1>
+    <div>
         <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
            asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
            asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine)"
@@ -18,9 +16,26 @@
     </div>
 </div>
 
+@if (ViewData?.ModelState?.Values.Count() > 0)
+{
+    <div class="col-12 col-sm-10 offset-sm-1">
+        <div class="alert alert-danger">
+            <p>There were issues with your submission:</p>
+            <ul class="mb-0">
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(_ => _.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+            </ul>
+        </div>
+    </div>
+}
+
 <form asp-action="@nameof(HomeController.Add)"
+      id="IncidentForm"
       method="post"
-      role="form">
+      role="form"
+      class="mt-2">
     <input type="hidden" id="witnessJson" asp-for="WitnessJson" />
     <input type="hidden" id="affectedJson" asp-for="AffectedJson" />
     <div class="row">
@@ -48,6 +63,7 @@
                                    data-val="true"
                                    data-val-required="Incident date is required." />
                             <span class="validation-message text-danger field-validation-valid"
+                                  id="IncidentDateValidationMessage"
                                   data-valmsg-for="IncidentDate"
                                   data-valmsg-replace="true"></span>
                         </div>
@@ -55,7 +71,6 @@
                             <input asp-for="IncidentTime"
                                    type="time"
                                    required
-                                   step="60"
                                    class="form-control"
                                    data-val="true"
                                    data-val-required="Incident time is required." />
@@ -156,7 +171,10 @@
             </select>
             <div class="row">
                 <div class="col-md-9 offset-md-3">
-                    <button type="submit" class="btn btn-outline-success">
+                    <button type="submit"
+                            class="btn btn-outline-success"
+                            id="submitIncidentReport"
+                            button-spinner>
                         <span class="far fa-save" aria-hidden="true"></span>
                         Save Incident
                     </button>
@@ -241,306 +259,302 @@
 </div>
 
 @section styles {
-<style type="text/css">
-    .tab-content {
-        border-left: solid 1px rgb(222, 226, 230);
-        border-right: solid 1px rgb(222, 226, 230);
-        border-bottom: solid 1px rgb(222, 226, 230);
-    }
+    <style type="text/css">
+        .tab-content {
+            border-left: solid 1px rgb(222, 226, 230);
+            border-right: solid 1px rgb(222, 226, 230);
+            border-bottom: solid 1px rgb(222, 226, 230);
+        }
 
-    .button-column {
-        width: 5rem;
-        text-align: center;
-    }
-</style>
+        .button-column {
+            width: 5rem;
+            text-align: center;
+        }
+    </style>
 }
 
-@section scripts {
-<script type="text/javascript">
-    var currentPage = 1;
-    var users = [];
-    var affectedId = @((int)Ocuda.Ops.Models.Entities.IncidentParticipantType.Affected)
+    @section scripts {
+    <script type="text/javascript">
+        var currentPage = 1;
+        var users = [];
+        var affectedId = @((int)Ocuda.Ops.Models.Entities.IncidentParticipantType.Affected)
 
-    $().ready(function() {
-        $('#addPersonModal').find('button[type="submit"]').attr('onclick', 'addPublic();');
-        $('#staffSearchText').keyup(function(e) {
-            if(e.keyCode === 13) {
-                e.preventDefault();
-                $('#staffSearchGo').click();
-            }
-        });
-        updateTable(0);
-        updateTable(1);
-
-        $('[maxlength]').each(function(index) {
-            let fieldId = '#' + this.id;
-            let lengthField = $(fieldId + '_LengthDisplay');
-            if(lengthField.length) {
-                $(fieldId).on('input', function() {
-                    if(this.value.length == 0) {
-                        $(lengthField).text("Up to " + $(fieldId).attr('maxlength') + ' characters.')
-                    }
-                    else {
-                        $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');
+            $().ready(function () {
+                $('#addPersonModal').find('button[type="submit"]').attr('onclick', 'addPublic();');
+                $('#staffSearchText').keyup(function (e) {
+                    if (e.keyCode === 13) {
+                        e.preventDefault();
+                        $('#staffSearchGo').click();
                     }
                 });
-                if($(fieldId).val()) {
-                    $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');
-                }
-            }
-        });
-    })
+                updateTable(0);
+                updateTable(1);
 
-    $('#addPersonModal').on('show.bs.modal', function (event) {
-        let caller = $(event.relatedTarget);
-        let type = caller.data('participanttype');
-        $('#personParticipantTypeId').val(caller.data('participanttypeid'));
-        $('#addPersonModalLabel').html('Add ' + type + ': Non-staff');
-    })
+                $('[maxlength]').each(function (index) {
+                    let fieldId = '#' + this.id;
+                    let lengthField = $(fieldId + '_LengthDisplay');
+                    if (lengthField.length) {
+                        $(fieldId).on('input', function () {
+                            if (this.value.length == 0) {
+                                $(lengthField).text("Up to " + $(fieldId).attr('maxlength') + ' characters.')
+                            }
+                            else {
+                                $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');
+                            }
+                        });
+                        if ($(fieldId).val()) {
+                            $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');
+                        }
+                    }
+                });
+            })
 
-    $('#addStaffModal').on('show.bs.modal', function (event) {
-        let caller = $(event.relatedTarget);
-        let type = caller.data('participanttype');
-        $('#staffParticipantTypeId').val(caller.data('participanttypeid'));
-        $('#addStaffModalLabel').html('Add ' + type + ': Staff member');
-        currentPage = 1;
-        clearSearchResults('Enter text above to search for a staff member.');
-        $('#staffSearchText').val('')
-    })
-
-    $('#staffSearchGo').click(function() {
-        currentPage = 1;
-        performSearch();
-    });
-
-    function clearPublicForm() {
-        $('#publicBarcode').val('');
-        $('#publicName').val('');
-        $('#publicDescription').val('');
-    }
-
-    function clearSearchResults(message) {
-        if(message) {
-        $('#searchResults').html('<tr><td colspan="2">' + message + '</td></tr>');
-        }
-        else {
-        $('#searchResults').html('<tr><td colspan="2">No staff members found.</td></tr>');
-        }
-        $('#pagination').addClass('d-none');
-    }
-
-    function performSearch() {
-        let link = '@Url.Action(nameof(Ocuda.Ops.Controllers.StaffController.SearchJson), Ocuda.Ops.Controllers.StaffController.Name )';
-        let jqxhr = $.ajax({
-            url: link,
-            data: { searchText: $('#staffSearchText').val(), page: currentPage }
+        $('#addPersonModal').on('show.bs.modal', function (event) {
+            let caller = $(event.relatedTarget);
+            let type = caller.data('participanttype');
+            $('#personParticipantTypeId').val(caller.data('participanttypeid'));
+            $('#addPersonModalLabel').html('Add ' + type + ': Non-staff');
         })
-        .done(function(data, textStatus, jqXHR) {
-            if(data && data.itemCount > 0) {
-                currentPage = data.currentPage;
-                let searchResult = [];
-                users =[];
-                $.each(data.users, function(index, value) {
-                    searchResult.push('<tr><td class="button-column">')
-                    searchResult.push('<button class="btn btn-sm btn-outline-success"')
-                    searchResult.push('onclick="addStaff(' + value.id + ')">')
-                    searchResult.push('<span class="fas fa-plus-circle"></span></button>')
-                    searchResult.push('</td><td class="align-middle">' + value.name +'</td></tr>');
-                    users[value.id] = value.name;
+
+        $('#addStaffModal').on('show.bs.modal', function (event) {
+            let caller = $(event.relatedTarget);
+            let type = caller.data('participanttype');
+            $('#staffParticipantTypeId').val(caller.data('participanttypeid'));
+            $('#addStaffModalLabel').html('Add ' + type + ': Staff member');
+            currentPage = 1;
+            clearSearchResults('Enter text above to search for a staff member.');
+            $('#staffSearchText').val('')
+        })
+
+        $('#staffSearchGo').click(function () {
+            currentPage = 1;
+            performSearch();
+        });
+
+        function clearPublicForm() {
+            $('#publicBarcode').val('');
+            $('#publicName').val('');
+            $('#publicDescription').val('');
+        }
+
+        function clearSearchResults(message) {
+            if (message) {
+                $('#searchResults').html('<tr><td colspan="2">' + message + '</td></tr>');
+            }
+            else {
+                $('#searchResults').html('<tr><td colspan="2">No staff members found.</td></tr>');
+            }
+            $('#pagination').addClass('d-none');
+        }
+
+        function performSearch() {
+            let link = '@Url.Action(nameof(Ocuda.Ops.Controllers.StaffController.SearchJson), Ocuda.Ops.Controllers.StaffController.Name )';
+            let jqxhr = $.ajax({
+                url: link,
+                data: { searchText: $('#staffSearchText').val(), page: currentPage }
+            })
+                .done(function (data, textStatus, jqXHR) {
+                    if (data && data.itemCount > 0) {
+                        currentPage = data.currentPage;
+                        let searchResult = [];
+                        users = [];
+                        $.each(data.users, function (index, value) {
+                            searchResult.push('<tr><td class="button-column">')
+                            searchResult.push('<button class="btn btn-sm btn-outline-success"')
+                            searchResult.push('onclick="addStaff(' + value.id + ')">')
+                            searchResult.push('<span class="fas fa-plus-circle"></span></button>')
+                            searchResult.push('</td><td class="align-middle">' + value.name + '</td></tr>');
+                            users[value.id] = value.name;
+                        })
+                        let pagination = [];
+                        if (data.maxPage > 1) {
+                            if (data.currentPage == 1) {
+                                pagination.push('<button class="btn btn-sm btn-outline-primary" disabled>');
+                                pagination.push('<span class="fa fa-backward"></span></button>');
+                            } else {
+                                pagination.push('<button class="btn btn-sm btn-outline-primary"');
+                                pagination.push(' onclick="prevPage();">');
+                                pagination.push('<span class="fa fa-backward"></span></button>');
+                            }
+                            pagination.push('<span class="d-inline-block mx-2">')
+                            pagination.push(data.currentPage + '/' + data.maxPage);
+                            pagination.push('</span>')
+                            if (data.currentPage == data.maxPage) {
+                                pagination.push('<button class="btn btn-sm btn-outline-primary" disabled>');
+                                pagination.push('<span class="fa fa-forward"></span></button>');
+                            } else {
+                                pagination.push('<button class="btn btn-sm btn-outline-primary"');
+                                pagination.push(' onclick="nextPage();">')
+                                pagination.push('<span class="fa fa-forward"></span></button>');
+                            }
+                        }
+                        $('#searchResults').html(searchResult.join(''));
+                        if (pagination.length > 0) {
+                            $('#pagination').removeClass('d-none');
+                        }
+                        else {
+                            $('#pagination').addClass('d-none');
+                        }
+                        $('#pagination').html(pagination.join(''));
+                    } else {
+                        clearSearchResults();
+                    }
                 })
-                let pagination = [];
-                if(data.maxPage > 1) {
-                    if(data.currentPage == 1) {
-                        pagination.push('<button class="btn btn-sm btn-outline-primary" disabled>');
-                        pagination.push('<span class="fa fa-backward"></span></button>');
-                    } else {
-                        pagination.push('<button class="btn btn-sm btn-outline-primary"');
-                        pagination.push(' onclick="prevPage();">');
-                        pagination.push('<span class="fa fa-backward"></span></button>');
-                    }
-                    pagination.push('<span class="d-inline-block mx-2">')
-                    pagination.push(data.currentPage + '/' + data.maxPage);
-                    pagination.push('</span>')
-                    if(data.currentPage == data.maxPage) {
-                        pagination.push('<button class="btn btn-sm btn-outline-primary" disabled>');
-                        pagination.push('<span class="fa fa-forward"></span></button>');
-                    } else {
-                        pagination.push('<button class="btn btn-sm btn-outline-primary"');
-                        pagination.push(' onclick="nextPage();">')
-                        pagination.push('<span class="fa fa-forward"></span></button>');
-                    }
-                }
-                $('#searchResults').html(searchResult.join(''));
-                if(pagination.length > 0) {
-                    $('#pagination').removeClass('d-none');
-                }
-                else {
-                    $('#pagination').addClass('d-none');
-                }
-                $('#pagination').html(pagination.join(''));
-            } else {
-                clearSearchResults();
+                .fail(function (jqXhr, textStatus, errorThrown) {
+                    console.error(textStatus);
+                    console.error(errorThrown);
+                    alert("Staff lookup failed.");
+                })
+                .always(function () {
+                    ResetSpinners();
+                });
+        }
+
+        function nextPage() {
+            currentPage = currentPage + 1;
+            performSearch();
+        }
+
+        function prevPage() {
+            currentPage = Math.max(1, currentPage - 1);
+            performSearch();
+        }
+
+        function addPublic() {
+            let publicBarcode = $('#publicBarcode').val();
+            let publicName = $('#publicName').val();
+            let publicDescription = $('#publicDescription').val();
+
+            if (publicBarcode.trim().length == 0 && publicName.trim().length == 0) {
+                ResetSpinners();
+                alert("You must enter a barcode or name.");
+                return;
             }
-        })
-        .fail(function(jqXhr, textStatus, errorThrown) {
-            console.error(textStatus);
-            console.error(errorThrown);
-            alert("Staff lookup failed.");
-        })
-        .always(function() {
+
+            var field;
+            let typeId = $('#personParticipantTypeId').val();
+            console.info(typeId);
+            if (typeId == affectedId) {
+                field = $('#affectedJson')
+                console.info(field);
+            } else {
+                field = $('#witnessJson')
+                console.info(field);
+            }
+
+            var people;
+            if (field.val().length != 0) {
+                people = JSON.parse(field.val());
+            }
+            else {
+                people = [];
+            }
+
+            people.push({ barcode: publicBarcode, name: publicName, description: publicDescription });
+
+            field.val(JSON.stringify(people));
             ResetSpinners();
-        });
-    }
-
-    function nextPage() {
-        currentPage = currentPage + 1;
-        performSearch();
-    }
-
-    function prevPage() {
-        currentPage = Math.max(1, currentPage - 1);
-        performSearch();
-    }
-
-    function addPublic() {
-        let publicBarcode = $('#publicBarcode').val();
-        let publicName = $('#publicName').val();
-        let publicDescription = $('#publicDescription').val();
-
-        if(publicBarcode.trim().length == 0 && publicName.trim().length == 0) {
-            ResetSpinners();
-            alert("You must enter a barcode or name.");
-            return;
+            clearPublicForm();
+            updateTable(typeId);
+            $('#addPersonModal').modal('hide');
         }
 
-        var field;
-        let typeId = $('#personParticipantTypeId').val();
-        console.info(typeId);
-        if(typeId == affectedId) {
-            field = $('#affectedJson')
-            console.info(field);
-        } else {
-            field = $('#witnessJson')
-            console.info(field);
+        function addStaff(staffId) {
+            var field;
+
+            let typeId = $('#staffParticipantTypeId').val();
+            if (typeId == affectedId) {
+                field = $('#affectedJson')
+            } else {
+                field = $('#witnessJson')
+            }
+
+            var people;
+            if (field.val().length != 0) {
+                people = JSON.parse(field.val());
+            }
+            else {
+                people = [];
+            }
+            people.push({ id: staffId, name: users[staffId] });
+
+            field.val(JSON.stringify(people));
+            updateTable(typeId);
+            $('#addStaffModal').modal('hide');
         }
 
-        var people;
-        if(field.val().length != 0) {
-            people = JSON.parse(field.val());
-        }
-        else
-        {
-            people = [];
-        }
+        function remove(typeId, itemId) {
+            if (typeId == affectedId) {
+                field = $('#affectedJson')
+            } else {
+                field = $('#witnessJson')
+            }
 
-        people.push({barcode: publicBarcode, name: publicName, description: publicDescription });
+            var data = JSON.parse(field.val());
+            data.splice(itemId, 1);
+            field.val(JSON.stringify(data));
 
-        field.val(JSON.stringify(people));
-        ResetSpinners();
-        clearPublicForm();
-        updateTable(typeId);
-        $('#addPersonModal').modal('hide');
-    }
-
-    function addStaff(staffId) {
-        var field;
-
-        let typeId = $('#staffParticipantTypeId').val();
-        if(typeId == affectedId) {
-            field = $('#affectedJson')
-        } else {
-            field = $('#witnessJson')
+            updateTable(typeId)
         }
 
-        var people;
-        if(field.val().length != 0) {
-            people = JSON.parse(field.val());
-        }
-        else
-        {
-            people = [];
-        }
-        people.push({id: staffId, name: users[staffId] });
+        function updateTable(typeId) {
+            var field;
+            var table;
+            var tableContent;
 
-        field.val(JSON.stringify(people));
-        updateTable(typeId);
-        $('#addStaffModal').modal('hide');
-    }
+            if (typeId == affectedId) {
+                field = $('#affectedJson')
+                table = $('#publicTable')
+                tableContent = $('#publicTableContent')
+            } else {
+                field = $('#witnessJson')
+                table = $('#witnessTable')
+                tableContent = $('#witnessTableContent')
+            }
 
-    function remove(typeId, itemId) {
-        if(typeId == affectedId) {
-            field = $('#affectedJson')
-        } else {
-            field = $('#witnessJson')
-        }
-
-        var data = JSON.parse(field.val());
-        data.splice(itemId, 1);
-        field.val(JSON.stringify(data));
-
-        updateTable(typeId)
-    }
-
-    function updateTable(typeId) {
-        var field;
-        var table;
-        var tableContent;
-
-        if(typeId == affectedId) {
-            field = $('#affectedJson')
-            table = $('#publicTable')
-            tableContent = $('#publicTableContent')
-        } else {
-            field = $('#witnessJson')
-            table = $('#witnessTable')
-            tableContent = $('#witnessTableContent')
-        }
-
-        if(field.val().length == 0) {
-            table.addClass('d-none');
-        }
-        else
-        {
-            let content = [];
-            let people = JSON.parse(field.val());
-            if(people.length == 0) {
+            if (field.val().length == 0) {
                 table.addClass('d-none');
             }
             else {
-                $.each(people, function(index, value) {
-                    if(value.id) {
-                        // staff
-                        content.push('<tr>');
-                        content.push('<td onclick="remove(' + typeId + ',' + index + ')"')
-                        content.push(' class="button-column align-middle">')
-                        content.push('<button class="btn btn-sm btn-outline-danger">')
-                        content.push('<span class="fas fa-minus-circle"></span></button>')
-                        content.push('</td><td class="align-middle">Staff</td>');
-                        content.push('<td class="align-middle">')
-                        content.push(value.name);
-                        content.push('</td><td>&nbsp;</td><td>&nbsp;</td></tr>');
-                    }
-                    else
-                    {
-                        content.push('<tr>');
-                        content.push('<td onclick="remove(' + typeId + ',' + index + ')"')
-                        content.push(' class="button-column align-middle">')
-                        content.push('<button class="btn btn-sm btn-outline-danger">')
-                        content.push('<span class="fas fa-minus-circle"></span></button>')
-                        content.push('</td><td class="align-middle">Non-staff</td>');
-                        content.push('<td class="align-middle">')
-                        content.push(value.name);
-                        content.push('</td><td class="align-middle">');
-                        content.push(value.barcode);
-                        content.push('</td><td class="align-middle">');
-                        content.push(value.description);
-                        content.push('</td></tr>');
-                    }
-                });
-                tableContent.html(content.join(''))
-                table.removeClass('d-none');
+                let content = [];
+                let people = JSON.parse(field.val());
+                if (people.length == 0) {
+                    table.addClass('d-none');
+                }
+                else {
+                    $.each(people, function (index, value) {
+                        if (value.id) {
+                            // staff
+                            content.push('<tr>');
+                            content.push('<td onclick="remove(' + typeId + ',' + index + ')"')
+                            content.push(' class="button-column align-middle">')
+                            content.push('<button class="btn btn-sm btn-outline-danger">')
+                            content.push('<span class="fas fa-minus-circle"></span></button>')
+                            content.push('</td><td class="align-middle">Staff</td>');
+                            content.push('<td class="align-middle">')
+                            content.push(value.name);
+                            content.push('</td><td>&nbsp;</td><td>&nbsp;</td></tr>');
+                        }
+                        else {
+                            content.push('<tr>');
+                            content.push('<td onclick="remove(' + typeId + ',' + index + ')"')
+                            content.push(' class="button-column align-middle">')
+                            content.push('<button class="btn btn-sm btn-outline-danger">')
+                            content.push('<span class="fas fa-minus-circle"></span></button>')
+                            content.push('</td><td class="align-middle">Non-staff</td>');
+                            content.push('<td class="align-middle">')
+                            content.push(value.name);
+                            content.push('</td><td class="align-middle">');
+                            content.push(value.barcode);
+                            content.push('</td><td class="align-middle">');
+                            content.push(value.description);
+                            content.push('</td></tr>');
+                        }
+                    });
+                    tableContent.html(content.join(''))
+                    table.removeClass('d-none');
+                }
             }
         }
-    }
-</script>
+    </script>
 }

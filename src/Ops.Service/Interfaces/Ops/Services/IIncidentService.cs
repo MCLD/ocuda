@@ -11,7 +11,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         public Task<int> AddAsync(Incident incident,
             ICollection<IncidentStaff> staffs,
             ICollection<IncidentParticipant> participants,
-            System.Uri baseUri);
+        System.Uri baseUri);
 
         public Task AddFollowupAsync(int incidentId, string followupText);
 
@@ -32,6 +32,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
         public Task<CollectionWithCount<Incident>> GetPaginatedAsync(IncidentFilter filter);
 
         public Task<IncidentType> GetTypeAsync(string incidentTypeDescription);
+
+        public Task SetVisibilityAsync(int incidentId, bool isVisible);
 
         public Task UpdateIncidentTypeAsync(int incidentTypeId, string incidentTypeDescription);
     }

@@ -1,35 +1,50 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.DetailsViewModel
 
-<div class="row mb-2">
-    <div class="col-sm-6">
-        <h1>
-            @Model.Heading
-            @if (!string.IsNullOrEmpty(Model.SecondaryHeading))
+<div class="d-flex justify-content-between">
+    <h1>
+        @Model.Heading
+        @if (!string.IsNullOrEmpty(Model.SecondaryHeading))
+        {
+            <small class="text-muted">@Model.SecondaryHeading</small>
+        }
+    </h1>
+    <div class="pt-2">
+        @if (Model.CanHide)
+        {
+            if (Model.Incident.IsVisible)
             {
-                <small class="text-muted">@Model.SecondaryHeading</small>
+                <form class="d-inline-block" asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.HideIncident)">
+                    <input type="hidden" value="@Model.Incident.Id" name="incidentId">
+                    <button class="btn btn-outline-warning d-print-none">Hide</button>
+                </form>
             }
-        </h1>
-    </div>
-    <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right d-print-none"
-           asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
-           asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine)"
-           asp-route-page="@(Model.Page > 1 ? Model.Page : null)">Back</a>
+            else
+            {
+                <form class="d-inline-block" asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.ShowIncident)">
+                    <input type="hidden" value="@Model.Incident.Id" name="incidentId">
+                    <button class="btn btn-outline-warning d-print-none">Un-hide</button>
+                </form>
+            }
+        }
         @if (Model.CanAdd)
         {
-            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right d-print-none"
+            <button class="btn btn-outline-success d-print-none"
                 data-toggle="modal"
                 data-target="#addFollowup">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Follow-up
             </button>
-            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right d-print-none"
+            <button class="btn btn-outline-success d-print-none"
                 data-toggle="modal"
                 data-target="#addRelationship">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Relationship
             </button>
         }
+        <a class="btn btn-outline-dark d-print-none ml-2"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
+           asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine)"
+           asp-route-page="@(Model.Page > 1 ? Model.Page : null)">Back</a>
     </div>
 </div>
 
@@ -83,6 +98,15 @@
             </div>
         </div>
     </form>
+}
+
+@if (!Model.Incident.IsVisible)
+{
+    <div class="row mt-2">
+        <div class="col-8 offset-2">
+            <div class="alert alert-warning">This incident report is hidden.</div>
+        </div>
+    </div>
 }
 
 <div class="row">
@@ -331,45 +355,45 @@
 }
 
 @section styles {
-<style type="text/css">
-    th.fieldname {
-        width: 13rem;
-    }
+    <style type="text/css">
+        th.fieldname {
+            width: 13rem;
+        }
 
-    th.typefieldname {
-        width: 8rem;
-    }
+        th.typefieldname {
+            width: 8rem;
+        }
 
-    th.namefieldname {
-        width: 10rem;
-    }
+        th.namefieldname {
+            width: 10rem;
+        }
 
-    th.nameanddatetime {
-        width: 11rem;
-    }
-</style>
+        th.nameanddatetime {
+            width: 11rem;
+        }
+    </style>
 }
 
-@section scripts {
-<script>
-    $().ready(function() {
-        $('[maxlength]').each(function(index) {
-            let fieldId = '#' + this.id;
-            let lengthField = $(fieldId + '_LengthDisplay');
-            if(lengthField.length) {
-                $(fieldId).on('input', function() {
-                    if(this.value.length == 0) {
-                        $(lengthField).text("Up to " + $(fieldId).attr('maxlength') + ' characters.')
-                    }
-                    else {
+    @section scripts {
+    <script>
+        $().ready(function () {
+            $('[maxlength]').each(function (index) {
+                let fieldId = '#' + this.id;
+                let lengthField = $(fieldId + '_LengthDisplay');
+                if (lengthField.length) {
+                    $(fieldId).on('input', function () {
+                        if (this.value.length == 0) {
+                            $(lengthField).text("Up to " + $(fieldId).attr('maxlength') + ' characters.')
+                        }
+                        else {
+                            $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');
+                        }
+                    });
+                    if ($(fieldId).val()) {
                         $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');
                     }
-                });
-                if($(fieldId).val()) {
-                    $(lengthField).text(this.value.length + '/' + $(fieldId).attr('maxlength') + ' characters');
                 }
-            }
-        });
-    })
-</script>
+            });
+        })
+    </script>
 }
