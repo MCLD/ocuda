@@ -8,6 +8,8 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 {
     public interface ISegmentRepository : IGenericRepository<Segment>
     {
+        Task<int> CountByWrapAsync(int segmentWrapId);
+
         Task<Segment> FindAsync(int id);
 
         Task<ICollection<Segment>> GetAllActiveSegmentsAsync();
@@ -19,5 +21,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
         Task<int?> GetPageLayoutIdForSegmentAsync(int id);
 
         Task<DataWithCount<ICollection<Segment>>> GetPaginatedListAsync(BaseFilter filter);
+
+        Task UpdateWrapAsync(int segmentId, int? segmentWrapId);
     }
 }

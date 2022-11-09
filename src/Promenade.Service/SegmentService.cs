@@ -21,6 +21,7 @@ namespace Ocuda.Promenade.Service
         private readonly LanguageService _languageService;
         private readonly ISegmentRepository _segmentRepository;
         private readonly ISegmentTextRepository _segmentTextRepository;
+        private readonly ISegmentWrapRepository _segmentWrapRepository;
 
         public SegmentService(ILogger<SegmentService> logger,
             IDateTimeProvider dateTimeProvider,
@@ -29,6 +30,7 @@ namespace Ocuda.Promenade.Service
             IHttpContextAccessor httpContextAccessor,
             ISegmentRepository segmentRepository,
             ISegmentTextRepository segmentTextRepository,
+            ISegmentWrapRepository segmentWrapRepository,
             LanguageService languageService)
             : base(logger, dateTimeProvider)
         {
@@ -40,6 +42,8 @@ namespace Ocuda.Promenade.Service
                 ?? throw new ArgumentNullException(nameof(segmentRepository));
             _segmentTextRepository = segmentTextRepository
                 ?? throw new ArgumentNullException(nameof(segmentTextRepository));
+            _segmentWrapRepository = segmentWrapRepository
+                 ?? throw new ArgumentNullException(nameof(segmentWrapRepository));
             _languageService = languageService
                 ?? throw new ArgumentNullException(nameof(languageService));
         }
@@ -68,14 +72,14 @@ namespace Ocuda.Promenade.Service
                 if (segment.EndDate.HasValue)
                 {
                     var timeFromNow = segment.EndDate.Value - DateTime.Now;
-                    if(timeFromNow < TimeSpan.FromHours(cachePagesInHours))
+                    if (timeFromNow < TimeSpan.FromHours(cachePagesInHours))
                     {
                         await _cache.SaveToCacheAsync(segmentCacheKey, segment, timeFromNow);
                         cached = true;
                     }
                 }
 
-                if(!cached)
+                if (!cached)
                 {
                     await _cache.SaveToCacheAsync(segmentCacheKey, segment, cachePagesInHours);
                 }
@@ -147,6 +151,35 @@ namespace Ocuda.Promenade.Service
                             cachePagesInHours);
                     }
                 }
+            }
+
+            SegmentWrap segmentWrap = null;
+
+            if (segment.SegmentWrapId.HasValue)
+            {
+                string segmentWrapCacheId = string.Format(CultureInfo.InvariantCulture,
+                    Utility.Keys.Cache.PromSegmentWrap,
+                    segment.SegmentWrapId.Value);
+
+                if (cachePagesInHours > 0 && !forceReload)
+                {
+                    segmentWrap = await _cache
+                        .GetObjectFromCacheAsync<SegmentWrap>(segmentWrapCacheId);
+                }
+
+                if (segmentWrap == null)
+                {
+                    segmentWrap = await _segmentWrapRepository
+                        .GetActiveAsync(segment.SegmentWrapId.Value);
+                    await _cache
+                        .SaveToCacheAsync(segmentWrapCacheId, segmentWrap, cachePagesInHours);
+                }
+            }
+
+            if (segmentWrap != null && segmentText != null)
+            {
+                segmentText.SegmentWrapPrefix = segmentWrap.Prefix;
+                segmentText.SegmentWrapSuffix = segmentWrap.Suffix;
             }
 
             return segmentText;

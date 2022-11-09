@@ -37,7 +37,7 @@ namespace Ocuda.Promenade.Controllers
 
             var products = await _productService.GetProductsAsync(forceReload);
 
-            if(products?.Any() != true)
+            if (products?.Any() != true)
             {
                 return StatusCode(Microsoft.AspNetCore.Http.StatusCodes.Status404NotFound);
             }
@@ -104,8 +104,9 @@ namespace Ocuda.Promenade.Controllers
                 }
                 if (!string.IsNullOrEmpty(product.SegmentText.Text))
                 {
-                    viewModel.SegmentText
-                        = CommonMark.CommonMarkConverter.Convert(product.SegmentText.Text);
+                    viewModel.SegmentText = product.SegmentText.SegmentWrapPrefix
+                        + CommonMark.CommonMarkConverter.Convert(product.SegmentText.Text)
+                        + product.SegmentText.SegmentWrapSuffix;
                 }
             }
 

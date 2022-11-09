@@ -38,6 +38,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly IPodcastService _podcastService;
         private readonly IProductService _productService;
         private readonly ISegmentService _segmentService;
+        private readonly ISegmentWrapService _segmentWrapService;
 
         public SegmentsController(ServiceFacades.Controller<SegmentsController> context,
             IEmediaService emediaService,
@@ -46,6 +47,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             IPermissionGroupService permissionGroupService,
             IPodcastService podcastService,
             IProductService productService,
+            ISegmentWrapService segmentWrapService,
             ISegmentService segmentService) : base(context)
         {
             _emediaService = emediaService
@@ -60,6 +62,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 ?? throw new ArgumentNullException(nameof(podcastService));
             _productService = productService
                 ?? throw new ArgumentNullException(nameof(productService));
+            _segmentWrapService = segmentWrapService
+                ?? throw new ArgumentNullException(nameof(segmentWrapService));
             _segmentService = segmentService
                 ?? throw new ArgumentNullException(nameof(segmentService));
         }
@@ -237,6 +241,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             var segmentText = await _segmentService
                 .GetBySegmentAndLanguageAsync(id, selectedLanguage.Id);
 
+            var wrapList = await _segmentWrapService.GetActiveListAsync();
+            if (wrapList?.Count > 0)
+            {
+                wrapList.Add("", "No wrap");
+            }
+
             var viewModel = new DetailViewModel
             {
                 LanguageDescription = selectedLanguage.Description,
@@ -250,7 +260,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 SegmentName = segment.Name,
                 SegmentStartDate = segment.StartDate,
                 SegmentText = await _segmentService
-                    .GetBySegmentAndLanguageAsync(id, selectedLanguage.Id)
+                    .GetBySegmentAndLanguageAsync(id, selectedLanguage.Id),
+                SegmentWrapId = segment.SegmentWrapId,
+                SegmentWrapList = new SelectList(wrapList.OrderBy(_ => _.Key),
+                    "Key",
+                    "Value",
+                    segment.SegmentWrapId)
             };
 
             viewModel.NewSegmentText = viewModel.SegmentText == null;
@@ -351,8 +366,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             return View(viewModel);
         }
 
-        [HttpPost]
-        [Route("[action]/{id}")]
+        [HttpPost("[action]/{id}")]
         [SaveModelState]
         public async Task<IActionResult> Detail(DetailViewModel model)
         {
@@ -365,6 +379,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             if (ModelState.IsValid)
             {
+                var segment = await _segmentService.GetByIdAsync(model.SegmentId);
+                if (segment != null && model.SegmentWrapId != segment.SegmentWrapId)
+                {
+                    await _segmentService.UpdateWrapAsync(segment.Id, model.SegmentWrapId);
+                }
+
                 var segmentText = model.SegmentText;
                 segmentText.LanguageId = language.Id;
                 segmentText.SegmentId = model.SegmentId;

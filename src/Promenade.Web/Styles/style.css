@@ -24,6 +24,10 @@ span.prom-fa-space {
     }
 }
 
+.prom-alert > p:last-child {
+    margin-bottom: 0px;
+}
+
 /* footer */
 footer {
     background-color: #333;

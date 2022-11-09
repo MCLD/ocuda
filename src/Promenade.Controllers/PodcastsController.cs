@@ -41,7 +41,8 @@ namespace Ocuda.Promenade.Controllers
                 ?? throw new ArgumentNullException(nameof(segmentService));
         }
 
-        public static string Name { get { return "Podcasts"; } }
+        public static string Name
+        { get { return "Podcasts"; } }
 
         [Route("{podcastStub}/{episodeStub}")]
         public async Task<IActionResult> Episode(string podcastStub, string episodeStub)
@@ -514,8 +515,9 @@ namespace Ocuda.Promenade.Controllers
                 var segmentText = await _segmentService.GetSegmentTextBySegmentIdAsync(
                     podcastItem.ShowNotesSegmentId.Value, forceReload);
 
-                segmentText.Text = CommonMark.CommonMarkConverter.Convert(
-                        segmentText.Text);
+                segmentText.Text = segmentText.SegmentWrapPrefix
+                    + CommonMark.CommonMarkConverter.Convert(segmentText.Text)
+                    + segmentText.SegmentWrapSuffix;
 
                 var viewModel = new ShowNotesViewModel
                 {

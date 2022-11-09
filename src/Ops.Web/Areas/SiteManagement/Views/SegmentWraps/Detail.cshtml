@@ -1,0 +1,41 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.SegmentWrap.DetailViewModel
+
+<div class="d-flex justify-content-between">
+    <h1>
+        @(Model.IsEdit ? "Edit" : "Add")
+        Segment Wrap
+        @if (Model.IsEdit)
+        {
+            <small class="text-muted">@Model.SegmentWrap?.Name</small>
+        }
+    </h1>
+    <div class="pt-2">
+        <a class="btn btn-outline-dark ml-2"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentWrapsController.Name"
+           asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentWrapsController.Index)"
+           asp-route-page="@Model.Page">Back</a>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-12">
+        <form asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.SegmentWrapsController.AddUpdate)"
+              method="post">
+            <input asp-for="IsEdit" type="hidden" />
+            <input asp-for="SegmentWrapId" type="hidden" />
+            <input asp-for="SegmentWrap.Name" formgroup />
+            <input asp-for="SegmentWrap.Description" formgroup />
+
+            <textarea asp-for="SegmentWrap.Prefix" rows="6" formgroup />
+            <textarea asp-for="SegmentWrap.Suffix" rows="6" formgroup />
+
+            <div class="col-md-9 offset-md-3">
+                <button class="btn btn-outline-success"
+                        type="submit"
+                        button-spinner>
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

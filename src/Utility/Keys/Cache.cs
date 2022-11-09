@@ -247,6 +247,11 @@
         public static readonly string PromSegmentText = "segmenttext.{0}.{1}";
 
         /// <summary>
+        /// Cached segment wrap, {0} is the segment wrap id
+        /// </summary>
+        public static readonly string PromSegmentWrap = "segmentwrap.{0}";
+
+        /// <summary>
         /// Cached site settings, {0} is the site setting key
         /// </summary>
         public static readonly string PromSiteSetting = "sitesetting.{0}";
