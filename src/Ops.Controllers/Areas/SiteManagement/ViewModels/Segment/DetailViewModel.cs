@@ -11,6 +11,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment
         public string AutomatedHeaderMarkup { get; set; }
 
         public string BackLink { get; set; }
+        public bool IsShowNotes { get; set; }
         public string LanguageDescription { get; set; }
         public int LanguageId { get; set; }
         public SelectList LanguageList { get; set; }
@@ -30,8 +31,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment
 
         public SegmentText SegmentText { get; set; }
 
+        [DisplayName("Segment Wrap (all languages)")]
+        public int? SegmentWrapId { get; set; }
+
+        public SelectList SegmentWrapList { get; set; }
+
         [DisplayName("Language")]
         public Language SelectedLanguage { get; set; }
-        public bool IsShowNotes { get; set; }
     }
 }

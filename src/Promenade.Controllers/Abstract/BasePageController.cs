@@ -191,7 +191,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
                 else if (item.DeckId.HasValue)
                 {
                     item.CardDetails = await DeckService.GetByIdAsync(item.DeckId.Value, forceReload);
-                    foreach(var cardDetail in item.CardDetails)
+                    foreach (var cardDetail in item.CardDetails)
                     {
                         cardDetail.Text = CommonMark.CommonMarkConverter.Convert(cardDetail.Text);
                     }
@@ -210,8 +210,9 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
                     if (item.SegmentText != null)
                     {
-                        item.SegmentText.Text = CommonMark.CommonMarkConverter.Convert(
-                            item.SegmentText.Text);
+                        item.SegmentText.Text = item.SegmentText.SegmentWrapPrefix
+                            + CommonMark.CommonMarkConverter.Convert(item.SegmentText.Text)
+                            + item.SegmentText.SegmentWrapSuffix;
                     }
                 }
                 else if (item.WebslideId.HasValue)

@@ -1,31 +1,19 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Segment.DetailViewModel
 
 @section styles {
-<link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
 
-<div class="row mb-2">
-    <div class="col-sm-6">
+    <div class="d-flex justify-content-between">
         <h1>
             Segment
             <small class="text-muted">@Model.SegmentName</small>
         </h1>
-    </div>
-    <div class="col-sm-6">
-        @if (!string.IsNullOrEmpty(Model.BackLink))
-        {
-            <a href="@Model.BackLink"
-           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
-        }
-        else
-        {
-            <a asp-action="Index"
-           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Cancel</a>
-        }
+        <div class="pt-2">
         @if (!Model.NewSegmentText && string.IsNullOrEmpty(Model.BackLink))
         {
             <button type="button"
-                class="btn btn-outline-danger mt-2 mb-1 mr-2 float-right"
+                class="btn btn-outline-danger"
                 data-toggle="modal"
                 data-target="#deleteModal"
                 data-segmentId="@Model.SegmentId"
@@ -35,10 +23,18 @@
                 Delete Segment
             </button>
         }
-
+        @if (!string.IsNullOrEmpty(Model.BackLink))
+        {
+            <a href="@Model.BackLink"
+           class="btn btn-outline-dark ml-2">Back</a>
+        }
+        else
+        {
+            <a asp-action="Index"
+           class="btn btn-outline-dark ml-2">Cancel</a>
+        }
     </div>
 </div>
-
 
 <form asp-controller="@SegmentsController.Name"
       asp-action="@(nameof(SegmentsController.DeleteText))"
@@ -107,6 +103,9 @@
     <input asp-for="SegmentId" type="hidden" />
     <input asp-for="LanguageId" type="hidden" />
 
+    <select asp-for="SegmentWrapId"
+            asp-items="Model.SegmentWrapList" formgroup></select>
+
     @if (!string.IsNullOrEmpty(Model.AutomatedHeaderMarkup))
     {
         <div class="form-group row">
@@ -155,32 +154,32 @@
 </form>
 
 @section scripts {
-<script src="~/js/md.min.js" asp-append-version="true"></script>
+    <script src="~/js/md.min.js" asp-append-version="true"></script>
 
-<script>
-    $(function () {
-        var editor = new Markdown.Editor($("#SegmentText_Text"), { 
-            allowUploads: false,
-            allowImages: false,
-            allowCode: @Json.Serialize(!Model.IsShowNotes),
-            allowHR: @Json.Serialize(!Model.IsShowNotes)
+    <script>
+        $(function () {
+            var editor = new Markdown.Editor($("#SegmentText_Text"), {
+                allowUploads: false,
+                allowImages: false,
+                allowCode: @Json.Serialize(!Model.IsShowNotes),
+                allowHR: @Json.Serialize(!Model.IsShowNotes)
+                        });
+            if (editor) {
+                editor.run();
+            }
         });
-        if (editor) {
-            editor.run();
-        }
-    });
 
-    $("#SegmentText_Text").keydown(function(event) {
-        $(".oc-save-warning").removeClass("d-none");
-    });
+        $("#SegmentText_Text").keydown(function (event) {
+            $(".oc-save-warning").removeClass("d-none");
+        });
 
-    $("#SegmentText_Header").keydown(function(event) {
-        $(".oc-save-warning").removeClass("d-none");
-    });
+        $("#SegmentText_Header").keydown(function (event) {
+            $(".oc-save-warning").removeClass("d-none");
+        });
 
-    $("#deleteModal").on("show.bs.modal", function (e) {
-        var languageDescription = $(e.relatedTarget).data("languagedescription");
-        $(this).find(".modal-text").text("Are you sure you want to delete the " + languageDescription + " text for this segment?");
-    });
-</script>
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            var languageDescription = $(e.relatedTarget).data("languagedescription");
+            $(this).find(".modal-text").text("Are you sure you want to delete the " + languageDescription + " text for this segment?");
+        });
+    </script>
 }

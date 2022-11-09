@@ -440,6 +440,8 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.SegmentRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ISegmentTextRepository,
                 Data.Promenade.SegmentTextRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ISegmentWrapRepository,
+                Data.Promenade.SegmentWrapRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ISiteAlertRepository,
                 Data.Promenade.SiteAlertRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ISiteSettingRepository,

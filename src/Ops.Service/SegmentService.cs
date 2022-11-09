@@ -46,32 +46,6 @@ namespace Ocuda.Ops.Service
                             ?? throw new ArgumentNullException(nameof(segmentTextRepository));
         }
 
-        public async Task<ICollection<Segment>> GetActiveSegmentsAsync()
-        {
-            return await _segmentRepository.GetAllActiveSegmentsAsync();
-        }
-
-        public async Task<DataWithCount<ICollection<Segment>>> GetPaginatedListAsync(
-            BaseFilter filter)
-        {
-            return await _segmentRepository.GetPaginatedListAsync(filter);
-        }
-
-        public async Task<Segment> GetByIdAsync(int segmentId)
-        {
-            return await _segmentRepository.FindAsync(segmentId);
-        }
-
-        public async Task<SegmentText> GetBySegmentAndLanguageAsync(int segmentId, int languageId)
-        {
-            return await _segmentTextRepository.GetBySegmentAndLanguageAsync(segmentId, languageId);
-        }
-
-        public async Task<ICollection<string>> GetSegmentLanguagesByIdAsync(int id)
-        {
-            return await _segmentTextRepository.GetUsedLanguageNamesBySegmentId(id);
-        }
-
         public async Task<Segment> CreateAsync(Segment segment)
         {
             segment = await CreateNoSaveAsync(segment);
@@ -88,18 +62,13 @@ namespace Ocuda.Ops.Service
             return segment;
         }
 
-        public async Task<Segment> EditAsync(Segment segment)
+        public async Task CreateSegmentTextAsync(SegmentText segmentText)
         {
-            var currentSegment = await _segmentRepository.FindAsync(segment.Id);
+            segmentText.Text = segmentText.Text?.Trim();
+            segmentText.Header = segmentText.Header?.Trim();
 
-            currentSegment.Name = segment.Name?.Trim();
-            currentSegment.IsActive = segment.IsActive;
-            currentSegment.StartDate = segment.StartDate;
-            currentSegment.EndDate = segment.EndDate;
-
-            _segmentRepository.Update(currentSegment);
-            await _segmentRepository.SaveAsync();
-            return segment;
+            await _segmentTextRepository.AddAsync(segmentText);
+            await _segmentTextRepository.SaveAsync();
         }
 
         public async Task DeleteAsync(int id)
@@ -127,13 +96,24 @@ namespace Ocuda.Ops.Service
             _segmentRepository.Remove(segment);
         }
 
-        public async Task CreateSegmentTextAsync(SegmentText segmentText)
+        public async Task DeleteSegmentTextAsync(SegmentText segmentText)
         {
-            segmentText.Text = segmentText.Text?.Trim();
-            segmentText.Header = segmentText.Header?.Trim();
-
-            await _segmentTextRepository.AddAsync(segmentText);
+            _segmentTextRepository.Remove(segmentText);
             await _segmentTextRepository.SaveAsync();
+        }
+
+        public async Task<Segment> EditAsync(Segment segment)
+        {
+            var currentSegment = await _segmentRepository.FindAsync(segment.Id);
+
+            currentSegment.Name = segment.Name?.Trim();
+            currentSegment.IsActive = segment.IsActive;
+            currentSegment.StartDate = segment.StartDate;
+            currentSegment.EndDate = segment.EndDate;
+
+            _segmentRepository.Update(currentSegment);
+            await _segmentRepository.SaveAsync();
+            return segment;
         }
 
         public async Task EditSegmentTextAsync(SegmentText segmentText)
@@ -147,10 +127,50 @@ namespace Ocuda.Ops.Service
             await _segmentTextRepository.SaveAsync();
         }
 
-        public async Task DeleteSegmentTextAsync(SegmentText segmentText)
+        public async Task<ICollection<Segment>> GetActiveSegmentsAsync()
         {
-            _segmentTextRepository.Remove(segmentText);
-            await _segmentTextRepository.SaveAsync();
+            return await _segmentRepository.GetAllActiveSegmentsAsync();
+        }
+
+        public async Task<Segment> GetByIdAsync(int segmentId)
+        {
+            return await _segmentRepository.FindAsync(segmentId);
+        }
+
+        public async Task<SegmentText> GetBySegmentAndLanguageAsync(int segmentId, int languageId)
+        {
+            return await _segmentTextRepository.GetBySegmentAndLanguageAsync(segmentId, languageId);
+        }
+
+        public async Task<IDictionary<int, string>> GetNamesByIdsAsync(IEnumerable<int> ids)
+        {
+            return await _segmentRepository.GetNamesByIdsAsync(ids);
+        }
+
+        public async Task<int?> GetPageHeaderIdForSegmentAsync(int id)
+        {
+            return await _segmentRepository.GetPageHeaderIdForSegmentAsync(id);
+        }
+
+        public async Task<int?> GetPageLayoutIdForSegmentAsync(int id)
+        {
+            return await _segmentRepository.GetPageLayoutIdForSegmentAsync(id);
+        }
+
+        public async Task<DataWithCount<ICollection<Segment>>> GetPaginatedListAsync(
+                                                    BaseFilter filter)
+        {
+            return await _segmentRepository.GetPaginatedListAsync(filter);
+        }
+
+        public async Task<ICollection<string>> GetSegmentLanguagesByIdAsync(int id)
+        {
+            return await _segmentTextRepository.GetUsedLanguageNamesBySegmentId(id);
+        }
+
+        public async Task UpdateWrapAsync(int segmentId, int? segmentWrapId)
+        {
+            await _segmentRepository.UpdateWrapAsync(segmentId, segmentWrapId);
         }
 
         private async Task<ICollection<string>> GetSegmentInUseByAsync(int id)
@@ -183,21 +203,6 @@ namespace Ocuda.Ops.Service
             }
 
             return inUseBy;
-        }
-
-        public async Task<int?> GetPageHeaderIdForSegmentAsync(int id)
-        {
-            return await _segmentRepository.GetPageHeaderIdForSegmentAsync(id);
-        }
-
-        public async Task<int?> GetPageLayoutIdForSegmentAsync(int id)
-        {
-            return await _segmentRepository.GetPageLayoutIdForSegmentAsync(id);
-        }
-
-        public async Task<IDictionary<int, string>> GetNamesByIdsAsync(IEnumerable<int> ids)
-        {
-            return await _segmentRepository.GetNamesByIdsAsync(ids);
         }
     }
 }

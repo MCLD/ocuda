@@ -18,6 +18,13 @@ namespace Ocuda.Ops.Data.Promenade
         {
         }
 
+        public async Task<int> CountByWrapAsync(int segmentWrapId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .CountAsync(_ => _.SegmentWrapId == segmentWrapId);
+        }
+
         public async Task<Segment> FindAsync(int id)
         {
             var entity = await DbSet.FindAsync(id);
@@ -82,6 +89,14 @@ namespace Ocuda.Ops.Data.Promenade
                     .ApplyPagination(filter)
                     .ToListAsync()
             };
+        }
+
+        public async Task UpdateWrapAsync(int segmentId, int? segmentWrapId)
+        {
+            var segment = await DbSet.FindAsync(segmentId);
+            segment.SegmentWrapId = segmentWrapId;
+            DbSet.Update(segment);
+            await _context.SaveChangesAsync();
         }
     }
 }

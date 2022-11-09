@@ -37,6 +37,9 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
         Task<int?> GetPageLayoutIdForSegmentAsync(int id);
 
         Task<DataWithCount<ICollection<Segment>>> GetPaginatedListAsync(BaseFilter filter);
+
         Task<ICollection<string>> GetSegmentLanguagesByIdAsync(int id);
+
+        Task UpdateWrapAsync(int segmentId, int? SegmentWrapId);
     }
 }

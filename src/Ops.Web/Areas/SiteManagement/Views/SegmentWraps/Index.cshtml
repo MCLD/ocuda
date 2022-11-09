@@ -1,0 +1,68 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.SegmentWrap.IndexViewModel
+
+<div class="d-flex justify-content-between">
+    <h1>
+        Segment Wraps
+    </h1>
+    <div class="pt-2">
+        <a class="btn btn-outline-success"
+           asp-controller="@SegmentWrapsController.Name"
+           asp-action="@nameof(SegmentWrapsController.AddUpdate)">Add Segment Wrap</a>
+        <a class="btn btn-outline-dark ml-2"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
+           asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index)">Back</a>
+    </div>
+</div>
+
+<table class="table table-sm table-bordered mt-2">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Used Count</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.SegmentWraps?.Count > 0)
+        {
+            @foreach (var segmentWrap in Model.SegmentWraps)
+            {
+                <tr class="@(segmentWrap.IsDeleted ? "text-danger" : null)">
+                    <td class="align-middle">@segmentWrap.Name</td>
+                    <td class="align-middle">@segmentWrap.Description</td>
+                    <td class="align-middle">
+                        @segmentWrap.UsedByCount
+                        @if (segmentWrap.IsDeleted)
+                        {
+                            <em>(Disabled)</em>
+                        }
+                    </td>
+                    <td class="align-middle">
+                        @if (!segmentWrap.IsDeleted)
+                        {
+                            <a class="btn btn-sm btn-outline-info"
+                   asp-action="@nameof(SegmentWrapsController.AddUpdate)"
+                   asp-route-segmentWrapId="@segmentWrap.Id"><span class="fas fa-fw fa-edit"></span></a>
+                        }
+                        @if (!segmentWrap.IsDeleted || segmentWrap.UsedByCount == 0)
+                        {
+                            <form class="d-inline-block"
+                      asp-action="@nameof(SegmentWrapsController.Disable)"
+                      asp-route-segmentWrapId="@segmentWrap.Id">
+                                <button class="btn btn-sm btn-outline-danger"><span class="fas fa-fw fa-minus-circle"></span></button>
+                            </form>
+
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3">No Segment Wraps configured.</td>
+            </tr>
+        }
+    </tbody>
+</table>
