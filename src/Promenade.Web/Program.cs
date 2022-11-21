@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ocuda.Utility.Keys;
 using Serilog;
@@ -11,8 +10,18 @@ namespace Ocuda.Promenade.Web
 {
     public static class Program
     {
+        private const string EnvAspNetCoreEnv = "ASPNETCORE_ENVIRONMENT";
+        private const string EnvRunningInContainer = "DOTNET_RUNNING_IN_CONTAINER";
         private const string Product = "Ocuda.Promenade";
 
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
+                .UseSerilog();
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+            "CA1031:Do not catch general exception types",
+            Justification = "Catch exceptions at the top level of the application.")]
         public static int Main(string[] args)
         {
             using var webHost = CreateHostBuilder(args).Build();
@@ -24,17 +33,28 @@ namespace Ocuda.Promenade.Web
 
             var version = Utility.Helpers.VersionHelper.GetVersion();
 
+            var webHostEnvironment
+                = (IWebHostEnvironment)webHost.Services.GetService(typeof(IWebHostEnvironment));
+
             Log.Logger = Utility.Logging.Configuration.Build(config).CreateLogger();
-            Log.Information("{Product} v{Version} instance {Instance} starting up",
+            Log.Information("{Product} v{Version} instance {Instance} environment {Environment} in {WebRootPath} with content root {ContentRoot} starting up",
                 Product,
                 version,
-                instance);
+                instance,
+                config[EnvAspNetCoreEnv] ?? "Production",
+                webHostEnvironment.WebRootPath,
+                config[Configuration.OcudaUrlSharedContent]);
+
+            if (!string.IsNullOrEmpty(config[EnvRunningInContainer]))
+            {
+                Log.Information("Containerized: commit {ContainerCommit} created on {ContainerDate} image {ContainerImageVersion}",
+                    config["org.opencontainers.image.revision"] ?? "unknown",
+                    config["org.opencontainers.image.created"] ?? "unknown",
+                    config["org.opencontainers.image.version"] ?? "unknown");
+            }
 
             // perform initialization
-            using (IServiceScope scope = webHost.Services.CreateScope())
-            {
-                Task.Run(() => new Web(scope).InitalizeAsync()).Wait();
-            }
+            Task.Run(() => new Web(webHost.Services).InitalizeAsync()).Wait();
 
             try
             {
@@ -61,7 +81,6 @@ namespace Ocuda.Promenade.Web
                 webHost.Run();
                 return 0;
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 Log.Fatal(ex, "{Product} instance {Instance} v{Version} exited unexpectedly: {Message}",
@@ -71,7 +90,6 @@ namespace Ocuda.Promenade.Web
                     ex.Message);
                 return 1;
             }
-#pragma warning restore CA1031 // Do not catch general exception types
             finally
             {
                 Log.Information("{Product} instance {Instance} v{Version} shutting down",
@@ -81,10 +99,5 @@ namespace Ocuda.Promenade.Web
                 Log.CloseAndFlush();
             }
         }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
-                .UseSerilog();
     }
 }

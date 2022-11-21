@@ -182,17 +182,20 @@ namespace Ocuda.Promenade.Service
                             item.ImageFeatureItemText = await _imageFeatureItemTextRepository
                                 .GetByIdsAsync(item.Id, defaultLanguageId);
 
-                            item.ImageFeatureItemText.Filepath = _pathResolver
+                            if (item.ImageFeatureItemText != null)
+                            {
+                                item.ImageFeatureItemText.Filepath = _pathResolver
                                 .GetPublicContentLink(ImagesFilePath,
                                     languageName,
                                     FeaturesFilePath,
                                     item.ImageFeatureItemText.Filename);
 
-                            if (expire.HasValue)
-                            {
-                                await _cache.SaveToCacheAsync(itemTextCacheKey,
-                                    item.ImageFeatureItemText,
-                                    expire.Value);
+                                if (expire.HasValue)
+                                {
+                                    await _cache.SaveToCacheAsync(itemTextCacheKey,
+                                        item.ImageFeatureItemText,
+                                        expire.Value);
+                                }
                             }
                         }
                     }
@@ -205,6 +208,7 @@ namespace Ocuda.Promenade.Service
 
                 foreach (var item in invalidItems)
                 {
+                    _logger.LogWarning("Invalid image feature item: {ItemInfo}", item.Name);
                     imageFeature.Items.Remove(item);
                 }
 

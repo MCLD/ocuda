@@ -24,18 +24,18 @@
     <div class="row">
         <div class="col-12 mb-2">
             <form asp-action="@nameof(LocationsController.Find)"
-                  method="get"
-                  role="form"
-                  id="ZipForm">
+              method="get"
+              role="form"
+              id="ZipForm">
                 <div class="input-group">
                     <input asp-for="Zip"
-                           placeholder="@Localizer[Promenade.ZipCodePrompt]"
-                           class="form-control default-text" />
+                       placeholder="@Localizer[Promenade.ZipCodePrompt]"
+                       class="form-control default-text search-box" />
                     <div class="input-group-append">
-                        <button class="btn btn-outline-primary"
-                                type="submit"
-                                id="GoButton"
-                                button-spinner>
+                        <button class="btn btn-outline-dark search-button"
+                            type="submit"
+                            id="GoButton"
+                            button-spinner>
                             @Localizer[Promenade.ButtonGo]
                         </button>
                     </div>
@@ -48,9 +48,9 @@
             <form asp-action="Location" method="get" role="form" id="GeoForm">
                 <input asp-for="Latitude" id="Latitude" hidden />
                 <input asp-for="Longitude" id="Longitude" hidden />
-                <button class="btn btn-outline-primary btn-block"
-                        id="GeoButton"
-                        button-spinner>
+                <button class="btn btn-outline-dark btn-block"
+                    id="GeoButton"
+                    button-spinner>
                     <span class="fas fa-map-marker-alt"></span>
                     @Localizer[Promenade.ButtonUseMyLocation]
                 </button>
@@ -67,17 +67,17 @@
             <div class="col-12 col-md-6 col-lg-4 mt-2 mb-3 d-flex">
                 <div class="prom-location-tile flex-fill w-100">
                     @if (!string.IsNullOrEmpty(location.MapLink)
-                     && !string.IsNullOrEmpty(location.MapImagePath))
+                   && !string.IsNullOrEmpty(location.MapImagePath))
                     {
                         <a href="@location.MapLink">
                             <img src="@location.MapImagePath"
-                                 class="img-fluid"
-                                 style="width: 100%;" />
+                     class="img-fluid"
+                     style="width: 100%;" />
                         </a>
                     }
                     <div class="status-bar @(location.CurrentStatus.IsCurrentlyOpen ? "bg-success" : location.CurrentStatus.IsSpecialHours ? "bg-primary" : "bg-danger")">&nbsp;</div>
                     <div class="px-3 pt-2 pb-3">
-                        <span class="h3">
+                        <span class="item-title">
                             @if (!string.IsNullOrWhiteSpace(location.LocatorName))
                             {
                                 @Html.Raw(location.LocatorName)
@@ -87,16 +87,14 @@
                                 @location.Name
                             }
                         </span>
-                        <em>
-                            @if (location.Distance != 0)
-                            {
-                                <text>(@location.Distance mi.)</text>
-                            }
-                        </em>
+                        @if (location.Distance != 0)
+                        {
+                            <em class="h3"><small>(@location.Distance mi.)</small></em>
+                        }
                         <p class="mb-1">
                             @location.Address<br />
-                            @location.City
-                            @location.State,
+                            @location.City,
+                            @location.State
                             @location.Zip
                         </p>
                         <p class="@(location.CurrentStatus.IsCurrentlyOpen ? "text-success" : location.CurrentStatus.IsSpecialHours ? "text-primary" : "text-danger")">
@@ -105,8 +103,8 @@
                         <div class="row">
                             <div class="col-6">
                                 <a asp-action="@nameof(LocationsController.Locations)"
-                                   asp-route-locationStub="@location.Stub"
-                                   class="btn btn-outline-dark">
+                           asp-route-locationStub="@location.Stub"
+                           class="btn btn-outline-dark">
                                     @Localizer[Promenade.LocationButtonDetails]
                                 </a>
                             </div>
@@ -114,7 +112,7 @@
                                 @if (location.HasEvents)
                                 {
                                     <a href="@location.EventLink"
-                                       class="btn btn-outline-dark">
+                           class="btn btn-outline-dark">
                                         @Localizer[Promenade.LocationButtonEvents]
                                     </a>
                                 }
@@ -140,13 +138,6 @@
 @section scripts {
     <script>
         var useMyLocation = '@Localizer[Promenade.ButtonUseMyLocation]';
-
-        $().ready(function () {
-            if (location.protocol != 'https:' && location.hostname != 'localhost') {
-                location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
-            }
-            $('#GeoButton').show();
-        });
 
         var geoSuccess = function (position) {
             $('#Latitude').val(position.coords.latitude);
