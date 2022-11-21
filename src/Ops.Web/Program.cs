@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ocuda.Utility.Keys;
 using Serilog;
@@ -11,6 +10,8 @@ namespace Ocuda.Ops.Web
 {
     public static class Program
     {
+        private const string EnvAspNetCoreEnv = "ASPNETCORE_ENVIRONMENT";
+        private const string EnvRunningInContainer = "DOTNET_RUNNING_IN_CONTAINER";
         private const string Product = "Ocuda.Ops";
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -32,11 +33,25 @@ namespace Ocuda.Ops.Web
 
             var version = Utility.Helpers.VersionHelper.GetVersion();
 
+            var webHostEnvironment
+                = (IWebHostEnvironment)webHost.Services.GetService(typeof(IWebHostEnvironment));
+
             Log.Logger = Utility.Logging.Configuration.Build(config).CreateLogger();
-            Log.Information("{Product} v{Version} instance {Instance} starting up",
+            Log.Information("{Product} v{Version} instance {Instance} environment {Environment} in {WebRootPath} with content root {ContentRoot} starting up",
                 Product,
                 version,
-                instance);
+                instance,
+                config[EnvAspNetCoreEnv] ?? "Production",
+                webHostEnvironment.WebRootPath,
+                config[Configuration.OcudaUrlSharedContent]);
+
+            if (!string.IsNullOrEmpty(config[EnvRunningInContainer]))
+            {
+                Log.Information("Containerized: commit {ContainerCommit} created on {ContainerDate} image {ContainerImageVersion}",
+                    config["org.opencontainers.image.revision"] ?? "unknown",
+                    config["org.opencontainers.image.created"] ?? "unknown",
+                    config["org.opencontainers.image.version"] ?? "unknown");
+            }
 
             try
             {
@@ -58,10 +73,7 @@ namespace Ocuda.Ops.Web
                         config[Configuration.OcudaRuntimeSessionTimeout]);
                 }
 
-                using (var scope = webHost.Services.CreateScope())
-                {
-                    Task.Run(() => new CacheManagement(scope).StartupClearAsync()).Wait();
-                }
+                Task.Run(() => new CacheManagement(webHost.Services).StartupClearAsync()).Wait();
 
                 webHost.Run();
                 return 0;

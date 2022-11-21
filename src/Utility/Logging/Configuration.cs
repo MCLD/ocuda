@@ -2,6 +2,7 @@
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+using Serilog.Core;
 using Serilog.Filters;
 
 namespace Ocuda.Utility.Logging
@@ -10,6 +11,9 @@ namespace Ocuda.Utility.Logging
     {
         private const string DefaultErrorControllerName = "Controllers.ErrorController";
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
+            "CA1305:Specify IFormatProvider",
+            Justification = "Logging details do not need to be localized.")]
         public static LoggerConfiguration Build(IConfiguration config)
         {
             if (config == null)
@@ -67,11 +71,14 @@ namespace Ocuda.Utility.Logging
             string seqEndpoint = config[Keys.Configuration.OcudaSeqEndpoint];
             if (!string.IsNullOrEmpty(seqEndpoint))
             {
+                var levelSwitch = new LoggingLevelSwitch();
+
                 loggerConfig
                     .WriteTo.Logger(_ => _
                         .Filter.ByExcluding(Matching.FromSource(errorControllerName))
                         .WriteTo.Seq(seqEndpoint,
-                            apiKey: config[Keys.Configuration.OcudaSeqAPI]));
+                            apiKey: config[Keys.Configuration.OcudaSeqAPI],
+                            controlLevelSwitch: levelSwitch));
             }
 
             return loggerConfig;
