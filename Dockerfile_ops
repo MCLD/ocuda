@@ -16,7 +16,7 @@ RUN dotnet test
 RUN dotnet publish -c Release -o "/app/publish/ops" "src/Ops.Web"
 
 # Get runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:6.0@sha256:44b4f667b4f1a7578c59b605bba50d98681904cd02bf3ca5a834bd59a666f281 as publish
+FROM mcr.microsoft.com/dotnet/aspnet:6.0@sha256:f5f612fe39ab701dbf0dbf453265e6719b6bfd2ce868ad250b98081a5234517d as publish
 
 WORKDIR /app
 
