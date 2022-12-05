@@ -1,5 +1,5 @@
 # Get build image
-FROM mcr.microsoft.com/dotnet/sdk:6.0@sha256:636957392a0ec2ef08ea2022596797672b7535d180ef7841561a0f517813f67b AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0@sha256:feec76a02b9b9c962ad7370ded941205ea68effed1c0a7b838f3c5d8181d4528 AS build
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN dotnet test
 RUN dotnet publish -c Release -o "/app/publish/ops" "src/Ops.Web"
 
 # Get runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:6.0@sha256:44b4f667b4f1a7578c59b605bba50d98681904cd02bf3ca5a834bd59a666f281 as publish
+FROM mcr.microsoft.com/dotnet/aspnet:6.0@sha256:f5f612fe39ab701dbf0dbf453265e6719b6bfd2ce868ad250b98081a5234517d as publish
 
 WORKDIR /app
 
