@@ -5,8 +5,8 @@
 Ocuda targets the ASP.NET 6 framework. For that to work currently
 you must:
 
-- Install the [.NET 6
-SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
+- Install the [.NET 7
+SDK](https://dotnet.microsoft.com/download/dotnet/7.0)
 - [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
 
 ## Project layout
