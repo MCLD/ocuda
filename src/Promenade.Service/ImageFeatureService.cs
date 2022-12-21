@@ -177,11 +177,11 @@ namespace Ocuda.Promenade.Service
                                 .GetObjectFromCacheAsync<ImageFeatureItemText>(itemTextCacheKey);
                         }
 
-                        if (item.ImageFeatureItemText == null)
-                        {
-                            item.ImageFeatureItemText = await _imageFeatureItemTextRepository
+                        item.ImageFeatureItemText ??= await _imageFeatureItemTextRepository
                                 .GetByIdsAsync(item.Id, defaultLanguageId);
 
+                        if (item.ImageFeatureItemText != null)
+                        {
                             item.ImageFeatureItemText.Filepath = _pathResolver
                                 .GetPublicContentLink(ImagesFilePath,
                                     languageName,
@@ -195,11 +195,10 @@ namespace Ocuda.Promenade.Service
                                     expire.Value);
                             }
                         }
-                    }
-
-                    if (item.ImageFeatureItemText == null)
-                    {
-                        invalidItems.Add(item);
+                        else
+                        {
+                            invalidItems.Add(item);
+                        }
                     }
                 }
 
