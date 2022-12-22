@@ -1,6 +1,5 @@
 ﻿@model Ocuda.Ops.Controllers.ViewModels.Contact.ScheduleIndexViewModel
 
-
 <div class="d-flex justify-content-between">
     <h1>
         Requests
@@ -11,6 +10,10 @@
         {
             <a class="btn btn-outline-primary mr-2" href="@Model.ScheduleDocumentLink">View Schedule</a>
         }
+        <a asp-controller="Schedule"
+           asp-action="Cancelled"
+           asp-area="Contact"
+           class="btn btn-outline-danger @Model.ActiveCancelled">Cancelled</a>
         <a asp-controller="Schedule"
            asp-action="Index"
            asp-area="Contact"
@@ -96,3 +99,5 @@
         }
     </tbody>
 </table>
+
+<nav paginate="@Model"></nav>

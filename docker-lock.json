@@ -1,0 +1,28 @@
+{
+	"dockerfiles": {
+		"Dockerfile_ops": [
+			{
+				"name": "mcr.microsoft.com/dotnet/sdk",
+				"tag": "7.0",
+				"digest": "7864257426b137231c0cf13cee1261c2b029f879ebcacea077de631404ba6447"
+			},
+			{
+				"name": "mcr.microsoft.com/dotnet/aspnet",
+				"tag": "7.0",
+				"digest": "00c2cfd910760eac2f1e2656bfb2db14937d73cd1858abae131046ad65a926b2"
+			}
+		],
+		"Dockerfile_promenade": [
+			{
+				"name": "mcr.microsoft.com/dotnet/sdk",
+				"tag": "7.0",
+				"digest": "7864257426b137231c0cf13cee1261c2b029f879ebcacea077de631404ba6447"
+			},
+			{
+				"name": "mcr.microsoft.com/dotnet/aspnet",
+				"tag": "7.0",
+				"digest": "00c2cfd910760eac2f1e2656bfb2db14937d73cd1858abae131046ad65a926b2"
+			}
+		]
+	}
+}

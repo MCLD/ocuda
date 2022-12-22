@@ -3,11 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.ViewModels.Contact
 {
-    public class ScheduleIndexViewModel
+    public class ScheduleIndexViewModel : PaginateModel
     {
+        public string ActiveCancelled
+        {
+            get
+            {
+                return ViewDescription == "Cancelled"
+                    ? "active"
+                    : null;
+            }
+        }
+
         public string ActiveToday
         {
             get
