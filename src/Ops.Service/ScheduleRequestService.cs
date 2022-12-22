@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Promenade.Models.Entities;
+using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Service
 {
@@ -43,9 +46,33 @@ namespace Ocuda.Ops.Service
             return await _scheduleRequestRepository.GetRequestAsync(requestId);
         }
 
-        public async Task<IEnumerable<ScheduleRequest>> GetRequestsAsync(DateTime requestedDate)
+        public async Task<CollectionWithCount<ScheduleRequest>> GetRequestsAsync(ScheduleRequestFilter scheduledRequestFilter)
         {
-            return await _scheduleRequestRepository.GetRequestsAsync(requestedDate);
+            if (scheduledRequestFilter?.IsCancelled == true)
+            {
+                return await _scheduleRequestRepository.GetPaginatedAsync(scheduledRequestFilter);
+            }
+            else if (scheduledRequestFilter?.RequestedDate.HasValue == true)
+            {
+                var data = await _scheduleRequestRepository
+                    .GetRequestsAsync(scheduledRequestFilter.RequestedDate.Value);
+
+                return new CollectionWithCount<ScheduleRequest>
+                {
+                    Data = data.ToList(),
+                    Count = data.Count()
+                };
+            }
+            else
+            {
+                var data = await _scheduleRequestRepository.GetUnclaimedRequestsAsync();
+
+                return new CollectionWithCount<ScheduleRequest>
+                {
+                    Data = data.ToList(),
+                    Count = data.Count()
+                };
+            }
         }
 
         public async Task<IEnumerable<ScheduleRequest>> GetUnclaimedRequestsAsync()
