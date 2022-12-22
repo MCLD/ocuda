@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Contact;
+using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 
 namespace Ocuda.Ops.Controllers.Areas.Contact
@@ -81,6 +82,43 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
             var requestedDate = GetClearSavedIndexParameter();
 
             return RedirectToAction(nameof(Index), new { requestedDate });
+        }
+
+        [Route("[action]")]
+        [Route("[action]/{page}")]
+        public async Task<IActionResult> Cancelled(int page)
+        {
+            int currentPage = page != 0 ? page : 1;
+
+            var filter = new ScheduleRequestFilter(currentPage)
+            {
+                IsCancelled = true
+            };
+
+            var scheduleRequests = await _scheduleRequestService
+                .GetRequestsAsync(filter);
+
+            var claims = await _scheduleService
+                .GetClaimsAsync(scheduleRequests.Data.Select(_ => _.Id).ToArray());
+
+            var viewModel = new ScheduleIndexViewModel
+            {
+                Claims = claims,
+                CurrentPage = currentPage,
+                ItemCount = scheduleRequests.Count,
+                ItemsPerPage = filter.Take.Value,
+                RequestedDate = DateTime.Now,
+                Requests = scheduleRequests.Data,
+                ScheduleDocumentLink = await _siteSettingService.GetSettingStringAsync(Models.Keys.SiteSetting.Scheduling.Documentation),
+                ViewDescription = "Cancelled"
+            };
+
+            if (viewModel.PastMaxPage)
+            {
+                return RedirectToRoute(new { page = viewModel.LastPage ?? 1 });
+            }
+
+            return View("Index", viewModel);
         }
 
         [HttpPost]
@@ -174,11 +212,14 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
             }
 
             var requests = date == DateTime.MinValue
-                ? await _scheduleRequestService.GetUnclaimedRequestsAsync()
-                : await _scheduleRequestService.GetRequestsAsync(date);
+                ? await _scheduleRequestService.GetRequestsAsync(null)
+                : await _scheduleRequestService.GetRequestsAsync(new ScheduleRequestFilter(0)
+                {
+                    RequestedDate = date
+                });
 
             var claims = await _scheduleService
-                .GetClaimsAsync(requests.Select(_ => _.Id).ToArray());
+                .GetClaimsAsync(requests.Data.Select(_ => _.Id).ToArray());
 
             if (date != DateTime.MinValue)
             {
@@ -194,7 +235,7 @@ namespace Ocuda.Ops.Controllers.Areas.Contact
             {
                 Claims = claims,
                 RequestedDate = date == DateTime.MinValue ? DateTime.Now : date,
-                Requests = requests,
+                Requests = requests.Data,
                 ScheduleDocumentLink = await _siteSettingService
                     .GetSettingStringAsync(Models.Keys.SiteSetting.Scheduling.Documentation),
                 ViewDescription = date == DateTime.MinValue ? "Unclaimed" : date.ToShortDateString()
