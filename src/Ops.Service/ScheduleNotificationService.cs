@@ -9,7 +9,6 @@ using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Promenade.Models.Entities;
-using Ocuda.Utility.Email;
 using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Ops.Service
@@ -194,6 +193,13 @@ namespace Ocuda.Ops.Service
                         request.Email.Trim());
 
                     await _scheduleRequestService.SetFollowupSentAsync(request);
+
+                    await _scheduleLogRepository.AddAsync(new ScheduleLog
+                    {
+                        CreatedAt = request.CreatedAt,
+                        Notes = "Request submitted by customer",
+                        ScheduleRequestId = request.Id
+                    });
 
                     await _scheduleLogRepository.AddAsync(new ScheduleLog
                     {
