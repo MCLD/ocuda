@@ -37,11 +37,13 @@
 {
     <div class="row">
         <div class="col-12 col-md-6 offset-md-3">
-            <div class="alert alert-info">
-                You are viewing a preview of how this page will
-                @(Model.PageLayout.StartDate == null
-                    ? "appear."
-                    : $"appear as of {Model.PageLayout.StartDate}.")
+            <div class="alert alert-info prom-alert">
+                <p>
+                    You are viewing a preview of how this page will
+                    @(Model.PageLayout.StartDate == null
+                        ? "appear."
+                        : $"appear as of {Model.PageLayout.StartDate}.")
+                </p>
             </div>
         </div>
     </div>
@@ -144,7 +146,7 @@
                            @foreach (var button in carouselItem.Buttons) {
                                 <text>data-button-@button.Order='{"Sort":"@button.Order","Button":"@button.LabelText.Text","Link":"@button.Url"}' </text>
 }>
-                                                                                                                    <img src="@carouselItem.CarouselItemText.ImageUrl" /><p>@carouselItem.CarouselItemText.Label</p></a>
+                                                                                                                                <img src="@carouselItem.CarouselItemText.ImageUrl" /><p>@carouselItem.CarouselItemText.Label</p></a>
                                 </div>
                             }
                         </div>
