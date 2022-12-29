@@ -255,3 +255,9 @@ src/Ops.Web.WindowsAuth/Properties/PublishProfiles/
 
 # Include all node_modules files
 !**/node_modules/**
+
+# Site-specific files
+src/Promenade.Web/wwwroot/*.ico
+src/Promenade.Web/wwwroot/*.png
+src/Promenade.Web/wwwroot/*.svg
+src/Promenade.Web/wwwroot/*.webmanifest

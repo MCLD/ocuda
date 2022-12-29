@@ -154,6 +154,19 @@ namespace Ocuda.Promenade.Service
                                         FeaturesFilePath,
                                         item.ImageFeatureItemText.Filename);
 
+                                if (item.ImageFeatureItemText
+                                    .Filepath
+                                    .EndsWith(".svg", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    var path = _pathResolver
+                                        .GetPublicContentFilePath(item.ImageFeatureItemText.Filename,
+                                            ImagesFilePath,
+                                            languageName,
+                                            FeaturesFilePath);
+                                    item.ImageFeatureItemText.FileContent =
+                                        System.IO.File.ReadAllText(path);
+                                }
+
                                 if (expire.HasValue)
                                 {
                                     await _cache.SaveToCacheAsync(itemTextCacheKey,

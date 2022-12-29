@@ -133,9 +133,9 @@ footer {
         background-color: white;
     }
 
-    .prom-nav-middle .prom-dropdown-swap-link > a {
-        border-radius: 0;
-    }
+        .prom-nav-middle .prom-dropdown-swap-link > a {
+            border-radius: 0;
+        }
 
     .prom-nav-middle .prom-nav-link {
         display: none;
@@ -278,6 +278,43 @@ a.prom-leftnav-header:hover {
 
     .prom-location-tile .status-bar {
         height: 0.4rem;
+    }
+
+.prom-tile {
+    padding-top: 45px;
+    background: #ffffff;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.125);
+    height: 162px;
+    margin-bottom: 0.5rem;
+}
+
+.prom-tile > svg {
+    width: 45px;
+}
+
+    .prom-tile:hover {
+        background-color: #cccccc;
+        color: #ffffff;
+        text-decoration: none;
+    }
+
+        .prom-tile:hover > svg path,
+        .prom-tile:hover > svg polygon {
+            fill: #ffffff;
+            stroke: #ffffff;
+        }
+
+    .prom-tile > svg path,
+    .prom-tile > svg polygon {
+        stroke: #666666;
+        fill: #666666;
+    }
+
+    .prom-tile > p {
+        margin-top: 0.5rem;
+        color: #000000;
+        text-align: center;
+        text-decoration: none;
     }
 
 .prom-location-icon-text {

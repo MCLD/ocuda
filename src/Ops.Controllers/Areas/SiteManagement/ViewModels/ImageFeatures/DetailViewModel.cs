@@ -9,6 +9,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.ImageFeatures
 {
     public class DetailViewModel
     {
+        public string AcceptImageExtensions { get; set; }
         public DateTime CurrentDateTime { get; set; }
 
         public string EditTemplateDisabled
