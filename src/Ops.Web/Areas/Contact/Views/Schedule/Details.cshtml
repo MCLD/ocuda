@@ -201,7 +201,7 @@
                 @if (!Model.ScheduleLogs.Where(_ => _.IsComplete == true).Any())
                 {
                     <select asp-for="AddLog.IsComplete" formgroup>
-                        <option value="false">No</option>
+                        <option value="false">Not complete: just add note, do not send email</option>
                         <option value="true">@Model.FinishMessage</option>
                     </select>
                 }
