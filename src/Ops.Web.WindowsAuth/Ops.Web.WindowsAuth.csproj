@@ -13,7 +13,7 @@
     <RepositoryUrl>https://github.com/MCLD/ocuda/</RepositoryUrl>
     <TargetFramework>net7.0</TargetFramework>
     <UserSecretsId>eb6c2377-84db-46df-9f5d-fde6a5ab4b8f</UserSecretsId>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

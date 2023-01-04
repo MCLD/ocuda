@@ -9,31 +9,36 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
+using Ocuda.Utility.Services;
 using Ocuda.Utility.Services.Interfaces;
-using Serilog;
 
 namespace Ops.Web.WindowsAuth
 {
     public class Startup
     {
-        private const string BadConfig = "Configured {0} could not be converted to a number. It should be a number of minutes (defaulting to 2).";
+        private const string BadConfig = "Configured {BadTimeout} could not be converted to a number. It should be a number of minutes (defaulting to 2).";
         private const string DUrlBit = "/d/";
         private const string HtmlDocumentFooter = "</body></html>";
         private const string HtmlDocumentHeader = "<!doctype html><html><head><style>* { font-family: sans-serif; }</style></head><body>";
         private const string IdUrlBit = "/id/";
         private readonly IConfiguration _config;
-        private readonly ILogger _logger;
 
         public Startup(IConfiguration configuration)
         {
             _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            _logger = Log.Logger;
         }
 
         private string CacheDiscriminator { get; set; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+            "CA1031:Do not catch general exception types",
+            Justification = "All exceptions should show a friendly message to the user.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability",
+            "CA1416:Validate platform compatibility",
+            Justification = "This application only works on Windows.")]
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -43,11 +48,11 @@ namespace Ops.Web.WindowsAuth
 
             app.Run(async (context) =>
             {
+                var logger = app.ApplicationServices.GetRequiredService<ILogger<Startup>>();
                 var id = string.Empty;
                 bool whoami = false;
 
                 var path = context.Request.Path.Value;
-
                 try
                 {
                     if (path.StartsWith(IdUrlBit))
@@ -58,7 +63,7 @@ namespace Ops.Web.WindowsAuth
                             id = path[IdUrlBit.Length..];
                             if (id.IndexOf("/", StringComparison.OrdinalIgnoreCase) != -1)
                             {
-                                id = id.Substring(0, id.IndexOf("/"));
+                                id = id[..id.IndexOf("/", StringComparison.OrdinalIgnoreCase)];
                             }
                         }
                         else
@@ -95,92 +100,99 @@ namespace Ops.Web.WindowsAuth
                     }
                     else
                     {
-                        var identity = context.User.Identity as WindowsIdentity;
-
-                        var roles = ((ClaimsIdentity)context.User.Identity)
-                            .Claims
-                            .Where(_ => _.Type == ClaimTypes.GroupSid)
-                            .Select(_ => _.Value);
-
-                        var roleNames = roles
-                            .Select(_ => new SecurityIdentifier(_)
-                                .Translate(typeof(NTAccount)).ToString());
-
-                        string username = identity.Name;
-
-                        string authenticationType = identity.AuthenticationType;
-
-                        if (whoami)
+                        using (Serilog.Context
+                            .LogContext
+                            .PushProperty("CacheDiscriminator", CacheDiscriminator))
                         {
-                            _logger.Information("Displaying whoami for {Username}", username);
-                            context.Response.ContentType = "application/json";
-                            context.Response.Headers.Add("X-Robots-Tag", "noindex");
-                            await context.Response.WriteAsJsonAsync(new
+                            var identity = context.User.Identity as WindowsIdentity;
+
+                            var roles = ((ClaimsIdentity)context.User.Identity)
+                                .Claims
+                                .Where(_ => _.Type == ClaimTypes.GroupSid)
+                                .Select(_ => _.Value);
+
+                            var roleNames = roles
+                                .Select(_ => new SecurityIdentifier(_)
+                                    .Translate(typeof(NTAccount)).ToString());
+
+                            string username = identity.Name;
+
+                            string authenticationType = identity.AuthenticationType;
+
+                            if (whoami)
                             {
-                                authenticatedAt = DateTime.Now,
-                                authenticationType,
-                                groupCount = roles.Count(),
-                                groups = new[] { roleNames },
-                                username
-                            });
-                        }
-                        else
-                        {
-                            var cache = app.ApplicationServices.GetRequiredService<IOcudaCache>();
-
-                            // by default time out cookies and distributed cache in 2 minutes
-                            int authTimeoutMinutes = 2;
-
-                            var configuredAuthTimeout = _config[Configuration.OpsAuthTimeoutMinutes];
-                            if (configuredAuthTimeout != null
-                                && !int.TryParse(configuredAuthTimeout, out authTimeoutMinutes))
-                            {
-                                _logger.Warning(BadConfig, Configuration.OpsAuthTimeoutMinutes);
-                            }
-
-                            var cacheExpiration = new TimeSpan(0, authTimeoutMinutes, 0);
-
-                            string referer
-                                = await cache.GetStringFromCache(CacheKey(Cache.OpsReturn, id));
-
-                            if (string.IsNullOrEmpty(CacheDiscriminator))
-                            {
-                                _logger.Debug("Id {UserId} user {Username} has {RolesCount} roles from {Referer}",
-                                    id,
+                                logger.LogInformation("Displaying whoami for user {Username} with {RolesCount} roles",
                                     username,
-                                    roles.Count(),
-                                    referer);
+                                    roles.Count());
+                                context.Response.ContentType = "application/json";
+                                context.Response.Headers.Add("X-Robots-Tag", "noindex");
+                                await context.Response.WriteAsJsonAsync(new
+                                {
+                                    authenticatedAt = DateTime.Now,
+                                    authenticationType,
+                                    groupCount = roles.Count(),
+                                    groups = new[] { roleNames },
+                                    username
+                                });
                             }
                             else
                             {
-                                _logger.Debug("Id {UserId} user {Username} has {RolesCount} roles from {Referer} cd {CacheDiscriminator}",
-                                    id,
+                                var cache = app.ApplicationServices.GetRequiredService<IOcudaCache>();
+
+                                // by default time out cookies and distributed cache in 2 minutes
+                                int authTimeoutMinutes = 2;
+
+                                var configuredAuthTimeout = _config[Configuration.OpsAuthTimeoutMinutes];
+                                if (configuredAuthTimeout != null
+                                    && !int.TryParse(configuredAuthTimeout, out authTimeoutMinutes))
+                                {
+                                    logger.LogWarning(BadConfig, Configuration.OpsAuthTimeoutMinutes);
+                                }
+
+                                var cacheExpiration = new TimeSpan(0, authTimeoutMinutes, 0);
+
+                                string referer
+                                    = await cache.GetStringFromCache(CacheKey(Cache.OpsReturn, id));
+
+                                if (roles.Any())
+                                {
+                                    logger.LogInformation("Id {UserId} user {Username} has {RolesCount} roles from {Referer}",
+                                        id,
+                                        username,
+                                        roles.Count(),
+                                        referer);
+                                }
+                                else
+                                {
+                                    logger.LogWarning("Id {UserId} user {Username} has {RolesCount} roles from {Referer}",
+                                        id,
+                                        username,
+                                        roles.Count(),
+                                        referer);
+                                }
+
+                                await cache.SaveToCacheAsync(CacheKey(Cache.OpsUsername, id),
                                     username,
-                                    roles.Count(),
-                                    referer,
-                                    CacheDiscriminator);
-                            }
-
-                            await cache.SaveToCacheAsync(CacheKey(Cache.OpsUsername, id),
-                                username,
-                                cacheExpiration);
-
-                            int groupId = 1;
-                            foreach (string roleName in roleNames)
-                            {
-                                await cache.SaveToCacheAsync(CacheKey(Cache.OpsGroup, id, groupId),
-                                    roleName,
                                     cacheExpiration);
-                                groupId++;
-                            }
 
-                            context.Response.Redirect(referer);
+                                int groupId = 1;
+                                foreach (string roleName in roleNames)
+                                {
+                                    await cache.SaveToCacheAsync(CacheKey(Cache.OpsGroup, id, groupId),
+                                        roleName,
+                                        cacheExpiration);
+                                    groupId++;
+                                }
+
+                                context.Response.Redirect(referer);
+                            }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.Fatal("Unable to authenticate user based on path {Path}: {ErrorMessage}",
+                    logger.LogError(ex,
+                        "Unable to authenticate user based on path {Path}: {ErrorMessage}",
                         path,
                         ex.Message);
                     context.Response.ContentType = "text/html";
@@ -211,6 +223,7 @@ namespace Ops.Web.WindowsAuth
                 _.Configuration = redisConfiguration;
                 _.InstanceName = instanceName;
             });
+            services.AddScoped<IOcudaCache, OcudaCache>();
         }
 
         private string CacheKey(string key, params object[] parameters)
