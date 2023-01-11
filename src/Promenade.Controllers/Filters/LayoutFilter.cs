@@ -13,8 +13,8 @@ namespace Ocuda.Promenade.Controllers.Filters
 {
     public class LayoutFilter : IAsyncResourceFilter
     {
-        private readonly IOptions<RequestLocalizationOptions> _l10nOptions;
         private readonly ExternalResourceService _externalResourceService;
+        private readonly IOptions<RequestLocalizationOptions> _l10nOptions;
         private readonly NavigationService _navigationService;
         private readonly IPathResolverService _pathResolverService;
         private readonly SiteSettingService _siteSettingService;
@@ -128,6 +128,9 @@ namespace Ocuda.Promenade.Controllers.Filters
 
             context.HttpContext.Items[ItemKey.SocialInstagramUrl] = await _siteSettingService
                 .GetSettingStringAsync(SiteSetting.Social.InstagramUrl, forceReload);
+
+            context.HttpContext.Items[ItemKey.SocialTikTokUrl] = await _siteSettingService
+                .GetSettingStringAsync(SiteSetting.Social.TikTokUrl, forceReload);
 
             context.HttpContext.Items[ItemKey.SocialTwitterUrl] = await _siteSettingService
                 .GetSettingStringAsync(SiteSetting.Social.TwitterUrl, forceReload);

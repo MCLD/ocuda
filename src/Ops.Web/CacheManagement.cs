@@ -9,19 +9,20 @@ namespace Ocuda.Ops.Web
     public class CacheManagement
     {
         private readonly ILogger<CacheManagement> _log;
-        private readonly IServiceScope _scope;
+        private readonly IServiceProvider _serviceProvider;
 
-        public CacheManagement(IServiceScope scope)
+        public CacheManagement(IServiceProvider serviceProvider)
         {
-            _scope = scope ?? throw new ArgumentNullException(nameof(scope));
-            _log = scope.ServiceProvider.GetRequiredService<ILogger<CacheManagement>>();
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _log = serviceProvider.GetRequiredService<ILogger<CacheManagement>>();
         }
 
         public async Task StartupClearAsync()
         {
             try
             {
-                var cache = _scope.ServiceProvider.GetRequiredService<IOcudaCache>();
+                using var scope = _serviceProvider.CreateScope();
+                var cache = scope.ServiceProvider.GetRequiredService<IOcudaCache>();
                 await cache.RemoveAsync(Utility.Keys.Cache.OpsSections);
                 _log.LogInformation("Cache clear for {CacheItem} upon startup", "sections");
             }

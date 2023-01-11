@@ -108,7 +108,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             else if (!ValidImageExtensions.Contains(Path.GetExtension(viewModel.CardImage.FileName)))
             {
-                issues.Add($"Image type must be one of: {ValidImageExtensions}");
+                issues.Add($"Image type must be one of: {string.Join(", ", ValidImageExtensions)}");
             }
             else if (viewModel.CardImage.Length > MaximumFileSizeBytes)
             {

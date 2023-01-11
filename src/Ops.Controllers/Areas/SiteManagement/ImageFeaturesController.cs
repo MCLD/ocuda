@@ -30,7 +30,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private const string DetailModelStateKey = "ImageFeatures.Detail";
         private const string ItemErrorMessageKey = "ImageFeatures.ItemErrorMessage";
         private const int MaximumFileSizeBytes = 200 * 1024;
-        private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".png" };
+        private static readonly string[] ValidImageExtensions = new[] { ".jpg", ".png", ".svg" };
 
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IImageFeatureService _imageFeatureService;
@@ -246,30 +246,26 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var viewModel = new DetailViewModel
             {
+                AcceptImageExtensions = string.Join(',', ValidImageExtensions),
+                CurrentDateTime = _dateTimeProvider.Now,
+                FocusItemId = item,
+                HasEditTemplatePermissions = IsSiteManager(),
                 ImageFeature = feature,
                 ImageFeatureId = feature.Id,
-                FocusItemId = item,
+                ImageFeatureTemplate = await _imageFeatureService
+                    .GetTemplateForImageFeatureAsync(feature.Id),
                 ItemErrorMessage = TempData[ItemErrorMessageKey] as string,
                 LanguageId = selectedLanguage.Id,
-                LanguageList = new SelectList(languages, nameof(Language.Name),
-                    nameof(Language.Description), selectedLanguage.Name),
+                LanguageList = new SelectList(languages,
+                    nameof(Language.Name),
+                    nameof(Language.Description),
+                    selectedLanguage.Name),
                 PageLayoutId = pageLayoutId ?? await _imageFeatureService
-                    .GetPageLayoutIdForImageFeatureAsync(feature.Id),
-                CurrentDateTime = _dateTimeProvider.Now,
-                HasEditTemplatePermissions = IsSiteManager(),
-                ImageFeatureTemplate = await _imageFeatureService
-                    .GetTemplateForImageFeatureAsync(feature.Id)
+                    .GetPageLayoutIdForImageFeatureAsync(feature.Id)
             };
 
-            if (viewModel.ImageFeatureTemplate == null)
-            {
-                viewModel.ImageFeatureTemplate = new ImageFeatureTemplate();
-            }
-
-            if (viewModel.ImageFeatureTemplate.MaximumFileSizeBytes.HasValue != true)
-            {
-                viewModel.ImageFeatureTemplate.MaximumFileSizeBytes = MaximumFileSizeBytes;
-            }
+            viewModel.ImageFeatureTemplate ??= new ImageFeatureTemplate();
+            viewModel.ImageFeatureTemplate.MaximumFileSizeBytes ??= MaximumFileSizeBytes;
 
             return View(viewModel);
         }
@@ -390,7 +386,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 if (!ValidImageExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
                 {
                     ModelState.AddModelError("ItemImage",
-                        $"Image type must be one of: {ValidImageExtensions}");
+                        $"Image type must be one of: {string.Join(", ", ValidImageExtensions)}");
                 }
                 else
                 {

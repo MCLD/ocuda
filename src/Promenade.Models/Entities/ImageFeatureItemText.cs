@@ -12,6 +12,9 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public string AltText { get; set; }
 
+        [NotMapped]
+        public string FileContent { get; set; }
+
         [MaxLength(255)]
         public string Filename { get; set; }
 
