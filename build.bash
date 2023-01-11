@@ -159,10 +159,9 @@ if [[ -z ${BLD_BRANCH} ]]; then
 fi
 
 if [[ $BLD_BRANCH = "develop"
-      || $BLD_BRANCH = "dev"
-      || $BLD_BRANCH = "main"
-      || $BLD_BRANCH = "master"
-      || $BLD_BRANCH = "test" ]]; then
+    || $BLD_BRANCH = "main"
+    || $BLD_BRANCH = "master"
+  || $BLD_BRANCH = "test" ]]; then
   BLD_DOCKER_TAG=$BLD_BRANCH
   BLD_VERSION=${BLD_BRANCH}-${BLD_VERSION_DATE}
   BLD_PUSH=true
@@ -325,7 +324,7 @@ else
   --build-arg IMAGE_VERSION="$BLD_VERSION" \
   --target build .
   msg "${GREEN}===${NOFORMAT} Docker image built"
-  msg "${ORANGE}===${NOFORMAT} Not pushing Docker image: branch is not develop, dev, main, test, or versioned release"
+  msg "${ORANGE}===${NOFORMAT} Not pushing Docker image: branch is not develop, main, test, or versioned release"
 fi
 
 msg "${PURPLE}===${NOFORMAT} Build script complete in $((SECONDS - BLD_STARTAT)) seconds."
