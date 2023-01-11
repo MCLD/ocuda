@@ -713,10 +713,6 @@
     <value>No Tiene {0}</value>
     <comment>Text indicating that a location does not have an item. {0} will be replaced with the name of the item</comment>
   </data>
-  <data name="{0} - Current Availability">
-    <value>{0} - Disponibilidad Actual</value>
-    <comment>Title of a product item page, {0} will be replaced with the item name</comment>
-  </data>
   <data name="Show notes for: {0}">
     <value>Mostrar notas para: {0}</value>
     <comment>Header for a podcast's show notes; {0} is the episode title</comment>

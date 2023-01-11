@@ -92,6 +92,5 @@
         public static readonly string ProductInventoryLastUpdate = "Last Update";
         public static readonly string ProductInventoryHas = "Has {0}";
         public static readonly string ProductInventoryDoesNotHave = "Does not have {0}";
-        public static readonly string ProductInventoryCurrentAvailability = "{0} - Current Availability";
     }
 }
