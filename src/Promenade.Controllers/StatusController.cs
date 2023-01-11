@@ -88,8 +88,7 @@ namespace Ocuda.Promenade.Controllers
                 });
             }
 
-            PageTitle = _localizer[i18n.Keys.Promenade.ProductInventoryCurrentAvailability,
-                product.Name];
+            PageTitle = product.Name;
 
             var viewModel = new ProductInventoryViewModel
             {

@@ -353,7 +353,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     viewModel.Relationship
                         = $"This segment is used for product: {products.First().Name}";
                     viewModel.AutomatedHeaderMarkup
-                        = $"<strong>{products.First().Name} - Current Availability</strong>";
+                        = $"<strong>{products.First().Name}</strong>";
                 }
                 else if (products?.Count > 1)
                 {
