@@ -711,7 +711,7 @@ namespace Ocuda.Promenade.Controllers
                 .GetSettingIntAsync(Models.Keys.SiteSetting.Scheduling.OverLimitSegment,
                     forceReload);
 
-            if (segmentId != default)
+            if (segmentId != default && segmentId > 0)
             {
                 scheduleViewModel.SegmentText = await _segmentService
                     .GetSegmentTextBySegmentIdAsync(segmentId, forceReload);
