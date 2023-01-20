@@ -104,41 +104,41 @@ namespace Ocuda.Ops.Service
                             switch (attribute.Name)
                             {
                                 case ADDepartment:
-                                    user.Department = attribute.StringValue;
+                                    user.Department = attribute.StringValue[..255];
                                     break;
 
                                 case ADDisplayName:
-                                    user.Name = attribute.StringValue;
+                                    user.Name = attribute.StringValue[..255];
                                     break;
 
                                 case ADGivenName:
                                     if (string.IsNullOrWhiteSpace(user.Nickname))
                                     {
-                                        user.Nickname = attribute.StringValue;
+                                        user.Nickname = attribute.StringValue[..255];
                                     }
                                     break;
 
                                 case ADMail:
-                                    user.Email = attribute.StringValue;
+                                    user.Email = attribute.StringValue[..255];
                                     break;
 
                                 case ADMobileNumber:
-                                    user.Mobile = attribute.StringValue;
+                                    user.Mobile = attribute.StringValue[..255];
                                     break;
 
                                 case ADsAMAccountName:
                                     if (string.IsNullOrEmpty(user.Username))
                                     {
-                                        user.Username = attribute.StringValue;
+                                        user.Username = attribute.StringValue[..255];
                                     }
                                     break;
 
                                 case ADTelephoneNumber:
-                                    user.Phone = attribute.StringValue;
+                                    user.Phone = attribute.StringValue[..255];
                                     break;
 
                                 case ADTitle:
-                                    user.Title = attribute.StringValue;
+                                    user.Title = attribute.StringValue[..255];
                                     break;
                             }
                         }
