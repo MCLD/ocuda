@@ -10,28 +10,31 @@ namespace Ocuda.Ops.Service
 {
     public class LdapService : ILdapService
     {
-        private const int LDAPSearchResponse = 4;
-
-        private const string ADsAMAccountName = "sAMAccountName";
+        private const string ADDepartment = "department";
         private const string ADDisplayName = "displayName";
-        private const string ADTelephoneNumber = "telephoneNumber";
-        private const string ADTitle = "title";
+        private const string ADGivenName = "givenName";
         private const string ADMail = "mail";
         private const string ADMailAlias = "proxyAddresses";
-        private const string ADGivenName = "givenName";
-
-        private readonly string[] AttributesToReturn = {
-            ADsAMAccountName,
-            ADDisplayName,
-            ADTelephoneNumber,
-            ADTitle,
-            ADMail,
-            ADMailAlias,
-            ADGivenName
-        };
+        private const string ADMobileNumber = "mobile";
+        private const string ADsAMAccountName = "sAMAccountName";
+        private const string ADTelephoneNumber = "telephoneNumber";
+        private const string ADTitle = "title";
+        private const int LDAPSearchResponse = 4;
+        private readonly IConfiguration _config;
 
         private readonly ILogger _logger;
-        private readonly IConfiguration _config;
+
+        private readonly string[] AttributesToReturn = {
+            ADDepartment,
+            ADDisplayName,
+            ADGivenName,
+            ADMail,
+            ADMailAlias,
+            ADMobileNumber,
+            ADsAMAccountName,
+            ADTelephoneNumber,
+            ADTitle
+        };
 
         public LdapService(ILogger<LdapService> logger,
             IConfiguration config)
@@ -40,17 +43,17 @@ namespace Ocuda.Ops.Service
             _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
-        public User LookupByUsername(User user)
-        {
-            // Lookup non-disabled account by username
-            var filter = $"(&({ADsAMAccountName}={user.Username})(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))";
-            return Lookup(user, filter);
-        }
-
         public User LookupByEmail(User user)
         {
             // Lookup non-disabled account by email
             var filter = $"(&(|({ADMail}={user.Email})({ADMailAlias}=smtp:{user.Email}))(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))";
+            return Lookup(user, filter);
+        }
+
+        public User LookupByUsername(User user)
+        {
+            // Lookup non-disabled account by username
+            var filter = $"(&({ADsAMAccountName}={user.Username})(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))";
             return Lookup(user, filter);
         }
 
@@ -100,32 +103,42 @@ namespace Ocuda.Ops.Service
                             var attribute = attributes.Current;
                             switch (attribute.Name)
                             {
+                                case ADDepartment:
+                                    user.Department = attribute.StringValue;
+                                    break;
+
+                                case ADDisplayName:
+                                    user.Name = attribute.StringValue;
+                                    break;
+
+                                case ADGivenName:
+                                    if (string.IsNullOrWhiteSpace(user.Nickname))
+                                    {
+                                        user.Nickname = attribute.StringValue;
+                                    }
+                                    break;
+
+                                case ADMail:
+                                    user.Email = attribute.StringValue;
+                                    break;
+
+                                case ADMobileNumber:
+                                    user.Mobile = attribute.StringValue;
+                                    break;
+
                                 case ADsAMAccountName:
                                     if (string.IsNullOrEmpty(user.Username))
                                     {
                                         user.Username = attribute.StringValue;
                                     }
                                     break;
-                                case ADDisplayName:
-                                    user.Name = attribute.StringValue;
-                                    break;
+
                                 case ADTelephoneNumber:
                                     user.Phone = attribute.StringValue;
                                     break;
+
                                 case ADTitle:
-                                    if (string.IsNullOrEmpty(user.Title))
-                                    {
-                                        user.Title = attribute.StringValue;
-                                    }
-                                    break;
-                                case ADMail:
-                                    user.Email = attribute.StringValue;
-                                    break;
-                                case ADGivenName:
-                                    if (string.IsNullOrWhiteSpace(user.Nickname))
-                                    {
-                                        user.Nickname = attribute.StringValue;
-                                    }
+                                    user.Title = attribute.StringValue;
                                     break;
                             }
                         }

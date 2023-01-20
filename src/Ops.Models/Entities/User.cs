@@ -12,6 +12,9 @@ namespace Ocuda.Ops.Models.Entities
         public int CreatedBy { get; set; }
 
         [MaxLength(255)]
+        public string Department { get; set; }
+
+        [MaxLength(255)]
         public string Email { get; set; }
 
         public int? EmployeeId { get; set; }
@@ -48,6 +51,9 @@ namespace Ocuda.Ops.Models.Entities
         public DateTime? LastSeen { get; set; }
 
         public ICollection<UserMetadata> Metadata { get; set; }
+
+        [MaxLength(255)]
+        public string Mobile { get; set; }
 
         [MaxLength(255)]
         public string Name { get; set; }
