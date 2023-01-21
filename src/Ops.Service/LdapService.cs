@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Novell.Directory.Ldap;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
+using Ocuda.Utility.Extensions;
 using Ocuda.Utility.Keys;
 
 namespace Ocuda.Ops.Service
@@ -104,41 +105,41 @@ namespace Ocuda.Ops.Service
                             switch (attribute.Name)
                             {
                                 case ADDepartment:
-                                    user.Department = attribute.StringValue[..255];
+                                    user.Department = attribute.StringValue.TruncateTo(255);
                                     break;
 
                                 case ADDisplayName:
-                                    user.Name = attribute.StringValue[..255];
+                                    user.Name = attribute.StringValue.TruncateTo(255);
                                     break;
 
                                 case ADGivenName:
                                     if (string.IsNullOrWhiteSpace(user.Nickname))
                                     {
-                                        user.Nickname = attribute.StringValue[..255];
+                                        user.Nickname = attribute.StringValue.TruncateTo(255);
                                     }
                                     break;
 
                                 case ADMail:
-                                    user.Email = attribute.StringValue[..255];
+                                    user.Email = attribute.StringValue.TruncateTo(255);
                                     break;
 
                                 case ADMobileNumber:
-                                    user.Mobile = attribute.StringValue[..255];
+                                    user.Mobile = attribute.StringValue.TruncateTo(255);
                                     break;
 
                                 case ADsAMAccountName:
                                     if (string.IsNullOrEmpty(user.Username))
                                     {
-                                        user.Username = attribute.StringValue[..255];
+                                        user.Username = attribute.StringValue.TruncateTo(255);
                                     }
                                     break;
 
                                 case ADTelephoneNumber:
-                                    user.Phone = attribute.StringValue[..255];
+                                    user.Phone = attribute.StringValue.TruncateTo(255);
                                     break;
 
                                 case ADTitle:
-                                    user.Title = attribute.StringValue[..255];
+                                    user.Title = attribute.StringValue.TruncateTo(255);
                                     break;
                             }
                         }

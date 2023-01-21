@@ -221,14 +221,16 @@ namespace Ocuda.Ops.Service
             var systemAdminUser = await _userRepository.GetSystemAdministratorAsync();
 
             User dbUser = await GetByIdAsync(user.Id);
+            dbUser.Department = user.Department;
             dbUser.LastRosterUpdate = user.LastRosterUpdate;
             dbUser.LastSeen = DateTime.Now;
-            dbUser.ReauthenticateUser = false;
+            dbUser.Mobile = user.Mobile;
             dbUser.Name = user.Name;
             dbUser.Nickname = user.Nickname;
-            dbUser.Title = user.Title;
             dbUser.Phone = user.Phone;
+            dbUser.ReauthenticateUser = false;
             dbUser.SupervisorId = user.SupervisorId;
+            dbUser.Title = user.Title;
             dbUser.UpdatedAt = DateTime.Now;
             dbUser.UpdatedBy = systemAdminUser.Id;
 
@@ -296,13 +298,15 @@ namespace Ocuda.Ops.Service
             var systemAdminUser = await _userRepository.GetSystemAdministratorAsync();
 
             User rosterUser = await GetByIdAsync(rosterUserId);
+            rosterUser.Department = user.Department;
             rosterUser.Email = user.Email;
+            rosterUser.Mobile = user.Mobile;
             rosterUser.Name = user.Name;
             rosterUser.Nickname = user.Nickname;
             rosterUser.Phone = user.Phone;
-            rosterUser.Username = user.Username;
             rosterUser.UpdatedAt = DateTime.Now;
             rosterUser.UpdatedBy = systemAdminUser.Id;
+            rosterUser.Username = user.Username;
 
             _userRepository.Update(rosterUser);
             await _userRepository.SaveAsync();
