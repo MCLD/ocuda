@@ -20,6 +20,10 @@ namespace Ocuda.Promenade.Data.Promenade
         public async Task<Location> FindAsync(int id)
         {
             var entity = await DbSet.FindAsync(id);
+            if (entity.IsDeleted)
+            {
+                return null;
+            }
             if (entity != null)
             {
                 _context.Entry(entity).State = EntityState.Detached;
@@ -31,6 +35,7 @@ namespace Ocuda.Promenade.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
+                .Where(_ => !_.IsDeleted)
                 .OrderBy(_ => _.Name)
                 .ToListAsync();
         }
@@ -39,7 +44,7 @@ namespace Ocuda.Promenade.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == stub)
+                .Where(_ => _.Stub == stub && !_.IsDeleted)
                 .SingleOrDefaultAsync();
         }
     }

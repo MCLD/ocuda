@@ -21,11 +21,11 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<Location> EditAsync(Location location);
 
-        Task<Dictionary<int, string>> GetAllLocationsIdNameAsync();
-
         Task<IEnumerable<LocationProductMap>> GetAllLocationProductMapsAsync(int productId);
 
         Task<List<Location>> GetAllLocationsAsync();
+
+        Task<Dictionary<int, string>> GetAllLocationsIdNameAsync();
 
         Task<(double? Latitude, double? Longitude)> GetCoordinatesAsync(string address);
 
@@ -43,7 +43,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<ICollection<LocationSummary>> GetLocationSummariesAsync(string address);
 
-        Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(BaseFilter filter);
+        Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(LocationFilter filter);
+
+        Task UndeleteAsync(int id);
 
         Task UpdateLocationMappingAsync(int locationMapId, string importLocation, int locationId);
     }

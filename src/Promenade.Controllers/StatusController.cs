@@ -74,18 +74,21 @@ namespace Ocuda.Promenade.Controllers
             foreach (var inventory in inventories)
             {
                 var location = locations.SingleOrDefault(_ => _.Id == inventory.LocationId);
-                locationInventories.Add(new LocationInventory
+                if (location != null)
                 {
-                    UpdatedAt = inventory.UpdatedAt ?? inventory.CreatedAt,
-                    CurrentStatus = location.CurrentStatus.StatusMessage,
-                    CurrentStatusClass = location.CurrentStatus.IsCurrentlyOpen
-                        ? "text-success"
-                        : location.CurrentStatus.IsSpecialHours ? "text-primary" : "text-danger",
-                    InventoryStatus = inventory.ItemCount > 0 ? hasItems : noItems,
-                    InventoryStatusClass = inventory.ItemCount > 0 ? "text-success" : "text-danger",
-                    Name = location.Name,
-                    Stub = location.Stub
-                });
+                    locationInventories.Add(new LocationInventory
+                    {
+                        UpdatedAt = inventory.UpdatedAt ?? inventory.CreatedAt,
+                        CurrentStatus = location.CurrentStatus.StatusMessage,
+                        CurrentStatusClass = location.CurrentStatus.IsCurrentlyOpen
+                            ? "text-success"
+                            : location.CurrentStatus.IsSpecialHours ? "text-primary" : "text-danger",
+                        InventoryStatus = inventory.ItemCount > 0 ? hasItems : noItems,
+                        InventoryStatusClass = inventory.ItemCount > 0 ? "text-success" : "text-danger",
+                        Name = location.Name,
+                        Stub = location.Stub
+                    });
+                }
             }
 
             PageTitle = product.Name;

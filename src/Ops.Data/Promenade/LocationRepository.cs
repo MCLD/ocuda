@@ -22,6 +22,10 @@ namespace Ocuda.Ops.Data.Promenade
         public async Task<Location> FindAsync(int id)
         {
             var entity = await DbSet.FindAsync(id);
+            if (entity == null)
+            {
+                return null;
+            }
             if (entity != null)
             {
                 _context.Entry(entity).State = EntityState.Detached;
@@ -33,6 +37,7 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
+                .Where(_ => !_.IsDeleted)
                 .OrderBy(_ => _.Name)
                 .ToListAsync();
         }
@@ -41,6 +46,7 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
+                .Where(_ => !_.IsDeleted)
                 .OrderBy(_ => _.Name)
                 .ToDictionaryAsync(k => k.Id, v => v.Name);
         }
@@ -49,17 +55,19 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Stub == locationStub)
+                .Where(_ => _.Stub == locationStub && !_.IsDeleted)
                 .FirstOrDefaultAsync();
         }
 
         public async Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(
-                    BaseFilter filter)
+            LocationFilter filter)
         {
+            var query = ApplyFilters(filter);
+
             return new DataWithCount<ICollection<Location>>
             {
-                Count = await DbSet.AsNoTracking().CountAsync(),
-                Data = await DbSet.AsNoTracking()
+                Count = await query.CountAsync(),
+                Data = await query
                     .OrderBy(_ => _.Name)
                     .ApplyPagination(filter)
                     .ToListAsync()
@@ -70,10 +78,11 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.DescriptionSegmentId == segmentId
+                .Where(_ => !_.IsDeleted
+                    && (_.DescriptionSegmentId == segmentId
                     || _.PostFeatureSegmentId == segmentId
                     || _.PreFeatureSegmentId == segmentId
-                    || _.HoursSegmentId == segmentId)
+                    || _.HoursSegmentId == segmentId))
                 .ToListAsync();
         }
 
@@ -81,7 +90,7 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id != location.Id && _.Name == location.Name)
+                .Where(_ => _.Id != location.Id && _.Name == location.Name && !_.IsDeleted)
                 .AnyAsync();
         }
 
@@ -89,7 +98,7 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id != location.Id && _.Stub == location.Stub)
+                .Where(_ => _.Id != location.Id && _.Stub == location.Stub && !_.IsDeleted)
                 .AnyAsync();
         }
 
@@ -97,9 +106,18 @@ namespace Ocuda.Ops.Data.Promenade
         {
             return await DbSet
                  .AsNoTracking()
-                 .Where(_ => _.Name.Contains(searchText))
+                 .Where(_ => _.Name.Contains(searchText) && !_.IsDeleted)
                  .Select(_ => _.Id)
                  .ToListAsync();
+        }
+
+        private IQueryable<Location> ApplyFilters(LocationFilter filter)
+        {
+            var items = DbSet.AsNoTracking();
+
+            return filter.IsDeleted
+                ? items.Where(_ => _.IsDeleted)
+                : items.Where(_ => !_.IsDeleted);
         }
     }
 }

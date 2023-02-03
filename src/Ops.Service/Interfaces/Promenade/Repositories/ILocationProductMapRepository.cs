@@ -9,5 +9,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
         Task<LocationProductMap> FindAsync(int locationProductMapId);
 
         Task<IEnumerable<LocationProductMap>> GetByProductAsync(int productId);
+
+        void RemoveForLocation(int locationId);
     }
 }

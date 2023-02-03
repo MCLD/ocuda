@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
+using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Ops.Service.Interfaces.Promenade.Repositories;
 using Ocuda.Promenade.Models;
@@ -23,25 +24,44 @@ namespace Ocuda.Ops.Service
         private const string ndash = "\u2013";
 
         private readonly IGoogleClient _googleClient;
+        private readonly ILocationFeatureRepository _locationFeatureRepository;
+        private readonly ILocationGroupRepository _locationGroupRepository;
+        private readonly ILocationHoursOverrideRepository _locationHoursOverrideRepository;
         private readonly ILocationHoursRepository _locationHoursRepository;
         private readonly ILocationProductMapRepository _locationProductMapRepository;
         private readonly ILocationRepository _locationRepository;
+        private readonly IRosterDivisionRepository _rosterDivisionRepository;
+        private readonly IRosterLocationRepository _rosterLocationRepository;
 
-        public LocationService(ILogger<LocationService> logger,
-            IGoogleClient googleClient,
+        public LocationService(IGoogleClient googleClient,
+            ILocationFeatureRepository locationFeatureRepository,
+            ILocationGroupRepository locationGroupRepository,
             IHttpContextAccessor httpContextAccessor,
-            ILocationRepository locationRepository,
+            ILocationHoursOverrideRepository locationHoursOverrideRepository,
             ILocationHoursRepository locationHoursRepository,
-            ILocationProductMapRepository locationProductMapRepository)
+            ILocationProductMapRepository locationProductMapRepository,
+            ILocationRepository locationRepository,
+            ILogger<LocationService> logger,
+            IRosterDivisionRepository rosterDivisionRepository,
+            IRosterLocationRepository rosterLocationRepository)
             : base(logger, httpContextAccessor)
         {
             _googleClient = googleClient ?? throw new ArgumentNullException(nameof(googleClient));
-            _locationRepository = locationRepository
-                ?? throw new ArgumentNullException(nameof(locationRepository));
+            _locationFeatureRepository = locationFeatureRepository
+                ?? throw new ArgumentNullException(nameof(locationFeatureRepository));
+            _locationGroupRepository = locationGroupRepository
+                ?? throw new ArgumentNullException(nameof(locationFeatureRepository));
+            _locationHoursOverrideRepository = locationHoursOverrideRepository
+                ?? throw new ArgumentNullException(nameof(locationHoursOverrideRepository));
             _locationHoursRepository = locationHoursRepository
                 ?? throw new ArgumentNullException(nameof(locationHoursRepository));
             _locationProductMapRepository = locationProductMapRepository
                 ?? throw new ArgumentNullException(nameof(locationProductMapRepository));
+            _locationRepository = locationRepository ?? throw new ArgumentNullException(nameof(locationRepository));
+            _rosterDivisionRepository = rosterDivisionRepository
+                ?? throw new ArgumentNullException(nameof(rosterDivisionRepository));
+            _rosterLocationRepository = rosterLocationRepository
+                ?? throw new ArgumentNullException(nameof(rosterLocationRepository));
         }
 
         public async Task<Location> AddLocationAsync(Location location)
@@ -89,11 +109,37 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteAsync(int id)
         {
+            var location = await _locationRepository.FindAsync(id);
+
+            var locationGroups = await _locationGroupRepository.GetLocationGroupsByLocationAsync(location);
+            _locationGroupRepository.RemoveRange(locationGroups);
+            var locationFeatures = await _locationFeatureRepository.GetLocationFeaturesByLocationId(id);
+            _locationFeatureRepository.RemoveRange(locationFeatures);
+
+            _locationProductMapRepository.RemoveForLocation(location.Id);
+
             var locationHours = await _locationHoursRepository.GetLocationHoursByLocationId(id);
             _locationHoursRepository.RemoveRange(locationHours);
 
-            var location = await _locationRepository.FindAsync(id);
-            _locationRepository.Remove(location);
+            var hourOverrides = await _locationHoursOverrideRepository.GetByLocationIdAsync(location.Id);
+            _locationHoursOverrideRepository.RemoveRange(hourOverrides);
+
+            var rosterDivisions = await _rosterDivisionRepository.GetAllAsync();
+            var mappedRosterDivisions = rosterDivisions.Where(_ => _.MapToLocationId == location.Id);
+            if (mappedRosterDivisions != null && mappedRosterDivisions?.Count() > 0)
+            {
+                _rosterDivisionRepository.RemoveRange(mappedRosterDivisions.ToArray());
+            }
+
+            var rosterLocations = await _rosterLocationRepository.GetAllAsync();
+            var mappedRosterLocations = rosterLocations.Where(_ => _.MapToLocationId == location.Id);
+            if (mappedRosterLocations != null && mappedRosterLocations?.Count() > 0)
+            {
+                _rosterLocationRepository.RemoveRange(mappedRosterLocations.ToArray());
+            }
+
+            location.IsDeleted = true;
+            _locationRepository.Update(location);
             await _locationRepository.SaveAsync();
         }
 
@@ -135,11 +181,6 @@ namespace Ocuda.Ops.Service
             return location;
         }
 
-        public async Task<Dictionary<int, string>> GetAllLocationsIdNameAsync()
-        {
-            return await _locationRepository.GetAllLocationsIdNameAsync();
-        }
-
         public async Task<IEnumerable<LocationProductMap>> GetAllLocationProductMapsAsync(int productId)
         {
             return await _locationProductMapRepository.GetByProductAsync(productId);
@@ -148,6 +189,11 @@ namespace Ocuda.Ops.Service
         public async Task<List<Location>> GetAllLocationsAsync()
         {
             return await _locationRepository.GetAllLocationsAsync();
+        }
+
+        public async Task<Dictionary<int, string>> GetAllLocationsIdNameAsync()
+        {
+            return await _locationRepository.GetAllLocationsIdNameAsync();
         }
 
         public async Task<(double? Latitude, double? Longitude)>
@@ -287,9 +333,17 @@ namespace Ocuda.Ops.Service
         }
 
         public async Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(
-                                            BaseFilter filter)
+                                            LocationFilter filter)
         {
             return await _locationRepository.GetPaginatedListAsync(filter);
+        }
+
+        public async Task UndeleteAsync(int id)
+        {
+            var location = await _locationRepository.FindAsync(id);
+            location.IsDeleted = false;
+            _locationRepository.Update(location);
+            await _locationRepository.SaveAsync();
         }
 
         public async Task UpdateLocationMappingAsync(int locationMapId, string importLocation, int locationId)
