@@ -73,8 +73,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             _apiKey = config[Configuration.OcudaGoogleAPI];
         }
 
-        public static string Area { get { return "SiteManagement"; } }
-        public static string Name { get { return "Locations"; } }
+        public static string Area
+        { get { return "SiteManagement"; } }
+        public static string Name
+        { get { return "Locations"; } }
 
         [HttpGet("[action]")]
         [SaveModelState]
@@ -338,6 +340,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 new { locationStub = location.Stub });
         }
 
+        [HttpGet("[action]")]
+        public async Task<IActionResult> Deleted(int page)
+        {
+            page = page == 0 ? 1 : page;
+            return await LocationListAsync(new LocationFilter(page == 0 ? 1 : page)
+            {
+                IsDeleted = true
+            });
+        }
+
         [HttpPost]
         [Route("[action]")]
         [SaveModelState]
@@ -345,17 +357,6 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             try
             {
-                var features = await _locationFeatureService
-                    .GetLocationFeaturesByLocationAsync(location);
-                var groups = await _locationGroupService
-                    .GetLocationGroupsByLocationAsync(location);
-
-                if (groups.Count > 0 || features.Count > 0)
-                {
-                    ShowAlertDanger($"You must delete all features and groups from {location.Name} before deleting it");
-                    return RedirectToAction(nameof(Index));
-                }
-
                 await _locationService.DeleteAsync(location.Id);
                 ShowAlertSuccess($"Deleted Location: {location.Name}");
             }
@@ -902,33 +903,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpGet("[action]")]
         public async Task<IActionResult> Index(int page = 1)
         {
-            var itemsPerPage = await _siteSettingService
-                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
-
-            var filter = new BaseFilter(page, itemsPerPage);
-
-            var locationList = await _locationService.GetPaginatedListAsync(filter);
-
-            var paginateModel = new PaginateModel
-            {
-                ItemCount = locationList.Count,
-                CurrentPage = page,
-                ItemsPerPage = filter.Take.Value
-            };
-
-            if (paginateModel.PastMaxPage)
-            {
-                return RedirectToRoute(new
-                {
-                    page = paginateModel.LastPage ?? 1
-                });
-            }
-
-            return View(new LocationViewModel
-            {
-                AllLocations = locationList.Data,
-                PaginateModel = paginateModel
-            });
+            return await LocationListAsync(new LocationFilter(page == 0 ? 1 : page));
         }
 
         [HttpGet("{locationStub}")]
@@ -1153,6 +1128,23 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
         }
 
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> UndeleteLocation(Location location)
+        {
+            try
+            {
+                await _locationService.UndeleteAsync(location.Id);
+                ShowAlertSuccess($"Undeleted Location: {location.Name}");
+            }
+            catch (OcudaException ex)
+            {
+                ShowAlertDanger($"Unable to Undelete Location {location.Name}: {ex.Message}");
+            }
+
+            return RedirectToAction(nameof(LocationsController.Index));
+        }
+
         private static IEnumerable<int> GetAssociatedSegmentIds(Location location)
         {
             var segmentIds = new List<int> { location.DescriptionSegmentId };
@@ -1169,6 +1161,37 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 segmentIds.Add(location.PostFeatureSegmentId.Value);
             }
             return segmentIds.AsEnumerable();
+        }
+
+        private async Task<IActionResult> LocationListAsync(LocationFilter filter)
+        {
+            filter ??= new LocationFilter(1);
+
+            filter.Take = await _siteSettingService
+                .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
+
+            var locationList = await _locationService.GetPaginatedListAsync(filter);
+
+            var paginateModel = new PaginateModel
+            {
+                ItemCount = locationList.Count,
+                CurrentPage = filter.Page,
+                ItemsPerPage = filter.Take.Value
+            };
+
+            if (paginateModel.PastMaxPage)
+            {
+                return RedirectToRoute(new
+                {
+                    page = paginateModel.LastPage ?? 1
+                });
+            }
+
+            return View("Index", new LocationViewModel
+            {
+                AllLocations = locationList.Data,
+                PaginateModel = paginateModel
+            });
         }
     }
 }

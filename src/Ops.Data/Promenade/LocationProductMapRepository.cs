@@ -30,5 +30,11 @@ namespace Ocuda.Ops.Data.Promenade
              .OrderBy(_ => _.ImportLocation)
              .ToListAsync();
         }
+
+        public void RemoveForLocation(int locationId)
+        {
+            var maps = DbSet.Where(_ => _.LocationId == locationId);
+            DbSet.RemoveRange(maps);
+        }
     }
 }

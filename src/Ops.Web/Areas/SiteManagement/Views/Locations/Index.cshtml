@@ -1,74 +1,114 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location.LocationViewModel
 
-<div class="row">
-    <div class="col-sm-7">
-        <h1>Locations</h1>
-    </div>
-    <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
-           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
-           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
-        <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+<div class="d-flex justify-content-between mb-2">
+    <h1>
+        Locations
+        @if (Model.AllLocations.Count(_ => !_.IsDeleted) != Model.AllLocations.Count())
+        {
+            <small class="text-muted">(deleted)</small>
+        }
+    </h1>
+    <div class="pt-2">
+        @if (Model.AllLocations.Count(_ => !_.IsDeleted) != Model.AllLocations.Count())
+        {
+            <a class="btn btn-outline-danger active"
+           asp-action="@nameof(LocationsController.Index)">
+                Deleted
+            </a>
+        }
+        else
+        {
+            <a class="btn btn-outline-danger"
+           asp-action="@nameof(LocationsController.Deleted)">
+                Deleted
+            </a>
+        }
+        <a class="btn btn-outline-success"
            asp-action="@nameof(LocationsController.AddLocation)">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
             Add location
         </a>
+        <a class="btn btn-outline-dark"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
     </div>
 </div>
 
 @if (!Model.AllLocations.Any())
 {
-        <div class="row">
-            <div class="col">
-                <div class="alert alert-warning">No locations found.</div>
-            </div>
+    <div class="row">
+        <div class="col">
+            <div class="alert alert-warning">No locations found.</div>
         </div>
+    </div>
 }
 else
 {
-        <table class="table table-sm table-bordered">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Address</th>
-                    <th>Phone</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
             @foreach (var location in Model.AllLocations)
             {
-                        <tr>
-                            <td class="align-middle">
-                                <a asp-action="@nameof(LocationsController.Location)"
-                           asp-route-locationStub="@location.Stub">
+                <tr class="@(location.IsDeleted ? "table-danger" : "")">
+                    <td class="align-middle">
+                        @if (location.IsDeleted)
+                        {
                             @location.Name
-                                </a>
-                            </td>
-                            <td class="align-middle">
+                        }
+                        else
+                        {
+                            <a asp-action="@nameof(LocationsController.Location)"
+                   asp-route-locationStub="@location.Stub">
+                                @location.Name
+                            </a>
+                        }
+                    </td>
+                    <td class="align-middle">
                         @location.Address
-                                <br />
+                        <br />
                         @location.City,
                         @location.State
                         @location.Zip
-                            </td>
-                            <td class="align-middle">@location.Phone</td>
-                            <td class="align-middle">
-                                <button type="button"
-                                class="btn btn-outline-danger"
-                                data-toggle="modal"
-                                data-target="#deleteModal"
-                                data-id="@location.Id"
-                                data-name="@location.Name">
-                                    <span class="fas fa-minus-circle"
-                                  aria-hidden="true"></span>
-                                </button>
-                            </td>
-                        </tr>
+                    </td>
+                    <td class="align-middle">@location.Phone</td>
+                    <td class="align-middle">
+                        @if (location.IsDeleted)
+                        {
+                            <button type="button"
+                        class="btn btn-warning"
+                        data-toggle="modal"
+                        data-target="#undeleteModal"
+                        data-id="@location.Id"
+                        data-name="@location.Name">
+                                <span class="fas fa-plus-circle"
+                          aria-hidden="true"></span>
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button"
+                        class="btn btn-outline-danger"
+                        data-toggle="modal"
+                        data-target="#deleteModal"
+                        data-id="@location.Id"
+                        data-name="@location.Name">
+                                <span class="fas fa-minus-circle"
+                          aria-hidden="true"></span>
+                            </button>
+                        }
+                    </td>
+                </tr>
             }
-            </tbody>
-        </table>
-        <nav paginate="@Model.PaginateModel"></nav>
+        </tbody>
+    </table>
+    <nav paginate="@Model.PaginateModel"></nav>
 }
 
 <div class="modal fade"
@@ -117,6 +157,53 @@ else
     </div>
 </div>
 
+<div class="modal fade"
+     id="undeleteModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="undeleteModalLabel">
+    <div class="modal-dialog" role="document">
+        <form asp-action="@nameof(LocationsController.UndeleteLocation)"
+              method="post"
+              role="form"
+              style="display:inline">
+            <input asp-for="Location.Id" type="hidden" />
+            <input asp-for="Location.Name" type="hidden" />
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="deleteModalLabel">Undelete Location</h4>
+                    <button type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+                    <span id="modal-text"></span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-default"
+                            data-dismiss="modal"
+                            style="margin-right: 1em;">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class="btn btn-warning pull-right"
+                            aria-label="Confirm"
+                            button-spinner>
+                        <span class="fas fa-times" aria-hidden="true"></span>
+                        Undelete
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 @section scripts
     {
     <script>
@@ -126,6 +213,16 @@ else
             var name = button.data("name");
             var modal = $(this);
             modal.find("#modal-text").text("Are you sure you want to delete the location \"" + name + "\"?");
+            modal.find("#Location_Id").val(id);
+            modal.find("#Location_Name").val(name);
+        });
+
+        $("#undeleteModal").on("show.bs.modal", function (e) {
+            var button = $(e.relatedTarget);
+            var id = button.data("id");
+            var name = button.data("name");
+            var modal = $(this);
+            modal.find("#modal-text").text("Are you sure you want to undelete the location \"" + name + "\"?");
             modal.find("#Location_Id").val(id);
             modal.find("#Location_Name").val(name);
         });

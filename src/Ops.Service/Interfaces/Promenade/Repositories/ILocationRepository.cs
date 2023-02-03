@@ -16,7 +16,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 
         Task<Location> GetLocationByStub(string locationStub);
 
-        Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(BaseFilter filter);
+        Task<DataWithCount<ICollection<Location>>> GetPaginatedListAsync(LocationFilter filter);
 
         Task<ICollection<Location>> GetUsingSegmentAsync(int segmentId);
 
