@@ -157,7 +157,7 @@
             <tr>
                 <th>Location</th>
                 <td>
-                    @Model.Locations[Model.Incident.LocationId]
+                    @(Model.Locations.ContainsKey(Model.Incident.LocationId) ? Model.Locations[Model.Incident.LocationId] : "Unknown")
                     <br />
                     @Model.Incident.LocationDescription
                 </td>
