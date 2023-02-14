@@ -11,6 +11,7 @@ namespace Ocuda.Ops.Controllers.Areas.Incident.ViewModel
             Heading = "Incident Details";
         }
 
+        public IDictionary<int, string> AllLocationNames { get; set; }
         public bool CanAdd { get; set; }
         public bool CanHide { get; set; }
         public Models.Entities.Incident Incident { get; set; }

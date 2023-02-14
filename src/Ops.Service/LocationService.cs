@@ -191,9 +191,14 @@ namespace Ocuda.Ops.Service
             return await _locationRepository.GetAllLocationsAsync();
         }
 
-        public async Task<Dictionary<int, string>> GetAllLocationsIdNameAsync()
+        public async Task<IDictionary<int, string>> GetAllLocationsIdNameAsync()
         {
             return await _locationRepository.GetAllLocationsIdNameAsync();
+        }
+
+        public async Task<IDictionary<int, string>> GetAllNamesIncludingDeletedAsync()
+        {
+            return await _locationRepository.GetAllNamesIncludingDeletedAsync();
         }
 
         public async Task<(double? Latitude, double? Longitude)>

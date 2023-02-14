@@ -42,11 +42,19 @@ namespace Ocuda.Ops.Data.Promenade
                 .ToListAsync();
         }
 
-        public async Task<Dictionary<int, string>> GetAllLocationsIdNameAsync()
+        public async Task<IDictionary<int, string>> GetAllLocationsIdNameAsync()
         {
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => !_.IsDeleted)
+                .OrderBy(_ => _.Name)
+                .ToDictionaryAsync(k => k.Id, v => v.Name);
+        }
+
+        public async Task<IDictionary<int, string>> GetAllNamesIncludingDeletedAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
                 .OrderBy(_ => _.Name)
                 .ToDictionaryAsync(k => k.Id, v => v.Name);
         }

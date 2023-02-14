@@ -315,11 +315,11 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
 
             var viewModel = new DetailsViewModel
             {
+                AllLocationNames = await _locationService.GetAllNamesIncludingDeletedAsync(),
                 CanAdd = hasPermission,
                 CanHide = IsSiteManager(),
                 Incident = incident,
                 IncidentTypes = await _incidentService.GetActiveIncidentTypesAsync(),
-                Locations = await GetLocationsAsync(_locationService),
                 SecondaryHeading = $"#{incident.Id}"
             };
 
@@ -488,13 +488,13 @@ namespace Ocuda.Ops.Controllers.Areas.Incident
 
             return new IndexViewModel
             {
+                AllLocationNames = await _locationService.GetAllNamesIncludingDeletedAsync(),
                 CanViewAll = await CanViewAllAsync(),
                 CurrentPage = currentPage,
                 Incidents = incidents.Data,
                 IncidentTypes = allIncidentTypes,
                 ItemCount = incidents.Count,
                 ItemsPerPage = filter.Take.Value,
-                Locations = await _locationService.GetAllLocationsIdNameAsync(),
                 SearchText = filter.SearchText,
             };
         }
