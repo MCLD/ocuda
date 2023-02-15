@@ -1,5 +1,9 @@
-﻿$("#openNavColumn").on("click", function () {
+﻿function openNavColumn() {
     $("#navColumn, #closeNavColumn").addClass("navcolumn-open");
+}
+
+$("#openNavColumn").on("click", function () {
+    openNavColumn();
 });
 
 $("#closeNavColumn").on("click", function () {

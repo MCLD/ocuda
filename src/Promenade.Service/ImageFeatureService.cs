@@ -163,11 +163,18 @@ namespace Ocuda.Promenade.Service
                                             ImagesFilePath,
                                             languageName,
                                             FeaturesFilePath);
-                                    item.ImageFeatureItemText.FileContent =
-                                        System.IO.File.ReadAllText(path);
+                                    if (System.IO.File.Exists(path))
+                                    {
+                                        item.ImageFeatureItemText.FileContent =
+                                            System.IO.File.ReadAllText(path);
+                                    }
+                                    else
+                                    {
+                                        invalidItems.Add(item);
+                                    }
                                 }
 
-                                if (expire.HasValue)
+                                if (expire.HasValue && !invalidItems.Contains(item))
                                 {
                                     await _cache.SaveToCacheAsync(itemTextCacheKey,
                                         item.ImageFeatureItemText,
@@ -177,7 +184,7 @@ namespace Ocuda.Promenade.Service
                         }
                     }
 
-                    if (item.ImageFeatureItemText == null)
+                    if (item.ImageFeatureItemText == null && !invalidItems.Contains(item))
                     {
                         var itemTextCacheKey = string.Format(CultureInfo.InvariantCulture,
                             Utility.Keys.Cache.PromImageFeatureItemText,
