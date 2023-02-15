@@ -29,5 +29,10 @@ namespace Ocuda.Ops.Data.Ops
         {
             DbSet.RemoveRange(DbSet.Where(_ => _.DigitalDisplayAssetId == assetId));
         }
+
+        public void RemoveForDisplay(int displayId)
+        {
+            DbSet.RemoveRange(DbSet.Where(_ => _.DigitalDisplayId == displayId));
+        }
     }
 }

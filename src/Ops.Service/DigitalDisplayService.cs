@@ -181,6 +181,7 @@ namespace Ocuda.Ops.Service
         public async Task DeleteDisplayAsync(int displayId)
         {
             var display = await _digitalDisplayRepository.FindAsync(displayId);
+            _digitalDisplayItemRepository.RemoveForDisplay(displayId);
             _digitalDisplayRepository.Remove(display);
             await _digitalDisplayRepository.SaveAsync();
         }
