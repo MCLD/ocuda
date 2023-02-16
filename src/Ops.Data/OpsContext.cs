@@ -36,6 +36,7 @@ namespace Ocuda.Ops.Data
         public DbSet<FileLibraryFileType> FileLibraryFileTypes { get; set; }
         public DbSet<File> Files { get; set; }
         public DbSet<FileType> FileTypes { get; set; }
+        public DbSet<VolunteerFormUserMapping> VolunteerFormUserMappings { get; set; }
         public DbSet<HistoricalIncident> HistoricalIncidents { get; set; }
         public DbSet<IncidentFollowup> IncidentFollowups { get; set; }
         public DbSet<IncidentParticipant> IncidentParticipants { get; set; }
@@ -69,6 +70,8 @@ namespace Ocuda.Ops.Data
         public DbSet<UserMetadata> UserMetadata { get; set; }
         public DbSet<UserMetadataType> UserMetadataTypes { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<UserSyncHistory> UserSyncHistories { get; set; }
+        public DbSet<UserSyncLocation> UserSyncLocations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -93,6 +96,8 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.EmailTemplateId, _.PromenadeLanguageName });
             modelBuilder.Entity<FileLibraryFileType>()
                 .HasKey(_ => new { _.FileLibraryId, _.FileTypeId });
+            modelBuilder.Entity<VolunteerFormUserMapping>()
+                .HasKey(_ => new { _.VolunteerFormId, _.LocationId, _.UserId });
             modelBuilder.Entity<IncidentRelationship>()
                 .HasKey(_ => new { _.IncidentId, _.RelatedIncidentId });
             modelBuilder.Entity<PermissionGroupApplication>()

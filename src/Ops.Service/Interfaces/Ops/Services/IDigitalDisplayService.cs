@@ -20,6 +20,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         public Task<IEnumerable<int>> AssignSetAsync(int displayId, int setId);
 
+        public Task<int> ClearExpiredAssetsAsync(DateTime endDate);
+
         public Task DeleteAssetAsync(int digitalDisplayAssetId);
 
         public Task DeleteDisplayAsync(int displayId);

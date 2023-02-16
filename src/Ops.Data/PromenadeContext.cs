@@ -51,73 +51,43 @@ namespace Ocuda.Ops.Data
         public DbSet<Feature> Features { get; set; }
 
         public DbSet<Group> Groups { get; set; }
-
         public DbSet<ImageFeatureItem> ImageFeatureItems { get; set; }
-
         public DbSet<ImageFeatureItemText> ImageFeatureItemTexts { get; set; }
-
         public DbSet<ImageFeature> ImageFeatures { get; set; }
-
         public DbSet<ImageFeatureTemplate> ImageFeatureTemplates { get; set; }
-
         public DbSet<Language> Languages { get; set; }
-
         public DbSet<LocationFeature> LocationFeatures { get; set; }
-
+        public DbSet<LocationForm> LocationForms { get; set; }
         public DbSet<LocationGroup> LocationGroups { get; set; }
-
         public DbSet<LocationHours> LocationHours { get; set; }
-
         public DbSet<LocationHoursOverride> LocationHoursOverrides { get; set; }
         public DbSet<LocationProductMap> LocationProductMaps { get; set; }
-
         public DbSet<Location> Locations { get; set; }
-
         public DbSet<Navigation> Navigations { get; set; }
-
         public DbSet<NavigationText> NavigationTexts { get; set; }
-
         public DbSet<PageHeader> PageHeaders { get; set; }
-
         public DbSet<PageItem> PageItems { get; set; }
-
         public DbSet<PageLayout> PageLayouts { get; set; }
-
         public DbSet<PageLayoutText> PageLayoutTexts { get; set; }
-
         public DbSet<Page> Pages { get; set; }
-
         public DbSet<PodcastDirectory> PodcastDirectories { get; set; }
-
         public DbSet<PodcastDirectoryInfo> PodcastDirectoryInfos { get; set; }
-
         public DbSet<PodcastItem> PodcastItems { get; set; }
-
         public DbSet<Podcast> Podcasts { get; set; }
-
         public DbSet<ProductLocationInventory> ProductLocationInventories { get; set; }
-
         public DbSet<Product> Products { get; set; }
-
         public DbSet<ScheduleRequest> ScheduleRequest { get; set; }
-
         public DbSet<ScheduleRequestLimit> ScheduleRequestLimits { get; set; }
-
         public DbSet<ScheduleRequestSubject> ScheduleRequestSubject { get; set; }
-
         public DbSet<ScheduleRequestSubjectText> ScheduleRequestSubjectTexts { get; set; }
         public DbSet<Segment> Segments { get; set; }
-
         public DbSet<SegmentText> SegmentTexts { get; set; }
-
         public DbSet<SiteSetting> SiteSettings { get; set; }
-
         public DbSet<SocialCard> SocialCards { get; set; }
-
         public DbSet<UrlRedirectAccess> UrlRedirectAccesses { get; set; }
-
         public DbSet<UrlRedirect> UrlRedirects { get; set; }
-
+        public DbSet<VolunteerForm> VolunteerForms { get; set; }
+        public DbSet<VolunteerFormSubmission> VolunteerFormSubmissions { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null)
@@ -153,6 +123,8 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.LanguageId, _.ImageFeatureItemId });
             modelBuilder.Entity<LocationFeature>()
                 .HasKey(_ => new { _.FeatureId, _.LocationId });
+            modelBuilder.Entity<LocationForm>()
+                .HasKey(_ => new { _.LocationId, _.FormId });
             modelBuilder.Entity<LocationGroup>()
                 .HasKey(_ => new { _.GroupId, _.LocationId });
             modelBuilder.Entity<LocationHours>()
@@ -173,6 +145,10 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.ScheduleRequestSubjectId, _.LanguageId });
             modelBuilder.Entity<SegmentText>()
                 .HasKey(_ => new { _.LanguageId, _.SegmentId });
+
+            modelBuilder.Entity<VolunteerForm>()
+                .Property(_ => _.VolunteerFormType)
+                .HasConversion<int>();
         }
 
         #region IMigratableContext

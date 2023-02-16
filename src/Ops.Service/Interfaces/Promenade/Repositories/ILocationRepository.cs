@@ -12,7 +12,9 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 
         Task<List<Location>> GetAllLocationsAsync();
 
-        Task<Dictionary<int, string>> GetAllLocationsIdNameAsync();
+        Task<IDictionary<int, string>> GetAllLocationsIdNameAsync();
+
+        Task<IDictionary<int, string>> GetAllNamesIncludingDeletedAsync();
 
         Task<Location> GetLocationByStub(string locationStub);
 

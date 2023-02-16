@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,12 +8,12 @@ using Ocuda.Ops.Data.Extensions;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
+using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class UserRepository
-        : OpsRepository<OpsContext, User, int>, IUserRepository
+    public class UserRepository : OpsRepository<OpsContext, User, int>, IUserRepository
     {
         public UserRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
             ILogger<UserRepository> logger) : base(repositoryFacade, logger)
@@ -23,32 +24,35 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => !_.IsDeleted && _.Id == id)
-                .FirstOrDefaultAsync();
+                .SingleOrDefaultAsync(_ => !_.IsDeleted && _.Id == id);
         }
 
         public async Task<User> FindByEmailAsync(string email)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => !_.IsDeleted && _.Email == email && !_.IsSysadmin)
-                .FirstOrDefaultAsync();
+                .SingleOrDefaultAsync(_ => !_.IsDeleted && _.Email == email && !_.IsSysadmin);
         }
 
         public async Task<User> FindByUsernameAsync(string username)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => !_.IsDeleted && _.Username == username && !_.IsSysadmin)
-                .FirstOrDefaultAsync();
+                .SingleOrDefaultAsync(_ => !_.IsDeleted && _.Username == username && !_.IsSysadmin);
         }
 
         public async Task<User> FindIncludeDeletedAsync(int id)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.Id == id)
-                .FirstOrDefaultAsync();
+                .SingleOrDefaultAsync(_ => _.Id == id);
+        }
+
+        public async Task<User> FindUsernameIncludeDeletedAsync(string username)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .SingleOrDefaultAsync(_ => _.Username == username && !_.IsSysadmin);
         }
 
         public async Task<ICollection<User>> GetAllAsync()
@@ -63,7 +67,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.SupervisorId == userId)
+                .Where(_ => _.SupervisorId == userId && !_.IsDeleted)
                 .Select(_ => new User
                 {
                     Name = _.Name,
@@ -125,6 +129,8 @@ namespace Ocuda.Ops.Data.Ops
                 .AsNoTracking()
                 .Where(_ => !_.IsDeleted && _.IsInLatestRoster == true);
 
+            searchFilter ??= new SearchFilter();
+
             if (!string.IsNullOrEmpty(searchFilter.SearchText))
             {
                 query = query.Where(_ => _.Name.Contains(searchFilter.SearchText)
@@ -148,6 +154,15 @@ namespace Ocuda.Ops.Data.Ops
                         || _.Username.Contains(searchFilter.SearchText)))
                 .Select(_ => _.Id)
                 .ToListAsync();
+        }
+
+        public async Task UpdateSupervisor(int userId, int supervisorId)
+        {
+            var user = DbSet.Where(_ => _.Id == userId).FirstOrDefault()
+                ?? throw new OcudaException($"User id {userId} could not be found.");
+            user.SupervisorId = supervisorId;
+            DbSet.Update(user);
+            await _context.SaveChangesAsync();
         }
 
         #region Initial setup methods
@@ -202,6 +217,24 @@ namespace Ocuda.Ops.Data.Ops
             return await DbSet
                 .AsNoTracking()
                 .AnyAsync(_ => _.SupervisorId == userId);
+        }
+
+        public async Task MarkUserDeletedAsync(string username, int currentUserId, DateTime asOf)
+        {
+            var users = DbSet.Where(_ => _.Username == username && !_.IsDeleted);
+            if (!users.Any())
+            {
+                throw new OcudaException($"Unable to find user with username {username}");
+            }
+            foreach (var user in users)
+            {
+                user.DeletedAt = asOf;
+                user.IsDeleted = true;
+                user.UpdatedAt = asOf;
+                user.UpdatedBy = currentUserId;
+            }
+            DbSet.UpdateRange(users);
+            await _context.SaveChangesAsync();
         }
 
         #endregion Initial setup methods

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Filters;
@@ -13,6 +14,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         Task<User> FindByUsernameAsync(string username);
 
         Task<User> FindIncludeDeletedAsync(int id);
+
+        Task<User> FindUsernameIncludeDeletedAsync(string username);
 
         Task<ICollection<User>> GetAllAsync();
 
@@ -34,8 +37,12 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 
         Task<bool> IsSupervisor(int userId);
 
+        Task MarkUserDeletedAsync(string username, int currentUserId, DateTime asOf);
+
         Task<CollectionWithCount<User>> SearchAsync(SearchFilter searchFilter);
 
         Task<IEnumerable<int>> SearchIdsAsync(SearchFilter searchFilter);
+
+        Task UpdateSupervisor(int userId, int supervisorId);
     }
 }

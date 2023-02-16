@@ -2,11 +2,22 @@
 {
     public static class Promenade
     {
+        public const string Email = "Email";
+        public const string Experience = "Why do you want to volunteer? Describe any previous volunteer experience.";
+        public const string GuardianEmail = "Parent/Guardian Email";
+        public const string GuardianName = "Parent/Guardian Name";
+        public const string GuardianPhone = "Parent/Guardian Phone";
+        public const string Name = "Name";
         public const string PromptPhone = "Phone";
         public const string PromptRequestedDate = "Requested date";
         public const string PromptRequestedDateAndTime = "Requested date and time";
         public const string PromptRequestedTime = "Requested time";
         public const string PromptSubject = "Subject";
+        public const string VolunteerRegularity = "Are you interested in regular volunteer work or certain number of hours?";
+        public const string WeeklyAvailability = "Weekly Availability";
+        public static readonly string AdultVolunteerForm = "Adult Volunteer Form";
+        public static readonly string AreYouAnAdultVolunteer = "Are you an adult looking to volunteer?";
+        public static readonly string AreYouATeenVolunteer = "Are you a teen looking to volunteer?";
         public static readonly string ButtonBack = "Back";
         public static readonly string ButtonBackToSite = "Back to the site";
         public static readonly string ButtonGo = "Go";
@@ -16,6 +27,7 @@
         public static readonly string ButtonUseMyLocation = "Use my location";
         public static readonly string ConnectSocialMedia = "Connect with us on social media!";
         public static readonly string ConnectSocialOn = "Connect with us on {0}";
+        public static readonly string ContactInformation = "Contact Information";
         public static readonly string CoordinatesErrorItem = "There was a problem locating these coordinates: {0}, {1}";
         public static readonly string Error = "Error";
         public static readonly string ErrorAvailableDaysItem = "This service is only available on the following days: {0}";
@@ -66,6 +78,12 @@
         public static readonly string PodcastListenOn = "You can listen to our podcast on:";
         public static readonly string PodcastsHeader = "Podcasts";
         public static readonly string PodcastTitle = "{0} Podcast";
+        public static readonly string ProductInventoryDoesNotHave = "Does not have {0}";
+        public static readonly string ProductInventoryHas = "Has {0}";
+        public static readonly string ProductInventoryHours = "Hours";
+        public static readonly string ProductInventoryLastUpdate = "Last Update";
+        public static readonly string ProductInventoryLocation = "Location";
+        public static readonly string ProductInventoryStatus = "Status";
         public static readonly string PromptEmail = "Email";
         public static readonly string PromptLanguage = "Language";
         public static readonly string PromptName = "Name";
@@ -81,16 +99,14 @@
         public static readonly string ScheduleYourTime = "Schedule your time";
         public static readonly string ScheduleYourTimeIsScheduled = "Your time is scheduled";
         public static readonly string ShowNotesFor = "Show notes for: {0}";
+        public static readonly string TeenVolunteerForm = "Teen Volunteer Form";
+        public static readonly string UseAdultVolunteerForm = "Use our adult volunteer form.";
+        public static readonly string UseTeenVolunteerForm = "Use our teen volunteer form.";
         public static readonly string ViewShowNotes = "View show notes";
         public static readonly string VisitHomePage = "Visit home page";
+        public static readonly string VolunteerReceivedSubmission = "We've received your submission.";
+        public static readonly string VolunteerThankYou = "Thank you for your interest! Someone will be in touch with you very soon.";
         public static readonly string ZipCodeClosest = "Libraries closest to ZIP code: {0}";
         public static readonly string ZipCodePrompt = "Enter a 5 digit ZIP code";
-
-        public static readonly string ProductInventoryLocation = "Location";
-        public static readonly string ProductInventoryHours = "Hours";
-        public static readonly string ProductInventoryStatus = "Status";
-        public static readonly string ProductInventoryLastUpdate = "Last Update";
-        public static readonly string ProductInventoryHas = "Has {0}";
-        public static readonly string ProductInventoryDoesNotHave = "Does not have {0}";
     }
 }

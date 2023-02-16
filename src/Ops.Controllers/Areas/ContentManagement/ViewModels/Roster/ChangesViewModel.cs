@@ -46,8 +46,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.Roster
 
         public string GetLocation(int locationId)
         {
-            return Locations.ContainsKey(locationId)
-                ? Locations[locationId]
+            return Locations.TryGetValue(locationId, out string value)
+                ? value
                 : $"Location id {locationId}";
         }
     }

@@ -32,11 +32,13 @@ namespace Ocuda.Ops.Service
 
         public async Task<Link> CreateAsync(Link link)
         {
+            ArgumentNullException.ThrowIfNull(link);
+
             var newLink = new Link
             {
                 Name = link.Name?.Trim(),
                 Url = link.Url?.Trim(),
-                Icon = link.Icon.Trim(),
+                Icon = link.Icon?.Trim(),
                 LinkLibraryId = link.LinkLibraryId,
                 CreatedAt = DateTime.Now,
                 CreatedBy = GetCurrentUserId()

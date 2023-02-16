@@ -7,12 +7,29 @@ namespace Ocuda.Ops.Models.Entities
 {
     public class User
     {
+        public User()
+        {
+            DirectReportDNs = new List<string>();
+        }
+
         public int? AssociatedLocation { get; set; }
+        public bool AssociatedLocationManuallySet { get; set; }
         public DateTime CreatedAt { get; set; }
         public int CreatedBy { get; set; }
 
+        public DateTime? DeletedAt { get; set; }
+
         [MaxLength(255)]
         public string Department { get; set; }
+
+        [MaxLength(255)]
+        public string Description { get; set; }
+
+        [NotMapped]
+        public ICollection<string> DirectReportDNs { get; }
+
+        [NotMapped]
+        public string DistinguishedName { get; set; }
 
         [MaxLength(255)]
         public string Email { get; set; }
@@ -37,7 +54,6 @@ namespace Ocuda.Ops.Models.Entities
         public int Id { get; set; }
 
         public bool IsDeleted { get; set; }
-
         public bool? IsInLatestRoster { get; set; }
 
         public bool IsSysadmin { get; set; }
@@ -66,6 +82,9 @@ namespace Ocuda.Ops.Models.Entities
 
         [MaxLength(255)]
         public string Phone { get; set; }
+
+        [NotMapped]
+        public string PhysicalDeliveryOfficeName { get; set; }
 
         [MaxLength(255)]
         public string PictureFilename { get; set; }

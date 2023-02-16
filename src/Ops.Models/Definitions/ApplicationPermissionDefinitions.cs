@@ -60,6 +60,12 @@ namespace Ocuda.Ops.Models.Definitions
                 Id = ApplicationPermission.UpdateProfilePictures,
                 Name = "Update Profile Pictures",
                 Info = "Users with this permission can update profile pictures for all users."
+            },            
+            new ApplicationPermissionDefinition
+            {
+                Id = ApplicationPermission.UserSync,
+                Name = "User sync with LDAP/AD",
+                Info = "Users with this permission can synchronize users and locations with LDAP/AD."
             },
             new ApplicationPermissionDefinition
             {

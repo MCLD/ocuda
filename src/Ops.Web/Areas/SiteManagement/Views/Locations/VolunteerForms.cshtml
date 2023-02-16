@@ -1,0 +1,61 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location.LocationFormsViewModel
+
+<div class="row">
+    <div class="col-sm-7">
+        <h1>
+            Forms
+            <small class="text-muted">
+                @Model.LocationName
+            </small>
+        </h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+		   asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Name"
+		   asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Index))">Back</a>
+    </div>
+</div>
+
+@await Html.PartialAsync("_LocationPartial")
+
+<form method="post"
+      asp-controller="@LocationsController.Name"
+      asp-action="Forms"
+      role="form"
+      display="inline">
+    <input asp-for="LocationId" type="hidden" />
+    <div class="row mt-2">
+        <div class="col">
+    <select class="form-control mt-2" asp-for="TypeId" onchange="this.form.submit()"
+            asp-items="Model.FormTypes" formgroup>
+            <option selected="selected" disabled>Please select a form type to display</option>
+        </select>
+        </div>
+    </div>
+</form>
+
+@if (Model.FormSubmissions?.Count > 0)
+{
+    <table class="table table-hover table-sm table-bordered">
+        <thead>
+            <tr>
+                <th>Created Date</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var form in Model.FormSubmissions) {
+                <tr role="button" id="submission-@form.Id" onclick="location.href='@Url.Action(nameof(LocationsController.VolunteerFormSubmissionDetails),
+                                                    LocationsController.Name,
+                                                    new { locationStub = Model.LocationStub, sid = form.Id })'">
+                    <td>@form.CreatedAt.ToString("MMMM dd h:mm tt")</td>
+                    <td>@form.Name</td>
+                    <td>@form.Email</td>
+                    <td>@form.Phone</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

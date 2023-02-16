@@ -384,6 +384,10 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.ExternalResourceRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IFeatureRepository,
                 Data.Promenade.FeatureRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IVolunteerFormRepository,
+                Data.Promenade.VolunteerFormRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.IVolunteerFormSubmissionRepository,
+                Data.Promenade.VolunteerFormSubmissionRepository>();
             services.AddScoped<Service.Interfaces.Repositories.IGroupRepository,
                 Data.Promenade.GroupRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ILanguageRepository,
@@ -392,6 +396,8 @@ namespace Ocuda.Promenade.Web
                 Data.Promenade.LocationRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ILocationFeatureRepository,
                 Data.Promenade.LocationFeatureRepository>();
+            services.AddScoped<Service.Interfaces.Repositories.ILocationFormRepository,
+                Data.Promenade.LocationFormRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ILocationGroupRepository,
                 Data.Promenade.LocationGroupRepository>();
             services.AddScoped<Service.Interfaces.Repositories.ILocationHoursRepository,
@@ -469,6 +475,7 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<DeckService>();
             services.AddScoped<EmediaService>();
             services.AddScoped<ExternalResourceService>();
+            services.AddScoped<ImageFeatureService>();
             services.AddScoped<LanguageService>();
             services.AddScoped<LocationService>();
             services.AddScoped<NavigationService>();
@@ -482,7 +489,7 @@ namespace Ocuda.Promenade.Web
             services.AddScoped<SiteAlertService>();
             services.AddScoped<SiteSettingService>();
             services.AddScoped<SocialCardService>();
-            services.AddScoped<ImageFeatureService>();
+            services.AddScoped<VolunteerFormService>();
         }
     }
 }

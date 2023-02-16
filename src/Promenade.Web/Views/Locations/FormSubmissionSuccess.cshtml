@@ -1,0 +1,27 @@
+﻿@model Ocuda.Promenade.Controllers.ViewModels.Locations.Volunteer.FormSubmissionSuccessViewModel
+
+@{
+    ViewData["Title"] = "Volunteer Form";
+}
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="col-xs-12 col-lg-12">
+            <h3>@Localizer[Ocuda.i18n.Keys.Promenade.VolunteerReceivedSubmission]</h3>
+
+            <p>@Localizer[Ocuda.i18n.Keys.Promenade.VolunteerThankYou]</p>
+
+            <hr />
+
+            <p>
+                <a class="btn btn-outline-success m-2 btn-lg float-left" href="@Url.Action(string.Format("{0}VolunteerForm", Model.VolunteerType), "Locations", new { locationStub = Model.LocationStub })">
+                    @Localizer[Ocuda.i18n.Keys.Promenade.ButtonBackToSite]
+                </a>
+            </p>
+
+        </div>
+
+    </div><!-- /row -->
+</div> <!-- /container --> 

@@ -195,12 +195,12 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> DeleteAsset(int digitalDisplayAssetId)
+        public async Task<IActionResult> DeleteAsset(int digitalDisplayAssetId, int page)
         {
             if (!await HasContentManagementRightsAsync())
             {
                 ShowAlertDanger("You do not have permission to remove this asset.");
-                return RedirectToAction(nameof(Assets));
+                return RedirectToAction(nameof(Assets), new { page });
             }
 
             try
@@ -211,7 +211,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             {
                 ShowAlertDanger(oex.Message);
             }
-            return RedirectToAction(nameof(Assets));
+            return RedirectToAction(nameof(Assets), new { page });
         }
 
         [HttpPost]

@@ -1,0 +1,45 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Volunteer.AddFormViewModel
+
+<div class="row">
+    <div class="col-sm-7">
+        <h1>
+            Details
+            <small class="text-muted">
+                Add Form
+            </small>
+        </h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.VolunteerController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.VolunteerController.Index))">Back</a>
+    </div>
+</div>
+
+<form method="post"
+      asp-controller="@VolunteerController.Name"
+      asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.VolunteerController.AddForm))"
+      role="form"
+      display="inline">
+    <input asp-for="FormId" id="form-id" type="hidden" />
+    <input asp-for="HeaderSegmentId" id="form-segment-id" type="hidden" />
+    <input asp-for="VolunteerFormsSelectList" type="hidden" />
+        <select class="form-control mt-2" asp-for="TypeName"
+            asp-items="Model.VolunteerFormsSelectList" formgroup></select>
+
+    <div class="row mt-3">
+        <div class="offset-md-3 col-md-9">
+            <div class="form-group">
+                <text>
+                    <button type="submit"
+                        id="submit"
+                        value="Submit"
+                        class="btn btn-success"
+                        button-spinner>
+                        <span class="buttonText">Add Form</span>
+                    </button>
+                </text>
+            </div>
+        </div>
+    </div>
+</form>

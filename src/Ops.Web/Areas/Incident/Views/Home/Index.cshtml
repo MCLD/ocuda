@@ -77,7 +77,7 @@
                                 </a>
                             </td>
                             <td class="align-middle">
-                                @Model.Locations[incident.LocationId]
+                                @(Model.AllLocationNames?.ContainsKey(incident.LocationId) == true ? Model.AllLocationNames[incident.LocationId] : "Unknown")
                             </td>
                             <td class="align-middle">
                                 @Model.IncidentTypes[incident.IncidentTypeId]

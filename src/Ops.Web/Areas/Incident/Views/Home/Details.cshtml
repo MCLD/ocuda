@@ -1,6 +1,6 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.Incident.ViewModel.DetailsViewModel
 
-<div class="d-flex justify-content-between">
+<div class="d-flex justify-content-between mb-2">
     <h1>
         @Model.Heading
         @if (!string.IsNullOrEmpty(Model.SecondaryHeading))
@@ -157,7 +157,7 @@
             <tr>
                 <th>Location</th>
                 <td>
-                    @Model.Locations[Model.Incident.LocationId]
+                    @(Model.AllLocationNames?.ContainsKey(Model.Incident.LocationId) == true ? Model.AllLocationNames[Model.Incident.LocationId] : "Unknown")
                     <br />
                     @Model.Incident.LocationDescription
                 </td>
@@ -345,7 +345,7 @@
                        asp-route-id="@relatedIncident.Id">@relatedIncident.Id</a>
                         </td>
                         <td>@relatedIncident.IncidentAt.ToString("g")</td>
-                        <td>@Model.Locations[relatedIncident.LocationId]</td>
+                        <td>@(Model.AllLocationNames?.ContainsKey(relatedIncident.LocationId) == true ? Model.AllLocationNames[relatedIncident.LocationId] : "Unknown")</td>
                         <td>@Model.IncidentTypes[relatedIncident.IncidentTypeId]</td>
                     </tr>
                 }

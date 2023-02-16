@@ -19,10 +19,10 @@ namespace Ocuda.Promenade.Models.Entities
         [Required]
         public int Id { get; set; }
 
-        [Display(Name = "Is it active?")]
+        [Display(Name = "Show inventory information")]
         public bool IsActive { get; set; }
 
-        [Display(Name = "Visible to the public?")]
+        [Display(Name = "Show this item on the public site")]
         public bool IsVisibleToPublic { get; set; }
 
         [Required]

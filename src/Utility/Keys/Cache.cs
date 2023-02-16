@@ -3,6 +3,11 @@
     public static class Cache
     {
         /// <summary>
+        /// Date and time of last expired slide purge
+        /// </summary>
+        public static readonly string OpsCleanupSlides = "cleanupslides";
+
+        /// <summary>
         /// Status of a digital display, {0} is the digital display id
         /// </summary>
         public static readonly string OpsDigitalDisplayStatus = "dd.{0}";

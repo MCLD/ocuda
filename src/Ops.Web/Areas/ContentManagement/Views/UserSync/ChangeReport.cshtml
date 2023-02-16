@@ -1,0 +1,122 @@
+﻿@using Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.UserSync
+@model ChangeReportViewModel
+@{
+    var first = true;
+}
+<div class="d-flex justify-content-between mb-2">
+    <h1>
+        @Model.Title
+        @if (!string.IsNullOrEmpty(Model.Subtitle))
+        {
+            <small class="text-muted">@Model.Subtitle</small>
+        }
+    </h1>
+    <div class="pt-2">
+        @if (Model.AllowPerformSync)
+        {
+            <form class="d-inline"
+                  method="post"
+              asp-action="@nameof(UserSyncController.PerformSync)">
+                <button class="btn btn-warning">
+                    Perform Sync
+                </button>
+            </form>
+        }
+        @if (Model.AllowUpdateLocations)
+        {
+            <form class="d-inline"
+                  method="post"
+              asp-action="@nameof(UserSyncController.SyncLocations)">
+                <button class="btn btn-warning">
+                    Sync Locations
+                </button>
+            </form>
+            <a class="btn btn-outline-dark"
+           asp-controller="@UserSyncController.Name"
+           asp-action="@nameof(UserSyncController.UpdateLocations)">Update Locations</a>
+
+        }
+        <a class="btn btn-outline-dark"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.UserSyncController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.UserSyncController.Index))">Back</a>
+    </div>
+</div>
+
+@if (!Model.IsApplied)
+{
+    <div class="alert alert-warning d-flex justify-content-between">
+        <span style="font-size: larger; font-weight: bold;">This was a check run, changes have not been applied.</span>
+    </div>
+}
+<h2>Changes</h2>
+<table class="table table-sm table-bordered">
+    <thead>
+        <tr>
+            <th>Item</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Status.Status.Keys.Count == 0)
+        {
+            <tr colspan="2">
+                <td>No updates detected.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var item in Model.Status.Status.Keys.OrderBy(_ => _))
+            {
+                first = true;
+                @foreach (var status in Model.Status.Status[item])
+                {
+                    <tr>
+                        @if (first)
+                        {
+                            first = false;
+                            <td rowspan="@Model.Status.Status[item].Count">@item</td>
+                        }
+                        @if (status.Status == Microsoft.Extensions.Logging.LogLevel.Error)
+                        {
+                            <td class="table-danger">@status.Message</td>
+                        }
+                        else if (status.Status == Microsoft.Extensions.Logging.LogLevel.Warning)
+                        {
+                            <td class="table-warning">@status.Message</td>
+                        }
+                        else if (status.Status == Microsoft.Extensions.Logging.LogLevel.Information)
+                        {
+                            <td class="table-success">@status.Message</td>
+                        }
+                        else
+                        {
+                            <td>@status.Message</td>
+                        }
+                    </tr>
+                }
+            }
+        }
+    </tbody>
+</table>
+
+@if (Model.Status.StatusCounts.Count > 0)
+{
+    <h2>Stats</h2>
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var key in Model.Status.StatusCounts.Keys.OrderBy(_ => _))
+            {
+                <tr>
+                    <td>@key</td>
+                    <td>@Model.Status.StatusCounts[key]</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

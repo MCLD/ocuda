@@ -1,0 +1,101 @@
+﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location.VolunteerFormSubmissionDetailsViewModel
+
+<div class="row">
+    <div class="col-sm-7">
+        <h1>
+            Details
+            <small class="text-muted">
+                Volunteer Form - 
+                @if (Model.IsTeen)
+                {
+                    @:Teen
+                }
+                else
+                {
+                    @:Adult
+                }
+            </small>
+        </h1>
+    </div>
+    <div class="col-sm-5">
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Name"
+           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.VolunteerForms))"
+            asp-route-locationStub="@Model.LocationStub">Back</a>
+    </div>
+</div>
+
+<div class="text-md-right col-md-7 mt-4">
+<div class="card text-left">
+    <div class="card-header">
+        <span class="h5">Applicant: @Model.Name</span>
+        <a asp-action=""
+            class="text-success float-right">
+            <span class="fas fa-print fa-lg text-secondary"></span>
+        </a>
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">Information</h5>
+        <div class="form-row">
+            <div class="col">
+                <label><strong>Created:</strong></label>
+                <span class="col-form-label">@Model.CreatedAt</span>
+            </div>
+            <div class="col">
+                <label><strong>Name:</strong></label>
+                <span class="col-form-label">@Model.Name</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col">
+                    <label><strong>Phone:</strong></label>
+                    <span class="col-form-label" >@Model.Phone</span>
+            </div>
+            <div class="col">
+                    <label><strong>Email:</strong></label>
+                    <span class="col-form-label" >@Model.Email</span>
+            </div>
+        </div>
+        @if (Model.IsTeen)
+        {
+            <div class="form-row">
+                <div class="col">
+                    <label><strong>Guardian Name:</strong></label>
+                    <span class="col-form-label">@Model.GuardianName</span>
+            </div>
+            <div class="col">
+                    <label><strong>Guardian Phone:</strong></label>
+                    <span class="col-form-label">@Model.GuardianPhone</span>
+            </div>
+        </div>
+            <div class="form-row">
+                <div class="col">
+                    <label><strong>Guardian Email:</strong></label>
+                    <span class="col-form-label">@Model.GuardianEmail</span>
+                </div>
+                    <div class="col"></div>
+            </div>
+        }
+        <div class="form-row">
+            <div class="col">
+                    <label><strong>Experience:</strong></label>
+                    <span class="col-form-label text-wrap">@Model.Experience</span>
+            </div>
+            <div class="col">
+                    <label><strong>Availability:</strong></label>
+                    <span class="col-form-label text-wrap">@Model.Availability</span>
+            </div>
+        </div>
+        @if (Model.IsTeen)
+        {
+        <div class="form-row">
+            <div class="col">
+                <label><strong>Regularity:</strong></label>
+                <span class="col-form-label">@Model.Regularity</span>
+            </div>
+            <div class="col"></div>
+        </div>
+        }
+    </div>
+</div>
+</div>

@@ -70,6 +70,7 @@ namespace Ocuda.Ops.Controllers
             var viewModel = new IndexViewModel
             {
                 CanUpdatePicture = IsSiteManager(),
+                CanViewLastSeen = IsSiteManager(),
                 Locations = await GetLocationsDropdownAsync(_locationService),
                 UserViewingSelf = string.IsNullOrEmpty(id)
                     || id == UserClaim(ClaimType.Username)
@@ -190,6 +191,19 @@ namespace Ocuda.Ops.Controllers
 
             await _userService.RemoveProfilePictureAsync(userId);
             return RedirectToAction(nameof(Index), new { id = username });
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> UnsetManualLocation(int userId)
+        {
+            if (userId != CurrentUserId)
+            {
+                return RedirectToUnauthorized();
+            }
+
+            await _userService.UnsetManualLocationAsync(userId);
+
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost("[action]")]

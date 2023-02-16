@@ -25,7 +25,9 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task<List<Location>> GetAllLocationsAsync();
 
-        Task<Dictionary<int, string>> GetAllLocationsIdNameAsync();
+        Task<IDictionary<int, string>> GetAllLocationsIdNameAsync();
+
+        Task<IDictionary<int, string>> GetAllNamesIncludingDeletedAsync();
 
         Task<(double? Latitude, double? Longitude)> GetCoordinatesAsync(string address);
 

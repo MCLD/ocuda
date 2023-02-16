@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -9,14 +10,18 @@ namespace Ocuda.Ops.Web.JobScheduling
     internal class JobScopedProcessingService
         : BaseScopedBackgroundService<JobScopedProcessingService>
     {
+        private readonly IDigitalDisplayCleanupService _digitalDisplayCleanupService;
         private readonly IDigitalDisplaySyncService _digitalDisplaySyncService;
         private readonly IScheduleNotificationService _scheduleNotificationService;
 
         public JobScopedProcessingService(ILogger<JobScopedProcessingService> logger,
+            IDigitalDisplayCleanupService digitalDisplayCleanupService,
             IDigitalDisplaySyncService digitalDisplaySyncService,
             IScheduleNotificationService scheduleNotificationService)
             : base(logger)
         {
+            _digitalDisplayCleanupService = digitalDisplayCleanupService
+                ?? throw new ArgumentNullException(nameof(digitalDisplayCleanupService));
             _digitalDisplaySyncService = digitalDisplaySyncService
                 ?? throw new ArgumentNullException(nameof(digitalDisplaySyncService));
             _scheduleNotificationService = scheduleNotificationService
@@ -30,26 +35,39 @@ namespace Ocuda.Ops.Web.JobScheduling
         {
             StartProcessing();
 
-            try
+            var scheduledTasks = new Dictionary<string, Func<Task>>
             {
-                await _scheduleNotificationService.SendPendingNotificationsAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogCritical(ex,
-                    "Fatal uncaught error in scheduled task: {ErrorMessage}",
-                    ex.Message);
-            }
+                ["SendPendingNotifications"] = _scheduleNotificationService.SendPendingNotificationsAsync,
+                ["CleanupSlides"] = _digitalDisplayCleanupService.CleanupSlidesAsync,
+                ["UpdateDigitalDisplays"] = _digitalDisplaySyncService.UpdateDigitalDisplaysAsync
+            };
 
-            try
+            foreach (var methodName in scheduledTasks.Keys)
             {
-                await _digitalDisplaySyncService.UpdateDigitalDisplaysAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogCritical(ex,
-                    "Fatal uncaught error in scheduled task: {ErrorMessage}",
-                    ex.Message);
+                try
+                {
+                    await scheduledTasks[methodName]();
+                }
+                catch (Exception ex)
+                {
+                    int preventLoop = 10;
+                    var innerException = ex;
+                    using (_logger.BeginScope(new Dictionary<string, object>
+                    {
+                        ["TopException"] = ex
+                    }))
+                    {
+                        while (innerException.InnerException != null && preventLoop > 0)
+                        {
+                            innerException = innerException.InnerException;
+                            preventLoop--;
+                        }
+                        _logger.LogCritical(ex,
+                            "Critical error in scheduled task {MethodName}: {ErrorMessage}",
+                            methodName,
+                            innerException.Message);
+                    }
+                }
             }
 
             _logger.LogDebug("Scheduled tasks complete in {Elapsed} ms",

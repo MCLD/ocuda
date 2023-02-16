@@ -32,6 +32,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
     public class SegmentsController : BaseController<SegmentsController>
     {
         private readonly IEmediaService _emediaService;
+        private readonly IVolunteerFormService _formService;
         private readonly ILanguageService _languageService;
         private readonly ILocationService _locationService;
         private readonly IPermissionGroupService _permissionGroupService;
@@ -42,6 +43,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         public SegmentsController(ServiceFacades.Controller<SegmentsController> context,
             IEmediaService emediaService,
+            IVolunteerFormService formService,
             ILanguageService languageService,
             ILocationService locationService,
             IPermissionGroupService permissionGroupService,
@@ -52,6 +54,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             _emediaService = emediaService
                 ?? throw new ArgumentNullException(nameof(emediaService));
+            _formService = formService
+                ?? throw new ArgumentNullException(nameof(formService));
             _languageService = languageService
                 ?? throw new ArgumentNullException(nameof(languageService));
             _locationService = locationService
@@ -318,6 +322,17 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     viewModel.Relationship = string.Format(CultureInfo.InvariantCulture,
                         "This segment is used for multiple locations: {0}",
                         string.Join(", ", locations.Select(_ => _.Name)));
+                }
+
+                var forms = await _formService.GetFormBySegmentIdAsync(segment.Id);
+                if (forms?.Count == 1)
+                {
+                    viewModel.BackLink = Url.Action(nameof(VolunteerController.Form),
+                        VolunteerController.Name,
+                        new
+                        {
+                            id = forms.First().Id
+                        });
                 }
 
                 var episode = await _podcastService.GetEpisodeBySegmentIdAsync(segment.Id);

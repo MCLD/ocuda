@@ -19,7 +19,6 @@ using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 using Ocuda.Utility.Services.Interfaces;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
 
 namespace Ocuda.Ops.Service
 {
@@ -102,6 +101,12 @@ namespace Ocuda.Ops.Service
                     IsSysadmin = true
                 };
                 await _userRepository.AddAsync(sysadminUser);
+                await _userRepository.SaveAsync();
+            }
+            if (!sysadminUser.ExcludeFromRoster)
+            {
+                sysadminUser.ExcludeFromRoster = true;
+                _userRepository.Update(sysadminUser);
                 await _userRepository.SaveAsync();
             }
             return sysadminUser;
@@ -276,6 +281,16 @@ namespace Ocuda.Ops.Service
             await _cache.RemoveAsync(cacheKey);
         }
 
+        public async Task UnsetManualLocationAsync(int userId)
+        {
+            var user = await _userRepository.FindAsync(userId)
+                ?? throw new OcudaException($"Cannot find user id {userId}");
+
+            user.AssociatedLocationManuallySet = false;
+            _userRepository.Update(user);
+            await _userRepository.SaveAsync();
+        }
+
         public async Task UpdateLocationAsync(int userId, int locationId)
         {
             if (userId != GetCurrentUserId() && !IsSiteManager())
@@ -283,12 +298,10 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException("Permission denied.");
             }
 
-            var user = await _userRepository.FindAsync(userId);
-            if (user == null)
-            {
-                throw new OcudaException($"Cannot find user id {userId}");
-            }
+            var user = await _userRepository.FindAsync(userId)
+                ?? throw new OcudaException($"Cannot find user id {userId}");
             user.AssociatedLocation = locationId;
+            user.AssociatedLocationManuallySet = true;
             _userRepository.Update(user);
             await _userRepository.SaveAsync();
         }
@@ -327,12 +340,13 @@ namespace Ocuda.Ops.Service
             try
             {
                 profilePicture = Convert.FromBase64String(profilePictureBase64);
-
-                var imageInfo = Image.Identify(profilePicture, out IImageFormat imageFormat);
+                var imageInfo = Image.Identify(profilePicture);
                 if (imageInfo.Height != imageInfo.Width)
                 {
                     throw new OcudaException("Profile picture must be square.");
                 }
+
+                var imageFormat = imageInfo.Metadata.DecodedImageFormat;
 
                 var validFileType = false;
                 foreach (var validExtension in ProfilePictureValidTypes)
