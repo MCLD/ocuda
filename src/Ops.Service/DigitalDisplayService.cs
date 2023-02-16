@@ -149,6 +149,30 @@ namespace Ocuda.Ops.Service
             return sets.Select(_ => _.DigitalDisplaySetId);
         }
 
+        public async Task<int> ClearExpiredAssetsAsync(DateTime endDate)
+        {
+            var count = 0;
+            var issues = 0;
+            var expiredAssets = await _digitalDisplayAssetSetRepository.GetExpiredAsync(endDate);
+            foreach (var assetId in expiredAssets)
+            {
+                try
+                {
+                    await DeleteAssetAsync(assetId);
+                    count++;
+                }
+                catch (OcudaException)
+                {
+                    issues++;
+                }
+            }
+            if (issues > 0)
+            {
+                _logger.LogError("There were {issues} issues deleting expired assets.", issues);
+            }
+            return count;
+        }
+
         public async Task DeleteAssetAsync(int digitalDisplayAssetId)
         {
             var asset = await _digitalDisplayAssetRepository.FindAsync(digitalDisplayAssetId);
@@ -160,6 +184,12 @@ namespace Ocuda.Ops.Service
 
             _digitalDisplayItemRepository.RemoveByAssetId(digitalDisplayAssetId);
             await _digitalDisplayItemRepository.SaveAsync();
+            var assetSets = await _digitalDisplayAssetSetRepository
+                .GetByAssetIdAsync(digitalDisplayAssetId);
+            _digitalDisplayAssetSetRepository.RemoveRange(assetSets);
+            _digitalDisplayAssetRepository.Remove(asset);
+            await _digitalDisplayAssetRepository.SaveAsync();
+
             try
             {
                 System.IO.File.Delete(GetAssetPath(asset.Path));
@@ -173,9 +203,6 @@ namespace Ocuda.Ops.Service
                     ex.Message);
                 throw new OcudaException("Unable to delete asset file.", ex);
             }
-
-            _digitalDisplayAssetRepository.Remove(asset);
-            await _digitalDisplayAssetRepository.SaveAsync();
         }
 
         public async Task DeleteDisplayAsync(int displayId)

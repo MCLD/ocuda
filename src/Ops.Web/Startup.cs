@@ -489,6 +489,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ICoverIssueService, CoverIssueService>();
             services.AddScoped<IDeckService, DeckService>();
             services.AddScoped<IDigitalDisplayService, DigitalDisplayService>();
+            services.AddScoped<IDigitalDisplayCleanupService, DigitalDisplayCleanupService>();
             services.AddScoped<IDigitalDisplaySyncService, DigitalDisplaySyncService>();
             services.AddScoped<IEmediaService, EmediaService>();
             services.AddScoped<IEmailService, EmailService>();

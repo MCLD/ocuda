@@ -104,6 +104,7 @@
 <nav paginate="@Model.PaginateModel"></nav>
 
 <form asp-action="@(nameof(DigitalDisplaysController.DeleteAsset))">
+    <input type="hidden" name="page" value="@Model.PaginateModel.CurrentPage" />
     <div class="modal fade"
          id="deleteAsset"
          data-backdrop="static"
