@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +41,23 @@ namespace Ocuda.Ops.Data.Ops
             return await DbSet
                 .AsNoTracking()
                 .Where(_ => _.DigitalDisplayAssetId == assetId)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<int>> GetExpiredAsync(DateTime endDate)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .GroupBy(_ => _.DigitalDisplayAssetId)
+                .Select(_ => new
+                {
+                    DigitalDisplayAssetId = _.Key,
+                    LatestEndDate = _.OrderByDescending(d => d.EndDate)
+                        .Select(d => d.EndDate)
+                        .FirstOrDefault()
+                })
+                .Where(_ => _.LatestEndDate <= endDate)
+                .Select(_ => _.DigitalDisplayAssetId)
                 .ToListAsync();
         }
 

@@ -9,5 +9,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
         public Task<ICollection<DigitalDisplayItem>> GetByDisplayAsync(int displayId);
 
         public void RemoveByAssetId(int assetId);
+
+        public void RemoveForDisplay(int displayId);
     }
 }
