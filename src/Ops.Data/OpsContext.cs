@@ -69,6 +69,8 @@ namespace Ocuda.Ops.Data
         public DbSet<UserMetadata> UserMetadata { get; set; }
         public DbSet<UserMetadataType> UserMetadataTypes { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<UserSyncHistory> UserSyncHistories { get; set; }
+        public DbSet<UserSyncLocation> UserSyncLocations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

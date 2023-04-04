@@ -380,6 +380,10 @@ namespace Ocuda.Ops.Web
                 Data.Ops.UserMetadataTypeRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserRepository,
                 Data.Ops.UserRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IUserSyncHistoryRepository,
+                Data.Ops.UserSyncHistoryRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IUserSyncLocationRepository,
+                Data.Ops.UserSyncLocationRepository>();
 
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICardDetailRepository,
                 Data.Promenade.CardDetailRepository>();
@@ -540,6 +544,7 @@ namespace Ocuda.Ops.Web
             services.AddScoped<Service.Abstract.IUserContextProvider, UserContextProvider>();
             services.AddScoped<IUserMetadataTypeService, UserMetadataTypeService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserSyncService, UserSyncService>();
 
             // background process
             services.AddScoped<JobScopedProcessingService>();

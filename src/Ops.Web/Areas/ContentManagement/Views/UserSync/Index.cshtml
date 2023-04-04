@@ -1,0 +1,71 @@
+﻿@model Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.UserSync.IndexViewModel
+
+<div class="d-flex justify-content-between mb-2">
+    <h1>
+        User Sync
+    </h1>
+    <div class="pt-2">
+        <a class="btn btn-outline-dark"
+           asp-controller="@UserSyncController.Name"
+           asp-action="@nameof(UserSyncController.CheckSync)">Check Sync</a>
+        <a class="btn btn-outline-dark"
+           asp-controller="@UserSyncController.Name"
+           asp-action="@nameof(UserSyncController.CheckLocations)">Check Locations</a>
+        <a class="btn btn-outline-dark"
+           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
+           asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index)">Back</a>
+    </div>
+</div>
+
+@if (!(Model.UserSyncHistories?.Count() > 0))
+{
+    <div class="alert alert-warning">No sync histories were found.</div>
+}
+else
+{
+    <div class="row">
+        <div class="col-12 col-lg-8 offset-lg-2">
+            <table class="table table-sm table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>Run at</th>
+                        <th>Run by</th>
+                        <th>Total Records</th>
+                        <th>Added</th>
+                        <th>Deleted</th>
+                        <th>Updated</th>
+                        <th>Undeleted</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var history in Model.UserSyncHistories)
+                    {
+                        <tr>
+                            <td class="align-middle">
+                                @history.CreatedAt
+                            </td>
+                            <td class="align-middle">
+                                <a asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
+                           asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
+                           asp-route-id="@history.CreatedByUser.Username"
+                                   target="_blank">@history.CreatedByUser.Name</a>
+                            </td>
+                            <td class="align-middle">@history.TotalRecords</td>
+                            <td class="align-middle">@history.AddedUsers</td>
+                            <td class="align-middle">@history.DeletedUsers</td>
+                            <td class="align-middle">@history.UpdatedUsers</td>
+                            <td class="align-middle">@history.UndeletedUsers</td>
+                            <td class="align-middle">
+                                <a asp-action="@nameof(UserSyncController.ImportDetail)"
+                           asp-route-id="@history.Id"
+                                   class="btn btn-outline-dark btn-sm"><span class="fas fa-info-circle"></span></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <nav paginate="@Model"></nav>
+        </div>
+    </div>
+}

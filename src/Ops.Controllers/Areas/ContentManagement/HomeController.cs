@@ -36,7 +36,9 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             {
                 IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
                 HasRosterPermissions = await HasAppPermissionAsync(_permissionGroupService,
-                    ApplicationPermission.RosterManagement)
+                    ApplicationPermission.RosterManagement),
+                HasUserSyncPermissions = await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.UserSync)
             };
 
             var claimPermissionIds = UserClaims(ClaimType.PermissionId);
