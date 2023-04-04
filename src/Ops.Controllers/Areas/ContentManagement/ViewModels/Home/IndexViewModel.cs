@@ -8,12 +8,14 @@
             {
                 return IsSiteManager
                     || HasRosterPermissions
-                    || HasSectionManagerPermissions;
+                    || HasSectionManagerPermissions
+                    || HasUserSyncPermissions;
             }
         }
 
         public bool HasRosterPermissions { get; set; }
         public bool HasSectionManagerPermissions { get; set; }
+        public bool HasUserSyncPermissions { get; set; }
         public bool IsSiteManager { get; set; }
     }
 }

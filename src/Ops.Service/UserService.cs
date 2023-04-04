@@ -104,6 +104,12 @@ namespace Ocuda.Ops.Service
                 await _userRepository.AddAsync(sysadminUser);
                 await _userRepository.SaveAsync();
             }
+            if (!sysadminUser.ExcludeFromRoster)
+            {
+                sysadminUser.ExcludeFromRoster = true;
+                _userRepository.Update(sysadminUser);
+                await _userRepository.SaveAsync();
+            }
             return sysadminUser;
         }
 
