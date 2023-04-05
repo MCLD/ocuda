@@ -70,6 +70,7 @@ namespace Ocuda.Ops.Controllers
             var viewModel = new IndexViewModel
             {
                 CanUpdatePicture = IsSiteManager(),
+                CanViewLastSeen = IsSiteManager(),
                 Locations = await GetLocationsDropdownAsync(_locationService),
                 UserViewingSelf = string.IsNullOrEmpty(id)
                     || id == UserClaim(ClaimType.Username)
