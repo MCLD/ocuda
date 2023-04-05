@@ -3,8 +3,8 @@
 @if (Model.CanEdit)
 {
     <form asp-action="@(nameof(ProfileController.EditNickname))"
-      method="post"
-      role="form">
+          method="post"
+          role="form">
         <input id="editId" asp-for="User.Id" type="hidden" />
         <input id="editUsername" asp-for="User.Username" type="hidden" />
         <div modal id="editModal" name="Nickname" type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
@@ -13,8 +13,8 @@
     </form>
 
     <form asp-action="@nameof(ProfileController.RemovePicture)"
-      method="post"
-      role="form">
+          method="post"
+          role="form">
         <input name="userId" value="@Model.User.Id" type="hidden" />
         <input name="username" value="@Model.User.Username" type="hidden" />
         <div modal
@@ -22,13 +22,13 @@
          name="Remove picture"
          modal-header="Remove picture"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
-         Remove the picture associated with this profile?
+            Remove the picture associated with this profile?
         </div>
     </form>
 
     <form asp-action="@(nameof(ProfileController.UpdateLocation))"
-      method="post"
-      role="form">
+          method="post"
+          role="form">
         <input name="userId" value="@Model.User.Id" type="hidden" />
         <div modal
          modal-header="Update associated location"
@@ -36,9 +36,9 @@
          name="Location"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
             <select name="locationId"
-                id="locationList"
+                    id="locationList"
                 asp-items="Model.Locations"
-                class="form-control"></select>
+                    class="form-control"></select>
         </div>
     </form>
 }
@@ -49,7 +49,7 @@
         {
             <div class="col-12 col-md-6 order-md-1 mb-2">
                 <img src="@Model.PicturePath"
-                 class="img-fluid rounded mx-auto d-block img-thumbnail oc-profile-picture">
+                     class="img-fluid rounded mx-auto d-block img-thumbnail oc-profile-picture">
             </div>
         }
         <div class="col-12 col-md-6">
@@ -66,21 +66,50 @@
                                 @if (Model.CanEdit)
                                 {
                                     <a href="#"
-                                   class="float-right pr-2"
-                                   data-toggle="modal"
-                                   data-target="#editModal"
-                                   data-id="@Model.User.Id"
-                                   data-nickname="@Model.User.Nickname"
-                                   title="Update nickname">
+                                       class="float-right pr-2"
+                                       data-toggle="modal"
+                                       data-target="#editModal"
+                                       data-id="@Model.User.Id"
+                                       data-nickname="@Model.User.Nickname"
+                                       title="Update nickname">
                                         <span class="fa fa-xs fa-edit"></span>
                                     </a>
                                 }
                             </td>
                         </tr>
                         <tr>
+                            <th class="align-middle">Email</th>
+                            <td class="align-middle"><a href="mailto:@Model.User.Email">@Model.User.Email</a></td>
+                        </tr>
+                        <tr>
+                            <th class="align-middle">Phone</th>
+                            <td class="align-middle">@Model.User.Phone</td>
+                        </tr>
+                        @if (!string.IsNullOrEmpty(Model.User.Mobile))
+                        {
+                            <tr>
+                                <th class="align-middle">Mobile</th>
+                                <td class="align-middle">@Model.User.Mobile</td>
+                            </tr>
+                        }
+                        <tr>
                             <th class="align-middle">Title</th>
                             <td class="align-middle">@Model.User.Title</td>
                         </tr>
+                        @if (!string.IsNullOrEmpty(Model.User.Description) && Model.User.Title != Model.User.Description)
+                        {
+                            <tr>
+                                <th class="align-middle">Description</th>
+                                <td class="align-middle">@Model.User.Description</td>
+                            </tr>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.User.Department))
+                        {
+                            <tr>
+                                <th class="align-middle">Department</th>
+                                <td class="align-middle">@Model.User.Department</td>
+                            </tr>
+                        }
                         <tr>
                             <th class="align-middle">Associated location</th>
                             <td class="align-middle">
@@ -90,12 +119,12 @@
                                     @if (Model.CanEdit)
                                     {
                                         <a href="#"
-                                   class="float-right pr-2"
-                                   data-toggle="modal"
-                                   data-target="#editLocationModal"
-                                   data-id="@Model.User.Id"
-                                   data-locationid="@Model.User.AssociatedLocation.Value"
-                                   title="Update location">
+                                           class="float-right pr-2"
+                                           data-toggle="modal"
+                                           data-target="#editLocationModal"
+                                           data-id="@Model.User.Id"
+                                           data-locationid="@Model.User.AssociatedLocation.Value"
+                                           title="Update location">
                                             <span class="fa fa-xs fa-edit"></span>
                                         </a>
                                     }
@@ -105,9 +134,9 @@
                                     @if (Model.CanEdit)
                                     {
                                         <button class="btn btn-sm btn-outline-primary"
-                                        data-toggle="modal"
-                                        data-target="#editLocationModal"
-                                        data-id="@Model.User.Id">
+                                                data-toggle="modal"
+                                                data-target="#editLocationModal"
+                                                data-id="@Model.User.Id">
                                             Choose a location
                                         </button>
                                     }
@@ -159,13 +188,16 @@
                                 </td>
                             </tr>
                         }
+                        @if (Model.User.ServiceStartDate.HasValue)
+                        {
+                            <tr>
+                                <th class="align-middle">Start date</th>
+                                <td class="align-middle">@Model.User.ServiceStartDate.Value.ToShortDateString()</td>
+                            </tr>
+                        }
                         <tr>
-                            <th class="align-middle">Email</th>
-                            <td class="align-middle"><a href="mailto:@Model.User.Email">@Model.User.Email</a></td>
-                        </tr>
-                        <tr>
-                            <th class="align-middle">Phone</th>
-                            <td class="align-middle">@Model.User.Phone</td>
+                            <th class="align-middle">Last seen</th>
+                            <td class="align-middle">@Model.User.LastSeen</td>
                         </tr>
                         @if (Model.UserViewingSelf)
                         {
@@ -175,8 +207,8 @@
                                     @Model.AuthenticatedAt
                                     <form asp-action="Reauthenticate" class="d-inline">
                                         <button type="submit"
-                                            class="float-right p-0 mr-2 btn btn-link"
-                                            title="Reauthenticate">
+                                                class="float-right p-0 mr-2 btn btn-link"
+                                                title="Reauthenticate">
                                             <span class="fa fa-xs fa-redo-alt"></span>
                                         </button>
                                     </form>
@@ -219,16 +251,16 @@
                                 <td class="align-middle">
                                     <a asp-action="@nameof(ProfileController.UpdatePicture)"
                                    asp-route-id="@Model.User.Id"
-                                   class="btn btn-sm btn-outline-primary">Upload new picture...</a>
+                                       class="btn btn-sm btn-outline-primary">Upload new picture...</a>
                                     @if (!string.IsNullOrEmpty(Model.PicturePath))
                                     {
                                         <a href="#"
-                                   class="btn btn-sm btn-outline-danger ml-2"
-                                   data-toggle="modal"
-                                   data-target="#removePictureModal"
-                                   data-id="@Model.User.Id"
-                                   data-username="@Model.User.Username"
-                                   title="Remove picture">
+                                           class="btn btn-sm btn-outline-danger ml-2"
+                                           data-toggle="modal"
+                                           data-target="#removePictureModal"
+                                           data-id="@Model.User.Id"
+                                           data-username="@Model.User.Username"
+                                           title="Remove picture">
                                             Remove picture
                                         </a>
                                     }
@@ -274,7 +306,7 @@
 @section scripts
     {
     <script>
-        $("#editModal").on("show.bs.modal", function(e) {
+        $("#editModal").on("show.bs.modal", function (e) {
             var button = $(e.relatedTarget);
             var id = button.data("id");
             var nickname = button.data("nickname");
@@ -282,7 +314,7 @@
             $("#editId").val(id);
             modal.find("#editName").val(nickname);
         });
-        $("#editLocationModal").on("show.bs.modal", function(e) {
+        $("#editLocationModal").on("show.bs.modal", function (e) {
             var sender = $(e.relatedTarget);
             var locationId = sender.data("locationid");
             if (locationId) {
