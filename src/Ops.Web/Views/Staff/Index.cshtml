@@ -90,13 +90,13 @@
                             </td>
                             <td class="align-middle">@user.Title</td>
                             <td class="align-middle">
-                                @if (user.AssociatedLocation.HasValue)
+                                @if (user.AssociatedLocation.HasValue && Model.Locations.ContainsKey(user.AssociatedLocation.Value))
                                 {
                                     @Model.Locations[user.AssociatedLocation.Value]
                                 }
                                 else
                                 {
-                                    @:None assigned
+                                    <em class="text-muted">None assigned</em>
                                 }
                             </td>
                             <td class="align-middle">
