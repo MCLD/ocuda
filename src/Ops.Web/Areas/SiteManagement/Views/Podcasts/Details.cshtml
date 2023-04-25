@@ -135,7 +135,7 @@
             <div class="col-md-9">
                 @if (Model.Podcast.IsExplicit)
                 {
-                    <span class="text-success fas fas-plus-circle" title="True"></span>
+                    <span class="text-success fas fa-check-circle" title="True"></span>
                 }
                 else
                 {
@@ -150,7 +150,7 @@
             <div class="col-md-9">
                 @if (Model.Podcast.IsSerial)
                 {
-                    <span class="text-success fas fas-plus-circle" title="True"></span>
+                    <span class="text-success fas fa-check-circle" title="True"></span>
                 }
                 else
                 {
@@ -165,7 +165,7 @@
             <div class="col-md-9">
                 @if (Model.Podcast.IsBlocked)
                 {
-                    <span class="text-success fas fas-plus-circle" title="True"></span>
+                    <span class="text-success fas fa-check-circle" title="True"></span>
                 }
                 else
                 {
@@ -180,7 +180,22 @@
             <div class="col-md-9">
                 @if (Model.Podcast.IsCompleted)
                 {
-                    <span class="text-success fas fas-plus-circle" title="True"></span>
+                    <span class="text-success fas fa-check-circle" title="True"></span>
+                }
+                else
+                {
+                    <span class="text-danger fas fa-times-circle" title="False"></span>
+                }
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-md-3 text-right">
+                <label asp-for="Podcast.IsHidden"></label>
+            </div>
+            <div class="col-md-9">
+                @if (Model.Podcast.IsHidden)
+                {
+                    <span class="text-success fas fa-check-circle" title="True"></span>
                 }
                 else
                 {
@@ -195,7 +210,7 @@
             <div class="col-md-9">
                 @if (Model.Podcast.IsDeleted)
                 {
-                    <span class="text-success fas fas-plus-circle" title="True"></span>
+                    <span class="text-success fas fa-check-circle" title="True"></span>
                 }
                 else
                 {

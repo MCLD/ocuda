@@ -8,57 +8,36 @@ namespace Ocuda.Promenade.Models.Entities
 {
     public class Podcast
     {
-        [Key]
-        [Required]
-        public int Id { get; set; }
-
-        [MaxLength(255)]
-        [Required]
-        public string Title { get; set; }
-
-        [MaxLength(50)]
-        [Required]
-        public string Stub { get; set; }
-
         [MaxLength(255)]
         public string Author { get; set; }
-
-        [MaxLength(1000)]
-        [Required]
-        public string Description { get; set; }
 
         [MaxLength(1000)]
         [Required]
         public string Category { get; set; }
 
         [MaxLength(255)]
+        public string Copyright { get; set; }
+
+        [MaxLength(1000)]
         [Required]
-        [DisplayName("Image URL")]
-        public string ImageUrl { get; set; }
+        public string Description { get; set; }
+
+        [NotMapped]
+        [DisplayName("Number of Episodes")]
+        public int EpisodeCount { get; set; }
+
+        [Key]
+        [Required]
+        public int Id { get; set; }
 
         [MaxLength(255)]
         [DisplayName("Image Thumbnail URL")]
         public string ImageThumbnailUrl { get; set; }
 
-        [MaxLength(8)]
-        [Required]
-        public string Language { get; set; }
-
-        [DisplayName("Is Explicit")]
-        public bool IsExplicit { get; set; }
-
-        [DisplayName("Is Serial")]
-        public bool IsSerial { get; set; }
-
         [MaxLength(255)]
         [Required]
-        [DisplayName("Owner Name")]
-        public string OwnerName { get; set; }
-
-        [MaxLength(255)]
-        [Required]
-        [DisplayName("Owner Email")]
-        public string OwnerEmail { get; set; }
+        [DisplayName("Image URL")]
+        public string ImageUrl { get; set; }
 
         [DisplayName("Is Blocked")]
         public bool IsBlocked { get; set; }
@@ -69,22 +48,46 @@ namespace Ocuda.Promenade.Models.Entities
         [DisplayName("Is Deleted")]
         public bool IsDeleted { get; set; }
 
+        [DisplayName("Is Explicit")]
+        public bool IsExplicit { get; set; }
+
+        [DisplayName("Is Hidden from public index")]
+        public bool IsHidden { get; set; }
+
+        [DisplayName("Is Serial")]
+        public bool IsSerial { get; set; }
+
+        [MaxLength(8)]
+        [Required]
+        public string Language { get; set; }
+
+        [MaxLength(255)]
+        [Required]
+        [DisplayName("Owner Email")]
+        public string OwnerEmail { get; set; }
+
+        [MaxLength(255)]
+        [Required]
+        [DisplayName("Owner Name")]
+        public string OwnerName { get; set; }
+
+        [NotMapped]
+        public IEnumerable<string> PermissionGroupIds { get; set; }
+
         public ICollection<PodcastItem> PodcastItems { get; set; }
 
-        [DisplayName("Last Update")]
-        public DateTime UpdatedAt { get; set; }
+        [MaxLength(50)]
+        [Required]
+        public string Stub { get; set; }
 
         [MaxLength(255)]
         public string Subtitle { get; set; }
 
         [MaxLength(255)]
-        public string Copyright { get; set; }
+        [Required]
+        public string Title { get; set; }
 
-        [NotMapped]
-        public IEnumerable<string> PermissionGroupIds { get; set; }
-
-        [NotMapped]
-        [DisplayName("Number of Episodes")]
-        public int EpisodeCount { get; set; }
+        [DisplayName("Last Update")]
+        public DateTime UpdatedAt { get; set; }
     }
 }

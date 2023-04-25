@@ -30,12 +30,23 @@ namespace Ocuda.Promenade.Data.Promenade
                 .SingleOrDefaultAsync();
         }
 
+        public async Task<ICollection<PodcastDirectoryInfo>> GetDirectoryInfosByPodcastIdAsync(
+            int id)
+        {
+            return await _context.PodcastDirectoryInfos
+                .Include(_ => _.PodcastDirectory)
+                .AsNoTracking()
+                .Where(_ => _.PodcastId == id)
+                .OrderBy(_ => _.PodcastDirectory.Name)
+                .ToListAsync();
+        }
+
         public async Task<DataWithCount<ICollection<Podcast>>> GetPaginatedListAsync(
-            BaseFilter filter)
+                    BaseFilter filter)
         {
             var query = DbSet
                 .AsNoTracking()
-                .Where(_ => !_.IsDeleted && !_.IsBlocked
+                .Where(_ => !_.IsDeleted && !_.IsHidden && !_.IsBlocked
                     && _.PodcastItems.Any(pi => !pi.IsDeleted && !pi.IsBlocked
                         && pi.PublishDate <= _dateTimeProvider.Now));
 
@@ -47,17 +58,6 @@ namespace Ocuda.Promenade.Data.Promenade
                 .ApplyPagination(filter)
                 .ToListAsync()
             };
-        }
-
-        public async Task<ICollection<PodcastDirectoryInfo>> GetDirectoryInfosByPodcastIdAsync(
-            int id)
-        {
-            return await _context.PodcastDirectoryInfos
-                .Include(_ => _.PodcastDirectory)
-                .AsNoTracking()
-                .Where(_ => _.PodcastId == id)
-                .OrderBy(_ => _.PodcastDirectory.Name)
-                .ToListAsync();
         }
     }
 }
