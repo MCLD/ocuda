@@ -194,6 +194,19 @@ namespace Ocuda.Ops.Controllers
         }
 
         [HttpPost("[action]")]
+        public async Task<IActionResult> UnsetManualLocation(int userId)
+        {
+            if (userId != CurrentUserId)
+            {
+                return RedirectToUnauthorized();
+            }
+
+            await _userService.UnsetManualLocationAsync(userId);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost("[action]")]
         public async Task<IActionResult> UpdateLocation(int userId, int locationId)
         {
             if (userId != CurrentUserId)

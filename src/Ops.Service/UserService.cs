@@ -282,6 +282,16 @@ namespace Ocuda.Ops.Service
             await _cache.RemoveAsync(cacheKey);
         }
 
+        public async Task UnsetManualLocationAsync(int userId)
+        {
+            var user = await _userRepository.FindAsync(userId)
+                ?? throw new OcudaException($"Cannot find user id {userId}");
+
+            user.AssociatedLocationManuallySet = false;
+            _userRepository.Update(user);
+            await _userRepository.SaveAsync();
+        }
+
         public async Task UpdateLocationAsync(int userId, int locationId)
         {
             if (userId != GetCurrentUserId() && !IsSiteManager())
@@ -289,12 +299,10 @@ namespace Ocuda.Ops.Service
                 throw new OcudaException("Permission denied.");
             }
 
-            var user = await _userRepository.FindAsync(userId);
-            if (user == null)
-            {
-                throw new OcudaException($"Cannot find user id {userId}");
-            }
+            var user = await _userRepository.FindAsync(userId)
+                ?? throw new OcudaException($"Cannot find user id {userId}");
             user.AssociatedLocation = locationId;
+            user.AssociatedLocationManuallySet = true;
             _userRepository.Update(user);
             await _userRepository.SaveAsync();
         }

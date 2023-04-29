@@ -12,16 +12,26 @@
         </div>
     </form>
 
+    <form asp-action="@(nameof(ProfileController.UnsetManualLocation))"
+          method="post"
+          role="form">
+        <div modal id="unsetModal" name="Manually-set Location Flag" type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
+            <input name="userId" value="@Model.User.Id" type="hidden" />
+            This associated location has been set manually. Do you want to delete this manual
+            override so the associated location is set automatically in the future?
+        </div>
+    </form>
+
     <form asp-action="@nameof(ProfileController.RemovePicture)"
           method="post"
           role="form">
         <input name="userId" value="@Model.User.Id" type="hidden" />
         <input name="username" value="@Model.User.Username" type="hidden" />
         <div modal
-         id="removePictureModal"
-         name="Remove picture"
-         modal-header="Remove picture"
-         type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
+             id="removePictureModal"
+             name="Remove picture"
+             modal-header="Remove picture"
+             type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
             Remove the picture associated with this profile?
         </div>
     </form>
@@ -31,13 +41,18 @@
           role="form">
         <input name="userId" value="@Model.User.Id" type="hidden" />
         <div modal
-         modal-header="Update associated location"
-         id="editLocationModal"
-         name="Location"
-         type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+             modal-header="Update associated location"
+             id="editLocationModal"
+             name="Location"
+             type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
+            <p>
+                If you regularly work in multiple locations you can use this form to change which
+                location you associate with by default. If you do not regularly work in multiple
+                locations, the system will keep your location up-to-date automatically.
+            </p>
             <select name="locationId"
                     id="locationList"
-                asp-items="Model.Locations"
+                    asp-items="Model.Locations"
                     class="form-control"></select>
         </div>
     </form>
@@ -127,6 +142,17 @@
                                            title="Update location">
                                             <span class="fa fa-xs fa-edit"></span>
                                         </a>
+                                        @if (Model.User.AssociatedLocationManuallySet)
+                                        {
+                                            <a href="#"
+                                               class="float-right pr-3"
+                                               data-toggle="modal"
+                                               data-target="#unsetModal"
+                                               data-id="@Model.User.Id"
+                                               title="Manually set">
+                                                <span class="fas fa-xs fa-wrench"></span>
+                                            </a>
+                                        }
                                     }
                                 }
                                 else
@@ -157,8 +183,8 @@
                                 else
                                 {
                                     <a asp-controller="@ProfileController.Name"
-                                   asp-action="@nameof(ProfileController.Index)"
-                                   asp-route-id="@Model.User.Supervisor.Username">@Model.User.Supervisor.Name</a>
+                                       asp-action="@nameof(ProfileController.Index)"
+                                       asp-route-id="@Model.User.Supervisor.Username">@Model.User.Supervisor.Name</a>
                                 }
                             </td>
                         </tr>
@@ -179,8 +205,8 @@
                                         else
                                         {
                                             <a asp-controller="@ProfileController.Name"
-                                   asp-action="@nameof(ProfileController.Index)"
-                                   asp-route-id="@directReport.Username">@directReport.Name</a>
+                                               asp-action="@nameof(ProfileController.Index)"
+                                               asp-route-id="@directReport.Username">@directReport.Name</a>
 
                                             <br />
                                         }
@@ -235,8 +261,8 @@
                                             else
                                             {
                                                 <a asp-controller="@ProfileController.Name"
-                                   asp-action="@nameof(ProfileController.Index)"
-                                   asp-route-id="@user.Username">@user.Name</a>
+                                                   asp-action="@nameof(ProfileController.Index)"
+                                                   asp-route-id="@user.Username">@user.Name</a>
                                                 <br />
                                             }
                                         }
@@ -250,7 +276,7 @@
                                 <th class="align-middle">Update photo</th>
                                 <td class="align-middle">
                                     <a asp-action="@nameof(ProfileController.UpdatePicture)"
-                                   asp-route-id="@Model.User.Id"
+                                       asp-route-id="@Model.User.Id"
                                        class="btn btn-sm btn-outline-primary">Upload new picture...</a>
                                     @if (!string.IsNullOrEmpty(Model.PicturePath))
                                     {

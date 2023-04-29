@@ -299,18 +299,14 @@ namespace Ocuda.Ops.Service
                     userFieldChanges.Add(nameof(opsUser.Title));
                     opsUser.Title = ldapUser.Title;
                 }
-                if (!opsUser.AssociatedLocation.HasValue
+                if (!opsUser.AssociatedLocationManuallySet
                     && !string.IsNullOrEmpty(ldapUser.PhysicalDeliveryOfficeName))
                 {
-                    var existingLocation = locations.SingleOrDefault(_ => string.Equals(_.Name,
+                    var ldapLocation = locations.SingleOrDefault(_ => string.Equals(_.Name,
                         ldapUser.PhysicalDeliveryOfficeName,
                         StringComparison.OrdinalIgnoreCase));
-                    if (existingLocation != null)
-                    {
-                        userFieldChanges.Add(nameof(opsUser.AssociatedLocation));
-                        opsUser.AssociatedLocation = existingLocation.MapToLocationId;
-                    }
-                    else
+
+                    if (ldapLocation == null)
                     {
                         if (!locationsToAdd.Contains(ldapUser.PhysicalDeliveryOfficeName))
                         {
@@ -321,6 +317,11 @@ namespace Ocuda.Ops.Service
                                 ldapUser.PhysicalDeliveryOfficeName);
                             locationsToAdd.Add(ldapUser.PhysicalDeliveryOfficeName);
                         }
+                    }
+                    else if (ldapLocation.MapToLocationId != opsUser.AssociatedLocation.Value)
+                    {
+                        userFieldChanges.Add(nameof(opsUser.AssociatedLocation));
+                        opsUser.AssociatedLocation = ldapLocation.MapToLocationId;
                     }
                 }
 
