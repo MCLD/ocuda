@@ -83,7 +83,10 @@ namespace Ocuda.Ops.Service
                         break;
 
                     case ADDirectReports:
-                        user.DirectReportDNs.Add(attribute.StringValue);
+                        foreach (var item in attribute.StringValueArray)
+                        {
+                            user.DirectReportDNs.Add(item);
+                        }
                         break;
 
                     case ADDisplayName:

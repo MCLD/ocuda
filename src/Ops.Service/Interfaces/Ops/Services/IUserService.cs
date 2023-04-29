@@ -47,6 +47,8 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 
         Task RemoveProfilePictureAsync(int userId);
 
+        Task UnsetManualLocationAsync(int userId);
+
         Task UpdateLocationAsync(int userId, int locationId);
 
         Task<User> UpdateRosterUserAsync(int rosterUserId, User user);

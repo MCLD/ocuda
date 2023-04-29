@@ -13,6 +13,7 @@ namespace Ocuda.Ops.Models.Entities
         }
 
         public int? AssociatedLocation { get; set; }
+        public bool AssociatedLocationManuallySet { get; set; }
         public DateTime CreatedAt { get; set; }
         public int CreatedBy { get; set; }
 
