@@ -318,7 +318,8 @@ namespace Ocuda.Ops.Service
                             locationsToAdd.Add(ldapUser.PhysicalDeliveryOfficeName);
                         }
                     }
-                    else if (ldapLocation.MapToLocationId != opsUser.AssociatedLocation.Value)
+                    else if (!opsUser.AssociatedLocation.HasValue
+                        || ldapLocation.MapToLocationId != opsUser.AssociatedLocation.Value)
                     {
                         userFieldChanges.Add(nameof(opsUser.AssociatedLocation));
                         opsUser.AssociatedLocation = ldapLocation.MapToLocationId;
@@ -403,7 +404,7 @@ namespace Ocuda.Ops.Service
                     if (staffUsername == null)
                     {
                         result.AddStatus(directReportDn,
-                            "Unable to find staff to attach supervisor for this DN",
+                            "Unable to find staff to attach supervisor for this DN, possibly disabled?",
                             LogLevel.Error);
                         _logger.LogWarning("Unable to determine staff username for DN: {DistinguishedName}",
                             directReportDn);
