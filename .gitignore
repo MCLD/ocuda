@@ -185,6 +185,7 @@ ClientBin/
 *.dbproj.schemaview
 *.pfx
 *.publishsettings
+node_modules/
 orleans.codegen.cs
 
 # RIA/Silverlight projects
@@ -242,8 +243,13 @@ ModelManifest.xml
 
 
 ##### Project-specific #####
+.docker
+.yarn
+release.env
+
 dist/*
 
+# Logs and shared files
 src/Ops.Web/logs/*
 src/Ops.Web/shared/*
 src/Ops.Web.WindowsAuth/logs/*
@@ -253,11 +259,11 @@ src/Promenade.Web/shared/*
 # Exclude publish results
 src/Ops.Web.WindowsAuth/Properties/PublishProfiles/
 
-# Include all node_modules files
-!**/node_modules/**
-
 # Site-specific files
 src/Promenade.Web/wwwroot/*.ico
 src/Promenade.Web/wwwroot/*.png
 src/Promenade.Web/wwwroot/*.svg
 src/Promenade.Web/wwwroot/*.webmanifest
+
+# Visual Studio Code settings
+.vscode/settings.json

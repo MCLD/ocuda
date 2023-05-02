@@ -26,7 +26,8 @@
             </script>
         }
     }
-    <link rel="stylesheet" href="~/css/styles.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/styles.min.css" />
     @if (Context.Items.ContainsKey(ItemKey.ExternalCSS))
     {
         foreach (var cssUrl in (List<string>)Context.Items[ItemKey.ExternalCSS])
@@ -503,6 +504,7 @@
         }
     </div>
     <script src="~/js/scripts.min.js" asp-append-version="true"></script>
+    <script src="~/js/bootstrap.min.js" asp-append-version="true"></script>
     @if (Context.Items.ContainsKey(ItemKey.ExternalJS))
     {
         foreach (var jsUrl in (List<string>)Context.Items[ItemKey.ExternalJS])

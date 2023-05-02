@@ -4,12 +4,12 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.13.3",
-    "bootstrap": "^4.6.0",
-    "jquery": "^3.6.0",
+    "@fortawesome/fontawesome-free": "^6.4.0",
+    "@popperjs/core": "^2.11.7",
+    "bootstrap": "^5.2.3",
+    "jquery": "^3.6.4",
     "jquery-validation": "^1.19.5",
-    "jquery-validation-unobtrusive": "^3.2.12",
-    "popper.js": "^1.16.1",
+    "jquery-validation-unobtrusive": "^4.0.0",
     "slick-carousel": "^1.8.1"
   }
 }

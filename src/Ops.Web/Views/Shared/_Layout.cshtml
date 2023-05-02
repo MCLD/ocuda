@@ -4,18 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData[Ocuda.Ops.Controllers.ViewDataKey.Title]</title>
-    <environment include="Production">
-        <link rel="stylesheet" href="~/css/main.min.css" asp-append-version="true" />
-    </environment>
-    <environment include="Development">
-        <link rel="stylesheet"
-              href="~/devmodules/bootstrap/dist/css/bootstrap.css"
-              asp-append-version="true" />
-        <link rel="stylesheet"
-              href="~/devmodules/@@fortawesome/fontawesome-free/css/all.css"
-              asp-append-version="true" />
-        <link rel="stylesheet" href="~/devstyles/ops.css" asp-append-version="true" />
-    </environment>
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/main.min.css" />
     @if (Context.Items.ContainsKey(ItemKey.ExternalCSS))
     {
         foreach (var cssUrl in (List<string>)Context.Items[ItemKey.ExternalCSS])
@@ -226,7 +216,7 @@
                                             @if (childRow.Rows?.Count > 0 == false)
                                             {
                                                 <a class="navcolumn-item navcolumn-child"
-                               href="@childRow.Url">@Html.Raw(childRow.Name)</a>
+                                                   href="@childRow.Url">@Html.Raw(childRow.Name)</a>
                                             }
                                             else
                                             {
@@ -239,7 +229,7 @@
                                                     {
                                                         <div class="card">
                                                             <a class="navcolumn-item navcolumn-grandchild"
-                                       href="@grandchildRow.Url">@Html.Raw(grandchildRow.Name)</a>
+                                                               href="@grandchildRow.Url">@Html.Raw(grandchildRow.Name)</a>
                                                         </div>
                                                     }
                                                 </div>
@@ -290,26 +280,8 @@
         @RenderBody()
     </div>
 
-    <environment include="Production">
-        <script src="~/js/main.min.js" asp-append-version="true"></script>
-    </environment>
-    <environment include="Development">
-        <script src="~/devmodules/jquery/dist/jquery.js" asp-append-version="true"></script>
-        <script src="~/devmodules/popper.js/dist/umd/popper.js"
-                asp-append-version="true"></script>
-        <script src="~/devmodules/bootstrap/dist/js/bootstrap.js"
-                asp-append-version="true"></script>
-        <script src="~/devmodules/jquery-validation/dist/jquery.validate.js"
-                asp-append-version="true"></script>
-        <script src="~/devmodules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js"
-                asp-append-version="true"></script>
-        <script src="~/devmodules/slick-carousel/slick/slick.js"
-                asp-append-version="true"></script>
-        <script src="~/devmodules/slugify/slugify.js"
-                asp-append-version="true"></script>
-        <script src="~/devscripts/Layout.js" asp-append-version="true"></script>
-        <script src="~/devscripts/ops.js" asp-append-version="true"></script>
-    </environment>
+    <script src="~/js/main.min.js" asp-append-version="true"></script>
+    <script src="~/js/bootstrap.min.js" asp-append-version="true"></script>
     @if (Context.Items.ContainsKey(ItemKey.ExternalJS))
     {
         foreach (var jsUrl in (List<string>)Context.Items[ItemKey.ExternalJS])
