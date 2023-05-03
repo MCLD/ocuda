@@ -164,7 +164,7 @@
             {
                 <input asp-for="Episode.Episode" type="hidden" />
                 <div class="row form-group">
-                    <div class="col-md-3 text-right">
+                    <div class="col-md-3 text-end">
                         <label asp-for="Episode.Episode"></label>
                     </div>
                     <div class="col-md-9">
@@ -187,7 +187,7 @@
             else
             {
                 <div class="row form-group">
-                    <div class="col-md-3 text-right">
+                    <div class="col-md-3 text-end">
                         <label asp-for="Episode.PublishDate"></label>
                     </div>
                     <div class="col-md-9">
@@ -212,7 +212,7 @@
 @if (Model.EditEpisode)
 {
     <div class="row my-3">
-        <div class="col-md-3 text-right">
+        <div class="col-md-3 text-end">
             <span class="h3">File details</span>
         </div>
     </div>
@@ -221,7 +221,7 @@
 
         {
             <div class="row my-3">
-                <div class="col-md-3 text-right">
+                <div class="col-md-3 text-end">
                     File name
                 </div>
                 <div class="col-md-9">
@@ -242,7 +242,7 @@
             if (!Model.FileMissing)
             {
                 <div class="row my-3">
-                    <div class="col-md-3 text-right">
+                    <div class="col-md-3 text-end">
                         File uploaded
                     </div>
                     <div class="col-md-9">
@@ -250,7 +250,7 @@
                     </div>
                 </div>
                 <div class="row my-3">
-                    <div class="col-md-3 text-right">
+                    <div class="col-md-3 text-end">
                         File size
                     </div>
                     <div class="col-md-9">
@@ -258,7 +258,7 @@
                     </div>
                 </div>
                 <div class="row my-3">
-                    <div class="col-md-3 text-right">
+                    <div class="col-md-3 text-end">
                         Duration
                     </div>
                     <div class="col-md-9">
@@ -269,7 +269,7 @@
         }
     }
     <div class="row my-3">
-        <div class="col-md-3 text-right pt-1">
+        <div class="col-md-3 text-end pt-1">
             Upload podcast
         </div>
         <div class="col-md-9">
@@ -289,7 +289,7 @@
         </div>
     </div>
     <div class="row my-3">
-        <div class="col-md-3 text-right">
+        <div class="col-md-3 text-end">
             Maximum allowed file size
         </div>
         <div class="col-md-9">

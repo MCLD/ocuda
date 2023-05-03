@@ -70,7 +70,7 @@
                 @for (int i = 0; i < Enum.GetNames(typeof(DayOfWeek)).Length; i++)
                 {
                     <tr>
-                        <td class="text-right">
+                        <td class="text-end">
                             <input asp-for="LocationHours[i].DayOfWeek" type="hidden" />
                             <input asp-for="LocationHours[i].LocationId" type="hidden" />
                             <strong>@Model.LocationHours[i].DayOfWeek.ToString()</strong>
@@ -160,7 +160,7 @@
                         <td class="align-middle">@hoursOverride.Date.ToShortDateString() &ndash; @hoursOverride.Date.DayOfWeek.ToString()</td>
                         <td class="align-middle">@(hoursOverride.LocationId.HasValue ? Model.LocationName : "All Locations")</td>
                         <td class="align-middle">@(hoursOverride.Open ? $"{hoursOverride.OpenTime.Value.ToShortTimeString()} {System.Net.WebUtility.HtmlDecode("&ndash;")} {hoursOverride.CloseTime.Value.ToShortTimeString()}" : "Closed")</td>
-                        <td class="on-top cursor-default align-middle text-right">
+                        <td class="on-top cursor-default align-middle text-end">
                             <button type="button"
                                     class="btn btn-outline-primary"
                                     data-toggle="modal"
