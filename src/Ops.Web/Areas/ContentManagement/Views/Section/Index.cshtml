@@ -5,12 +5,12 @@
         <h1>Sections</h1>
     </div>
     <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
         @if (Model.IsSiteManager)
         {
-            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-end"
                     data-toggle="modal"
                     data-target="#addModal"
                     disabled>
@@ -20,7 +20,7 @@
             <form method="post"
                   role="form"
                   action="@Url.Action(nameof(SectionController.ClearSectionCache))">
-                <button class="btn btn-outline-warning mt-2 mb-1 mr-2 float-right"
+                <button class="btn btn-outline-warning mt-2 mb-1 mr-2 float-end"
                         type="submit">
                     Clear cache
                 </button>

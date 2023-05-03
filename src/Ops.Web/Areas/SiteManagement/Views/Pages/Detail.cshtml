@@ -12,7 +12,7 @@
         </h1>
     </div>
     <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.PagesController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.PagesController.Index))"
            asp-route-Type="@Model.HeaderType">Back</a>
@@ -72,7 +72,7 @@
                 {
                     <div class="col-3">
                         <button type="button"
-                                class="btn btn-danger float-right"
+                                class="btn btn-danger float-end"
                                 data-toggle="modal"
                                 data-target="#deleteModal"
                                 data-headerId="@Model.Page.PageHeaderId"

@@ -8,14 +8,14 @@
         </h1>
     </div>
     <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.PodcastsController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.PodcastsController.Index))">Back</a>
         @if (Model.IsSiteManager || Model.HasPermission)
         {
             <a asp-action="@(nameof(PodcastsController.AddEpisode))"
            asp-route-podcastId="@Model.PodcastId"
-           class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
+           class="btn btn-outline-success mt-2 mb-1 mr-2 float-end">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Add Episode
             </a>

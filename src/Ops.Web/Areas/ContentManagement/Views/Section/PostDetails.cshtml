@@ -135,9 +135,9 @@
                             @Model.Post.Title
                         </h4>
                     </div>
-                    <div class="float-right align-middle h4">
+                    <div class="float-end align-middle h4">
                         <a href="@Url.Action(nameof(SectionController.EditPost), new { sectionSlug = Model.SectionSlug, postSlug = Model.Post.Slug})">
-                            <span class="far fa-edit float-right"></span>
+                            <span class="far fa-edit float-end"></span>
                         </a>
                     </div>
                 </div>
@@ -176,7 +176,7 @@
                             </div>
                         }
                     </div>
-                    <div class="float-right align-middle">
+                    <div class="float-end align-middle">
                         <button class="btn btn-danger" type="submit" id="delPost">
                             Delete Post
                         </button>

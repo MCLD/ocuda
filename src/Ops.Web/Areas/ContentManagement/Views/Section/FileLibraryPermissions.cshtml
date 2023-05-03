@@ -5,7 +5,7 @@
         <h1>File replacement permissions <small class="text-muted">@Model.Name</small></h1>
     </div>
     <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibrary))"
            asp-route-sectionSlug="@Model.SectionSlug"
@@ -37,7 +37,7 @@
                                   asp-route-sectionSlug="@Model.SectionSlug"
                                   asp-route-permissionGroupId="@availableGroup.Key">
                                 @availableGroup.Value
-                                <button class="btn btn-link text-success float-right">
+                                <button class="btn btn-link text-success float-end">
                                     <span class="fa fa-plus-circle"></span>
                                 </button>
                             </form>
@@ -68,7 +68,7 @@
                                   asp-route-sectionSlug="@Model.SectionSlug"
                                   asp-route-permissionGroupId="@availableGroup.Key">
                                 @availableGroup.Value
-                                <button class="btn btn-link text-danger float-right">
+                                <button class="btn btn-link text-danger float-end">
                                     <span class="fa fa-minus-circle"></span>
                                 </button>
                             </form>

@@ -11,7 +11,7 @@
         @if (Model.Header.HasPendingIssue && Model.CanEdit)
         {
             <form asp-action="@nameof(HomeController.ResolveIssue)"
-                  class="d-inline-block float-right mx-1"
+                  class="d-inline-block float-end mx-1"
                   method="post"
                   role="form">
                 <input asp-for="HeaderId" value="@Model.Header.Id" type="hidden" />
@@ -25,12 +25,12 @@
         {
             <a href="@Model.LeapPath"
                target="_blank"
-               class="btn btn-outline-info float-right d-inline-block mx-1">
+               class="btn btn-outline-info float-end d-inline-block mx-1">
                 <span class="fas fa-book-reader"></span>
                 Leap
             </a>
         }
-        <a asp-action="Index" class="btn btn-outline-secondary text-dark ml-1 mr-4 float-right">
+        <a asp-action="Index" class="btn btn-outline-secondary text-dark ml-1 mr-4 float-end">
             <span class="fas fa-arrow-left"></span>
             Back
         </a>

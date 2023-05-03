@@ -81,7 +81,7 @@
                                 @if (Model.CanEdit)
                                 {
                                     <a href="#"
-                                       class="float-right pr-2"
+                                       class="float-end pr-2"
                                        data-toggle="modal"
                                        data-target="#editModal"
                                        data-id="@Model.User.Id"
@@ -134,7 +134,7 @@
                                     @if (Model.CanEdit)
                                     {
                                         <a href="#"
-                                           class="float-right pr-2"
+                                           class="float-end pr-2"
                                            data-toggle="modal"
                                            data-target="#editLocationModal"
                                            data-id="@Model.User.Id"
@@ -145,7 +145,7 @@
                                         @if (Model.User.AssociatedLocationManuallySet)
                                         {
                                             <a href="#"
-                                               class="float-right pr-3"
+                                               class="float-end pr-3"
                                                data-toggle="modal"
                                                data-target="#unsetModal"
                                                data-id="@Model.User.Id"
@@ -233,7 +233,7 @@
                                     @Model.AuthenticatedAt
                                     <form asp-action="Reauthenticate" class="d-inline">
                                         <button type="submit"
-                                                class="float-right p-0 mr-2 btn btn-link"
+                                                class="float-end p-0 mr-2 btn btn-link"
                                                 title="Reauthenticate">
                                             <span class="fa fa-xs fa-redo-alt"></span>
                                         </button>

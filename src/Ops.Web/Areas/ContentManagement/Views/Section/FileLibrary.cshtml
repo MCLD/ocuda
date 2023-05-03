@@ -192,14 +192,14 @@
         <h1>File library <small class="text-muted">@Model.FileLibraryName</small></h1>
     </div>
     <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-end"
            asp-area=""
            asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.HomeController.SectionIndex))"
            asp-route-slug="@Model.SectionSlug">Back</a>
         @if (Model.HasAdminRights)
         {
-            <button class="btn btn-outline-primary mt-2 mb-1 mr-2 float-right"
+            <button class="btn btn-outline-primary mt-2 mb-1 mr-2 float-end"
                 data-toggle="modal"
                 data-target="#listAddModal">
                 <span class="fas fa-file-upload" aria-hidden="true"></span>
@@ -208,7 +208,7 @@
         }
         @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
         {
-            <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+            <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-end"
            asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
            asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibraryPermissions)"

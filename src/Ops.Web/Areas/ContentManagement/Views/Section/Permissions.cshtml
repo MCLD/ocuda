@@ -5,7 +5,7 @@
         <h1>Section management permissions</h1>
     </div>
     <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Section))"
            asp-route-sectionSlug="@Model.Slug">Back</a>
@@ -36,7 +36,7 @@
                                   asp-route-slug="@Model.Slug"
                                   asp-route-permissionGroupId="@availableGroup.Key">
                                 <span class="d-inline-block mt-1">@availableGroup.Value</span>
-                                <button class="btn btn-outline-success float-right">
+                                <button class="btn btn-outline-success float-end">
                                     <span class="fa fa-plus-circle"></span>
                                 </button>
                             </form>
@@ -66,7 +66,7 @@
                                   asp-route-slug="@Model.Slug"
                                   asp-route-permissionGroupId="@availableGroup.Key">
                                 <span class="d-inline-block mt-1">@availableGroup.Value</span>
-                                <button class="btn btn-outline-danger float-right">
+                                <button class="btn btn-outline-danger float-end">
                                     <span class="fa fa-minus-circle"></span>
                                 </button>
                             </form>

@@ -215,12 +215,12 @@
         <h1>Section <small class="text-muted">@Model.Section.Name</small></h1>
     </div>
     <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Index))">Back</a>
         @if (false)
         {
-            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-end"
                 data-toggle="modal"
                 data-target="#addModal">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
@@ -264,11 +264,11 @@
                                         </h5>
                                     </a>
                                 </div>
-                                <div class="float-right align-middle h4">
+                                <div class="float-end align-middle h4">
                                     <a asp-action="@nameof(SectionController.EditPost)"
                                asp-route-sectionSlug="@Model.Section.Slug"
                                asp-route-postSlug="@post.Slug">
-                                        <span class="far fa-edit float-right"></span>
+                                        <span class="far fa-edit float-end"></span>
                                     </a>
                                 </div>
                             </div>
@@ -319,7 +319,7 @@
                 <tr>
                     <th colspan="3">
                         File Libraries
-                        <div class="float-right align-middle">
+                        <div class="float-end align-middle">
                             <a role="button"
                                class="text-success align-middle"
                                id="addFileLibrary"
@@ -349,7 +349,7 @@
                            data-name="@library.Name"
                            data-slug="@library.Slug"
                            data-type="file">
-                                    <span class="far fa-edit float-right"></span>
+                                    <span class="far fa-edit float-end"></span>
                                 </a>
                             </td>
                             <td style="position: relative;" class="text-center">
@@ -382,7 +382,7 @@
                 <tr>
                     <th colspan="3">
                         Link Libraries
-                        <div class="float-right align-middle">
+                        <div class="float-end align-middle">
                             <a role="button"
                                class="text-success align-middle"
                                data-toggle="modal"
@@ -412,7 +412,7 @@
                            data-name="@library.Name"
                            data-slug="@library.Slug"
                            data-type="link">
-                                    <span class="far fa-edit float-right"></span>
+                                    <span class="far fa-edit float-end"></span>
                                 </a>
                             </td>
                             <td style="position: relative;" class="text-center">

@@ -11,18 +11,18 @@
         <a asp-controller="@ProductsController.Name"
            asp-action="@nameof(ProductsController.Product)"
            asp-route-productSlug="@Model.Product.Slug"
-           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-end">Back</a>
         <a asp-controller="@ProductsController.Name"
            asp-action="@nameof(ProductsController.UploadDistribution)"
            asp-route-productSlug="@Model.Product.Slug"
-           class="btn btn-outline-info mt-2 mb-1 mr-2 float-right">
+           class="btn btn-outline-info mt-2 mb-1 mr-2 float-end">
             <span class="fas fa-file-upload"></span>
             Upload Distribution
         </a>
         <a asp-controller="@ProductsController.Name"
            asp-action="@nameof(ProductsController.UploadReplenishment)"
            asp-route-productSlug="@Model.Product.Slug"
-           class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
+           class="btn btn-outline-success mt-2 mb-1 mr-2 float-end">
             <span class="fas fa-file-upload"></span>
             Upload Replenishment
         </a>
@@ -38,7 +38,7 @@
                 <th class="align-middle">
                     Action
                     <button type="button"
-                            class="btn btn-sm btn-outline-success float-right"
+                            class="btn btn-sm btn-outline-success float-end"
                             data-toggle="modal"
                             data-target="#mappingModal">
                         <span class="fas fa-sm fa-plus-circle"></span>

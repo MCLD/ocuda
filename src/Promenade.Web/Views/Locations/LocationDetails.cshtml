@@ -14,7 +14,7 @@
             <h1>@Model.Location.Name</h1>
             <a aria-label="@Localizer[Promenade.NewWindowItem, @Localizer[Promenade.LocationSeeAMap]]"
                href="@Model.Location.MapLink"
-               class="btn btn-outline-secondary float-right ml-2 prom-locations-maplink d-print-none"
+               class="btn btn-outline-secondary float-end ml-2 prom-locations-maplink d-print-none"
                target="_blank">
                 <span class="fas fa-map-marker-alt"></span> Map
             </a>
@@ -187,7 +187,7 @@
                                         {
                                             <a aria-label="@Localizer[Promenade.LocationSubscribeToName, locationGroup.Location.Name]"
                                                href="@locationGroup.Location.SubscriptionLink"
-                                               class="btn btn-sm btn-outline-secondary text-dark m-1 float-right">
+                                               class="btn btn-sm btn-outline-secondary text-dark m-1 float-end">
                                                 <span class="far fa-envelope"></span>
                                                 @Localizer[Promenade.ButtonSubscribe]
                                             </a>
@@ -196,7 +196,7 @@
                                         {
                                             <a aria-label="@Localizer[Promenade.LocationViewEventsName, locationGroup.Location.Name]"
                                                href="@locationGroup.Location.EventLink"
-                                               class="btn btn-sm btn-outline-secondary text-dark m-1 float-right">
+                                               class="btn btn-sm btn-outline-secondary text-dark m-1 float-end">
                                                 <span class="fas fa-calendar-alt"></span>
                                                 @Localizer[Promenade.LocationButtonEvents]
                                             </a>
@@ -208,7 +208,7 @@
                         <tr>
                             <td colspan="3">
                                 <a href="@Model.LocationNeighborGroup.SubscriptionUrl"
-                                   class="btn btn-sm btn-outline-secondary text-dark m-1 float-right"
+                                   class="btn btn-sm btn-outline-secondary text-dark m-1 float-end"
                                    target="_blank">
                                     <span class="far fa-envelope"></span>
                                     @if (Model.NearbyCount == Model.NearbyEventsCount)

@@ -15,11 +15,11 @@
         @if (!string.IsNullOrEmpty(Model.BackLink))
         {
             <a href="@Model.BackLink"
-           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-end">Back</a>
         }
         @if (Model.CardDetail != null)
         {
-            <button class="btn btn-outline-danger mt-2 mb-1 mr-2 float-right"
+            <button class="btn btn-outline-danger mt-2 mb-1 mr-2 float-end"
                 data-toggle="modal"
                 data-target="#deleteModal">
                 <span class="fas fa-times"></span>

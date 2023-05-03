@@ -207,7 +207,7 @@
                             {
                                 <div class="navcolumn-item navcolumn-collapsible">
                                     @Html.Raw(row.Name)
-                                    <span class="fas fa-chevron-right float-right"></span>
+                                    <span class="fas fa-chevron-right float-end"></span>
                                 </div>
                                 <div class="collapse navcolumn-collapse">
                                     @foreach (var childRow in row.Rows)
@@ -222,7 +222,7 @@
                                             {
                                                 <div class="navcolumn-item navcolumn-child navcolumn-collapsible">
                                                     @Html.Raw(childRow.Name)
-                                                    <span class="fas fa-chevron-right float-right"></span>
+                                                    <span class="fas fa-chevron-right float-end"></span>
                                                 </div>
                                                 <div class="collapse navcolumn-collapse">
                                                     @foreach (var grandchildRow in childRow.Rows)

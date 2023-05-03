@@ -20,18 +20,18 @@
             <a asp-controller="@NavigationsController.Name"
                asp-action="@(nameof(NavigationsController.Details))"
                asp-route-id="@Model.Navigation.NavigationId.Value"
-               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-end">Back</a>
         }
         else
         {
             <a asp-controller="@NavigationsController.Name"
                asp-action="@(nameof(NavigationsController.Index))"
-               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-end">Back</a>
         }
         @if (Model.CanDeleteText)
         {
             <button type="button"
-                    class="btn btn-outline-danger mt-2 mb-1 mr-2 float-right"
+                    class="btn btn-outline-danger mt-2 mb-1 mr-2 float-end"
                     data-toggle="modal"
                     data-target="#deleteTextModal"
                     data-languageDescription="@Model.LanguageDescription">
@@ -44,7 +44,7 @@
         {
             <button data-toggle="modal"
                     data-target="#addModal"
-                    class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
+                    class="btn btn-outline-success mt-2 mb-1 mr-2 float-end">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Add Navigation
             </button>
