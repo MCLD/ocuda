@@ -121,39 +121,39 @@
     </div>
 
     <div class="row">
-        <div class="col-sm-3 text-sm-right"><strong>Requested time</strong></div>
+        <div class="col-sm-3 text-sm-end"><strong>Requested time</strong></div>
         <div class="col-sm-9">@Model.ScheduleRequest.RequestedTime</div>
     </div>
     <div class="row mt-2">
-        <div class="col-sm-3 text-sm-right"><strong>Name</strong></div>
+        <div class="col-sm-3 text-sm-end"><strong>Name</strong></div>
         <div class="col-sm-9">@Model.ScheduleRequest.Name</div>
     </div>
     <div class="row mt-2">
-        <div class="col-sm-3 text-sm-right"><strong>Phone</strong></div>
+        <div class="col-sm-3 text-sm-end"><strong>Phone</strong></div>
         <div class="col-sm-9">@Model.FormattedPhone</div>
     </div>
 
     @if (!string.IsNullOrEmpty(Model.ScheduleRequest.Email))
     {
         <div class="row mt-2">
-            <div class="col-sm-3 text-sm-right"><strong>Email</strong></div>
+            <div class="col-sm-3 text-sm-end"><strong>Email</strong></div>
             <div class="col-sm-9">@Model.ScheduleRequest.Email</div>
         </div>
     }
 
     <div class="row mt-2">
-        <div class="col-sm-3 text-sm-right"><strong>Subject</strong></div>
+        <div class="col-sm-3 text-sm-end"><strong>Subject</strong></div>
         <div class="col-sm-9">@Model.ScheduleRequest.ScheduleRequestSubject.Subject</div>
     </div>
     <div class="row mt-2">
-        <div class="col-sm-3 text-sm-right"><strong>Language</strong></div>
+        <div class="col-sm-3 text-sm-end"><strong>Language</strong></div>
         <div class="col-sm-9">@(new System.Globalization.CultureInfo(Model.ScheduleRequest.Language).EnglishName)</div>
     </div>
 
     @if (!string.IsNullOrEmpty(Model.ScheduleRequest.Notes))
     {
         <div class="row mt-2">
-            <div class="col-sm-3 text-sm-right"><strong>Notes</strong></div>
+            <div class="col-sm-3 text-sm-end"><strong>Notes</strong></div>
             <div class="col-sm-9">@Model.ScheduleRequest.Notes</div>
         </div>
     }
@@ -161,7 +161,7 @@
     @if (Model.ScheduleClaim != null)
     {
         <div class="row mt-4">
-            <div class="col-sm-3 text-sm-right"><strong>Claimed by</strong></div>
+            <div class="col-sm-3 text-sm-end"><strong>Claimed by</strong></div>
             <div class="col-sm-9">
                 @if (Model.ScheduleClaim.User.IsDeleted == false)
                 {
@@ -177,7 +177,7 @@
             </div>
         </div>
         <div class="row mt-2">
-            <div class="col-sm-3 text-sm-right"><strong>Claimed at</strong></div>
+            <div class="col-sm-3 text-sm-end"><strong>Claimed at</strong></div>
             <div class="col-sm-9">@Model.ScheduleClaim.CreatedAt</div>
         </div>
         @if (Model.IsClaimedByCurrentUser && !Model.ScheduleRequest.IsCancelled)
