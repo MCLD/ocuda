@@ -36,7 +36,7 @@ else
 
         @foreach (var setting in Model.SiteSettingsByCategory[category])
         {
-            <div class="form-group row">
+            <div class="mb-3 row">
                 <label asp-for="@setting.Name" class="col-md-3 col-form-label text-md-end">
                     @setting.Name
                     <span class="far fa-question-circle ml-1" title="@setting.Description"

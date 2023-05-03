@@ -33,30 +33,30 @@
          name="Item"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addItemName" asp-for="ImageFeatureItem.Name" formgroup />
-        <div class="form-group row">
+        <div class="mb-3 row">
             <label asp-for="ImageFeatureItem.StartDate"
                    class="col-form-label col-12 col-md-3 text-md-end"></label>
-            <div class="form-group-inner col-12 col-md-5">
+            <div class="mb-3-inner col-12 col-md-5">
                 <input asp-for="ImageFeatureStartDate"
                        class="form-control"
                        type="date" />
             </div>
-            <div class="form-group-inner col-12 col-md-4">
+            <div class="mb-3-inner col-12 col-md-4">
                 <input asp-for="ImageFeatureStartTime"
                        class="form-control"
                        step="60"
                        type="time" />
             </div>
         </div>
-        <div class="form-group row">
+        <div class="mb-3 row">
             <label asp-for="ImageFeatureItem.EndDate"
                    class="col-form-label col-12 col-md-3 text-md-end"></label>
-            <div class="form-group-inner col-12 col-md-5">
+            <div class="mb-3-inner col-12 col-md-5">
                 <input asp-for="ImageFeatureEndDate"
                        class="form-control"
                        type="date" />
             </div>
-            <div class="form-group-inner col-12 col-md-4">
+            <div class="mb-3-inner col-12 col-md-4">
                 <input asp-for="ImageFeatureEndTime"
                        class="form-control"
                        step="60"
@@ -78,16 +78,16 @@
          name="Segment"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
         <input id="editItemName" asp-for="ImageFeatureItem.Name" formgroup />
-        <div class="form-group row">
+        <div class="mb-3 row">
             <label asp-for="ImageFeatureItem.StartDate"
                    class="col-form-label col-12 col-md-3 text-md-end"></label>
-            <div class="form-group-inner col-12 col-md-5">
+            <div class="mb-3-inner col-12 col-md-5">
                 <input asp-for="ImageFeatureStartDate"
                        class="form-control"
                        id="editItemStartDate"
                        type="date" />
             </div>
-            <div class="form-group-inner col-12 col-md-4">
+            <div class="mb-3-inner col-12 col-md-4">
                 <input asp-for="ImageFeatureStartTime"
                        class="form-control"
                        id="editItemStartTime"
@@ -95,16 +95,16 @@
                        type="time" />
             </div>
         </div>
-        <div class="form-group row">
+        <div class="mb-3 row">
             <label asp-for="ImageFeatureItem.EndDate"
                    class="col-form-label col-12 col-md-3 text-md-end"></label>
-            <div class="form-group-inner col-12 col-md-5">
+            <div class="mb-3-inner col-12 col-md-5">
                 <input asp-for="ImageFeatureEndDate"
                        class="form-control"
                        id="editItemEndDate"
                        type="date" />
             </div>
-            <div class="form-group-inner col-12 col-md-4">
+            <div class="mb-3-inner col-12 col-md-4">
                 <input asp-for="ImageFeatureEndTime"
                        class="form-control"
                        id="editItemEndTime"
@@ -291,7 +291,7 @@
                                    asp-for="ImageFeatureItemText.LanguageId"
                                    value="@(item.ImageFeatureItemText?.LanguageId ?? Model.LanguageId)"
                                    type="hidden" />
-                                    <div class="row form-group">
+                                    <div class="row mb-3">
                                         <label class="col-form-label text-md-end col-md-3" asp-for="ItemImage">
                                             Image
                                             <span class="fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker"></span>

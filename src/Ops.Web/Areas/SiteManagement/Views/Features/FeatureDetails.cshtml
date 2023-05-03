@@ -57,9 +57,9 @@
                                autocomplete="off"
                                info-tooltip="The stub is the nickname/URL for the feature."
                                on-blur-js="FormatStub" />
-                        <div class="form-group row">
+                        <div class="mb-3 row">
                             <label asp-for="Feature.BodyText" class="col-md-3 col-form-label text-md-end"></label>
-                            <div class="form-group-inner col-md-9">
+                            <div class="mb-3-inner col-md-9">
                                 <textarea asp-for="Feature.BodyText" markdown-editor></textarea>
                                 <span asp-validation-for="Feature.BodyText" class="validation-message text-danger"></span>
                             </div>
@@ -71,7 +71,7 @@
     </div>
     <div class="row mt-3">
         <div class="offset-md-3 col-md-9">
-            <div class="form-group">
+            <div class="mb-3">
                 <a class="btn btn-secondary"
                    id="return-home"
                    asp-action="@nameof(FeaturesController.Index)">Return to Features</a>

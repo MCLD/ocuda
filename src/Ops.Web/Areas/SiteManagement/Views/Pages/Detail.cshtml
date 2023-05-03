@@ -99,9 +99,9 @@
 
     <input asp-for="Page.Title" formgroup />
 
-    <div class="form-group row">
+    <div class="mb-3 row">
         <label asp-for="Page.Content" class="col-md-3 col-form-label text-md-end"></label>
-        <div class="form-group-inner col-md-9">
+        <div class="mb-3-inner col-md-9">
             <textarea asp-for="Page.Content" markdown-editor></textarea>
             <span asp-validation-for="Page.Content" class="validation-message text-danger"></span>
         </div>

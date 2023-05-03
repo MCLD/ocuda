@@ -163,7 +163,7 @@
             @if (Model.EditEpisode)
             {
                 <input asp-for="Episode.Episode" type="hidden" />
-                <div class="row form-group">
+                <div class="row mb-3">
                     <div class="col-md-3 text-end">
                         <label asp-for="Episode.Episode"></label>
                     </div>
@@ -186,7 +186,7 @@
             }
             else
             {
-                <div class="row form-group">
+                <div class="row mb-3">
                     <div class="col-md-3 text-end">
                         <label asp-for="Episode.PublishDate"></label>
                     </div>
@@ -296,7 +296,7 @@
             @Model.MaximumFileSizeMB MB
         </div>
     </div>
-    <div class="row form-group mt-4">
+    <div class="row mb-3 mt-4">
         <div class="col-form-label text-md-end col-md-3">
             <label asp-for="Episode.ShowNotesSegmentId">
             </label>

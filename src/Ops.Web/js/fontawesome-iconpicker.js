@@ -830,9 +830,9 @@
         _updateFormGroupStatus: function(e) {
             if (this.hasInput()) {
                 if (e !== false) {
-                    this.input.parents(".form-group:first").removeClass("has-error");
+                    this.input.parents(".mb-3:first").removeClass("has-error");
                 } else {
-                    this.input.parents(".form-group:first").addClass("has-error");
+                    this.input.parents(".mb-3:first").addClass("has-error");
                 }
                 return true;
             }

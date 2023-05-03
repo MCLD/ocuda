@@ -76,7 +76,7 @@ filename = Model.CardDetail.Filename
                             </div>
                         </div>
                     }
-                    <div class="row form-group">
+                    <div class="row mb-3">
                         <label class="col-form-label text-md-end col-md-3">
                             Image
                             <span class="fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker"></span>
@@ -98,7 +98,7 @@ filename = Model.CardDetail.Filename
                             </div>
                         </div>
                     </div>
-                    <div class="row form-group">
+                    <div class="row mb-3">
                         <label class="col-form-label text-md-end col-md-3" asp-for="AltText">
                             Image alternative text
                             <span class="fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker"></span>
@@ -128,7 +128,7 @@ filename = Model.CardDetail.Filename
         <span class="d-none"><input asp-for="DeckName" formgroup readonly /></span>
         @if (Model.LanguageList?.Count() > 1)
         {
-            <div class="form-group row">
+            <div class="mb-3 row">
                 <div class="col-md-3 text-md-end">
                     <label asp-for="SelectedLanguage" class="col-form-label"></label>
                 </div>
@@ -159,11 +159,11 @@ filename = Model.CardDetail.Filename
     <input asp-for="CardDetail.Filename" type="hidden" />
 
     <input asp-for="CardDetail.Header" formgroup />
-    <div class="form-group row">
+    <div class="mb-3 row">
         <div class="col-md-3 text-md-end">
             <label asp-for="CardDetail.Text" class="col-form-label"></label>
         </div>
-        <div class="form-group-inner col-md-9">
+        <div class="mb-3-inner col-md-9">
             <textarea asp-for="CardDetail.Text" markdown-editor></textarea>
             <span asp-validation-for="CardDetail.Text"
                   class="validation-message text-danger"></span>
@@ -202,11 +202,11 @@ filename = Model.CardDetail.Filename
         </div>
         @if (!string.IsNullOrEmpty(Model.CardDetail?.Filename))
         {
-            <div class="form-group row">
+            <div class="mb-3 row">
                 <div class="col-md-3 text-md-end">
                     <label asp-for="CardDetail.Filename" class="col-form-label"></label>
                 </div>
-                <div class="form-group-inner col-md-9">
+                <div class="mb-3-inner col-md-9">
                     <input value="@Model.CardDetail.Filename" class="form-control" disabled />
                 </div>
             </div>

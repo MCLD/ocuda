@@ -122,7 +122,7 @@
         <div class="col">
             <input asp-for="Product.Id" type="hidden" />
             <input asp-for="Product.Name" formgroup />
-            <div class="row form-group">
+            <div class="row mb-3">
                 <div class="col-form-label text-md-end col-md-3">
                     <label asp-for="Product.Slug"></label>
                 </div>
@@ -141,20 +141,20 @@
                 </div>
             </div>
             <input asp-for="Product.CacheInventoryMinutes" formgroup />
-            <div class="row form-group">
+            <div class="row mb-3">
                 <div class="col-form-label text-md-end col-md-3">
                     <label asp-for="Product.IsActive"></label>
                 </div>
                 <div class="col-md-9 pt-2">
-                    <input asp-for="Product.IsActive" type="checkbox" class="form-group" />
+                    <input asp-for="Product.IsActive" type="checkbox" class="mb-3" />
                 </div>
             </div>
-            <div class="row form-group">
+            <div class="row mb-3">
                 <div class="col-form-label text-md-end col-md-3">
                     <label asp-for="Product.IsVisibleToPublic"></label>
                 </div>
                 <div class="col-md-9 pt-2">
-                    <input asp-for="Product.IsVisibleToPublic" type="checkbox" class="form-group" />
+                    <input asp-for="Product.IsVisibleToPublic" type="checkbox" class="mb-3" />
                 </div>
             </div>
         </div>
@@ -174,7 +174,7 @@
 
 <div class="row mt-4">
     <div class="col">
-        <div class="row form-group">
+        <div class="row mb-3">
             <div class="col-form-label text-md-end col-md-3">
                 <label asp-for="Product.SegmentId"></label>
             </div>

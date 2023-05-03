@@ -19,15 +19,15 @@ namespace Ocuda.Utility.TagHelpers
     public class FormGroupTagHelper : TagHelper
     {
         private const string attributeName = "formgroup";
-        private const string defaultInnerDivClass = "form-group-inner col-md-9";
+        private const string defaultInnerDivClass = "mb-3-inner col-md-9";
         private const string defaultInputClass = "form-control";
         private const string defaultLabelClass = "col-form-label text-md-end";
         private const string defaultLabelLayoutClass = "col-md-3";
         private const string defaultValidationMessageClass = "validation-message text-danger";
-        private const string defaultWrapperDivClass = "row form-group";
+        private const string defaultWrapperDivClass = "row mb-3";
         private const string forAttributeName = "asp-for";
         private const string hideLabelAttributeName = "hide-label";
-        private const string hideLabelInnerDivClass = "form-group-inner col-12";
+        private const string hideLabelInnerDivClass = "mb-3-inner col-12";
         private const string hideRequiredAttributeName = "hide-required";
         private const string ignoreValidationAttributeName = "ignore-validation";
         private const string infoTooltipAttributeName = "info-tooltip";
