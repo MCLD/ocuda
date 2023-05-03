@@ -11,7 +11,7 @@
         @if (Model.ShowAddPageButton)
         {
             <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-end"
-                data-toggle="modal"
+                data-bs-toggle="modal"
                 data-target="#addModal">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Add Page
@@ -229,7 +229,7 @@ else
                                         </a>
                                         <button type="button"
                                     class="btn btn-outline-primary"
-                                    data-toggle="modal"
+                                    data-bs-toggle="modal"
                                     data-target="#editModal"
                                     data-id="@header.Id"
                                     data-layout="@header.IsLayoutPage"
@@ -266,7 +266,7 @@ else
                                     {
                                         <button type="button"
                                     class="btn btn-outline-danger"
-                                    data-toggle="modal"
+                                    data-bs-toggle="modal"
                                     data-target="#deleteModal"
                                     data-id="@header.Id"
                                     data-name="@header.PageName"

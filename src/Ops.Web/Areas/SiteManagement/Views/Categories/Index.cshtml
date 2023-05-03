@@ -12,7 +12,7 @@
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">Back</a>
 
         <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-end"
-                data-toggle="modal"
+                data-bs-toggle="modal"
                 data-target="#addModal">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
             Add Category
@@ -44,7 +44,7 @@
                             <td class="align-middle">
                                 <button type="button"
                                         class="btn btn-outline-primary"
-                                        data-toggle="modal"
+                                        data-bs-toggle="modal"
                                         data-target="#editModal"
                                         data-id="@category.Id"
                                         data-name="@category.Name"
@@ -61,7 +61,7 @@
                                 </a>
                                 <button type="button"
                                         class="btn btn-outline-danger"
-                                        data-toggle="modal"
+                                        data-bs-toggle="modal"
                                         data-target="#deleteModal"
                                         data-id="@category.Id"
                                         data-name="@category.Name"

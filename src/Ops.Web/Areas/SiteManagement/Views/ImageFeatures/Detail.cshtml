@@ -7,7 +7,7 @@
     </h1>
     <div class="pt-2">
         <button class="btn btn-outline-success"
-                data-toggle="modal"
+                data-bs-toggle="modal"
                 data-target="#addItemModal">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
             Add Item
@@ -142,7 +142,7 @@
                 <div class="card">
                     <div class="card-header bg-info text-white">
                         <div class="card-title h5 mb-0"
-                         data-toggle="collapse"
+                         data-bs-toggle="collapse"
                          data-target="#accordionTemplateContent"
                          aria-expanded="false"
                          aria-controls="accordionTemplateContent">
@@ -213,7 +213,7 @@
                     <div class="card">
                         <div class="card-header d-flex" id="heading@(item.Id)">
                             <div class="card-title h5 mb-0 flex-grow-1"
-                         data-toggle="collapse"
+                         data-bs-toggle="collapse"
                          data-target="#collapse@(item.Id)"
                          aria-controls="collapse@(item.Id)"
                          aria-expanded="@(Model.FocusItemId == item.Id ? "true" : "false")">
@@ -244,7 +244,7 @@
                                 </button>
                                 <button type="button"
                                 class="btn btn-sm btn-outline-primary"
-                                data-toggle="modal"
+                                data-bs-toggle="modal"
                                 data-target="#editItemModal"
                                 data-id="@item.Id"
                                 data-name="@item.Name"
@@ -256,7 +256,7 @@
                                     <span class="fas fa-cog" aria-hidden="true"></span>
                                 </button>
                                 <button class="btn btn-sm btn-outline-danger"
-                                data-toggle="modal"
+                                data-bs-toggle="modal"
                                 data-target="#deleteItemModal"
                                 data-id="@item.Id"
                                 data-name="@item.Name">

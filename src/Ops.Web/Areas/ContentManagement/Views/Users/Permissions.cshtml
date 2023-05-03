@@ -9,7 +9,7 @@
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
         <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-end"
-                data-toggle="modal"
+                data-bs-toggle="modal"
                 data-target="#addModal">
             <span class="fa fa-plus-circle"></span>
             Add Permission Group
@@ -84,7 +84,7 @@
                     <td align="center">
                         <button type="button"
                         class="btn btn-outline-primary"
-                        data-toggle="modal"
+                        data-bs-toggle="modal"
                         data-target="#editModal"
                         data-id="@permissionGroup.Id"
                         data-permissiongroupname="@permissionGroup.PermissionGroupName"
@@ -93,7 +93,7 @@
                         </button>
                         <button type="button"
                         class="btn btn-outline-danger"
-                        data-toggle="modal"
+                        data-bs-toggle="modal"
                         data-target="#deleteModal"
                         data-id="@permissionGroup.Id"
                         data-permissiongroupname="@permissionGroup.PermissionGroupName">

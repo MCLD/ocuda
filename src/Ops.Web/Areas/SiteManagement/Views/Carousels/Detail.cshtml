@@ -22,7 +22,7 @@
         }
 
         <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-end"
-                data-toggle="modal"
+                data-bs-toggle="modal"
                 data-target="#addItemModal">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
             Add Carousel Item
@@ -159,7 +159,7 @@
                     <div class="card">
                         <div class="card-header d-flex" id="heading@(item.Id)">
                             <div class="card-title h5 mb-0 flex-grow-1"
-                                 data-toggle="collapse"
+                                 data-bs-toggle="collapse"
                                  data-target="#collapse@(item.Id)"
                                  aria-controls="collapse@(item.Id)"
                                  aria-expanded="@(Model.FocusItemId == item.Id ? "true" : "false")">
@@ -183,7 +183,7 @@
                                     <span class="fas fa-arrow-down"></span>
                                 </button>
                                 <button class="btn btn-sm btn-outline-danger"
-                                        data-toggle="modal"
+                                        data-bs-toggle="modal"
                                         data-target="#deleteItemModal"
                                         data-id="@item.Id"
                                         data-name="@item.Name">
@@ -247,7 +247,7 @@
                             </div>
                             <div class="card-footer">
                                 <button class="btn btn-info mb-2"
-                                        data-toggle="modal"
+                                        data-bs-toggle="modal"
                                         data-target="#addButtonModal"
                                         data-id="@item.Id">
                                     <span class="fas fa-plus-circle"></span>
@@ -279,7 +279,7 @@
                                                             <span class="fas fa-arrow-down"></span>
                                                         </button>
                                                         <button class="btn btn-sm btn-outline-info"
-                                                                data-toggle="modal"
+                                                                data-bs-toggle="modal"
                                                                 data-target="#editButtonModal"
                                                                 data-id="@button.Id"
                                                                 data-label="@button.LabelId"
@@ -287,7 +287,7 @@
                                                             <span class="fas fa-pencil-alt"></span>
                                                         </button>
                                                         <button class="btn btn-sm btn-outline-danger"
-                                                                data-toggle="modal"
+                                                                data-bs-toggle="modal"
                                                                 data-target="#deleteButtonModal"
                                                                 data-id="@button.Id"
                                                                 data-item="@button.CarouselItemId"

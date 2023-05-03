@@ -82,7 +82,7 @@
                                 {
                                     <a href="#"
                                        class="float-end pr-2"
-                                       data-toggle="modal"
+                                       data-bs-toggle="modal"
                                        data-target="#editModal"
                                        data-id="@Model.User.Id"
                                        data-nickname="@Model.User.Nickname"
@@ -135,7 +135,7 @@
                                     {
                                         <a href="#"
                                            class="float-end pr-2"
-                                           data-toggle="modal"
+                                           data-bs-toggle="modal"
                                            data-target="#editLocationModal"
                                            data-id="@Model.User.Id"
                                            data-locationid="@Model.User.AssociatedLocation.Value"
@@ -146,7 +146,7 @@
                                         {
                                             <a href="#"
                                                class="float-end pr-3"
-                                               data-toggle="modal"
+                                               data-bs-toggle="modal"
                                                data-target="#unsetModal"
                                                data-id="@Model.User.Id"
                                                title="Manually set">
@@ -160,7 +160,7 @@
                                     @if (Model.CanEdit)
                                     {
                                         <button class="btn btn-sm btn-outline-primary"
-                                                data-toggle="modal"
+                                                data-bs-toggle="modal"
                                                 data-target="#editLocationModal"
                                                 data-id="@Model.User.Id">
                                             Choose a location
@@ -282,7 +282,7 @@
                                     {
                                         <a href="#"
                                            class="btn btn-sm btn-outline-danger ml-2"
-                                           data-toggle="modal"
+                                           data-bs-toggle="modal"
                                            data-target="#removePictureModal"
                                            data-id="@Model.User.Id"
                                            data-username="@Model.User.Username"

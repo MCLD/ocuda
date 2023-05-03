@@ -14,7 +14,7 @@
         @if (!Model.EmediaGroup.SegmentId.HasValue)
         {
             <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-end"
-                    data-toggle="modal"
+                    data-bs-toggle="modal"
                     data-target="#updateSegmentModal">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Add a Segment
@@ -22,7 +22,7 @@
         }
 
         <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-end"
-                data-toggle="modal"
+                data-bs-toggle="modal"
                 data-target="#addModal">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
             Add Emedia
@@ -41,7 +41,7 @@
                         <div class="input-group-prepend">
                             <button class="btn btn-primary"
                                     type="button"
-                                    data-toggle="modal"
+                                    data-bs-toggle="modal"
                                     data-target="#updateSegmentModal">
                                 <span class="far fa-edit"></span>
                             </button>
@@ -64,7 +64,7 @@
                     </a>
                     <button type="submit"
                             class="btn btn-outline-danger"
-                            data-toggle="modal"
+                            data-bs-toggle="modal"
                             data-target="#deleteSegmentModal"
                             data-id="@Model.EmediaGroup.Id"
                             data-name="@Model.EmediaGroup.Segment.Name">
@@ -96,7 +96,7 @@
                                 Group has no emedia.
                                 <a href="#"
                                    class="text-success"
-                                   data-toggle="modal"
+                                   data-bs-toggle="modal"
                                    data-target="#addModal">
                                     <span class="fas fa-plus-circle" aria-hidden="true"></span>
                                     Add an emedia.
@@ -119,7 +119,7 @@
                             <td class="align-middle">
                                 <button type="button"
                                         class="btn btn-outline-primary"
-                                        data-toggle="modal"
+                                        data-bs-toggle="modal"
                                         data-target="#editModal"
                                         data-id="@emedia.Id"
                                         data-name="@emedia.Name"
@@ -136,7 +136,7 @@
                                 </a>
                                 <button type="button"
                                         class="btn btn-outline-danger"
-                                        data-toggle="modal"
+                                        data-bs-toggle="modal"
                                         data-target="#deleteModal"
                                         data-id="@emedia.Id"
                                         data-name="@emedia.Name">

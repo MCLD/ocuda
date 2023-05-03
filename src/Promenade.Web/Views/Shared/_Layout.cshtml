@@ -60,7 +60,7 @@
                                     <button class="btn btn-outline-dark btn-sm dropdown-toggle prom-language-dropdown"
                                     type="button"
                                     id="languageDropdown"
-                                    data-toggle="dropdown"
+                                    data-bs-toggle="dropdown"
                                     aria-haspopup="true" aria-expanded="true">
                                         @(currentUiCulture.Parent.NativeName ?? currentUiCulture.NativeName) <span class="caret"></span>
                                     </button>
@@ -116,7 +116,7 @@
                                         <li role="presentation"
                             class="dropdown @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : null)">
                                             <a class="nav-link dropdown-toggle @(item.NavigationText.Label == null ? null : "d-flex align-items-center")"
-                               data-toggle="dropdown"
+                               data-bs-toggle="dropdown"
                                href="#"
                                role="button"
                                aria-haspopup="true"
@@ -202,7 +202,7 @@
                                         <li role="presentation"
                                 class="nav-item dropdown p-0 m-1 @(item.ChangeToLinkWhenExtraSmall ? "prom-dropdown-swap-link" : null)">
                                             <a class="nav-link dropdown-toggle p-1"
-                                   data-toggle="dropdown"
+                                   data-bs-toggle="dropdown"
                                    href="#"
                                    role="button"
                                    aria-haspopup="true"
@@ -417,7 +417,7 @@
                                 leftNavigationSectionNumber++;
                                 <div class="prom-leftnav-section">
                                     <a class="prom-leftnav-header collapsed d-block text-decoration-none"
-                           data-toggle="collapse"
+                           data-bs-toggle="collapse"
                            href="#left-navigation-@leftNavigationSectionNumber"
                            role="button"
                            aria-expanded="false"

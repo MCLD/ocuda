@@ -10,7 +10,7 @@
         <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">Back</a>
-        <button data-toggle="modal"
+        <button data-bs-toggle="modal"
                 data-target="#addModal"
                 class="btn btn-outline-success mt-2 mb-1 mr-2 float-end">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
@@ -56,7 +56,7 @@
                                 </button>
                                 <button type="button"
                                         class="btn btn-outline-primary"
-                                        data-toggle="modal"
+                                        data-bs-toggle="modal"
                                         data-target="#editModal"
                                         data-id="@group.Id"
                                         data-name="@group.Name"
@@ -72,7 +72,7 @@
                                 </a>
                                 <button type="button"
                                         class="btn btn-outline-danger"
-                                        data-toggle="modal"
+                                        data-bs-toggle="modal"
                                         data-target="#deleteModal"
                                         data-id="@group.Id"
                                         data-name="@group.Name">

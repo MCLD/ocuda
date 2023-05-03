@@ -12,7 +12,7 @@
            class="btn btn-outline-dark mt-2 mb-1 ml-2 float-end">Back</a>
         @if (Model.OpenRoles.Count > 0)
         {
-            <button data-toggle="modal"
+            <button data-bs-toggle="modal"
                     data-target="#addModal"
                     class="btn btn-outline-success mt-2 mb-1 mr-2 float-end">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
@@ -48,7 +48,7 @@
                             <td class="align-middle">
                                 <button type="button"
                                         class="btn btn-outline-primary"
-                                        data-toggle="modal"
+                                        data-bs-toggle="modal"
                                         data-target="#editModal"
                                         data-id="@navigation.Id"
                                         data-name="@navigation.Name"
@@ -64,7 +64,7 @@
                                 </a>
                                 <button type="button"
                                         class="btn btn-outline-danger"
-                                        data-toggle="modal"
+                                        data-bs-toggle="modal"
                                         data-target="#deleteModal"
                                         data-id="@navigation.Id"
                                         data-name="@navigation.Name">

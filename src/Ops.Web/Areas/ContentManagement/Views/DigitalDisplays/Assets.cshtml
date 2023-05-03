@@ -14,7 +14,7 @@
         {
             <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-end"
                 type="button"
-                data-toggle="modal"
+                data-bs-toggle="modal"
                 data-target="#uploadAsset">
                 <span class="fas fa-file-upload" aria-hidden="true"></span>
                 Upload Image
@@ -77,7 +77,7 @@
                             @if (Model.GetSetCount(asset.Id) == "0")
                             {
                                 <button type="button"
-                        data-toggle="modal"
+                        data-bs-toggle="modal"
                         data-target="#deleteAsset"
                         data-id="@asset.Id"
                         data-name="@asset.Name"

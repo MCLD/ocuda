@@ -200,7 +200,7 @@
         @if (Model.HasAdminRights)
         {
             <button class="btn btn-outline-primary mt-2 mb-1 mr-2 float-end"
-                data-toggle="modal"
+                data-bs-toggle="modal"
                 data-target="#listAddModal">
                 <span class="fas fa-file-upload" aria-hidden="true"></span>
                 Add file
@@ -291,7 +291,7 @@
                                     {
                                         <button type="button"
                                 class="btn btn-outline-warning"
-                                data-toggle="modal"
+                                data-bs-toggle="modal"
                                 data-target="#replaceModal"
                                 data-id="@file.Id"
                                 data-name="@file.Name"
@@ -305,7 +305,7 @@
                                     {
                                         <button type="button"
                                 class="btn btn-outline-danger"
-                                data-toggle="modal"
+                                data-bs-toggle="modal"
                                 data-target="#deleteModal"
                                 data-id="@file.Id"
                                 data-name="@file.Name"

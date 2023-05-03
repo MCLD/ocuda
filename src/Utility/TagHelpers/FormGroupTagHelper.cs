@@ -204,7 +204,7 @@ namespace Ocuda.Utility.TagHelpers
 
                 var tooltip = new TagBuilder("span");
                 tooltip.AddCssClass("fas fa-info-circle");
-                tooltip.Attributes.Add("data-toggle", "tooltip");
+                tooltip.Attributes.Add("data-bs-toggle", "tooltip");
                 tooltip.Attributes.Add("href", "#");
                 tooltip.Attributes.Add("title", _localizer[InfoTooltip]);
                 tooltip.Attributes.Add("onclick", $"alert('{popupTooltip}');");

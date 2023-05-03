@@ -18,7 +18,7 @@
         @if (Model.CanConfigureIncidents)
         {
             <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-end"
-                data-toggle="modal"
+                data-bs-toggle="modal"
                 data-target="#addTypeModal">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Add Incident Type
@@ -80,7 +80,7 @@
                                 </form>
                             }
                             <button class="btn btn-sm btn-outline-primary"
-                        data-toggle="modal"
+                        data-bs-toggle="modal"
                         data-target="#updateTypeModal"
                         data-id="@incidentType.Id"
                         data-description="@incidentType.Description">

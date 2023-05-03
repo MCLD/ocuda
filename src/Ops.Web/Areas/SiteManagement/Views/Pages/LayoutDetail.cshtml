@@ -21,7 +21,7 @@
             </form>
         }
         <button class="btn btn-outline-success"
-                data-toggle="modal"
+                data-bs-toggle="modal"
                 data-target="#addModal">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
             Add Item
@@ -232,7 +232,7 @@
                                 Layout has no items.
                                 <a href="#"
                                class="text-success"
-                               data-toggle="modal"
+                               data-bs-toggle="modal"
                                data-target="#addModal">
                                     <span class="fas fa-plus-circle" aria-hidden="true"></span>
                                     Add a layout item.
@@ -308,7 +308,7 @@
                                 {
                                     <button type="button"
                                 class="btn btn-outline-primary"
-                                data-toggle="modal"
+                                data-bs-toggle="modal"
                                 data-target="#editBannerModal"
                                 data-id="@item.Id"
                                 data-name="@item.BannerFeature.Name"
@@ -341,7 +341,7 @@
                                 {
                                     <button type="button"
                                 class="btn btn-outline-primary"
-                                data-toggle="modal"
+                                data-bs-toggle="modal"
                                 data-target="#editDeckModal"
                                 data-id="@item.Id"
                                 data-name="@item.Deck.Name"
@@ -361,7 +361,7 @@
                                 {
                                     <button type="button"
                                 class="btn btn-outline-primary"
-                                data-toggle="modal"
+                                data-bs-toggle="modal"
                                 data-target="#editFeatureModal"
                                 data-id="@item.Id"
                                 data-name="@item.PageFeature.Name"
@@ -381,7 +381,7 @@
                                 {
                                     <button type="button"
                                 class="btn btn-outline-primary"
-                                data-toggle="modal"
+                                data-bs-toggle="modal"
                                 data-target="#editSegmentModal"
                                 data-id="@item.Id"
                                 data-name="@item.Segment.Name"
@@ -400,7 +400,7 @@
                                 {
                                     <button type="button"
                                 class="btn btn-outline-primary"
-                                data-toggle="modal"
+                                data-bs-toggle="modal"
                                 data-target="#editWebslideModal"
                                 data-id="@item.Id"
                                 data-name="@item.Webslide.Name"
@@ -418,7 +418,7 @@
                                 }
                                 <button type="button"
                                 class="btn btn-outline-danger"
-                                data-toggle="modal"
+                                data-bs-toggle="modal"
                                 data-target="#deleteModal"
                                 data-id="@item.Id"
                                 data-name="@(item.BannerFeature?.Name ?? item.Carousel?.Name ?? item.Deck?.Name ?? item.PageFeature?.Name ?? item.Segment?.Name ?? item.Webslide?.Name)"
