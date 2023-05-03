@@ -21,7 +21,7 @@ namespace Ocuda.Utility.TagHelpers
         private const string attributeName = "formgroup";
         private const string defaultInnerDivClass = "form-group-inner col-md-9";
         private const string defaultInputClass = "form-control";
-        private const string defaultLabelClass = "col-form-label text-md-right";
+        private const string defaultLabelClass = "col-form-label text-md-end";
         private const string defaultLabelLayoutClass = "col-md-3";
         private const string defaultValidationMessageClass = "validation-message text-danger";
         private const string defaultWrapperDivClass = "row form-group";

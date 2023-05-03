@@ -35,7 +35,7 @@
         <input id="addItemName" asp-for="ImageFeatureItem.Name" formgroup />
         <div class="form-group row">
             <label asp-for="ImageFeatureItem.StartDate"
-                   class="col-form-label col-12 col-md-3 text-md-right"></label>
+                   class="col-form-label col-12 col-md-3 text-md-end"></label>
             <div class="form-group-inner col-12 col-md-5">
                 <input asp-for="ImageFeatureStartDate"
                        class="form-control"
@@ -50,7 +50,7 @@
         </div>
         <div class="form-group row">
             <label asp-for="ImageFeatureItem.EndDate"
-                   class="col-form-label col-12 col-md-3 text-md-right"></label>
+                   class="col-form-label col-12 col-md-3 text-md-end"></label>
             <div class="form-group-inner col-12 col-md-5">
                 <input asp-for="ImageFeatureEndDate"
                        class="form-control"
@@ -80,7 +80,7 @@
         <input id="editItemName" asp-for="ImageFeatureItem.Name" formgroup />
         <div class="form-group row">
             <label asp-for="ImageFeatureItem.StartDate"
-                   class="col-form-label col-12 col-md-3 text-md-right"></label>
+                   class="col-form-label col-12 col-md-3 text-md-end"></label>
             <div class="form-group-inner col-12 col-md-5">
                 <input asp-for="ImageFeatureStartDate"
                        class="form-control"
@@ -97,7 +97,7 @@
         </div>
         <div class="form-group row">
             <label asp-for="ImageFeatureItem.EndDate"
-                   class="col-form-label col-12 col-md-3 text-md-right"></label>
+                   class="col-form-label col-12 col-md-3 text-md-end"></label>
             <div class="form-group-inner col-12 col-md-5">
                 <input asp-for="ImageFeatureEndDate"
                        class="form-control"
@@ -292,7 +292,7 @@
                                    value="@(item.ImageFeatureItemText?.LanguageId ?? Model.LanguageId)"
                                    type="hidden" />
                                     <div class="row form-group">
-                                        <label class="col-form-label text-md-right col-md-3" asp-for="ItemImage">
+                                        <label class="col-form-label text-md-end col-md-3" asp-for="ItemImage">
                                             Image
                                             <span class="fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker"></span>
                                         </label>

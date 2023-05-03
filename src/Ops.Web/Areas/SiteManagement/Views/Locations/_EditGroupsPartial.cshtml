@@ -12,7 +12,7 @@
         @if (Model.Group.IsLocationRegion)
         {
             <div class="row form-group">
-                <label class="col-form-label text-md-right col-md-3">
+                <label class="col-form-label text-md-end col-md-3">
                     Set as Location's Mapped Region?
                 </label>
                 <div class="flex-md-grow-0">
@@ -22,7 +22,7 @@
                                asp-for="IsLocationsGroup"
                                value="@Model.IsLocationsGroup.ToString().ToLower()"
                                id="locationMapGroup" />
-                        <label class="col-form-label text-md-right col-md-3 custom-control-label text-hide" for="locationMapGroup"></label>
+                        <label class="col-form-label text-md-end col-md-3 custom-control-label text-hide" for="locationMapGroup"></label>
                     </div>
                 </div>
             </div>

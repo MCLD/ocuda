@@ -66,7 +66,7 @@
                     @if (!string.IsNullOrEmpty(Model.CardDetail?.Filename))
                     {
                         <div class="row mb-4">
-                            <div class="col-form-label text-md-right col-md-3">Current image</div>
+                            <div class="col-form-label text-md-end col-md-3">Current image</div>
                             <div class="col-md-9">
                                 <img style="max-width: 333px;"
                                  src="@Url.Action(nameof(DecksController.Image), DecksController.Name, new {
@@ -77,7 +77,7 @@ filename = Model.CardDetail.Filename
                         </div>
                     }
                     <div class="row form-group">
-                        <label class="col-form-label text-md-right col-md-3">
+                        <label class="col-form-label text-md-end col-md-3">
                             Image
                             <span class="fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker"></span>
                         </label>
@@ -99,7 +99,7 @@ filename = Model.CardDetail.Filename
                         </div>
                     </div>
                     <div class="row form-group">
-                        <label class="col-form-label text-md-right col-md-3" asp-for="AltText">
+                        <label class="col-form-label text-md-end col-md-3" asp-for="AltText">
                             Image alternative text
                             <span class="fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker"></span>
                         </label>
@@ -129,7 +129,7 @@ filename = Model.CardDetail.Filename
         @if (Model.LanguageList?.Count() > 1)
         {
             <div class="form-group row">
-                <div class="col-md-3 text-md-right">
+                <div class="col-md-3 text-md-end">
                     <label asp-for="SelectedLanguage" class="col-form-label"></label>
                 </div>
                 <div class="col-md-9">
@@ -160,7 +160,7 @@ filename = Model.CardDetail.Filename
 
     <input asp-for="CardDetail.Header" formgroup />
     <div class="form-group row">
-        <div class="col-md-3 text-md-right">
+        <div class="col-md-3 text-md-end">
             <label asp-for="CardDetail.Text" class="col-form-label"></label>
         </div>
         <div class="form-group-inner col-md-9">
@@ -203,7 +203,7 @@ filename = Model.CardDetail.Filename
         @if (!string.IsNullOrEmpty(Model.CardDetail?.Filename))
         {
             <div class="form-group row">
-                <div class="col-md-3 text-md-right">
+                <div class="col-md-3 text-md-end">
                     <label asp-for="CardDetail.Filename" class="col-form-label"></label>
                 </div>
                 <div class="form-group-inner col-md-9">

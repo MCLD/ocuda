@@ -58,7 +58,7 @@
                                info-tooltip="The stub is the nickname/URL for the feature."
                                on-blur-js="FormatStub" />
                         <div class="form-group row">
-                            <label asp-for="Feature.BodyText" class="col-md-3 col-form-label text-md-right"></label>
+                            <label asp-for="Feature.BodyText" class="col-md-3 col-form-label text-md-end"></label>
                             <div class="form-group-inner col-md-9">
                                 <textarea asp-for="Feature.BodyText" markdown-editor></textarea>
                                 <span asp-validation-for="Feature.BodyText" class="validation-message text-danger"></span>

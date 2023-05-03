@@ -14,7 +14,7 @@ To configure the Markdown editor on a page in Ops:
 
     ```razor
     <div class="form-group row">
-        <div class="col-md-3 text-md-right">
+        <div class="col-md-3 text-md-end">
             <label asp-for="Model.Text" class="col-form-label"></label>
         </div>
         <div class="form-group-inner col-md-9">
