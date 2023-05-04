@@ -23,7 +23,7 @@
 
         <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
                 data-bs-toggle="modal"
-                data-target="#addItemModal">
+                data-bs-target="#addItemModal">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
             Add Carousel Item
         </button>
@@ -160,7 +160,7 @@
                         <div class="card-header d-flex" id="heading@(item.Id)">
                             <div class="card-title h5 mb-0 flex-grow-1"
                                  data-bs-toggle="collapse"
-                                 data-target="#collapse@(item.Id)"
+                                 data-bs-target="#collapse@(item.Id)"
                                  aria-controls="collapse@(item.Id)"
                                  aria-expanded="@(Model.FocusItemId == item.Id ? "true" : "false")">
                                 <span id="disclosure@(item.Id)"
@@ -184,7 +184,7 @@
                                 </button>
                                 <button class="btn btn-sm btn-outline-danger"
                                         data-bs-toggle="modal"
-                                        data-target="#deleteItemModal"
+                                        data-bs-target="#deleteItemModal"
                                         data-id="@item.Id"
                                         data-name="@item.Name">
                                     <span class="fas fa-minus-circle"></span>
@@ -248,7 +248,7 @@
                             <div class="card-footer">
                                 <button class="btn btn-info mb-2"
                                         data-bs-toggle="modal"
-                                        data-target="#addButtonModal"
+                                        data-bs-target="#addButtonModal"
                                         data-id="@item.Id">
                                     <span class="fas fa-plus-circle"></span>
                                     Add button
@@ -280,7 +280,7 @@
                                                         </button>
                                                         <button class="btn btn-sm btn-outline-info"
                                                                 data-bs-toggle="modal"
-                                                                data-target="#editButtonModal"
+                                                                data-bs-target="#editButtonModal"
                                                                 data-id="@button.Id"
                                                                 data-label="@button.LabelId"
                                                                 data-url="@button.Url">
@@ -288,7 +288,7 @@
                                                         </button>
                                                         <button class="btn btn-sm btn-outline-danger"
                                                                 data-bs-toggle="modal"
-                                                                data-target="#deleteButtonModal"
+                                                                data-bs-target="#deleteButtonModal"
                                                                 data-id="@button.Id"
                                                                 data-item="@button.CarouselItemId"
                                                                 data-name="@button.Label.Name">

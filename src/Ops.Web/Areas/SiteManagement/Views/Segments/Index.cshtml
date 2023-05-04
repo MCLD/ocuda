@@ -10,7 +10,7 @@
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
         <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
                 data-bs-toggle="modal"
-                data-target="#addModal">
+                data-bs-target="#addModal">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
             Create Segment
         </button>
@@ -155,7 +155,7 @@ else
                                     <button type="button"
                                     class="btn btn-outline-primary"
                                     data-bs-toggle="modal"
-                                    data-target="#editModal"
+                                    data-bs-target="#editModal"
                                     data-id="@segment.Id"
                                     data-name="@segment.Name"
                                     data-startdate="@segment.StartDate?.ToString("yyyy-MM-dd")"
@@ -168,7 +168,7 @@ else
                                     <button type="button"
                                     class="btn btn-outline-danger"
                                     data-bs-toggle="modal"
-                                    data-target="#deleteModal"
+                                    data-bs-target="#deleteModal"
                                     data-id="@segment.Id"
                                     data-name="@segment.Name">
                                         <span class="fas fa-minus-circle" aria-hidden="true"></span>

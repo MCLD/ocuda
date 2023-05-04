@@ -15,7 +15,7 @@
            asp-route-Type="@Model.HeaderType">Back</a>
         <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
                 data-bs-toggle="modal"
-                data-target="#addModal">
+                data-bs-target="#addModal">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
             Add Layout
         </button>
@@ -174,7 +174,7 @@
                                     <a href="#"
                                        class="text-success"
                                        data-bs-toggle="modal"
-                                       data-target="#addModal">
+                                       data-bs-target="#addModal">
                                         <span class="fas fa-plus-circle" aria-hidden="true"></span>
                                         Add a page layout.
                                     </a>
@@ -199,7 +199,7 @@
                                     <button type="button"
                                             class="btn btn-outline-primary"
                                             data-bs-toggle="modal"
-                                            data-target="#editModal"
+                                            data-bs-target="#editModal"
                                             data-id="@layout.Id"
                                             data-name="@layout.Name"
                                             data-startdate="@layout.StartDate?.ToString("yyyy-MM-dd")"
@@ -220,7 +220,7 @@
                                                 data-id="@layout.Id"
                                                 data-name="@layout.Name"
                                                 data-bs-toggle="modal"
-                                                data-target="#cloneModal"
+                                                data-bs-target="#cloneModal"
                                                 title="Clone layout">
                                             <span class="far fa-copy" aria-hidden="true"></span>
                                         </button>
@@ -228,7 +228,7 @@
                                     <button type="button"
                                             class="btn btn-outline-danger"
                                             data-bs-toggle="modal"
-                                            data-target="#deleteModal"
+                                            data-bs-target="#deleteModal"
                                             data-id="@layout.Id"
                                             data-name="@layout.Name"
                                             title="Delete layout">

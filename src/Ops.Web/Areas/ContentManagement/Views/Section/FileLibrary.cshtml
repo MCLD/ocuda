@@ -201,7 +201,7 @@
         {
             <button class="btn btn-outline-primary mt-2 mb-1 me-2 float-end"
                 data-bs-toggle="modal"
-                data-target="#listAddModal">
+                data-bs-target="#listAddModal">
                 <span class="fas fa-file-upload" aria-hidden="true"></span>
                 Add file
             </button>
@@ -292,7 +292,7 @@
                                         <button type="button"
                                 class="btn btn-outline-warning"
                                 data-bs-toggle="modal"
-                                data-target="#replaceModal"
+                                data-bs-target="#replaceModal"
                                 data-id="@file.Id"
                                 data-name="@file.Name"
                                 data-extension="@Model.FileTypes.Where(_ => _.Id == file.FileTypeId).FirstOrDefault().Extension"
@@ -306,7 +306,7 @@
                                         <button type="button"
                                 class="btn btn-outline-danger"
                                 data-bs-toggle="modal"
-                                data-target="#deleteModal"
+                                data-bs-target="#deleteModal"
                                 data-id="@file.Id"
                                 data-name="@file.Name"
                                 title="Delete file">

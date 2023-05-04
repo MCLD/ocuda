@@ -276,7 +276,7 @@
             <button type="button"
                     class="btn btn-sm btn-outline-primary"
                     data-bs-toggle="modal"
-                    data-target="#uploadModal">
+                    data-bs-target="#uploadModal">
                 @if (Model.Episode.MediaSize > 0)
                 {
                     @:Replace podcast file
@@ -315,7 +315,7 @@
                                 data-segment="Description"
                                 data-segment-display="Description"
                                 data-bs-toggle="modal"
-                                data-target="#addSegmentModal">
+                                data-bs-target="#addSegmentModal">
                             <span class="fas fa-plus-circle"
                                   aria-hidden="true"
                                   title="Add segment"></span>
@@ -324,7 +324,7 @@
                     else if (!string.IsNullOrEmpty(Model.ShowNotesSegmentName) && Model.CanEditShowNotes)
                     {
                         <a class="btn btn-outline-danger"
-                           data-target="#deleteModal"
+                           data-bs-target="#deleteModal"
                            data-bs-toggle="modal">
                             <span class="fas fa-minus-circle"
                                   aria-hidden="true"

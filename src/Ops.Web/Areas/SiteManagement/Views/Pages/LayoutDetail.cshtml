@@ -22,7 +22,7 @@
         }
         <button class="btn btn-outline-success"
                 data-bs-toggle="modal"
-                data-target="#addModal">
+                data-bs-target="#addModal">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
             Add Item
         </button>
@@ -233,7 +233,7 @@
                                 <a href="#"
                                class="text-success"
                                data-bs-toggle="modal"
-                               data-target="#addModal">
+                               data-bs-target="#addModal">
                                     <span class="fas fa-plus-circle" aria-hidden="true"></span>
                                     Add a layout item.
                                 </a>
@@ -309,7 +309,7 @@
                                     <button type="button"
                                 class="btn btn-outline-primary"
                                 data-bs-toggle="modal"
-                                data-target="#editBannerModal"
+                                data-bs-target="#editBannerModal"
                                 data-id="@item.Id"
                                 data-name="@item.BannerFeature.Name"
                                 title="Edit banner name">
@@ -342,7 +342,7 @@
                                     <button type="button"
                                 class="btn btn-outline-primary"
                                 data-bs-toggle="modal"
-                                data-target="#editDeckModal"
+                                data-bs-target="#editDeckModal"
                                 data-id="@item.Id"
                                 data-name="@item.Deck.Name"
                                 title="Edit segment name">
@@ -362,7 +362,7 @@
                                     <button type="button"
                                 class="btn btn-outline-primary"
                                 data-bs-toggle="modal"
-                                data-target="#editFeatureModal"
+                                data-bs-target="#editFeatureModal"
                                 data-id="@item.Id"
                                 data-name="@item.PageFeature.Name"
                                 title="Edit feature">
@@ -382,7 +382,7 @@
                                     <button type="button"
                                 class="btn btn-outline-primary"
                                 data-bs-toggle="modal"
-                                data-target="#editSegmentModal"
+                                data-bs-target="#editSegmentModal"
                                 data-id="@item.Id"
                                 data-name="@item.Segment.Name"
                                 title="Edit segment name">
@@ -401,7 +401,7 @@
                                     <button type="button"
                                 class="btn btn-outline-primary"
                                 data-bs-toggle="modal"
-                                data-target="#editWebslideModal"
+                                data-bs-target="#editWebslideModal"
                                 data-id="@item.Id"
                                 data-name="@item.Webslide.Name"
                                 title="Edit webslide">
@@ -419,7 +419,7 @@
                                 <button type="button"
                                 class="btn btn-outline-danger"
                                 data-bs-toggle="modal"
-                                data-target="#deleteModal"
+                                data-bs-target="#deleteModal"
                                 data-id="@item.Id"
                                 data-name="@(item.BannerFeature?.Name ?? item.Carousel?.Name ?? item.Deck?.Name ?? item.PageFeature?.Name ?? item.Segment?.Name ?? item.Webslide?.Name)"
                                 data-banner="@item.BannerFeatureId"

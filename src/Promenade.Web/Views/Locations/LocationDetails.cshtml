@@ -97,7 +97,7 @@
                        asp-route-locationStub="@Model.Location.Stub"
                        asp-route-featureStub="@feature.Stub"
                        data-bs-toggle="modal"
-                       data-target="#featureModal"
+                       data-bs-target="#featureModal"
                        target="@(feature.NewTab == true ? "_blank" : null)"
                        data-featureUrl="@Url.Action(nameof(LocationsController.FeatureInfo), LocationsController.Name, new { locationStub = Model.Location.Stub, featureStub = feature.Stub })"
                        data-name="@feature.Name">
@@ -163,7 +163,7 @@
                     <a href="@Model.LocationNeighborGroup.MapImage"
                        class="map-popup"
                        data-bs-toggle="modal"
-                       data-target="#mapModal"
+                       data-bs-target="#mapModal"
                        target="_blank">
                         <img src="@Model.LocationNeighborGroup.MapImage"
                              class="d-block img-fluid mx-auto"

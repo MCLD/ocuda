@@ -8,7 +8,7 @@
     <div class="pt-2">
         <button class="btn btn-outline-success"
                 data-bs-toggle="modal"
-                data-target="#addItemModal">
+                data-bs-target="#addItemModal">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
             Add Item
         </button>
@@ -143,7 +143,7 @@
                     <div class="card-header bg-info text-white">
                         <div class="card-title h5 mb-0"
                          data-bs-toggle="collapse"
-                         data-target="#accordionTemplateContent"
+                         data-bs-target="#accordionTemplateContent"
                          aria-expanded="false"
                          aria-controls="accordionTemplateContent">
                             Template: @Model.ImageTemplateDescription
@@ -214,7 +214,7 @@
                         <div class="card-header d-flex" id="heading@(item.Id)">
                             <div class="card-title h5 mb-0 flex-grow-1"
                          data-bs-toggle="collapse"
-                         data-target="#collapse@(item.Id)"
+                         data-bs-target="#collapse@(item.Id)"
                          aria-controls="collapse@(item.Id)"
                          aria-expanded="@(Model.FocusItemId == item.Id ? "true" : "false")">
                                 <span id="disclosure@(item.Id)"
@@ -245,7 +245,7 @@
                                 <button type="button"
                                 class="btn btn-sm btn-outline-primary"
                                 data-bs-toggle="modal"
-                                data-target="#editItemModal"
+                                data-bs-target="#editItemModal"
                                 data-id="@item.Id"
                                 data-name="@item.Name"
                                 data-startdate="@item.StartDate?.ToString("yyyy-MM-dd")"
@@ -257,7 +257,7 @@
                                 </button>
                                 <button class="btn btn-sm btn-outline-danger"
                                 data-bs-toggle="modal"
-                                data-target="#deleteItemModal"
+                                data-bs-target="#deleteItemModal"
                                 data-id="@item.Id"
                                 data-name="@item.Name">
                                     <span class="fas fa-minus-circle"></span>

@@ -13,7 +13,7 @@
         @if (Model.OpenRoles.Count > 0)
         {
             <button data-bs-toggle="modal"
-                    data-target="#addModal"
+                    data-bs-target="#addModal"
                     class="btn btn-outline-success mt-2 mb-1 me-2 float-end">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Add Navigation
@@ -49,7 +49,7 @@
                                 <button type="button"
                                         class="btn btn-outline-primary"
                                         data-bs-toggle="modal"
-                                        data-target="#editModal"
+                                        data-bs-target="#editModal"
                                         data-id="@navigation.Id"
                                         data-name="@navigation.Name"
                                         title="Edit Navigation">
@@ -65,7 +65,7 @@
                                 <button type="button"
                                         class="btn btn-outline-danger"
                                         data-bs-toggle="modal"
-                                        data-target="#deleteModal"
+                                        data-bs-target="#deleteModal"
                                         data-id="@navigation.Id"
                                         data-name="@navigation.Name">
                                     <span class="fas fa-minus-circle" aria-hidden="true"></span>

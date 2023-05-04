@@ -33,7 +33,7 @@
             <button type="button"
                     class="btn btn-outline-danger mt-2 mb-1 me-2 float-end"
                     data-bs-toggle="modal"
-                    data-target="#deleteTextModal"
+                    data-bs-target="#deleteTextModal"
                     data-languageDescription="@Model.LanguageDescription">
                 <span class="fas fa-minus-circle"></span>
                 Delete Text
@@ -43,7 +43,7 @@
         @if (Model.RoleProperties.CanHaveChildren)
         {
             <button data-bs-toggle="modal"
-                    data-target="#addModal"
+                    data-bs-target="#addModal"
                     class="btn btn-outline-success mt-2 mb-1 me-2 float-end">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Add Navigation
@@ -137,7 +137,7 @@
                                         <a href="#"
                                            class="text-success"
                                            data-bs-toggle="modal"
-                                           data-target="#addModal">
+                                           data-bs-target="#addModal">
                                             <span class="fas fa-plus-circle" aria-hidden="true"></span>
                                             Add a navigation.
                                         </a>
@@ -176,7 +176,7 @@
                                     <button type="button"
                                             class="btn btn-outline-primary"
                                             data-bs-toggle="modal"
-                                            data-target="#editModal"
+                                            data-bs-target="#editModal"
                                             data-id="@navigation.Id"
                                             data-name="@navigation.Name"
                                             data-nav-change="@navigation.ChangeToLinkWhenExtraSmall"
@@ -196,7 +196,7 @@
                                     <button type="button"
                                             class="btn btn-outline-danger"
                                             data-bs-toggle="modal"
-                                            data-target="#deleteModal"
+                                            data-bs-target="#deleteModal"
                                             data-id="@navigation.Id"
                                             data-name="@navigation.Name">
                                         <span class="fas fa-minus-circle" aria-hidden="true"></span>
