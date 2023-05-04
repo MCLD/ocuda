@@ -10,13 +10,13 @@
         </h1>
     </div>
     <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-end"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-action="@nameof(HistoricalController.Index)"
            asp-route-searchText="@Model.SearchText"
            asp-route-page="@(Model.Page > 1 ? Model.Page : null)">Back</a>
         @if (Model.FileExists)
         {
-            <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-end"
+            <a class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
            asp-action="@nameof(HistoricalController.Download)"
            asp-route-historicalIncidentId="@Model.HistoricalIncident.Id">
                 <span class="fas fa-file-download" aria-hidden="true"></span>

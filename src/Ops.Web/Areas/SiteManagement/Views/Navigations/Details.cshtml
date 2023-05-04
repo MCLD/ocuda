@@ -20,18 +20,18 @@
             <a asp-controller="@NavigationsController.Name"
                asp-action="@(nameof(NavigationsController.Details))"
                asp-route-id="@Model.Navigation.NavigationId.Value"
-               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-end">Back</a>
+               class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
         }
         else
         {
             <a asp-controller="@NavigationsController.Name"
                asp-action="@(nameof(NavigationsController.Index))"
-               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-end">Back</a>
+               class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
         }
         @if (Model.CanDeleteText)
         {
             <button type="button"
-                    class="btn btn-outline-danger mt-2 mb-1 mr-2 float-end"
+                    class="btn btn-outline-danger mt-2 mb-1 me-2 float-end"
                     data-bs-toggle="modal"
                     data-target="#deleteTextModal"
                     data-languageDescription="@Model.LanguageDescription">
@@ -44,7 +44,7 @@
         {
             <button data-bs-toggle="modal"
                     data-target="#addModal"
-                    class="btn btn-outline-success mt-2 mb-1 mr-2 float-end">
+                    class="btn btn-outline-success mt-2 mb-1 me-2 float-end">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Add Navigation
             </button>
@@ -98,7 +98,7 @@
                         <span class="far fa-save"></span>
                         Save
                     </button>
-                    <div class="d-none oc-save-warning ml-3 flex-fill">
+                    <div class="d-none oc-save-warning ms-3 flex-fill">
                         <div class="alert alert-warning mb-0">
                             <span class="fas fa-exclamation-triangle"></span>
                             You have unsaved changes.

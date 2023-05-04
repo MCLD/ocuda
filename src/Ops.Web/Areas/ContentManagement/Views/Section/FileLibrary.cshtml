@@ -49,7 +49,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button"
-                            class="btn btn-outline-dark mr-2"
+                            class="btn btn-outline-dark me-2"
                             data-dismiss="modal">
                         Cancel
                     </button>
@@ -117,7 +117,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button"
-                            class="btn btn-outline-dark mr-2"
+                            class="btn btn-outline-dark me-2"
                             data-dismiss="modal">
                         Cancel
                     </button>
@@ -158,7 +158,7 @@
                     </button>
                 </div>
                 <div class="modal-body d-flex">
-                    <span class="fa fa-exclamation-triangle text-danger fa-lg align-self-center mr-3"
+                    <span class="fa fa-exclamation-triangle text-danger fa-lg align-self-center me-3"
                           aria-hidden="true"></span>
                     <span class="d-flex-grow-1">
                         <p>
@@ -169,7 +169,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button"
-                            class="btn btn-outline-dark mr-1"
+                            class="btn btn-outline-dark me-1"
                             data-dismiss="modal">
                         Cancel
                     </button>
@@ -192,14 +192,14 @@
         <h1>File library <small class="text-muted">@Model.FileLibraryName</small></h1>
     </div>
     <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-end"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-area=""
            asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.HomeController.SectionIndex))"
            asp-route-slug="@Model.SectionSlug">Back</a>
         @if (Model.HasAdminRights)
         {
-            <button class="btn btn-outline-primary mt-2 mb-1 mr-2 float-end"
+            <button class="btn btn-outline-primary mt-2 mb-1 me-2 float-end"
                 data-bs-toggle="modal"
                 data-target="#listAddModal">
                 <span class="fas fa-file-upload" aria-hidden="true"></span>
@@ -208,7 +208,7 @@
         }
         @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
         {
-            <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-end"
+            <a class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
            asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
            asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibraryPermissions)"

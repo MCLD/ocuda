@@ -218,7 +218,7 @@
                          aria-controls="collapse@(item.Id)"
                          aria-expanded="@(Model.FocusItemId == item.Id ? "true" : "false")">
                                 <span id="disclosure@(item.Id)"
-                              class="fas fa-caret-right mr-1"></span>
+                              class="fas fa-caret-right me-1"></span>
                                 @item.Name &ndash;
                                 @if (!(item.StartDate > Model.CurrentDateTime) && !(item.EndDate < Model.CurrentDateTime))
                                 {
@@ -294,7 +294,7 @@
                                     <div class="row mb-3">
                                         <label class="col-form-label text-md-end col-md-3" asp-for="ItemImage">
                                             Image
-                                            <span class="fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker"></span>
+                                            <span class="fas fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span>
                                         </label>
                                         <div class="col-md-9">
                                             <div class="input-group">

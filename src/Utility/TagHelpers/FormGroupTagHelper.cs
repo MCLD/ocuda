@@ -34,7 +34,7 @@ namespace Ocuda.Utility.TagHelpers
         private const string labelClassAttribute = "label-class";
         private const string labelNameAttribute = "label-name";
         private const string onBlurJs = "on-blur-js";
-        private const string requiredFieldClass = "fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker";
+        private const string requiredFieldClass = "fas fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker";
         private const string showLengthAttributeName = "show-length";
         private const string validationIgnoreClass = "validation-ignore";
 

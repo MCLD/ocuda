@@ -233,7 +233,7 @@
                                     @Model.AuthenticatedAt
                                     <form asp-action="Reauthenticate" class="d-inline">
                                         <button type="submit"
-                                                class="float-end p-0 mr-2 btn btn-link"
+                                                class="float-end p-0 me-2 btn btn-link"
                                                 title="Reauthenticate">
                                             <span class="fa fa-xs fa-redo-alt"></span>
                                         </button>
@@ -281,7 +281,7 @@
                                     @if (!string.IsNullOrEmpty(Model.PicturePath))
                                     {
                                         <a href="#"
-                                           class="btn btn-sm btn-outline-danger ml-2"
+                                           class="btn btn-sm btn-outline-danger ms-2"
                                            data-bs-toggle="modal"
                                            data-target="#removePictureModal"
                                            data-id="@Model.User.Id"

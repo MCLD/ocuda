@@ -62,14 +62,14 @@
                                        asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
                                        asp-route-postSlug="@post.Slug"
                                        asp-route-sectionSlug="@Model.SectionSlug"
-                                       class="btn btn-sm btn-outline-secondary ml-3">
+                                       class="btn btn-sm btn-outline-secondary ms-3">
                                         <span class="fas fa-edit fa-xs fa-fw" title="Edit post"></span>
                                         Edit Post
                                     </a>
                                 </span>
                                 @if (post.UpdatedAt.HasValue)
                                 {
-                                    <em class="mr-3 text-muted" title="@post.UpdatedAt.Value">
+                                    <em class="me-3 text-muted" title="@post.UpdatedAt.Value">
                                         <small>
                                             Last update
                                             @if (post.UpdatedBy.HasValue && !string.IsNullOrEmpty(post.UpdatedByName))
@@ -91,7 +91,7 @@
                         @Html.Raw(post.Content)
                     </div>
                     <div class="card-footer d-flex flex-wrap py-1">
-                        <div class="flex-grow-1 mr-2">
+                        <div class="flex-grow-1 me-2">
                             <em>
                                 <small class="text-muted">
                                     Posted by

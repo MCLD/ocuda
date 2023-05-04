@@ -26,12 +26,12 @@
         @if (!string.IsNullOrEmpty(Model.BackLink))
         {
             <a href="@Model.BackLink"
-           class="btn btn-outline-dark ml-2">Back</a>
+           class="btn btn-outline-dark ms-2">Back</a>
         }
         else
         {
             <a asp-action="Index"
-           class="btn btn-outline-dark ml-2">Cancel</a>
+           class="btn btn-outline-dark ms-2">Cancel</a>
         }
     </div>
 </div>
@@ -142,7 +142,7 @@
                     <span class="far fa-save"></span>
                     Save
                 </button>
-                <div class="d-none oc-save-warning ml-3 flex-fill">
+                <div class="d-none oc-save-warning ms-3 flex-fill">
                     <div class="alert alert-warning mb-0">
                         <span class="fas fa-exclamation-triangle"></span>
                         You have unsaved changes.

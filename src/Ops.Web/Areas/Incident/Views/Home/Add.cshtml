@@ -9,7 +9,7 @@
         }
     </h1>
     <div>
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-end"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
            asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine)"
            asp-route-page="@(Model.Page > 1 ? Model.Page : null)">Back</a>
@@ -51,7 +51,7 @@
             <div class="row mb-3">
                 <label class="col-form-label text-md-end col-md-3" for="IncidentDate">
                     Date & time of incident
-                    <span class="fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker"></span>
+                    <span class="fas fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span>
                 </label>
                 <div class="mb-3-inner col-md-9">
                     <div class="d-flex flex-row">
