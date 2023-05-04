@@ -103,7 +103,7 @@ namespace Ocuda.Utility.TagHelpers
             var cancelButton = new TagBuilder("button");
             cancelButton.AddCssClass(cancelButtonClass);
             cancelButton.Attributes.Add("type", "button");
-            cancelButton.Attributes.Add("data-dismiss", "modal");
+            cancelButton.Attributes.Add("data-bs-dismiss", "modal");
 
             if (!Type.HasValue)
             {
@@ -179,7 +179,7 @@ namespace Ocuda.Utility.TagHelpers
             var button = new TagBuilder("button");
             button.AddCssClass(headerButtonClass);
             button.Attributes.Add("type", "button");
-            button.Attributes.Add("data-dismiss", "modal");
+            button.Attributes.Add("data-bs-dismiss", "modal");
             button.Attributes.Add("aria-label", "Close dialog.");
             button.InnerHtml.AppendHtml("&times;");
 

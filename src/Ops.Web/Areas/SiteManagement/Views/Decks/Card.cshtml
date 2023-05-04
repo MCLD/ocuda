@@ -46,7 +46,7 @@
 <form id="addImageForm" method="post" enctype="multipart/form-data">
     <input type="hidden" asp-for="CardDetail.CardId" />
     <input type="hidden" asp-for="CardDetail.LanguageId" />
-    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="addModal">
+    <div class="modal fade" data-bs-backdrop="static" data-keyboard="false" id="addModal">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -109,7 +109,7 @@ filename = Model.CardDetail.Filename
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
                     <button class="btn btn-outline-success"
                             id="addImageFormButton"
                             disabled="disabled"

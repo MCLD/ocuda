@@ -79,7 +79,7 @@
 <form asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.DeleteSet))">
     <div class="modal fade"
          id="deleteSet"
-         data-backdrop="static"
+         data-bs-backdrop="static"
          data-keyboard="false"
          tabindex="-1"
          aria-labelledby="deleteSetLabel"
@@ -88,7 +88,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="deleteSetLabel">Delete digital display set</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -98,7 +98,7 @@
                     <strong><span id="digitalDisplaySetName"></span></strong>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                         Cancel
                     </button>
                     <button type="submit" class="btn btn-danger">Delete display set</button>
