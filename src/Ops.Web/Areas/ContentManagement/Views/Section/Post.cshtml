@@ -36,29 +36,29 @@
             <input asp-for="Post.Slug" formgroup value="@Model.Post.Slug" />
             @if (!Model.Post.PublishedAt.HasValue)
             {
-                <div class="form-group row">
+                <div class="mb-3 row">
                     <label class="col-form-label text-md-end col-md-3"
                            asp-for="Publish"></label>
-                    <div class="form-group-inner col-md-9">
+                    <div class="col-md-9">
                         <select asp-for="Publish"
                                 class="form-control"
                                 asp-items="PostViewModel.PublishSelect">
                         </select>
                     </div>
                 </div>
-                <div class="form-group row d-none" id="PublishWhen">
+                <div class="mb-3 row d-none" id="PublishWhen">
                     <div class="col-md-3 text-md-end">
                         <label asp-for="PublishAtDate" class="col-form-label"></label>
                         <span class="fas fa-info-circle text-info"
                               title="Leave date and time empty to publish this post when you save it."></span>
                     </div>
-                    <div class="form-group-inner col-md-3">
+                    <div class="col-md-3">
                         <input asp-for="PublishAtDate"
                                type="date"
                                class="form-control"
                                asp-items="Model.PublishSelect" />
                     </div>
-                    <div class="form-group-inner col-md-3">
+                    <div class="col-md-3">
                         <input asp-for="PublishAtTime"
                                type="time"
                                class="form-control"
@@ -73,10 +73,10 @@
                        value="@Model.Post.PublishedAt"
                        disabled />
             }
-            <div class="form-group row">
+            <div class="mb-3 row">
                 <label class="col-form-label text-md-end col-md-3"
                        asp-for="Post.ShowOnHomePage"></label>
-                <div class="form-group-inner col-md-9">
+                <div class="col-md-9">
                     <select asp-for="Post.ShowOnHomePage"
                             class="form-control"
                             disabled="@(!Model.CanPromote)"
@@ -84,26 +84,26 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group row">
+            <div class="mb-3 row">
                 <div class="col-md-3 text-md-end">
                     <label asp-for="Post.PinnedUntil" class="col-form-label"></label>
                     <span class="fas fa-info-circle text-info"
                           title="Leave date and time empty to not pin this post to the top of the @Model.SectionName section."></span>
                 </div>
-                <div class="form-group-inner col-md-3">
+                <div class="col-md-3">
                     <input asp-for="PinUntilDate"
                            type="date"
                            class="form-control"
                            asp-items="Model.PublishSelect" />
                 </div>
-                <div class="form-group-inner col-md-3">
+                <div class="col-md-3">
                     <input asp-for="PinUntilTime"
                            type="time"
                            class="form-control"
                            asp-items="Model.PublishSelect" />
                 </div>
             </div>
-            <div class="form-group row">
+            <div class="mb-3 row">
                 <div class="col-form-label text-md-end col-md-3">
                     <label asp-for="Post.Content"></label>
                 </div>
