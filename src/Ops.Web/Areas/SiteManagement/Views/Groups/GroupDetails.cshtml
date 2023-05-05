@@ -21,7 +21,7 @@
       role="form"
       display="inline">
     <input asp-for="Group.Id" id="group-id" type="hidden" />
-    <input asp-for="Group.IsLocationRegion" id="group-isLocationRegion" type="hidden" />
+    <input asp-for="Group.IsLocationRegion" type="hidden" />
     <input asp-for="Group.GroupType"
            formgroup
            autocomplete="off" />
@@ -32,9 +32,9 @@
            on-blur-js="FormatStub" />
     <div class="row">
         <div class="accordion offset-md-3 col-md-9" id="locationregion-accordion">
-            <div class="card">
-                <div class="card-header @(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) && !Model.Group.IsLocationRegion ? "" : "bg-info")" id="accordion-header">
-                    <button class="btn btn-link @(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) && !Model.Group.IsLocationRegion ? "text-info" : "text-white")"
+            <div class="accordion-item">
+                <div class="accordion-header" id="accordion-header">
+                    <button class="accordion-button collapsed"
                             style="text-decoration: none;"
                             id="popup-button"
                             type="button"
@@ -42,21 +42,20 @@
                             data-bs-target="#collapseDiv"
                             aria-expanded="true"
                             aria-controls="collapseDiv">
-                        <span class="fas fa-caret-@(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) && !Model.Group.IsLocationRegion ? "right" : "down")" id="accordion-disclosure"></span>
                         Is a Location Region
                     </button>
                 </div>
                 <div id="collapseDiv"
-                     class="collapse@(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) && !Model.Group.IsLocationRegion ? "" : " show")"
+                     class="accordion-collapse collapse@(string.IsNullOrEmpty(Model?.Group?.SubscriptionUrl) && !Model.Group.IsLocationRegion ? "" : " show")"
                      aria-labelledby="headingOne"
                      data-parent="#locationregion-accordion">
-                    <div class="card-body">
+                    <div class="accordion-body">
                         <input asp-for="Group.SubscriptionUrl"
                                formgroup
                                autocomplete="off" />
                         <input asp-for="OrderedLocationIds"
                                hidden />
-                        @if (!Model.Group.IsNewGroup && Model.LocationGroups.Count > 0)
+                        @if (!Model.Group.IsNewGroup && Model.LocationGroups?.Count > 0)
                         {
                             <h4>Map Display Order</h4>
                             @foreach (var locationGroup in Model.LocationGroups)
@@ -118,28 +117,10 @@
 @section scripts{
     <script src="~/js/md.min.js" asp-append-version="true"></script>
     <script>
-        $("#popup-button").click(function () {
-            if ($("#accordion-header").hasClass("bg-info")) {
-                $("#accordion-header").removeClass("bg-info");
-                $("#popup-button").removeClass("text-white");
-                $("#popup-button").addClass("text-info");
-                $("#accordion-disclosure").removeClass("fa-caret-down");
-                $("#accordion-disclosure").addClass("fa-caret-right");
-                $("#group-isLocationRegion").val("False");
-            }
-            else {
-                $("#accordion-header").addClass("bg-info");
-                $("#popup-button").addClass("text-white");
-                $("#popup-button").removeClass("text-info");
-                $("#accordion-disclosure").removeClass("fa-caret-right");
-                $("#accordion-disclosure").addClass("fa-caret-down");
-                $("#group-isLocationRegion").val("True");
-            }
-        });
         $("#groupform").submit(function () {
-            if (!$("#accordion-header").hasClass("bg-info")) {
+            if (!$("#collapseDiv").hasClass("show")) {
                 $("#Group_SubscriptionUrl").val("");
-                $("#group-isLocationRegion").val("False");
+                $("#Group_IsLocationRegion").val("False");
             }
             else {
                 var ids = $(".location-ordering");
