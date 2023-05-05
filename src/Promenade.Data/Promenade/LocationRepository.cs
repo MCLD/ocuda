@@ -40,11 +40,11 @@ namespace Ocuda.Promenade.Data.Promenade
                 .ToListAsync();
         }
 
-        public async Task<Location> GetLocationByStub(string stub)
+        public async Task<int?> GetIdBySlugAsync(string slug)
         {
             return await DbSet
-                .AsNoTracking()
-                .Where(_ => _.Stub == stub && !_.IsDeleted)
+                .Where(_ => !_.IsDeleted && _.Stub == slug)
+                .Select(_ => _.Id)
                 .SingleOrDefaultAsync();
         }
     }

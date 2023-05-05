@@ -102,7 +102,8 @@
                         </p>
                         <div class="row">
                             <div class="col-6">
-                                <a asp-action="@nameof(LocationsController.Locations)"
+                                <a asp-action="@nameof(HomeController.Location)"
+                                asp-controller="@HomeController.Name"
                            asp-route-locationStub="@location.Stub"
                            class="btn btn-outline-dark">
                                     @Localizer[Promenade.LocationButtonDetails]

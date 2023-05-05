@@ -37,9 +37,9 @@
             else
             {
                 <p>
-                    @if (Model.HoursSegment != null)
+                    @if (!string.IsNullOrEmpty(Model.HoursSegmentText))
                     {
-                        @Html.Raw(Model.HoursSegment.Text)
+                        @Html.Raw(Model.HoursSegmentText)
                     }
                     else
                     {
@@ -63,15 +63,15 @@
         </div>
     </div>
 
-    @if (Model.PreFeatureSegment != null)
+    @if (!string.IsNullOrEmpty(Model.PreFeatureSegmentText))
     {
         <div class="row prom-feature-segment">
             <div class="col-12">
-                @if (!string.IsNullOrEmpty(Model.PreFeatureSegment?.Header))
+                @if (!string.IsNullOrEmpty(Model.PreFeatureSegmentHeader))
                 {
-                    <h2>@Model.PreFeatureSegment.Header</h2>
+                    <h2>@Model.PreFeatureSegmentHeader</h2>
                 }
-                @Html.Raw(Model.PreFeatureSegment.Text)
+                @Html.Raw(Model.PreFeatureSegmentText)
             </div>
         </div>
     }
@@ -93,18 +93,19 @@
             <div class="col-4 col-md-3 col-lg-2 mb-2">
                 @if (string.IsNullOrEmpty(feature.RedirectUrl))
                 {
-                    <a asp-action="@nameof(LocationsController.Locations)"
-                       asp-route-locationStub="@Model.Location.Stub"
-                       asp-route-featureStub="@feature.Stub"
+                    <a asp-action="@nameof(HomeController.Feature)"
+               asp-controller="@HomeController.Name"
+               asp-route-locationSlug="@Model.Location.Stub"
+               asp-route-featureSlug="@feature.Stub"
                        data-toggle="modal"
                        data-target="#featureModal"
                        target="@(feature.NewTab == true ? "_blank" : null)"
-                       data-featureUrl="@Url.Action(nameof(LocationsController.FeatureInfo), LocationsController.Name, new { locationStub = Model.Location.Stub, featureStub = feature.Stub })"
+                       data-featureUrl="@Url.Action(nameof(HomeController.FeatureDetails), HomeController.Name, new { locationSlug = Model.Location.Stub, featureSlug = feature.Stub })"
                        data-name="@feature.Name">
                         <span class="fa-stack fa-2x d-block mx-auto">
                             <span class="fa fa-square fa-stack-2x"></span>
                             <span class="@feature.Icon"
-                                  @(string.IsNullOrEmpty(feature.IconText) ? "" : "aria-hidden='true'")>
+                            @(string.IsNullOrEmpty(feature.IconText) ? "" : "aria-hidden='true'")>
                                 @Html.Raw(feature.IconText)
                             </span>
                         </span>
@@ -133,15 +134,15 @@
         }
     </div>
 
-    @if (Model.PostFeatureSegment != null)
+    @if (!string.IsNullOrEmpty(Model.PostFeatureSegmentText))
     {
         <div class="row prom-feature-segment">
             <div class="col-12">
-                @if (!string.IsNullOrEmpty(Model.PostFeatureSegment?.Header))
+                @if (!string.IsNullOrEmpty(Model.PostFeatureSegmentHeader))
                 {
-                    <h2>@Model.PostFeatureSegment.Header</h2>
+                    <h2>@Model.PostFeatureSegmentHeader</h2>
                 }
-                @Html.Raw(Model.PostFeatureSegment.Text)
+                @Html.Raw(Model.PostFeatureSegmentText)
             </div>
         </div>
     }
@@ -177,8 +178,9 @@
                             <tr>
                                 <td>@locationGroup.DisplayOrder.</td>
                                 <td colspan="@(locationGroup.Location.HasEvents ? 1 : 2)">
-                                    <a asp-action="@nameof(LocationsController.Locations)"
-                                       asp-route-locationStub="@locationGroup.Location.Stub">@locationGroup.Location.Name</a>
+                                    <a asp-action="@nameof(HomeController.Location)"
+                                    asp-controller="@HomeController.Name"
+                               asp-route-locationStub="@locationGroup.Location.Stub">@locationGroup.Location.Name</a>
                                 </td>
                                 @if (locationGroup.Location.HasEvents)
                                 {
@@ -213,11 +215,13 @@
                                     <span class="far fa-envelope"></span>
                                     @if (Model.NearbyCount == Model.NearbyEventsCount)
                                     {
-                                        @Localizer[Promenade.LocationUpdatesFromAllCount, Model.NearbyEventsCount];
+                                        @Localizer[Promenade.LocationUpdatesFromAllCount, Model.NearbyEventsCount]
+                                        ;
                                     }
                                     else
                                     {
-                                        @Localizer[Promenade.LocationUpdatesFromCount, Model.NearbyEventsCount];
+                                        @Localizer[Promenade.LocationUpdatesFromCount, Model.NearbyEventsCount]
+                                        ;
                                     }
                                     <span class="sr-only">@Localizer[Promenade.NewWindow]</span>
                                 </a>
@@ -278,7 +282,7 @@
         "location": { "@@id": "@Model.CanonicalUrl" },
         "parentOrganization": "@Model.Location.ParentOrganization",
         "telephone": "@Html.Raw(@Model.Location.Phone)",
-        @if (!Model.Location.IsClosed && Model.HoursSegment == null)
+        @if (!Model.Location.IsClosed && Model.HoursSegmentText == null)
         {
             @:"openingHours": @Html.Raw(Json.Serialize(@Model.StructuredLocationHours)),
         }

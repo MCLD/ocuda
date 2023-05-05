@@ -172,6 +172,41 @@
         public static readonly string PromLanguageName = "langname.{0}";
 
         /// <summary>
+        /// Location, {0} is the location's id
+        /// </summary>
+        public static readonly string PromLocation = "loc.{0}";
+
+        /// <summary>
+        /// Location feature, {0} is the location location id, {1} is the feature slug
+        /// </summary>
+        public static readonly string PromLocationFeature = "loc-feature.{0}.{1}";
+
+        /// <summary>
+        /// Location features, {0} is the location's id
+        /// </summary>
+        public static readonly string PromLocationFeatures = "loc-features.{0}";
+
+        /// <summary>
+        /// Location group, {0} is the location group id
+        /// </summary>
+        public static readonly string PromLocationGroup = "loc-group.{0}";
+
+        /// <summary>
+        /// Location neighbor group
+        /// </summary>
+        public static readonly string PromLocationNeighborGroup = "loc-neighbor-group.{0}";
+
+        /// <summary>
+        /// Location id, {0} is the location's slug
+        /// </summary>
+        public static readonly string PromLocationSlugToId = "loc-id.{0}";
+
+        /// <summary>
+        /// Weekly hours, {0} is the location's id
+        /// </summary>
+        public static readonly string PromLocationWeeklyHours = "loc-hours.{0}";
+
+        /// <summary>
         /// Cached navigation element, {0} is the id of the element, {1} is the language id
         /// </summary>
         public static readonly string PromNavLang = "nav.{0}.{1}";

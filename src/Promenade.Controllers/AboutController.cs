@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Models.Entities;
-using Ocuda.Promenade.Service;
 
 namespace Ocuda.Promenade.Controllers
 {
@@ -11,15 +10,8 @@ namespace Ocuda.Promenade.Controllers
     public class AboutController : BasePageController<AboutController>
     {
         public AboutController(ServiceFacades.Controller<AboutController> context,
-            CarouselService carouselService,
-            DeckService deckService,
-            ImageFeatureService imageFeatureService,
-            PageService pageService,
-            RedirectService redirectService,
-            SegmentService segmentService,
-            SocialCardService socialCardService)
-            : base(context, carouselService, deckService, imageFeatureService,
-                  pageService, redirectService, segmentService, socialCardService)
+            ServiceFacades.PageController pageContext)
+            : base(context, pageContext)
         {
         }
 

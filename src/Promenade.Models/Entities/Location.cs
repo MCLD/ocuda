@@ -83,6 +83,9 @@ namespace Ocuda.Promenade.Models.Entities
         [DisplayName("Hours Override Segment")]
         public int? HoursSegmentId { get; set; }
 
+        [NotMapped]
+        public SegmentText HoursSegmentText { get; set; }
+
         [Key]
         [Required]
         public int Id { get; set; }
@@ -137,8 +140,14 @@ namespace Ocuda.Promenade.Models.Entities
         [DisplayName("Post-Feature Segment")]
         public int? PostFeatureSegmentId { get; set; }
 
+        [NotMapped]
+        public SegmentText PostFeatureSegmentText { get; set; }
+
         [DisplayName("Pre-Feature Segment")]
         public int? PreFeatureSegmentId { get; set; }
+
+        [NotMapped]
+        public SegmentText PreFeatureSegmentText { get; set; }
 
         [MaxLength(50)]
         public string PriceRange { get; set; }
