@@ -19,7 +19,6 @@ using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 using Ocuda.Utility.Services.Interfaces;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
 
 namespace Ocuda.Ops.Service
 {
@@ -341,12 +340,13 @@ namespace Ocuda.Ops.Service
             try
             {
                 profilePicture = Convert.FromBase64String(profilePictureBase64);
-
-                var imageInfo = Image.Identify(profilePicture, out IImageFormat imageFormat);
+                var imageInfo = Image.Identify(profilePicture);
                 if (imageInfo.Height != imageInfo.Width)
                 {
                     throw new OcudaException("Profile picture must be square.");
                 }
+
+                var imageFormat = imageInfo.Metadata.DecodedImageFormat;
 
                 var validFileType = false;
                 foreach (var validExtension in ProfilePictureValidTypes)
