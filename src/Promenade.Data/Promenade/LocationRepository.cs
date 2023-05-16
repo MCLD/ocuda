@@ -20,7 +20,7 @@ namespace Ocuda.Promenade.Data.Promenade
         public async Task<Location> FindAsync(int id)
         {
             var entity = await DbSet.FindAsync(id);
-            if (entity.IsDeleted)
+            if (entity?.IsDeleted != false)
             {
                 return null;
             }
