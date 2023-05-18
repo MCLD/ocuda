@@ -13,16 +13,12 @@ namespace Ocuda.Promenade.Controllers
     {
         private readonly string _apiKey;
         private readonly LocationService _locationService;
-        private readonly SegmentService _segmentService;
 
         public LocationsController(ServiceFacades.Controller<LocationsController> context,
-            LocationService locationService,
-            SegmentService segmentService) : base(context)
+            LocationService locationService) : base(context)
         {
             _locationService = locationService
                 ?? throw new ArgumentNullException(nameof(locationService));
-            _segmentService = segmentService
-                ?? throw new ArgumentNullException(nameof(segmentService));
 
             _apiKey = _config[Utility.Keys.Configuration.OcudaGoogleAPI];
         }
@@ -136,10 +132,7 @@ namespace Ocuda.Promenade.Controllers
 
         private async Task<IActionResult> ShowNearestAsync(LocationViewModel viewModel)
         {
-            if (viewModel == null)
-            {
-                viewModel = await CreateLocationViewModelAsync();
-            }
+            viewModel ??= await CreateLocationViewModelAsync();
 
             PageTitle = _localizer[i18n.Keys.Promenade.LocationFind];
 
