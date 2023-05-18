@@ -37,7 +37,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 
         Task<bool> IsSupervisor(int userId);
 
-        Task MarkUserDeletedAsync(string userName, int currentUserId, DateTime asOf);
+        Task MarkUserDeletedAsync(string username, int currentUserId, DateTime asOf);
 
         Task<CollectionWithCount<User>> SearchAsync(SearchFilter searchFilter);
 

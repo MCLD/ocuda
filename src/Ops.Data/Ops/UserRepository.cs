@@ -13,8 +13,7 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class UserRepository
-        : OpsRepository<OpsContext, User, int>, IUserRepository
+    public class UserRepository : OpsRepository<OpsContext, User, int>, IUserRepository
     {
         public UserRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
             ILogger<UserRepository> logger) : base(repositoryFacade, logger)
@@ -68,7 +67,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.SupervisorId == userId)
+                .Where(_ => _.SupervisorId == userId && !_.IsDeleted)
                 .Select(_ => new User
                 {
                     Name = _.Name,
@@ -129,6 +128,8 @@ namespace Ocuda.Ops.Data.Ops
             var query = DbSet
                 .AsNoTracking()
                 .Where(_ => !_.IsDeleted && _.IsInLatestRoster == true);
+
+            searchFilter ??= new SearchFilter();
 
             if (!string.IsNullOrEmpty(searchFilter.SearchText))
             {
