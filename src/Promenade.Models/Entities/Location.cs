@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -26,9 +25,6 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(50)]
         public string City { get; set; }
 
-        [NotMapped]
-        public List<Location> CloseLocations { get; set; }
-
         [MaxLength(5)]
         [DisplayName("Short code")]
         public string Code { get; set; }
@@ -41,9 +37,6 @@ namespace Ocuda.Promenade.Models.Entities
 
         [NotMapped]
         public LocationHoursResult CurrentStatus { get; set; }
-
-        [NotMapped]
-        public List<int> DefaultLibIds { get; set; }
 
         [NotMapped]
         public SegmentText DescriptionSegment { get; set; }
@@ -61,9 +54,6 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(50)]
         public string Email { get; set; }
 
-        [NotMapped]
-        public SelectList EventDistanceOptions { get; set; }
-
         [MaxLength(255)]
         [DisplayName("Link to events")]
         public string EventLink { get; set; }
@@ -71,9 +61,6 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(50)]
         [DisplayName("Link to Facebook page")]
         public string Facebook { get; set; }
-
-        [NotMapped]
-        public string FormattedAddress { get; set; }
 
         [MaxLength(255)]
         public string GeoLocation { get; set; }
@@ -106,7 +93,7 @@ namespace Ocuda.Promenade.Models.Entities
         public bool IsNewLocation { get; set; }
 
         [NotMapped]
-        public List<LocationDayGrouping> LocationHours { get; set; }
+        public ICollection<LocationDayGrouping> LocationHours { get; set; }
 
         [MaxLength(50)]
         public string LocatorName { get; set; }
@@ -124,9 +111,6 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         [Required]
         public string Name { get; set; }
-
-        [NotMapped]
-        public bool Open { get; set; }
 
         [MaxLength(50)]
         public string PAbbreviation { get; set; }
@@ -170,9 +154,6 @@ namespace Ocuda.Promenade.Models.Entities
 
         [MaxLength(50)]
         public string Type { get; set; }
-
-        [NotMapped]
-        public List<string> WeeklyHours { get; set; }
 
         [MaxLength(10)]
         public string Zip { get; set; }

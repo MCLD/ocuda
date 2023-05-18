@@ -8,7 +8,9 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
     {
         Task<Location> FindAsync(int id);
 
-        Task<List<Location>> GetAllLocations();
+        Task<ICollection<int>> GetAllLocationIdsAsync();
+
+        Task<ICollection<Location>> GetAllLocationsAsync();
 
         Task<int?> GetIdBySlugAsync(string slug);
     }

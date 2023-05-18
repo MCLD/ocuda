@@ -1,7 +1,7 @@
 ﻿@model Ocuda.Promenade.Controllers.ViewModels.Locations.LocationDetailViewModel
 
 @section metadata {
-    <link rel="canonical" href="@Model.CanonicalUrl" />
+    <link rel="canonical" href="@Model.CanonicalLink" />
 }
 
 <div class="prom-location">
@@ -18,6 +18,20 @@
                target="_blank">
                 <span class="fas fa-map-marker-alt"></span> Map
             </a>
+            @if (Model.Location.CurrentStatus != null)
+            {
+                <div class="todays-status">
+                    @if (Model.Location.CurrentStatus?.IsCurrentlyOpen == true
+                   && !string.IsNullOrEmpty(Model.Location.CurrentStatus.TodaysHours))
+                    {
+                        @:Today's Hours: @Model.Location.CurrentStatus.TodaysHours
+                    }
+                    else
+                    {
+                        @Model.Location.CurrentStatus.StatusMessage
+                    }
+                </div>
+            }
             <div class="sr-only">@Localizer[Promenade.LocationOurAddress]</div>
             <address>
                 @Model.Location.Address
@@ -52,9 +66,10 @@
                         {
                             @foreach (var dayGrouping in Model.Location.LocationHours)
                             {
-                                <strong>@dayGrouping.Days</strong>
-                                <span>@dayGrouping.Time</span>
-                                <br />
+                                <div>
+                                    <strong>@dayGrouping.Days</strong>
+                                    <span>@dayGrouping.Time</span>
+                                </div>
                             }
                         }
                     }
@@ -94,9 +109,9 @@
                 @if (string.IsNullOrEmpty(feature.RedirectUrl))
                 {
                     <a asp-action="@nameof(HomeController.Feature)"
-               asp-controller="@HomeController.Name"
-               asp-route-locationSlug="@Model.Location.Stub"
-               asp-route-featureSlug="@feature.Stub"
+                       asp-controller="@HomeController.Name"
+                       asp-route-locationSlug="@Model.Location.Stub"
+                       asp-route-featureSlug="@feature.Stub"
                        data-toggle="modal"
                        data-target="#featureModal"
                        target="@(feature.NewTab == true ? "_blank" : null)"
@@ -179,8 +194,8 @@
                                 <td>@locationGroup.DisplayOrder.</td>
                                 <td colspan="@(locationGroup.Location.HasEvents ? 1 : 2)">
                                     <a asp-action="@nameof(HomeController.Location)"
-                                    asp-controller="@HomeController.Name"
-                               asp-route-locationStub="@locationGroup.Location.Stub">@locationGroup.Location.Name</a>
+                                       asp-controller="@HomeController.Name"
+                                       asp-route-locationStub="@locationGroup.Location.Stub">@locationGroup.Location.Name</a>
                                 </td>
                                 @if (locationGroup.Location.HasEvents)
                                 {
@@ -270,7 +285,7 @@
         },
         "email": "@Model.Location.Email",
         "address": {
-        "@@id": "@Model.CanonicalUrl",
+        "@@id": "@Model.CanonicalLink",
         "@@type": "@Model.Location.AddressType",
         "addressCountry": "@Model.Location.Country",
         "addressRegion": "@Model.Location.State",
@@ -279,7 +294,7 @@
         "postalCode": "@Model.Location.Zip",
         "streetAddress": "@Model.Location.Address"
         },
-        "location": { "@@id": "@Model.CanonicalUrl" },
+        "location": { "@@id": "@Model.CanonicalLink" },
         "parentOrganization": "@Model.Location.ParentOrganization",
         "telephone": "@Html.Raw(@Model.Location.Phone)",
         @if (!Model.Location.IsClosed && Model.HoursSegmentText == null)

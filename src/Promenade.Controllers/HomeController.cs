@@ -8,6 +8,7 @@ using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.ViewModels.Locations;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service;
+using Ocuda.Utility.Abstract;
 using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Promenade.Controllers
@@ -16,13 +17,17 @@ namespace Ocuda.Promenade.Controllers
     [Route("{culture:cultureConstraint?}")]
     public class HomeController : BasePageController<HomeController>
     {
+        private readonly IDateTimeProvider _dateTimeProvider;
         private readonly LocationService _locationService;
 
-        public HomeController(ServiceFacades.Controller<HomeController> context,
-           ServiceFacades.PageController pageContext,
-           LocationService locationService)
+        public HomeController(IDateTimeProvider dateTimeProvider,
+           LocationService locationService,
+           ServiceFacades.Controller<HomeController> context,
+           ServiceFacades.PageController pageContext)
             : base(context, pageContext)
         {
+            _dateTimeProvider = dateTimeProvider
+                ?? throw new ArgumentNullException(nameof(dateTimeProvider));
             _locationService = locationService
                 ?? throw new ArgumentNullException(nameof(locationService));
         }
@@ -32,12 +37,6 @@ namespace Ocuda.Promenade.Controllers
 
         protected override PageType PageType
         { get { return PageType.Home; } }
-
-        [HttpGet("{stub?}/item/{id}")]
-        public async Task<IActionResult> CarouselItem(string stub, int id)
-        {
-            return await ReturnCarouselItemAsync(stub, id);
-        }
 
         [HttpGet("{locationSlug:locationSlugConstraint}/[action]/{featureSlug}")]
         public async Task<IActionResult> Feature(string locationSlug, string featureSlug)
@@ -67,7 +66,8 @@ namespace Ocuda.Promenade.Controllers
 
                 return View("Feature", new LocationDetailViewModel
                 {
-                    CanonicalUrl = await GetCanonicalUrlAsync(),
+                    CanonicalLink = await GetCanonicalLinkAsync(),
+                    DayOfWeek = _dateTimeProvider.Now.DayOfWeek,
                     LocationFeatures = new List<LocationsFeaturesViewModel>
                     {
                         new LocationsFeaturesViewModel(locationFeature)
@@ -137,7 +137,8 @@ namespace Ocuda.Promenade.Controllers
 
             var viewModel = new LocationDetailViewModel
             {
-                CanonicalUrl = await GetCanonicalUrlAsync(),
+                DayOfWeek = _dateTimeProvider.Now.DayOfWeek,
+                CanonicalLink = await GetCanonicalLinkAsync(),
                 Location = await _locationService.GetLocationAsync(locationId.Value, forceReload)
             };
 
@@ -148,42 +149,41 @@ namespace Ocuda.Promenade.Controllers
 
             if (viewModel.Location.HoursSegmentText != null)
             {
-                viewModel.HoursSegmentText = CommonMarkConverter
-                    .Convert(viewModel.Location.HoursSegmentText.Text);
+                viewModel.HoursSegmentText = FormatForDisplay(viewModel.Location.HoursSegmentText);
             }
 
             if (viewModel.Location.PreFeatureSegmentText != null)
             {
                 viewModel.PreFeatureSegmentHeader
                     = viewModel.Location.PreFeatureSegmentText.Header;
-                viewModel.PreFeatureSegmentText = CommonMarkConverter
-                    .Convert(viewModel.Location.PreFeatureSegmentText.Text);
+                viewModel.PreFeatureSegmentText
+                    = FormatForDisplay(viewModel.Location.PreFeatureSegmentText);
             }
 
             if (viewModel.Location.PostFeatureSegmentText != null)
             {
                 viewModel.PostFeatureSegmentHeader
                     = viewModel.Location.PostFeatureSegmentText.Header;
-                viewModel.PostFeatureSegmentText = CommonMarkConverter
-                    .Convert(viewModel.Location.PostFeatureSegmentText.Text);
+                viewModel.PostFeatureSegmentText
+                    = FormatForDisplay(viewModel.Location.PostFeatureSegmentText);
             }
 
             if (viewModel.Location.DescriptionSegment != null)
             {
-                viewModel.DescriptionSegmentText = CommonMarkConverter
-                    .Convert(viewModel.Location.DescriptionSegment.Text);
+                viewModel.DescriptionSegmentText
+                    = FormatForDisplay(viewModel.Location.DescriptionSegment);
             }
 
             viewModel.Location.LocationHours
-                = await _locationService.GetHoursAsync(viewModel.Location.Id, forceReload);
+                = await _locationService.GetHoursAsync(viewModel.Location.Id, forceReload, false);
 
             if (viewModel.Location.LocationHours != null)
             {
                 var hours = await _locationService
-                    .GetStructuredHoursAsync(viewModel.Location.Id, forceReload);
+                    .GetHoursAsync(viewModel.Location.Id, forceReload, true);
 
-                viewModel.StructuredLocationHours = hours.ToList()
-                    .ConvertAll(_ => $"{_.Days} {_.Time}");
+                ((List<string>)viewModel.StructuredLocationHours).AddRange(hours.ToList()
+                    .ConvertAll(_ => $"{_.Days} {_.Time}"));
             }
 
             var locationFeatures = await _locationService
@@ -204,7 +204,7 @@ namespace Ocuda.Promenade.Controllers
 
                 if (neighbors?.Count > 0)
                 {
-                    viewModel.NearbyLocationGroups = neighbors;
+                    ((List<LocationGroup>)viewModel.NearbyLocationGroups).AddRange(neighbors);
                     viewModel.NearbyCount = viewModel.NearbyLocationGroups.Count;
                     viewModel.NearbyEventsCount = viewModel.NearbyLocationGroups
                         .Count(_ => _.Location.HasEvents);
@@ -216,15 +216,8 @@ namespace Ocuda.Promenade.Controllers
             return View(nameof(Location), viewModel);
         }
 
-        [HttpPost("")]
-        public async Task<IActionResult> PagePreview()
-        {
-            return await ReturnPreviewPageAsync(nameof(Index),
-                HttpContext.Request.Form["PreviewId"].FirstOrDefault());
-        }
-
         private async Task<LocationFeature> GetFeatureDetailsAsync(string locationSlug,
-                            string featureSlug,
+            string featureSlug,
             bool forceReload)
         {
             if (string.IsNullOrEmpty(locationSlug))

@@ -84,9 +84,12 @@ namespace Ocuda.Promenade.Controllers
         private async Task<LocationViewModel> CreateLocationViewModelAsync(double? latitude,
             double? longitude)
         {
+            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
             return new LocationViewModel
             {
-                Locations = await _locationService.GetLocationsStatusAsync(latitude, longitude),
+                Locations = await _locationService
+                    .GetLocationsStatusAsync(latitude, longitude, forceReload),
                 CanSearchAddress = !string.IsNullOrWhiteSpace(_apiKey),
                 Latitude = latitude,
                 Longitude = longitude

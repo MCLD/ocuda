@@ -485,7 +485,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
             else
             {
-                ShowAlertDanger($"Failed to Delete Link");
+                ShowAlertDanger("Failed to Delete Link");
                 return RedirectToAction(nameof(SectionController.LinkLibrary),
                     new { sectionSlug = model.SectionSlug, linkLibSlug = model.LinkLibrarySlug });
             }
@@ -1186,7 +1186,7 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement
             }
             else
             {
-                ShowAlertDanger($"Could not Update Link");
+                ShowAlertDanger("Could not Update Link");
                 return RedirectToAction(nameof(SectionController.LinkLibrary),
                     new { sectionSlug = model.SectionSlug, linkLibSlug = model.LinkLibrarySlug });
             }

@@ -64,7 +64,10 @@ namespace Ocuda.Promenade.Web
                 throw new ArgumentNullException(nameof(pathResolver));
             }
 
-            app.UseResponseCompression();
+            if (!_isDevelopment)
+            {
+                app.UseResponseCompression();
+            }
 
             if (!string.IsNullOrEmpty(_config[Configuration.OcudaProxyAddress]))
             {
@@ -84,10 +87,8 @@ namespace Ocuda.Promenade.Web
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                app.UseStatusCodePagesWithReExecute("/Error/{0}");
-            }
+
+            app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
             var requestLocalizationOptions = new RequestLocalizationOptions
             {
@@ -172,12 +173,17 @@ namespace Ocuda.Promenade.Web
             {
                 services.AddApplicationInsightsTelemetry();
             }
-
-            services.AddResponseCompression(_ =>
+            else
             {
-                _.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-                        new[] { "application/rss+xml" });
-            });
+                services.AddResponseCompression(_ =>
+                {
+                    _.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                            new[] {
+                                "application/rss+xml",
+                                "image/svg+xml"
+                            });
+                });
+            }
 
             services.AddLocalization();
 

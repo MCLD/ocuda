@@ -13,6 +13,8 @@ namespace Ocuda.Promenade.Service
 {
     public class SiteSettingService : BaseService<SiteSettingService>
     {
+        private const int CacheSiteSettingsHours = 12;
+        private const int CacheUnsetSiteSettingHours = 3;
         private const string NoValue = "null";
 
         private readonly IOcudaCache _cache;
@@ -176,11 +178,29 @@ namespace Ocuda.Promenade.Service
             {
                 var siteSetting = await _siteSettingRepository.FindAsync(key)
                     ?? GetDefaultSetting(key);
-                setting = siteSetting?.Value ?? NoValue;
-                await _cache.SaveToCacheAsync(cacheKey,
-                    setting,
-                    TimeSpan.FromHours(12),
-                    CacheSlidingExpiration);
+                if (siteSetting != null)
+                {
+                    if (!string.IsNullOrEmpty(siteSetting?.Value))
+                    {
+                        setting = siteSetting.Value;
+                        await _cache.SaveToCacheAsync(cacheKey,
+                            setting,
+                            TimeSpan.FromHours(CacheSiteSettingsHours),
+                            CacheSlidingExpiration);
+                    }
+                    else if (siteSetting.Type == Utility.Models.SiteSettingType.StringNullable)
+                    {
+                        await _cache.SaveToCacheAsync(cacheKey,
+                            NoValue,
+                            TimeSpan.FromHours(CacheUnsetSiteSettingHours));
+                    }
+                    else
+                    {
+                        _logger
+                            .LogInformation("Not caching non-nullable, unset setting {SettingName}",
+                            siteSetting.Name);
+                    }
+                }
             }
             return setting;
         }

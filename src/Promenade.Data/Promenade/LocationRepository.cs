@@ -31,7 +31,17 @@ namespace Ocuda.Promenade.Data.Promenade
             return entity;
         }
 
-        public async Task<List<Location>> GetAllLocations()
+        public async Task<ICollection<int>> GetAllLocationIdsAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => !_.IsDeleted)
+                .OrderBy(_ => _.Name)
+                .Select(_ => _.Id)
+                .ToListAsync();
+        }
+
+        public async Task<ICollection<Location>> GetAllLocationsAsync()
         {
             return await DbSet
                 .AsNoTracking()
@@ -42,10 +52,14 @@ namespace Ocuda.Promenade.Data.Promenade
 
         public async Task<int?> GetIdBySlugAsync(string slug)
         {
-            return await DbSet
+            var result = await DbSet
                 .Where(_ => !_.IsDeleted && _.Stub == slug)
+                .OrderBy(_ => _.Id)
+                .Take(1)
                 .Select(_ => _.Id)
-                .SingleOrDefaultAsync();
+                .ToListAsync();
+
+            return result.Any() ? result.FirstOrDefault() : null;
         }
     }
 }

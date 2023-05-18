@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Threading.Tasks;
+using CommonMark;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
@@ -61,7 +62,23 @@ namespace Ocuda.Promenade.Controllers.Abstract
             ViewData[Utility.Keys.ViewData.Title] = pageTitle;
         }
 
-        protected async Task<string> GetCanonicalUrlAsync()
+        /// <summary>
+        /// Process a SegmentText to wrap it in the SegmentWrap prefix and suffix and also convert
+        /// the text to HTML using the CommonMark converter.
+        /// </summary>
+        /// <param name="segmentText">The SegmentText as retreived by the database, should include
+        /// SegmentWrapPrefix and SegmentWrapSuffix.</param>
+        /// <returns>A string containing HTML to display to the user via Html.Raw()</returns>
+        protected static string FormatForDisplay(Models.Entities.SegmentText segmentText)
+        {
+            return segmentText == null
+                ? null
+                : segmentText.SegmentWrapPrefix?.Trim()
+                    + CommonMarkConverter.Convert(segmentText.Text?.Trim())
+                    + segmentText.SegmentWrapSuffix?.Trim();
+        }
+
+        protected async Task<string> GetCanonicalLinkAsync()
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
             var isTLS = await _siteSettingService

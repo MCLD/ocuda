@@ -177,7 +177,7 @@
         public static readonly string PromLocation = "loc.{0}";
 
         /// <summary>
-        /// Location feature, {0} is the location location id, {1} is the feature slug
+        /// Location feature, {0} is the location id, {1} is the feature slug
         /// </summary>
         public static readonly string PromLocationFeature = "loc-feature.{0}.{1}";
 
@@ -192,6 +192,11 @@
         public static readonly string PromLocationGroup = "loc-group.{0}";
 
         /// <summary>
+        /// An integer array of location ids
+        /// </summary>
+        public static readonly string PromLocationIds = "loc-ids.{0}";
+
+        /// <summary>
         /// Location neighbor group
         /// </summary>
         public static readonly string PromLocationNeighborGroup = "loc-neighbor-group.{0}";
@@ -200,6 +205,11 @@
         /// Location id, {0} is the location's slug
         /// </summary>
         public static readonly string PromLocationSlugToId = "loc-id.{0}";
+
+        /// <summary>
+        /// Location status, {0} is the location's id
+        /// </summary>
+        public static readonly string PromLocationStatus = "loc-status.{0}";
 
         /// <summary>
         /// Weekly hours, {0} is the location's id

@@ -68,7 +68,9 @@ namespace Ocuda.Promenade.Controllers
                 var inventories = await _productService.GetInventoriesAsync(product.Id,
                     product.CacheInventoryMinutes,
                     forceReload);
-                var locations = await _locationService.GetLocationsStatusAsync(null, null);
+
+                var locations = await _locationService
+                    .GetLocationsStatusAsync(null, null, forceReload);
 
                 var hasItems = _localizer[i18n.Keys.Promenade.ProductInventoryHas, product.Name];
                 var noItems = _localizer[i18n.Keys.Promenade.ProductInventoryDoesNotHave, product.Name];
@@ -109,9 +111,7 @@ namespace Ocuda.Promenade.Controllers
                 }
                 if (!string.IsNullOrEmpty(product.SegmentText.Text))
                 {
-                    viewModel.SegmentText = product.SegmentText.SegmentWrapPrefix
-                        + CommonMark.CommonMarkConverter.Convert(product.SegmentText.Text)
-                        + product.SegmentText.SegmentWrapSuffix;
+                    viewModel.SegmentText = FormatForDisplay(product.SegmentText);
                 }
             }
 

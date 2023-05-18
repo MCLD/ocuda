@@ -18,11 +18,11 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<LocationHours> GetByDayOfWeek(int locationId, DateTime date)
+        public async Task<LocationHours> GetByDayOfWeek(int locationId, DateTime dateTime)
         {
             return await DbSet
                 .AsNoTracking()
-                .Where(_ => _.DayOfWeek == date.DayOfWeek && _.LocationId == locationId)
+                .Where(_ => _.DayOfWeek == dateTime.DayOfWeek && _.LocationId == locationId)
                 .SingleOrDefaultAsync();
         }
 
@@ -33,13 +33,6 @@ namespace Ocuda.Promenade.Data.Promenade
                 .Where(_ => _.LocationId == locationId)
                 .OrderBy(_ => _.DayOfWeek)
                 .ToListAsync();
-        }
-
-        public void DeleteHoursByLocationAsync(int locationId)
-        {
-            var locationHours = DbSet.AsNoTracking().Where(_ => _.LocationId == locationId);
-
-            _context.RemoveRange(locationHours);
         }
     }
 }
