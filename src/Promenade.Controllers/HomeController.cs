@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CommonMark;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Promenade.Controllers.Abstract;
+using Ocuda.Promenade.Controllers.ViewModels.Home;
 using Ocuda.Promenade.Controllers.ViewModels.Locations;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service;
@@ -19,17 +20,21 @@ namespace Ocuda.Promenade.Controllers
     {
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly LocationService _locationService;
+        private readonly VolunteerFormService _volunteerFormService;
 
         public HomeController(IDateTimeProvider dateTimeProvider,
            LocationService locationService,
            ServiceFacades.Controller<HomeController> context,
-           ServiceFacades.PageController pageContext)
+           ServiceFacades.PageController pageContext,
+           VolunteerFormService volunteerFormService)
             : base(context, pageContext)
         {
             _dateTimeProvider = dateTimeProvider
                 ?? throw new ArgumentNullException(nameof(dateTimeProvider));
             _locationService = locationService
                 ?? throw new ArgumentNullException(nameof(locationService));
+            _volunteerFormService = volunteerFormService
+                ?? throw new ArgumentNullException(nameof(volunteerFormService));
         }
 
         public static string Name
@@ -246,5 +251,220 @@ namespace Ocuda.Promenade.Controllers
             return await _locationService
                 .GetLocationFullFeatureAsync(locationId.Value, featureSlug, forceReload);
         }
+
+
+
+
+
+
+
+
+
+
+
+        [HttpGet("{locationSlug:locationSlugConstraint}/volunteer")]
+        [HttpGet("{locationSlug:locationSlugConstraint}/volunteer/adult")]
+        public async Task<IActionResult> VolunteerAdult(string locationSlug)
+        {
+            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
+            var locationId = await _locationService.GetLocationIdAsync(locationSlug, forceReload);
+
+            if (!locationId.HasValue)
+            {
+                return NotFound();
+            }
+
+            var adultVolunteerForm = await _volunteerFormService.FindVolunteerFormAsync(VolunteerFormType.Adult, forceReload);
+            var teenVolunteerForm = await _volunteerFormService.FindVolunteerFormAsync(VolunteerFormType.Teen, forceReload);
+
+            if ((adultVolunteerForm?.IsDisabled != false)
+                && (teenVolunteerForm?.IsDisabled != false))
+            {
+                return RedirectToAction(nameof(Location), new { locationSlug });
+            }
+
+            LocationForm adultLocationMapping = null;
+            LocationForm teenLocationMapping = null;
+
+            if (adultVolunteerForm != null)
+            {
+                adultLocationMapping
+                    = await _volunteerFormService.FindLocationFormAsync(adultVolunteerForm.Id, locationId.Value);
+            }
+            if (teenVolunteerForm != null)
+            {
+                teenLocationMapping = await _volunteerFormService.FindLocationFormAsync(teenVolunteerForm.Id, locationId.Value);
+            }
+
+            if (adultLocationMapping == null)
+            {
+                if (teenLocationMapping == null)
+                {
+                    return RedirectToAction(nameof(Location), new { locationSlug });
+                }
+                else
+                {
+                    return RedirectToAction(nameof(VolunteerTeen), new { locationSlug });
+                }
+            }
+
+            var viewModel = new AdultVolunteerFormViewModel
+            {
+                LocationSlug = locationSlug,
+                LocationId = locationId.Value,
+                TeenFormAvailable = teenLocationMapping != null,
+                FormId = adultVolunteerForm.Id
+            };
+
+            if (adultVolunteerForm.HeaderSegmentId.HasValue)
+            {
+                viewModel.SegmentHeader
+                    = adultVolunteerForm.HeaderSegment.Header;
+                viewModel.SegmentText
+                    = FormatForDisplay(adultVolunteerForm.HeaderSegment);
+            }
+
+            return View(viewModel);
+        }
+
+
+        [HttpPost("{locationSlug:locationSlugConstraint}/volunteer/adult")]
+        public async Task<IActionResult> VolunteerAdult(AdultVolunteerFormViewModel viewModel)
+        {
+            if (viewModel == null)
+            {
+                throw new ArgumentNullException(nameof(viewModel));
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _volunteerFormService.SaveSubmissionAsync(viewModel.ToFormSubmission());
+                }
+                catch (Exception ex)
+                {
+                    viewModel.WarningText = _localizer[i18n.Keys.Promenade.Error];
+                    return View(viewModel);
+                }
+            }
+            return RedirectToAction(nameof(Index));
+            //return RedirectToAction(nameof(FormSubmissionSuccess), new { locationSlug = viewModel.LocationSlug, volunteerType = VolunteerFormType.Adult });
+        }
+
+
+        [HttpPost("{locationSlug:locationSlugConstraint}/volunteer/teen")]
+        public async Task<IActionResult> VolunteerTeen(TeenVolunteerFormViewModel viewModel)
+        {
+            if (viewModel == null)
+            {
+                throw new ArgumentNullException(nameof(viewModel));
+            }
+
+            if (string.IsNullOrWhiteSpace(viewModel.GuardianName))
+            {
+                ModelState.AddModelError(nameof(viewModel.GuardianName), "Please include the name of your parent or guardian");
+            }
+            if (string.IsNullOrWhiteSpace(viewModel.GuardianPhone))
+            {
+                ModelState.AddModelError(nameof(viewModel.GuardianPhone), "Please include the phone number of your parent or guardian");
+            }
+            if (string.IsNullOrWhiteSpace(viewModel.GuardianEmail))
+            {
+                ModelState.AddModelError(nameof(viewModel.GuardianEmail), "Please include the email of your parent or guardian");
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _volunteerFormService.SaveSubmissionAsync(viewModel.ToFormSubmission());
+                }
+                catch (Exception)
+                {
+                    viewModel.WarningText = _localizer[i18n.Keys.Promenade.Error];
+                    return View(viewModel);
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
+            //return RedirectToAction(nameof(FormSubmissionSuccess), new { locationSlug = viewModel.LocationSlug, volunteerType = VolunteerFormType.Teen });
+        }
+
+        [HttpGet("{locationSlug:locationSlugConstraint}/volunteer/teen")]
+        public async Task<IActionResult> VolunteerTeen(string locationSlug)
+        {
+            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
+            var locationId = await _locationService.GetLocationIdAsync(locationSlug, forceReload);
+
+            if (!locationId.HasValue)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                var teenVolunteerForm = await _volunteerFormService.FindVolunteerFormAsync(VolunteerFormType.Teen, forceReload);
+                var adultVolunteerForm = await _volunteerFormService.FindVolunteerFormAsync(VolunteerFormType.Adult, forceReload);
+
+                if (teenVolunteerForm?.IsDisabled != false
+                    && adultVolunteerForm?.IsDisabled != false)
+                {
+                    // Alert: volunteers are not being accepted atm
+                    return RedirectToAction(nameof(Location), new { locationSlug });
+                }
+
+                LocationForm teenLocationMapping = null;
+                LocationForm adultLocationMapping = null;
+
+                if (teenVolunteerForm != null)
+                {
+                    teenLocationMapping = await _volunteerFormService.FindLocationFormAsync(teenVolunteerForm.Id, locationId.Value);
+                }
+                if (adultVolunteerForm != null)
+                {
+                    adultLocationMapping
+                        = await _volunteerFormService.FindLocationFormAsync(adultVolunteerForm.Id, locationId.Value);
+                }
+
+                if (teenLocationMapping == null)
+                {
+                    if (adultLocationMapping == null)
+                    {
+                        return RedirectToAction(nameof(Location), new { locationSlug });
+                    }
+                    else
+                    {
+                        return RedirectToAction(nameof(VolunteerAdult), new { locationSlug });
+                    }
+                }
+
+                var viewModel = new TeenVolunteerFormViewModel
+                {
+                    LocationSlug = locationSlug,
+                    LocationId = locationId.Value,
+                    AdultFormAvailable = adultLocationMapping != null,
+                    FormId = teenVolunteerForm.Id
+                };
+
+
+                if (adultVolunteerForm.HeaderSegmentId.HasValue)
+                {
+                    viewModel.SegmentHeader
+                        = teenVolunteerForm.HeaderSegment.Header;
+                    viewModel.SegmentText
+                        = FormatForDisplay(teenVolunteerForm.HeaderSegment);
+                }
+
+                return View(viewModel);
+            }
+            catch (Exception)
+            {
+                return RedirectToAction(nameof(Location), new { locationSlug });
+            }
+        }
+
     }
 }

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using Ocuda.Promenade.Models.Entities;
 
-namespace Ocuda.Promenade.Controllers.ViewModels.Locations.Volunteer
+namespace Ocuda.Promenade.Controllers.ViewModels.Home
 {
     public class TeenVolunteerFormViewModel : VolunteerFormViewModel
     {

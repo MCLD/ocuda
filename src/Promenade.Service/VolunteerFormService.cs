@@ -10,27 +10,27 @@ namespace Ocuda.Promenade.Service
 {
     public class VolunteerFormService : BaseService<VolunteerFormService>
     {
-        private readonly ILocationFeatureRepository _locationFeatureRepository;
         private readonly ILocationFormRepository _locationFormRepository;
+        private readonly SegmentService _segmentService;
         private readonly IVolunteerFormRepository _volunteerFormRepository;
         private readonly IVolunteerFormSubmissionRepository _volunteerFormSubmissionRepository;
 
         public VolunteerFormService(ILogger<VolunteerFormService> logger,
             IDateTimeProvider dateTimeProvider,
-            ILocationFeatureRepository locationFeatureRepository,
             ILocationFormRepository locationFormRepository,
             IVolunteerFormRepository volunteerFormRepository,
-            IVolunteerFormSubmissionRepository volunteerFormSubmissionRepository)
+            IVolunteerFormSubmissionRepository volunteerFormSubmissionRepository,
+            SegmentService segmentService)
             : base(logger, dateTimeProvider)
         {
-            _locationFeatureRepository = locationFeatureRepository
-                ?? throw new ArgumentNullException(nameof(locationFeatureRepository));
-            _locationFormRepository = locationFormRepository ??
-                throw new ArgumentNullException(nameof(locationFormRepository));
+            _locationFormRepository = locationFormRepository
+                ?? throw new ArgumentNullException(nameof(locationFormRepository));
+            _segmentService = segmentService
+                ?? throw new ArgumentNullException(nameof(segmentService));
             _volunteerFormRepository = volunteerFormRepository
                 ?? throw new ArgumentNullException(nameof(volunteerFormRepository));
-            _volunteerFormSubmissionRepository = volunteerFormSubmissionRepository ??
-                throw new ArgumentNullException(nameof(volunteerFormSubmissionRepository));
+            _volunteerFormSubmissionRepository = volunteerFormSubmissionRepository
+                ?? throw new ArgumentNullException(nameof(volunteerFormSubmissionRepository));
         }
 
         public async Task<LocationForm> FindLocationFormAsync(int formId, int locationId)
@@ -38,12 +38,19 @@ namespace Ocuda.Promenade.Service
             return await _locationFormRepository.FindAsync(formId, locationId);
         }
 
-        public async Task<VolunteerForm> FindVolunteerFormAsync(VolunteerFormType type)
+        public async Task<VolunteerForm> FindVolunteerFormAsync(VolunteerFormType type, 
+            bool forceReload)
         {
-            return await _volunteerFormRepository.FindByTypeAsync(type);
+            var form = await _volunteerFormRepository.FindByTypeAsync(type);
+            if (form.HeaderSegmentId.HasValue)
+            {
+                form.HeaderSegment = await _segmentService
+                    .GetSegmentTextBySegmentIdAsync(form.HeaderSegmentId.Value, forceReload);
+            }
+            return form;
         }
 
-        public async Task SaveSubmission(VolunteerFormSubmission form)
+        public async Task SaveSubmissionAsync(VolunteerFormSubmission form)
         {
             if (form == null)
             {

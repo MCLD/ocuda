@@ -1,9 +1,8 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Ocuda.Promenade.Models.Entities;
 
-namespace Ocuda.Promenade.Controllers.ViewModels.Locations.Volunteer
+namespace Ocuda.Promenade.Controllers.ViewModels.Home
 {
     public class VolunteerFormViewModel
     {
@@ -21,9 +20,9 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Locations.Volunteer
         public string Experience { get; set; }
 
         public int FormId { get; set; }
-        public SegmentText HeaderSegment { get; set; }
+
         public int LocationId { get; set; }
-        public string LocationStub { get; set; }
+        public string LocationSlug { get; set; }
 
         [Required]
         [DisplayName(i18n.Keys.Promenade.Name)]
@@ -39,6 +38,8 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Locations.Volunteer
         [MaxLength(255)]
         public string Regularity { get; set; }
 
+        public string SegmentHeader { get; set; }
+        public string SegmentText { get; set; }
         public string WarningText { get; set; }
 
         public virtual VolunteerFormSubmission ToFormSubmission()

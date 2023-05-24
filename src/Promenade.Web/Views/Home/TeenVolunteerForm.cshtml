@@ -1,22 +1,22 @@
-﻿@model Ocuda.Promenade.Controllers.ViewModels.Locations.Volunteer.TeenVolunteerFormViewModel
+﻿@model TeenVolunteerFormViewModel
 
-@if (Model?.HeaderSegment != null)
+@if (!string.IsNullOrEmpty(Model?.SegmentText))
 {
-    if (!string.IsNullOrEmpty(Model.HeaderSegment.Header))
-    {
-        <h1>@Model.HeaderSegment.Header</h1>
-    }
-    else
-    {
-        <h1>@Localizer[Ocuda.i18n.Keys.Promenade.TeenVolunteerForm]</h1>
-    }
-    @Html.Raw(Model.HeaderSegment.Text)
+    <div class="row prom-feature-segment">
+        <div class="col-12">
+            @if (!string.IsNullOrEmpty(Model.SegmentHeader))
+            {
+                <h2>@Model.SegmentHeader</h2>
+            }
+            @Html.Raw(Model.SegmentText)
+        </div>
+    </div>
 }
 
 @if (Model.AdultFormAvailable)
 {
     <span>@Html.Raw(Localizer[Ocuda.i18n.Keys.Promenade.AreYouAnAdultVolunteer])</span>
-    <span>@Html.ActionLink(Localizer[Ocuda.i18n.Keys.Promenade.UseAdultVolunteerForm], "AdultVolunteerForm", "Locations", new { locationStub = Model.LocationStub })</span>
+    <span>@Html.ActionLink(Localizer[Ocuda.i18n.Keys.Promenade.UseAdultVolunteerForm], "AdultVolunteerForm", "Locations", new { locationStub = Model.LocationSlug })</span>
 }
 
 @if (!string.IsNullOrEmpty(Model?.WarningText))
@@ -79,7 +79,7 @@
 
             <input asp-for="FormId" type="hidden" />
             <input asp-for="LocationId" type="hidden" />
-            <input asp-for="LocationStub" type="hidden" />
+            <input asp-for="LocationSlug" type="hidden" />
         </form>
     </div>
 </div>
