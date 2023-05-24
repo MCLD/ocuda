@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using CommonMark;
 using Microsoft.AspNetCore.Mvc;
 using Ocuda.Promenade.Controllers.Abstract;
-using Ocuda.Promenade.Controllers.ViewModels.Locations;
+using Ocuda.Promenade.Controllers.ViewModels.Home;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility.Abstract;

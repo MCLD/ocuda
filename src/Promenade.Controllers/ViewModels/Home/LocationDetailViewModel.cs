@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Ocuda.Promenade.Models.Entities;
 
-namespace Ocuda.Promenade.Controllers.ViewModels.Locations
+namespace Ocuda.Promenade.Controllers.ViewModels.Home
 {
     public class LocationDetailViewModel
     {

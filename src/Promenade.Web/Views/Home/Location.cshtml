@@ -1,4 +1,4 @@
-﻿@model Ocuda.Promenade.Controllers.ViewModels.Locations.LocationDetailViewModel
+﻿@model Ocuda.Promenade.Controllers.ViewModels.Home.LocationDetailViewModel
 
 @section metadata {
     <link rel="canonical" href="@Model.CanonicalLink" />
@@ -106,7 +106,7 @@
         @foreach (var feature in Model.LocationFeatures)
         {
             <div class="col-4 col-md-3 col-lg-2 mb-2">
-                @if (string.IsNullOrEmpty(feature.RedirectUrl))
+                @if (string.IsNullOrEmpty(feature.RedirectLink))
                 {
                     <a asp-action="@nameof(HomeController.Feature)"
                        asp-controller="@HomeController.Name"
@@ -133,7 +133,7 @@
                 }
                 else
                 {
-                    <a href="@feature.RedirectUrl" target="@(feature.NewTab == true ? "_blank" : null)">
+                    <a href="@feature.RedirectLink" target="@(feature.NewTab == true ? "_blank" : null)">
                         <span class="fa-stack fa-2x d-block mx-auto">
                             <span class="fa fa-square fa-stack-2x"></span>
                             <span class="@feature.Icon"></span>
