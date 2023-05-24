@@ -17,24 +17,24 @@ namespace Ocuda.Promenade.Data.Promenade
         {
         }
 
-        public async Task<LocationFeature> GetFullLocationFeatureAsync(string locationStub,
+        public async Task<LocationFeature> GetFullLocationFeatureAsync(int locationId,
             string featureStub)
         {
             return await DbSet
                 .AsNoTracking()
                 .Include(_ => _.Feature)
-                .Where(_ => _.Feature.Stub == featureStub
-                    && _.Location.Stub == locationStub)
+                .Where(_ => !_.Location.IsDeleted
+                    && _.Feature.Stub == featureStub
+                    && _.Location.Id == locationId)
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<List<LocationFeature>>
-            GetFullLocationFeaturesAsync(string locationStub)
+        public async Task<ICollection<LocationFeature>> GetFullLocationFeaturesAsync(int locationId)
         {
             return await DbSet
                 .AsNoTracking()
                 .Include(_ => _.Feature)
-                .Where(_ => _.Location.Stub == locationStub)
+                .Where(_ => !_.Location.IsDeleted && _.Location.Id == locationId)
                 .OrderByDescending(_ => _.Feature.SortOrder.HasValue)
                 .ThenBy(_ => _.Feature.SortOrder)
                 .ThenBy(_ => _.Feature.Name)

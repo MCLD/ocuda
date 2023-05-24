@@ -35,8 +35,7 @@ namespace Ocuda.Promenade.Controllers
             {
                 if (!string.IsNullOrWhiteSpace(group.Segment?.SegmentText?.Text))
                 {
-                    group.Segment.SegmentText.Text = CommonMark.CommonMarkConverter
-                        .Convert(group.Segment.SegmentText.Text);
+                    group.Segment.SegmentText.Text = FormatForDisplay(group.Segment.SegmentText);
                 }
 
                 foreach (var emedia in group.Emedias)

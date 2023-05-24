@@ -7,8 +7,9 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
     public interface ILocationGroupRepository : IGenericRepository<LocationGroup>
     {
         Task<LocationGroup> GetByIdsAsync(int groupId, int locationId);
-        Task<List<LocationGroup>> GetGroupByLocationIdAsync(int locationId);
-        Task<List<LocationGroup>> GetLocationsByGroupIdAsync(int groupId);
+
+        Task<ICollection<LocationGroup>> GetGroupByLocationIdAsync(int locationId);
+
+        Task<ICollection<LocationGroup>> GetLocationsByGroupIdAsync(int groupId);
     }
 }
-

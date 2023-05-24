@@ -7,7 +7,8 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
     public interface ILocationHoursRepository : IGenericRepository<LocationHours>
     {
-        Task<LocationHours> GetByDayOfWeek(int locationId, DateTime date);
+        Task<LocationHours> GetByDayOfWeek(int locationId, DateTime dateTime);
+
         Task<ICollection<LocationHours>> GetWeeklyHoursAsync(int locationId);
     }
 }

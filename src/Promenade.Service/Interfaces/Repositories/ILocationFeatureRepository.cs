@@ -6,7 +6,8 @@ namespace Ocuda.Promenade.Service.Interfaces.Repositories
 {
     public interface ILocationFeatureRepository : IGenericRepository<LocationFeature>
     {
-        Task<List<LocationFeature>> GetFullLocationFeaturesAsync(string locationStub);
-        Task<LocationFeature> GetFullLocationFeatureAsync(string locationStub, string featureStub);
+        Task<LocationFeature> GetFullLocationFeatureAsync(int locationId, string featureStub);
+
+        Task<ICollection<LocationFeature>> GetFullLocationFeaturesAsync(int locationId);
     }
 }

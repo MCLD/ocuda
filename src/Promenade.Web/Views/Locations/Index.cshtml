@@ -89,7 +89,7 @@
                         </span>
                         @if (location.Distance != 0)
                         {
-                            <em class="h3"><small>(@location.Distance mi.)</small></em>
+                            <em class="h3"><small>(@location.Distance  mi.)</small></em>
                         }
                         <p class="mb-1">
                             @location.Address<br />
@@ -102,8 +102,9 @@
                         </p>
                         <div class="row">
                             <div class="col-6">
-                                <a asp-action="@nameof(LocationsController.Locations)"
-                           asp-route-locationStub="@location.Stub"
+                                <a asp-action="@nameof(HomeController.Location)"
+                                asp-controller="@HomeController.Name"
+                           asp-route-locationSlug="@location.Stub"
                            class="btn btn-outline-dark">
                                     @Localizer[Promenade.LocationButtonDetails]
                                 </a>

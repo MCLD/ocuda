@@ -226,11 +226,8 @@ namespace Ocuda.Ops.Service
 
         public async Task LinkSegment(int productId, int segmentId)
         {
-            var product = await _productRepository.GetByIdAsync(productId);
-            if (product == null)
-            {
-                throw new OcudaException($"Unable to find product id {productId}");
-            }
+            var product = await _productRepository.GetByIdAsync(productId)
+                ?? throw new OcudaException($"Unable to find product id {productId}");
             product.SegmentId = segmentId;
             _productRepository.Update(product);
             await _productRepository.SaveAsync();
@@ -370,12 +367,8 @@ namespace Ocuda.Ops.Service
                 throw new ArgumentNullException(nameof(productSlug));
             }
 
-            var product = await _productRepository.GetBySlugAsync(productSlug);
-
-            if (product == null)
-            {
-                throw new OcudaException($"Can't find product: {productSlug}");
-            }
+            var product = await _productRepository.GetBySlugAsync(productSlug)
+                ?? throw new OcudaException($"Can't find product: {productSlug}");
 
             if (isActive)
             {
@@ -401,11 +394,8 @@ namespace Ocuda.Ops.Service
 
         public async Task UnlinkSegment(int productId)
         {
-            var product = await _productRepository.GetByIdAsync(productId);
-            if (product == null)
-            {
-                throw new OcudaException($"Unable to find product id {productId}");
-            }
+            var product = await _productRepository.GetByIdAsync(productId)
+                ?? throw new OcudaException($"Unable to find product id {productId}");
             product.SegmentId = null;
             _productRepository.Update(product);
             await _productRepository.SaveAsync();
@@ -427,13 +417,8 @@ namespace Ocuda.Ops.Service
         public async Task<Product> UpdateProductAsync(Product product)
         {
             if (product == null) { throw new ArgumentNullException(nameof(product)); }
-            var currentProduct = await _productRepository.GetByIdAsync(product.Id);
-
-            if (currentProduct == null)
-            {
-                throw new OcudaException($"Unable to find product id {product.Id}");
-            }
-
+            var currentProduct = await _productRepository.GetByIdAsync(product.Id)
+                ?? throw new OcudaException($"Unable to find product id {product.Id}");
             currentProduct.CacheInventoryMinutes = product.CacheInventoryMinutes;
             currentProduct.IsActive = product.IsActive;
             currentProduct.IsVisibleToPublic = product.IsVisibleToPublic;

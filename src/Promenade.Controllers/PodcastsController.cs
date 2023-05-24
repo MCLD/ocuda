@@ -515,9 +515,7 @@ namespace Ocuda.Promenade.Controllers
                 var segmentText = await _segmentService.GetSegmentTextBySegmentIdAsync(
                     podcastItem.ShowNotesSegmentId.Value, forceReload);
 
-                segmentText.Text = segmentText.SegmentWrapPrefix
-                    + CommonMark.CommonMarkConverter.Convert(segmentText.Text)
-                    + segmentText.SegmentWrapSuffix;
+                segmentText.Text = FormatForDisplay(segmentText);
 
                 var viewModel = new ShowNotesViewModel
                 {

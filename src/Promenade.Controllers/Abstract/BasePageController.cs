@@ -1,63 +1,55 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Controllers.ViewModels.Shared;
 using Ocuda.Promenade.Models.Entities;
-using Ocuda.Promenade.Service;
 
 namespace Ocuda.Promenade.Controllers.Abstract
 {
     public abstract class BasePageController<T> : BaseController<T>
     {
         protected BasePageController(ServiceFacades.Controller<T> context,
-            CarouselService carouselService,
-            DeckService deckService,
-            ImageFeatureService imageFeatureService,
-            PageService pageService,
-            RedirectService redirectService,
-            SegmentService segmentService,
-            SocialCardService socialCardService) : base(context)
+            ServiceFacades.PageController pageContext) : base(context)
         {
-            CarouselService = carouselService
-                ?? throw new ArgumentNullException(nameof(carouselService));
-            DeckService = deckService ?? throw new ArgumentNullException(nameof(deckService));
-            ImageFeatureService = imageFeatureService
-                ?? throw new ArgumentNullException(nameof(imageFeatureService));
-            PageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
-            RedirectService = redirectService
-                ?? throw new ArgumentNullException(nameof(redirectService));
-            SegmentService = segmentService
-                ?? throw new ArgumentNullException(nameof(segmentService));
-            SocialCardService = socialCardService
-                ?? throw new ArgumentNullException(nameof(socialCardService));
+            PageContext = pageContext;
         }
 
-        protected CarouselService CarouselService { get; }
-        protected DeckService DeckService { get; }
-        protected ImageFeatureService ImageFeatureService { get; }
-        protected PageService PageService { get; }
+        protected ServiceFacades.PageController PageContext { get; }
         protected abstract PageType PageType { get; }
-        protected RedirectService RedirectService { get; }
-        protected SegmentService SegmentService { get; }
-        protected SocialCardService SocialCardService { get; }
+
+        [HttpGet("{stub?}/item/{id}")]
+        public async Task<IActionResult> CarouselItem(string stub, int id)
+        {
+            return await ReturnCarouselItemAsync(stub, id);
+        }
+
+        [HttpGet("{stub?}")]
+        public async Task<IActionResult> Page(string stub)
+        {
+            return await ReturnPageAsync(stub);
+        }
+
+        [HttpPost("{stub?}")]
+        public async Task<IActionResult> PagePreview(string stub)
+        {
+            return await ReturnPageAsync(stub, HttpContext.Request.Form["PreviewId"].FirstOrDefault());
+        }
 
         protected async Task<IActionResult> ReturnCarouselItemAsync(string stub, int id)
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
-            var pageHeader = await PageService.GetHeaderByStubAndTypeAsync(stub,
-                PageType,
-                forceReload);
+            var pageHeader = await PageContext.PageService
+                .GetHeaderByStubAndTypeAsync(stub, PageType, forceReload);
 
             if (pageHeader?.IsLayoutPage != true)
             {
                 return NotFound();
             }
 
-            var carouselItem = await CarouselService.GetItemForHeaderAsync(pageHeader.Id, id,
-                forceReload);
+            var carouselItem = await PageContext.CarouselService
+                .GetItemForHeaderAsync(pageHeader.Id, id, forceReload);
 
             if (carouselItem == null)
             {
@@ -75,34 +67,15 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
         protected async Task<IActionResult> ReturnPageAsync(string stub)
         {
-            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
-
-            var pageHeader = await PageService.GetHeaderByStubAndTypeAsync(stub,
-                PageType,
-                forceReload);
-
-            if (pageHeader == null)
-            {
-                return NotFound();
-            }
-
-            if (pageHeader.IsLayoutPage)
-            {
-                return await ReturnLayoutPageAsync(pageHeader.Id, stub, null);
-            }
-            else
-            {
-                return await ReturnContentPageAsync(stub);
-            }
+            return await ReturnPageAsync(stub, null);
         }
 
-        protected async Task<IActionResult> ReturnPreviewPageAsync(string stub, string previewId)
+        protected async Task<IActionResult> ReturnPageAsync(string stub, string previewId)
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
-            var pageHeader = await PageService.GetHeaderByStubAndTypeAsync(stub,
-                PageType,
-                forceReload);
+            var pageHeader = await PageContext.PageService
+                .GetHeaderByStubAndTypeAsync(stub, PageType, forceReload);
 
             if (pageHeader == null)
             {
@@ -111,9 +84,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
             if (pageHeader.IsLayoutPage)
             {
-                return await ReturnLayoutPageAsync(pageHeader.Id,
-                    stub,
-                    previewId);
+                return await ReturnLayoutPageAsync(pageHeader.Id, stub, previewId);
             }
             else
             {
@@ -125,7 +96,9 @@ namespace Ocuda.Promenade.Controllers.Abstract
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
-            var page = await PageService.GetContentPageByStubAndType(stub, PageType, forceReload);
+            var page = await PageContext.PageService.GetContentPageByStubAndType(stub,
+                PageType,
+                forceReload);
 
             if (page == null)
             {
@@ -135,13 +108,13 @@ namespace Ocuda.Promenade.Controllers.Abstract
             var viewModel = new PageViewModel
             {
                 Content = CommonMark.CommonMarkConverter.Convert(page.Content),
-                CanonicalUrl = await GetCanonicalUrlAsync()
+                CanonicalUrl = await GetCanonicalLinkAsync()
             };
 
             if (page.SocialCardId.HasValue)
             {
-                var card = await SocialCardService.GetByIdAsync(page.SocialCardId.Value,
-                    forceReload);
+                var card = await PageContext.SocialCardService
+                    .GetByIdAsync(page.SocialCardId.Value, forceReload);
                 card.Url = viewModel.CanonicalUrl;
                 viewModel.SocialCard = card;
             }
@@ -166,9 +139,8 @@ namespace Ocuda.Promenade.Controllers.Abstract
                 forceReload = true;
             }
 
-            var pageLayout = await PageService.GetLayoutPageByHeaderAsync(headerId,
-                forceReload,
-                previewId);
+            var pageLayout = await PageContext.PageService
+                .GetLayoutPageByHeaderAsync(headerId, forceReload, previewId);
 
             if (pageLayout == null)
             {
@@ -179,18 +151,18 @@ namespace Ocuda.Promenade.Controllers.Abstract
             {
                 if (item.BannerFeatureId.HasValue)
                 {
-                    item.BannerFeature = await ImageFeatureService.GetByIdAsync(
-                        item.BannerFeatureId.Value,
-                        forceReload);
+                    item.BannerFeature = await PageContext.ImageFeatureService
+                        .GetByIdAsync(item.BannerFeatureId.Value, forceReload);
                 }
                 else if (item.CarouselId.HasValue)
                 {
-                    item.Carousel = await CarouselService.GetByIdAsync(item.CarouselId.Value,
-                        forceReload);
+                    item.Carousel = await PageContext.CarouselService
+                        .GetByIdAsync(item.CarouselId.Value, forceReload);
                 }
                 else if (item.DeckId.HasValue)
                 {
-                    item.CardDetails = await DeckService.GetByIdAsync(item.DeckId.Value, forceReload);
+                    item.CardDetails = await PageContext.DeckService
+                        .GetByIdAsync(item.DeckId.Value, forceReload);
                     foreach (var cardDetail in item.CardDetails)
                     {
                         cardDetail.Text = CommonMark.CommonMarkConverter.Convert(cardDetail.Text);
@@ -198,48 +170,43 @@ namespace Ocuda.Promenade.Controllers.Abstract
                 }
                 else if (item.PageFeatureId.HasValue)
                 {
-                    item.PageFeature = await ImageFeatureService.GetByIdAsync(
-                        item.PageFeatureId.Value,
-                        forceReload);
+                    item.PageFeature = await PageContext.ImageFeatureService
+                        .GetByIdAsync(item.PageFeatureId.Value, forceReload);
                 }
                 else if (item.SegmentId.HasValue)
                 {
-                    item.SegmentText = await SegmentService.GetSegmentTextBySegmentIdAsync(
-                        item.SegmentId.Value,
-                        forceReload);
+                    item.SegmentText = await PageContext.SegmentService
+                        .GetSegmentTextBySegmentIdAsync(item.SegmentId.Value, forceReload);
 
                     if (item.SegmentText != null)
                     {
-                        item.SegmentText.Text = item.SegmentText.SegmentWrapPrefix
-                            + CommonMark.CommonMarkConverter.Convert(item.SegmentText.Text)
-                            + item.SegmentText.SegmentWrapSuffix;
+                        item.SegmentText.Text = FormatForDisplay(item.SegmentText);
                     }
                 }
                 else if (item.WebslideId.HasValue)
                 {
-                    item.Webslide = await ImageFeatureService.GetByIdAsync(item.WebslideId.Value,
-                        forceReload);
+                    item.Webslide = await PageContext.ImageFeatureService
+                        .GetByIdAsync(item.WebslideId.Value, forceReload);
                 }
             }
 
             var viewModel = new PageLayoutViewModel
             {
-                CanonicalUrl = await GetCanonicalUrlAsync(),
+                CanonicalUrl = await GetCanonicalLinkAsync(),
                 HasCarousels = pageLayout.Items.Any(_ => _.CarouselId.HasValue),
                 Stub = stub?.Trim()
             };
 
             if (pageLayout.Items.Any(_ => _.PageFeatureId.HasValue))
             {
-                viewModel.PageFeatureTemplate = await ImageFeatureService
+                viewModel.PageFeatureTemplate = await PageContext.ImageFeatureService
                     .GetTemplateForPageLayoutAsync(pageLayout.Id);
             }
 
             if (pageLayout.SocialCardId.HasValue)
             {
-                pageLayout.SocialCard = await SocialCardService.GetByIdAsync(
-                    pageLayout.SocialCardId.Value,
-                    forceReload);
+                pageLayout.SocialCard = await PageContext.SocialCardService
+                    .GetByIdAsync(pageLayout.SocialCardId.Value, forceReload);
                 pageLayout.SocialCard.Url = viewModel.CanonicalUrl;
             }
 
