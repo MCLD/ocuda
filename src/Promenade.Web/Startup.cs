@@ -20,6 +20,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using Ocuda.i18n;
 using Ocuda.i18n.RouteConstraint;
+using Ocuda.Promenade.Controllers;
 using Ocuda.Promenade.Data;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility.Abstract;
@@ -63,7 +64,10 @@ namespace Ocuda.Promenade.Web
                 throw new ArgumentNullException(nameof(pathResolver));
             }
 
-            app.UseResponseCompression();
+            if (!_isDevelopment)
+            {
+                app.UseResponseCompression();
+            }
 
             if (!string.IsNullOrEmpty(_config[Configuration.OcudaProxyAddress]))
             {
@@ -83,10 +87,8 @@ namespace Ocuda.Promenade.Web
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                app.UseStatusCodePagesWithReExecute("/Error/{0}");
-            }
+
+            app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
             var requestLocalizationOptions = new RequestLocalizationOptions
             {
@@ -171,12 +173,17 @@ namespace Ocuda.Promenade.Web
             {
                 services.AddApplicationInsightsTelemetry();
             }
-
-            services.AddResponseCompression(_ =>
+            else
             {
-                _.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-                        new[] { "application/rss+xml" });
-            });
+                services.AddResponseCompression(_ =>
+                {
+                    _.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                            new[] {
+                                "application/rss+xml",
+                                "image/svg+xml"
+                            });
+                });
+            }
 
             services.AddLocalization();
 
@@ -302,7 +309,11 @@ namespace Ocuda.Promenade.Web
             services.AddDataProtection().PersistKeysToDbContext<PromenadeContext>();
 
             services.Configure<RouteOptions>(_ =>
-                _.ConstraintMap.Add("cultureConstraint", typeof(CultureRouteConstraint)));
+            {
+                _.ConstraintMap.Add("cultureConstraint", typeof(CultureRouteConstraint));
+                _.ConstraintMap.Add(LocationSlugRouteConstraint.Name,
+                    typeof(LocationSlugRouteConstraint));
+            });
 
             if (_isDevelopment)
             {
@@ -338,6 +349,7 @@ namespace Ocuda.Promenade.Web
 
             // service facades
             services.AddScoped(typeof(Controllers.ServiceFacades.Controller<>));
+            services.AddScoped(typeof(Controllers.ServiceFacades.PageController));
             services.AddScoped(typeof(Data.ServiceFacade.Repository<>));
 
             // utilities

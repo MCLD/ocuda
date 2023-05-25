@@ -25,7 +25,7 @@ namespace Ocuda.Promenade.Data.Promenade
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<List<LocationGroup>> GetGroupByLocationIdAsync(int locationId)
+        public async Task<ICollection<LocationGroup>> GetGroupByLocationIdAsync(int locationId)
         {
             return await DbSet
                 .AsNoTracking()
@@ -33,7 +33,7 @@ namespace Ocuda.Promenade.Data.Promenade
                 .ToListAsync();
         }
 
-        public async Task<List<LocationGroup>> GetLocationsByGroupIdAsync(int groupId)
+        public async Task<ICollection<LocationGroup>> GetLocationsByGroupIdAsync(int groupId)
         {
             return await DbSet
                 .AsNoTracking()

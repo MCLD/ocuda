@@ -29,9 +29,9 @@
         {
             <tr>
                 <td>
-                    <a asp-action="@nameof(LocationsController.Locations)"
-               asp-controller="@LocationsController.Name"
-               asp-route-locationStub="@item.Stub">@item.Name</a>
+                    <a asp-action="@nameof(HomeController.Location)"
+               asp-controller="@HomeController.Name"
+               asp-route-locationSlug="@item.Stub">@item.Name</a>
                 </td>
                 <td class="@item.CurrentStatusClass">@item.CurrentStatus</td>
                 <td class="@item.InventoryStatusClass">@item.InventoryStatus</td>

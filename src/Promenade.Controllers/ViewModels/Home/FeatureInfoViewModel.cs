@@ -1,4 +1,4 @@
-﻿namespace Ocuda.Promenade.Controllers.ViewModels.Locations
+﻿namespace Ocuda.Promenade.Controllers.ViewModels.Home
 {
     public class FeatureInfoViewModel
     {

@@ -12,9 +12,8 @@ namespace Ocuda.Promenade.Data
         where TEntity : class
     {
         protected readonly TContext _context;
-        protected readonly ILogger _logger;
         protected readonly IDateTimeProvider _dateTimeProvider;
-
+        protected readonly ILogger _logger;
         private DbSet<TEntity> _dbSet;
 
         internal GenericRepository(Repository<TContext> repositoryFacade, ILogger logger)
@@ -34,7 +33,7 @@ namespace Ocuda.Promenade.Data
         {
             get
             {
-                return _dbSet ?? (_dbSet = _context.Set<TEntity>());
+                return _dbSet ??= _context.Set<TEntity>();
             }
         }
     }
