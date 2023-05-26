@@ -458,8 +458,10 @@
                             else
                             {
                                 leftNavigationFeaturetteNumber++;
-                                <a href="@item.NavigationText.Link"
-                       class="btn btn-secondary btn-block prom-leftnav-featurette-button prom-leftnav-featurette-button-@leftNavigationFeaturetteNumber">@item.NavigationText.Label</a>
+                                <div class="d-grid">
+                                    <a href="@item.NavigationText.Link"
+                       class="btn btn-secondary prom-leftnav-featurette-button prom-leftnav-featurette-button-@leftNavigationFeaturetteNumber">@item.NavigationText.Label</a>
+                                </div>
                             }
                         }
                     </div>
