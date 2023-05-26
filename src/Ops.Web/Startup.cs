@@ -55,10 +55,8 @@ namespace Ocuda.Ops.Web
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                app.UseStatusCodePagesWithReExecute("/Error/Index/{0}");
-            }
+
+            app.UseStatusCodePagesWithReExecute("/Error/Index/{0}");
 
             // insert remote address into the log context for each request
             app.Use(async (context, next) =>

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Options;
 using Ocuda.Promenade.Models.Keys;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility.Models;
@@ -14,18 +12,15 @@ namespace Ocuda.Promenade.Controllers.Filters
     public class LayoutFilter : IAsyncResourceFilter
     {
         private readonly ExternalResourceService _externalResourceService;
-        private readonly IOptions<RequestLocalizationOptions> _l10nOptions;
         private readonly NavigationService _navigationService;
         private readonly IPathResolverService _pathResolverService;
         private readonly SiteSettingService _siteSettingService;
 
-        public LayoutFilter(IOptions<RequestLocalizationOptions> l10nOptions,
-            ExternalResourceService externalResourceService,
+        public LayoutFilter(ExternalResourceService externalResourceService,
             NavigationService navigationService,
             IPathResolverService pathResolverService,
             SiteSettingService siteSettingService)
         {
-            _l10nOptions = l10nOptions ?? throw new ArgumentNullException(nameof(l10nOptions));
             _externalResourceService = externalResourceService
                 ?? throw new ArgumentNullException(nameof(externalResourceService));
             _navigationService = navigationService

@@ -166,21 +166,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
             else
             {
-                var updated = await _productService.UpdateProductAsync(viewModel.Product);
-                var product = await _productService.GetBySlugAsync(updated.Slug);
-                if (!CanManage(product))
-                {
-                    return RedirectToUnauthorized();
-                }
-                if (viewModel.Product.CacheInventoryMinutes == 0)
+                if (viewModel.Product.CacheInventoryMinutes < 5)
                 {
                     viewModel.Product.CacheInventoryMinutes = 5;
                     ShowAlertWarning("Cache set to default of 5 minutes.");
                 }
+                var updated = await _productService.UpdateProductAsync(viewModel.Product);
                 ShowAlertSuccess("Location updated.");
                 return RedirectToAction(nameof(Details), new
                 {
-                    productSlug = product.Slug
+                    productSlug = updated.Slug
                 });
             }
         }
@@ -762,11 +757,10 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         private bool CanManage(Product product)
         {
-            return IsSiteManager() 
+            return IsSiteManager()
                 || product.PermissionGroupIds != null
                 && UserClaims(ClaimType.PermissionId)?
                     .Any(_ => product.PermissionGroupIds.Contains(_)) == true;
-
         }
     }
 }

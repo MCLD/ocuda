@@ -34,7 +34,7 @@ namespace Ocuda.Ops.Data
         {
             get
             {
-                return _dbSet ?? (_dbSet = _context.Set<TEntity>());
+                return _dbSet ??= _context.Set<TEntity>();
             }
         }
 
@@ -48,6 +48,11 @@ namespace Ocuda.Ops.Data
             await DbSet.AddRangeAsync(entities);
         }
 
+        public virtual async Task<int> CountAsync()
+        {
+            return await DbSet.CountAsync();
+        }
+
         public virtual void Remove(TEntity entity)
         {
             DbSet.Remove(entity);
@@ -58,30 +63,17 @@ namespace Ocuda.Ops.Data
             DbSet.RemoveRange(entities);
         }
 
-        public virtual void Update(TEntity entity)
+        public virtual async Task SaveAsync()
         {
-            DbSet.Update(entity);
-        }
-
-        public virtual void UpdateRange(ICollection<TEntity> entities)
-        {
-            DbSet.UpdateRange(entities);
-        }
-
-        public virtual async Task<int> CountAsync()
-        {
-            return await DbSet.CountAsync();
+            await _context.SaveChangesAsync();
         }
 
         public virtual async Task<ICollection<TEntity>>
             ToListAsync(params Expression<Func<TEntity, IComparable>>[] orderBys)
         {
-            if (orderBys == null || orderBys.Count() == 0)
-            {
-                throw new ArgumentNullException(nameof(orderBys));
-            }
-
-            return await DbSetOrdered(orderBys)
+            return orderBys == null || orderBys.Length == 0
+                ? throw new ArgumentNullException(nameof(orderBys))
+                : (ICollection<TEntity>)await DbSetOrdered(orderBys)
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -90,21 +82,23 @@ namespace Ocuda.Ops.Data
             int take,
             params Expression<Func<TEntity, IComparable>>[] orderBys)
         {
-            if (orderBys == null || orderBys.Count() == 0)
-            {
-                throw new ArgumentNullException(nameof(orderBys));
-            }
-
-            return await DbSetOrdered(orderBys)
+            return orderBys == null || orderBys.Length == 0
+                ? throw new ArgumentNullException(nameof(orderBys))
+                : (ICollection<TEntity>)await DbSetOrdered(orderBys)
                 .AsNoTracking()
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync();
         }
 
-        public virtual async Task SaveAsync()
+        public virtual void Update(TEntity entity)
         {
-            await _context.SaveChangesAsync();
+            DbSet.Update(entity);
+        }
+
+        public virtual void UpdateRange(ICollection<TEntity> entities)
+        {
+            DbSet.UpdateRange(entities);
         }
 
         protected IOrderedQueryable<TEntity>

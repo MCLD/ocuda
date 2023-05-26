@@ -246,7 +246,7 @@
                         <div class="d-none d-sm-block me-2" style="font-size: 1.25rem;">
                             <ul aria-label="@Localizer[Promenade.ConnectSocialMedia]"
                             class="nav d-inline-flex justify-content-center prom-nav-middle-social">
-                                @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl].ToString()))
+                                @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]?.ToString()))
                                 {
                                     <li>
                                         <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]"
@@ -257,7 +257,7 @@
                                         <span>&nbsp;</span>
                                     </li>
                                 }
-                                @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl].ToString()))
+                                @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl]?.ToString()))
                                 {
                                     <li>
                                         <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl]"
@@ -268,7 +268,7 @@
                                         <span>&nbsp;</span>
                                     </li>
                                 }
-                                @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTikTokUrl].ToString()))
+                                @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTikTokUrl]?.ToString()))
                                 {
                                     <li>
                                         <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTikTokUrl]"
@@ -279,7 +279,7 @@
                                         <span>&nbsp;</span>
                                     </li>
                                 }
-                                @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl].ToString()))
+                                @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]?.ToString()))
                                 {
                                     <li>
                                         <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]"
@@ -290,7 +290,7 @@
                                         <span>&nbsp;</span>
                                     </li>
                                 }
-                                @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl].ToString()))
+                                @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl]?.ToString()))
                                 {
                                     <li>
                                         <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl]"
@@ -328,7 +328,7 @@
                 <div class="col-12 d-block d-sm-none text-center prom-leftnav-social">
                     <ul aria-label="@Localizer[Promenade.ConnectSocialMedia]"
                     class="nav d-inline-flex justify-content-center">
-                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl].ToString()))
+                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]?.ToString()))
                         {
                             <li>
                                 <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialFacebookUrl]"
@@ -339,7 +339,7 @@
                                 <span>&nbsp;</span>
                             </li>
                         }
-                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl].ToString()))
+                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl]?.ToString()))
                         {
                             <li>
                                 <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialInstagramUrl]"
@@ -350,7 +350,7 @@
                                 <span>&nbsp;</span>
                             </li>
                         }
-                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTikTokUrl].ToString()))
+                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTikTokUrl]?.ToString()))
                         {
                             <li>
                                 <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTikTokUrl]"
@@ -361,7 +361,7 @@
                                 <span>&nbsp;</span>
                             </li>
                         }
-                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl].ToString()))
+                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]?.ToString()))
                         {
                             <li>
                                 <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialTwitterUrl]"
@@ -372,7 +372,7 @@
                                 <span>&nbsp;</span>
                             </li>
                         }
-                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl].ToString()))
+                        @if (!string.IsNullOrEmpty(Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl]?.ToString()))
                         {
                             <li>
                                 <a href="@Context.Items[Ocuda.Promenade.Controllers.ItemKey.SocialYoutubeUrl]"

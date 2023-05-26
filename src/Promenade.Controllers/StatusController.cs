@@ -61,33 +61,38 @@ namespace Ocuda.Promenade.Controllers
                 return StatusCode(Microsoft.AspNetCore.Http.StatusCodes.Status404NotFound);
             }
 
-            var inventories = await _productService.GetInventoriesAsync(product.Id,
-                product.CacheInventoryMinutes,
-                forceReload);
-            var locations = await _locationService.GetLocationsStatusAsync(null, null);
-
             var locationInventories = new List<LocationInventory>();
 
-            var hasItems = _localizer[i18n.Keys.Promenade.ProductInventoryHas, product.Name];
-            var noItems = _localizer[i18n.Keys.Promenade.ProductInventoryDoesNotHave, product.Name];
-
-            foreach (var inventory in inventories)
+            if (product.IsActive)
             {
-                var location = locations.SingleOrDefault(_ => _.Id == inventory.LocationId);
-                if (location != null)
+                var inventories = await _productService.GetInventoriesAsync(product.Id,
+                    product.CacheInventoryMinutes,
+                    forceReload);
+
+                var locations = await _locationService
+                    .GetLocationsStatusAsync(null, null, forceReload);
+
+                var hasItems = _localizer[i18n.Keys.Promenade.ProductInventoryHas, product.Name];
+                var noItems = _localizer[i18n.Keys.Promenade.ProductInventoryDoesNotHave, product.Name];
+
+                foreach (var inventory in inventories)
                 {
-                    locationInventories.Add(new LocationInventory
+                    var location = locations.SingleOrDefault(_ => _.Id == inventory.LocationId);
+                    if (location != null)
                     {
-                        UpdatedAt = inventory.UpdatedAt ?? inventory.CreatedAt,
-                        CurrentStatus = location.CurrentStatus.StatusMessage,
-                        CurrentStatusClass = location.CurrentStatus.IsCurrentlyOpen
-                            ? "text-success"
-                            : location.CurrentStatus.IsSpecialHours ? "text-primary" : "text-danger",
-                        InventoryStatus = inventory.ItemCount > 0 ? hasItems : noItems,
-                        InventoryStatusClass = inventory.ItemCount > 0 ? "text-success" : "text-danger",
-                        Name = location.Name,
-                        Stub = location.Stub
-                    });
+                        locationInventories.Add(new LocationInventory
+                        {
+                            UpdatedAt = inventory.UpdatedAt ?? inventory.CreatedAt,
+                            CurrentStatus = location.CurrentStatus.StatusMessage,
+                            CurrentStatusClass = location.CurrentStatus.IsCurrentlyOpen
+                                ? "text-success"
+                                : location.CurrentStatus.IsSpecialHours ? "text-primary" : "text-danger",
+                            InventoryStatus = inventory.ItemCount > 0 ? hasItems : noItems,
+                            InventoryStatusClass = inventory.ItemCount > 0 ? "text-success" : "text-danger",
+                            Name = location.Name,
+                            Stub = location.Stub
+                        });
+                    }
                 }
             }
 
@@ -106,9 +111,7 @@ namespace Ocuda.Promenade.Controllers
                 }
                 if (!string.IsNullOrEmpty(product.SegmentText.Text))
                 {
-                    viewModel.SegmentText = product.SegmentText.SegmentWrapPrefix
-                        + CommonMark.CommonMarkConverter.Convert(product.SegmentText.Text)
-                        + product.SegmentText.SegmentWrapSuffix;
+                    viewModel.SegmentText = FormatForDisplay(product.SegmentText);
                 }
             }
 

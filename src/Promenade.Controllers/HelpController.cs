@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using CommonMark;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
@@ -59,7 +58,8 @@ namespace Ocuda.Promenade.Controllers
                 ?? throw new ArgumentNullException(nameof(segmentService));
         }
 
-        public static string Name { get { return "Help"; } }
+        public static string Name
+        { get { return "Help"; } }
 
         [HttpGet("[action]")]
         [ResponseCache(NoStore = true)]
@@ -313,8 +313,7 @@ namespace Ocuda.Promenade.Controllers
 
                     if (!string.IsNullOrEmpty(viewModel.SegmentText?.Text))
                     {
-                        viewModel.SegmentText.Text
-                            = CommonMarkConverter.Convert(viewModel.SegmentText.Text);
+                        viewModel.SegmentText.Text = FormatForDisplay(viewModel.SegmentText);
                     }
                 }
 
@@ -551,7 +550,7 @@ namespace Ocuda.Promenade.Controllers
                 if (!string.IsNullOrEmpty(scheduleViewModel.SegmentText?.Text))
                 {
                     scheduleViewModel.SegmentText.Text
-                        = CommonMarkConverter.Convert(scheduleViewModel.SegmentText.Text);
+                        = FormatForDisplay(scheduleViewModel.SegmentText);
                 }
             }
 
@@ -621,7 +620,7 @@ namespace Ocuda.Promenade.Controllers
                 if (!string.IsNullOrEmpty(scheduleViewModel.SegmentText?.Text))
                 {
                     scheduleViewModel.SegmentText.Text
-                        = CommonMarkConverter.Convert(scheduleViewModel.SegmentText.Text);
+                        = FormatForDisplay(scheduleViewModel.SegmentText);
                 }
             }
 
@@ -719,7 +718,7 @@ namespace Ocuda.Promenade.Controllers
                 if (!string.IsNullOrEmpty(scheduleViewModel.SegmentText?.Text))
                 {
                     scheduleViewModel.SegmentText.Text
-                        = CommonMarkConverter.Convert(scheduleViewModel.SegmentText.Text);
+                        = FormatForDisplay(scheduleViewModel.SegmentText);
                 }
             }
 
