@@ -23,24 +23,20 @@
       enctype="multipart/form-data">
     <div class="mb-3 row my-2">
         <div class="col-12 col-lg-8 offset-lg-2">
+            <label for="rosterFile" class="form-label">Select a roster file to upload</label>
             <div class="input-group">
-                <div class="input-group-prepend">
-                    <label class="btn btn-outline-secondary btn-file form-control">
-                        <span class="far fa-file"></span> Select a File
-                        <input type="file" asp-for="Roster" accept=".xls,.xlsx" hidden />
-                    </label>
-                </div>
-                <input type="text" class="custom-file form-control" readonly id="selectedFile" />
-                <div class="input-group-append">
-                    <button type="submit"
-                            class="btn btn-outline-success form-control"
-                            aria-label="Confirm"
-                            button-spinner>
-                        <span class="fas fa-file-upload"></span>
-                        Upload
-                    </button>
-
-                </div>
+                <input type="file"
+                       class="form-control"
+                       id="rosterFile"
+                       asp-for="Roster"
+                       accept=".xls,.xlsx" />
+                <button type="submit"
+                        class="btn btn-outline-success"
+                        aria-label="Confirm"
+                        button-spinner>
+                    <span class="fas fa-file-upload"></span>
+                    Upload
+                </button>
             </div>
             <div>
                 <span asp-validation-for="Roster" class="text-danger"></span>
@@ -78,7 +74,7 @@ else
                                 else
                                 {
                                     <a asp-action="@nameof(RosterController.Changes)"
-                           asp-route-rosterHeaderId="@roster.Id">
+                                       asp-route-rosterHeaderId="@roster.Id">
                                         @roster.CreatedAt.ToString("g")
                                     </a>
                                 }
@@ -88,9 +84,9 @@ else
                             </td>
                             <td class="align-middle">
                                 <a asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
-                           asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
-                           asp-route-id="@roster.CreatedByUser.Username"
-                           target="_blank">@roster.CreatedByUser.Name</a><br />
+                                   asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
+                                   asp-route-id="@roster.CreatedByUser.Username"
+                                   target="_blank">@roster.CreatedByUser.Name</a><br />
                             </td>
                             <td class="align-middle">
                                 @roster.DetailCount

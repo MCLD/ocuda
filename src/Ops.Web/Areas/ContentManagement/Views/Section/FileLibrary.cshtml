@@ -30,20 +30,12 @@
                     <input asp-for="SectionSlug" type="hidden" />
                     <input asp-for="FileLibrarySlug" type="hidden" />
                     <input asp-for="FileLibraryId" type="hidden" />
-                    <p>Replace file: <strong id="ReplaceFileName"></strong></p>
+                    <label for="" class="form-label">Replace file: <strong id="ReplaceFileName"></strong></label>
                     <div class="input-group">
-                        <label class="input-group-btn">
-                            <span class="btn btn-light btn-file">
-                                <span class="far fa-file-image"></span> Select file...
-                                <input type="file"
-                                       id="ReplaceFileUpload"
-                                       asp-for="UploadFile"
-                                       style="display: none;" />
-                            </span>
-                        </label>
-                        <input type="text"
+                        <input type="file"
                                class="form-control @(ViewData.ModelState.GetValidationState("UploadFile") == invalid ? "input-validation-error" : "")"
-                               readonly />
+                               id="ReplaceFileUpload"
+                               asp-for="UploadFile" />
                     </div>
                     <span asp-validation-for="UploadFile" class="text-danger"></span>
                 </div>
@@ -96,20 +88,13 @@
                            autocomplete="off"
                            type="hidden" />
                     <input asp-for="CurrentPage" type="hidden" />
-                    <div class="input-group">
-                        <label class="input-group-btn">
-                            <span class="btn btn-light btn-file">
-                                <span class="far fa-file-image"></span> Select file(s)...
-                                <input type="file"
-                                       multiple="multiple"
-                                       asp-for="UploadFile"
-                                       accept="@(string.Join(",",Model.FileTypes.Select(_=>_.Extension).ToList()))"
-                                       style="display: none;" />
-                            </span>
-                        </label>
-                        <input type="text"
+                    <label for="UploadFile" class="form-label">Select a file (valid types: @(Model.FileTypes?.Any() == true ? string.Join(", ", Model.FileTypes.Select(_ => _.Extension).ToList()) : "none"))</label>
+                    <div class="input-group mb-3">
+                        <input type="file"
                                class="form-control @(ViewData.ModelState.GetValidationState("UploadFile") == invalid ? "input-validation-error" : "")"
-                               readonly />
+                               multiple="multiple"
+                               asp-for="UploadFile"
+                               accept="@string.Join(",",Model.FileTypes.Select(_=>_.Extension).ToList())" />
                     </div>
                     <span asp-validation-for="UploadFile" class="text-danger"></span>
                     <input asp-for="File.Name" autocomplete="off" formgroup />
@@ -200,8 +185,8 @@
         @if (Model.HasAdminRights)
         {
             <button class="btn btn-outline-primary mt-2 mb-1 me-2 float-end"
-                data-bs-toggle="modal"
-                data-bs-target="#listAddModal">
+                    data-bs-toggle="modal"
+                    data-bs-target="#listAddModal">
                 <span class="fas fa-file-upload" aria-hidden="true"></span>
                 Add file
             </button>
@@ -209,11 +194,11 @@
         @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
         {
             <a class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
-           asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
-           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
-           asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibraryPermissions)"
-           asp-route-sectionSlug="@Model.SectionSlug"
-           asp-route-fileLibrarySlug="@Model.FileLibrarySlug">
+               asp-area="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Area"
+               asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
+               asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibraryPermissions)"
+               asp-route-sectionSlug="@Model.SectionSlug"
+               asp-route-fileLibrarySlug="@Model.FileLibrarySlug">
                 <span class="fas fa-user-plus"></span>
                 Permissions
             </a>
@@ -244,12 +229,12 @@
                         <tr>
                             <td class="align-middle text-center">
                                 <a asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.GetFile)"
-                           asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
-                           asp-area=""
-                           asp-route-libraryId="@Model.FileLibraryId"
-                           asp-route-fileId="@file.Id"
-                           title="Download file"
-                           class="btn btn-outline-primary">
+                                   asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
+                                   asp-area=""
+                                   asp-route-libraryId="@Model.FileLibraryId"
+                                   asp-route-fileId="@file.Id"
+                                   title="Download file"
+                                   class="btn btn-outline-primary">
                                     @if (string.IsNullOrEmpty(file.FileType?.Icon))
                                     {
                                         <span class="far fa-file fa-fw fa-lg"></span>
@@ -280,8 +265,8 @@
                                     <br />
                                     <span class="d-none d-md-inline">by </span>
                                     <a asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
-                               asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
-                               asp-route-id="@file.LastUpdateBy.Username">@file.LastUpdateBy.Name</a><br />
+                                       asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
+                                       asp-route-id="@file.LastUpdateBy.Username">@file.LastUpdateBy.Name</a><br />
                                 </small>
                             </td>
                             @if (Model.HasReplaceRights || Model.HasAdminRights)
@@ -290,28 +275,28 @@
                                     @if (Model.HasReplaceRights)
                                     {
                                         <button type="button"
-                                class="btn btn-outline-warning"
-                                data-bs-toggle="modal"
-                                data-bs-target="#replaceModal"
-                                data-id="@file.Id"
-                                data-name="@file.Name"
-                                data-extension="@Model.FileTypes.Where(_ => _.Id == file.FileTypeId).FirstOrDefault().Extension"
-                                title="Replace file">
+                                                class="btn btn-outline-warning"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#replaceModal"
+                                                data-id="@file.Id"
+                                                data-name="@file.Name"
+                                                data-extension="@Model.FileTypes.Where(_ => _.Id == file.FileTypeId).FirstOrDefault().Extension"
+                                                title="Replace file">
                                             <span class="fas fa-sync-alt fa-fw"
-                                  aria-hidden="true"></span>
+                                                  aria-hidden="true"></span>
                                         </button>
                                     }
                                     @if (Model.HasAdminRights)
                                     {
                                         <button type="button"
-                                class="btn btn-outline-danger"
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteModal"
-                                data-id="@file.Id"
-                                data-name="@file.Name"
-                                title="Delete file">
+                                                class="btn btn-outline-danger"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteModal"
+                                                data-id="@file.Id"
+                                                data-name="@file.Name"
+                                                title="Delete file">
                                             <span class="far fa-times-circle fa-fw"
-                                  aria-hidden="true"></span>
+                                                  aria-hidden="true"></span>
                                         </button>
                                     }
                                 </td>
@@ -332,20 +317,20 @@
 </div>
 
 @section scripts {
-<script>
-    $("#deleteModal").on("show.bs.modal", function (e) {
-        let button = $(e.relatedTarget);
-        let id = button.data("id");
-        let name = button.data("name");
-        $(this).find("#deleteModalText").text(name);
-        $(this).find("#delFileId").val(String(id));
-    });
-    $("#replaceModal").on("show.bs.modal", function (e) {
-        let button = $(e.relatedTarget);
-        let id = button.data("id");
-        $(this).find("#ReplaceFileName").text(button.data("name"));
-        $(this).find("#ReplaceFileId").val(String(id));
-        $(this).find("#ReplaceFileUpload").attr("accept", button.data("extension"));
-    });
-</script>
+    <script>
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            let button = $(e.relatedTarget);
+            let id = button.data("id");
+            let name = button.data("name");
+            $(this).find("#deleteModalText").text(name);
+            $(this).find("#delFileId").val(String(id));
+        });
+        $("#replaceModal").on("show.bs.modal", function (e) {
+            let button = $(e.relatedTarget);
+            let id = button.data("id");
+            $(this).find("#ReplaceFileName").text(button.data("name"));
+            $(this).find("#ReplaceFileId").val(String(id));
+            $(this).find("#ReplaceFileUpload").attr("accept", button.data("extension"));
+        });
+    </script>
 }

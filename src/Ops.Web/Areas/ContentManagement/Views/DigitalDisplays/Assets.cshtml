@@ -13,9 +13,9 @@
         @if (Model.HasPermissions)
         {
             <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
-                type="button"
-                data-bs-toggle="modal"
-                data-bs-target="#uploadAsset">
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#uploadAsset">
                 <span class="fas fa-file-upload" aria-hidden="true"></span>
                 Upload Image
             </button>
@@ -63,25 +63,25 @@
                     <td class="align-middle">
                         Uploaded by:
                         <a asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
-                   asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
-                   asp-route-id="@asset.CreatedByUser.Username"
-                   target="_blank">@asset.CreatedByUser.Name</a><br />
+                           asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
+                           asp-route-id="@asset.CreatedByUser.Username"
+                           target="_blank">@asset.CreatedByUser.Name</a><br />
                         Uploaded at: @asset.CreatedAt
                     </td>
                     <td class="align-middle">
                         @if (Model.HasPermissions)
                         {
                             <a asp-action="@nameof(DigitalDisplaysController.AssetAssociations)"
-                   asp-route-digitalDisplayAssetId="@asset.Id"
-                   class="btn btn-outline-primary my-1"><span class="fas fa-paperclip"></span></a>
+                               asp-route-digitalDisplayAssetId="@asset.Id"
+                               class="btn btn-outline-primary my-1"><span class="fas fa-paperclip"></span></a>
                             @if (Model.GetSetCount(asset.Id) == "0")
                             {
                                 <button type="button"
-                        data-bs-toggle="modal"
-                        data-bs-target="#deleteAsset"
-                        data-id="@asset.Id"
-                        data-name="@asset.Name"
-                        class="btn btn-outline-danger my-1">
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteAsset"
+                                        data-id="@asset.Id"
+                                        data-name="@asset.Name"
+                                        class="btn btn-outline-danger my-1">
                                     <span class="fas fa-minus-circle"></span>
                                 </button>
                             }
@@ -159,20 +159,13 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <label for="assetFile" classt="form-label">Select an image file (.jpg or .png)</label>
                     <div class="input-group">
-                        <div class="input-group-prepend">
-                            <label class="btn btn-outline-secondary btn-file form-control">
-                                <span class="far fa-file"></span> Select a File
-                                <input type="file"
-                                       name="assetFile"
-                                       id="assetFile"
-                                       accept=".jpg,.png"
-                                       hidden />
-                            </label>
-                        </div>
-                        <div class="custom-file">
-                            <input type="text" class="form-control" readonly id="selectedFile" />
-                        </div>
+                        <input type="file"
+                               class="form-control"
+                               name="assetFile"
+                               id="assetFile"
+                               accept=".jpg,.png" />
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -190,11 +183,11 @@
 </form>
 
 @section Scripts {
-<script>
-    $('#deleteAsset').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget)
-        $(this).find('#digitalDisplayAssetName').text(button.data('name'))
-        $(this).find('#digitalDisplayAssetId').val(button.data('id'));
-    })
-</script>
+    <script>
+        $('#deleteAsset').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget)
+            $(this).find('#digitalDisplayAssetName').text(button.data('name'))
+            $(this).find('#digitalDisplayAssetId').val(button.data('id'));
+        })
+    </script>
 }

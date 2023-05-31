@@ -4,24 +4,24 @@
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
 
-    <div class="row mb-2">
-        <div class="col-sm-6">
-            <h1>
-                Add Card
-                <small class="text-muted">@Model.DeckName</small>
-            </h1>
-        </div>
-        <div class="col-sm-6">
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Add Card
+            <small class="text-muted">@Model.DeckName</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
         @if (!string.IsNullOrEmpty(Model.BackLink))
         {
             <a href="@Model.BackLink"
-           class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
+               class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
         }
         @if (Model.CardDetail != null)
         {
             <button class="btn btn-outline-danger mt-2 mb-1 me-2 float-end"
-                data-bs-toggle="modal"
-                data-bs-target="#deleteModal">
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteModal">
                 <span class="fas fa-times"></span>
                 Delete Card
             </button>
@@ -69,7 +69,7 @@
                             <div class="col-form-label text-md-end col-md-3">Current image</div>
                             <div class="col-md-9">
                                 <img style="max-width: 333px;"
-                                 src="@Url.Action(nameof(DecksController.Image), DecksController.Name, new {
+                                     src="@Url.Action(nameof(DecksController.Image), DecksController.Name, new {
 language = Model.SelectedLanguage.Name,
 filename = Model.CardDetail.Filename
 })" />
@@ -79,22 +79,16 @@ filename = Model.CardDetail.Filename
                     <div class="row mb-3">
                         <label class="col-form-label text-md-end col-md-3">
                             Image
-                            <span class="fas fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span>
+                            <span class="fas fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span><br />
+                            (.jpg or .png)
                         </label>
                         <div class="col-md-9">
                             <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <label class="btn btn-outline-secondary btn-file form-control">
-                                        <span class="far fa-file"></span> Select a File
-                                        <input type="file"
-                                               asp-for="CardImage"
-                                               accept=".jpg,.png"
-                                               hidden />
-                                    </label>
-                                </div>
-                                <div class="custom-file">
-                                    <input type="text" class="form-control" id="File_Name" readonly />
-                                </div>
+                                <input type="file"
+                                       class="form-control"
+                                       asp-for="CardImage"
+                                       accept=".jpg,.png" />
+                                <!-- id = file_name -->
                             </div>
                         </div>
                     </div>
@@ -136,7 +130,7 @@ filename = Model.CardDetail.Filename
                     @foreach (var item in Model.LanguageList.Where(_ => !_.Disabled))
                     {
                         <a href="@Url.Action(nameof(DecksController.UpdateCard), new { cardId = Model.CardDetail.CardId, language = item.Value })"
-                   class="btn btn-sm btn-outline-info mt-1 @(item.Selected ? "active" : null)">@item.Text</a>
+                           class="btn btn-sm btn-outline-info mt-1 @(item.Selected ? "active" : null)">@item.Text</a>
                     }
                 </div>
             </div>
@@ -186,8 +180,8 @@ filename = Model.CardDetail.Filename
         <div class="row mb-3 mt-2">
             <div class="col-md-6 offset-md-3">
                 <button type="button" class="btn btn-outline-success"
-                    data-bs-toggle="modal"
-                    data-bs-target="#addModal">
+                        data-bs-toggle="modal"
+                        data-bs-target="#addModal">
                     <span class="fas fa-plus-circle" aria-hidden="true"></span>
                     @if (string.IsNullOrEmpty(Model.CardDetail?.Filename))
                     {
@@ -284,12 +278,11 @@ filename = Model.CardDetail.Filename
                 ResetSpinners();
             }
         }
-
-        $('#addModal').on('show.bs.modal', function (e) {
-            if (!$('#File_Name').val() && $('#CardDetail_Filename').val()) {
-                $('#File_Name').val($('#CardDetail_Filename').val());
-            }
-            $('#AltText').val($('#CardDetail_AltText').val());
+        
+        $('#addModal').on('hidden.bs.modal', function(e) {
+            $('#CardImage').val('');
+            $('#addImageAlertRow').addClass('d-none');
+            $('#AltText').val('');
         });
 
         $('#CardImage').on('change', function (e) {
@@ -301,7 +294,7 @@ filename = Model.CardDetail.Filename
             let goodToGo = true;
 
             var notes = [];
-            if (!$('#File_Name').val()) {
+            if (!$('#CardImage').val()) {
                 goodToGo = false;
                 notes.push("<li>You must select an image file.</li>")
             }

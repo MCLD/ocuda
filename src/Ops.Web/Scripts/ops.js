@@ -35,20 +35,6 @@ $(".btn-spinner").on("click", function (e) {
     }
 });
 
-$(document).on('change', ':file', function (e) {
-    var fileInput = $(this),
-        filePath = fileInput.val().replace(/\\/g, '/').replace(/.*\//, '');
-
-    validateFile(e, filePath);
-});
-
-$(document).on('fileselect', ':file', function (e) {
-    var fileInput = $(this),
-        filePath = fileInput.val().replace(/\\/g, '/').replace(/.*\//, '');
-
-    validateFile(e, filePath);
-});
-
 function validateFile(e, filePath) {
     var file = $(e.target)[0].files[0],
         fileButton = e.target.parentElement,

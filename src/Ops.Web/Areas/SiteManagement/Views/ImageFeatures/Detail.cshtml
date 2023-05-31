@@ -142,10 +142,10 @@
                 <div class="accordion-item">
                     <div class="accordion-header">
                         <button class="accordion-button collapsed"
-                         data-bs-toggle="collapse"
-                         data-bs-target="#accordionTemplateContent"
-                         aria-expanded="false"
-                         aria-controls="accordionTemplateContent">
+                                data-bs-toggle="collapse"
+                                data-bs-target="#accordionTemplateContent"
+                                aria-expanded="false"
+                                aria-controls="accordionTemplateContent">
                             Template: @Model.ImageTemplateDescription
                         </button>
                     </div>
@@ -156,31 +156,31 @@
                                 <input type="hidden" asp-for="ImageFeatureId">
                                 <input type="hidden" asp-for="ImageFeatureTemplate.Id">
                                 <input type="hidden"
-                                   asp-for="ImageFeatureTemplate.Name"
-                                   value="@Model.ImageFeature.Name">
+                                       asp-for="ImageFeatureTemplate.Name"
+                                       value="@Model.ImageFeature.Name">
                                 <div class="row">
                                     <div class="col-12">
                                         <input disabled="@Model.EditTemplateDisabled"
-                                           asp-for="ImageFeatureTemplate.MaximumFileSizeBytes" formgroup>
+                                               asp-for="ImageFeatureTemplate.MaximumFileSizeBytes" formgroup>
                                     </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-12">
                                         <input disabled="@Model.EditTemplateDisabled"
-                                           asp-for="ImageFeatureTemplate.Width" formgroup>
+                                               asp-for="ImageFeatureTemplate.Width" formgroup>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-12">
                                         <input disabled="@Model.EditTemplateDisabled"
-                                           asp-for="ImageFeatureTemplate.Height" formgroup>
+                                               asp-for="ImageFeatureTemplate.Height" formgroup>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-12">
                                         <input disabled="@Model.EditTemplateDisabled"
-                                           asp-for="ImageFeatureTemplate.ItemsToDisplay" formgroup>
+                                               asp-for="ImageFeatureTemplate.ItemsToDisplay" formgroup>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -213,10 +213,10 @@
                     <div class="accordion-item">
                         <div class="accordion-header d-flex" id="heading@(item.Id)">
                             <button class="accordion-button collapsed"
-                                 data-bs-toggle="collapse"
-                                 data-bs-target="#collapse@(item.Id)"
-                                 aria-controls="collapse@(item.Id)"
-                                 aria-expanded="@(Model.FocusItemId == item.Id ? "true" : "false")">
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#collapse@(item.Id)"
+                                    aria-controls="collapse@(item.Id)"
+                                    aria-expanded="@(Model.FocusItemId == item.Id ? "true" : "false")">
                                 @item.Name &ndash;
                                 @if (!(item.StartDate > Model.CurrentDateTime) && !(item.EndDate < Model.CurrentDateTime))
                                 {
@@ -229,43 +229,43 @@
                             </button>
                             <div class="btn-group" role="group">
                                 <button class="btn btn-sm btn-outline-primary changeSort decreaseSortButton"
-                                data-id="@item.Id"
-                                data-increase="false"
-                                disabled="@(item.Id == Model.ImageFeature.Items.First().Id ? "disabled" : null)">
+                                        data-id="@item.Id"
+                                        data-increase="false"
+                                        disabled="@(item.Id == Model.ImageFeature.Items.First().Id ? "disabled" : null)">
                                     <span class="fas fa-arrow-up"></span>
                                 </button>
                                 <button class="btn btn-sm btn-outline-primary changeSort increaseSortButton"
-                                data-id="@item.Id"
-                                data-increase="true"
-                                disabled="@(item.Id == Model.ImageFeature.Items.Last().Id ? "disabled" : null)">
+                                        data-id="@item.Id"
+                                        data-increase="true"
+                                        disabled="@(item.Id == Model.ImageFeature.Items.Last().Id ? "disabled" : null)">
                                     <span class="fas fa-arrow-down"></span>
                                 </button>
                                 <button type="button"
-                                class="btn btn-sm btn-outline-primary"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editItemModal"
-                                data-id="@item.Id"
-                                data-name="@item.Name"
-                                data-startdate="@item.StartDate?.ToString("yyyy-MM-dd")"
-                                data-starttime="@item.StartDate?.ToString("HH:mm")"
-                                data-enddate="@item.EndDate?.ToString("yyyy-MM-dd")"
-                                data-endtime="@item.EndDate?.ToString("HH:mm")"
-                                title="Edit item details">
+                                        class="btn btn-sm btn-outline-primary"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editItemModal"
+                                        data-id="@item.Id"
+                                        data-name="@item.Name"
+                                        data-startdate="@item.StartDate?.ToString("yyyy-MM-dd")"
+                                        data-starttime="@item.StartDate?.ToString("HH:mm")"
+                                        data-enddate="@item.EndDate?.ToString("yyyy-MM-dd")"
+                                        data-endtime="@item.EndDate?.ToString("HH:mm")"
+                                        title="Edit item details">
                                     <span class="fas fa-cog" aria-hidden="true"></span>
                                 </button>
                                 <button class="btn btn-sm btn-outline-danger"
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteItemModal"
-                                data-id="@item.Id"
-                                data-name="@item.Name">
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteItemModal"
+                                        data-id="@item.Id"
+                                        data-name="@item.Name">
                                     <span class="fas fa-minus-circle"></span>
                                 </button>
                             </div>
                         </div>
                         <div id="collapse@(item.Id)"
-                     class="accordion-collapse collapse @(Model.FocusItemId == item.Id ? "show" : null)"
-                     data-parent="#accordion@(item.Id)"
-                     aria-labelledby="heading@(item.Id)">
+                             class="accordion-collapse collapse @(Model.FocusItemId == item.Id ? "show" : null)"
+                             data-parent="#accordion@(item.Id)"
+                             aria-labelledby="heading@(item.Id)">
                             <div class="accordion-body">
                                 @if (Model.FocusItemId == item.Id && !string.IsNullOrWhiteSpace(Model.ItemErrorMessage))
                                 {
@@ -276,55 +276,64 @@
                                     </div>
                                 }
                                 <form asp-controller="@ImageFeaturesController.Name"
-                              asp-action="@nameof(ImageFeaturesController.EditImageFeatureItemText)"
-                              enctype="multipart/form-data">
+                                      asp-action="@nameof(ImageFeaturesController.EditImageFeatureItemText)"
+                                      enctype="multipart/form-data">
                                     <input id="featureItem@(item.Id)Feature"
-                                   asp-for="ImageFeatureId"
-                                   type="hidden" />
+                                           asp-for="ImageFeatureId"
+                                           type="hidden" />
                                     <input id="featureItem@(item.Id)Id"
-                                   asp-for="ImageFeatureItemText.ImageFeatureItemId"
-                                   value="@item.Id"
-                                   type="hidden" />
+                                           asp-for="ImageFeatureItemText.ImageFeatureItemId"
+                                           value="@item.Id"f
+                                           type="hidden" />
                                     <input id="featureItem@(item.Id)Language"
-                                   asp-for="ImageFeatureItemText.LanguageId"
-                                   value="@(item.ImageFeatureItemText?.LanguageId ?? Model.LanguageId)"
-                                   type="hidden" />
+                                           asp-for="ImageFeatureItemText.LanguageId"
+                                           value="@(item.ImageFeatureItemText?.LanguageId ?? Model.LanguageId)"
+                                           type="hidden" />
+                                    @if (!string.IsNullOrEmpty(item?.ImageFeatureItemText?.Filename))
+                                    {
+                                        <div class="row mb-3">
+                                            <label class="col-form-label text-md-end col-md-3">Current image</label>
+                                            <div class="col-md-9 col-form-label">
+                                                @if (!string.IsNullOrEmpty(Model.PublicLinkBase))
+                                                {
+                                                    <a href="@(Model.PublicLinkBase + '/' + item.ImageFeatureItemText?.Filename)"
+                                                       target="_blank">@item.ImageFeatureItemText?.Filename</a>
+                                                }
+                                                else
+                                                {
+                                                    @item.ImageFeatureItemText?.Filename
+                                                }
+                                            </div>
+                                        </div>
+                                    }
                                     <div class="row mb-3">
                                         <label class="col-form-label text-md-end col-md-3" asp-for="ItemImage">
-                                            Image
+                                            Image (@Model.AcceptImageExtensions.Replace(",", ", "))
                                             <span class="fas fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span>
                                         </label>
                                         <div class="col-md-9">
                                             <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <label class="btn btn-outline-secondary btn-file form-control">
-                                                        <span class="far fa-file"></span> Select a File
-                                                        <input type="file"
+                                                <input type="file"
+                                                       class="form-control"
                                                        asp-for="ItemImage"
-                                                       accept="@Model.AcceptImageExtensions"
-                                                       hidden />
-                                                    </label>
-                                                </div>
-                                                <div class="custom-file">
-                                                    <input type="text" class="form-control" value="@item.ImageFeatureItemText?.Filename" readonly id="selectedFile" />
-                                                </div>
+                                                       accept="@Model.AcceptImageExtensions" />
                                             </div>
                                             <span asp-validation-for="ItemImage" class="validation-message text-danger"></span>
                                         </div>
                                     </div>
                                     <input id="featureItem@(item.Id)Link"
-                                   asp-for="ImageFeatureItemText.Link"
-                                   value="@item.ImageFeatureItemText?.Link"
-                                   formgroup />
+                                           asp-for="ImageFeatureItemText.Link"
+                                           value="@item.ImageFeatureItemText?.Link"
+                                           formgroup />
                                     <input id="featureItem@(item.Id)AltText"
-                                   asp-for="ImageFeatureItemText.AltText"
-                                   value="@item.ImageFeatureItemText?.AltText"
-                                   formgroup />
+                                           asp-for="ImageFeatureItemText.AltText"
+                                           value="@item.ImageFeatureItemText?.AltText"
+                                           formgroup />
                                     <div class="row">
                                         <div class="offset-md-3 col-md-9">
                                             <button type="submit"
-                                            class="btn btn-outline-success"
-                                            button-spinner>
+                                                    class="btn btn-outline-success"
+                                                    button-spinner>
                                                 <span class="far fa-save"></span>
                                                 Save
                                             </button>

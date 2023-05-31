@@ -257,7 +257,7 @@ namespace Ocuda.Ops.Web
                     new NUglify.JavaScript.CodeSettings { MinifyCode = false },
                     "js/bootstrap.min.js").UseContentRoot();
 
-                _.AddJavaScriptBundle("/js/md.min.us",
+                _.AddJavaScriptBundle("/js/md.min.js",
                     "js/commonmark.js",
                     "Scripts/md-editor.js"
                     ).UseContentRoot();

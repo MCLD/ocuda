@@ -19,8 +19,9 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p>Select a file to upload:</p>
+                    <label for="UploadedFile" class="form-label">Select a file to upload (.mp3):</label>
                     <input asp-for="UploadedFile"
+                           class="form-control"
                            accept=".mp3"
                            type="file" />
                 </div>
