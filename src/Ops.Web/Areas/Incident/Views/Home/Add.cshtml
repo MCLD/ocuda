@@ -22,10 +22,10 @@
         <div class="alert alert-danger">
             <p>There were issues with your submission:</p>
             <ul class="mb-0">
-            @foreach (var error in ViewData.ModelState.Values.SelectMany(_ => _.Errors))
-            {
-                <li>@error.ErrorMessage</li>
-            }
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(_ => _.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
             </ul>
         </div>
     </div>
@@ -43,10 +43,10 @@
             @if (Model.MultiUserAccount)
             {
                 <input asp-for="Incident.ReportedByName"
-                   formgroup
-                   type="text"
-                   data-val="true"
-                   data-val-required="Reported by name is required." />
+                       formgroup
+                       type="text"
+                       data-val="true"
+                       data-val-required="Reported by name is required." />
             }
             <div class="row mb-3">
                 <label class="col-form-label text-md-end col-md-3" for="IncidentDate">
@@ -199,13 +199,11 @@
                    id="staffSearchText"
                    class="form-control"
                    aria-label="Search text" />
-            <div class="input-group-append">
-                <button class="btn btn-outline-success"
-                        id="staffSearchGo"
-                        button-spinner>
-                    Go
-                </button>
-            </div>
+            <button class="btn btn-outline-success"
+                    id="staffSearchGo"
+                    button-spinner>
+                Go
+            </button>
         </div>
 
     </div>
@@ -273,7 +271,7 @@
     </style>
 }
 
-    @section scripts {
+@section scripts {
     <script type="text/javascript">
         var currentPage = 1;
         var users = [];

@@ -33,14 +33,12 @@
             <label class="col-form-label text-md-end col-md-3" for="CategorySelection">Categories</label>
             <div class="mb-3-inner col-md-9">
                 <div class="input-group">
-                    <div class="input-group-prepend">
-                        <button class="btn btn-primary"
-                                type="button"
-                                data-bs-toggle="modal"
-                                data-bs-target="#categoryModal">
-                            <span class="far fa-edit"></span>
-                        </button>
-                    </div>
+                    <button class="btn btn-outline-primary"
+                            type="button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#categoryModal">
+                        <span class="far fa-edit"></span>
+                    </button>
                     <input asp-for="CategorySelection" value="@Model.CategorySelectionText" class="form-control" readonly />
                 </div>
             </div>

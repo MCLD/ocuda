@@ -134,9 +134,9 @@
                     else
                     {
                         <input type="text"
-                           readonly
-                           class="form-control-plaintext"
-                           value="@Model.Product.Slug">
+                               readonly
+                               class="form-control-plaintext"
+                               value="@Model.Product.Slug">
                     }
                 </div>
             </div>
@@ -162,8 +162,8 @@
             @if (Model.IsProductManager)
             {
                 <button type="submit"
-                    class="btn btn-outline-success"
-                    button-spinner>
+                        class="btn btn-outline-success"
+                        button-spinner>
                     <span class="far fa-save"></span>
                     Save
                 </button>
@@ -184,36 +184,34 @@
                            class="form-control"
                            disabled
                            value="@Model.SegmentName" />
-                    <div class="input-group-append">
-                        @if (string.IsNullOrEmpty(Model.SegmentName))
-                        {
-                            <button class="btn btn-outline-success"
+                    @if (string.IsNullOrEmpty(Model.SegmentName))
+                    {
+                        <button class="btn btn-outline-success"
                                 data-bs-toggle="modal"
                                 data-bs-target="#addSegmentModal">
-                                <span class="fas fa-plus-circle"
+                            <span class="fas fa-fw fa-plus-circle"
                                   aria-hidden="true"
                                   title="Add segment"></span>
-                            </button>
-                        }
-                        else
-                        {
-                            <button class="btn btn-outline-danger"
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-outline-danger"
                                 data-bs-toggle="modal"
                                 data-bs-target="#removeSegmentModal">
-                                <span class="fas fa-minus-circle"
+                            <span class="fas fa-fw fa-minus-circle"
                                   aria-hidden="true"
                                   title="Remove segment"></span>
-                            </button>
-                            <a class="btn btn-outline-primary"
+                        </button>
+                        <a class="btn btn-outline-primary"
                            asp-action="@nameof(SegmentsController.Detail)"
                            asp-controller="@SegmentsController.Name"
                            asp-route-id="@Model.Product.SegmentId">
-                                <span class="far fa-file-alt"
+                            <span class="far fa-fw fa-file-alt"
                                   aria-hidden="true"
                                   title="Edit segment"></span>
-                            </a>
-                        }
-                    </div>
+                        </a>
+                    }
                 </div>
             </div>
             <span class="validation-message text-danger"
@@ -223,10 +221,10 @@
 </div>
 
 @section Styles {
-<style type="text/css">
-    input[type='checkbox'] {
-        width: 1.5rem;
-        height: 1.5rem;
-    }
-</style>
+    <style type="text/css">
+        input[type='checkbox'] {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+    </style>
 }

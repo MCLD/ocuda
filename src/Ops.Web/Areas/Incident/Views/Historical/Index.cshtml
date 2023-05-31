@@ -9,8 +9,8 @@
             <div class="alert alert-info">
                 Search results for: @Model.SearchText
                 <a asp-action="@nameof(HistoricalController.Index)"
-               class="btn-close"
-               aria-label="Close">&times;</a>
+                   class="btn-close"
+                   aria-label="Close">&times;</a>
             </div>
         </div>
     </div>
@@ -23,16 +23,12 @@
     <div class="row mb-3">
         <div class="col-12">
             <div class="input-group">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Search:</span>
-                </div>
+                <span class="input-group-text">Search:</span>
                 <input asp-for="SearchText"
                        type="text"
                        class="form-control"
                        aria-label="Search text" />
-                <div class="input-group-append">
-                    <button class="btn btn-outline-success">Go</button>
-                </div>
+                <button class="btn btn-outline-success">Go</button>
             </div>
         </div>
     </div>
@@ -60,9 +56,9 @@ else
                         <tr>
                             <td class="align-middle">
                                 <a asp-action="@nameof(HistoricalController.Details)"
-                           asp-route-historicalIncidentId="@historicalIncident.Id"
-                           asp-route-page="@(Model.CurrentPage > 1 ? Model.CurrentPage : null)"
-                           asp-route-searchText="@Model.SearchText">
+                                   asp-route-historicalIncidentId="@historicalIncident.Id"
+                                   asp-route-page="@(Model.CurrentPage > 1 ? Model.CurrentPage : null)"
+                                   asp-route-searchText="@Model.SearchText">
                                     @historicalIncident.IncidentAt.ToString("g")
                                 </a>
                             </td>

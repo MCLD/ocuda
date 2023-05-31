@@ -31,7 +31,7 @@ namespace Ocuda.Utility.TagHelpers
         private const string footerClass = "modal-footer";
         private const string footerDeleteIconClass = "fas fa-minus-circle me-1";
         private const string headerAttributeName = "modal-header";
-        private const string headerButtonClass = "close";
+        private const string headerButtonClass = "btn-close";
         private const string headerClass = "modal-header";
         private const string headerTitleClass = "modal-title";
         private const string idAttributeName = "id";
@@ -181,8 +181,6 @@ namespace Ocuda.Utility.TagHelpers
             button.Attributes.Add("type", "button");
             button.Attributes.Add("data-bs-dismiss", "modal");
             button.Attributes.Add("aria-label", "Close dialog.");
-            button.InnerHtml.AppendHtml("&times;");
-
             header.InnerHtml.AppendHtml(button);
             return header;
         }

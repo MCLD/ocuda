@@ -308,39 +308,37 @@
                        class="form-control"
                        disabled
                        value="@Model.ShowNotesSegmentName" />
-                <div class="input-group-append">
-                    @if (string.IsNullOrEmpty(Model.ShowNotesSegmentName) && Model.CanEditShowNotes)
-                    {
-                        <button id="addShowNotesSegment"
-                                class="btn btn-outline-success"
-                                data-segment="Description"
-                                data-segment-display="Description"
-                                data-bs-toggle="modal"
-                                data-bs-target="#addSegmentModal">
-                            <span class="fas fa-plus-circle"
-                                  aria-hidden="true"
-                                  title="Add segment"></span>
-                        </button>
-                    }
-                    else if (!string.IsNullOrEmpty(Model.ShowNotesSegmentName) && Model.CanEditShowNotes)
-                    {
-                        <a class="btn btn-outline-danger"
-                           data-bs-target="#deleteModal"
-                           data-bs-toggle="modal">
-                            <span class="fas fa-minus-circle"
-                                  aria-hidden="true"
-                                  title="Delete segment"></span>
-                        </a>
-                        <a class="btn btn-outline-primary"
-                           asp-action="@nameof(SegmentsController.Detail)"
-                           asp-controller="@SegmentsController.Name"
-                           asp-route-id="@Model.Episode.ShowNotesSegmentId">
-                            <span class="far fa-file-alt"
-                                  aria-hidden="true"
-                                  title="Edit segment"></span>
-                        </a>
-                    }
-                </div>
+                @if (string.IsNullOrEmpty(Model.ShowNotesSegmentName) && Model.CanEditShowNotes)
+                {
+                    <button id="addShowNotesSegment"
+                            class="btn btn-outline-success"
+                            data-segment="Description"
+                            data-segment-display="Description"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addSegmentModal">
+                        <span class="fas fa-fw fa-plus-circle"
+                              aria-hidden="true"
+                              title="Add segment"></span>
+                    </button>
+                }
+                else if (!string.IsNullOrEmpty(Model.ShowNotesSegmentName) && Model.CanEditShowNotes)
+                {
+                    <a class="btn btn-outline-danger"
+                       data-bs-target="#deleteModal"
+                       data-bs-toggle="modal">
+                        <span class="fas fa-fw fa-minus-circle"
+                              aria-hidden="true"
+                              title="Delete segment"></span>
+                    </a>
+                    <a class="btn btn-outline-primary"
+                       asp-action="@nameof(SegmentsController.Detail)"
+                       asp-controller="@SegmentsController.Name"
+                       asp-route-id="@Model.Episode.ShowNotesSegmentId">
+                        <span class="far fa-fw fa-file-alt"
+                              aria-hidden="true"
+                              title="Edit segment"></span>
+                    </a>
+                }
             </div>
         </div>
         <span class="validation-message text-danger"

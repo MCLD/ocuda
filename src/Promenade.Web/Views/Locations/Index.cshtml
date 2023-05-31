@@ -31,14 +31,12 @@
                     <input asp-for="Zip"
                            placeholder="@Localizer[Promenade.ZipCodePrompt]"
                            class="form-control default-text search-box" />
-                    <div class="input-group-append">
-                        <button class="btn btn-outline-dark search-button"
-                                type="submit"
-                                id="GoButton"
-                                button-spinner>
-                            @Localizer[Promenade.ButtonGo]
-                        </button>
-                    </div>
+                    <button class="btn btn-outline-dark search-button"
+                            type="submit"
+                            id="GoButton"
+                            button-spinner>
+                        @Localizer[Promenade.ButtonGo]
+                    </button>
                 </div>
             </form>
         </div>
