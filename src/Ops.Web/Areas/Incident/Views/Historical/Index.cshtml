@@ -6,11 +6,11 @@
 {
     <div class="row">
         <div class="col-12">
-            <div class="alert alert-info">
-                Search results for: @Model.SearchText
+            <div class="alert alert-info d-flex">
+                <div class="flex-grow-1">Search results for: @Model.SearchText</div>
                 <a asp-action="@nameof(HistoricalController.Index)"
                    class="btn-close"
-                   aria-label="Close">&times;</a>
+                   aria-label="Close"></a>
             </div>
         </div>
     </div>

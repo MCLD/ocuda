@@ -70,7 +70,7 @@ namespace Ocuda.Ops.Service
             var postsWithCount = await _postRepository.GetPaginatedListAsync(filter);
 
             // populate additional info if it's a limited number of posts
-            if (postsWithCount.Count <= new BlogFilter().Take)
+            if (postsWithCount.Data.Count <= new BlogFilter().Take)
             {
                 foreach (var post in postsWithCount.Data)
                 {

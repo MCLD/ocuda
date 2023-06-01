@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
@@ -203,12 +204,13 @@ namespace Ocuda.Ops.Controllers
 
             var viewModel = new IndexViewModel
             {
-                Posts = posts.Data,
                 ItemCount = posts.Count,
                 CurrentPage = page,
                 ItemsPerPage = filter.Take.Value,
                 SectionManager = isAdmin
             };
+
+            ((List<Post>)viewModel.Posts).AddRange(posts.Data);
 
             if (viewModel.PastMaxPage)
             {

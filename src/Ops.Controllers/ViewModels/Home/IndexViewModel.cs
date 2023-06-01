@@ -10,6 +10,7 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
         {
             FileLibraries = new List<FileLibrary>();
             LinkLibraries = new List<LinkLibrary>();
+            Posts = new List<Post>();
         }
 
         public ICollection<FileLibrary> FileLibraries { get; }
@@ -36,10 +37,10 @@ namespace Ocuda.Ops.Controllers.ViewModels.Home
             }
         }
 
-        public ICollection<Post> Posts { get; set; }
+        public ICollection<Post> Posts { get; }
+        public bool SectionManager { get; set; }
         public string SectionName { get; set; }
         public string SectionSlug { get; set; }
         public bool SupervisorsOnly { get; set; }
-        public bool SectionManager { get; set; }
     }
 }
