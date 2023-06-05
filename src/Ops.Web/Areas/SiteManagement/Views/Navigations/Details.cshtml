@@ -165,13 +165,13 @@
                                             data-id="@navigation.Id"
                                             data-increase="false"
                                             disabled="@(navigation.Id == Model.Navigations.First().Id ? "disabled" : null)">
-                                        <span class="fas fa-arrow-up" aria-hidden="true"></span>
+                                        <span class="fas fa-fw fa-arrow-up" aria-hidden="true"></span>
                                     </button>
                                     <button class="btn btn-outline-primary changeSort increaseSortButton"
                                             data-id="@navigation.Id"
                                             data-increase="true"
                                             disabled="@(navigation.Id == Model.Navigations.Last().Id ? "disabled" : null)">
-                                        <span class="fas fa-arrow-down" aria-hidden="true"></span>
+                                        <span class="fas fa-fw fa-arrow-down" aria-hidden="true"></span>
                                     </button>
                                     <button type="button"
                                             class="btn btn-outline-primary"
@@ -184,14 +184,14 @@
                                             data-nav-icon="@navigation.Icon"
                                             data-nav-target="@navigation.TargetNewWindow"
                                             title="Edit Navigation">
-                                        <span class="fas fa-cog" aria-hidden="true"></span>
+                                        <span class="fas fa-fw fa-cog" aria-hidden="true"></span>
                                     </button>
                                     <a asp-controller="@NavigationsController.Name"
                                        asp-action="@(nameof(NavigationsController.Details))"
                                        asp-route-id="@navigation.Id"
                                        class="btn btn-outline-primary"
                                        title="Edit navigation details">
-                                        <span class="far fa-file-alt" aria-hidden="true"></span>
+                                        <span class="far fa-fw fa-file-alt" aria-hidden="true"></span>
                                     </a>
                                     <button type="button"
                                             class="btn btn-outline-danger"
@@ -199,7 +199,7 @@
                                             data-bs-target="#deleteModal"
                                             data-id="@navigation.Id"
                                             data-name="@navigation.Name">
-                                        <span class="fas fa-minus-circle" aria-hidden="true"></span>
+                                        <span class="fas fa-fw fa-minus-circle" aria-hidden="true"></span>
                                     </button>
                                 </td>
                             </tr>

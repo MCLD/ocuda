@@ -76,35 +76,35 @@ else
                     <td>@externalResource.Type</td>
                     <td align="center">
                         <button type="button"
-                                class="btn btn-light btn-xd changeSort decreaseSortButton"
+                                class="btn btn-outline-dark btn-xd changeSort decreaseSortButton"
                                 data-id="@externalResource.Id"
                                 data-increase="false"
                                 disabled="@(externalResource == Model.ExternalResources.First() ? "disabled" : null)">
-                            <span class="fas fa-arrow-up"></span>
+                            <span class="fas fa-fw fa-arrow-up"></span>
                         </button>
                         <button type="button"
-                                class="btn btn-light btn-xd changeSort increaseSortButton"
+                                class="btn btn-outline-dark btn-xd changeSort increaseSortButton"
                                 data-id="@externalResource.Id"
                                 data-increase="true"
                                 disabled="@(externalResource == Model.ExternalResources.Last() ? "disabled" : null)">
-                            <span class="fas fa-arrow-down"></span>
+                            <span class="fas fa-fw fa-arrow-down"></span>
                         </button>
                         <button type="button"
-                                class="btn btn-info btn-xs"
+                                class="btn btn-outline-primary btn-xs"
                                 data-bs-toggle="modal"
                                 data-bs-target="#editModal"
                                 data-id="@externalResource.Id"
                                 data-name="@externalResource.Name"
                                 data-url="@externalResource.Url">
-                            <span class="fa fa-pencil-alt" aria-hidden="true"></span>
+                            <span class="fa fa-fw fa-pencil-alt" aria-hidden="true"></span>
                         </button>
                         <button type="button"
-                                class="btn btn-danger btn-xs"
+                                class="btn btn-outline-danger btn-xs"
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                                 data-id="@externalResource.Id"
                                 data-name="@externalResource.Name">
-                            <span class="fa fa-times" aria-hidden="true"></span>
+                            <span class="fa fa-fw fa-times" aria-hidden="true"></span>
                         </button>
                     </td>
                 </tr>

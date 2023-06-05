@@ -44,16 +44,6 @@ else
                 </label>
                 <div class="d-flex col-md-9">
                     <div class="input-group">
-                        <button type="button"
-                                class="btn btn-outline-primary"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editModal"
-                                data-key="@setting.Id"
-                                data-name="@setting.Name"
-                                data-value="@setting.Value"
-                                data-type="@setting.Type">
-                            <span class="fa fa-pencil-alt" aria-hidden="true"></span>
-                        </button>
                         @if (setting.Type == Ocuda.Utility.Models.SiteSettingType.Bool)
                         {
                             <select class="form-control" asp-for="@setting.Value" disabled>
@@ -65,6 +55,16 @@ else
                         {
                             <input class="form-control" asp-for="@setting.Value" disabled />
                         }
+                        <button type="button"
+                                class="btn btn-outline-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editModal"
+                                data-key="@setting.Id"
+                                data-name="@setting.Name"
+                                data-value="@setting.Value"
+                                data-type="@setting.Type">
+                            <span class="fa fa-fw fa-pencil-alt" aria-hidden="true"></span>
+                        </button>
                     </div>
                 </div>
             </div>

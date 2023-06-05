@@ -205,13 +205,13 @@
                                             data-startdate="@layout.StartDate?.ToString("yyyy-MM-dd")"
                                             data-starttime="@layout.StartDate?.ToString("HH:mm")"
                                             title="Edit layout name and start date">
-                                        <span class="fas fa-cog" aria-hidden="true"></span>
+                                        <span class="fas fa-fw fa-cog" aria-hidden="true"></span>
                                     </button>
                                     <a asp-action="@(nameof(PagesController.LayoutDetail))"
                                        asp-route-id="@layout.Id"
                                        class="btn btn-outline-primary"
                                        title="Edit content">
-                                        <span class="far fa-file-alt" aria-hidden="true"></span>
+                                        <span class="far fa-fw fa-file-alt" aria-hidden="true"></span>
                                     </a>
                                     @if (LayoutsViewModel.IsClonable(layout))
                                     {
@@ -222,7 +222,7 @@
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#cloneModal"
                                                 title="Clone layout">
-                                            <span class="far fa-copy" aria-hidden="true"></span>
+                                            <span class="far fa-fw fa-copy" aria-hidden="true"></span>
                                         </button>
                                     }
                                     <button type="button"
@@ -232,7 +232,7 @@
                                             data-id="@layout.Id"
                                             data-name="@layout.Name"
                                             title="Delete layout">
-                                        <span class="fas fa-times-circle" aria-hidden="true"></span>
+                                        <span class="fas fa-fw fa-times-circle" aria-hidden="true"></span>
                                     </button>
                                 </td>
                             </tr>
