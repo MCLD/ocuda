@@ -90,10 +90,12 @@
         for (var index = 0; index < players.length; index++) {
             var episode = players[index].getAttribute("data-episode");
             players[index].addEventListener("play", function () {
-                gtag('event', 'Podcast play', {
-                    'event_category': '@Html.Raw(Model.Podcast.Title.Replace("'", "\\'"))',
-                    'event_label': episode
-                });
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'Podcast play', {
+                        'event_category': '@Html.Raw(Model.Podcast.Title.Replace("'", "\\'"))',
+                        'event_label': episode
+                    });
+                }
             });
         }
         </script>
