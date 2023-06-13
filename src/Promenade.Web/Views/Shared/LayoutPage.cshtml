@@ -7,7 +7,10 @@
 
 @if (Model.HasCarousels)
 {
-    <div class="modal prom-modal-details" tabindex="-1" role="dialog">
+    <div class="modal prom-modal-details" 
+         id="prom-carousel-modal-details"
+         tabindex="-1" 
+         role="dialog">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -15,10 +18,9 @@
                         <span class="modal-content-title"></span>
                     </h5>
                     <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Close">
-                        <span class="visually-hidden" aria-hidden="true">&times;</span>
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
                     </button>
                 </div>
                 <div class="modal-body">
@@ -66,15 +68,15 @@
                     {
                         <a href="@bannerItem.ImageFeatureItemText.Link">
                             <img src="@bannerItem.ImageFeatureItemText.Filepath"
-                 alt="@bannerItem.ImageFeatureItemText.AltText"
-                 class="img-fluid mt-2 mb-3 d-block mx-auto">
+                                 alt="@bannerItem.ImageFeatureItemText.AltText"
+                                 class="img-fluid mt-2 mb-3 d-block mx-auto">
                         </a>
                     }
                     else
                     {
                         <img src="@bannerItem.ImageFeatureItemText.Filepath"
-             class="img-fluid mt-2 mb-3 d-block mx-auto"
-             alt="@bannerItem.ImageFeatureItemText.AltText" />
+                             class="img-fluid mt-2 mb-3 d-block mx-auto"
+                             alt="@bannerItem.ImageFeatureItemText.AltText" />
                     }
                     break; // only one banner
                 }
@@ -94,15 +96,15 @@
                             {
                                 <a href="@card.Link">
                                     <img class="card-img-top"
-                     alt="@card.AltText"
-                     src="@card.ImagePath" />
+                                         alt="@card.AltText"
+                                         src="@card.ImagePath" />
                                 </a>
                             }
                             else
                             {
                                 <img class="card-img-top"
-                 alt="@card.AltText"
-                 src="@card.ImagePath" />
+                                     alt="@card.AltText"
+                                     src="@card.ImagePath" />
                             }
                         }
                         <div class="card-body">
@@ -139,14 +141,16 @@
                             {
                                 <div>
                                     <a href="@Url.Action(nameof(HomeController.CarouselItem), new { stub = Model.Stub, id = carouselItem.Id })"
-                           class="prom-carousel-modal"
-                           data-title="@carouselItem.CarouselItemText.Title"
-                           data-img="@carouselItem.CarouselItemText.ImageUrl"
-                           data-description="@carouselItem.CarouselItemText.Description"
-                           @foreach (var button in carouselItem.Buttons) {
-                                <text>data-button-@button.Order='{"Sort":"@button.Order","Button":"@button.LabelText.Text","Link":"@button.Url"}' </text>
-}>
-                                                                                                                                                                                                                                <img src="@carouselItem.CarouselItemText.ImageUrl" /><p>@carouselItem.CarouselItemText.Label</p></a>
+                                       class="prom-carousel-modal"
+                                       data-title="@carouselItem.CarouselItemText.Title"
+                                       data-img="@carouselItem.CarouselItemText.ImageUrl"
+                                       data-description="@carouselItem.CarouselItemText.Description"
+                                    @foreach (var button in carouselItem.Buttons)
+                                    {
+                                        <text>data-button-@button.Order='{"Sort":"@button.Order","Button":"@button.LabelText.Text","Link":"@button.Url"}' </text>
+                                    }>
+                                        <img src="@carouselItem.CarouselItemText.ImageUrl" /><p>@carouselItem.CarouselItemText.Label</p>
+                                    </a>
                                 </div>
                             }
                         </div>
@@ -196,13 +200,12 @@
                                 {
                                     <a href="@featureItem.ImageFeatureItemText.Link">
                                         <img src="@featureItem.ImageFeatureItemText.Filepath"
-                             alt="@featureItem.ImageFeatureItemText.AltText"
-                             class="img-fluid mx-auto d-block"
-                             style="width: 182px;" />
+                                             alt="@featureItem.ImageFeatureItemText.AltText"
+                                             class="img-fluid mx-auto d-block"
+                                             style="width: 182px;" />
                                     </a>
                                 }
                             </div>
-
                             count++;
                             if (count >= Model.PageFeatureTemplate?.ItemsToDisplay)
                             {
@@ -231,32 +234,32 @@
         <div class="row">
             <div class="col-12">
                 <div id="carouselControls"
-             style="max-width: 740px"
-             class="carousel slide mx-auto d-block mb-4"
-             data-ride="carousel"
-             aria-hidden="true">
+                     style="max-width: 740px"
+                     class="carousel slide mx-auto d-block mb-4"
+                     data-ride="carousel"
+                     aria-hidden="true">
                     <div class="carousel-inner">
                         @foreach (var webslideItem in item.Webslide.Items)
                         {
                             <div class="carousel-item @(webslideItem == item.Webslide.Items.First() ? "active" : null)">
                                 <a href="@webslideItem.ImageFeatureItemText.Link">
                                     <img class="d-block w-100"
-                             src="@webslideItem.ImageFeatureItemText.Filepath"
-                             alt="@webslideItem.ImageFeatureItemText.AltText" />
+                                         src="@webslideItem.ImageFeatureItemText.Filepath"
+                                         alt="@webslideItem.ImageFeatureItemText.AltText" />
                                 </a>
                             </div>
                         }
                     </div>
                     <a class="carousel-control-prev"
-               style="left: -1.5rem"
-               href="#carouselControls"
-               role="button"
-               data-slide="prev"><span class="carousel-control-prev-icon text-left" aria-hidden="true"></span><span class="sr-only">Previous</span></a>
+                       style="left: -1.5rem"
+                       href="#carouselControls"
+                       role="button"
+                       data-slide="prev"><span class="carousel-control-prev-icon text-left" aria-hidden="true"></span><span class="sr-only">Previous</span></a>
                     <a class="carousel-control-next"
-               style="right: -1.5rem"
-               href="#carouselControls"
-               role="button"
-               data-slide="next"><span class="carousel-control-next-icon text-end" aria-hidden="true"></span><span class="sr-only">Next</span></a>
+                       style="right: -1.5rem"
+                       href="#carouselControls"
+                       role="button"
+                       data-slide="next"><span class="carousel-control-next-icon text-end" aria-hidden="true"></span><span class="sr-only">Next</span></a>
                 </div>
             </div>
         </div>
