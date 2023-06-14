@@ -158,10 +158,11 @@ if [[ -z ${BLD_BRANCH} ]]; then
   fi
 fi
 
-if [[ $BLD_BRANCH = "develop"
+if [[ $BLD_BRANCH = "dev"
+    || $BLD_BRANCH = "develop"
     || $BLD_BRANCH = "main"
     || $BLD_BRANCH = "master"
-  || $BLD_BRANCH = "test" ]]; then
+    || $BLD_BRANCH = "test" ]]; then
   BLD_DOCKER_TAG=$BLD_BRANCH
   BLD_VERSION=${BLD_BRANCH}-${BLD_VERSION_DATE}
   BLD_PUSH=true
