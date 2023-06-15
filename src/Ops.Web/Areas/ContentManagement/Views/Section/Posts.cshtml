@@ -29,7 +29,7 @@
                                 <li>
                                     <a href="@Url.Action(nameof(SectionController.Posts),
                                        new { sectionSlug = Model.SectionSlug, categorySlug = category.Stub, page=1})"
-                               class=" badge badge-light text-left"
+                               class=" badge badge-light text-start"
                                style="margin: 5px 10px; padding: 5px 10px; width:80%">
                                         @category.Name
                                     </a>
@@ -58,7 +58,7 @@
                                 <li>
                                     <a href="@Url.Action(nameof(SectionController.PostDetails),
                                        new { sectionSlug = Model.SectionSlug, postSlug = post.Slug })"
-                               class="badge badge-light text-left"
+                               class="badge badge-light text-start"
                                style="margin: 5px 10px; padding: 5px 10px; width:80%">
                                         @post.Title
                                     </a>
@@ -131,8 +131,8 @@
                                            .Where(_ => _.PostId == post.Id)
                                            .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
                                             {
-                                                <a class="badge badge-pill badge-info"
-                                   href="@Url.Action(nameof(SectionController.Posts),
+                                                <a class="badge rounded-pill bg-info"
+                                                   href="@Url.Action(nameof(SectionController.Posts),
                                                         new { sectionSlug = Model.SectionSlug,
                                                         categorySlug = category.Stub, page = 1})">
                                                     @category.Name

@@ -54,9 +54,14 @@
                         </div>
                         <div class="card-footer">
                             <span class="sr-only">@Localizer[Promenade.OffersItem, emedia.Name]</span>
-                            @foreach (var category in emedia.Categories)
+                            @if (emedia.Categories?.Count > 0)
                             {
-                                <span class="badge @category.Class">@category.CategoryText?.Text</span>
+                                <h5>
+                                    @foreach (var category in emedia.Categories)
+                                    {
+                                        <span class="badge text-dark @category.Class">@category.CategoryText?.Text</span>
+                                    }
+                                </h5>
                             }
                         </div>
                     </div>

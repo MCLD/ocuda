@@ -295,8 +295,8 @@
                                            .Where(_ => _.PostId == post.Id)
                                            .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
                                             {
-                                                <a class="badge badge-pill badge-info"
-                                   href="@Url.Action(nameof(SectionController.Posts),
+                                                <a class="badge rounded-pill bg-info"
+                                                   href="@Url.Action(nameof(SectionController.Posts),
                                         new { sectionSlug = Model.Section.Slug,
                                             categorySlug = category.Stub, page = 1})">
                                                     @category.Name
