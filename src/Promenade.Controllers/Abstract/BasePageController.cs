@@ -215,7 +215,7 @@ namespace Ocuda.Promenade.Controllers.Abstract
             PageTitle = pageLayout.PageLayoutText?.Title;
 
             viewModel.PageHeaderClasses = pageLayout.PageLayoutText?.IsTitleHidden == true
-                ? "oc-title sr-only"
+                ? "oc-title visually-hidden"
                 : "oc-title";
 
             return View("LayoutPage", viewModel);

@@ -32,7 +32,7 @@
                     }
                 </div>
             }
-            <div class="sr-only">@Localizer[Promenade.LocationOurAddress]</div>
+            <div class="visually-hidden">@Localizer[Promenade.LocationOurAddress]</div>
             <address>
                 @Model.Location.Address
                 <br />
@@ -43,7 +43,7 @@
                 <a aria-label="@Localizer[Promenade.LocationCallUsAt, Model.Location.Phone]"
                    href="tel:@Model.Location.Phone">@Model.Location.Phone</a>
             </address>
-            <div class="sr-only">@Localizer[Promenade.LocationCurrentHours]</div>
+            <div class="visually-hidden">@Localizer[Promenade.LocationCurrentHours]</div>
             @if (Model.Location.IsAlwaysOpen)
             {
                 <p>@Localizer[Promenade.LocationOpen]</p>
@@ -127,7 +127,7 @@
                         @feature.Name
                         @if (feature.NewTab == true)
                         {
-                            <span class="sr-only">@Localizer[Promenade.NewWindow]</span>
+                            <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
                         }
                     </a>
                 }
@@ -141,7 +141,7 @@
                         @feature.Name
                         @if (feature.NewTab.HasValue && feature.NewTab.Value == true)
                         {
-                            <span class="sr-only">@Localizer[Promenade.NewWindow]</span>
+                            <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
                         }
                     </a>
                 }
@@ -238,7 +238,7 @@
                                         @Localizer[Promenade.LocationUpdatesFromCount, Model.NearbyEventsCount]
                                         ;
                                     }
-                                    <span class="sr-only">@Localizer[Promenade.NewWindow]</span>
+                                    <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
                                 </a>
                             </td>
                         </tr>

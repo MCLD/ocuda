@@ -18,7 +18,7 @@
         <p>@Model.Podcast.Description</p>
         <div class="row">
             <div class="col-12">
-                <span class="sr-only">@Localizer[Promenade.PodcastListenOn]</span>
+                <span class="visually-hidden">@Localizer[Promenade.PodcastListenOn]</span>
                 @foreach (var directoryInfo in Model.PodcastDirectoryInfos)
                 {
                     <a href="@directoryInfo.Url"

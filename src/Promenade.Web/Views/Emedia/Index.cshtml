@@ -53,7 +53,7 @@
                             @Html.Raw(emedia.EmediaText?.Description)
                         </div>
                         <div class="card-footer">
-                            <span class="sr-only">@Localizer[Promenade.OffersItem, emedia.Name]</span>
+                            <span class="visually-hidden">@Localizer[Promenade.OffersItem, emedia.Name]</span>
                             @if (emedia.Categories?.Count > 0)
                             {
                                 <h5>
