@@ -7,9 +7,9 @@
 
 @if (Model.HasCarousels)
 {
-    <div class="modal prom-modal-details" 
+    <div class="modal prom-modal-details"
          id="prom-carousel-modal-details"
-         tabindex="-1" 
+         tabindex="-1"
          role="dialog">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -149,8 +149,8 @@
                                     {
                                         <text>data-button-@button.Order='{"Sort":"@button.Order","Button":"@button.LabelText.Text","Link":"@button.Url"}' </text>
                                     }>
-                                        <img src="@carouselItem.CarouselItemText.ImageUrl" /><p>@carouselItem.CarouselItemText.Label</p>
-                                    </a>
+                                                                            <img src="@carouselItem.CarouselItemText.ImageUrl" /><p>@carouselItem.CarouselItemText.Label</p>
+                                                                        </a>
                                 </div>
                             }
                         </div>
@@ -234,9 +234,9 @@
         <div class="row">
             <div class="col-12">
                 <div id="carouselControls"
-                     style="max-width: 740px"
                      class="carousel slide mx-auto d-block mb-4"
-                     data-ride="carousel"
+                     data-bs-ride="carousel"
+                     style="max-width: 740px"
                      aria-hidden="true">
                     <div class="carousel-inner">
                         @foreach (var webslideItem in item.Webslide.Items)
@@ -250,16 +250,20 @@
                             </div>
                         }
                     </div>
-                    <a class="carousel-control-prev"
-                       style="left: -1.5rem"
-                       href="#carouselControls"
-                       role="button"
-                       data-slide="prev"><span class="carousel-control-prev-icon text-start" aria-hidden="true"></span><span class="visually-hidden">Previous</span></a>
-                    <a class="carousel-control-next"
-                       style="right: -1.5rem"
-                       href="#carouselControls"
-                       role="button"
-                       data-slide="next"><span class="carousel-control-next-icon text-end" aria-hidden="true"></span><span class="visually-hidden">Next</span></a>
+                    <button class="carousel-control-prev"
+                            type="button"
+                            data-bs-target="#carouselControls"
+                            data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next"
+                            type="button"
+                            data-bs-target="#carouselControls"
+                            data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
                 </div>
             </div>
         </div>
