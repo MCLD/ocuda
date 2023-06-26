@@ -11,15 +11,15 @@
         </h1>
     </div>
     <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
            asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine)"
            asp-route-page="@(Model.Page > 1 ? Model.Page : null)">Back</a>
         @if (Model.CanConfigureIncidents)
         {
-            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
-                data-toggle="modal"
-                data-target="#addTypeModal">
+            <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
+                data-bs-toggle="modal"
+                data-bs-target="#addTypeModal">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Add Incident Type
             </button>
@@ -80,8 +80,8 @@
                                 </form>
                             }
                             <button class="btn btn-sm btn-outline-primary"
-                        data-toggle="modal"
-                        data-target="#updateTypeModal"
+                        data-bs-toggle="modal"
+                        data-bs-target="#updateTypeModal"
                         data-id="@incidentType.Id"
                         data-description="@incidentType.Description">
                                 <span class="fas fa-edit"></span>
@@ -147,7 +147,7 @@ else
         {
             <tfoot>
                 <tr>
-                    <td colspan="2" class="align-middle text-right">
+                    <td colspan="2" class="align-middle text-end">
                         <button type="submit" class="btn btn-outline-dark">Update email settings</button>
                     </td>
                 </tr>
@@ -164,8 +164,8 @@ else
          id="addTypeModal"
          name="Incident Type"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add"
-         data-backdrop="static">
-            <div class="form-group">
+         data-bs-backdrop="static">
+            <div class="mb-3">
                 <label for="incidentTypeDescription">Incident Type Description</label>
                 <input type="text"
                    class="form-control"
@@ -187,8 +187,8 @@ else
          id="updateTypeModal"
          name="Incident Type"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Edit"
-         data-backdrop="static">
-            <div class="form-group">
+         data-bs-backdrop="static">
+            <div class="mb-3">
                 <label for="incidentTypeDescription">Incident Type Description</label>
                 <input type="text"
                    class="form-control"

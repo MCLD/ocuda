@@ -4,75 +4,64 @@
     <link rel="stylesheet" href="~/css/crop.min.css" asp-append-version="true" />
 }
 
-    <div class="row mb-2">
-        <div class="col-sm-6">
-            <h1>
-                Update Picture
-                <small class="text-muted">@Model.User.Name</small>
-            </h1>
-        </div>
-        <div class="col-sm-6">
-            <a class="btn btn-outline-dark mt-2 mb-1 float-right"
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Update Picture
+            <small class="text-muted">@Model.User.Name</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-outline-dark mt-2 mb-1 float-end"
            asp-action="@nameof(ProfileController.Index)"
            asp-controller="@ProfileController.Name"
            asp-route-Id="@Model.User.Username">Back</a>
+    </div>
+</div>
+<div class="row mb-2">
+    <div class="col-12">
+        <div class="alert alert-danger d-none" id="alertItem">
+            The cropped image is too small. It must be at least
+            <strong>@Model.CropWidth pixels wide by @Model.CropWidth pixels high</strong>.
+            <span class="alertDetails"></span>
+        </div>
+        <p>
+            Use this form to upload a new profile picture for
+            <strong>@Model.User.Name</strong>. The uploaded file should be a JPEG or PNG image
+            at least
+            <strong>@Model.CropWidth pixels wide by @Model.CropWidth pixels high</strong>.
+            Once you select a file you will be able to crop it square before saving it.
+        </p>
+        <input type="file"
+               class="form-control mb-3"
+               id="uploadedImage"
+               accept="image/*" />
+    </div>
+    <div class="col-12 mb-2" style="min-height: 100px;">
+        <div id="previewContainer">
+            <canvas id="previewCanvas"></canvas>
         </div>
     </div>
-    <div class="row mb-2">
-        <div class="col-12">
-            <div class="alert alert-danger d-none" id="alertItem">
-                The cropped image is too small. It must be at least
-                <strong>@Model.CropWidth pixels wide by @Model.CropWidth pixels high</strong>.
-                <span class="alertDetails"></span>
-            </div>
-            <p>
-                Use this form to upload a new profile picture for
-                <strong>@Model.User.Name</strong>. The uploaded file should be a JPEG or PNG image
-                at least
-                <strong>@Model.CropWidth pixels wide by @Model.CropWidth pixels high</strong>.
-                Once you select a file you will be able to crop it square before saving it.
-            </p>
-            <div class="input-group">
-                <label class="input-group-btn">
-                    <span class="btn btn-light btn-file">
-                        <span class="far fa-file-image"></span> Select file...
-                        <input type="file"
-                           id="uploadedImage"
-                           accept="image/*"
-                           style="display: none;" />
-                    </span>
-                </label>
-                <input type="text"
-                   disabled="disabled"
-                   id="File_Name"
-                   class="form-control" />
-            </div>
-        </div>
-        <div class="col-12 mb-2">
-            <div id="previewContainer">
-                <canvas id="previewCanvas"></canvas>
-            </div>
-        </div>
-        <div class="col-12">
-            <form method="post" asp-action="@nameof(ProfileController.UploadPicture)">
-                <input type="hidden" asp-for="ProfilePictureMetadata" />
-                <input type="hidden" asp-for="ProfilePicture" />
-                <input type="hidden" asp-for="UserId" value="@Model.User.Id" />
-                <button type="submit"
+    <div class="col-12" style="clear: both;">
+        <form method="post" asp-action="@nameof(ProfileController.UploadPicture)">
+            <input type="hidden" asp-for="ProfilePictureMetadata" />
+            <input type="hidden" asp-for="ProfilePicture" />
+            <input type="hidden" asp-for="UserId" value="@Model.User.Id" />
+            <button type="submit"
                     class="btn btn-primary d-none"
                     disabled="disabled"
                     id="submitButton"
                     button-spinner>
-                    <span class="fas fa-file-upload"></span>
-                    Upload profile picture
-                </button>
-            </form>
-        </div>
+                <span class="fas fa-file-upload"></span>
+                Upload profile picture
+            </button>
+        </form>
     </div>
+</div>
 
-    <img id="baseImage" style="display: none" />
+<img id="baseImage" style="display: none" />
 
-    @section scripts {
+@section scripts {
     <script src="~/js/crop.min.js" asp-append-version="true"></script>
     <script>
         const dataDivider = ";base64,";
@@ -88,12 +77,12 @@
             displayDimension: necessaryDisplayDimension,
             uploadControl: document.getElementById("uploadedImage"),
             previewCanvas: document.getElementById("previewCanvas"),
-            onCropLoad: function() {
+            onCropLoad: function () {
                 $("#previewRow").removeClass("d-none");
                 $("#submitButton").removeClass("d-none");
                 alertVisible = true;
             },
-            onCropResize: function(imageDataUrl, cropFailure, cropWidth, cropHeight) {
+            onCropResize: function (imageDataUrl, cropFailure, cropWidth, cropHeight) {
                 if (imageDataUrl) {
                     let dataDividerLocation = imageDataUrl.indexOf(dataDivider);
                     document.getElementById("ProfilePictureMetadata").value

@@ -29,7 +29,7 @@
                                 <li>
                                     <a href="@Url.Action(nameof(SectionController.Posts),
                                        new { sectionSlug = Model.SectionSlug, categorySlug = category.Stub, page=1})"
-                               class=" badge badge-light text-left"
+                               class=" badge bg-light text-start"
                                style="margin: 5px 10px; padding: 5px 10px; width:80%">
                                         @category.Name
                                     </a>
@@ -58,7 +58,7 @@
                                 <li>
                                     <a href="@Url.Action(nameof(SectionController.PostDetails),
                                        new { sectionSlug = Model.SectionSlug, postSlug = post.Slug })"
-                               class="badge badge-light text-left"
+                               class="badge bg-light text-start"
                                style="margin: 5px 10px; padding: 5px 10px; width:80%">
                                         @post.Title
                                     </a>
@@ -92,8 +92,8 @@
                     <div class="mx-auto">
                         <div class="card m-3">
                             <div class="card-header">
-                                <div class="float-left align-middle">
-                                    <a class="float-left align-middle"
+                                <div class="float-start align-middle">
+                                    <a class="float-start align-middle"
                                href="@Url.Action(nameof(SectionController.PostDetails),
                                             new { sectionSlug = Model.SectionSlug, postSlug = post.Slug})">
                                         <h5>
@@ -101,10 +101,10 @@
                                         </h5>
                                     </a>
                                 </div>
-                                <div class="float-right align-middle h4">
+                                <div class="float-end align-middle h4">
                                     <a href="@Url.Action(nameof(SectionController.EditPost),
                                             new { sectionSlug = Model.SectionSlug, postSlug = post.Slug})">
-                                        <span class="far fa-edit float-right"></span>
+                                        <span class="far fa-edit float-end"></span>
                                     </a>
                                 </div>
                             </div>
@@ -131,8 +131,8 @@
                                            .Where(_ => _.PostId == post.Id)
                                            .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
                                             {
-                                                <a class="badge badge-pill badge-info"
-                                   href="@Url.Action(nameof(SectionController.Posts),
+                                                <a class="badge rounded-pill bg-info"
+                                                   href="@Url.Action(nameof(SectionController.Posts),
                                                         new { sectionSlug = Model.SectionSlug,
                                                         categorySlug = category.Stub, page = 1})">
                                                     @category.Name
@@ -157,7 +157,7 @@
         @if (Model.SectionCategories.Count == 0)
         {
             @:$("#addPost").addClass("disabled");
-            @:$('[data-toggle="tooltip"]').tooltip();
+            @:$('[data-bs-toggle="tooltip"]').tooltip();
         }
     });
 </script>

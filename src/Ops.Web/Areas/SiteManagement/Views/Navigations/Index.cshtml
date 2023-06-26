@@ -9,12 +9,12 @@
     <div class="col-sm-6">
         <a asp-controller="@HomeController.Name"
            asp-action="@(nameof(HomeController.Index))"
-           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+           class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
         @if (Model.OpenRoles.Count > 0)
         {
-            <button data-toggle="modal"
-                    data-target="#addModal"
-                    class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
+            <button data-bs-toggle="modal"
+                    data-bs-target="#addModal"
+                    class="btn btn-outline-success mt-2 mb-1 me-2 float-end">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Add Navigation
             </button>
@@ -48,27 +48,27 @@
                             <td class="align-middle">
                                 <button type="button"
                                         class="btn btn-outline-primary"
-                                        data-toggle="modal"
-                                        data-target="#editModal"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editModal"
                                         data-id="@navigation.Id"
                                         data-name="@navigation.Name"
                                         title="Edit Navigation">
-                                    <span class="fas fa-cog" aria-hidden="true"></span>
+                                    <span class="fas fa-fw fa-cog" aria-hidden="true"></span>
                                 </button>
                                 <a asp-controller="@NavigationsController.Name"
                                    asp-action="@(nameof(NavigationsController.Details))"
                                    asp-route-id="@navigation.Id"
                                    class="btn btn-outline-primary"
                                    title="Edit navigation details">
-                                    <span class="far fa-file-alt" aria-hidden="true"></span>
+                                    <span class="far fa-fw fa-file-alt" aria-hidden="true"></span>
                                 </a>
                                 <button type="button"
                                         class="btn btn-outline-danger"
-                                        data-toggle="modal"
-                                        data-target="#deleteModal"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal"
                                         data-id="@navigation.Id"
                                         data-name="@navigation.Name">
-                                    <span class="fas fa-minus-circle" aria-hidden="true"></span>
+                                    <span class="fas fa-fw fa-minus-circle" aria-hidden="true"></span>
                                 </button>
                             </td>
                         </tr>

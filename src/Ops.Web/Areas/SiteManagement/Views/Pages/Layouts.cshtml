@@ -10,12 +10,12 @@
         </h1>
     </div>
     <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-action="@(nameof(PagesController.Index))"
            asp-route-Type="@Model.HeaderType">Back</a>
-        <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
-                data-toggle="modal"
-                data-target="#addModal">
+        <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
+                data-bs-toggle="modal"
+                data-bs-target="#addModal">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
             Add Layout
         </button>
@@ -34,16 +34,16 @@
          name="Page Layout"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add">
         <input id="addName" asp-for="PageLayout.Name" formgroup />
-        <div class="form-group row">
+        <div class="mb-3 row">
             <label asp-for="PageLayout.StartDate"
-                   class="col-form-label col-12 col-md-3 text-md-right"></label>
-            <div class="form-group-inner col-12 col-md-5">
+                   class="col-form-label col-12 col-md-3 text-md-end"></label>
+            <div class="mb-3-inner col-12 col-md-5">
                 <input asp-for="StartDate"
                        required
                        class="form-control"
                        type="date" />
             </div>
-            <div class="form-group-inner col-12 col-md-4">
+            <div class="mb-3-inner col-12 col-md-4">
                 <input asp-for="StartTime"
                        class="form-control"
                        required
@@ -58,7 +58,7 @@
       asp-action="@(nameof(PagesController.CloneLayout))">
     <div class="modal fade"
          id="cloneModal"
-         data-backdrop="static"
+         data-bs-backdrop="static"
          data-keyboard="false"
          tabindex="-1"
          aria-labelledby="cloneModalLabel"
@@ -67,8 +67,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="cloneModalLabel">Clone layout</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="visually-hidden" aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -77,7 +77,7 @@
                            name="clonePageHeaderId"
                            type="hidden"
                            value="@Model.HeaderId" />
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="clonedName">
                             Enter a name for the clone of the
                             <strong id="cloneLayoutName"></strong> layout:
@@ -86,7 +86,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                         Cancel
                     </button>
                     <button type="submit" class="btn btn-outline-primary">
@@ -107,17 +107,17 @@
          name="Page Layout"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Edit">
         <input id="editName" asp-for="PageLayout.Name" formgroup />
-        <div class="form-group row">
+        <div class="mb-3 row">
             <label asp-for="PageLayout.StartDate"
-                   class="col-form-label col-12 col-md-3 text-md-right"></label>
-            <div class="form-group-inner col-12 col-md-5">
+                   class="col-form-label col-12 col-md-3 text-md-end"></label>
+            <div class="mb-3-inner col-12 col-md-5">
                 <input asp-for="StartDate"
                        id="editStartDate"
                        required
                        class="form-control"
                        type="date" />
             </div>
-            <div class="form-group-inner col-12 col-md-4">
+            <div class="mb-3-inner col-12 col-md-4">
                 <input asp-for="StartTime"
                        id="editStartTime"
                        class="form-control"
@@ -173,8 +173,8 @@
                                     Page has no layouts.
                                     <a href="#"
                                        class="text-success"
-                                       data-toggle="modal"
-                                       data-target="#addModal">
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#addModal">
                                         <span class="fas fa-plus-circle" aria-hidden="true"></span>
                                         Add a page layout.
                                     </a>
@@ -198,20 +198,20 @@
                                 <td class="align-middle">
                                     <button type="button"
                                             class="btn btn-outline-primary"
-                                            data-toggle="modal"
-                                            data-target="#editModal"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editModal"
                                             data-id="@layout.Id"
                                             data-name="@layout.Name"
                                             data-startdate="@layout.StartDate?.ToString("yyyy-MM-dd")"
                                             data-starttime="@layout.StartDate?.ToString("HH:mm")"
                                             title="Edit layout name and start date">
-                                        <span class="fas fa-cog" aria-hidden="true"></span>
+                                        <span class="fas fa-fw fa-cog" aria-hidden="true"></span>
                                     </button>
                                     <a asp-action="@(nameof(PagesController.LayoutDetail))"
                                        asp-route-id="@layout.Id"
                                        class="btn btn-outline-primary"
                                        title="Edit content">
-                                        <span class="far fa-file-alt" aria-hidden="true"></span>
+                                        <span class="far fa-fw fa-file-alt" aria-hidden="true"></span>
                                     </a>
                                     @if (LayoutsViewModel.IsClonable(layout))
                                     {
@@ -219,20 +219,20 @@
                                                 class="btn btn-outline-primary"
                                                 data-id="@layout.Id"
                                                 data-name="@layout.Name"
-                                                data-toggle="modal"
-                                                data-target="#cloneModal"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#cloneModal"
                                                 title="Clone layout">
-                                            <span class="far fa-copy" aria-hidden="true"></span>
+                                            <span class="far fa-fw fa-copy" aria-hidden="true"></span>
                                         </button>
                                     }
                                     <button type="button"
                                             class="btn btn-outline-danger"
-                                            data-toggle="modal"
-                                            data-target="#deleteModal"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal"
                                             data-id="@layout.Id"
                                             data-name="@layout.Name"
                                             title="Delete layout">
-                                        <span class="fas fa-times-circle" aria-hidden="true"></span>
+                                        <span class="fas fa-fw fa-times-circle" aria-hidden="true"></span>
                                     </button>
                                 </td>
                             </tr>

@@ -35,20 +35,6 @@ $(".btn-spinner").on("click", function (e) {
     }
 });
 
-$(document).on('change', ':file', function (e) {
-    var fileInput = $(this),
-        filePath = fileInput.val().replace(/\\/g, '/').replace(/.*\//, '');
-
-    validateFile(e, filePath);
-});
-
-$(document).on('fileselect', ':file', function (e) {
-    var fileInput = $(this),
-        filePath = fileInput.val().replace(/\\/g, '/').replace(/.*\//, '');
-
-    validateFile(e, filePath);
-});
-
 function validateFile(e, filePath) {
     var file = $(e.target)[0].files[0],
         fileButton = e.target.parentElement,
@@ -80,7 +66,7 @@ function updateStub(stub, text) {
 function SetValidation(target, message) {
     target.addClass("input-validation-error");
 
-    var validationMessage = target.closest(".form-group-inner").find(".validation-message");
+    var validationMessage = target.closest(".mb-3-inner").find(".validation-message");
     validationMessage.removeClass("field-validation-valid");
     validationMessage.addClass("field-validation-error");
     validationMessage.text(message);
@@ -89,7 +75,7 @@ function SetValidation(target, message) {
 function ClearValidation(target) {
     target.removeClass("input-validation-error");
 
-    var validationMessage = target.closest(".form-group-inner").find(".validation-message");
+    var validationMessage = target.closest(".mb-3-inner").find(".validation-message");
     validationMessage.text("");
     validationMessage.removeClass("field-validation-error");
     validationMessage.addClass("text-danger field-validation-valid");
@@ -98,7 +84,7 @@ function ClearValidation(target) {
 function ValidateField(target, validateUrl, params) {
     ClearValidation(target);
 
-    var validationMessage = target.closest(".form-group-inner").find(".validation-message");
+    var validationMessage = target.closest(".mb-3-inner").find(".validation-message");
     validationMessage.removeClass("text-danger text-success");
     validationMessage.text("Checking...");
 

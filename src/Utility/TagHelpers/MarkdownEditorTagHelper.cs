@@ -56,7 +56,7 @@ namespace Ocuda.Utility.TagHelpers
             editTab.AddCssClass(navLinkClass);
             editTab.AddCssClass(activeClass);
             editTab.Attributes.Add("href", $"#{inputId}");
-            editTab.Attributes.Add("data-toggle", tabDataToggle);
+            editTab.Attributes.Add("data-bs-toggle", tabDataToggle);
             editTab.Attributes.Add("role", tabRole);
             editTab.InnerHtml.Append("Edit");
 
@@ -67,7 +67,7 @@ namespace Ocuda.Utility.TagHelpers
             var previewTab = new TagBuilder("a");
             previewTab.AddCssClass(navLinkClass);
             previewTab.Attributes.Add("href", $"#{previewId}");
-            previewTab.Attributes.Add("data-toggle", tabDataToggle);
+            previewTab.Attributes.Add("data-bs-toggle", tabDataToggle);
             previewTab.Attributes.Add("role", tabRole);
             previewTab.InnerHtml.Append("Preview");
 

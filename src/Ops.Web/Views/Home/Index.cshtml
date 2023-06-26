@@ -4,7 +4,7 @@
 {
     <div class="d-flex">
         <div class="flex-grow-1 align-middle">
-            <h1 class="h2 pl-2 pb-2 flex-grow-1">
+            <h1 class="h2 ps-2 pb-2 flex-grow-1">
                 @Model.SectionName
                 @if (Model.SupervisorsOnly)
                 {
@@ -62,14 +62,14 @@
                                        asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
                                        asp-route-postSlug="@post.Slug"
                                        asp-route-sectionSlug="@Model.SectionSlug"
-                                       class="btn btn-sm btn-outline-secondary ml-3">
+                                       class="btn btn-sm btn-outline-secondary ms-3">
                                         <span class="fas fa-edit fa-xs fa-fw" title="Edit post"></span>
                                         Edit Post
                                     </a>
                                 </span>
                                 @if (post.UpdatedAt.HasValue)
                                 {
-                                    <em class="mr-3 text-muted" title="@post.UpdatedAt.Value">
+                                    <em class="me-3 text-muted" title="@post.UpdatedAt.Value">
                                         <small>
                                             Last update
                                             @if (post.UpdatedBy.HasValue && !string.IsNullOrEmpty(post.UpdatedByName))
@@ -91,7 +91,7 @@
                         @Html.Raw(post.Content)
                     </div>
                     <div class="card-footer d-flex flex-wrap py-1">
-                        <div class="flex-grow-1 mr-2">
+                        <div class="flex-grow-1 me-2">
                             <em>
                                 <small class="text-muted">
                                     Posted by
@@ -146,7 +146,7 @@
                         <div class="card-header">
                             <h2 class="h5 mb-0">@linkLibrary.Name</h2>
                         </div>
-                        <div class="card-body p-0 pl-2 m-0">
+                        <div class="card-body p-0 ps-2 m-0">
                             <table class="table table-borderless table-sm mt-1 mb-0">
                                 @foreach (var link in linkLibrary.Links)
                                 {
@@ -155,7 +155,7 @@
                                             <a href="@link.Url">
                                                 @if (!string.IsNullOrEmpty(link.Icon))
                                                 {
-                                                    <span class="@link.Icon fa-fw pr-1"></span>
+                                                    <span class="@link.Icon fa-fw pe-1"></span>
                                                 }
                                                 <small>@link.Name</small>
                                             </a>
@@ -189,32 +189,25 @@
                         <div class="card-body p-0 m-0">
                             <table class="table table-sm mb-0">
                                 <tr>
-                                    <th class="pl-2">File</th>
+                                    <th class="ps-2">File</th>
                                     <th style="width: 20%;">Size</th>
                                 </tr>
                                 @foreach (var file in fileLibrary.Files)
                                 {
                                     <tr>
-                                        <td class="pl-2">
+                                        <td class="ps-2">
                                             <a asp-action="@nameof(HomeController.GetFile)"
                                                asp-route-libraryId="@fileLibrary.Id"
                                                asp-route-fileId="@file.Id">
                                                 @if (string.IsNullOrEmpty(file.FileType?.Icon))
                                                 {
-                                                    <span class="far fa-file fa-fw pr-1"></span>
+                                                    <span class="far fa-file fa-fw pe-1"></span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="@file.FileType.Icon fa-fw pr-1"></span>
+                                                    <span class="@file.FileType.Icon fa-fw pe-1"></span>
                                                 }
-                                                @if (file.Name.Length > 18)
-                                                {
-                                                    <small>@file.Name</small>
-                                                }
-                                                else
-                                                {
-                                                    @file.Name
-                                                }
+                                                <small>@file.Name</small>
                                             </a>
                                         </td>
                                         <td>

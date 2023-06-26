@@ -22,7 +22,7 @@
       id="featureform"
       display="inline">
     <input asp-for="Feature.Id" id="feature-id" type="hidden" />
-    <input asp-for="Feature.NeedsPopup" id="feature-needsPopup" type="hidden" />
+    <input asp-for="Feature.NeedsPopup" type="hidden" />
     <input asp-for="Feature.Name"
            formgroup
            autocomplete="off" />
@@ -33,33 +33,32 @@
            autocomplete="off" />
     <div class="row">
         <div class="accordion offset-md-3 col-md-9" id="popup-accordion">
-            <div class="card">
-                <div class="card-header @(string.IsNullOrEmpty(Model?.Feature?.Stub)&&!Model.Feature.NeedsPopup ? "" : "bg-info")" id="accordion-header">
-                    <button class="btn btn-link @(string.IsNullOrEmpty(Model?.Feature?.Stub)&&!Model.Feature.NeedsPopup ? "text-info" : "text-white")"
+            <div class="accordion-item">
+                <div class="accordion-header" id="accordion-header">
+                    <button class="accordion-button collapsed"
                             style="text-decoration: none;"
                             id="popup-button"
                             type="button"
-                            data-toggle="collapse"
-                            data-target="#collapseDiv"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseDiv"
                             aria-expanded="true"
                             aria-controls="collapseDiv">
-                        <span class="fas fa-caret-@(string.IsNullOrEmpty(Model?.Feature?.Stub)&&!Model.Feature.NeedsPopup ? "right" : "down")" id="accordion-disclosure"></span>
                         Display this feature in a pop-up
                     </button>
                 </div>
                 <div id="collapseDiv"
-                     class="collapse@(string.IsNullOrEmpty(Model?.Feature?.Stub)&&!Model.Feature.NeedsPopup ? "" : " show")"
+                     class="accordion-collapse collapse@(string.IsNullOrEmpty(Model?.Feature?.Stub)&&!Model.Feature.NeedsPopup ? "" : " show")"
                      aria-labelledby="headingOne"
                      data-parent="#popup-accordion">
-                    <div class="card-body">
+                    <div class="accordion-body">
                         <input asp-for="Feature.Stub"
                                formgroup
                                autocomplete="off"
                                info-tooltip="The stub is the nickname/URL for the feature."
                                on-blur-js="FormatStub" />
-                        <div class="form-group row">
-                            <label asp-for="Feature.BodyText" class="col-md-3 col-form-label text-md-right"></label>
-                            <div class="form-group-inner col-md-9">
+                        <div class="mb-3 row">
+                            <label asp-for="Feature.BodyText" class="col-md-3 col-form-label text-md-end"></label>
+                            <div class="mb-3-inner col-md-9">
                                 <textarea asp-for="Feature.BodyText" markdown-editor></textarea>
                                 <span asp-validation-for="Feature.BodyText" class="validation-message text-danger"></span>
                             </div>
@@ -71,7 +70,7 @@
     </div>
     <div class="row mt-3">
         <div class="offset-md-3 col-md-9">
-            <div class="form-group">
+            <div class="mb-3">
                 <a class="btn btn-secondary"
                    id="return-home"
                    asp-action="@nameof(FeaturesController.Index)">Return to Features</a>
@@ -108,31 +107,13 @@
     <script src="~/js/iconpicker.min.js" asp-append-version="true"></script>
     <script src="~/js/md.min.js" asp-append-version="true"></script>
     <script>
-        $("#popup-button").click(function () {
-            if ($("#accordion-header").hasClass("bg-info")) {
-                $("#accordion-header").removeClass("bg-info");
-                $("#popup-button").removeClass("text-white");
-                $("#popup-button").addClass("text-info");
-                $("#accordion-disclosure").removeClass("fa-caret-down");
-                $("#accordion-disclosure").addClass("fa-caret-right");
-                $("#feature-needsPopup").val("False");
-            }
-            else {
-                $("#accordion-header").addClass("bg-info");
-                $("#popup-button").addClass("text-white");
-                $("#popup-button").removeClass("text-info");
-                $("#accordion-disclosure").removeClass("fa-caret-right");
-                $("#accordion-disclosure").addClass("fa-caret-down");
-                $("#feature-needsPopup").val("True");
-            }
-        });
-        $("#featureform").submit(function (event) {
-            if (!$("#accordion-header").hasClass("bg-info")) {
-                $("#feature-needsPopup").val("False");
-                $("#Feature_Stub").val("");
-                $("#wmd-input").val("");
-            }
-        });
+                $("#featureform").submit(function (event) {
+                    if (!$("#collapseDiv").hasClass("show")) {
+                        $("#Feature_NeedsPopup").val("False");
+                        $("#Feature_Stub").val("");
+                        $("#wmd-input").val("");
+                    }
+                });
         function FormatStub(object) {
             updateStub($(object), $(object).val());
         }
@@ -141,7 +122,7 @@
             var editor = new Markdown.Editor($("#Feature_BodyText"), { allowUploads: false });
             editor.run();
             $('.icon-picker').iconpicker();
-            $('[data-toggle="tooltip"]').tooltip();
+            $('[data-bs-toggle="tooltip"]').tooltip();
         });
     </script>
 }

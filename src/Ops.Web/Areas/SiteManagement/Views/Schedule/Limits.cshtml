@@ -5,7 +5,7 @@
         Scheduling Limits
     </h1>
     <div class="pt-2">
-        <a class="btn btn-outline-dark float-right"
+        <a class="btn btn-outline-dark float-end"
            asp-controller="@(HomeController.Name)"
            asp-action="@(nameof(HomeController.Index))">
             <span class="fa fa-backward"></span>
@@ -43,9 +43,9 @@
         <div class="col-12">
             @foreach (var limit in Model.DayLimits)
             {
-                <div class="row form-group my-3">
-                    <label class="col-md-2 col-form-label text-md-right">@DateTime.Now.Date.AddHours(limit.Key).ToShortTimeString()</label>
-                    <div class="form-group-inner col-md-9">
+                <div class="row mb-3 my-3">
+                    <label class="col-md-2 col-form-label text-md-end">@DateTime.Now.Date.AddHours(limit.Key).ToShortTimeString()</label>
+                    <div class="mb-3-inner col-md-9">
                         <input name="DayLimits.@limit.Key"
                            value="@(ViewData.ModelState[$"DayLimits.{limit.Key}"]?.RawValue ?? limit.Value)"
                            class="form-control"
@@ -59,7 +59,7 @@
             <div class="row justify-content-end">
                 <div class="col-md-10">
                     <button type="submit"
-                            class="btn btn-success"
+                            class="btn btn-outline-success"
                             aria-label="Confirm"
                             button-spinner>
                         Save

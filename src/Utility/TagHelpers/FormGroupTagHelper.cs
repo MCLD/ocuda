@@ -19,22 +19,22 @@ namespace Ocuda.Utility.TagHelpers
     public class FormGroupTagHelper : TagHelper
     {
         private const string attributeName = "formgroup";
-        private const string defaultInnerDivClass = "form-group-inner col-md-9";
+        private const string defaultInnerDivClass = "mb-3-inner col-md-9";
         private const string defaultInputClass = "form-control";
-        private const string defaultLabelClass = "col-form-label text-md-right";
+        private const string defaultLabelClass = "col-form-label text-md-end";
         private const string defaultLabelLayoutClass = "col-md-3";
         private const string defaultValidationMessageClass = "validation-message text-danger";
-        private const string defaultWrapperDivClass = "row form-group";
+        private const string defaultWrapperDivClass = "row mb-3";
         private const string forAttributeName = "asp-for";
         private const string hideLabelAttributeName = "hide-label";
-        private const string hideLabelInnerDivClass = "form-group-inner col-12";
+        private const string hideLabelInnerDivClass = "mb-3-inner col-12";
         private const string hideRequiredAttributeName = "hide-required";
         private const string ignoreValidationAttributeName = "ignore-validation";
         private const string infoTooltipAttributeName = "info-tooltip";
         private const string labelClassAttribute = "label-class";
         private const string labelNameAttribute = "label-name";
         private const string onBlurJs = "on-blur-js";
-        private const string requiredFieldClass = "fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker";
+        private const string requiredFieldClass = "fas fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker";
         private const string showLengthAttributeName = "show-length";
         private const string validationIgnoreClass = "validation-ignore";
 
@@ -204,7 +204,7 @@ namespace Ocuda.Utility.TagHelpers
 
                 var tooltip = new TagBuilder("span");
                 tooltip.AddCssClass("fas fa-info-circle");
-                tooltip.Attributes.Add("data-toggle", "tooltip");
+                tooltip.Attributes.Add("data-bs-toggle", "tooltip");
                 tooltip.Attributes.Add("href", "#");
                 tooltip.Attributes.Add("title", _localizer[InfoTooltip]);
                 tooltip.Attributes.Add("onclick", $"alert('{popupTooltip}');");

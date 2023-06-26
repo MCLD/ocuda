@@ -27,10 +27,10 @@
                 <div class="modal-header">
                     <h4 class="modal-title" id="deleteModalLabel">Delete Feature</h4>
                     <button type="button"
-                            class="close"
-                            data-dismiss="modal"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
                             aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <span class="visually-hidden" aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -40,13 +40,13 @@
                 <div class="modal-footer">
                     <button type="button"
                             class="btn btn-default"
-                            data-dismiss="modal"
+                            data-bs-dismiss="modal"
                             style="margin-right: 1em;">
                         Cancel
                     </button>
                     <button type="submit"
                             id="delModalButton"
-                            class="btn btn-danger pull-right"
+                            class="btn btn-danger float-end"
                             aria-label="Confirm"
                             button-spinner>
                         Delete
@@ -72,7 +72,7 @@
                                 <li>
                                     <a href="@Url.Action(nameof(SectionController.Posts),
                                        new { sectionSlug = Model.SectionSlug, categorySlug = category.Stub, page=1})"
-                                       class=" badge badge-light text-left"
+                                       class=" badge bg-light text-start"
                                        style="margin: 5px 10px; padding: 5px 10px; width:80%">
                                         @category.Name
                                     </a>
@@ -101,7 +101,7 @@
                                 <li>
                                     <a href="@Url.Action(nameof(SectionController.PostDetails),
                                        new { sectionSlug = Model.SectionSlug, postSlug = post.Slug })"
-                                       class="badge badge-light text-left"
+                                       class="badge bg-light text-start"
                                        style="margin: 5px 10px; padding: 5px 10px; width:80%">
                                         @post.Title
                                     </a>
@@ -130,14 +130,14 @@
         <div class="col-10">
             <div class="card">
                 <div class="card-header">
-                    <div class="float-left align-middle">
+                    <div class="float-start align-middle">
                         <h4>
                             @Model.Post.Title
                         </h4>
                     </div>
-                    <div class="float-right align-middle h4">
+                    <div class="float-end align-middle h4">
                         <a href="@Url.Action(nameof(SectionController.EditPost), new { sectionSlug = Model.SectionSlug, postSlug = Model.Post.Slug})">
-                            <span class="far fa-edit float-right"></span>
+                            <span class="far fa-edit float-end"></span>
                         </a>
                     </div>
                 </div>
@@ -145,7 +145,7 @@
                     @Html.Raw(Model.Post.Content)
                 </div>
                 <div class="card-footer">
-                    <div class="float-left align-middle">
+                    <div class="float-start align-middle">
                         <div class="font-italic">
                             @if (Model.Post.PublishedAt.HasValue)
                             {
@@ -165,7 +165,7 @@
                                          .Where(_ => _.PostId == Model.Post.Id)
                                          .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
                                     {
-                                        <a class="badge badge-pill badge-info"
+                                        <a class="badge rounded-pill bg-info"
                                            href="@Url.Action(nameof(SectionController.Posts),
                                         new { sectionSlug = Model.SectionSlug,
                                         categorySlug = category.Stub, page = 1})">
@@ -176,7 +176,7 @@
                             </div>
                         }
                     </div>
-                    <div class="float-right align-middle">
+                    <div class="float-end align-middle">
                         <button class="btn btn-danger" type="submit" id="delPost">
                             Delete Post
                         </button>

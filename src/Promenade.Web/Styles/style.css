@@ -257,24 +257,6 @@ a.prom-leftnav-header:hover {
     }
 }
 
-.prom-leftnav-header[data-toggle="collapse"]::after {
-    font-weight: 900;
-    position: absolute;
-    right: 0.75rem;
-    top: 0.25rem;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-family: "Font Awesome 5 Free";
-    content: "\f0d7";
-    transform: rotate(180deg);
-    transition: all linear 0.25s;
-}
-
-.prom-leftnav-header[data-toggle="collapse"].collapsed::after {
-    transform: rotate(0deg);
-}
-
 .prom-body-content h1 {
     font-size: 2rem;
     display: inline-block;

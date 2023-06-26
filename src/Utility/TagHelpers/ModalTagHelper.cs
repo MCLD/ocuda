@@ -21,7 +21,7 @@ namespace Ocuda.Utility.TagHelpers
         private const string attributeName = "modal";
         private const string bodyClass = "modal-body";
         private const string bodyDeleteTextClass = "modal-text";
-        private const string buttonSpinnerClass = "fas fa-spinner fa-lg fa-pulse fa-fw ml-1 d-none";
+        private const string buttonSpinnerClass = "fas fa-spinner fa-lg fa-pulse fa-fw ms-1 d-none";
         private const string cancelButtonClass = "btn btn-outline-secondary";
         private const string confirmButtonClass = "modal-btn-confirm";
         private const string containerClass = "row";
@@ -29,9 +29,9 @@ namespace Ocuda.Utility.TagHelpers
         private const string deleteButtonClass = "btn btn-outline-danger btn-spinner";
         private const string dialogClass = "modal-dialog";
         private const string footerClass = "modal-footer";
-        private const string footerDeleteIconClass = "fas fa-minus-circle mr-1";
+        private const string footerDeleteIconClass = "fas fa-minus-circle me-1";
         private const string headerAttributeName = "modal-header";
-        private const string headerButtonClass = "close";
+        private const string headerButtonClass = "btn-close";
         private const string headerClass = "modal-header";
         private const string headerTitleClass = "modal-title";
         private const string idAttributeName = "id";
@@ -41,7 +41,7 @@ namespace Ocuda.Utility.TagHelpers
         private const string modalLargeClass = "modal-lg oc-modal-xl";
         private const string nameAttributeName = "name";
         private const string saveButtonClass = "btn btn-outline-success btn-spinner";
-        private const string saveIconClass = "far fa-save mr-1";
+        private const string saveIconClass = "far fa-save me-1";
         private const string suppressFooterAttributeName = "suppress-footer";
         private const string typeAttributeName = "type";
 
@@ -103,7 +103,7 @@ namespace Ocuda.Utility.TagHelpers
             var cancelButton = new TagBuilder("button");
             cancelButton.AddCssClass(cancelButtonClass);
             cancelButton.Attributes.Add("type", "button");
-            cancelButton.Attributes.Add("data-dismiss", "modal");
+            cancelButton.Attributes.Add("data-bs-dismiss", "modal");
 
             if (!Type.HasValue)
             {
@@ -179,10 +179,8 @@ namespace Ocuda.Utility.TagHelpers
             var button = new TagBuilder("button");
             button.AddCssClass(headerButtonClass);
             button.Attributes.Add("type", "button");
-            button.Attributes.Add("data-dismiss", "modal");
+            button.Attributes.Add("data-bs-dismiss", "modal");
             button.Attributes.Add("aria-label", "Close dialog.");
-            button.InnerHtml.AppendHtml("&times;");
-
             header.InnerHtml.AppendHtml(button);
             return header;
         }

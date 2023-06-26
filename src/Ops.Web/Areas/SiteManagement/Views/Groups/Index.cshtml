@@ -17,10 +17,10 @@
                         <div class="modal-header">
                             <h4 class="modal-title" id="deleteModalLabel">Delete Group</h4>
                             <button type="button"
-                                    class="close"
-                                    data-dismiss="modal"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
                                     aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+                                <span class="visually-hidden" aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -30,12 +30,12 @@
                         <div class="modal-footer">
                             <button type="button" 
                                     class="btn btn-default" 
-                                    data-dismiss="modal" 
+                                    data-bs-dismiss="modal" 
                                     style="margin-right: 1em;">
                                 Cancel
                             </button>
                             <button type="submit" 
-                                    class="btn btn-danger pull-right" 
+                                    class="btn btn-danger float-end" 
                                     aria-label="Confirm"
                                     button-spinner>
                                 Delete
@@ -52,7 +52,7 @@
                 <div class="card-header">
                     <span class="h5">Groups</span>
                     <a asp-action="@nameof(GroupsController.CreateGroup)"
-                       class="text-success float-right">
+                       class="text-success float-end">
                         <span class="fas fa-plus-circle fa-lg"></span>
                     </a>
                 </div>
@@ -95,8 +95,8 @@
                                                         <td class="on-top gra-mc-icon">
                                                             <button type="button"
                                                     class="btn btn-link text-danger"
-                                                    data-toggle="modal"
-                                                    data-target="#deleteModal"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal"
                                                     data-id="@group.Id"
                                                     data-name="@group.GroupType">
                                                                 <span class="far fa-times-circle fa-lg"

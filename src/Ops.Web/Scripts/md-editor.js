@@ -1101,7 +1101,7 @@ Markdown.HookCollection = HookCollection;
 
             if (allowUploads == true) {
                 var uploadTab = doc.createElement("li");
-                uploadTab.innerHTML = '<a data-toggle="tab" class="nav-link active" href="#uploadFile"><b>Upload File</b></a>';
+                uploadTab.innerHTML = '<a data-bs-toggle="tab" class="nav-link active" href="#uploadFile"><b>Upload File</b></a>';
                 uploadTab.className = "nav-item";
                 tabs.appendChild(uploadTab);
             }
@@ -1111,7 +1111,7 @@ Markdown.HookCollection = HookCollection;
             if (allowUploads == false) {
                 navLinkClass += " active";
             }
-            inputTab.innerHTML = '<a data-toggle="tab" class="' + navLinkClass + '" href="#inputUrl"><b>Input URL</b></a>';
+            inputTab.innerHTML = '<a data-bs-toggle="tab" class="' + navLinkClass + '" href="#inputUrl"><b>Input URL</b></a>';
             inputTab.className = "nav-item";
 
             tabs.appendChild(inputTab);

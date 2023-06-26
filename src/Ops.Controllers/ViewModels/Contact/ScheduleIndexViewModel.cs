@@ -93,35 +93,35 @@ namespace Ocuda.Ops.Controllers.ViewModels.Contact
 
             if (claim?.IsComplete == true)
             {
-                return "<span class=\"far fa-check-square mr-1\" title=\"Complete\"></span>";
+                return "<span class=\"far fa-check-square me-1\" title=\"Complete\"></span>";
             }
 
             if (request.RequestedTime.AddHours(1) < DateTime.Now
                 && request?.IsClaimed == true
                 && request.IsUnderway)
             {
-                return "<span class=\"fas fa-tasks mr-1\" title=\"Underway, not yet complete\"></span>";
+                return "<span class=\"fas fa-tasks me-1\" title=\"Underway, not yet complete\"></span>";
             }
 
             if (request?.IsClaimed == true)
             {
                 return request.IsUnderway
-                    ? "<span class=\"fas fa-user mr-1\" title=\"Claimed, underway\"></span>"
-                    : "<span class=\"far fa-user mr-1\" title=\"Claimed, not started\"></span>";
+                    ? "<span class=\"fas fa-user me-1\" title=\"Claimed, underway\"></span>"
+                    : "<span class=\"far fa-user me-1\" title=\"Claimed, not started\"></span>";
             }
 
             if (request.RequestedTime.AddHours(1) < DateTime.Now
                 && request?.IsClaimed != true
                 && !request.IsUnderway)
             {
-                return "<span class=\"fas fa-exclamation-triangle mr-1\" title=\"Unclaimed, overdue\"></span>";
+                return "<span class=\"fas fa-exclamation-triangle me-1\" title=\"Unclaimed, overdue\"></span>";
             }
 
             if (request.RequestedTime.AddHours(-1) < DateTime.Now
                 && request?.IsClaimed != true
                 && !request.IsUnderway)
             {
-                return "<span class=\"fas fa-clock mr-1\" title=\"Unclaimed, scheduled soon\"></span>";
+                return "<span class=\"fas fa-clock me-1\" title=\"Unclaimed, scheduled soon\"></span>";
             }
 
             return null;

@@ -5,8 +5,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Bookmarklet for reporting cover issues</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span class="visually-hidden" aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
@@ -32,9 +32,9 @@
         <h1>Cover Issues</h1>
     </div>
     <div class="col-12 col-md-6 py-2">
-        <button class="btn btn-outline-info float-right mx-1"
-                data-toggle="modal"
-                data-target="#bookmarkletModal">
+        <button class="btn btn-outline-info float-end mx-1"
+                data-bs-toggle="modal"
+                data-bs-target="#bookmarkletModal">
             <span class="fas fa-bookmark"></span>
             Bookmarklet
         </button>
@@ -96,7 +96,7 @@
                             @header.BibId
                         </a>
                     </td>
-                    <td class="font-weight-bold">
+                    <td class="fw-bold">
                         @if (header.LastResolved == null)
                         {
                             if (DateTime.Now.AddDays(-7) > header.LastResolved)

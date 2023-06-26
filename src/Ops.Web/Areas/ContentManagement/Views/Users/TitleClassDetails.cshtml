@@ -8,12 +8,12 @@
         </h1>
     </div>
     <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.UsersController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.UsersController.TitleClassList))">Back</a>
-        <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
-                data-toggle="modal"
-                data-target="#addModal">
+        <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
+                data-bs-toggle="modal"
+                data-bs-target="#addModal">
             <span class="fa fa-plus-circle"></span>
             Add Title
         </button>
@@ -29,8 +29,8 @@
                     <h5 class="modal-title" id="addModalTitle">
                         Add Title Classification Mapping
                     </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="visually-hidden" aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -51,7 +51,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-outline-success">Add</button>
                 </div>
             </div>

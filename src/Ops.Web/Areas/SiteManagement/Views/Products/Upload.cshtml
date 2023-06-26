@@ -11,18 +11,18 @@
         <a asp-controller="@ProductsController.Name"
            asp-action="@nameof(ProductsController.Product)"
            asp-route-productSlug="@Model.Product.Slug"
-           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+           class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
         <a asp-controller="@ProductsController.Name"
            asp-action="@nameof(ProductsController.UploadDistribution)"
            asp-route-productSlug="@Model.Product.Slug"
-           class="btn btn-outline-info mt-2 mb-1 mr-2 float-right">
+           class="btn btn-outline-info mt-2 mb-1 me-2 float-end">
             <span class="fas fa-file-upload"></span>
             Upload Distribution
         </a>
         <a asp-controller="@ProductsController.Name"
            asp-action="@nameof(ProductsController.UploadReplenishment)"
            asp-route-productSlug="@Model.Product.Slug"
-           class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
+           class="btn btn-outline-success mt-2 mb-1 me-2 float-end">
             <span class="fas fa-file-upload"></span>
             Upload Replenishment
         </a>
@@ -35,36 +35,25 @@
       role="form"
       enctype="multipart/form-data">
       <input asp-for="IsReplenishment" type="hidden" value="@Model.IsReplenishment" />
-    <div class="form-group row">
+    <div class="mb-3 row">
         <label asp-for="Inventory"
-               class="col-md-3 col-form-label text-md-right">Upload @Model.UploadType Sheet</label>
+               class="col-md-3 col-form-label text-md-end">Upload @Model.UploadType Sheet (.xls, .xlsx)</label>
         <div class="col-md-9">
             <div class="input-group">
-                <div class="input-group-prepend">
-                    <label class="btn btn-outline-secondary btn-file form-control">
-                        <span class="far fa-file-excel"></span>
-                        Select Excel File
-                        <input type="file" asp-for="Inventory" accept=".xls,.xlsx" hidden />
-                    </label>
-                </div>
-                <div class="custom-file">
-                    <input type="text" class="form-control" readonly id="selectedFile" />
-                </div>
+                <input type="file"
+                    class="form-control"
+                    asp-for="Inventory" 
+                    accept=".xls,.xlsx" />
+                <button type="submit"
+                        class="btn btn-outline-primary"
+                        aria-label="Confirm"
+                        button-spinner>
+                    Upload
+                </button>
             </div>
             <div>
                 <span asp-validation-for="Inventory" class="text-danger"></span>
             </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="offset-md-3 col-md-9">
-            <button type="submit"
-                    class="btn btn-outline-primary"
-                    aria-label="Confirm"
-                    button-spinner>
-                Upload
-            </button>
         </div>
     </div>
 </form>

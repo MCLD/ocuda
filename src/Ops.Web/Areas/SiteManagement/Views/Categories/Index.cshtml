@@ -7,13 +7,13 @@
         </h1>
     </div>
     <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">Back</a>
 
-        <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
-                data-toggle="modal"
-                data-target="#addModal">
+        <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
+                data-bs-toggle="modal"
+                data-bs-target="#addModal">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
             Add Category
         </button>
@@ -44,8 +44,8 @@
                             <td class="align-middle">
                                 <button type="button"
                                         class="btn btn-outline-primary"
-                                        data-toggle="modal"
-                                        data-target="#editModal"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editModal"
                                         data-id="@category.Id"
                                         data-name="@category.Name"
                                         data-class="@category.Class"
@@ -61,8 +61,8 @@
                                 </a>
                                 <button type="button"
                                         class="btn btn-outline-danger"
-                                        data-toggle="modal"
-                                        data-target="#deleteModal"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal"
                                         data-id="@category.Id"
                                         data-name="@category.Name"
                                         data-emedia="@string.Join("|", category.CategoryEmedias)">

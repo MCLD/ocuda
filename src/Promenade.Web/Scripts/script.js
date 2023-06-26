@@ -36,47 +36,51 @@
 
 document.addEventListener("DOMContentLoaded", function () {
     $(".prom-carousel-modal").on("click", function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
+        if (typeof bootstrap !== 'undefined') {
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
 
-        const buttons = [];
+            const buttons = [];
 
-        $.each($(this).data(), function (key, value) {
-            switch (key) {
-                case "title":
-                    $(".modal-content-title").text(value);
-                    break;
-                case "img":
-                    $(".modal-content-image").attr("src", value);
-                    break;
-                case "description":
-                    $(".modal-content-description").text(value);
-                    break;
-                default:
-                    if (key.length > 6 && key.substring(0, 6) === "button") {
-                        buttons.push(value);
-                    }
-                    break;
+            $.each($(this).data(), function (key, value) {
+                switch (key) {
+                    case "title":
+                        $(".modal-content-title").text(value);
+                        break;
+                    case "img":
+                        $(".modal-content-image").attr("src", value);
+                        break;
+                    case "description":
+                        $(".modal-content-description").text(value);
+                        break;
+                    default:
+                        if (key.length > 6 && key.substring(0, 6) === "button") {
+                            buttons.push(value);
+                        }
+                        break;
+                }
+            });
+
+            if (buttons.length > 0) {
+                $(".modal-content-footer").text("");
+                buttons.sort(function (a, b) {
+                    return a.Sort - b.Sort;
+                });
+                buttons.forEach(function (b) {
+                    $(".modal-content-footer").append('<a href="' +
+                        b.Link +
+                        '" target="_blank" class="btn btn-outline-primary m-1">' +
+                        b.Button +
+                        "</a>");
+                });
             }
-        });
 
-        if (buttons.length > 0) {
-            $(".modal-content-footer").text("");
-            buttons.sort(function (a, b) {
-                return a.Sort - b.Sort;
-            });
-            buttons.forEach(function (b) {
-                let buttonText =
-                    '<a href="' +
-                    b.Link +
-                    '" target="_blank" class="btn btn-outline-primary m-1">' +
-                    b.Button +
-                    "</a>";
-                $(".modal-content-footer").append(buttonText);
-            });
+            bootstrap
+                .Modal
+                .getOrCreateInstance(document.getElementById("prom-carousel-modal-details"))
+                .show();
         }
-        $(".prom-modal-details").modal().show();
     });
 });
 

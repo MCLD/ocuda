@@ -25,39 +25,39 @@ else
 <p class="lead">@Localizer[Promenade.ScheduleAppointmentDetails]</p>
 
 <div class="row">
-    <div class="col-md-3 text-md-right"><strong>@Localizer[Promenade.PromptRequestedDateAndTime]</strong></div>
+    <div class="col-md-3 text-md-end"><strong>@Localizer[Promenade.PromptRequestedDateAndTime]</strong></div>
     <div class="col-md-9">@Model.DisplayTime</div>
 </div>
 <div class="row mt-2">
-    <div class="col-md-3 text-md-right"><strong>@Localizer[Promenade.PromptName]</strong></div>
+    <div class="col-md-3 text-md-end"><strong>@Localizer[Promenade.PromptName]</strong></div>
     <div class="col-md-9">@Model.ScheduleRequest.Name</div>
 </div>
 <div class="row mt-2">
-    <div class="col-md-3 text-md-right"><strong>@Localizer[Promenade.PromptPhone]</strong></div>
+    <div class="col-md-3 text-md-end"><strong>@Localizer[Promenade.PromptPhone]</strong></div>
     <div class="col-md-9">@Model.FormattedPhone</div>
 </div>
 
 @if (!string.IsNullOrEmpty(Model.ScheduleRequest.Email))
 {
     <div class="row mt-2">
-        <div class="col-md-3 text-md-right"><strong>@Localizer[Promenade.PromptEmail]</strong></div>
+        <div class="col-md-3 text-md-end"><strong>@Localizer[Promenade.PromptEmail]</strong></div>
         <div class="col-md-9">@Model.ScheduleRequest.Email</div>
     </div>
 }
 
 <div class="row mt-2">
-    <div class="col-md-3 text-md-right"><strong>@Localizer[Promenade.PromptSubject]</strong></div>
+    <div class="col-md-3 text-md-end"><strong>@Localizer[Promenade.PromptSubject]</strong></div>
     <div class="col-md-9">@Model.DisplaySubject</div>
 </div>
 <div class="row mt-2">
-    <div class="col-md-3 text-md-right"><strong>@Localizer[Promenade.PromptLanguage]</strong></div>
+    <div class="col-md-3 text-md-end"><strong>@Localizer[Promenade.PromptLanguage]</strong></div>
     <div class="col-md-9">@Model.ScheduleRequest.Language</div>
 </div>
 
 @if (!string.IsNullOrEmpty(Model.ScheduleRequest.Notes))
 {
     <div class="row mt-2">
-        <div class="col-md-3 text-md-right"><strong>@Localizer[Promenade.PromptNotes]</strong></div>
+        <div class="col-md-3 text-md-end"><strong>@Localizer[Promenade.PromptNotes]</strong></div>
         <div class="col-md-9">@Model.ScheduleRequest.Notes</div>
     </div>
 }

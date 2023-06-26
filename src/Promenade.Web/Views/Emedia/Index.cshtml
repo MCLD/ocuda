@@ -39,9 +39,9 @@
                             @if (!string.IsNullOrEmpty(emedia.EmediaText?.Details))
                             {
                                 <a href="#"
-                                   class="emedia-help fa-pull-right"
-                                   data-target="#infoModal"
-                                   data-toggle="modal"
+                                   class="emedia-help fa-float-end"
+                                   data-bs-target="#infoModal"
+                                   data-bs-toggle="modal"
                                    data-name="@Localizer[Promenade.HelpItem, emedia.Name]"
                                    data-details="@emedia.EmediaText.Details"
                                    title="@Localizer[Promenade.HelpItem, emedia.Name]">
@@ -53,10 +53,15 @@
                             @Html.Raw(emedia.EmediaText?.Description)
                         </div>
                         <div class="card-footer">
-                            <span class="sr-only">@Localizer[Promenade.OffersItem, emedia.Name]</span>
-                            @foreach (var category in emedia.Categories)
+                            <span class="visually-hidden">@Localizer[Promenade.OffersItem, emedia.Name]</span>
+                            @if (emedia.Categories?.Count > 0)
                             {
-                                <span class="badge @category.Class">@category.CategoryText?.Text</span>
+                                <h5>
+                                    @foreach (var category in emedia.Categories)
+                                    {
+                                        <span class="badge text-dark @category.Class">@category.CategoryText?.Text</span>
+                                    }
+                                </h5>
                             }
                         </div>
                     </div>

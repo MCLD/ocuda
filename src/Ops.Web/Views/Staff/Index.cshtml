@@ -7,7 +7,7 @@
         </h1>
     </div>
     <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-area=""
            asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
            asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Index)">Back</a>
@@ -22,23 +22,19 @@
     <div class="row mb-3">
         <div class="col-12">
             <div class="input-group">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Search:</span>
-                </div>
+                <span class="input-group-text">Search:</span>
                 <input asp-for="SearchText"
                        type="text"
                        class="form-control"
                        aria-label="Search text" />
-                <div class="input-group-append">
-                    <a class="btn btn-outline-secondary"
-                       asp-action=@nameof(Ocuda.Ops.Controllers.StaffController.Index)>
-                        Clear
-                    </a>
-                    <button class="btn btn-outline-success"
-                            id="goSearch">
-                        Go
-                    </button>
-                </div>
+                <a class="btn btn-outline-secondary"
+                   asp-action=@nameof(Ocuda.Ops.Controllers.StaffController.Index)>
+                    Clear
+                </a>
+                <button class="btn btn-outline-success"
+                        id="goSearch">
+                    Go
+                </button>
             </div>
         </div>
     </div>
@@ -66,10 +62,10 @@
                                 @if (!string.IsNullOrEmpty(user.PictureFilename))
                                 {
                                     <a asp-action="@nameof(ProfileController.Index)"
-                           asp-controller="@ProfileController.Name"
-                           asp-route-id="@user.Username">
+                                       asp-controller="@ProfileController.Name"
+                                       asp-route-id="@user.Username">
                                         <img src="@Url.Action(nameof(ProfileController.Picture), ProfileController.Name,  new { id =  user.Username })"
-                                 class="img-fluid rounded mx-auto d-block img-thumbnail oc-staff-index-picture">
+                                             class="img-fluid rounded mx-auto d-block img-thumbnail oc-staff-index-picture">
                                     </a>
                                 }
                                 else
@@ -79,8 +75,8 @@
                             </td>
                             <td class="align-middle">
                                 <a asp-action="@nameof(ProfileController.Index)"
-                           asp-controller="@ProfileController.Name"
-                           asp-route-id="@user.Username">
+                                   asp-controller="@ProfileController.Name"
+                                   asp-route-id="@user.Username">
                                     @user.Name
                                     @if (!string.IsNullOrEmpty(user.Nickname) && !user.Name.StartsWith(user.Nickname))
                                     {

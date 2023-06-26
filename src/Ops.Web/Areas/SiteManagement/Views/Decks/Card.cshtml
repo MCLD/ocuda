@@ -4,24 +4,24 @@
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
 }
 
-    <div class="row mb-2">
-        <div class="col-sm-6">
-            <h1>
-                Add Card
-                <small class="text-muted">@Model.DeckName</small>
-            </h1>
-        </div>
-        <div class="col-sm-6">
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>
+            Add Card
+            <small class="text-muted">@Model.DeckName</small>
+        </h1>
+    </div>
+    <div class="col-sm-6">
         @if (!string.IsNullOrEmpty(Model.BackLink))
         {
             <a href="@Model.BackLink"
-           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+               class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
         }
         @if (Model.CardDetail != null)
         {
-            <button class="btn btn-outline-danger mt-2 mb-1 mr-2 float-right"
-                data-toggle="modal"
-                data-target="#deleteModal">
+            <button class="btn btn-outline-danger mt-2 mb-1 me-2 float-end"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteModal">
                 <span class="fas fa-times"></span>
                 Delete Card
             </button>
@@ -46,7 +46,7 @@
 <form id="addImageForm" method="post" enctype="multipart/form-data">
     <input type="hidden" asp-for="CardDetail.CardId" />
     <input type="hidden" asp-for="CardDetail.LanguageId" />
-    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="addModal">
+    <div class="modal fade" data-bs-backdrop="static" data-keyboard="false" id="addModal">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -66,42 +66,36 @@
                     @if (!string.IsNullOrEmpty(Model.CardDetail?.Filename))
                     {
                         <div class="row mb-4">
-                            <div class="col-form-label text-md-right col-md-3">Current image</div>
+                            <div class="col-form-label text-md-end col-md-3">Current image</div>
                             <div class="col-md-9">
                                 <img style="max-width: 333px;"
-                                 src="@Url.Action(nameof(DecksController.Image), DecksController.Name, new {
+                                     src="@Url.Action(nameof(DecksController.Image), DecksController.Name, new {
 language = Model.SelectedLanguage.Name,
 filename = Model.CardDetail.Filename
 })" />
                             </div>
                         </div>
                     }
-                    <div class="row form-group">
-                        <label class="col-form-label text-md-right col-md-3">
+                    <div class="row mb-3">
+                        <label class="col-form-label text-md-end col-md-3">
                             Image
-                            <span class="fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker"></span>
+                            <span class="fas fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span><br />
+                            (.jpg or .png)
                         </label>
                         <div class="col-md-9">
                             <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <label class="btn btn-outline-secondary btn-file form-control">
-                                        <span class="far fa-file"></span> Select a File
-                                        <input type="file"
-                                               asp-for="CardImage"
-                                               accept=".jpg,.png"
-                                               hidden />
-                                    </label>
-                                </div>
-                                <div class="custom-file">
-                                    <input type="text" class="form-control" id="File_Name" readonly />
-                                </div>
+                                <input type="file"
+                                       class="form-control"
+                                       asp-for="CardImage"
+                                       accept=".jpg,.png" />
+                                <!-- id = file_name -->
                             </div>
                         </div>
                     </div>
-                    <div class="row form-group">
-                        <label class="col-form-label text-md-right col-md-3" asp-for="AltText">
+                    <div class="row mb-3">
+                        <label class="col-form-label text-md-end col-md-3" asp-for="AltText">
                             Image alternative text
-                            <span class="fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker"></span>
+                            <span class="fas fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span>
                         </label>
                         <div class="col-md-9">
                             <input asp-for="AltText" class="form-control" />
@@ -109,7 +103,7 @@ filename = Model.CardDetail.Filename
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
                     <button class="btn btn-outline-success"
                             id="addImageFormButton"
                             disabled="disabled"
@@ -128,15 +122,15 @@ filename = Model.CardDetail.Filename
         <span class="d-none"><input asp-for="DeckName" formgroup readonly /></span>
         @if (Model.LanguageList?.Count() > 1)
         {
-            <div class="form-group row">
-                <div class="col-md-3 text-md-right">
+            <div class="mb-3 row">
+                <div class="col-md-3 text-md-end">
                     <label asp-for="SelectedLanguage" class="col-form-label"></label>
                 </div>
                 <div class="col-md-9">
                     @foreach (var item in Model.LanguageList.Where(_ => !_.Disabled))
                     {
                         <a href="@Url.Action(nameof(DecksController.UpdateCard), new { cardId = Model.CardDetail.CardId, language = item.Value })"
-                   class="btn btn-sm btn-outline-info mt-1 @(item.Selected ? "active" : null)">@item.Text</a>
+                           class="btn btn-sm btn-outline-info mt-1 @(item.Selected ? "active" : null)">@item.Text</a>
                     }
                 </div>
             </div>
@@ -159,11 +153,11 @@ filename = Model.CardDetail.Filename
     <input asp-for="CardDetail.Filename" type="hidden" />
 
     <input asp-for="CardDetail.Header" formgroup />
-    <div class="form-group row">
-        <div class="col-md-3 text-md-right">
+    <div class="mb-3 row">
+        <div class="col-md-3 text-md-end">
             <label asp-for="CardDetail.Text" class="col-form-label"></label>
         </div>
-        <div class="form-group-inner col-md-9">
+        <div class="mb-3-inner col-md-9">
             <textarea asp-for="CardDetail.Text" markdown-editor></textarea>
             <span asp-validation-for="CardDetail.Text"
                   class="validation-message text-danger"></span>
@@ -186,8 +180,8 @@ filename = Model.CardDetail.Filename
         <div class="row mb-3 mt-2">
             <div class="col-md-6 offset-md-3">
                 <button type="button" class="btn btn-outline-success"
-                    data-toggle="modal"
-                    data-target="#addModal">
+                        data-bs-toggle="modal"
+                        data-bs-target="#addModal">
                     <span class="fas fa-plus-circle" aria-hidden="true"></span>
                     @if (string.IsNullOrEmpty(Model.CardDetail?.Filename))
                     {
@@ -202,11 +196,11 @@ filename = Model.CardDetail.Filename
         </div>
         @if (!string.IsNullOrEmpty(Model.CardDetail?.Filename))
         {
-            <div class="form-group row">
-                <div class="col-md-3 text-md-right">
+            <div class="mb-3 row">
+                <div class="col-md-3 text-md-end">
                     <label asp-for="CardDetail.Filename" class="col-form-label"></label>
                 </div>
-                <div class="form-group-inner col-md-9">
+                <div class="mb-3-inner col-md-9">
                     <input value="@Model.CardDetail.Filename" class="form-control" disabled />
                 </div>
             </div>
@@ -223,7 +217,7 @@ filename = Model.CardDetail.Filename
                     <span class="far fa-save"></span>
                     Save
                 </button>
-                <div class="d-none oc-save-warning ml-3 flex-fill">
+                <div class="d-none oc-save-warning ms-3 flex-fill">
                     <div class="alert alert-warning mb-0">
                         <span class="fas fa-exclamation-triangle"></span>
                         You have unsaved changes.
@@ -284,12 +278,11 @@ filename = Model.CardDetail.Filename
                 ResetSpinners();
             }
         }
-
-        $('#addModal').on('show.bs.modal', function (e) {
-            if (!$('#File_Name').val() && $('#CardDetail_Filename').val()) {
-                $('#File_Name').val($('#CardDetail_Filename').val());
-            }
-            $('#AltText').val($('#CardDetail_AltText').val());
+        
+        $('#addModal').on('hidden.bs.modal', function(e) {
+            $('#CardImage').val('');
+            $('#addImageAlertRow').addClass('d-none');
+            $('#AltText').val('');
         });
 
         $('#CardImage').on('change', function (e) {
@@ -301,7 +294,7 @@ filename = Model.CardDetail.Filename
             let goodToGo = true;
 
             var notes = [];
-            if (!$('#File_Name').val()) {
+            if (!$('#CardImage').val()) {
                 goodToGo = false;
                 notes.push("<li>You must select an image file.</li>")
             }

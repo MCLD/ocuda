@@ -80,7 +80,7 @@ namespace Ocuda.Ops.Data.Ops
                     .Where(_ => _.postCategory.CategoryId == filter.CategoryId.Value)
                     .Select(_ => _.post);
             }
-            
+
             return new DataWithCount<ICollection<Post>>
             {
                 Count = await query.CountAsync(),

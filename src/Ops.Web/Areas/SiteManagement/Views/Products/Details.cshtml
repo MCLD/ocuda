@@ -8,14 +8,14 @@
         </h1>
     </div>
     <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 float-end"
            asp-action="@nameof(ProductsController.Index)"
            asp-controller="@ProductsController.Name">Back</a>
     </div>
 </div>
 
 <div class="modal fade"
-     data-backdrop="static"
+     data-bs-backdrop="static"
      data-keyboard="false"
      id="addSegmentModal"
      tabindex="-1"
@@ -37,10 +37,10 @@
                                 Add segment for @Model.Product.Name
                             </h5>
                             <button type="button"
-                                    class="close"
-                                    data-dismiss="modal"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
                                     aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+                                <span class="visually-hidden" aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -53,8 +53,8 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button"
-                                    class="btn btn-outline-dark mr-1"
-                                    data-dismiss="modal">
+                                    class="btn btn-outline-dark me-1"
+                                    data-bs-dismiss="modal">
                                 Cancel
                             </button>
                             <button type="submit" class="btn btn-outline-success" button-spinner>
@@ -69,7 +69,7 @@
 </div>
 
 <div class="modal fade"
-     data-backdrop="static"
+     data-bs-backdrop="static"
      data-keyboard="false"
      id="removeSegmentModal"
      tabindex="-1"
@@ -91,10 +91,10 @@
                                 Remove segment: @Model.SegmentName
                             </h5>
                             <button type="button"
-                                    class="close"
-                                    data-dismiss="modal"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
                                     aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+                                <span class="visually-hidden" aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -102,8 +102,8 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button"
-                                    class="btn btn-outline-dark mr-1"
-                                    data-dismiss="modal">
+                                    class="btn btn-outline-dark me-1"
+                                    data-bs-dismiss="modal">
                                 Cancel
                             </button>
                             <button type="submit" class="btn btn-outline-danger" button-spinner>
@@ -122,8 +122,8 @@
         <div class="col">
             <input asp-for="Product.Id" type="hidden" />
             <input asp-for="Product.Name" formgroup />
-            <div class="row form-group">
-                <div class="col-form-label text-md-right col-md-3">
+            <div class="row mb-3">
+                <div class="col-form-label text-md-end col-md-3">
                     <label asp-for="Product.Slug"></label>
                 </div>
                 <div class="col-md-9">
@@ -134,27 +134,27 @@
                     else
                     {
                         <input type="text"
-                           readonly
-                           class="form-control-plaintext"
-                           value="@Model.Product.Slug">
+                               readonly
+                               class="form-control-plaintext"
+                               value="@Model.Product.Slug">
                     }
                 </div>
             </div>
             <input asp-for="Product.CacheInventoryMinutes" formgroup />
-            <div class="row form-group">
-                <div class="col-form-label text-md-right col-md-3">
+            <div class="row mb-3">
+                <div class="col-form-label text-md-end col-md-3">
                     <label asp-for="Product.IsActive"></label>
                 </div>
                 <div class="col-md-9 pt-2">
-                    <input asp-for="Product.IsActive" type="checkbox" class="form-group" />
+                    <input asp-for="Product.IsActive" type="checkbox" class="mb-3" />
                 </div>
             </div>
-            <div class="row form-group">
-                <div class="col-form-label text-md-right col-md-3">
+            <div class="row mb-3">
+                <div class="col-form-label text-md-end col-md-3">
                     <label asp-for="Product.IsVisibleToPublic"></label>
                 </div>
                 <div class="col-md-9 pt-2">
-                    <input asp-for="Product.IsVisibleToPublic" type="checkbox" class="form-group" />
+                    <input asp-for="Product.IsVisibleToPublic" type="checkbox" class="mb-3" />
                 </div>
             </div>
         </div>
@@ -162,8 +162,8 @@
             @if (Model.IsProductManager)
             {
                 <button type="submit"
-                    class="btn btn-outline-success"
-                    button-spinner>
+                        class="btn btn-outline-success"
+                        button-spinner>
                     <span class="far fa-save"></span>
                     Save
                 </button>
@@ -174,8 +174,8 @@
 
 <div class="row mt-4">
     <div class="col">
-        <div class="row form-group">
-            <div class="col-form-label text-md-right col-md-3">
+        <div class="row mb-3">
+            <div class="col-form-label text-md-end col-md-3">
                 <label asp-for="Product.SegmentId"></label>
             </div>
             <div class="col-md-9">
@@ -184,36 +184,34 @@
                            class="form-control"
                            disabled
                            value="@Model.SegmentName" />
-                    <div class="input-group-append">
-                        @if (string.IsNullOrEmpty(Model.SegmentName))
-                        {
-                            <button class="btn btn-outline-success"
-                                data-toggle="modal"
-                                data-target="#addSegmentModal">
-                                <span class="fas fa-plus-circle"
+                    @if (string.IsNullOrEmpty(Model.SegmentName))
+                    {
+                        <button class="btn btn-outline-success"
+                                data-bs-toggle="modal"
+                                data-bs-target="#addSegmentModal">
+                            <span class="fas fa-fw fa-plus-circle"
                                   aria-hidden="true"
                                   title="Add segment"></span>
-                            </button>
-                        }
-                        else
-                        {
-                            <button class="btn btn-outline-danger"
-                                data-toggle="modal"
-                                data-target="#removeSegmentModal">
-                                <span class="fas fa-minus-circle"
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-outline-danger"
+                                data-bs-toggle="modal"
+                                data-bs-target="#removeSegmentModal">
+                            <span class="fas fa-fw fa-minus-circle"
                                   aria-hidden="true"
                                   title="Remove segment"></span>
-                            </button>
-                            <a class="btn btn-outline-primary"
+                        </button>
+                        <a class="btn btn-outline-primary"
                            asp-action="@nameof(SegmentsController.Detail)"
                            asp-controller="@SegmentsController.Name"
                            asp-route-id="@Model.Product.SegmentId">
-                                <span class="far fa-file-alt"
+                            <span class="far fa-fw fa-file-alt"
                                   aria-hidden="true"
                                   title="Edit segment"></span>
-                            </a>
-                        }
-                    </div>
+                        </a>
+                    }
                 </div>
             </div>
             <span class="validation-message text-danger"
@@ -223,10 +221,10 @@
 </div>
 
 @section Styles {
-<style type="text/css">
-    input[type='checkbox'] {
-        width: 1.5rem;
-        height: 1.5rem;
-    }
-</style>
+    <style type="text/css">
+        input[type='checkbox'] {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+    </style>
 }

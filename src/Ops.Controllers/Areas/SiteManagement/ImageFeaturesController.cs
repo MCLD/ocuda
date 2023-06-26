@@ -261,8 +261,16 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     nameof(Language.Description),
                     selectedLanguage.Name),
                 PageLayoutId = pageLayoutId ?? await _imageFeatureService
-                    .GetPageLayoutIdForImageFeatureAsync(feature.Id)
+                    .GetPageLayoutIdForImageFeatureAsync(feature.Id),
             };
+
+            var promBaseLink = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.PromenadeUrl);
+
+            if (!string.IsNullOrEmpty(promBaseLink))
+            {
+                viewModel.PublicLinkBase = $"{promBaseLink}assets/images/{selectedLanguage.Name}/features";
+            }
 
             viewModel.ImageFeatureTemplate ??= new ImageFeatureTemplate();
             viewModel.ImageFeatureTemplate.MaximumFileSizeBytes ??= MaximumFileSizeBytes;

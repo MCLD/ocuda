@@ -13,11 +13,11 @@ To configure the Markdown editor on a page in Ops:
 2. Create the tag that will contain the editor on the form:
 
     ```razor
-    <div class="form-group row">
-        <div class="col-md-3 text-md-right">
+    <div class="mb-3 row">
+        <div class="col-md-3 text-md-end">
             <label asp-for="Model.Text" class="col-form-label"></label>
         </div>
-        <div class="form-group-inner col-md-9">
+        <div class="mb-3-inner col-md-9">
             <textarea asp-for="Model.Text" markdown-editor></textarea>
             <span asp-validation-for="Model.Text"
                 class="validation-message text-danger"></span>

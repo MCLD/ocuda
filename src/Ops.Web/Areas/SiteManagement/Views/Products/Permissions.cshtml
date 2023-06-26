@@ -8,7 +8,7 @@
         </h1>
     </div>
     <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 float-end"
            asp-action="@(nameof(ProductsController.Index))">Back</a>
     </div>
 </div>
@@ -37,7 +37,7 @@
                           asp-route-productId="@Model.ProductId"
                           asp-route-permissionGroupId="@availableGroup.Key">
                                 <span class="d-inline-block mt-1">@availableGroup.Value</span>
-                                <button class="btn btn-outline-success float-right">
+                                <button class="btn btn-outline-success float-end">
                                     <span class="fa fa-plus-circle"></span>
                                 </button>
                             </form>
@@ -67,7 +67,7 @@
                           asp-route-productId="@Model.ProductId"
                           asp-route-permissionGroupId="@availableGroup.Key">
                                 <span class="d-inline-block mt-1">@availableGroup.Value</span>
-                                <button class="btn btn-outline-danger float-right">
+                                <button class="btn btn-outline-danger float-end">
                                     <span class="fa fa-minus-circle"></span>
                                 </button>
                             </form>

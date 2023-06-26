@@ -8,22 +8,22 @@
         </h1>
     </div>
     <div class="col-sm-4">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-action="@(nameof(EmediaController.Index))">Back</a>
 
         @if (!Model.EmediaGroup.SegmentId.HasValue)
         {
-            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
-                    data-toggle="modal"
-                    data-target="#updateSegmentModal">
+            <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
+                    data-bs-toggle="modal"
+                    data-bs-target="#updateSegmentModal">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Add a Segment
             </button>
         }
 
-        <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
-                data-toggle="modal"
-                data-target="#addModal">
+        <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
+                data-bs-toggle="modal"
+                data-bs-target="#addModal">
             <span class="fas fa-plus-circle" aria-hidden="true"></span>
             Add Emedia
         </button>
@@ -34,18 +34,16 @@
 {
     <div class="row mb-3">
         <div class="col-12">
-            <div class="row form-group">
-                <label class="col-form-label text-md-right col-md-3" for="SegmentName">Segment</label>
-                <div class="form-group-inner col-md-9">
+            <div class="row mb-3">
+                <label class="col-form-label text-md-end col-md-3" for="SegmentName">Segment</label>
+                <div class="mb-3-inner col-md-9">
                     <div class="input-group">
-                        <div class="input-group-prepend">
-                            <button class="btn btn-primary"
-                                    type="button"
-                                    data-toggle="modal"
-                                    data-target="#updateSegmentModal">
-                                <span class="far fa-edit"></span>
-                            </button>
-                        </div>
+                        <button class="btn btn-outline-primary"
+                                type="button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#updateSegmentModal">
+                            <span class="far fa-edit"></span>
+                        </button>
                         <input asp-for="EmediaGroup.Segment.Name" class="form-control" readonly />
                     </div>
                 </div>
@@ -64,8 +62,8 @@
                     </a>
                     <button type="submit"
                             class="btn btn-outline-danger"
-                            data-toggle="modal"
-                            data-target="#deleteSegmentModal"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteSegmentModal"
                             data-id="@Model.EmediaGroup.Id"
                             data-name="@Model.EmediaGroup.Segment.Name">
                         <span class="fas fa-times"></span>
@@ -96,8 +94,8 @@
                                 Group has no emedia.
                                 <a href="#"
                                    class="text-success"
-                                   data-toggle="modal"
-                                   data-target="#addModal">
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#addModal">
                                     <span class="fas fa-plus-circle" aria-hidden="true"></span>
                                     Add an emedia.
                                 </a>
@@ -119,8 +117,8 @@
                             <td class="align-middle">
                                 <button type="button"
                                         class="btn btn-outline-primary"
-                                        data-toggle="modal"
-                                        data-target="#editModal"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editModal"
                                         data-id="@emedia.Id"
                                         data-name="@emedia.Name"
                                         data-url="@emedia.RedirectUrl"
@@ -136,8 +134,8 @@
                                 </a>
                                 <button type="button"
                                         class="btn btn-outline-danger"
-                                        data-toggle="modal"
-                                        data-target="#deleteModal"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal"
                                         data-id="@emedia.Id"
                                         data-name="@emedia.Name">
                                     <span class="fas fa-minus-circle" aria-hidden="true"></span>
@@ -256,14 +254,14 @@
             $.post("@(Url.Action(nameof(EmediaController.EditEmedia), EmediaController.Name))",
                 form.serialize(),
                 function (response) {
-                if (response.success == true) {
-                    location.reload();
-                }
-                else {
-                    alert(response.message);
-                    ResetSpinners(form.find(".btn-spinner"));
-                }
-            });
+                    if (response.success == true) {
+                        location.reload();
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
         });
 
         $("#deleteModal").on("show.bs.modal", function (e) {

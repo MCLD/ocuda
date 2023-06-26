@@ -11,18 +11,18 @@
         <a asp-controller="@ProductsController.Name"
            asp-action="@nameof(ProductsController.Product)"
            asp-route-productSlug="@Model.Product.Slug"
-           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+           class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
         <a asp-controller="@ProductsController.Name"
            asp-action="@nameof(ProductsController.UploadDistribution)"
            asp-route-productSlug="@Model.Product.Slug"
-           class="btn btn-outline-info mt-2 mb-1 mr-2 float-right">
+           class="btn btn-outline-info mt-2 mb-1 me-2 float-end">
             <span class="fas fa-file-upload"></span>
             Upload Distribution
         </a>
         <a asp-controller="@ProductsController.Name"
            asp-action="@nameof(ProductsController.UploadReplenishment)"
            asp-route-productSlug="@Model.Product.Slug"
-           class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
+           class="btn btn-outline-success mt-2 mb-1 me-2 float-end">
             <span class="fas fa-file-upload"></span>
             Upload Replenishment
         </a>
@@ -33,7 +33,7 @@
     <div class="col-12 col-md-6">
         <div class="card mb-2">
             <div class="card-header">
-                <span class="h5 font-weight-bold">@Model.LocationInventory.Location.Name</span>
+                <span class="h5 fw-bold">@Model.LocationInventory.Location.Name</span>
             </div>
             <div class="card-body p-0">
                 <table class="table table-sm mb-0">
@@ -59,9 +59,9 @@
                     <tr>
                         <th class="text-middle">Many threshhold (less than this = few)</th>
                         <td class="text-middle">@Model.LocationInventory.ManyThreshhold</td>
-                        <td class="text-middle"><button class="pull-right btn btn-sm btn-outline-primary"
-                            data-toggle="modal"
-                            data-target="#threshholdModal">Adjust</button></td>
+                        <td class="text-middle"><button class="float-end btn btn-sm btn-outline-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#threshholdModal">Adjust</button></td>
                     </tr>
                     @if (Model.LocationInventory.ThreshholdUpdatedAt.HasValue)
                     {
@@ -99,7 +99,7 @@
                 <div class="card-body">
                     <input asp-for="ItemCount" value="@Model.LocationInventory.ItemCount" formgroup type="number" />
                 </div>
-                <div class="card-footer text-right">
+                <div class="card-footer text-end">
                     <button class="btn btn-outline-primary"
                             type="submit"
                             button-spinner>
@@ -122,17 +122,17 @@
          tabindex="-1"
          aria-labelledby="threshholdModalLabel"
          aria-hidden="true"
-         data-backdrop="static">
+         data-bs-backdrop="static">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="threshholdModalLabel">Many threshhold</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="visually-hidden" aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="threshholdValue">Many threshhold</label>
                         <input type="number" 
                                class="form-control"
@@ -142,7 +142,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-outline-primary">Update</button>
                 </div>
             </div>

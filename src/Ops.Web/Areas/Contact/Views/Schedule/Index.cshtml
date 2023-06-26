@@ -8,7 +8,7 @@
     <div class="pt-2">
         @if (!string.IsNullOrEmpty(Model.ScheduleDocumentLink))
         {
-            <a class="btn btn-outline-primary mr-2" href="@Model.ScheduleDocumentLink">View Schedule</a>
+            <a class="btn btn-outline-primary me-2" href="@Model.ScheduleDocumentLink">View Schedule</a>
         }
         <a asp-controller="Schedule"
            asp-action="Cancelled"

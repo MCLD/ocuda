@@ -70,7 +70,7 @@
         <div class="col-12 col-md-6">
             <div class="card mb-2">
                 <div class="card-header">
-                    <span class="h5 font-weight-bold">@Model.User.Name</span>
+                    <span class="h5 fw-bold">@Model.User.Name</span>
                 </div>
                 <div class="card-body p-0">
                     <table class="table table-sm mb-0">
@@ -81,9 +81,9 @@
                                 @if (Model.CanEdit)
                                 {
                                     <a href="#"
-                                       class="float-right pr-2"
-                                       data-toggle="modal"
-                                       data-target="#editModal"
+                                       class="float-end pe-2"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#editModal"
                                        data-id="@Model.User.Id"
                                        data-nickname="@Model.User.Nickname"
                                        title="Update nickname">
@@ -134,9 +134,9 @@
                                     @if (Model.CanEdit)
                                     {
                                         <a href="#"
-                                           class="float-right pr-2"
-                                           data-toggle="modal"
-                                           data-target="#editLocationModal"
+                                           class="float-end pe-2"
+                                           data-bs-toggle="modal"
+                                           data-bs-target="#editLocationModal"
                                            data-id="@Model.User.Id"
                                            data-locationid="@Model.User.AssociatedLocation.Value"
                                            title="Update location">
@@ -145,9 +145,9 @@
                                         @if (Model.User.AssociatedLocationManuallySet)
                                         {
                                             <a href="#"
-                                               class="float-right pr-3"
-                                               data-toggle="modal"
-                                               data-target="#unsetModal"
+                                               class="float-end pe-3"
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#unsetModal"
                                                data-id="@Model.User.Id"
                                                title="Manually set">
                                                 <span class="fas fa-xs fa-wrench"></span>
@@ -160,8 +160,8 @@
                                     @if (Model.CanEdit)
                                     {
                                         <button class="btn btn-sm btn-outline-primary"
-                                                data-toggle="modal"
-                                                data-target="#editLocationModal"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editLocationModal"
                                                 data-id="@Model.User.Id">
                                             Choose a location
                                         </button>
@@ -233,7 +233,7 @@
                                     @Model.AuthenticatedAt
                                     <form asp-action="Reauthenticate" class="d-inline">
                                         <button type="submit"
-                                                class="float-right p-0 mr-2 btn btn-link"
+                                                class="float-end p-0 me-2 btn btn-link"
                                                 title="Reauthenticate">
                                             <span class="fa fa-xs fa-redo-alt"></span>
                                         </button>
@@ -281,9 +281,9 @@
                                     @if (!string.IsNullOrEmpty(Model.PicturePath))
                                     {
                                         <a href="#"
-                                           class="btn btn-sm btn-outline-danger ml-2"
-                                           data-toggle="modal"
-                                           data-target="#removePictureModal"
+                                           class="btn btn-sm btn-outline-danger ms-2"
+                                           data-bs-toggle="modal"
+                                           data-bs-target="#removePictureModal"
                                            data-id="@Model.User.Id"
                                            data-username="@Model.User.Username"
                                            title="Remove picture">
@@ -311,7 +311,7 @@
                             {
                                 if (permission == "Site manager")
                                 {
-                                    <li class="list-group-item p-2 font-weight-bold">
+                                    <li class="list-group-item p-2 fw-bold">
                                         @permission
                                         <span class="fa fa-xs fa-star" style="color: gold;"></span>
                                     </li>

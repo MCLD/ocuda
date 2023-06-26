@@ -7,8 +7,8 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="addModalTitle">Add Link Library</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <span class="visually-hidden" aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <form asp-action="@nameof(SectionController.AddLinkLibrary)"
@@ -35,7 +35,7 @@
                             <button type="submit" value="Submit" class="btn btn-primary">Save</button>
                             <button type="button"
                                     class="btn btn-default"
-                                    data-dismiss="modal"
+                                    data-bs-dismiss="modal"
                                     style="margin-right: 1em;">
                                 Close
                             </button>
@@ -58,8 +58,8 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="addModalTitle"></h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <span class="visually-hidden" aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <form method="post"
@@ -97,7 +97,7 @@
                             <button type="submit" value="submit" class="btn btn-primary">Save</button>
                             <button type="button"
                                     class="btn btn-default"
-                                    data-dismiss="modal"
+                                    data-bs-dismiss="modal"
                                     style="margin-right: 1em;">
                                 Close
                             </button>
@@ -120,8 +120,8 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="addModalTitle">Add File Library</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <span class="visually-hidden" aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <form asp-action="@nameof(SectionController.AddFileLibrary)"
@@ -152,7 +152,7 @@
                             </button>
                             <button type="button"
                                     class="btn btn-default"
-                                    data-dismiss="modal"
+                                    data-bs-dismiss="modal"
                                     style="margin-right: 1em;">
                                 Close
                             </button>
@@ -180,10 +180,10 @@
                 <div class="modal-header">
                     <h4 class="modal-title" id="deleteModalLabel">Delete Feature</h4>
                     <button type="button"
-                            class="close"
-                            data-dismiss="modal"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
                             aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <span class="visually-hidden" aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -193,12 +193,12 @@
                 <div class="modal-footer">
                     <button type="button"
                             class="btn btn-default"
-                            data-dismiss="modal"
+                            data-bs-dismiss="modal"
                             style="margin-right: 1em;">
                         Cancel
                     </button>
                     <button type="submit"
-                            class="btn btn-danger pull-right"
+                            class="btn btn-danger float-end"
                             aria-label="Confirm"
                             id="confirmDelButton"
                             button-spinner>
@@ -215,14 +215,14 @@
         <h1>Section <small class="text-muted">@Model.Section.Name</small></h1>
     </div>
     <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Index))">Back</a>
         @if (false)
         {
-            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
-                data-toggle="modal"
-                data-target="#addModal">
+            <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
+                data-bs-toggle="modal"
+                data-bs-target="#addModal">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Add Post
             </button>
@@ -254,8 +254,8 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header p-4" style="transform: rotate(0);">
-                                <div class="float-left align-middle">
-                                    <a class="float-left align-middle"
+                                <div class="float-start align-middle">
+                                    <a class="float-start align-middle"
                                asp-action="@nameof(SectionController.PostDetails)"
                                asp-route-sectionSlug="@Model.Section.Slug"
                                asp-route-postSlug="@post.Slug">
@@ -264,11 +264,11 @@
                                         </h5>
                                     </a>
                                 </div>
-                                <div class="float-right align-middle h4">
+                                <div class="float-end align-middle h4">
                                     <a asp-action="@nameof(SectionController.EditPost)"
                                asp-route-sectionSlug="@Model.Section.Slug"
                                asp-route-postSlug="@post.Slug">
-                                        <span class="far fa-edit float-right"></span>
+                                        <span class="far fa-edit float-end"></span>
                                     </a>
                                 </div>
                             </div>
@@ -295,8 +295,8 @@
                                            .Where(_ => _.PostId == post.Id)
                                            .Select(_ => Model.SectionCategories.Where(__ => __.Id == _.CategoryId).FirstOrDefault()).ToList())
                                             {
-                                                <a class="badge badge-pill badge-info"
-                                   href="@Url.Action(nameof(SectionController.Posts),
+                                                <a class="badge rounded-pill bg-info"
+                                                   href="@Url.Action(nameof(SectionController.Posts),
                                         new { sectionSlug = Model.Section.Slug,
                                             categorySlug = category.Stub, page = 1})">
                                                     @category.Name
@@ -319,12 +319,12 @@
                 <tr>
                     <th colspan="3">
                         File Libraries
-                        <div class="float-right align-middle">
+                        <div class="float-end align-middle">
                             <a role="button"
                                class="text-success align-middle"
                                id="addFileLibrary"
-                               data-toggle="modal"
-                               data-target="#addFileLibModal">
+                               data-bs-toggle="modal"
+                               data-bs-target="#addFileLibModal">
                                 <span class="fas fa-plus-circle fa-lg align-middle"></span>
                             </a>
                         </div>
@@ -343,20 +343,20 @@
                             <td style="position: relative;" class="text-center">
                                 <a role="button"
                            class="text-danger h4 editfile text-center"
-                           data-toggle="modal"
-                           data-target="#editLibModal"
+                           data-bs-toggle="modal"
+                           data-bs-target="#editLibModal"
                            data-id="@library.Id"
                            data-name="@library.Name"
                            data-slug="@library.Slug"
                            data-type="file">
-                                    <span class="far fa-edit float-right"></span>
+                                    <span class="far fa-edit float-end"></span>
                                 </a>
                             </td>
                             <td style="position: relative;" class="text-center">
                                 <button type="button"
                                 class="btn btn-danger"
-                                data-toggle="modal"
-                                data-target="#deleteModal"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal"
                                 data-id="@library.Id"
                                 data-name="@library.Name"
                                 data-slug="@library.Slug"
@@ -382,11 +382,11 @@
                 <tr>
                     <th colspan="3">
                         Link Libraries
-                        <div class="float-right align-middle">
+                        <div class="float-end align-middle">
                             <a role="button"
                                class="text-success align-middle"
-                               data-toggle="modal"
-                               data-target="#addLinkLibModal"
+                               data-bs-toggle="modal"
+                               data-bs-target="#addLinkLibModal"
                                id="addLinkLibrary">
                                 <span class="fas fa-plus-circle fa-lg align-middle"></span>
                             </a>
@@ -406,20 +406,20 @@
                             <td style="position: relative;" class="text-center align-middle">
                                 <a role="button"
                            class="text-danger h4 editlink"
-                           data-toggle="modal"
-                           data-target="#editLibModal"
+                           data-bs-toggle="modal"
+                           data-bs-target="#editLibModal"
                            data-id="@library.Id"
                            data-name="@library.Name"
                            data-slug="@library.Slug"
                            data-type="link">
-                                    <span class="far fa-edit float-right"></span>
+                                    <span class="far fa-edit float-end"></span>
                                 </a>
                             </td>
                             <td style="position: relative;" class="text-center">
                                 <button type="button"
                                 class="btn btn-danger"
-                                data-toggle="modal"
-                                data-target="#deleteModal"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal"
                                 data-id="@library.Id"
                                 data-name="@library.Name"
                                 data-slug="@library.Slug"
