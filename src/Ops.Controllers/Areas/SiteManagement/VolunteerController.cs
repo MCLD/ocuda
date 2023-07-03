@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,7 +16,6 @@ using Ocuda.Ops.Service.Interfaces.Promenade.Services;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
-using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 {
@@ -140,7 +138,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             await _volunteerFormService.EditAsync(form);
 
-            ShowAlertSuccess($"Segment added.");
+            ShowAlertSuccess("Segment added.");
             return RedirectToAction(nameof(Form), new { form.Id });
         }
 
@@ -150,14 +148,13 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         {
             try
             {
-                var form = await _volunteerFormService.GetFormByIdAsync(id);
-                await _volunteerFormService.DisableAsync(form);
-                ShowAlertSuccess($"Deleted form: {form.VolunteerFormType}");
+                await _volunteerFormService.DisableAsync(id);
+                ShowAlertSuccess("Form disabled.");
             }
             catch (OcudaException ex)
             {
-                _logger.LogError(ex, "Error deleting form: {Message}", ex.Message);
-                ShowAlertDanger($"Error deleting form");
+                _logger.LogError(ex, "Error disabling form: {Message}", ex.Message);
+                ShowAlertDanger("Error disabling form");
             }
 
             return RedirectToAction(nameof(Index));
@@ -195,6 +192,24 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             }
         }
 
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> EnableForm(int id)
+        {
+            try
+            {
+                await _volunteerFormService.EnableAsync(id);
+                ShowAlertSuccess("Form enabled.");
+            }
+            catch (OcudaException ex)
+            {
+                _logger.LogError(ex, "Error enabling form: {Message}", ex.Message);
+                ShowAlertDanger("Error enabling form");
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
         [Route("{Id}")]
         [RestoreModelState]
         public async Task<IActionResult> Form(int Id)
@@ -213,11 +228,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
                 return View("Details", new DetailsViewModel
                 {
-                    TypeName = form.VolunteerFormType.ToString(),
                     FormId = form.Id,
                     FormTypeId = (int)form.VolunteerFormType,
+                    HeaderSegmentId = segmentId,
                     HeaderSegmentName = segmentName,
-                    HeaderSegmentId = segmentId
+                    IsDisabled = form.IsDisabled,
+                    TypeName = form.VolunteerFormType.ToString(),
                 });
             }
             catch (OcudaException ex)
@@ -240,42 +256,32 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
             var itemsPerPage = await _siteSettingService
                 .GetSettingIntAsync(Models.Keys.SiteSetting.UserInterface.ItemsPerPage);
-            var filter = new BaseFilter(page, itemsPerPage);
 
+            var filter = new BaseFilter(page, itemsPerPage);
             var formList = await _volunteerFormService.GetPaginatedListAsync(filter);
 
-            var paginateModel = new PaginateModel
+            var viewModel = new IndexViewModel
             {
                 ItemCount = formList.Count,
                 CurrentPage = page,
                 ItemsPerPage = filter.Take.Value
             };
-            if (paginateModel.PastMaxPage)
+
+            if (viewModel.PastMaxPage)
             {
-                return RedirectToRoute(
-                    new
-                    {
-                        page = paginateModel.LastPage ?? 1
-                    });
+                return RedirectToRoute(new { page = viewModel.LastPage ?? 1 });
             }
 
-            var volunteerForms = new List<DetailsViewModel>();
-            foreach (var vform in formList.Data)
+            foreach (var form in formList.Data)
             {
-                var tempForm = new DetailsViewModel
+                viewModel.VolunteerForms.Add(new DetailsViewModel
                 {
-                    FormId = vform.Id,
-                    FormTypeId = (int)vform.VolunteerFormType,
-                    TypeName = vform.VolunteerFormType.ToString()
-                };
-                volunteerForms.Add(tempForm);
+                    FormId = form.Id,
+                    FormTypeId = (int)form.VolunteerFormType,
+                    TypeName = form.VolunteerFormType.ToString(),
+                    IsDisabled = form.IsDisabled
+                });
             }
-
-            var viewModel = new IndexViewModel
-            {
-                VolunteerForms = volunteerForms,
-                PaginateModel = paginateModel
-            };
 
             return View(viewModel);
         }

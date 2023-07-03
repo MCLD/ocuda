@@ -58,7 +58,7 @@
      role="dialog"
      aria-labelledby="listModalLabel">
     <div class="modal-dialog modal-lg" role="document">
-        <form method="post" 
+        <form method="post"
               role="form"
               id="updateItem"
               asp-controller="@LocationsController.Name"
@@ -599,18 +599,19 @@
         <span class="validation-message text-danger"
               asp-validation-for="Location.PostFeatureSegmentId"></span>
     </div>
-        
-    @if (Model.VolunteerForms != null) {
-        @foreach(var form in Model.VolunteerForms)
+
+    @if (Model.VolunteerForms != null)
+    {
+        @foreach (var form in Model.VolunteerForms)
         {
-            <div class="row form-group">
-                <div class="col-form-label text-md-right col-md-3">
+            <div class="row form-group mb-3">
+                <div class="col-form-label text-md-end col-md-3">
                     <label for="@form.FormMappings">@form.TypeName</label>
                 </div>
-                <div class="form-group-inner col-md-9">
+                <div class="col-md-9">
                     @if (!form.IsDisabled)
                     {
-                        @if (form.FormMappings != null && form.FormMappings.Count > 0)
+                        @if (form.FormMappings?.Count > 0)
                         {
                             <table class="table table-sm table-bordered table-striped table-hover" id="staffRecipientTable">
                                 <thead>
@@ -620,42 +621,41 @@
                                     </tr>
                                 </thead>
                                 <tbody id="staffTableContent">
-                                    @for (int m = 0; m < form.FormMappings.Count(); m++)
+                                    @foreach (var formMapping in form.FormMappings)
                                     {
                                         <tr>
                                             <td>
                                                 <form method="post" role="form" asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.RemoveFormUserMapping)"
-                                                    asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Name"
-                                                    asp-route-locationStub="@Model.Location.Stub"
-                                                    asp-route-userId="@form.FormMappings[m].UserId"
-                                                    asp-route-type="@form.TypeId">
+                                                      asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Name"
+                                                      asp-route-locationStub="@Model.Location.Stub"
+                                                      asp-route-userId="@formMapping.UserId"
+                                                      asp-route-type="@form.TypeId">
                                                     <button class="btn btn-sm btn-outline-danger" type="submit">
                                                         <span class="fas fa-minus-circle"></span>
                                                     </button>
                                                 </form>
                                             </td>
                                             <td class="align-middle">
-                                                @form.FormMappings[m].Name
+                                                @formMapping.Name
                                             </td>
                                         </tr>
                                     }
                                 </tbody>
-                        </table>
+                            </table>
                         }
                         <button type="button"
-                            class="btn btn-outline-primary"
-                            data-toggle="modal"
-                            data-target="#addStaffModal"
-                            data-formtype="@((VolunteerFormType)form.TypeId)"
-                            data-formtypeid="@form.TypeId">
+                                class="btn btn-sm btn-outline-primary mt-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#addStaffModal"
+                                data-formtype="@((VolunteerFormType)form.TypeId)"
+                                data-formtypeid="@form.TypeId">
                             <span class="fas fa-plus-circle" aria-hidden="true"></span>
                             Add staff
                         </button>
                     }
                     else
                     {
-                        <div
-                            class="alert alert-warning">
+                        <div class="alert alert-warning">
                             @form.AlertWarning
                         </div>
                     }
@@ -664,29 +664,26 @@
             </div>
 
             <div modal
-         isLarge="true"
-         id="addStaffModal"
-         name="Staff Member"
-         type="Ocuda.Utility.TagHelpers.ModalTypes.Add"
-         suppress-footer="true"
-         data-backdrop="static">
-         <input type="hidden" asp-for="@form.TypeId" />
-                <div class="form-group">
+                 isLarge="true"
+                 id="addStaffModal"
+                 name="Staff Member"
+                 type="Ocuda.Utility.TagHelpers.ModalTypes.Add"
+                 suppress-footer="true"
+                 data-backdrop="static">
+                <input type="hidden" asp-for="@form.TypeId" />
+                <div class="form-group mb-2">
                     <label for="staffSearchText">Search</label>
                     <div class="input-group">
                         <input type="text"
-                       id="staffSearchText"
-                       class="form-control"
-                       aria-label="Search text" />
-                        <div class="input-group-append">
-                            <button class="btn btn-outline-success"
-                            id="staffSearchGo"
-                            button-spinner>
-                                Go
-                            </button>
-                        </div>
+                               id="staffSearchText"
+                               class="form-control"
+                               aria-label="Search text" />
+                        <button class="btn btn-outline-success"
+                                id="staffSearchGo"
+                                button-spinner>
+                            Go
+                        </button>
                     </div>
-
                 </div>
                 <table class="table table-sm table-bordered table-hover table-striped">
                     <thead>
@@ -1084,7 +1081,7 @@
                     {
                         itemId: itemId,
                         locationId: @Model.Location.Id
-                                }, function () {
+                                                                                }, function () {
                     $("#deleteModal").modal('hide');
                     window.location.reload();
                 });
@@ -1288,7 +1285,7 @@
         $('#addStaffModal').on('show.bs.modal', function (event) {
             let caller = $(event.relatedTarget);
             currentFormTypeId = caller.data('formtypeid');
-            $('#addStaffModalLabel').html('Add Staff member - ' + caller.data('formtype') + ' Volunteer form');
+            $('#addStaffModalLabel').html('Add staff member - ' + caller.data('formtype') + ' Volunteer form');
             currentPage = 1;
             clearSearchResults('Enter text above to search for a staff member.', adultSearchBody, paginationAdult);
             adultTextInput.val('')
@@ -1311,14 +1308,14 @@
 
         function OcudaFetch(url, params, method = 'GET') {
             let requestUrl = new URL(url)
-            if (params){
+            if (params) {
                 Object.keys(params).forEach(key => requestUrl.searchParams.append(key, params[key]));
             }
 
             return fetch(requestUrl, { method: method })
         }
 
-        async function volunteerMappingSearch(){
+        async function volunteerMappingSearch() {
             await performStaffSearch(adultTextInput.val(), currentPage)
                 .then((response) => {
                     return response.json();
@@ -1342,7 +1339,7 @@
                             btnMapUser.setAttribute('type', 'submit');
 
                             var span = document.createElement('span');
-                            span.setAttribute('class', 'fas fa-plus-circle');
+                            span.setAttribute('class', 'fas fa-fw fa-plus-circle');
 
                             btnMapUser.appendChild(span);
                             form.appendChild(btnMapUser);
@@ -1356,22 +1353,22 @@
                         if (data.maxPage > 1) {
                             if (data.currentPage == 1) {
                                 paginationContent.push('<button class="btn btn-sm btn-outline-primary" disabled>');
-                                paginationContent.push('<span class="fa fa-backward"></span></button>');
+                                paginationContent.push('<span class="fa fa-fw fa-backward"></span></button>');
                             } else {
                                 paginationContent.push('<button class="btn btn-sm btn-outline-primary"');
                                 paginationContent.push(' onclick="prevPage(' + false + ');">');
-                                paginationContent.push('<span class="fa fa-backward"></span></button>');
+                                paginationContent.push('<span class="fa fa-fw fa-backward"></span></button>');
                             }
                             paginationContent.push('<span class="d-inline-block mx-2">')
                             paginationContent.push(data.currentPage + '/' + data.maxPage);
                             paginationContent.push('</span>')
                             if (data.currentPage == data.maxPage) {
                                 paginationContent.push('<button class="btn btn-sm btn-outline-primary" disabled>');
-                                paginationContent.push('<span class="fa fa-forward"></span></button>');
+                                paginationContent.push('<span class="fa fa-fw fa-forward"></span></button>');
                             } else {
                                 paginationContent.push('<button class="btn btn-sm btn-outline-primary"');
                                 paginationContent.push(' onclick="nextPage(' + false + ');">')
-                                paginationContent.push('<span class="fa fa-forward"></span></button>');
+                                paginationContent.push('<span class="fa fa-fw fa-forward"></span></button>');
                             }
                         }
 
@@ -1393,7 +1390,7 @@
                 });;
         }
 
-        async function performStaffSearch(searchText, page){
+        async function performStaffSearch(searchText, page) {
             let searchJsonUrl = '@Url.Action(nameof(Ocuda.Ops.Controllers.StaffController.SearchJson), Ocuda.Ops.Controllers.StaffController.Name, null, protocol:"http")';
             let searchParams = { searchText: searchText, page: page }
             return await OcudaFetch(searchJsonUrl, searchParams);

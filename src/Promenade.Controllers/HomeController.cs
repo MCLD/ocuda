@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommonMark;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.ViewModels.Home;
-using Ocuda.Promenade.Controllers.ViewModels.Locations;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service;
 using Ocuda.Utility.Abstract;
@@ -216,6 +216,11 @@ namespace Ocuda.Promenade.Controllers
                 }
             }
 
+            if (HasAlertInfo)
+            {
+                viewModel.ShowMessage = AlertInfo;
+            }
+
             PageTitle = viewModel.Location.Name;
 
             return View(nameof(Location), viewModel);
@@ -252,19 +257,10 @@ namespace Ocuda.Promenade.Controllers
                 .GetLocationFullFeatureAsync(locationId.Value, featureSlug, forceReload);
         }
 
+        #region Volunteer form handling
 
-
-
-
-
-
-
-
-
-
-        [HttpGet("{locationSlug:locationSlugConstraint}/volunteer")]
-        [HttpGet("{locationSlug:locationSlugConstraint}/volunteer/adult")]
-        public async Task<IActionResult> VolunteerAdult(string locationSlug)
+        [HttpGet("{locationSlug:locationSlugConstraint}/[action]")]
+        public async Task<IActionResult> Volunteer(string locationSlug)
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
@@ -275,66 +271,56 @@ namespace Ocuda.Promenade.Controllers
                 return NotFound();
             }
 
-            var adultVolunteerForm = await _volunteerFormService.FindVolunteerFormAsync(VolunteerFormType.Adult, forceReload);
-            var teenVolunteerForm = await _volunteerFormService.FindVolunteerFormAsync(VolunteerFormType.Teen, forceReload);
+            var adultLocationMapping = await _volunteerFormService
+                .FindLocationFormAsync(VolunteerFormType.Adult, locationId.Value, forceReload);
 
-            if ((adultVolunteerForm?.IsDisabled != false)
-                && (teenVolunteerForm?.IsDisabled != false))
+            if (adultLocationMapping != null)
             {
-                return RedirectToAction(nameof(Location), new { locationSlug });
+                return RedirectToAction(nameof(VolunteerAdult), new { locationSlug });
             }
 
-            LocationForm adultLocationMapping = null;
-            LocationForm teenLocationMapping = null;
+            var teenVolunteerForm = await _volunteerFormService
+                .FindLocationFormAsync(VolunteerFormType.Teen, locationId.Value, forceReload);
 
-            if (adultVolunteerForm != null)
-            {
-                adultLocationMapping
-                    = await _volunteerFormService.FindLocationFormAsync(adultVolunteerForm.Id, locationId.Value);
-            }
             if (teenVolunteerForm != null)
             {
-                teenLocationMapping = await _volunteerFormService.FindLocationFormAsync(teenVolunteerForm.Id, locationId.Value);
+                return RedirectToAction(nameof(VolunteerTeen), new { locationSlug });
             }
 
-            if (adultLocationMapping == null)
+            SetAlertInfo("This location is not accepting volunteer applications at this time!");
+            return RedirectToAction(nameof(Location), new { locationSlug });
+        }
+
+        [HttpGet("{locationSlug:locationSlugConstraint}/volunteer/adult")]
+        public async Task<IActionResult> VolunteerAdult(string locationSlug)
+        {
+            try
             {
-                if (teenLocationMapping == null)
+                var viewModel = await PopulateAdultVolunteerViewModelAsync(locationSlug, null);
+                PageTitle = _localizer["Volunteer"];
+                return View("AdultVolunteerForm", viewModel);
+            }
+            catch (OcudaException oex)
+            {
+                if (string.IsNullOrEmpty(oex.Message))
                 {
-                    return RedirectToAction(nameof(Location), new { locationSlug });
+                    return NotFound();
                 }
                 else
                 {
-                    return RedirectToAction(nameof(VolunteerTeen), new { locationSlug });
+                    SetAlertInfo(oex.Message);
+                    return RedirectToAction(nameof(Location), new { locationSlug });
                 }
             }
-
-            var viewModel = new AdultVolunteerFormViewModel
-            {
-                LocationSlug = locationSlug,
-                LocationId = locationId.Value,
-                TeenFormAvailable = teenLocationMapping != null,
-                FormId = adultVolunteerForm.Id
-            };
-
-            if (adultVolunteerForm.HeaderSegmentId.HasValue)
-            {
-                viewModel.SegmentHeader
-                    = adultVolunteerForm.HeaderSegment.Header;
-                viewModel.SegmentText
-                    = FormatForDisplay(adultVolunteerForm.HeaderSegment);
-            }
-
-            return View(viewModel);
         }
 
-
         [HttpPost("{locationSlug:locationSlugConstraint}/volunteer/adult")]
-        public async Task<IActionResult> VolunteerAdult(AdultVolunteerFormViewModel viewModel)
+        public async Task<IActionResult> VolunteerAdult(string locationSlug,
+            AdultVolunteerFormViewModel viewModel)
         {
             if (viewModel == null)
             {
-                throw new ArgumentNullException(nameof(viewModel));
+                return RedirectToAction(nameof(Location), new { locationSlug });
             }
 
             if (ModelState.IsValid)
@@ -343,19 +329,24 @@ namespace Ocuda.Promenade.Controllers
                 {
                     await _volunteerFormService.SaveSubmissionAsync(viewModel.ToFormSubmission());
                 }
-                catch (Exception ex)
+                catch (OcudaException oex)
                 {
-                    viewModel.WarningText = _localizer[i18n.Keys.Promenade.Error];
-                    return View(viewModel);
+                    _logger.LogError(oex,
+                        "Error saving adult volunteer form: {ErrorMessage}",
+                        oex.Message);
+                    viewModel.WarningText = "We were unable to save your submission, please try again.";
+                    var returnViewModel = await PopulateAdultVolunteerViewModelAsync(locationSlug, viewModel);
+                    return View("AdultVolunteerForm", returnViewModel);
                 }
             }
+            // todo fix show success message
+            SetAlertInfo("Thank you for submitting your volunteer application.");
             return RedirectToAction(nameof(Index));
-            //return RedirectToAction(nameof(FormSubmissionSuccess), new { locationSlug = viewModel.LocationSlug, volunteerType = VolunteerFormType.Adult });
         }
 
-
         [HttpPost("{locationSlug:locationSlugConstraint}/volunteer/teen")]
-        public async Task<IActionResult> VolunteerTeen(TeenVolunteerFormViewModel viewModel)
+        public async Task<IActionResult> VolunteerTeen(string locationSlug,
+            TeenVolunteerFormViewModel viewModel)
         {
             if (viewModel == null)
             {
@@ -381,19 +372,47 @@ namespace Ocuda.Promenade.Controllers
                 {
                     await _volunteerFormService.SaveSubmissionAsync(viewModel.ToFormSubmission());
                 }
-                catch (Exception)
+                catch (OcudaException oex)
                 {
+                    _logger.LogError(oex,
+                        "Error saving teen volunteer form: {ErrorMessage}",
+                        oex.Message);
                     viewModel.WarningText = _localizer[i18n.Keys.Promenade.Error];
-                    return View(viewModel);
+                    PageTitle = _localizer["Volunteer"];
+                    var returnViewModel = await PopulateTeenVolunteerViewModelAsync(locationSlug, viewModel);
+                    return View("TeenVolunteerForm", viewModel);
                 }
             }
 
+            SetAlertInfo("Thank you for submitting your volunteer application.");
             return RedirectToAction(nameof(Index));
-            //return RedirectToAction(nameof(FormSubmissionSuccess), new { locationSlug = viewModel.LocationSlug, volunteerType = VolunteerFormType.Teen });
         }
 
         [HttpGet("{locationSlug:locationSlugConstraint}/volunteer/teen")]
         public async Task<IActionResult> VolunteerTeen(string locationSlug)
+        {
+            try
+            {
+                var viewModel = await PopulateTeenVolunteerViewModelAsync(locationSlug, null);
+                PageTitle = _localizer["Volunteer"];
+                return View("TeenVolunteerForm", viewModel);
+            }
+            catch (OcudaException oex)
+            {
+                if (string.IsNullOrEmpty(oex.Message))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    SetAlertInfo(oex.Message);
+                    return RedirectToAction(nameof(Location), new { locationSlug });
+                }
+            }
+        }
+
+        private async Task<TeenVolunteerFormViewModel> PopulateTeenVolunteerViewModelAsync(string locationSlug,
+            TeenVolunteerFormViewModel viewModel)
         {
             var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
 
@@ -401,70 +420,71 @@ namespace Ocuda.Promenade.Controllers
 
             if (!locationId.HasValue)
             {
-                return NotFound();
+                throw new OcudaException();
             }
 
-            try
+            var teenLocationMapping = await _volunteerFormService
+                .FindLocationFormAsync(VolunteerFormType.Teen, locationId.Value, forceReload)
+                ?? throw new OcudaException("This location is not accepting teen volunteer applications at this time!");
+
+            var adultLocationMapping = await _volunteerFormService
+                .FindLocationFormAsync(VolunteerFormType.Teen, locationId.Value, forceReload);
+
+            viewModel ??= new TeenVolunteerFormViewModel();
+
+            viewModel.LocationSlug = locationSlug;
+            viewModel.LocationId = locationId.Value;
+            viewModel.AdultFormAvailable = adultLocationMapping != null;
+            viewModel.FormId = teenLocationMapping.Form.Id;
+
+            if (teenLocationMapping.Form.HeaderSegmentId.HasValue)
             {
-                var teenVolunteerForm = await _volunteerFormService.FindVolunteerFormAsync(VolunteerFormType.Teen, forceReload);
-                var adultVolunteerForm = await _volunteerFormService.FindVolunteerFormAsync(VolunteerFormType.Adult, forceReload);
-
-                if (teenVolunteerForm?.IsDisabled != false
-                    && adultVolunteerForm?.IsDisabled != false)
-                {
-                    // Alert: volunteers are not being accepted atm
-                    return RedirectToAction(nameof(Location), new { locationSlug });
-                }
-
-                LocationForm teenLocationMapping = null;
-                LocationForm adultLocationMapping = null;
-
-                if (teenVolunteerForm != null)
-                {
-                    teenLocationMapping = await _volunteerFormService.FindLocationFormAsync(teenVolunteerForm.Id, locationId.Value);
-                }
-                if (adultVolunteerForm != null)
-                {
-                    adultLocationMapping
-                        = await _volunteerFormService.FindLocationFormAsync(adultVolunteerForm.Id, locationId.Value);
-                }
-
-                if (teenLocationMapping == null)
-                {
-                    if (adultLocationMapping == null)
-                    {
-                        return RedirectToAction(nameof(Location), new { locationSlug });
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(VolunteerAdult), new { locationSlug });
-                    }
-                }
-
-                var viewModel = new TeenVolunteerFormViewModel
-                {
-                    LocationSlug = locationSlug,
-                    LocationId = locationId.Value,
-                    AdultFormAvailable = adultLocationMapping != null,
-                    FormId = teenVolunteerForm.Id
-                };
-
-
-                if (adultVolunteerForm.HeaderSegmentId.HasValue)
-                {
-                    viewModel.SegmentHeader
-                        = teenVolunteerForm.HeaderSegment.Header;
-                    viewModel.SegmentText
-                        = FormatForDisplay(teenVolunteerForm.HeaderSegment);
-                }
-
-                return View(viewModel);
+                viewModel.SegmentHeader
+                    = teenLocationMapping.Form.HeaderSegment.Header;
+                viewModel.SegmentText
+                    = FormatForDisplay(teenLocationMapping.Form.HeaderSegment);
             }
-            catch (Exception)
-            {
-                return RedirectToAction(nameof(Location), new { locationSlug });
-            }
+
+            return viewModel;
         }
 
+        private async Task<AdultVolunteerFormViewModel> PopulateAdultVolunteerViewModelAsync(string locationSlug,
+            AdultVolunteerFormViewModel viewModel)
+        {
+            var forceReload = HttpContext.Items[ItemKey.ForceReload] as bool? ?? false;
+
+            var locationId = await _locationService.GetLocationIdAsync(locationSlug, forceReload);
+
+            if (!locationId.HasValue)
+            {
+                throw new OcudaException();
+            }
+
+            var adultLocationMapping = await _volunteerFormService
+                .FindLocationFormAsync(VolunteerFormType.Adult, locationId.Value, forceReload)
+                ?? throw new OcudaException("This location is not accepting adult volunteer applications at this time!");
+
+            var teenLocationMapping = await _volunteerFormService
+                .FindLocationFormAsync(VolunteerFormType.Teen, locationId.Value, forceReload);
+
+            viewModel ??= new AdultVolunteerFormViewModel();
+
+            viewModel.LocationSlug = locationSlug;
+            viewModel.LocationId = locationId.Value;
+            viewModel.TeenFormAvailable = teenLocationMapping != null;
+            viewModel.FormId = adultLocationMapping.Form.Id;
+
+            if (adultLocationMapping.Form.HeaderSegmentId.HasValue)
+            {
+                viewModel.SegmentHeader
+                    = adultLocationMapping.Form.HeaderSegment.Header;
+                viewModel.SegmentText
+                    = FormatForDisplay(adultLocationMapping.Form.HeaderSegment);
+            }
+
+            return viewModel;
+        }
+
+        #endregion Volunteer form handling
     }
 }

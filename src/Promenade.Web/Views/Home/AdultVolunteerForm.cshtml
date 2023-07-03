@@ -1,22 +1,13 @@
-﻿@model AdultVolunteerFormViewModel
+﻿@model Ocuda.Promenade.Controllers.ViewModels.Home.AdultVolunteerFormViewModel
 
-@if (!string.IsNullOrEmpty(Model?.SegmentText))
+
+@if (!string.IsNullOrEmpty(Model?.SegmentHeader))
 {
-    <div class="row prom-feature-segment">
+    <div class="row">
         <div class="col-12">
-            @if (!string.IsNullOrEmpty(Model.SegmentHeader))
-            {
-                <h2>@Model.SegmentHeader</h2>
-            }
-            @Html.Raw(Model.SegmentText)
+            <h2>@Model.SegmentHeader</h2>
         </div>
     </div>
-}
-
-@if (Model.TeenFormAvailable)
-{
-    <span>@Html.Raw(Localizer[Ocuda.i18n.Keys.Promenade.AreYouATeenVolunteer])</span>
-    <span>@Html.ActionLink(Localizer[Ocuda.i18n.Keys.Promenade.UseTeenVolunteerForm], "TeenVolunteerForm", "Locations", new { locationStub = Model.LocationSlug })</span>
 }
 
 @if (!string.IsNullOrEmpty(Model?.WarningText))
@@ -30,11 +21,33 @@
     </div>
 }
 
-<div class="row">
+@if (!string.IsNullOrEmpty(Model?.SegmentText))
+{
+    <div class="row">
+        <div class="col-12">
+            @Html.Raw(Model.SegmentText)
+        </div>
+    </div>
+}
+
+@if (Model.TeenFormAvailable)
+{
+    <div class="row">
+        <div class="col-12">
+            <strong>
+                <em>
+                    @Html.Raw(Localizer[Ocuda.i18n.Keys.Promenade.AreYouATeenVolunteer])
+                    @Html.ActionLink(Localizer[Ocuda.i18n.Keys.Promenade.UseTeenVolunteerForm], nameof(HomeController.VolunteerTeen), HomeController.Name, new { Model.LocationSlug })
+                </em>
+            </strong>
+        </div>
+    </div>
+}
+
+<div class="row mt-2">
     <div class="col-12">
         <form method="post" role="form" asp-action="AdultVolunteerForm" asp-controller="Locations">
-            <br /><h2>@Localizer[Ocuda.i18n.Keys.Promenade.ContactInformation]</h2>
-
+            <h2>@Localizer[Ocuda.i18n.Keys.Promenade.ContactInformation]</h2>
             <input asp-for="Name"
                    type="text"
                    formgroup />
@@ -47,17 +60,17 @@
                    formgroup />
             <h2>Availability & Experience</h2>
             <textarea asp-for="Availability"
-                   rows="5"
-                   type="text"
-                   formgroup />
+                      rows="5"
+                      type="text"
+                      formgroup />
             <textarea asp-for="Experience"
-                   rows="5"
-                   type="text"
-                   formgroup />
+                      rows="5"
+                      type="text"
+                      formgroup />
             <div>
                 <button type="submit" button-spinner
-                            class="btn btn-outline-success m-2 btn-lg float-right">
-                        <span class="far fa-check-circle"></span>
+                        class="btn m-2 btn-lg float-right">
+                    <span class="far fa-check-circle"></span>
                     @Localizer[Promenade.ButtonSubmit]
                 </button>
             </div>

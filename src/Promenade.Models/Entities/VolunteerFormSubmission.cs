@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -46,9 +45,6 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string Name { get; set; }
 
-        [NotMapped]
-        public int NotifyUserId { get; set; }
-
         [Required]
         [DisplayName(i18n.Keys.Promenade.PromptPhone)]
         [MaxLength(255)]
@@ -58,6 +54,6 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string Regularity { get; set; }
 
-        public DateTime StaffNotifiedAt { get; set; }
+        public DateTime? StaffNotifiedAt { get; set; }
     }
 }

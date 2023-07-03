@@ -1,7 +1,9 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service.Interfaces.Repositories;
+using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Promenade.Data.Promenade
 {
@@ -19,7 +21,15 @@ namespace Ocuda.Promenade.Data.Promenade
 
         public async Task SaveAsync()
         {
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException duex)
+            {
+                throw new OcudaException($"Error inserting volunteer form submission: {duex.Message}",
+                    duex);
+            }
         }
     }
 }

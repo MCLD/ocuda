@@ -1,22 +1,12 @@
-﻿@model TeenVolunteerFormViewModel
+﻿@model Ocuda.Promenade.Controllers.ViewModels.Home.TeenVolunteerFormViewModel
 
-@if (!string.IsNullOrEmpty(Model?.SegmentText))
+@if (!string.IsNullOrEmpty(Model?.SegmentHeader))
 {
-    <div class="row prom-feature-segment">
+    <div class="row">
         <div class="col-12">
-            @if (!string.IsNullOrEmpty(Model.SegmentHeader))
-            {
-                <h2>@Model.SegmentHeader</h2>
-            }
-            @Html.Raw(Model.SegmentText)
+            <h2>@Model.SegmentHeader</h2>
         </div>
     </div>
-}
-
-@if (Model.AdultFormAvailable)
-{
-    <span>@Html.Raw(Localizer[Ocuda.i18n.Keys.Promenade.AreYouAnAdultVolunteer])</span>
-    <span>@Html.ActionLink(Localizer[Ocuda.i18n.Keys.Promenade.UseAdultVolunteerForm], "AdultVolunteerForm", "Locations", new { locationStub = Model.LocationSlug })</span>
 }
 
 @if (!string.IsNullOrEmpty(Model?.WarningText))
@@ -30,10 +20,33 @@
     </div>
 }
 
+@if (!string.IsNullOrEmpty(Model?.SegmentText))
+{
+    <div class="row">
+        <div class="col-12">
+            @Html.Raw(Model.SegmentText)
+        </div>
+    </div>
+}
+
+@if (Model.AdultFormAvailable)
+{
+    <div class="row">
+        <div class="col-12">
+            <strong>
+                <em>
+                    @Html.Raw(Localizer[Ocuda.i18n.Keys.Promenade.AreYouAnAdultVolunteer])
+                    @Html.ActionLink(Localizer[Ocuda.i18n.Keys.Promenade.UseAdultVolunteerForm], nameof(HomeController.VolunteerAdult), HomeController.Name, new { Model.LocationSlug })
+                </em>
+            </strong>
+        </div>
+    </div>
+}
+
 <div class="row">
     <div class="col-12">
         <form method="post" role="form" asp-action="TeenVolunteerForm" asp-controller="Locations">
-            <br /><h2>@Localizer[Ocuda.i18n.Keys.Promenade.ContactInformation]</h2>
+            <h2>@Localizer[Ocuda.i18n.Keys.Promenade.ContactInformation]</h2>
             <input asp-for="Name"
                    type="text"
                    formgroup />
@@ -44,15 +57,15 @@
             <input asp-for="Email"
                    type="email"
                    formgroup />
-                   <br />
-                <input asp-for="GuardianName"
+            
+            <input asp-for="GuardianName"
                    type="text"
                    formgroup />
-                <input asp-for="GuardianPhone"
+            <input asp-for="GuardianPhone"
                    type="tel"
                    formgroup
                    placeholder="###-###-####" />
-                <input asp-for="GuardianEmail"
+            <input asp-for="GuardianEmail"
                    type="email"
                    formgroup />
             <h2>Availability & Experience</h2>
@@ -70,7 +83,7 @@
                       formgroup />
             <div>
                 <button type="submit"
-                        class="btn btn-outline-success m-2 btn-lg float-right"
+                        class="btn m-2 btn-lg float-right"
                         button-spinner>
                     <span class="far fa-check-circle"></span>
                     @Localizer[Promenade.ButtonSubmit]

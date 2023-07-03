@@ -13,20 +13,12 @@ namespace Ocuda.Promenade.Controllers
     {
         private readonly string _apiKey;
         private readonly LocationService _locationService;
-        private readonly SegmentService _segmentService;
-        private readonly VolunteerFormService _volunteerFormService;
 
         public LocationsController(ServiceFacades.Controller<LocationsController> context,
-            LocationService locationService,
-            VolunteerFormService volunteerFormService,
-            SegmentService segmentService) : base(context)
+            LocationService locationService) : base(context)
         {
             _locationService = locationService
                 ?? throw new ArgumentNullException(nameof(locationService));
-            _volunteerFormService = volunteerFormService
-                ?? throw new ArgumentNullException(nameof(volunteerFormService));
-            _segmentService = segmentService
-                ?? throw new ArgumentNullException(nameof(segmentService));
 
             _apiKey = _config[Utility.Keys.Configuration.OcudaGoogleAPI];
         }

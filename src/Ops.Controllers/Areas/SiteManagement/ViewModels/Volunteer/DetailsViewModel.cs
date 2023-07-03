@@ -14,6 +14,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Volunteer
 
         public string HeaderSegmentName { get; set; }
 
+        public bool IsDisabled { get; set; } = false;
+
         [DisplayName("Volunteer Type")]
         public string TypeName { get; set; }
     }

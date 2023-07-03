@@ -26,56 +26,87 @@
 }
 else
 {
-<table class="table table-sm table-bordered">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var form in Model.VolunteerForms)
-        {
+    <table class="table table-sm table-bordered">
+        <thead>
             <tr>
-                <td class="align-middle">
-                    <a asp-action="@nameof(VolunteerController.Form)"
-                        asp-route-Id="@form.FormId">
-                        @form.TypeName
-                    </a>
-                </td>
-                <td class="align-middle">
-                    <button type="button"
-                        class="btn btn-outline-danger"
-                        data-toggle="modal"
-                        data-target="#disableModal"
-                        data-id="@form.FormId"
-                        data-type="@Ocuda.Utility.TagHelpers.ModalTypes.Delete"
-                        data-formType="@form.TypeName">
-                        <span class="fas fa-minus-circle" aria-hidden="true"></span>
-                    </button>
-                </td>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Action</th>
             </tr>
+        </thead>
+        <tbody>
+            @foreach (var form in Model.VolunteerForms)
+            {
+                <tr>
+                    <td class="align-middle">
+                        <a asp-action="@nameof(VolunteerController.Form)"
+                           asp-route-Id="@form.FormId">
+                            @form.TypeName
+                        </a>
+                    </td>
+                    <td class="align-middle">
+                        @if (form.IsDisabled)
+                        {
+                            <span class="text-danger fa-solid fw-fw fa-circle-minus"
+                                  title="This form type is disabled."
+                                  aria-hidden="true"></span>
+                        }
+                        else
+                        {
+                            <span class="text-success fa-regular fw-fw fa-circle-check"
+                                  title="This form type is enabled."
+                                  aria-hidden="true"></span>
+                        }
+                    </td>
+                    <td class="align-middle">
+                        @if (form.IsDisabled)
+                        {
+                            <form asp-controller="@VolunteerController.Name" 
+                                  asp-action="@(nameof(VolunteerController.EnableForm))" 
+                                  method="post" 
+                                  role="form">
+                                  <input type="hidden" name="id" value="@form.FormId">
+                                <button type="submit"
+                                        class="btn btn-outline-success">
+                                    Enable form
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <button type="button"
+                                    class="btn btn-outline-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#disableModal"
+                                    data-id="@form.FormId"
+                                    data-type="@Ocuda.Utility.TagHelpers.ModalTypes.Delete"
+                                    data-formType="@form.TypeName">
+                                Disable form
+                            </button>
+                        }
+                    </td>
+                </tr>
 
-        }
-    </tbody>
-</table>
-<nav paginate="@Model.PaginateModel"></nav>
+            }
+        </tbody>
+    </table>
+    <nav paginate="@Model"></nav>
 }
 
-@if (Model.VolunteerForms.Any()) 
+@if (Model.VolunteerForms.Any())
 {
-<form asp-controller="@VolunteerController.Name" asp-action="@(nameof(VolunteerController.DisableForm))" method="post" role="form">
-    <input id="deleteCurrentPage" asp-for="PaginateModel.CurrentPage" type="hidden" />
+    <form asp-controller="@VolunteerController.Name" asp-action="@(nameof(VolunteerController.DisableForm))" method="post" role="form">
+        <input id="deleteCurrentPage" asp-for="CurrentPage" type="hidden" />
 
-    <input id="deleteId" name="id" type="hidden" />
-    <input id="deleteType" type="hidden" />
-    <div modal
-    id="disableModal"                 
-    name="Form"
-    type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
-        <div id="dependentWarnings" class="d-none"></div>
-    </div>
-</form>
+        <input id="deleteId" name="id" type="hidden" />
+        <input id="deleteType" type="hidden" />
+        <div modal
+             id="disableModal"
+             name="Form"
+             type="Ocuda.Utility.TagHelpers.ModalTypes.Delete">
+            <div id="dependentWarnings" class="d-none"></div>
+        </div>
+    </form>
 }
 
 @section scripts {

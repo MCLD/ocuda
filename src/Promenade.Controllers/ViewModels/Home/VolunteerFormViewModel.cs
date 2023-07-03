@@ -46,14 +46,14 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
         {
             return new VolunteerFormSubmission
             {
-                Name = Name,
-                Phone = Phone,
-                Email = Email,
                 Availability = Availability,
+                Email = Email,
                 Experience = Experience,
-                Regularity = Regularity,
                 FormId = FormId,
                 LocationId = LocationId,
+                Name = Name,
+                Phone = Phone,
+                Regularity = Regularity
             };
         }
     }

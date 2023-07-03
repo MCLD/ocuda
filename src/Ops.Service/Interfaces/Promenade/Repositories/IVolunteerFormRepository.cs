@@ -20,8 +20,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Repositories
 
         Task<VolunteerForm> FindByTypeAsync(int typeId);
 
-        Task<DataWithCount<ICollection<VolunteerForm>>> GetPaginatedListAsync(
-                    BaseFilter filter);
+        Task<DataWithCount<ICollection<VolunteerForm>>> GetPaginatedListAsync(BaseFilter filter);
 
         Task UpdateSaveAsync(VolunteerForm form);
     }

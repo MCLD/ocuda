@@ -75,6 +75,10 @@
                     }
                 </p>
             }
+            @if (!string.IsNullOrEmpty(Model.ShowMessage))
+            {
+                <div class="alert alert-info prom-alert"><p>@Html.Raw(Model.ShowMessage)</p></div>
+            }
         </div>
     </div>
 

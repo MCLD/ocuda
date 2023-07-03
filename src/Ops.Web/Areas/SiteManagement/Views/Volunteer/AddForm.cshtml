@@ -1,16 +1,14 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Volunteer.AddFormViewModel
 
-<div class="row">
-    <div class="col-sm-7">
-        <h1>
-            Details
-            <small class="text-muted">
-                Add Form
-            </small>
-        </h1>
-    </div>
-    <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+<div class="d-flex justify-content-between mb-2">
+    <h1>
+        Volunteer Forms
+        <small class="text-body-secondary">
+            Add Form
+        </small>
+    </h1>
+    <div class="pt-2">
+        <a class="btn btn-outline-dark"
            asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.VolunteerController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.VolunteerController.Index))">Back</a>
     </div>

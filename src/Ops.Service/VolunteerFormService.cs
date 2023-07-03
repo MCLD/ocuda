@@ -65,6 +65,7 @@ namespace Ocuda.Ops.Service
 
         public async Task<VolunteerForm> AddUpdateFormAsync(VolunteerForm form)
         {
+            ArgumentNullException.ThrowIfNull(form);
             var existingForm = await _volunteerFormRepository.FindByTypeAsync(form.VolunteerFormType);
             if (existingForm != null)
             {
@@ -97,18 +98,14 @@ namespace Ocuda.Ops.Service
             await _locationFeatureRepository.SaveAsync();
         }
 
-        public async Task DisableAsync(VolunteerForm form)
+        public async Task DisableAsync(int formId)
         {
-            if (form == null)
-            {
-                throw new OcudaException("Form does not exist.");
-            }
-            form.IsDisabled = true;
-            await _volunteerFormRepository.UpdateSaveAsync(form);
+            await SetDisabled(formId, true);
         }
 
         public async Task<VolunteerForm> EditAsync(VolunteerForm form)
         {
+            ArgumentNullException.ThrowIfNull(form);
             var currentForm = await _volunteerFormRepository.FindAsync(form.Id);
 
             if (currentForm != null)
@@ -122,6 +119,11 @@ namespace Ocuda.Ops.Service
             {
                 throw new OcudaException($"Could not find form id {form.Id} to edit.");
             }
+        }
+
+        public async Task EnableAsync(int formId)
+        {
+            await SetDisabled(formId, false);
         }
 
         public Dictionary<string, int> GetAllVolunteerFormTypes()
@@ -157,7 +159,7 @@ namespace Ocuda.Ops.Service
         }
 
         public async Task<DataWithCount<ICollection<VolunteerForm>>> GetPaginatedListAsync(
-                                                            BaseFilter filter)
+            BaseFilter filter)
         {
             return await _volunteerFormRepository.GetPaginatedListAsync(filter);
         }
@@ -193,6 +195,14 @@ namespace Ocuda.Ops.Service
                     await _locationFormRepository.RemoveSaveAsync(locationForm);
                 }
             }
+        }
+
+        private async Task SetDisabled(int formId, bool isDisabled)
+        {
+            var form = await GetFormByIdAsync(formId)
+                ?? throw new OcudaException($"Unable to find form id {formId}.");
+            form.IsDisabled = isDisabled;
+            await _volunteerFormRepository.UpdateSaveAsync(form);
         }
     }
 }

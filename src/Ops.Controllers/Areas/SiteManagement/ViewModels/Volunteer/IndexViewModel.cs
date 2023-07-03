@@ -3,9 +3,13 @@ using Ocuda.Utility.Models;
 
 namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Volunteer
 {
-    public class IndexViewModel
+    public class IndexViewModel : PaginateModel
     {
-        public PaginateModel PaginateModel { get; set; }
-        public ICollection<DetailsViewModel> VolunteerForms { get; set; }
+        public IndexViewModel()
+        {
+            VolunteerForms = new List<DetailsViewModel>();
+        }
+
+        public ICollection<DetailsViewModel> VolunteerForms { get; }
     }
 }

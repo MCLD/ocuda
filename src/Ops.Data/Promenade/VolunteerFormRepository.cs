@@ -62,13 +62,12 @@ namespace Ocuda.Ops.Data.Promenade
         }
 
         public async Task<DataWithCount<ICollection<VolunteerForm>>> GetPaginatedListAsync(
-                    BaseFilter filter)
+            BaseFilter filter)
         {
             return new DataWithCount<ICollection<VolunteerForm>>
             {
                 Count = await DbSet.AsNoTracking().CountAsync(),
                 Data = await DbSet.AsNoTracking()
-                    .Where(_ => !_.IsDisabled)
                     .OrderBy(_ => _.VolunteerFormType)
                     .ApplyPagination(filter)
                     .ToListAsync()

@@ -15,9 +15,11 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         Task AddVolunteerLocationFeature(int featureId, int locationId, string locationStub);
 
-        Task DisableAsync(VolunteerForm form);
+        Task DisableAsync(int formId);
 
         Task<VolunteerForm> EditAsync(VolunteerForm form);
+
+        Task EnableAsync(int formId);
 
         Dictionary<string, int> GetAllVolunteerFormTypes();
 
