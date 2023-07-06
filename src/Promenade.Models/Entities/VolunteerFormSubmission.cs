@@ -6,18 +6,18 @@ namespace Ocuda.Promenade.Models.Entities
 {
     public class VolunteerFormSubmission
     {
-        [DisplayName(i18n.Keys.Promenade.WeeklyAvailability)]
+        [DisplayName(i18n.Keys.Promenade.PromptWeeklyAvailability)]
         [MaxLength(255)]
         public string Availability { get; set; }
 
         public DateTime CreatedAt { get; set; }
 
         [Required]
-        [DisplayName(i18n.Keys.Promenade.Email)]
+        [DisplayName(i18n.Keys.Promenade.PromptEmail)]
         [MaxLength(255)]
         public string Email { get; set; }
 
-        [DisplayName(i18n.Keys.Promenade.Experience)]
+        [DisplayName(i18n.Keys.Promenade.PromptExperience)]
         [MaxLength(255)]
         public string Experience { get; set; }
 
@@ -41,7 +41,7 @@ namespace Ocuda.Promenade.Models.Entities
         public int LocationId { get; set; }
 
         [Required]
-        [DisplayName(i18n.Keys.Promenade.Name)]
+        [DisplayName(i18n.Keys.Promenade.PromptName)]
         [MaxLength(255)]
         public string Name { get; set; }
 
@@ -50,7 +50,7 @@ namespace Ocuda.Promenade.Models.Entities
         [MaxLength(255)]
         public string Phone { get; set; }
 
-        [DisplayName(i18n.Keys.Promenade.VolunteerRegularity)]
+        [DisplayName(i18n.Keys.Promenade.PromptVolunteerRegularity)]
         [MaxLength(255)]
         public string Regularity { get; set; }
 

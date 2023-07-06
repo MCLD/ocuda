@@ -4,19 +4,24 @@
 
 @if (Model.CanSearchAddress)
 {
-    @if (!string.IsNullOrEmpty(Model.Warning))
+    @if (!string.IsNullOrEmpty(Model?.WarningText))
     {
         <div class="row">
-            <div class="col-12 col-sm-6 offset-sm-3">
-                <div class="alert alert-warning prom-alert"><p>@Model.Warning</p></div>
+            <div class="col-12 col-sm-10 offset-sm-1">
+                <div class="alert alert-warning prom-alert">
+                    <p>@Html.Raw(Model.WarningText)</p>
+                </div>
             </div>
         </div>
     }
-    @if (!string.IsNullOrEmpty(Model.Info))
+
+    @if (!string.IsNullOrEmpty(Model?.InfoText))
     {
         <div class="row">
-            <div class="col-12 col-sm-6 offset-sm-3">
-                <div class="alert alert-info prom-alert"><p>@Model.Info</p></div>
+            <div class="col-12 col-sm-10 offset-sm-1">
+                <div class="alert alert-info prom-alert">
+                    <p>@Html.Raw(Model.InfoText)</p>
+                </div>
             </div>
         </div>
     }

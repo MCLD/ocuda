@@ -9,17 +9,17 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
         public bool AdultFormAvailable { get; set; }
 
         [Required]
-        [DisplayName(i18n.Keys.Promenade.GuardianEmail)]
+        [DisplayName(i18n.Keys.Promenade.PromptGuardianEmail)]
         [MaxLength(255)]
         public string GuardianEmail { get; set; }
 
         [Required]
-        [DisplayName(i18n.Keys.Promenade.GuardianName)]
+        [DisplayName(i18n.Keys.Promenade.PromptGuardianName)]
         [MaxLength(255)]
         public string GuardianName { get; set; }
 
         [Required]
-        [DisplayName(i18n.Keys.Promenade.GuardianPhone)]
+        [DisplayName(i18n.Keys.Promenade.PromptGuardianPhone)]
         [MaxLength(255)]
         public string GuardianPhone { get; set; }
 

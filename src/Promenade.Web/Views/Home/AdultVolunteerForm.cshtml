@@ -36,8 +36,8 @@
         <div class="col-12">
             <strong>
                 <em>
-                    @Html.Raw(Localizer[Ocuda.i18n.Keys.Promenade.AreYouATeenVolunteer])
-                    @Html.ActionLink(Localizer[Ocuda.i18n.Keys.Promenade.UseTeenVolunteerForm], nameof(HomeController.VolunteerTeen), HomeController.Name, new { Model.LocationSlug })
+                    @Html.Raw(Localizer[Ocuda.i18n.Keys.Promenade.PromptAreYouTeenVolunteer])
+                    @Html.ActionLink(Localizer[Ocuda.i18n.Keys.Promenade.LinkTeenVolunteerForm], nameof(HomeController.VolunteerTeen), HomeController.Name, new { Model.LocationSlug })
                 </em>
             </strong>
         </div>

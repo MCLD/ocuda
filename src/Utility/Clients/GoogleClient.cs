@@ -156,6 +156,9 @@ namespace Ocuda.Utility.Clients
             }
             else
             {
+                _logger.LogWarning("Unable to geocode address {Address} - call returned {Status}",
+                    address,
+                    response.Status);
                 return (null, null);
             }
         }
