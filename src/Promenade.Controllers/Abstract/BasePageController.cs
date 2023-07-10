@@ -7,6 +7,14 @@ using Ocuda.Promenade.Models.Entities;
 
 namespace Ocuda.Promenade.Controllers.Abstract
 {
+    /// <summary>
+    /// This abstract class contains the core functionality necessary to display a "page" on the
+    /// site. It only contains methods for obtaining content and returning it and no ASP.NET MVC
+    /// decorations on any methods. This is distinct from GeneralBasePageController so that the
+    /// ErrorController is capable of displaying Sorry type pages with its default index containing
+    /// the HTTP respone status code.
+    /// </summary>
+    /// <typeparam name="T">The type of the concrete page controller</typeparam>
     public abstract class BasePageController<T> : BaseController<T>
     {
         protected BasePageController(ServiceFacades.Controller<T> context,
@@ -17,24 +25,6 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
         protected ServiceFacades.PageController PageContext { get; }
         protected abstract PageType PageType { get; }
-
-        [HttpGet("{stub?}/item/{id}")]
-        public async Task<IActionResult> CarouselItem(string stub, int id)
-        {
-            return await ReturnCarouselItemAsync(stub, id);
-        }
-
-        [HttpGet("{stub?}")]
-        public async Task<IActionResult> Page(string stub)
-        {
-            return await ReturnPageAsync(stub);
-        }
-
-        [HttpPost("{stub?}")]
-        public async Task<IActionResult> PagePreview(string stub)
-        {
-            return await ReturnPageAsync(stub, HttpContext.Request.Form["PreviewId"].FirstOrDefault());
-        }
 
         protected async Task<IActionResult> ReturnCarouselItemAsync(string stub, int id)
         {

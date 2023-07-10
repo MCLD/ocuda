@@ -19,6 +19,7 @@ namespace Ocuda.Ops.Service
 {
     public class PageService : BaseService<PageService>, IPageService
     {
+        private const string IndexStub = "index";
         private readonly ICarouselService _carouselService;
         private readonly IDeckService _deckService;
         private readonly IImageFeatureService _imageFeatureService;
@@ -350,6 +351,12 @@ namespace Ocuda.Ops.Service
         {
             var header = await _pageHeaderRepository.FindAsync(id);
 
+            if (header.Type == PageType.Home
+                && header.Stub.Equals(IndexStub, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new OcudaException($"Unable to delete {header.Type} section {header.Stub} page.");
+            }
+
             if (header.IsLayoutPage)
             {
                 var layoutTexts = await _pageLayoutTextRepository.GetAllForHeaderAsync(header.Id);
@@ -387,12 +394,8 @@ namespace Ocuda.Ops.Service
 
         public async Task DeleteItemNoSaveAsync(int pageItemId, bool ignoreSort = false)
         {
-            var pageItem = await _pageItemRepository.FindAsync(pageItemId);
-
-            if (pageItem == null)
-            {
-                throw new OcudaException("Page item does not exist.");
-            }
+            var pageItem = await _pageItemRepository.FindAsync(pageItemId)
+                ?? throw new OcudaException("Page item does not exist.");
 
             if (pageItem.CarouselId.HasValue)
             {
@@ -623,12 +626,8 @@ namespace Ocuda.Ops.Service
             }
 
             var itemInPosition = await _pageItemRepository.GetByLayoutAndOrderAsync(
-                item.PageLayoutId, newSortOrder);
-
-            if (itemInPosition == null)
-            {
-                throw new OcudaException("Item is already in the last position.");
-            }
+                item.PageLayoutId, newSortOrder)
+                ?? throw new OcudaException("Item is already in the last position.");
 
             itemInPosition.Order = item.Order;
             item.Order = newSortOrder;

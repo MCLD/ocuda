@@ -23,13 +23,19 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Pages
             get
             {
                 return IsSiteManager
-                    && PageType != PageType.Home
-                    && PageHeaders?.Count > 0;
+                    && PageType != PageType.Home;
             }
         }
 
+        public string TypeNotes { get; set; }
+
         public string MakeLink(PageHeader pageHeader)
         {
+            if (pageHeader == null)
+            {
+                return null;
+            }
+
             string type = pageHeader.Type.ToString().Trim('/').ToLowerInvariant();
             string stub = pageHeader.Stub.Trim('/');
 

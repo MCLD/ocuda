@@ -6,15 +6,15 @@ namespace Ocuda.Promenade.Controllers
 {
     [Route("[Controller]")]
     [Route("{culture:cultureConstraint?}/[Controller]")]
-    public class NewsController : GeneralBasePageController<NewsController>
+    public class ThanksController : GeneralBasePageController<ThanksController>
     {
-        public NewsController(ServiceFacades.Controller<NewsController> context,
+        public ThanksController(ServiceFacades.Controller<ThanksController> context,
             ServiceFacades.PageController pageContext)
             : base(context, pageContext)
         {
         }
 
         protected override PageType PageType
-        { get { return PageType.News; } }
+        { get { return PageType.Thanks; } }
     }
 }

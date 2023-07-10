@@ -16,7 +16,7 @@ namespace Ocuda.Promenade.Controllers
 {
     [Route("")]
     [Route("{culture:cultureConstraint?}")]
-    public class HomeController : BasePageController<HomeController>
+    public class HomeController : GeneralBasePageController<HomeController>
     {
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly LocationService _locationService;

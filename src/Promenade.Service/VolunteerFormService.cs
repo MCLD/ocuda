@@ -64,8 +64,11 @@ namespace Ocuda.Promenade.Service
 
             if (form?.IsDisabled == false)
             {
-                form.HeaderSegment = await _segmentService
-                    .GetSegmentTextBySegmentIdAsync(form.HeaderSegmentId.Value, forceReload);
+                if (form.HeaderSegmentId.HasValue)
+                {
+                    form.HeaderSegment = await _segmentService
+                        .GetSegmentTextBySegmentIdAsync(form.HeaderSegmentId.Value, forceReload);
+                }
 
                 var formLocationCacheKey = string.Format(CultureInfo.InvariantCulture,
                     Utility.Keys.Cache.PromVolunteerFormLocation,

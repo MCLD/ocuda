@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -218,10 +217,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> Create(IndexViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             JsonResponse response;
 
-            var checkStub = new Regex(@"^[\w\-]*$");
-            if (!checkStub.IsMatch(model.PageHeader.Stub))
+            if (!model.PageHeader.Stub.All(_ => char.IsLetterOrDigit(_) || _ == '-' || _ == '_'))
             {
                 ModelState.AddModelError("PageHeader.Stub", "Invalid stub; only letters, numbers, hyphens and underscores are allowed.");
             }
@@ -969,6 +969,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]/{page}")]
         public async Task<IActionResult> Index(int page = 1, PageType? Type = null)
         {
+            if (Type == null)
+            {
+                return RedirectToAction(nameof(Index), new { page, Type = PageType.Home });
+            }
+
             var filter = new PageFilter(page)
             {
                 PageType = Type ?? PageType.Home
@@ -982,6 +987,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 CurrentPage = page,
                 ItemsPerPage = filter.Take.Value
             };
+
             if (paginateModel.PastMaxPage)
             {
                 return RedirectToRoute(
@@ -992,24 +998,38 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                     });
             }
 
+            var typeNotes = new StringBuilder();
+
+            if (Type == PageType.Sorry)
+            {
+                typeNotes.Append("The following are special page stubs that can be used to represent errors accessing a resource based on HTTP result codes:<ul>")
+                    .Append("<li><strong>").Append(Utility.ErrorPageSlug.Error).Append("</strong> - ")
+                    .Append("An error of some sort has prevented the requested page from displaying.")
+                    .AppendLine("</li>")
+                    .Append("<li><strong>").Append(Utility.ErrorPageSlug.NotFound).Append("</strong> - ")
+                    .Append("A Not Found error (HTTP 404) occured when attempting to access the requested resource.")
+                    .AppendLine("</li>").Append("</ul>");
+            }
+
             var viewModel = new IndexViewModel
             {
-                PageHeaders = headerList.Data,
-                PaginateModel = paginateModel,
-                PageType = filter.PageType.Value,
-                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
-                IsWebContentManager = await HasAppPermissionAsync(_permissionGroupService,
-                    ApplicationPermission.WebPageContentManagement),
-                PermissionIds = UserClaims(ClaimType.PermissionId),
+                BaseLink = await _siteSettingService
+                .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.PromenadeUrl),
                 CarouselTemplates = new SelectList(await _carouselService.GetAllTemplatesAsync(),
                     nameof(CarouselTemplate.Id),
                     nameof(CarouselTemplate.Name)),
-                ImageFeatureTemplates
-                    = new SelectList(await _imageFeatureService.GetAllTemplatesAsync(),
+                ImageFeatureTemplates = new SelectList(await _imageFeatureService
+                    .GetAllTemplatesAsync(),
                         nameof(ImageFeatureTemplate.Id),
                         nameof(ImageFeatureTemplate.Name)),
-                BaseLink = await _siteSettingService
-                    .GetSettingStringAsync(Models.Keys.SiteSetting.SiteManagement.PromenadeUrl)
+                IsSiteManager = !string.IsNullOrEmpty(UserClaim(ClaimType.SiteManager)),
+                IsWebContentManager = await HasAppPermissionAsync(_permissionGroupService,
+                ApplicationPermission.WebPageContentManagement),
+                PageHeaders = headerList.Data,
+                PageType = filter.PageType.Value,
+                PaginateModel = paginateModel,
+                PermissionIds = UserClaims(ClaimType.PermissionId),
+                TypeNotes = typeNotes.ToString()
             };
 
             return View(viewModel);

@@ -11,8 +11,8 @@
         @if (Model.ShowAddPageButton)
         {
             <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
-                data-bs-toggle="modal"
-                data-bs-target="#addModal">
+                    data-bs-toggle="modal"
+                    data-bs-target="#addModal">
                 <span class="fas fa-plus-circle" aria-hidden="true"></span>
                 Add Page
             </button>
@@ -32,7 +32,7 @@
             @foreach (var type in (PageType[])Enum.GetValues(typeof(PageType)))
             {
                 <option value="@Convert.ToInt32(type)"
-                    selected="@(type == Model.PageType ? "selected" : null)">
+                        selected="@(type == Model.PageType ? "selected" : null)">
                     @type
                 </option>
             }
@@ -139,49 +139,31 @@
 <div class="row mb-2">
     <div class="col-12">
         <ul class="nav nav-pills">
-            <li class="nav-item">
-                <a asp-action="@nameof(PagesController.Index)"
-                   asp-route-Type=""
-                   class="nav-link"
-                   ActiveBy
-                   routeKey="type"
-                   value=",@PageType.Home">
-                    @PageType.Home.ToString()
-                </a>
-            </li>
-            <li class="nav-item">
-                <a asp-action="@nameof(PagesController.Index)"
-                   asp-route-Type="@PageType.About"
-                   class="nav-link"
-                   ActiveBy
-                   routeKey="type"
-                   value="@PageType.About">
-                    @PageType.About.ToString()
-                </a>
-            </li>
-            <li class="nav-item">
-                <a asp-action="@nameof(PagesController.Index)"
-                   asp-route-Type="@PageType.News"
-                   class="nav-link"
-                   ActiveBy
-                   routeKey="type"
-                   value="@PageType.News">
-                    @PageType.News.ToString()
-                </a>
-            </li>
-            <li class="nav-item">
-                <a asp-action="@nameof(PagesController.Index)"
-                   asp-route-Type="@PageType.Subject"
-                   class="nav-link"
-                   ActiveBy
-                   routeKey="type"
-                   value="@PageType.Subject">
-                    @PageType.Subject.ToString()
-                </a>
-            </li>
+            @foreach (var type in (PageType[])Enum.GetValues(typeof(PageType)))
+            {
+                <li class="nav-item">
+                    <a asp-action="@nameof(PagesController.Index)"
+                       asp-route-Type="@type"
+                       class="nav-link"
+                       ActiveBy
+                       routeKey="type"
+                       value="@type">
+                        @type.ToString()
+                    </a>
+                </li>
+            }
         </ul>
     </div>
 </div>
+
+@if (!string.IsNullOrEmpty(Model.TypeNotes?.Trim()))
+{
+    <div class="row">
+        <div class="col col-md-10 offset-md-1 col-lg-6 offset-lg-3">
+            <div class="alert alert-info">@Html.Raw(Model.TypeNotes)</div>
+        </div>
+    </div>
+}
 
 @if (Model.PageHeaders.Count() == 0)
 {
@@ -208,7 +190,7 @@ else
                                     @if (Model.IsSiteManager || Model.PermissionIds.Any(_ => header.PermissionGroupIds.Contains(_)))
                                     {
                                         <a asp-action="@(header.IsLayoutPage ? nameof(PagesController.Layouts) : nameof(PagesController.Detail))"
-                               asp-route-id="@header.Id">
+                                           asp-route-id="@header.Id">
                                             @header.PageName
                                         </a>
                                     }
@@ -222,55 +204,55 @@ else
                                     @if (Model.IsSiteManager)
                                     {
                                         <a asp-action="@(nameof(PagesController.ContentPermissions))"
-                               asp-route-id="@header.Id"
-                               title="Page content permissions"
-                               class="btn btn-outline-primary">
+                                           asp-route-id="@header.Id"
+                                           title="Page content permissions"
+                                           class="btn btn-outline-primary">
                                             <span class="fas fa-fw fa-user-plus" aria-hidden="true"></span>
                                         </a>
                                         <button type="button"
-                                    class="btn btn-outline-primary"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#editModal"
-                                    data-id="@header.Id"
-                                    data-layout="@header.IsLayoutPage"
-                                    data-name="@header.PageName"
-                                    data-stub="@header.Stub"
-                                    data-type="@((int)header.Type)"
-                                    data-bannertemplate="@header.LayoutBannerTemplateId"
-                                    data-carouseltemplate="@header.LayoutCarouselTemplateId"
-                                    data-featuretemplate="@header.LayoutFeatureTemplateId"
-                                    data-webslidetemplate="@header.LayoutWebslideTemplateId"
-                                    title="Edit page name">
+                                                class="btn btn-outline-primary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editModal"
+                                                data-id="@header.Id"
+                                                data-layout="@header.IsLayoutPage"
+                                                data-name="@header.PageName"
+                                                data-stub="@header.Stub"
+                                                data-type="@((int)header.Type)"
+                                                data-bannertemplate="@header.LayoutBannerTemplateId"
+                                                data-carouseltemplate="@header.LayoutCarouselTemplateId"
+                                                data-featuretemplate="@header.LayoutFeatureTemplateId"
+                                                data-webslidetemplate="@header.LayoutWebslideTemplateId"
+                                                title="Edit page name">
                                             <span class="fas fa-fw fa-cog" aria-hidden="true"></span>
                                         </button>
                                     }
                                     @if (Model.IsSiteManager || Model.IsWebContentManager || Model.PermissionIds.Any(_ => header.PermissionGroupIds.Contains(_)))
                                     {
                                         <a asp-action="@(nameof(PagesController.Detail))"
-                               asp-route-id="@header.Id"
-                               class="btn btn-outline-primary"
-                               title="Edit page content">
+                                           asp-route-id="@header.Id"
+                                           class="btn btn-outline-primary"
+                                           title="Edit page content">
                                             <span class="far fa-fw fa-file-alt" aria-hidden="true"></span>
                                         </a>
                                     }
                                     @if (!string.IsNullOrEmpty(Model.BaseLink))
                                     {
                                         <a class="btn btn-outline-success text-success"
-                               target="_blank"
-                               href="@Model.MakeLink(header)"
-                               title="View page">
+                                           target="_blank"
+                                           href="@Model.MakeLink(header)"
+                                           title="View page">
                                             <span class="fas fa-fw fa-external-link-alt"></span>
                                         </a>
                                     }
                                     @if (Model.IsSiteManager)
                                     {
                                         <button type="button"
-                                    class="btn btn-outline-danger"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#deleteModal"
-                                    data-id="@header.Id"
-                                    data-name="@header.PageName"
-                                    title="Delete page">
+                                                class="btn btn-outline-danger"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteModal"
+                                                data-id="@header.Id"
+                                                data-name="@header.PageName"
+                                                title="Delete page">
                                             <span class="fas fa-fw fa-times-circle" aria-hidden="true"></span>
                                         </button>
                                     }
@@ -287,107 +269,107 @@ else
 }
 
 @section scripts {
-<script>
-    $(window).on("load", function() {
-        $('.td-class').each(function() {
-            $(this).children('a.rowlink').height($(this).height() + 11);
+    <script>
+        $(window).on("load", function () {
+            $('.td-class').each(function () {
+                $(this).children('a.rowlink').height($(this).height() + 11);
+            });
         });
-    });
-    $(window).resize(function() {
-        $('.td-class').each(function() {
-            $(this).children('a.rowlink').height($(this).height() + 11);
+        $(window).resize(function () {
+            $('.td-class').each(function () {
+                $(this).children('a.rowlink').height($(this).height() + 11);
+            });
         });
-    });
 
-    let addStub = $("#addStub");
+        let addStub = $("#addStub");
 
-    addStub.on("blur", function () {
-        if (addStub.valid()) {
-            updateStub(addStub, addStub.val());
-            let addType = $("#addType");
-            if (addType.val() != "") {
-                setTimeout(function () {
-                    ValidateField(addStub,
-                        "@Url.Action(nameof(PagesController.StubInUse), PagesController.Name)",
-                        [addStub.serialize(), addType.serialize()].join("&"));
-                }, 200);
+        addStub.on("blur", function () {
+            if (addStub.valid()) {
+                updateStub(addStub, addStub.val());
+                let addType = $("#addType");
+                if (addType.val() != "") {
+                    setTimeout(function () {
+                        ValidateField(addStub,
+                            "@Url.Action(nameof(PagesController.StubInUse), PagesController.Name)",
+                            [addStub.serialize(), addType.serialize()].join("&"));
+                    }, 200);
+                }
             }
-        }
-    })
+        })
 
-    $("#addForm").submit(function (e) {
-        e.preventDefault();
-        let form = $(this);
-        if (addStub.valid()) {
-            updateStub(addStub, addStub.val());
-        }
-        $.post("@(Url.Action(nameof(PagesController.Create), PagesController.Name))",
-            form.serialize(),
-            function (response) {
-                if (response.success == true) {
-                    location.href = response.url;
-                }
-                else {
-                    alert(response.message);
-                    ResetSpinners(form.find(".btn-spinner"));
-                }
-            });
-    });
+        $("#addForm").submit(function (e) {
+            e.preventDefault();
+            let form = $(this);
+            if (addStub.valid()) {
+                updateStub(addStub, addStub.val());
+            }
+            $.post("@(Url.Action(nameof(PagesController.Create), PagesController.Name))",
+                form.serialize(),
+                function (response) {
+                    if (response.success == true) {
+                        location.href = response.url;
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
+        });
 
-    $("#editModal").on("show.bs.modal", function (e) {
-        let button = $(e.relatedTarget);
-        let id = button.data("id");
-        let layout = button.data("layout");
-        let name = button.data("name");
-        let stub = button.data("stub");
-        let type = button.data("type");
-        let carouselTemplate = button.data("carouseltemplate");
-        let bannerTemplate = button.data("bannertemplate");
-        let featureTemplate = button.data("featuretemplate");
-        let webslideTeplate = button.data("webslidetemplate");
+        $("#editModal").on("show.bs.modal", function (e) {
+            let button = $(e.relatedTarget);
+            let id = button.data("id");
+            let layout = button.data("layout");
+            let name = button.data("name");
+            let stub = button.data("stub");
+            let type = button.data("type");
+            let carouselTemplate = button.data("carouseltemplate");
+            let bannerTemplate = button.data("bannertemplate");
+            let featureTemplate = button.data("featuretemplate");
+            let webslideTeplate = button.data("webslidetemplate");
 
-        $("#editId").val(id);
-        $("#editLayout").val(layout);
-        $("#editName").val(name);
-        $("#editStub").val(stub);
-        $("#editType").val(type);
-        $("#editBannerTemplate").val(bannerTemplate);
-        $("#editCarouselTemplate").val(carouselTemplate);
-        $("#editFeatureTemplate").val(featureTemplate);
-        $("#editWebslideTemplate").val(webslideTeplate);
+            $("#editId").val(id);
+            $("#editLayout").val(layout);
+            $("#editName").val(name);
+            $("#editStub").val(stub);
+            $("#editType").val(type);
+            $("#editBannerTemplate").val(bannerTemplate);
+            $("#editCarouselTemplate").val(carouselTemplate);
+            $("#editFeatureTemplate").val(featureTemplate);
+            $("#editWebslideTemplate").val(webslideTeplate);
 
-        if (layout == "True") {
-            $("#editTemplateContainer").removeClass("d-none");
-        }
-        else {
-            $("#editTemplateContainer").addClass("d-none");
-        }
-    });
+            if (layout == "True") {
+                $("#editTemplateContainer").removeClass("d-none");
+            }
+            else {
+                $("#editTemplateContainer").addClass("d-none");
+            }
+        });
 
-    $("#editForm").submit(function (e) {
-        e.preventDefault();
-        let form = $(this);
-        $.post("@(Url.Action(nameof(PagesController.Edit), PagesController.Name))",
-            form.serialize(),
-            function (response) {
-                if (response.success == true) {
-                    location.reload();
-                }
-                else {
-                    alert(response.message);
-                    ResetSpinners(form.find(".btn-spinner"));
-                }
-            });
-    });
+        $("#editForm").submit(function (e) {
+            e.preventDefault();
+            let form = $(this);
+            $.post("@(Url.Action(nameof(PagesController.Edit), PagesController.Name))",
+                form.serialize(),
+                function (response) {
+                    if (response.success == true) {
+                        location.reload();
+                    }
+                    else {
+                        alert(response.message);
+                        ResetSpinners(form.find(".btn-spinner"));
+                    }
+                });
+        });
 
-    $("#deleteModal").on("show.bs.modal", function (e) {
-        let button = $(e.relatedTarget);
-        let id = button.data("id");
-        let name = button.data("name");
-        let modal = $(this);
-        $("#deleteId").val(id);
-        $("#deleteName").val(name);
-        modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
-    });
-</script>
+        $("#deleteModal").on("show.bs.modal", function (e) {
+            let button = $(e.relatedTarget);
+            let id = button.data("id");
+            let name = button.data("name");
+            let modal = $(this);
+            $("#deleteId").val(id);
+            $("#deleteName").val(name);
+            modal.find(".modal-text").text("Are you sure you want to delete \"" + name + "\"?");
+        });
+    </script>
 }

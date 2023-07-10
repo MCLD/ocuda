@@ -93,7 +93,7 @@ namespace Ocuda.Ops.Service
                 {
                     LocationId = locationId,
                     FeatureId = featureId,
-                    RedirectUrl = $"/locations/{locationStub}/volunteer"
+                    RedirectUrl = $"/{locationStub}/volunteer"
                 });
             await _locationFeatureRepository.SaveAsync();
         }

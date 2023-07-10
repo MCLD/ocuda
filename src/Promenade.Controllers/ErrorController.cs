@@ -1,27 +1,39 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Controllers.Abstract;
 using Ocuda.Promenade.Controllers.ViewModels;
+using Ocuda.Promenade.Models.Entities;
 using Ocuda.Promenade.Service;
 
 namespace Ocuda.Promenade.Controllers
 {
     [Route("[controller]")]
     [Route("{culture:cultureConstraint?}/[Controller]")]
-    public class ErrorController : BaseController<ErrorController>
+    public class ErrorController : BasePageController<ErrorController>
     {
+        private readonly PageService _pageService;
         private readonly RedirectService _redirectService;
 
         public ErrorController(ServiceFacades.Controller<ErrorController> context,
-            RedirectService redirectService) : base(context)
+            ServiceFacades.PageController pageContext,
+            PageService pageService,
+            RedirectService redirectService) : base(context, pageContext)
         {
+            _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
             _redirectService = redirectService
                 ?? throw new ArgumentNullException(nameof(redirectService));
         }
+
+        public static string Name
+        { get { return "Error"; } }
+
+        protected override PageType PageType
+        { get { return PageType.Sorry; } }
 
         [HttpGet("")]
         [HttpGet("{id}")]
@@ -35,7 +47,7 @@ namespace Ocuda.Promenade.Controllers
                 originalPath = statusFeature.OriginalPath;
             }
 
-            if (id == 404)
+            if (id == (int)HttpStatusCode.NotFound)
             {
                 var redirect
                     = await _redirectService.GetUrlRedirectByPathAsync(originalPath);
@@ -47,20 +59,45 @@ namespace Ocuda.Promenade.Controllers
                         : Redirect(redirect.Url + statusFeature?.OriginalQueryString);
                 }
 
-                _logger.LogWarning("HTTP Error {StatusCode}: {RequestPath}",
+                _logger.LogWarning("HTTP Error {StatusCode} {StatusName}: {RequestPath}",
                     id,
+                    Enum.GetName(typeof(HttpStatusCode), id),
                     originalPath);
 
-                PageTitle = _localizer[i18n.Keys.Promenade.ErrorPageNotFound];
+                var notFoundPageHeader
+                    = await _pageService.GetHeaderByStubAndTypeAsync(Utility.ErrorPageSlug.NotFound,
+                        PageType,
+                        false);
 
-                return NotFound();
+                if (notFoundPageHeader != null)
+                {
+                    HttpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    return await ReturnPageAsync(Utility.ErrorPageSlug.NotFound);
+                }
+                else
+                {
+                    PageTitle = _localizer[i18n.Keys.Promenade.ErrorPageNotFound];
+                    return NotFound();
+                }
             }
 
-            _logger.LogCritical("HTTP Error {StatusCode}: {RequestPath}",
+            _logger.LogCritical("HTTP Error {StatusCode} {StatusName}: {RequestPath}",
                 id,
+                Enum.GetName(typeof(HttpStatusCode), id),
                 originalPath);
 
-            PageTitle = "Error";
+            var errorPageHeader
+                = await _pageService.GetHeaderByStubAndTypeAsync(Utility.ErrorPageSlug.Error,
+                    PageType,
+                    false);
+
+            if (errorPageHeader != null)
+            {
+                HttpContext.Response.StatusCode = id;
+                return await ReturnPageAsync(Utility.ErrorPageSlug.Error);
+            }
+
+            PageTitle = _localizer[i18n.Keys.Promenade.Error];
 
             return View("Error", new ErrorViewModel
             {

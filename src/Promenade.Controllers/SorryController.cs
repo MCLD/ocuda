@@ -6,15 +6,18 @@ namespace Ocuda.Promenade.Controllers
 {
     [Route("[Controller]")]
     [Route("{culture:cultureConstraint?}/[Controller]")]
-    public class NewsController : GeneralBasePageController<NewsController>
+    public class SorryController : GeneralBasePageController<SorryController>
     {
-        public NewsController(ServiceFacades.Controller<NewsController> context,
+        public SorryController(ServiceFacades.Controller<SorryController> context,
             ServiceFacades.PageController pageContext)
             : base(context, pageContext)
         {
         }
 
+        public static string Name
+        { get { return "Sorry"; } }
+
         protected override PageType PageType
-        { get { return PageType.News; } }
+        { get { return PageType.Sorry; } }
     }
 }
