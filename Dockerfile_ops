@@ -10,7 +10,7 @@ COPY . ./
 RUN dotnet restore
 
 # Build project and run tests
-RUN dotnet test
+RUN dotnet test -v m /property:WarningLevel=0
 
 # Publish
 RUN dotnet publish -c Release -o "/app/publish/ops" "src/Ops.Web"
