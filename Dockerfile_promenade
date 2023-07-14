@@ -6,14 +6,14 @@ WORKDIR /app
 # Copy source
 COPY . ./
 
-# Run tests if they are present
+# Restore packages
 RUN dotnet restore
 
 # Build project and run tests
-RUN dotnet test
+RUN dotnet test -v m /property:WarningLevel=0
 
 # Publish
-RUN dotnet publish -c Release -o "/app/publish/promenade" "src/Promenade.Web"
+RUN dotnet publish -v m /property:WarningLevel=0 -c Release -o "/app/publish/ops" "src/Ops.Web"
 
 # Get runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 as publish
