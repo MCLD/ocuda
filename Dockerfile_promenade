@@ -13,7 +13,7 @@ RUN dotnet restore
 RUN dotnet test -v m /property:WarningLevel=0
 
 # Publish
-RUN dotnet publish -v m /property:WarningLevel=0 -c Release -o "/app/publish/ops" "src/Ops.Web"
+RUN dotnet publish -v m /property:WarningLevel=0 -c Release -o "/app/publish/promenade" "src/Promenade.Web"
 
 # Get runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 as publish
