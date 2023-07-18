@@ -20,10 +20,12 @@ namespace Ocuda.Promenade.Controllers
     {
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly LocationService _locationService;
+        private readonly PageService _pageService;
         private readonly VolunteerFormService _volunteerFormService;
 
         public HomeController(IDateTimeProvider dateTimeProvider,
            LocationService locationService,
+           PageService pageService,
            ServiceFacades.Controller<HomeController> context,
            ServiceFacades.PageController pageContext,
            VolunteerFormService volunteerFormService)
@@ -33,6 +35,7 @@ namespace Ocuda.Promenade.Controllers
                 ?? throw new ArgumentNullException(nameof(dateTimeProvider));
             _locationService = locationService
                 ?? throw new ArgumentNullException(nameof(locationService));
+            _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
             _volunteerFormService = volunteerFormService
                 ?? throw new ArgumentNullException(nameof(volunteerFormService));
         }
@@ -342,9 +345,8 @@ namespace Ocuda.Promenade.Controllers
                     return View("AdultVolunteerForm", returnViewModel);
                 }
             }
-            // todo fix show success message
-            SetAlertInfo("Thank you for submitting your volunteer application.");
-            return RedirectToAction(nameof(Index));
+
+            return await ReturnThanks(locationSlug, VolunteerFormType.Adult);
         }
 
         [HttpPost("{locationSlug:locationSlugConstraint}/volunteer/teen")]
@@ -394,8 +396,7 @@ namespace Ocuda.Promenade.Controllers
                 }
             }
 
-            SetAlertInfo("Thank you for submitting your volunteer application.");
-            return RedirectToAction(nameof(Index));
+            return await ReturnThanks(locationSlug, VolunteerFormType.Teen);
         }
 
         [HttpGet("{locationSlug:locationSlugConstraint}/volunteer/teen")]
@@ -495,6 +496,38 @@ namespace Ocuda.Promenade.Controllers
             }
 
             return viewModel;
+        }
+
+        private async Task<IActionResult> ReturnThanks(string locationSlug, VolunteerFormType volunteerFormType)
+        {
+            var locationId = await _locationService.GetLocationIdAsync(locationSlug, false);
+
+            if (!locationId.HasValue)
+            {
+                return NotFound();
+            }
+
+            var locationMapping = await _volunteerFormService
+                .FindLocationFormAsync(volunteerFormType, locationId.Value, false);
+
+            if (locationMapping.Form.ThanksPageHeaderId.HasValue)
+            {
+                var pageStub = await _pageService
+                    .GetStubByHeaderIdTypeAsync(locationMapping.Form.ThanksPageHeaderId.Value,
+                        PageType.Thanks,
+                        false);
+
+                if (!string.IsNullOrEmpty(pageStub))
+                {
+                    return RedirectToAction(nameof(ThanksController.Page),
+                        ThanksController.Name,
+                        new { stub = pageStub });
+                }
+            }
+
+            // todo i18n
+            SetAlertInfo("Thank you for submitting your volunteer application.");
+            return RedirectToAction(nameof(Location), new { locationSlug });
         }
 
         #endregion Volunteer form handling

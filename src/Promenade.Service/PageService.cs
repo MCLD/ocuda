@@ -341,6 +341,37 @@ namespace Ocuda.Promenade.Service
             return pageLayout;
         }
 
+        public async Task<string> GetStubByHeaderIdTypeAsync(int headerId,
+            PageType type,
+            bool forceReload)
+        {
+            var cacheKey = string.Format(CultureInfo.InvariantCulture,
+                Utility.Keys.Cache.PromPageHeaderSlug,
+                headerId,
+                type);
+
+            PageHeader header = null;
+
+            if (!forceReload)
+            {
+                header = await _cache.GetObjectFromCacheAsync<PageHeader>(cacheKey);
+            }
+
+            if(header == null)
+            {
+                header = await _pageHeaderRepository.GetByIdAndTypeAsync(headerId, type);
+
+                var cachePagesInHours = GetPageCacheDuration(_config);
+
+                if (header != null && cachePagesInHours > 0)
+                {
+                    await _cache.SaveToCacheAsync(cacheKey, header, cachePagesInHours);
+                }
+            }
+
+            return header.Stub?.Trim();
+        }
+
         private async Task<Page> GetPageFromCacheAsync(int languageId, PageType type, string stub)
         {
             /// Cached page, {0} is the language id, {1} is the type, {2} is the stub

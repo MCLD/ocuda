@@ -14,6 +14,8 @@ namespace Ocuda.Promenade.Controllers
         {
         }
 
+        public static string Name {  get { return "Thanks"; } }
+
         protected override PageType PageType
         { get { return PageType.Thanks; } }
     }

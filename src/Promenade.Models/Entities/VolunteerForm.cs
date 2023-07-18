@@ -16,6 +16,10 @@ namespace Ocuda.Promenade.Models.Entities
 
         public bool IsDisabled { get; set; }
 
+        public PageHeader ThanksPageHeader { get; set; }
+
+        public int? ThanksPageHeaderId { get; set; }
+
         [DisplayName("Volunteer Type")]
         public VolunteerFormType VolunteerFormType { get; set; }
     }
