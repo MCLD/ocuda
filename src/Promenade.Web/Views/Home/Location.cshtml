@@ -105,7 +105,7 @@
     <div class="row prom-features">
         @foreach (var feature in Model.LocationFeatures)
         {
-            <div class="col-4 col-md-3 col-lg-2 mb-2">
+            <div class="col-4 col-md-3 col-lg-2 my-2">
                 @if (string.IsNullOrEmpty(feature.RedirectLink))
                 {
                     <a asp-action="@nameof(HomeController.Feature)"
