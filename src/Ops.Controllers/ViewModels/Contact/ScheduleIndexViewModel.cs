@@ -93,35 +93,35 @@ namespace Ocuda.Ops.Controllers.ViewModels.Contact
 
             if (claim?.IsComplete == true)
             {
-                return "<span class=\"far fa-check-square me-1\" title=\"Complete\"></span>";
+                return "<span class=\"fa-regular fa-square-check me-1\" title=\"Complete\"></span>";
             }
 
             if (request.RequestedTime.AddHours(1) < DateTime.Now
                 && request?.IsClaimed == true
                 && request.IsUnderway)
             {
-                return "<span class=\"fas fa-tasks me-1\" title=\"Underway, not yet complete\"></span>";
+                return "<span class=\"fa-solid fa-list-check me-1\" title=\"Underway, not yet complete\"></span>";
             }
 
             if (request?.IsClaimed == true)
             {
                 return request.IsUnderway
-                    ? "<span class=\"fas fa-user me-1\" title=\"Claimed, underway\"></span>"
-                    : "<span class=\"far fa-user me-1\" title=\"Claimed, not started\"></span>";
+                    ? "<span class=\"fa-solid fa-user me-1\" title=\"Claimed, underway\"></span>"
+                    : "<span class=\"fa-regular fa-user me-1\" title=\"Claimed, not started\"></span>";
             }
 
             if (request.RequestedTime.AddHours(1) < DateTime.Now
                 && request?.IsClaimed != true
                 && !request.IsUnderway)
             {
-                return "<span class=\"fas fa-exclamation-triangle me-1\" title=\"Unclaimed, overdue\"></span>";
+                return "<span class=\"fa-solid fa-triangle-exclamation me-1\" title=\"Unclaimed, overdue\"></span>";
             }
 
             if (request.RequestedTime.AddHours(-1) < DateTime.Now
                 && request?.IsClaimed != true
                 && !request.IsUnderway)
             {
-                return "<span class=\"fas fa-clock me-1\" title=\"Unclaimed, scheduled soon\"></span>";
+                return "<span class=\"fa-solid fa-clock me-1\" title=\"Unclaimed, scheduled soon\"></span>";
             }
 
             return null;

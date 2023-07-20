@@ -16,7 +16,7 @@
                     type="button"
                     data-bs-toggle="modal"
                     data-bs-target="#uploadAsset">
-                <span class="fas fa-file-upload" aria-hidden="true"></span>
+                <span class="fa-solid fa-file-arrow-up" aria-hidden="true"></span>
                 Upload Image
             </button>
         }
@@ -33,7 +33,7 @@
             <th>Display Sets</th>
             <th>
                 Info
-                <span class="fas fa-caret-down"></span>
+                <span class="fa-solid fa-caret-down"></span>
             </th>
             <th>Actions</th>
         </tr>
@@ -73,7 +73,7 @@
                         {
                             <a asp-action="@nameof(DigitalDisplaysController.AssetAssociations)"
                                asp-route-digitalDisplayAssetId="@asset.Id"
-                               class="btn btn-outline-primary my-1"><span class="fas fa-paperclip"></span></a>
+                               class="btn btn-outline-primary my-1"><span class="fa-solid fa-paperclip"></span></a>
                             @if (Model.GetSetCount(asset.Id) == "0")
                             {
                                 <button type="button"
@@ -82,7 +82,7 @@
                                         data-id="@asset.Id"
                                         data-name="@asset.Name"
                                         class="btn btn-outline-danger my-1">
-                                    <span class="fas fa-minus-circle"></span>
+                                    <span class="fa-solid fa-circle-minus"></span>
                                 </button>
                             }
                         }
@@ -130,7 +130,7 @@
                         Cancel
                     </button>
                     <button type="submit" class="btn btn-danger" button-spinner>
-                        <span class="fas fa-minus-circle"></span>
+                        <span class="fa-solid fa-circle-minus"></span>
                         Delete image
                     </button>
                 </div>
@@ -173,7 +173,7 @@
                         Cancel
                     </button>
                     <button type="submit" class="btn btn-outline-success" button-spinner>
-                        <span class="fas fa-file-upload" aria-hidden="true"></span>
+                        <span class="fa-solid fa-file-arrow-up" aria-hidden="true"></span>
                         Upload image
                     </button>
                 </div>

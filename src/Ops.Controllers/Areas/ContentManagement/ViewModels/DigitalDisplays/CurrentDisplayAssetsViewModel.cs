@@ -19,8 +19,8 @@ namespace Ocuda.Ops.Controllers.Areas.ContentManagement.ViewModels.DigitalDispla
         public static string HtmlIsEnabled(bool enabled)
         {
             return enabled
-                ? "<span class=\"far fa-check-square\"></span>"
-                : "<span class=\"far fa-times-circle\"></span>";
+                ? "<span class=\"fa-regular fa-square-check\"></span>"
+                : "<span class=\"fa-regular fa-circle-xmark\"></span>";
         }
     }
 }

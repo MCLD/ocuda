@@ -368,22 +368,22 @@
                         if (data.maxPage > 1) {
                             if (data.currentPage == 1) {
                                 pagination.push('<button class="btn btn-sm btn-outline-primary" disabled>');
-                                pagination.push('<span class="fa fa-backward"></span></button>');
+                                pagination.push('<span class="fa-solid fa-backward"></span></button>');
                             } else {
                                 pagination.push('<button class="btn btn-sm btn-outline-primary"');
                                 pagination.push(' onclick="prevPage();">');
-                                pagination.push('<span class="fa fa-backward"></span></button>');
+                                pagination.push('<span class="fa-solid fa-backward"></span></button>');
                             }
                             pagination.push('<span class="d-inline-block mx-2">')
                             pagination.push(data.currentPage + '/' + data.maxPage);
                             pagination.push('</span>')
                             if (data.currentPage == data.maxPage) {
                                 pagination.push('<button class="btn btn-sm btn-outline-primary" disabled>');
-                                pagination.push('<span class="fa fa-forward"></span></button>');
+                                pagination.push('<span class="fa-solid fa-forward"></span></button>');
                             } else {
                                 pagination.push('<button class="btn btn-sm btn-outline-primary"');
                                 pagination.push(' onclick="nextPage();">')
-                                pagination.push('<span class="fa fa-forward"></span></button>');
+                                pagination.push('<span class="fa-solid fa-forward"></span></button>');
                             }
                         }
                         $('#searchResults').html(searchResult.join(''));

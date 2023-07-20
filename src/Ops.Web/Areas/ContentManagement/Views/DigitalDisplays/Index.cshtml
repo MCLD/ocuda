@@ -14,7 +14,7 @@
         {
             <a class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
            asp-action="@nameof(DigitalDisplaysController.Provision)">
-                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                 @nameof(DigitalDisplaysController.Provision)
             </a>
         }
@@ -86,7 +86,7 @@
                         {
                             <a asp-action="@nameof(DigitalDisplaysController.UpdateDisplay)"
                    asp-route-displayId="@display.Id"
-                   class="btn btn-outline-primary my-1"><span class="fas fa-edit"></span></a>
+                   class="btn btn-outline-primary my-1"><span class="fa-solid fa-pen-to-square"></span></a>
                             @if (!Model.HasSets(display.Id))
                             {
                                 <button type="button"
@@ -95,7 +95,7 @@
                         data-id="@display.Id"
                         data-name="@display.Name"
                         class="btn btn-outline-danger my-1">
-                                    <span class="fas fa-minus-circle"></span>
+                                    <span class="fa-solid fa-circle-minus"></span>
                                 </button>
                             }
                         }

@@ -34,7 +34,7 @@ namespace Ocuda.Utility.TagHelpers
         private const string labelClassAttribute = "label-class";
         private const string labelNameAttribute = "label-name";
         private const string onBlurJs = "on-blur-js";
-        private const string requiredFieldClass = "fas fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker";
+        private const string requiredFieldClass = "fa-solid fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker";
         private const string showLengthAttributeName = "show-length";
         private const string validationIgnoreClass = "validation-ignore";
 
@@ -203,7 +203,7 @@ namespace Ocuda.Utility.TagHelpers
                     StringComparison.InvariantCultureIgnoreCase);
 
                 var tooltip = new TagBuilder("span");
-                tooltip.AddCssClass("fas fa-info-circle");
+                tooltip.AddCssClass("fa-solid fa-circle-info");
                 tooltip.Attributes.Add("data-bs-toggle", "tooltip");
                 tooltip.Attributes.Add("href", "#");
                 tooltip.Attributes.Add("title", _localizer[InfoTooltip]);

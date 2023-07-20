@@ -87,7 +87,7 @@
                                        data-id="@Model.User.Id"
                                        data-nickname="@Model.User.Nickname"
                                        title="Update nickname">
-                                        <span class="fa fa-xs fa-edit"></span>
+                                        <span class="fa-solid fa-xs fa-pencil"></span>
                                     </a>
                                 }
                             </td>
@@ -140,7 +140,7 @@
                                            data-id="@Model.User.Id"
                                            data-locationid="@Model.User.AssociatedLocation.Value"
                                            title="Update location">
-                                            <span class="fa fa-xs fa-edit"></span>
+                                            <span class="fa-solid fa-xs fa-pencil"></span>
                                         </a>
                                         @if (Model.User.AssociatedLocationManuallySet)
                                         {
@@ -235,7 +235,7 @@
                                         <button type="submit"
                                                 class="float-end p-0 me-2 btn btn-link"
                                                 title="Reauthenticate">
-                                            <span class="fa fa-xs fa-redo-alt"></span>
+                                            <span class="fa-solid fa-xs fa-rotate-right"></span>
                                         </button>
                                     </form>
                                 </td>
@@ -313,7 +313,7 @@
                                 {
                                     <li class="list-group-item p-2 fw-bold">
                                         @permission
-                                        <span class="fa fa-xs fa-star" style="color: gold;"></span>
+                                        <span class="fa-regular fa-xs fa-star" style="color: gold;"></span>
                                     </li>
                                 }
                                 else
