@@ -14,7 +14,7 @@
         <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
                 data-bs-toggle="modal"
                 data-bs-target="#addModal">
-            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
             Add Category
         </button>
     </div>
@@ -50,14 +50,14 @@
                                         data-name="@category.Name"
                                         data-class="@category.Class"
                                         title="Edit Category">
-                                    <span class="fas fa-cog" aria-hidden="true"></span>
+                                    <span class="fa-solid fa-gear" aria-hidden="true"></span>
                                 </button>
                                 <a asp-controller="@CategoriesController.Name"
                                    asp-action="@(nameof(CategoriesController.Details))"
                                    asp-route-id="@category.Id"
                                    class="btn btn-outline-primary"
                                    title="Edit category content">
-                                    <span class="far fa-file-alt" aria-hidden="true"></span>
+                                    <span class="fa-regular fa-file-alt" aria-hidden="true"></span>
                                 </a>
                                 <button type="button"
                                         class="btn btn-outline-danger"
@@ -66,7 +66,7 @@
                                         data-id="@category.Id"
                                         data-name="@category.Name"
                                         data-emedia="@string.Join("|", category.CategoryEmedias)">
-                                    <span class="fas fa-minus-circle" aria-hidden="true"></span>
+                                    <span class="fa-solid fa-circle-minus" aria-hidden="true"></span>
                                 </button>
                             </td>
                         </tr>

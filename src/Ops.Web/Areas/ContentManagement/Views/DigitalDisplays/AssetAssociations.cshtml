@@ -124,7 +124,7 @@
                                 data-assetid="@Model.DigitalDisplayAsset.Id"
                                 class="oc-update-asset-associations btn btn-outline-secondary my-1"
                                 button-spinner>
-                            <span class="far fa-save"></span>
+                            <span class="fa-regular fa-floppy-disk"></span>
                         </button>
                         @if (Model?.DigitalDisplaySets.Count > 1)
                         {
@@ -132,7 +132,7 @@
                                     title="Apply this date and time to all rows"
                                     class="oc-apply-to-all btn btn-outline-secondary my-1"
                                     button-spinner>
-                                <span class="far fa-copy"></span>
+                                <span class="fa-regular fa-copy"></span>
                             </button>
                         }
                         <button type="button"
@@ -140,7 +140,7 @@
                                 data-assetid="@Model.DigitalDisplayAsset.Id"
                                 class="oc-delete-asset btn btn-outline-danger my-1 @(assetSet?.IsEnabled == true ? "" : "d-none")"
                                 button-spinner>
-                            <span class="fas fa-minus-circle"></span>
+                            <span class="fa-solid fa-circle-minus"></span>
                         </button>
                     </td>
                 </tr>

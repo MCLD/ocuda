@@ -155,7 +155,7 @@ namespace Ocuda.Utility.TagHelpers
             {
                 TagRenderMode = TagRenderMode.Normal
             };
-            spanTag.MergeAttribute("class", $"fa fa-{glyph}");
+            spanTag.MergeAttribute("class", $"fa-solid fa-{glyph}");
             if (asButtons)
             {
                 var buttonTag = new TagBuilder("button")

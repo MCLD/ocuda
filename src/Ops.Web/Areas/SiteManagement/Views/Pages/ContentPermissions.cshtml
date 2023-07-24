@@ -3,7 +3,7 @@
 <a class="btn btn-outline-dark float-end"   
    asp-action="@(nameof(PagesController.Index))"
    asp-route-type="@Model.HeaderType">
-    <span class="fa fa-backward"></span>
+    <span class="fa-solid fa-backward"></span>
     Back
 </a>
 <h1>Assign content permissions</h1>
@@ -34,7 +34,7 @@
                                   asp-route-permissionGroupId="@availableGroup.Key">
                                 @availableGroup.Value
                                 <button class="btn btn-link text-success float-end">
-                                    <span class="fa fa-plus-circle"></span>
+                                    <span class="fa-solid fa-circle-plus"></span>
                                 </button>
                             </form>
                         </li>
@@ -64,7 +64,7 @@
                                   asp-route-permissionGroupId="@availableGroup.Key">
                                 @availableGroup.Value
                                 <button class="btn btn-link text-danger float-end">
-                                    <span class="fa fa-minus-circle"></span>
+                                    <span class="fa-solid fa-circle-minus"></span>
                                 </button>
                             </form>
                         </li>

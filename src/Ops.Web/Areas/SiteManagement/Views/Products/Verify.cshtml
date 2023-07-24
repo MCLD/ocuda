@@ -18,14 +18,14 @@
            asp-action="@nameof(ProductsController.UploadDistribution)"
            asp-route-productSlug="@Model.Product.Slug"
            class="btn btn-outline-info mt-2 mb-1 me-2 float-end">
-            <span class="fas fa-file-upload"></span>
+            <span class="fa-solid fa-file-arrow-up"></span>
             Upload Distribution
         </a>
         <a asp-controller="@ProductsController.Name"
            asp-action="@nameof(ProductsController.UploadReplenishment)"
            asp-route-productSlug="@Model.Product.Slug"
            class="btn btn-outline-success mt-2 mb-1 me-2 float-end">
-            <span class="fas fa-file-upload"></span>
+            <span class="fa-solid fa-file-arrow-up"></span>
             Upload Replenishment
         </a>
     </div>
@@ -49,7 +49,7 @@
                                         data-bs-toggle="modal"
                                         data-bs-target="#mappingModal"
                                         data-importlocation="@issue.Value">
-                                    <span class="fas fa-plus-circle"></span>
+                                    <span class="fa-solid fa-circle-plus"></span>
                                     Add mapping
                                 </button>
                             }

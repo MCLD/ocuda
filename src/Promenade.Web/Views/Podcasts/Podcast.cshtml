@@ -27,7 +27,7 @@
                 }
                 <a href="@Url.Action(nameof(PodcastsController.RSS), new { stub = Model.Podcast.Stub })"
                    target="_blank"
-                   class="btn btn-outline-secondary mt-1"><span class="fas fa-rss-square"></span> RSS</a>
+                   class="btn btn-outline-secondary mt-1"><span class="fa-solid fa-square-rss"></span> RSS</a>
             </div>
         </div>
     </div>
@@ -65,7 +65,7 @@
                    aria-label="@Localizer[Promenade.NewWindow]"
                    title="@Localizer[Promenade.ShowNotesFor, item.Title]"
                    class="btn d-block d-md-inline-block btn-outline-primary">
-                   <span class="far fa-file-alt"></span>
+                   <span class="fa-regular fa-file-lines"></span>
                    @Localizer[Promenade.ViewShowNotes]
                 </a>
             }

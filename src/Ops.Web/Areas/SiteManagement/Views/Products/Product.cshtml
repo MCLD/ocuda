@@ -17,14 +17,14 @@
            asp-action="@nameof(ProductsController.UploadDistribution)"
            asp-route-productSlug="@Model.Product.Slug"
            class="btn btn-outline-info mt-2 mb-1 me-2 float-end">
-            <span class="fas fa-file-upload"></span>
+            <span class="fa-solid fa-file-arrow-up"></span>
             Upload Distribution
         </a>
         <a asp-controller="@ProductsController.Name"
            asp-action="@nameof(ProductsController.UploadReplenishment)"
            asp-route-productSlug="@Model.Product.Slug"
            class="btn btn-outline-success mt-2 mb-1 me-2 float-end">
-            <span class="fas fa-file-upload"></span>
+            <span class="fa-solid fa-file-arrow-up"></span>
             Upload Replenishment
         </a>
     </div>
@@ -67,7 +67,7 @@
                                asp-action="@nameof(ProductsController.LocationInventory)"
                                asp-route-locationslug="@inventory.Location.Stub"
                                asp-route-productslug="@Model.Product.Slug">
-                                        <span class="fas fa-edit"></span>
+                                        <span class="fa-solid fa-pencil"></span>
                                         Update
                                     </a>
                                     @if (Model.IsProductManager)

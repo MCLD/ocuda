@@ -13,7 +13,7 @@
             <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
                     data-bs-toggle="modal"
                     data-bs-target="#addModal">
-                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                 Add Page
             </button>
         }
@@ -204,6 +204,7 @@ else
                                     @if (Model.IsSiteManager)
                                     {
                                         <a asp-action="@(nameof(PagesController.ContentPermissions))"
+<<<<<<< HEAD
                                            asp-route-id="@header.Id"
                                            title="Page content permissions"
                                            class="btn btn-outline-primary">
@@ -224,29 +225,66 @@ else
                                                 data-webslidetemplate="@header.LayoutWebslideTemplateId"
                                                 title="Edit page name">
                                             <span class="fas fa-fw fa-cog" aria-hidden="true"></span>
+=======
+                               asp-route-id="@header.Id"
+                               title="Page content permissions"
+                               class="btn btn-outline-primary">
+                                            <span class="fa-solid fa-user-plus fa-fw" aria-hidden="true"></span>
+                                        </a>
+                                        <button type="button"
+                                    class="btn btn-outline-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editModal"
+                                    data-id="@header.Id"
+                                    data-layout="@header.IsLayoutPage"
+                                    data-name="@header.PageName"
+                                    data-stub="@header.Stub"
+                                    data-type="@((int)header.Type)"
+                                    data-bannertemplate="@header.LayoutBannerTemplateId"
+                                    data-carouseltemplate="@header.LayoutCarouselTemplateId"
+                                    data-featuretemplate="@header.LayoutFeatureTemplateId"
+                                    data-webslidetemplate="@header.LayoutWebslideTemplateId"
+                                    title="Edit page name">
+                                            <span class="fa-solid fa-gear fa-fw" aria-hidden="true"></span>
+>>>>>>> feature/bootstrap5
                                         </button>
                                     }
                                     @if (Model.IsSiteManager || Model.IsWebContentManager || Model.PermissionIds.Any(_ => header.PermissionGroupIds.Contains(_)))
                                     {
                                         <a asp-action="@(nameof(PagesController.Detail))"
+<<<<<<< HEAD
                                            asp-route-id="@header.Id"
                                            class="btn btn-outline-primary"
                                            title="Edit page content">
                                             <span class="far fa-fw fa-file-alt" aria-hidden="true"></span>
+=======
+                               asp-route-id="@header.Id"
+                               class="btn btn-outline-primary"
+                               title="Edit page content">
+                                            <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
+>>>>>>> feature/bootstrap5
                                         </a>
                                     }
                                     @if (!string.IsNullOrEmpty(Model.BaseLink))
                                     {
                                         <a class="btn btn-outline-success text-success"
+<<<<<<< HEAD
                                            target="_blank"
                                            href="@Model.MakeLink(header)"
                                            title="View page">
                                             <span class="fas fa-fw fa-external-link-alt"></span>
+=======
+                               target="_blank"
+                               href="@Model.MakeLink(header)"
+                               title="View page">
+                                            <span class="fa-solid fa-arrow-up-right-from-square fa-fw"></span>
+>>>>>>> feature/bootstrap5
                                         </a>
                                     }
                                     @if (Model.IsSiteManager)
                                     {
                                         <button type="button"
+<<<<<<< HEAD
                                                 class="btn btn-outline-danger"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#deleteModal"
@@ -254,6 +292,15 @@ else
                                                 data-name="@header.PageName"
                                                 title="Delete page">
                                             <span class="fas fa-fw fa-times-circle" aria-hidden="true"></span>
+=======
+                                    class="btn btn-outline-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal"
+                                    data-id="@header.Id"
+                                    data-name="@header.PageName"
+                                    title="Delete page">
+                                            <span class="fa-solid fa-circle-xmark fa-fw" aria-hidden="true"></span>
+>>>>>>> feature/bootstrap5
                                         </button>
                                     }
                                 </td>

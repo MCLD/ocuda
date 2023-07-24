@@ -122,70 +122,70 @@ namespace Ocuda.Ops.Service
                     CreatedAt = DateTime.Now,
                     CreatedBy = SystemAdministrator.Id,
                     Extension = ".zip",
-                    Icon = "fa fa-file-archive"
+                    Icon = "fa-regular fa-file-zipper"
                     },
                 new FileType
                 {
                     CreatedAt = DateTime.Now,
                     CreatedBy = SystemAdministrator.Id,
                     Extension = ".mp3",
-                    Icon = "fa fa-file-audio"
+                    Icon = "fa-regular fa-file-audio"
                 },
                 new FileType
                 {
                     CreatedAt = DateTime.Now,
                     CreatedBy = SystemAdministrator.Id,
                     Extension = ".cs",
-                    Icon = "fa fa-file-code"
+                    Icon = "fa-regular fa-file-code"
                 },
                 new FileType
                 {
                     CreatedAt = DateTime.Now,
                     CreatedBy = SystemAdministrator.Id,
                     Extension = ".jpg",
-                    Icon = "fa fa-file-image"
+                    Icon = "fa-regular fa-file-image"
                 },
                 new FileType
                 {
                     CreatedAt = DateTime.Now,
                     CreatedBy = SystemAdministrator.Id,
                     Extension = ".xlsx",
-                    Icon = "fa fa-file-excel alert-success"
+                    Icon = "fa-regular fa-file-excel alert-success"
                 },
                 new FileType
                 {
                     CreatedAt = DateTime.Now,
                     CreatedBy = SystemAdministrator.Id,
                     Extension = ".pptx",
-                    Icon = "fa fa-file-powerpoint"
+                    Icon = "fa-regular fa-file-powerpoint"
                 },
                 new FileType
                 {
                     CreatedAt = DateTime.Now,
                     CreatedBy = SystemAdministrator.Id,
                     Extension = ".docx",
-                    Icon = "fa fa-file-word alert-primary"
+                    Icon = "fa-regular fa-file-word alert-primary"
                 },
                 new FileType
                 {
                     CreatedAt = DateTime.Now,
                     CreatedBy = SystemAdministrator.Id,
                     Extension = ".pdf",
-                    Icon = "fa fa-file-pdf alert-danger"
+                    Icon = "fa-regular fa-file-pdf alert-danger"
                 },
                 new FileType
                 {
                     CreatedAt = DateTime.Now,
                     CreatedBy = SystemAdministrator.Id,
                     Extension = ".txt",
-                    Icon = "fa fa-file-alt"
+                    Icon = "fa-regular fa-file-lines"
                 },
                 new FileType
                 {
                     CreatedAt = DateTime.Now,
                     CreatedBy = SystemAdministrator.Id,
                     Extension = ".mp4",
-                    Icon = "fa fa-file-video"
+                    Icon = "fa-regular fa-file-video"
                 }
             };
 

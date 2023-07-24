@@ -14,7 +14,7 @@
         {
             <a class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
                asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.AddSet))">
-                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                 Add set
             </a>
         }
@@ -48,7 +48,7 @@
                         {
                             <a asp-action="@nameof(DigitalDisplaysController.UpdateSet)"
                                asp-route-digitalDisplaySetId="@set.Id"
-                               class="btn btn-outline-primary my-1"><span class="fas fa-edit"></span></a>
+                               class="btn btn-outline-primary my-1"><span class="fa-solid fa-pencil"></span></a>
                             @if (Model.AssetCount(set.Id) == 0 && Model.DisplayCount(set.Id) == 0)
                             {
                                 <button type="button"
@@ -57,7 +57,7 @@
                                         data-id="@set.Id"
                                         data-name="@set.Name"
                                         class="btn btn-outline-danger my-1">
-                                    <span class="fas fa-minus-circle"></span>
+                                    <span class="fa-solid fa-circle-minus"></span>
                                 </button>
                             }
                         }

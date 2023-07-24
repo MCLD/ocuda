@@ -80,14 +80,14 @@ else
                                 data-id="@externalResource.Id"
                                 data-increase="false"
                                 disabled="@(externalResource == Model.ExternalResources.First() ? "disabled" : null)">
-                            <span class="fas fa-fw fa-arrow-up"></span>
+                            <span class="fa-solid fa-fw fa-arrow-up"></span>
                         </button>
                         <button type="button"
                                 class="btn btn-outline-dark btn-xd changeSort increaseSortButton"
                                 data-id="@externalResource.Id"
                                 data-increase="true"
                                 disabled="@(externalResource == Model.ExternalResources.Last() ? "disabled" : null)">
-                            <span class="fas fa-fw fa-arrow-down"></span>
+                            <span class="fa-solid fa-fw fa-arrow-down"></span>
                         </button>
                         <button type="button"
                                 class="btn btn-outline-primary btn-xs"
@@ -96,7 +96,7 @@ else
                                 data-id="@externalResource.Id"
                                 data-name="@externalResource.Name"
                                 data-url="@externalResource.Url">
-                            <span class="fa fa-fw fa-pencil-alt" aria-hidden="true"></span>
+                            <span class="fa-solid fa-fw fa-pencil" aria-hidden="true"></span>
                         </button>
                         <button type="button"
                                 class="btn btn-outline-danger btn-xs"
@@ -104,7 +104,7 @@ else
                                 data-bs-target="#deleteModal"
                                 data-id="@externalResource.Id"
                                 data-name="@externalResource.Name">
-                            <span class="fa fa-fw fa-times" aria-hidden="true"></span>
+                            <span class="fa-solid fa-fw fa-circle-xmark" aria-hidden="true"></span>
                         </button>
                     </td>
                 </tr>

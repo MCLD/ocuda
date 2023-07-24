@@ -187,7 +187,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+                    <span class="fa-solid fa-triangle-exclamation" aria-hidden="true"></span>
                     <span id="modal-text"></span>
                 </div>
                 <div class="modal-footer">
@@ -223,7 +223,7 @@
             <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
                 data-bs-toggle="modal"
                 data-bs-target="#addModal">
-                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                 Add Post
             </button>
         }
@@ -268,7 +268,7 @@
                                     <a asp-action="@nameof(SectionController.EditPost)"
                                asp-route-sectionSlug="@Model.Section.Slug"
                                asp-route-postSlug="@post.Slug">
-                                        <span class="far fa-edit float-end"></span>
+                                        <span class="fa-solid fa-pencil float-end"></span>
                                     </a>
                                 </div>
                             </div>
@@ -325,7 +325,7 @@
                                id="addFileLibrary"
                                data-bs-toggle="modal"
                                data-bs-target="#addFileLibModal">
-                                <span class="fas fa-plus-circle fa-lg align-middle"></span>
+                                <span class="fa-solid fa-circle-plus fa-lg align-middle"></span>
                             </a>
                         </div>
                     </th>
@@ -349,7 +349,7 @@
                            data-name="@library.Name"
                            data-slug="@library.Slug"
                            data-type="file">
-                                    <span class="far fa-edit float-end"></span>
+                                    <span class="fa-solid fa-pencil float-end"></span>
                                 </a>
                             </td>
                             <td style="position: relative;" class="text-center">
@@ -388,7 +388,7 @@
                                data-bs-toggle="modal"
                                data-bs-target="#addLinkLibModal"
                                id="addLinkLibrary">
-                                <span class="fas fa-plus-circle fa-lg align-middle"></span>
+                                <span class="fa-solid fa-circle-plus fa-lg align-middle"></span>
                             </a>
                         </div>
                     </th>
@@ -412,7 +412,7 @@
                            data-name="@library.Name"
                            data-slug="@library.Slug"
                            data-type="link">
-                                    <span class="far fa-edit float-end"></span>
+                                    <span class="fa-solid fa-pencil float-end"></span>
                                 </a>
                             </td>
                             <td style="position: relative;" class="text-center">

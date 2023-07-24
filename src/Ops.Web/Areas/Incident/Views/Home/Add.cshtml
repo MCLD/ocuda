@@ -51,7 +51,7 @@
             <div class="row mb-3">
                 <label class="col-form-label text-md-end col-md-3" for="IncidentDate">
                     Date & time of incident
-                    <span class="fas fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span>
+                    <span class="fa-solid fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span>
                 </label>
                 <div class="mb-3-inner col-md-9">
                     <div class="d-flex flex-row">
@@ -112,7 +112,7 @@
                             data-bs-target="#addStaffModal"
                             data-participanttype="@nameof(Ocuda.Ops.Models.Entities.IncidentParticipantType.Witness)"
                             data-participanttypeid="@((int)Ocuda.Ops.Models.Entities.IncidentParticipantType.Witness)">
-                        <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                        <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                         Add staff witness
                     </button>
                     <button type="button"
@@ -121,7 +121,7 @@
                             data-bs-target="#addPersonModal"
                             data-participanttype="@nameof(Ocuda.Ops.Models.Entities.IncidentParticipantType.Witness)"
                             data-participanttypeid="@((int)Ocuda.Ops.Models.Entities.IncidentParticipantType.Witness)">
-                        <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                        <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                         Add other witness
                     </button>
                 </div>
@@ -150,7 +150,7 @@
                             data-bs-target="#addStaffModal"
                             data-participanttype="@nameof(Ocuda.Ops.Models.Entities.IncidentParticipantType.Affected)"
                             data-participanttypeid="@((int)Ocuda.Ops.Models.Entities.IncidentParticipantType.Affected)">
-                        <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                        <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                         Add staff affected
                     </button>
                     <button type="button"
@@ -159,7 +159,7 @@
                             data-bs-target="#addPersonModal"
                             data-participanttype="@nameof(Ocuda.Ops.Models.Entities.IncidentParticipantType.Affected)"
                             data-participanttypeid="@((int)Ocuda.Ops.Models.Entities.IncidentParticipantType.Affected)">
-                        <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                        <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                         Add other affected
                     </button>
                 </div>
@@ -175,7 +175,7 @@
                             class="btn btn-outline-success"
                             id="submitIncidentReport"
                             button-spinner>
-                        <span class="far fa-save" aria-hidden="true"></span>
+                        <span class="fa-regular fa-floppy-disk" aria-hidden="true"></span>
                         Save Incident
                     </button>
                 </div>
@@ -360,7 +360,7 @@
                             searchResult.push('<tr><td class="button-column">')
                             searchResult.push('<button class="btn btn-sm btn-outline-success"')
                             searchResult.push('onclick="addStaff(' + value.id + ')">')
-                            searchResult.push('<span class="fas fa-plus-circle"></span></button>')
+                            searchResult.push('<span class="fa-solid fa-circle-plus"></span></button>')
                             searchResult.push('</td><td class="align-middle">' + value.name + '</td></tr>');
                             users[value.id] = value.name;
                         })
@@ -368,22 +368,22 @@
                         if (data.maxPage > 1) {
                             if (data.currentPage == 1) {
                                 pagination.push('<button class="btn btn-sm btn-outline-primary" disabled>');
-                                pagination.push('<span class="fa fa-backward"></span></button>');
+                                pagination.push('<span class="fa-solid fa-backward"></span></button>');
                             } else {
                                 pagination.push('<button class="btn btn-sm btn-outline-primary"');
                                 pagination.push(' onclick="prevPage();">');
-                                pagination.push('<span class="fa fa-backward"></span></button>');
+                                pagination.push('<span class="fa-solid fa-backward"></span></button>');
                             }
                             pagination.push('<span class="d-inline-block mx-2">')
                             pagination.push(data.currentPage + '/' + data.maxPage);
                             pagination.push('</span>')
                             if (data.currentPage == data.maxPage) {
                                 pagination.push('<button class="btn btn-sm btn-outline-primary" disabled>');
-                                pagination.push('<span class="fa fa-forward"></span></button>');
+                                pagination.push('<span class="fa-solid fa-forward"></span></button>');
                             } else {
                                 pagination.push('<button class="btn btn-sm btn-outline-primary"');
                                 pagination.push(' onclick="nextPage();">')
-                                pagination.push('<span class="fa fa-forward"></span></button>');
+                                pagination.push('<span class="fa-solid fa-forward"></span></button>');
                             }
                         }
                         $('#searchResults').html(searchResult.join(''));
@@ -527,7 +527,7 @@
                             content.push('<td onclick="remove(' + typeId + ',' + index + ')"')
                             content.push(' class="button-column align-middle">')
                             content.push('<button class="btn btn-sm btn-outline-danger" type="button">')
-                            content.push('<span class="fas fa-minus-circle"></span></button>')
+                            content.push('<span class="fa-solid fa-circle-minus"></span></button>')
                             content.push('</td><td class="align-middle">Staff</td>');
                             content.push('<td class="align-middle">')
                             content.push(value.name);
@@ -538,7 +538,7 @@
                             content.push('<td onclick="remove(' + typeId + ',' + index + ')"')
                             content.push(' class="button-column align-middle">')
                             content.push('<button class="btn btn-sm btn-outline-danger" type="button">')
-                            content.push('<span class="fas fa-minus-circle"></span></button>')
+                            content.push('<span class="fa-solid fa-circle-minus"></span></button>')
                             content.push('</td><td class="align-middle">Non-staff</td>');
                             content.push('<td class="align-middle">')
                             content.push(value.name);

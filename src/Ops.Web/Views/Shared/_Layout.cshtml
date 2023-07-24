@@ -23,7 +23,7 @@
                 if (navigationRows?.Count > 0)
                 {
                     <a id="openNavColumn" href="#" style="margin-right: 1rem; padding: 0.5rem">
-                        <span class="fas fa-ellipsis-v fa-inverse"></span>
+                        <span class="fa-solid fa-ellipsis-vertical fa-inverse"></span>
                     </a>
                 }
             }
@@ -36,7 +36,7 @@
                        role="button"
                        data-bs-toggle="dropdown"
                        title="Intranet">
-                        <span class="fas fa-info-circle"></span>
+                        <span class="fa-solid fa-circle-info"></span>
                         Intranet
                     </a>
                     <div class="dropdown-menu">
@@ -56,7 +56,7 @@
                                     @opsSection.Name
                                     @if (opsSection.SupervisorsOnly)
                                     {
-                                        <span class="text-muted fas fa-lock fa-fw oc-dropdown-locked"></span>
+                                        <span class="text-muted fa-solid fa-lock fa-fw oc-dropdown-locked"></span>
                                     }
                                 </a>
                             }
@@ -81,7 +81,7 @@
                            aria-haspopup="true"
                            aria-expanded="false"
                            title="Customer Service">
-                            <span class="fas fa-users fa-fw"></span>
+                            <span class="fa-solid fa-users fa-fw"></span>
                             Customer Service
                         </a>
                         <div class="dropdown-menu"
@@ -90,14 +90,14 @@
                                asp-controller="@Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Name"
                                asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.Contact))"
                                asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Index))">
-                                <span class="far fa-clock"></span>
+                                <span class="fa-regular fa-clock"></span>
                                 Book a Librarian
                             </a>
                             <a class="dropdown-item"
                                asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
                                asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.Incident))"
                                asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine))">
-                                <span class="fas fa-user-injured"></span>
+                                <span class="fa-solid fa-user-injured"></span>
                                 Incident Reports
                             </a>
                         </div>
@@ -113,7 +113,7 @@
                            aria-haspopup="true"
                            aria-expanded="false"
                            title="Materials">
-                            <span class="fas fa-book fa-fw"></span>
+                            <span class="fa-solid fa-book fa-fw"></span>
                             Materials
                         </a>
                         <div class="dropdown-menu"
@@ -122,7 +122,7 @@
                                asp-controller="@Ocuda.Ops.Controllers.Areas.CoverIssue.HomeController.Name"
                                asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.CoverIssue))"
                                asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.CoverIssue.HomeController.Index))">
-                                <span class="fas fa-book-dead fa-fw"></span>
+                                <span class="fa-solid fa-book-skull fa-fw"></span>
                                 Cover Issues
                             </a>
                         </div>
@@ -141,7 +141,7 @@
                            aria-haspopup="true"
                            aria-expanded="false"
                            title="Management">
-                            <span class="fas fa-cog fa-fw"></span>
+                            <span class="fa-solid fa-gear fa-fw"></span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end"
                              aria-labelledby="navbarManagementDropdown">
@@ -149,7 +149,7 @@
                                asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
                                asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement))"
                                asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">
-                                <span class="fas fa-network-wired fa-fw"></span>
+                                <span class="fa-solid fa-network-wired fa-fw"></span>
                                 Intranet Management
                             </a>
                             @if (Context.User?.HasClaim(ClaimType.HasSiteAdminRights, ClaimType.HasSiteAdminRights) == true)
@@ -158,7 +158,7 @@
                                    asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
                                    asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement))"
                                    asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">
-                                    <span class="fas fa-globe-americas fa-fw"></span>
+                                    <span class="fa-solid fa-earth-americas fa-fw"></span>
                                     Web Site Management
                                 </a>
                             }
@@ -170,7 +170,7 @@
                            asp-controller="@StaffController.Name"
                            class="nav-link text-white"
                            title="@StaffController.Name">
-                            <span class="fas fa-fw fa-id-card-alt"></span>
+                            <span class="fa-solid fa-id-card fa-fw"></span>
                         </a>
                     </li>
                     @if (Context.Items[ItemKey.Nickname] != null)
@@ -182,7 +182,7 @@
                                asp-route-section=""
                                asp-route-area=""
                                asp-route-id="">
-                                <span class="fas fa-fw fa-user-circle fa-fw"></span>
+                                <span class="fa-solid fa-circle-user fa-fw"></span>
                                 @Context.Items[ItemKey.Nickname]
                             </a>
                         </li>
@@ -209,7 +209,7 @@
                             {
                                 <div class="navcolumn-item navcolumn-collapsible">
                                     @Html.Raw(row.Name)
-                                    <span class="fas fa-chevron-right float-end"></span>
+                                    <span class="fa-solid fa-chevron-right float-end"></span>
                                 </div>
                                 <div class="collapse navcolumn-collapse">
                                     @foreach (var childRow in row.Rows)
@@ -224,7 +224,7 @@
                                             {
                                                 <div class="navcolumn-item navcolumn-child navcolumn-collapsible">
                                                     @Html.Raw(childRow.Name)
-                                                    <span class="fas fa-chevron-right float-end"></span>
+                                                    <span class="fa-solid fa-chevron-right float-end"></span>
                                                 </div>
                                                 <div class="collapse navcolumn-collapse">
                                                     @foreach (var grandchildRow in childRow.Rows)

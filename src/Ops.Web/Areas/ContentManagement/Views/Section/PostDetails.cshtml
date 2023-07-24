@@ -34,7 +34,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+                    <span class="fa-solid fa-triangle-exclamation" aria-hidden="true"></span>
                     <span id="modal-text">Are you sure you want to delete "@Model.Post.Title"</span>
                 </div>
                 <div class="modal-footer">
@@ -137,7 +137,7 @@
                     </div>
                     <div class="float-end align-middle h4">
                         <a href="@Url.Action(nameof(SectionController.EditPost), new { sectionSlug = Model.SectionSlug, postSlug = Model.Post.Slug})">
-                            <span class="far fa-edit float-end"></span>
+                            <span class="fa-solid fa-pencil float-end"></span>
                         </a>
                     </div>
                 </div>

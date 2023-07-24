@@ -24,7 +24,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+                            <span class="fa-solid fa-triangle-exclamation" aria-hidden="true"></span>
                             <span id="modal-text"></span>
                         </div>
                         <div class="modal-footer">
@@ -38,7 +38,7 @@
                                     class="btn btn-danger float-end"
                                     aria-label="Confirm"
                                     button-spinner>
-                                <span class="fas fa-times" aria-hidden="true"></span>
+                                <span class="fa-solid fa-xmark" aria-hidden="true"></span>
                                 Delete
                             </button>
                         </div>
@@ -55,7 +55,7 @@
                     <span class="h5">Features</span>
                     <a asp-action="@nameof(FeaturesController.CreateFeature)"
                        class="text-success float-end">
-                        <span class="fas fa-plus-circle fa-lg"></span>
+                        <span class="fa-solid fa-circle-plus fa-lg"></span>
                     </a>
                 </div>
                 @if (Model.AllFeatures.Count() == 0)
@@ -104,7 +104,7 @@
                                             data-bs-target="#deleteModal"
                                             data-id="@feature.Id"
                                             data-name="@feature.Name">
-                                                <span class="far fa-times-circle fa-lg"
+                                                <span class="fa-regular fa-circle-xmark fa-lg"
                                               aria-hidden="true"></span>
                                             </button>
                                         </td>

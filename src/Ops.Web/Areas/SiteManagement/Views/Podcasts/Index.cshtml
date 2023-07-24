@@ -55,14 +55,14 @@ else
                                asp-route-podcastId="@podcast.Id"
                                title="Podcast episode permissions"
                                class="btn btn-outline-primary">
-                                            <span class="fas fa-fw fa-user-plus" aria-hidden="true"></span>
+                                            <span class="fa-solid fa-user-plus fa-fw" aria-hidden="true"></span>
                                         </a>
                                     }
                                     <a asp-action="@(nameof(PodcastsController.Details))"
                                asp-route-podcastId="@podcast.Id"
                                class="btn btn-outline-primary"
                                title="Podcast details">
-                                        <span class="far fa-fw fa-file-alt" aria-hidden="true"></span>
+                                        <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
                                     </a>
                                     @if (Model.IsSiteManager || Model.PermissionIds?.Any(_ => podcast.PermissionGroupIds.Contains(_)) == true)
                                     {
@@ -70,7 +70,7 @@ else
                                asp-route-podcastId="@podcast.Id"
                                class="btn btn-outline-primary"
                                title="Episodes">
-                                            <span class="fas fa-fw fa-list-ol" aria-hidden="true"></span>
+                                            <span class="fa-solid fa-list-ol fa-fw" aria-hidden="true"></span>
                                         </a>
                                     }
                                 </td>

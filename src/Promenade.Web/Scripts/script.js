@@ -5,9 +5,9 @@
         autoplay: false,
         dots: false,
         prevArrow:
-            '<span class="fas fa-arrow-alt-circle-left fa-2x prom-carousel-nav prom-carousel-prev"></span>',
+            '<span class="fa-solid fa-circle-left fa-fw fa-2x prom-carousel-nav prom-carousel-prev"></span>',
         nextArrow:
-            '<span class="fas fa-arrow-alt-circle-right fa-2x prom-carousel-nav prom-carousel-next"></span>',
+            '<span class="fa-solid fa-circle-right fa-fw fa-2x prom-carousel-nav prom-carousel-next"></span>',
         responsive: [
             {
                 breakpoint: 1350,

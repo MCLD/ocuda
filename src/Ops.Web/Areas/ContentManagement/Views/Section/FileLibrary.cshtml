@@ -48,7 +48,7 @@
                     <button type="submit"
                             value="Submit"
                             class="btn btn-outline-success">
-                        <span class="fas fa-file-upload" aria-hidden="true"></span>
+                        <span class="fa-solid fa-file-arrow-up" aria-hidden="true"></span>
                         Replace
                     </button>
                 </div>
@@ -109,7 +109,7 @@
                     <button type="submit"
                             value="Submit"
                             class="btn btn-outline-success">
-                        <span class="fas fa-file-upload" aria-hidden="true"></span>
+                        <span class="fa-solid fa-file-arrow-up" aria-hidden="true"></span>
                         Upload
                     </button>
                 </div>
@@ -143,7 +143,7 @@
                     </button>
                 </div>
                 <div class="modal-body d-flex">
-                    <span class="fa fa-exclamation-triangle text-danger fa-lg align-self-center me-3"
+                    <span class="fa-solid fa-triangle-exclamation text-danger fa-lg align-self-center me-3"
                           aria-hidden="true"></span>
                     <span class="d-flex-grow-1">
                         <p>
@@ -187,7 +187,7 @@
             <button class="btn btn-outline-primary mt-2 mb-1 me-2 float-end"
                     data-bs-toggle="modal"
                     data-bs-target="#listAddModal">
-                <span class="fas fa-file-upload" aria-hidden="true"></span>
+                <span class="fa-solid fa-file-arrow-up" aria-hidden="true"></span>
                 Add file
             </button>
         }
@@ -199,7 +199,7 @@
                asp-action="@nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.FileLibraryPermissions)"
                asp-route-sectionSlug="@Model.SectionSlug"
                asp-route-fileLibrarySlug="@Model.FileLibrarySlug">
-                <span class="fas fa-user-plus"></span>
+                <span class="fa-solid fa-user-plus"></span>
                 Permissions
             </a>
         }
@@ -237,7 +237,7 @@
                                    class="btn btn-outline-primary">
                                     @if (string.IsNullOrEmpty(file.FileType?.Icon))
                                     {
-                                        <span class="far fa-file fa-fw fa-lg"></span>
+                                        <span class="fa-regular fa-file fa-fw fa-lg"></span>
                                     }
                                     else
                                     {
@@ -282,7 +282,7 @@
                                                 data-name="@file.Name"
                                                 data-extension="@Model.FileTypes.Where(_ => _.Id == file.FileTypeId).FirstOrDefault().Extension"
                                                 title="Replace file">
-                                            <span class="fas fa-sync-alt fa-fw"
+                                            <span class="fa-solid fa-rotate fa-fw"
                                                   aria-hidden="true"></span>
                                         </button>
                                     }
@@ -295,7 +295,7 @@
                                                 data-id="@file.Id"
                                                 data-name="@file.Name"
                                                 title="Delete file">
-                                            <span class="far fa-times-circle fa-fw"
+                                            <span class="fa-regular fa-circle-xmark fa-fw"
                                                   aria-hidden="true"></span>
                                         </button>
                                     }

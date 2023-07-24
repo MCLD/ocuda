@@ -272,13 +272,13 @@ namespace Ocuda.Ops.Controllers.Abstract
             }
             else
             {
-                AlertSuccess = $"{Fa("thumbs-up", "far")} {message}";
+                AlertSuccess = $"{Fa("thumbs-up", "fa-regular")} {message}";
             }
         }
 
         protected void ShowAlertWarning(string message, string details = null)
         {
-            AlertWarning = $"{Fa("exclamation-circle")} {message}{details}";
+            AlertWarning = $"{Fa("circle-exclamation")} {message}{details}";
         }
 
         protected string UserClaim(string claimType)
@@ -291,7 +291,25 @@ namespace Ocuda.Ops.Controllers.Abstract
             return _userContextProvider.UserClaims(AuthUser, claimType);
         }
 
-        private string Fa(string iconName, string iconStyle = "fa")
+
+        /// <summary>
+        /// Shorthand method to output an icon from FontAwesome, also outputs the fa-solid tag.
+        /// </summary>
+        /// <param name="iconName">The icon name with the fa- prefix left out</param>
+        /// <returns>A proper span tag to display the icon in the fa-solid style</returns>
+        private static string Fa(string iconName)
+        {
+            return Fa(iconName, "fa-solid");
+        }
+
+
+        /// <summary>
+        /// Shorthand method to output an icon from FontAwesome
+        /// </summary>
+        /// <param name="iconName">The icon name with the "fa-" prefix left out</param>
+        /// <param name="iconStyle">The full icon style text, must include the "fa-" prefix</param>
+        /// <returns>A proper span tag to display the icon</returns>
+        private static string Fa(string iconName, string iconStyle)
         {
             return $"<span class=\"{iconStyle} fa-{iconName}\" aria-hidden=\"true\"></span>";
         }
