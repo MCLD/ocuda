@@ -262,10 +262,6 @@ namespace Ocuda.Ops.Web
                     "Scripts/md-editor.js"
                     ).UseContentRoot();
 
-                _.AddJavaScriptBundle("/js/iconpicker.min.js",
-                    "js/fontawesome-iconpicker.js"
-                    ).UseContentRoot();
-
                 _.AddJavaScriptBundle("/js/coverissue-bookmarklet.min.js",
                     "Scripts/CoverIssue-Bookmarklet.js"
                     ).UseContentRoot();
@@ -290,11 +286,6 @@ namespace Ocuda.Ops.Web
 
                 _.AddCssBundle("/css/md.min.css",
                     "Styles/md-editor.css"
-                    ).UseContentRoot();
-
-                _.AddCssBundle("/css/iconpicker.min.css",
-                    "css/fontawesome-iconpicker.css",
-                    "Styles/iconpicker-fix.css"
                     ).UseContentRoot();
 
                 _.AddCssBundle("/css/crop.min.css",
