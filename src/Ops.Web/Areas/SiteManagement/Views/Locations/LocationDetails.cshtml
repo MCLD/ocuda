@@ -631,7 +631,7 @@
                                                       asp-route-userId="@formMapping.UserId"
                                                       asp-route-type="@form.TypeId">
                                                     <button class="btn btn-sm btn-outline-danger" type="submit">
-                                                        <span class="fas fa-minus-circle"></span>
+                                                        <span class="fa-solid fa-circle-minus"></span>
                                                     </button>
                                                 </form>
                                             </td>
@@ -649,7 +649,7 @@
                                 data-bs-target="#addStaffModal"
                                 data-formtype="@((VolunteerFormType)form.TypeId)"
                                 data-formtypeid="@form.TypeId">
-                            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                            <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                             Add staff
                         </button>
                     }
@@ -1339,7 +1339,7 @@
                             btnMapUser.setAttribute('type', 'submit');
 
                             var span = document.createElement('span');
-                            span.setAttribute('class', 'fas fa-fw fa-plus-circle');
+                            span.setAttribute('class', 'fa-solid fa-circle-plus fa-fw');
 
                             btnMapUser.appendChild(span);
                             form.appendChild(btnMapUser);
