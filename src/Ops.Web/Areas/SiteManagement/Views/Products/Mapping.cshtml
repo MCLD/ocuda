@@ -16,14 +16,14 @@
            asp-action="@nameof(ProductsController.UploadDistribution)"
            asp-route-productSlug="@Model.Product.Slug"
            class="btn btn-outline-info mt-2 mb-1 me-2 float-end">
-            <span class="fas fa-file-upload"></span>
+            <span class="fa-solid fa-file-arrow-up"></span>
             Upload Distribution
         </a>
         <a asp-controller="@ProductsController.Name"
            asp-action="@nameof(ProductsController.UploadReplenishment)"
            asp-route-productSlug="@Model.Product.Slug"
            class="btn btn-outline-success mt-2 mb-1 me-2 float-end">
-            <span class="fas fa-file-upload"></span>
+            <span class="fa-solid fa-file-arrow-up"></span>
             Upload Replenishment
         </a>
     </div>
@@ -41,7 +41,7 @@
                             class="btn btn-sm btn-outline-success float-end"
                             data-bs-toggle="modal"
                             data-bs-target="#mappingModal">
-                        <span class="fas fa-sm fa-plus-circle"></span>
+                        <span class="fa-solid fa-circle-plus fa-sm"></span>
                     </button>
                 </th>
             </tr>
@@ -60,7 +60,7 @@
                             data-locationmapid="@locationMap.Id"
                             data-locationid="@locationMap.LocationId"
                             data-importlocation="@locationMap.ImportLocation">
-                                <span class="fas fa-minus-circle"></span>
+                                <span class="fa-solid fa-circle-minus"></span>
                             </button>
                             <button type="button"
                             class="btn btn-sm btn-outline-primary"
@@ -69,7 +69,7 @@
                             data-locationmapid="@locationMap.Id"
                             data-locationid="@locationMap.LocationId"
                             data-importlocation="@locationMap.ImportLocation">
-                                <span class="fas fa-edit"></span>
+                                <span class="fa-solid fa-pencil"></span>
                             </button>
                         </td>
                     </tr>
@@ -84,7 +84,7 @@
                             class="btn btn-sm btn-outline-success"
                             data-bs-toggle="modal"
                             data-bs-target="#mappingModal">
-                            <span class="fas fa-plus-circle"></span>
+                            <span class="fa-solid fa-circle-plus"></span>
                             Add mapping
                         </button>
                     </td>

@@ -73,7 +73,7 @@
                         {
                             <a asp-action="@nameof(DigitalDisplaysController.AssetAssociations)"
                                asp-route-digitalDisplayAssetId="@asset.Id"
-                               class="btn btn-outline-primary my-1"><span class="fa-solid fa-paperclip"></span></a>
+                               class="btn btn-outline-primary my-1"><span class="fa-solid fa-tv fa-fw"></span></a>
                             @if (Model.GetSetCount(asset.Id) == "0")
                             {
                                 <button type="button"

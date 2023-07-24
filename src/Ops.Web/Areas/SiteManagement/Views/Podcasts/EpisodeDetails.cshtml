@@ -34,7 +34,7 @@
                     <button type="submit"
                             class="btn btn-outline-success"
                             button-spinner>
-                        <span class="fas fa-file-upload"></span>
+                        <span class="fa-solid fa-file-arrow-up"></span>
                         Upload file
                     </button>
                 </div>
@@ -203,7 +203,7 @@
             <button type="submit"
                     class="btn btn-outline-success btn-lg"
                     button-spinner>
-                <span class="far fa-save"></span>
+                <span class="fa-regular fa-floppy-disk"></span>
                 Save
             </button>
         </div>
@@ -316,7 +316,7 @@
                             data-segment-display="Description"
                             data-bs-toggle="modal"
                             data-bs-target="#addSegmentModal">
-                        <span class="fas fa-fw fa-plus-circle"
+                        <span class="fa-solid fa-circle-plus fa-fw"
                               aria-hidden="true"
                               title="Add segment"></span>
                     </button>
@@ -326,7 +326,7 @@
                     <a class="btn btn-outline-danger"
                        data-bs-target="#deleteModal"
                        data-bs-toggle="modal">
-                        <span class="fas fa-fw fa-minus-circle"
+                        <span class="fa-solid fa-circle-minus fa-fw"
                               aria-hidden="true"
                               title="Delete segment"></span>
                     </a>
@@ -334,7 +334,7 @@
                        asp-action="@nameof(SegmentsController.Detail)"
                        asp-controller="@SegmentsController.Name"
                        asp-route-id="@Model.Episode.ShowNotesSegmentId">
-                        <span class="far fa-fw fa-file-alt"
+                        <span class="fa-regular fa-file-lines fa-fw"
                               aria-hidden="true"
                               title="Edit segment"></span>
                     </a>

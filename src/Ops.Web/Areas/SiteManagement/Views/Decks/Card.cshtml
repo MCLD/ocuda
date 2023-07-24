@@ -22,7 +22,7 @@
             <button class="btn btn-outline-danger mt-2 mb-1 me-2 float-end"
                     data-bs-toggle="modal"
                     data-bs-target="#deleteModal">
-                <span class="fas fa-times"></span>
+                <span class="fa-solid fa-xmark"></span>
                 Delete Card
             </button>
         }
@@ -79,7 +79,7 @@ filename = Model.CardDetail.Filename
                     <div class="row mb-3">
                         <label class="col-form-label text-md-end col-md-3">
                             Image
-                            <span class="fas fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span><br />
+                            <span class="fa-solid fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span><br />
                             (.jpg or .png)
                         </label>
                         <div class="col-md-9">
@@ -95,7 +95,7 @@ filename = Model.CardDetail.Filename
                     <div class="row mb-3">
                         <label class="col-form-label text-md-end col-md-3" asp-for="AltText">
                             Image alternative text
-                            <span class="fas fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span>
+                            <span class="fa-solid fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span>
                         </label>
                         <div class="col-md-9">
                             <input asp-for="AltText" class="form-control" />
@@ -108,7 +108,7 @@ filename = Model.CardDetail.Filename
                             id="addImageFormButton"
                             disabled="disabled"
                             button-spinner>
-                        <span class="fas fa-upload"></span>
+                        <span class="fa-solid fa-upload"></span>
                         Upload
                     </button>
                 </div>
@@ -137,7 +137,7 @@ filename = Model.CardDetail.Filename
             <div class="row d-none oc-save-warning">
                 <div class="offset-md-3 col-md-9">
                     <div class="alert alert-warning">
-                        <span class="fas fa-arrow-circle-up"></span> Unsaved changes will be lost if you change languages.
+                        <span class="fa-solid fa-circle-arrow-up"></span> Unsaved changes will be lost if you change languages.
                     </div>
                 </div>
             </div>
@@ -182,7 +182,7 @@ filename = Model.CardDetail.Filename
                 <button type="button" class="btn btn-outline-success"
                         data-bs-toggle="modal"
                         data-bs-target="#addModal">
-                    <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                    <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                     @if (string.IsNullOrEmpty(Model.CardDetail?.Filename))
                     {
                         @:Add image...
@@ -214,12 +214,12 @@ filename = Model.CardDetail.Filename
                 <button type="submit"
                         class="btn btn-outline-success btn-lg"
                         buttonspinner>
-                    <span class="far fa-save"></span>
+                    <span class="fa-regular fa-floppy-disk"></span>
                     Save
                 </button>
                 <div class="d-none oc-save-warning ms-3 flex-fill">
                     <div class="alert alert-warning mb-0">
-                        <span class="fas fa-exclamation-triangle"></span>
+                        <span class="fa-solid fa-triangle-exclamation"></span>
                         You have unsaved changes.
                     </div>
                 </div>

@@ -9,7 +9,7 @@
                 @if (Model.SupervisorsOnly)
                 {
                     <small class="text-muted">
-                        (<span class="fas fa-lock oc-section-locked"></span> Supervisors only)
+                        (<span class="fa-solid fa-lock oc-section-locked"></span> Supervisors only)
                     </small>
                 }
             </h1>
@@ -22,7 +22,7 @@
                    asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.SectionController.Name"
                    asp-route-sectionSlug="@Model.SectionSlug"
                    class="btn btn-sm btn-outline-success">
-                    <span class="fas fa-plus-circle"></span>
+                    <span class="fa-solid fa-circle-plus"></span>
                     Add Post
                 </a>
             </div>
@@ -43,12 +43,12 @@
                         </div>
                         @if (post.ShowOnHomePage && !string.IsNullOrEmpty(Model.SectionName))
                         {
-                            <span class="fas fa-home fa-fw text-muted mt-1"
+                            <span class="fa-solid fa-house fa-fw text-muted mt-1"
                                   title="This post is shown on the Intranet home page."></span>
                         }
                         @if (post.IsPinned)
                         {
-                            <span class="fas fa-map-pin fa-fw mt-1"
+                            <span class="fa-solid fa-map-pin fa-fw mt-1"
                                   title="This post is pinned to remain at the top until @post.PinnedUntil."></span>
                         }
                     </div>
@@ -63,7 +63,7 @@
                                        asp-route-postSlug="@post.Slug"
                                        asp-route-sectionSlug="@Model.SectionSlug"
                                        class="btn btn-sm btn-outline-secondary ms-3">
-                                        <span class="fas fa-edit fa-xs fa-fw" title="Edit post"></span>
+                                        <span class="fa-solid fa-pencil fa-xs fa-fw" title="Edit post"></span>
                                         Edit Post
                                     </a>
                                 </span>
@@ -182,7 +182,7 @@
                                asp-route-sectionSlug="@Model.SectionSlug"
                                asp-route-fileLibrarySlug="@fileLibrary.Slug"
                                class="btn btn-sm btn-outline-secondary">
-                                <span class="fas fa-tasks fa-fw"
+                                <span class="fa-solid fa-list-check fa-fw"
                                       title="View this file library."></span>
                             </a>
                         </div>
@@ -201,7 +201,7 @@
                                                asp-route-fileId="@file.Id">
                                                 @if (string.IsNullOrEmpty(file.FileType?.Icon))
                                                 {
-                                                    <span class="far fa-file fa-fw pe-1"></span>
+                                                    <span class="fa-regular fa-file fa-fw pe-1"></span>
                                                 }
                                                 else
                                                 {
@@ -214,7 +214,7 @@
                                             <small>
                                                 @if (string.IsNullOrEmpty(file.Size))
                                                 {
-                                                    <span class="text-danger fas fa-exclamation-triangle"
+                                                    <span class="text-danger fa-solid fa-triangle-exclamation"
                                                           title="This file appears to be missing."></span>
                                                 }
                                                 else

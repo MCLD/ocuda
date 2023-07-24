@@ -13,7 +13,7 @@
         <button data-bs-toggle="modal"
                 data-bs-target="#addModal"
                 class="btn btn-outline-success mt-2 mb-1 me-2 float-end">
-            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
             Add Group
         </button>
     </div>
@@ -46,13 +46,13 @@
                                         data-id="@group.Id"
                                         data-increase="false"
                                         disabled="@(group.Id == Model.EmediaGroups.First().Id && !Model.PaginateModel.FirstPage.HasValue ? "disabled" : null)">
-                                    <span class="fas fa-arrow-up" aria-hidden="true"></span>
+                                    <span class="fa-solid fa-arrow-up" aria-hidden="true"></span>
                                 </button>
                                 <button class="btn btn-outline-primary changeSort increaseSortButton"
                                         data-id="@group.Id"
                                         data-increase="true"
                                         disabled="@(group.Id == Model.EmediaGroups.Last().Id && !Model.PaginateModel.LastPage.HasValue ? "disabled" : null)">
-                                    <span class="fas fa-arrow-down" aria-hidden="true"></span>
+                                    <span class="fa-solid fa-arrow-down" aria-hidden="true"></span>
                                 </button>
                                 <button type="button"
                                         class="btn btn-outline-primary"
@@ -61,14 +61,14 @@
                                         data-id="@group.Id"
                                         data-name="@group.Name"
                                         title="Edit Group">
-                                    <span class="fas fa-cog" aria-hidden="true"></span>
+                                    <span class="fa-solid fa-gear" aria-hidden="true"></span>
                                 </button>
                                 <a asp-controller="@EmediaController.Name"
                                    asp-action="@(nameof(EmediaController.GroupDetails))"
                                    asp-route-id="@group.Id"
                                    class="btn btn-outline-primary"
                                    title="Edit group content">
-                                    <span class="far fa-file-alt" aria-hidden="true"></span>
+                                    <span class="fa-regular fa-file-alt" aria-hidden="true"></span>
                                 </a>
                                 <button type="button"
                                         class="btn btn-outline-danger"
@@ -76,7 +76,7 @@
                                         data-bs-target="#deleteModal"
                                         data-id="@group.Id"
                                         data-name="@group.Name">
-                                    <span class="fas fa-minus-circle" aria-hidden="true"></span>
+                                    <span class="fa-solid fa-circle-minus" aria-hidden="true"></span>
                                 </button>
                             </td>
                         </tr>

@@ -16,7 +16,7 @@
             <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
                     data-bs-toggle="modal"
                     data-bs-target="#updateSegmentModal">
-                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                 Add a Segment
             </button>
         }
@@ -24,7 +24,7 @@
         <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
                 data-bs-toggle="modal"
                 data-bs-target="#addModal">
-            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
             Add Emedia
         </button>
     </div>
@@ -42,7 +42,7 @@
                                 type="button"
                                 data-bs-toggle="modal"
                                 data-bs-target="#updateSegmentModal">
-                            <span class="far fa-edit"></span>
+                            <span class="fa-solid fa-pencil"></span>
                         </button>
                         <input asp-for="EmediaGroup.Segment.Name" class="form-control" readonly />
                     </div>
@@ -66,7 +66,7 @@
                             data-bs-target="#deleteSegmentModal"
                             data-id="@Model.EmediaGroup.Id"
                             data-name="@Model.EmediaGroup.Segment.Name">
-                        <span class="fas fa-times"></span>
+                        <span class="fa-solid fa-xmark"></span>
                         Delete Segment
                     </button>
                 </div>
@@ -96,7 +96,7 @@
                                    class="text-success"
                                    data-bs-toggle="modal"
                                    data-bs-target="#addModal">
-                                    <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                                    <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                                     Add an emedia.
                                 </a>
                             </em>
@@ -123,14 +123,14 @@
                                         data-name="@emedia.Name"
                                         data-url="@emedia.RedirectUrl"
                                         title="Edit Emedia">
-                                    <span class="fas fa-cog" aria-hidden="true"></span>
+                                    <span class="fa-solid fa-gear" aria-hidden="true"></span>
                                 </button>
                                 <a asp-controller="@EmediaController.Name"
                                    asp-action="@(nameof(EmediaController.Details))"
                                    asp-route-id="@emedia.Id"
                                    class="btn btn-outline-primary"
                                    title="Edit emedia content">
-                                    <span class="far fa-file-alt" aria-hidden="true"></span>
+                                    <span class="fa-regular fa-file-alt" aria-hidden="true"></span>
                                 </a>
                                 <button type="button"
                                         class="btn btn-outline-danger"
@@ -138,7 +138,7 @@
                                         data-bs-target="#deleteModal"
                                         data-id="@emedia.Id"
                                         data-name="@emedia.Name">
-                                    <span class="fas fa-minus-circle" aria-hidden="true"></span>
+                                    <span class="fa-solid fa-circle-minus" aria-hidden="true"></span>
                                 </button>
                             </td>
                         </tr>

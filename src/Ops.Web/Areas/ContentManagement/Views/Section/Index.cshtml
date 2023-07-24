@@ -14,7 +14,7 @@
                     data-bs-toggle="modal"
                     data-bs-target="#addModal"
                     disabled>
-                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                 Add Section
             </button>
             <form method="post"
@@ -51,7 +51,7 @@
                         <a asp-action="@nameof(SectionController.Section)"
                            asp-route-sectionslug="@userSection.Slug"
                            class="btn btn-outline-primary me-1 mb-1">
-                            <span class="fas fa-tools"></span>
+                            <span class="fa-solid fa-wrench"></span>
                             Admin
                         </a>
                         @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
@@ -59,7 +59,7 @@
                             <a asp-action="@nameof(SectionController.Permissions)"
                                asp-route-slug="@userSection.Slug"
                                class="btn btn-outline-primary me-1 mb-1">
-                                <span class="fas fa-user-plus"></span>
+                                <span class="fa-solid fa-user-plus"></span>
                                 Permissions
                             </a>
                         }
@@ -68,7 +68,7 @@
                            asp-area=""
                            asp-route-slug="@userSection.Slug"
                            class="btn btn-outline-primary me-1 mb-1">
-                            <span class="fas fa-list"></span>
+                            <span class="fa-solid fa-list"></span>
                             View
                         </a>
                     </div>

@@ -53,7 +53,7 @@
                     <span class="h5">Groups</span>
                     <a asp-action="@nameof(GroupsController.CreateGroup)"
                        class="text-success float-end">
-                        <span class="fas fa-plus-circle fa-lg"></span>
+                        <span class="fa-solid fa-circle-plus fa-lg"></span>
                     </a>
                 </div>
                 @if (Model.AllGroups.Count() == 0)
@@ -87,7 +87,7 @@
                                             @if (group.IsLocationRegion)
                                             {
                                                 
-                                                <text><span class="fas fa-check"></span></text>
+                                                <text><span class="fa-solid fa-check"></span></text>
                                             
                                             }
                                                         </td>
@@ -99,7 +99,7 @@
                                                     data-bs-target="#deleteModal"
                                                     data-id="@group.Id"
                                                     data-name="@group.GroupType">
-                                                                <span class="far fa-times-circle fa-lg"
+                                                                <span class="fa-regular fa-circle-xmark fa-lg"
                                                       aria-hidden="true"></span>
                                                             </button>
                                                         </td>

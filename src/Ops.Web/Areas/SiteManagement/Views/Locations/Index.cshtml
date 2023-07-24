@@ -25,7 +25,7 @@
         }
         <a class="btn btn-outline-success"
            asp-action="@nameof(LocationsController.AddLocation)">
-            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
             Add location
         </a>
         <a class="btn btn-outline-dark"
@@ -87,7 +87,7 @@ else
                         data-bs-target="#undeleteModal"
                         data-id="@location.Id"
                         data-name="@location.Name">
-                                <span class="fas fa-plus-circle"
+                                <span class="fa-solid fa-circle-plus"
                           aria-hidden="true"></span>
                             </button>
                         }
@@ -99,7 +99,7 @@ else
                         data-bs-target="#deleteModal"
                         data-id="@location.Id"
                         data-name="@location.Name">
-                                <span class="fas fa-minus-circle"
+                                <span class="fa-solid fa-circle-minus"
                           aria-hidden="true"></span>
                             </button>
                         }
@@ -148,7 +148,7 @@ else
                             class="btn btn-danger float-end"
                             aria-label="Confirm"
                             button-spinner>
-                        <span class="fas fa-times" aria-hidden="true"></span>
+                        <span class="fa-solid fa-xmark" aria-hidden="true"></span>
                         Delete
                     </button>
                 </div>
@@ -194,7 +194,7 @@ else
                             class="btn btn-warning float-end"
                             aria-label="Confirm"
                             button-spinner>
-                        <span class="fas fa-times" aria-hidden="true"></span>
+                        <span class="fa-solid fa-xmark" aria-hidden="true"></span>
                         Undelete
                     </button>
                 </div>

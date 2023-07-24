@@ -360,13 +360,13 @@
                            id="oc-map"
                            title="Display these coordinates on a map"
                            href="#">
-                            <span class="far fa-fw fa-map" aria-hidden="true"></span>
+                            <span class="fa-regular fa-map fa-fw" aria-hidden="true"></span>
                         </a>
                         <a class="btn btn-outline-primary"
                            id="oc-geocode"
                            title="Use address to look up coordinates"
                            href="#">
-                            <span class="fas fa-fw fa-redo-alt"
+                            <span class="fa-solid fa-rotate-right fa-fw"
                                   aria-hidden="true"></span>
                         </a>
                     </div>
@@ -406,7 +406,7 @@
                     class="btn btn-outline-success"
                     button-spinner>
                 <span class="buttonText">
-                    <span class="far fa-save"></span>
+                    <span class="fa-regular fa-floppy-disk"></span>
                     Save Location Details
                 </span>
             </button>
@@ -419,7 +419,7 @@
     <div class="row mb-3 mt-4">
         <div class="col-form-label text-md-end col-md-3">
             <label asp-for="Location.DescriptionSegmentId">
-            </label><span class="fas fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span>
+            </label><span class="fa-solid fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span>
         </div>
         <div class="col-md-9">
             <div class="input-group">
@@ -434,7 +434,7 @@
                             data-segment-display="Description"
                             data-bs-toggle="modal"
                             data-bs-target="#addSegmentModal">
-                        <span class="fas fa-fw fa-plus-circle"
+                        <span class="fa-solid fa-circle-plus fa-fw"
                               aria-hidden="true"
                               title="Add segment"></span>
                     </button>
@@ -445,7 +445,7 @@
                        asp-action="@nameof(SegmentsController.Detail)"
                        asp-controller="@SegmentsController.Name"
                        asp-route-id="@Model.Location.DescriptionSegmentId">
-                        <span class="far fa-fw fa-file-alt"
+                        <span class="fa-regular fa-file-lines fa-fw"
                               aria-hidden="true"
                               title="Edit segment"></span>
                     </a>
@@ -473,7 +473,7 @@
                             data-segment-display="Hours Override"
                             data-bs-toggle="modal"
                             data-bs-target="#addSegmentModal">
-                        <span class="fas fa-fw fa-plus-circle"
+                        <span class="fa-solid fa-circle-plus fa-fw"
                               aria-hidden="true"
                               title="Add segment"></span>
                     </button>
@@ -485,7 +485,7 @@
                             data-segment-display="Hours Override"
                             data-bs-toggle="modal"
                             data-bs-target="#removeSegmentModal">
-                        <span class="fas fa-fw fa-minus-circle"
+                        <span class="fa-solid fa-circle-minus fa-fw"
                               aria-hidden="true"
                               title="Remove segment"></span>
                     </button>
@@ -493,7 +493,7 @@
                        asp-action="@nameof(SegmentsController.Detail)"
                        asp-controller="@SegmentsController.Name"
                        asp-route-id="@Model.Location.HoursSegmentId">
-                        <span class="far fa-fw fa-file-alt"
+                        <span class="fa-regular fa-file-lines fa-fw"
                               aria-hidden="true"
                               title="Edit segment"></span>
                     </a>
@@ -521,7 +521,7 @@
                             data-segment-display="Pre-Feature"
                             data-bs-toggle="modal"
                             data-bs-target="#addSegmentModal">
-                        <span class="fas fa-fw fa-plus-circle"
+                        <span class="fa-solid fa-circle-plus fa-fw"
                               aria-hidden="true"
                               title="Add segment"></span>
                     </button>
@@ -533,7 +533,7 @@
                             data-segment-display="Pre-Feature"
                             data-bs-toggle="modal"
                             data-bs-target="#removeSegmentModal">
-                        <span class="fas fa-fw fa-minus-circle"
+                        <span class="fa-solid fa-circle-minus fa-fw"
                               aria-hidden="true"
                               title="Remove segment"></span>
                     </button>
@@ -541,7 +541,7 @@
                        asp-action="@nameof(SegmentsController.Detail)"
                        asp-controller="@SegmentsController.Name"
                        asp-route-id="@Model.Location.PreFeatureSegmentId">
-                        <span class="far fa-fw fa-file-alt"
+                        <span class="fa-regular fa-file-lines fa-fw"
                               aria-hidden="true"
                               title="Edit segment"></span>
                     </a>
@@ -569,7 +569,7 @@
                             data-segment-display="Post-Feature"
                             data-bs-toggle="modal"
                             data-bs-target="#addSegmentModal">
-                        <span class="fas fa-fw fa-plus-circle"
+                        <span class="fa-solid fa-circle-plus fa-fw"
                               aria-hidden="true"
                               title="Add segment"></span>
                     </button>
@@ -581,7 +581,7 @@
                             data-segment-display="Post-Feature"
                             data-bs-toggle="modal"
                             data-bs-target="#removeSegmentModal">
-                        <span class="fas fa-fw fa-minus-circle"
+                        <span class="fa-solid fa-circle-minus fa-fw"
                               aria-hidden="true"
                               title="Remove segment"></span>
                     </button>
@@ -589,7 +589,7 @@
                        asp-action="@nameof(SegmentsController.Detail)"
                        asp-controller="@SegmentsController.Name"
                        asp-route-id="@Model.Location.PostFeatureSegmentId">
-                        <span class="far fa-fw fa-file-alt"
+                        <span class="fa-regular fa-file-lines fa-fw"
                               aria-hidden="true"
                               title="Edit segment"></span>
                     </a>
@@ -616,7 +616,7 @@
                        asp-controller="@SocialCardsController.Name"
                        asp-action="@nameof(SocialCardsController.EditForLocation)"
                        asp-route-locationStub="@Model.LocationStub">
-                        <span class="fas fa-fw fa-plus-circle"
+                        <span class="fa-solid fa-circle-plus fa-fw"
                               aria-hidden="true"
                               title="Add social card"></span>
                     </a>
@@ -626,7 +626,7 @@
                     <button class="btn btn-outline-danger"
                             data-bs-toggle="modal"
                             data-bs-target="#removeSocialCardModal">
-                        <span class="fas fa-fw fa-minus-circle"
+                        <span class="fa-solid fa-circle-minus fa-fw"
                               aria-hidden="true"
                               title="Delete social card"></span>
                     </button>
@@ -634,7 +634,7 @@
                        asp-action="@nameof(SocialCardsController.EditForLocation)"
                        asp-controller="@SocialCardsController.Name"
                        asp-route-locationStub="@Model.LocationStub">
-                        <span class="far fa-fw fa-file-alt"
+                        <span class="fa-regular fa-file-lines fa-fw"
                               aria-hidden="true"
                               title="Edit social card"></span>
                     </a>
@@ -658,7 +658,7 @@
                             <button type="button"
                                     class="btn btn-outline-success addItemButtonModal"
                                     data-itemType="Feature">
-                                <span class="fas fa-fw fa-plus-circle"></span>
+                                <span class="fa-solid fa-circle-plus fa-fw"></span>
                             </button>
                         </th>
                     </tr>
@@ -682,12 +682,12 @@
                                     <td class="align-middle text-center">
                                         @if (!string.IsNullOrEmpty(locationFeature.Text))
                                         {
-                                            <span class="fas fa-fw fa-align-left"
+                                            <span class="fa-solid fa-align-left fa-fw"
                                                   title="Custom Text"></span>
                                         }
                                         else if (!string.IsNullOrEmpty(locationFeature.RedirectUrl))
                                         {
-                                            <span class="fas fa-fw fa-link" title="Redirect URL"></span>
+                                            <span class="fa-solid fa-link fa-fw" title="Redirect URL"></span>
                                         }
                                         else
                                         {
@@ -697,7 +697,7 @@
                                                asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.FeaturesController.Feature)"
                                                asp-route-featureName="@feature.Name?.Replace(" ", "")"
                                                target="_blank">
-                                                <span class="fas fa-fw fa-globe-americas" title="Multi-location feature"></span>
+                                                <span class="fa-solid fa-earth-americas fa-fw" title="Multi-location feature"></span>
                                             </a>
                                         }
                                     </td>
@@ -752,7 +752,7 @@
                                                 data-itemType="Feature"
                                                 data-itemId="@locationFeature.FeatureId"
                                                 data-itemName="@feature.Name">
-                                            <span class="fas fa-fw fa-minus-circle"
+                                            <span class="fa-solid fa-circle-minus fa-fw"
                                                   aria-hidden="true"></span>
                                         </button>
                                     </td>
@@ -782,7 +782,7 @@
                                     class="btn btn-outline-success addItemButtonModal"
                                     data-bs-toggle="modal"
                                     data-itemType="Group">
-                                <span class="fas fa-fw fa-plus-circle"></span>
+                                <span class="fa-solid fa-circle-plus fa-fw"></span>
                             </button>
                         </th>
                     </tr>
@@ -804,7 +804,7 @@
                                     <td class="align-middle">
                                         @if (group.IsLocationRegion)
                                         {
-                                            <span class="fas fa-fw fa-check"></span>
+                                            <span class="fa-solid fa-check fa-fw"></span>
                                         }
                                     </td>
                                     <td class="align-middle"
@@ -812,7 +812,7 @@
                                         @if (Model.Location.DisplayGroupId == group.Id)
                                         {
                                             <text>
-                                                <span class="fas fa-fw fa-check"></span>
+                                                <span class="fa-solid fa-check fa-fw"></span>
                                             </text>
                                         }
                                     </td>
@@ -822,7 +822,7 @@
                                                 data-itemType="Group"
                                                 data-itemId="@locationGroup.GroupId"
                                                 data-itemName="@group.GroupType">
-                                            <span class="fas fa-fw fa-minus-circle"
+                                            <span class="fa-solid fa-circle-minus fa-fw"
                                                   aria-hidden="true"></span>
                                         </button>
                                     </td>
@@ -886,7 +886,7 @@
             $(".addItemButtonModal").on('click', function (e) {
                 $("#addModalTitle").text("Add a " + $(this).data("itemtype"));
                 $("#addModalTitle").attr("data-objType", $(this).data("itemtype"));
-                $("#modalItemList").html('<div class="fa-3x text-center"><span class="fas fa-spinner fa-spin"></span></div>');
+                $("#modalItemList").html('<div class="fa-3x text-center"><span class="fa-solid fa-spinner fa-spin"></span></div>');
                 $("#listAddModal").modal("show");
                 GetItemList($(this).data("itemtype"));
             });
@@ -951,7 +951,7 @@
                     url = "@Url.Action(nameof(LocationsController.EditLocationGroup),LocationsController.Name)"
                     $("#editModalTitle").text("Edit Group: " + $(this).data("itemname"));
                 }
-                $("#modalItemInfo").html('<div class="fa-3x text-center"><span class="fas fa-spinner fa-spin"></span></div>');
+                $("#modalItemInfo").html('<div class="fa-3x text-center"><span class="fa-solid fa-spinner fa-spin"></span></div>');
                 $("#itemEditModal").modal("show");
                 $('#updateItem').attr('name', $(this).data("itemtype"));
                 $("#updateItem").attr("action", url);
@@ -1120,8 +1120,8 @@
             for (var index = 0; index < locations.length; index++) {
                 console.info(locations[index]);
                 var icon = document.createElement("span");
-                icon.classList.add("fas");
-                icon.classList.add("fa-map-marker-alt");
+                icon.classList.add("fa-solid");
+                icon.classList.add("fa-location-dot");
 
                 var formatAddr = document.createElement("span");
                 formatAddr.innerHTML = " " + locations[index].address;

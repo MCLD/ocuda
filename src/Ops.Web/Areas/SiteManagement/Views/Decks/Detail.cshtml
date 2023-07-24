@@ -22,7 +22,7 @@
         <a class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
            asp-action="AddCard"
            asp-route-deckid="@Model.DeckId">
-            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
             Add Card
         </a>
     </div>
@@ -48,7 +48,7 @@
             <div class="row d-none oc-save-warning">
                 <div class="offset-md-3 col-md-9">
                     <div class="alert alert-warning">
-                        <span class="fas fa-arrow-circle-up"></span> Unsaved changes will be lost if you change languages.
+                        <span class="fa-solid fa-circle-arrow-up"></span> Unsaved changes will be lost if you change languages.
                     </div>
                 </div>
             </div>
@@ -111,7 +111,7 @@ filename = cardDetail.Filename
                         <div class="d-inline-block fa-fw @Model.LanguageCssClass(cardDetail.LanguageCount)"
                      style="font-size: 1.5rem;"
                      title="@DetailViewModel.LanguageTitle(cardDetail.LanguageCount)">
-                            <span class="fas fa-language"></span>
+                            <span class="fa-solid fa-language"></span>
                         </div>
                         <div>
                             <form method="post"
@@ -121,7 +121,7 @@ filename = cardDetail.Filename
                                 <input type="hidden" name="cardId" value="@cardDetail.CardId">
                                 <button class="btn btn-sm btn-outline-info"
                                 @(cardNumber == 0 ? "disabled=disabled" : null)>
-                                    <span class="fas fa-arrow-up"></span>
+                                    <span class="fa-solid fa-arrow-up"></span>
                                 </button>
                             </form>
                             <form method="post"
@@ -131,7 +131,7 @@ filename = cardDetail.Filename
                                 <input type="hidden" name="cardId" value="@cardDetail.CardId">
                                 <button class="btn btn-sm btn-outline-info"
                                 @(cardNumber == Model.CardDetails.Count - 1 ? "disabled=disabled" : null)>
-                                    <span class="fas fa-arrow-down"></span>
+                                    <span class="fa-solid fa-arrow-down"></span>
                                 </button>
                             </form>
                         </div>

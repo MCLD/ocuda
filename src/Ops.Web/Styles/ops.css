@@ -149,7 +149,7 @@ a.rowlink {
         background-color: orange;
     }
 
-    .navcolumn-item .fas {
+    .navcolumn-item .fas, .navcolumn-item .fa-solid {
         line-height: 1.5;
     }
 

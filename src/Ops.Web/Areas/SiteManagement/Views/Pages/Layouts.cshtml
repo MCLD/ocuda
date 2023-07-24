@@ -16,7 +16,7 @@
         <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
                 data-bs-toggle="modal"
                 data-bs-target="#addModal">
-            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
             Add Layout
         </button>
     </div>
@@ -90,7 +90,7 @@
                         Cancel
                     </button>
                     <button type="submit" class="btn btn-outline-primary">
-                        <span class="far fa-copy" aria-hidden="true"></span>
+                        <span class="fa-solid fa-copy" aria-hidden="true"></span>
                         Clone layout
                     </button>
                 </div>
@@ -158,7 +158,7 @@
                         <th>Name</th>
                         <th>
                             Start Date
-                            <span class="fas fa-caret-down"></span>
+                            <span class="fa-solid fa-caret-down"></span>
                         </th>
                         <th>Items</th>
                         <th>Actions</th>
@@ -175,7 +175,7 @@
                                        class="text-success"
                                        data-bs-toggle="modal"
                                        data-bs-target="#addModal">
-                                        <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                                        <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                                         Add a page layout.
                                     </a>
                                 </em>
@@ -205,13 +205,13 @@
                                             data-startdate="@layout.StartDate?.ToString("yyyy-MM-dd")"
                                             data-starttime="@layout.StartDate?.ToString("HH:mm")"
                                             title="Edit layout name and start date">
-                                        <span class="fas fa-fw fa-cog" aria-hidden="true"></span>
+                                        <span class="fa-solid fa-gear fa-fw" aria-hidden="true"></span>
                                     </button>
                                     <a asp-action="@(nameof(PagesController.LayoutDetail))"
                                        asp-route-id="@layout.Id"
                                        class="btn btn-outline-primary"
                                        title="Edit content">
-                                        <span class="far fa-fw fa-file-alt" aria-hidden="true"></span>
+                                        <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
                                     </a>
                                     @if (LayoutsViewModel.IsClonable(layout))
                                     {
@@ -222,7 +222,7 @@
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#cloneModal"
                                                 title="Clone layout">
-                                            <span class="far fa-fw fa-copy" aria-hidden="true"></span>
+                                            <span class="fa-solid fa-copy fa-fw" aria-hidden="true"></span>
                                         </button>
                                     }
                                     <button type="button"
@@ -232,7 +232,7 @@
                                             data-id="@layout.Id"
                                             data-name="@layout.Name"
                                             title="Delete layout">
-                                        <span class="fas fa-fw fa-times-circle" aria-hidden="true"></span>
+                                        <span class="fa-solid fa-circle-xmark fa-fw" aria-hidden="true"></span>
                                     </button>
                                 </td>
                             </tr>

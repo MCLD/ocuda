@@ -15,7 +15,7 @@
               target="_blank">
                 <input type="hidden" name="PreviewId" value="@Model.PageLayout.PreviewId" />
                 <button class="btn btn-outline-info">
-                    <span class="fas fa-file-alt"></span>
+                    <span class="fa-solid fa-file-lines"></span>
                     Preview
                 </button>
             </form>
@@ -23,7 +23,7 @@
         <button class="btn btn-outline-success"
                 data-bs-toggle="modal"
                 data-bs-target="#addModal">
-            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
             Add Item
         </button>
         <a class="btn btn-outline-dark ms-2"
@@ -203,7 +203,7 @@
                     <button type="submit"
                             class="btn btn-outline-success btn-lg"
                             button-spinner>
-                        <span class="far fa-save"></span>
+                        <span class="fa-regular fa-floppy-disk"></span>
                         Save
                     </button>
                 </div>
@@ -234,7 +234,7 @@
                                class="text-success"
                                data-bs-toggle="modal"
                                data-bs-target="#addModal">
-                                    <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                                    <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                                     Add a layout item.
                                 </a>
                             </em>
@@ -295,14 +295,14 @@
                                 data-increase="false"
                                 data-item="true"
                                 disabled="@(item.Id == Model.PageLayout.Items.First().Id ? "disabled" : null)">
-                                    <span class="fas fa-fw fa-arrow-up" aria-hidden="true"></span>
+                                    <span class="fa-solid fa-arrow-up fa-fw" aria-hidden="true"></span>
                                 </button>
                                 <button class="btn btn-outline-primary changeSort increaseSortButton"
                                 data-id="@item.Id"
                                 data-increase="true"
                                 data-item="true"
                                 disabled="@(item.Id == Model.PageLayout.Items.Last().Id ? "disabled" : null)">
-                                    <span class="fas fa-fw fa-arrow-down" aria-hidden="true"></span>
+                                    <span class="fa-solid fa-arrow-down fa-fw" aria-hidden="true"></span>
                                 </button>
                                 @if (item.BannerFeatureId.HasValue)
                                 {
@@ -313,7 +313,7 @@
                                 data-id="@item.Id"
                                 data-name="@item.BannerFeature.Name"
                                 title="Edit banner name">
-                                        <span class="fas fa-fw fa-cog" aria-hidden="true"></span>
+                                        <span class="fa-solid fa-gear fa-fw" aria-hidden="true"></span>
                                     </button>
                                     <a asp-controller="@ImageFeaturesController.Name"
                            asp-action="@(nameof(ImageFeaturesController.Detail))"
@@ -321,20 +321,20 @@
                            asp-route-pageLayoutId=@Model.PageLayoutId
                            class="btn btn-outline-primary"
                            title="Edit banner content">
-                                        <span class="far fa-fw fa-file-alt" aria-hidden="true"></span>
+                                        <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
                                     </a>
                                 }
                                 else if (item.CarouselId.HasValue)
                                 {
                                     <button type="button" class="btn btn-outline-primary invisible">
-                                        <span class="fas fa-fw fa-cog" aria-hidden="true"></span>
+                                        <span class="fa-solid fa-gear fa-fw" aria-hidden="true"></span>
                                     </button>
                                     <a asp-controller="@CarouselsController.Name"
                            asp-action="@(nameof(CarouselsController.Detail))"
                            asp-route-id="@item.CarouselId.Value"
                            class="btn btn-outline-primary"
                            title="Edit carousel content">
-                                        <span class="far fa-fw fa-file-alt" aria-hidden="true"></span>
+                                        <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
                                     </a>
                                 }
                                 else if (item.DeckId.HasValue)
@@ -346,14 +346,14 @@
                                 data-id="@item.Id"
                                 data-name="@item.Deck.Name"
                                 title="Edit segment name">
-                                        <span class="fas fa-fw fa-cog" aria-hidden="true"></span>
+                                        <span class="fa-solid fa-gear fa-fw" aria-hidden="true"></span>
                                     </button>
                                     <a asp-controller="@DecksController.Name"
                            asp-action="@(nameof(DecksController.Detail))"
                            asp-route-deckId="@item.DeckId.Value"
                            class="btn btn-outline-primary"
                            title="Edit deck content">
-                                        <span class="far fa-fw fa-file-alt" aria-hidden="true"></span>
+                                        <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
                                     </a>
 
                                 }
@@ -366,7 +366,7 @@
                                 data-id="@item.Id"
                                 data-name="@item.PageFeature.Name"
                                 title="Edit feature">
-                                        <span class="fas fa-fw fa-cog" aria-hidden="true"></span>
+                                        <span class="fa-solid fa-gear fa-fw" aria-hidden="true"></span>
                                     </button>
                                     <a asp-controller="@ImageFeaturesController.Name"
                            asp-action="@(nameof(ImageFeaturesController.Detail))"
@@ -374,7 +374,7 @@
                            asp-route-pageLayoutId=@Model.PageLayoutId
                            class="btn btn-outline-primary"
                            title="Edit feature content">
-                                        <span class="far fa-fw fa-file-alt" aria-hidden="true"></span>
+                                        <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
                                     </a>
                                 }
                                 else if (item.SegmentId.HasValue)
@@ -386,14 +386,14 @@
                                 data-id="@item.Id"
                                 data-name="@item.Segment.Name"
                                 title="Edit segment name">
-                                        <span class="fas fa-fw fa-cog" aria-hidden="true"></span>
+                                        <span class="fa-solid fa-gear fa-fw" aria-hidden="true"></span>
                                     </button>
                                     <a asp-controller="@SegmentsController.Name"
                            asp-action="@(nameof(SegmentsController.Detail))"
                            asp-route-id="@item.SegmentId.Value"
                            class="btn btn-outline-primary"
                            title="Edit segment content">
-                                        <span class="far fa-fw fa-file-alt" aria-hidden="true"></span>
+                                        <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
                                     </a>
                                 }
                                 else if (item.WebslideId.HasValue)
@@ -405,7 +405,7 @@
                                 data-id="@item.Id"
                                 data-name="@item.Webslide.Name"
                                 title="Edit webslide">
-                                        <span class="fas fa-fw fa-cog" aria-hidden="true"></span>
+                                        <span class="fa-solid fa-gear fa-fw" aria-hidden="true"></span>
                                     </button>
                                     <a asp-controller="@ImageFeaturesController.Name"
                            asp-action="@(nameof(ImageFeaturesController.Detail))"
@@ -413,7 +413,7 @@
                            asp-route-pageLayoutId=@Model.PageLayoutId
                            class="btn btn-outline-primary"
                            title="Edit webslide content">
-                                        <span class="far fa-fw fa-file-alt" aria-hidden="true"></span>
+                                        <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
                                     </a>
                                 }
                                 <button type="button"
@@ -429,7 +429,7 @@
                                 data-segment="@item.SegmentId"
                                 data-webslide="@item.WebslideId"
                                 title="Delete layout item">
-                                    <span class="fas fa-fw fa-times-circle" aria-hidden="true"></span>
+                                    <span class="fa-solid fa-circle-xmark fa-fw" aria-hidden="true"></span>
                                 </button>
                             </td>
                         </tr>

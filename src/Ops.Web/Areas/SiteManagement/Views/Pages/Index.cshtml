@@ -13,7 +13,7 @@
             <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
                 data-bs-toggle="modal"
                 data-bs-target="#addModal">
-                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                 Add Page
             </button>
         }
@@ -225,7 +225,7 @@ else
                                asp-route-id="@header.Id"
                                title="Page content permissions"
                                class="btn btn-outline-primary">
-                                            <span class="fas fa-fw fa-user-plus" aria-hidden="true"></span>
+                                            <span class="fa-solid fa-user-plus fa-fw" aria-hidden="true"></span>
                                         </a>
                                         <button type="button"
                                     class="btn btn-outline-primary"
@@ -241,7 +241,7 @@ else
                                     data-featuretemplate="@header.LayoutFeatureTemplateId"
                                     data-webslidetemplate="@header.LayoutWebslideTemplateId"
                                     title="Edit page name">
-                                            <span class="fas fa-fw fa-cog" aria-hidden="true"></span>
+                                            <span class="fa-solid fa-gear fa-fw" aria-hidden="true"></span>
                                         </button>
                                     }
                                     @if (Model.IsSiteManager || Model.IsWebContentManager || Model.PermissionIds.Any(_ => header.PermissionGroupIds.Contains(_)))
@@ -250,7 +250,7 @@ else
                                asp-route-id="@header.Id"
                                class="btn btn-outline-primary"
                                title="Edit page content">
-                                            <span class="far fa-fw fa-file-alt" aria-hidden="true"></span>
+                                            <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
                                         </a>
                                     }
                                     @if (!string.IsNullOrEmpty(Model.BaseLink))
@@ -259,7 +259,7 @@ else
                                target="_blank"
                                href="@Model.MakeLink(header)"
                                title="View page">
-                                            <span class="fas fa-fw fa-external-link-alt"></span>
+                                            <span class="fa-solid fa-arrow-up-right-from-square fa-fw"></span>
                                         </a>
                                     }
                                     @if (Model.IsSiteManager)
@@ -271,7 +271,7 @@ else
                                     data-id="@header.Id"
                                     data-name="@header.PageName"
                                     title="Delete page">
-                                            <span class="fas fa-fw fa-times-circle" aria-hidden="true"></span>
+                                            <span class="fa-solid fa-circle-xmark fa-fw" aria-hidden="true"></span>
                                         </button>
                                     }
                                 </td>

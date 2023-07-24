@@ -42,11 +42,11 @@ else
                                 <td class="align-middle">
                                     @if (product.IsActive)
                                     {
-                                        <span class="far fa-fw fa-check-circle text-success"></span>
+                                        <span class="fa-regular fa-circle-check fa-fw text-success"></span>
                                     }
                                     else
                                     {
-                                        <span class="far fa-fw fa-times-circle text-danger"></span>
+                                        <span class="fa-regular fa-circle-xmark fa-fw text-danger"></span>
                                     }
                                 </td>
                                 <td class="align-middle">
@@ -56,12 +56,12 @@ else
                                target="_blank"
                                href="@Model.MakeLink(product.Slug)"
                                title="See public view">
-                                            <span class="fas fa-fw fa-external-link-alt"></span>
+                                            <span class="fa-solid fa-arrow-up-right-from-square fa-fw"></span>
                                         </a>
                                     }
                                     else
                                     {
-                                        <span class="far fa-fw fa-times-circle text-danger"></span>
+                                        <span class="fa-regular fa-circle-xmark fa-fw text-danger"></span>
                                     }
                                 </td>
                                 <td class="align-middle text-nowrap">
@@ -71,7 +71,7 @@ else
                                asp-route-productId="@product.Id"
                                title="Product Management permissions"
                                class="btn btn-outline-primary">
-                                            <span class="fas fa-fw fa-user-plus" aria-hidden="true"></span>
+                                            <span class="fa-solid fa-user-plus fa-fw" aria-hidden="true"></span>
                                         </a>
                                     }
                                     @if (Model.IsSiteManager || Model.PermissionIds?.Any(_ => product.PermissionGroupIds.Contains(_)) == true)
@@ -80,13 +80,13 @@ else
                                asp-route-productSlug="@product.Slug"
                                title="Configure product"
                                class="btn btn-outline-primary">
-                                            <span class="fas fa-fw fa-cog" aria-hidden="true"></span>
+                                            <span class="fa-solid fa-gear fa-fw" aria-hidden="true"></span>
                                         </a>
                                         <a asp-action="@nameof(ProductsController.Mapping)"
                                asp-route-productSlug="@product.Slug"
                                title="Handle mappings"
                                class="btn btn-outline-primary">
-                                            <span class="fas fa-fw fa-random" aria-hidden="true"></span>
+                                            <span class="fa-solid fa-shuffle fa-fw" aria-hidden="true"></span>
                                         </a>
                                     }
                                     &nbsp;
