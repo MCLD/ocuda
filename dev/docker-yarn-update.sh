@@ -19,7 +19,6 @@ cp /app/src/Ops.Web/node_modules/jquery-validation-unobtrusive/dist/jquery.valid
 cp /app/src/Ops.Web/node_modules/slick-carousel/slick/slick.js /app/src/Ops.Web/js
 cp /app/src/Ops.Web/node_modules/slugify/slugify.js /app/src/Ops.Web/js
 cp /app/src/Ops.Web/node_modules/commonmark/dist/commonmark.js /app/src/Ops.Web/js
-cp /app/src/Ops.Web/node_modules/fontawesome-iconpicker/dist/js/fontawesome-iconpicker.js /app/src/Ops.Web/js
 cp /app/src/Ops.Web/node_modules/smartcrop/smartcrop.js /app/src/Ops.Web/js
 cp /app/src/Ops.Web/node_modules/cropperjs/dist/cropper.js /app/src/Ops.Web/js
 cp /app/src/Ops.Web/node_modules/@popperjs/core/dist/umd/popper.js /app/src/Ops.Web/js
@@ -31,7 +30,6 @@ cp /app/src/Ops.Web/node_modules/bootstrap/dist/css/bootstrap.min.css /app/src/O
 cp /app/src/Ops.Web/node_modules/@fortawesome/fontawesome-free/css/all.css /app/src/Ops.Web/css
 cp /app/src/Ops.Web/node_modules/slick-carousel/slick/slick.css /app/src/Ops.Web/css
 cp /app/src/Ops.Web/node_modules/slick-carousel/slick/slick-theme.css /app/src/Ops.Web/css
-cp /app/src/Ops.Web/node_modules/fontawesome-iconpicker/dist/css/fontawesome-iconpicker.css /app/src/Ops.Web/css
 cp /app/src/Ops.Web/node_modules/cropperjs/dist/cropper.css /app/src/Ops.Web/css
 
 ## FontAwesome

@@ -1,12 +1,5 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Navigations.DetailsViewModel
 
-@section styles {
-    @if (Model.RoleProperties.CanHaveChildren)
-    {
-        <link rel="stylesheet" href="~/css/iconpicker.min.css" asp-append-version="true" />
-    }
-}
-
 <div class="row mb-2">
     <div class="col-sm-6">
         <h1>
@@ -358,11 +351,6 @@
 }
 
 @section scripts {
-    @if (Model.RoleProperties.CanHaveChildren)
-    {
-        <script src="~/js/iconpicker.min.js" asp-append-version="true"></script>
-    }
-
     <script>
         @if (Model.RoleProperties.MustHaveText)
         {
