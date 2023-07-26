@@ -36,7 +36,8 @@
 
 document.addEventListener("DOMContentLoaded", function () {
     $(".prom-carousel-modal").on("click", function (event) {
-        if (typeof bootstrap !== 'undefined') {
+        /*eslint no-undef: "error"*/
+        if (typeof bootstrap !== "undefined") {
             event.preventDefault();
             event.stopPropagation();
             event.stopImmediatePropagation();
