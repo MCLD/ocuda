@@ -1,0 +1,6 @@
+---
+exclude_paths:
+  src/Ops.Web/css/**
+  src/Ops.Web/js/**
+  src/Promenade.Web/css/**
+  src/Promenade.Web/js/**
