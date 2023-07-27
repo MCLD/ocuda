@@ -38,28 +38,28 @@ $(".btn-spinner").on("click", function (e) {
 function validateFile(e, filePath) {
     var file = $(e.target)[0].files[0],
         fileButton = e.target.parentElement,
-        fileDisplay = $(e.target).parents('.input-group').find(':text'),
-        fileNameField = $('#File_Name');
+        fileDisplay = $(e.target).parents(".input-group").find(":text"),
+        fileNameField = $("#File_Name");
 
     fileDisplay.val(filePath);
 
-    if (fileNameField.val().length == 0) {
-        fileNameField.val(file.name.split('.')[0]);
+    if (fileNameField.val().length === 0) {
+        fileNameField.val(file.name.split(".")[0]);
     }
 
-    $(fileButton).removeClass('btn-outline-secondary');
-    $(fileButton).addClass('btn-success');
+    $(fileButton).removeClass("btn-outline-secondary");
+    $(fileButton).addClass("btn-success");
 }
 
 function updateStub(stub, text) {
     // From https://gist.github.com/mathewbyrne/1280286
     var slug = text.toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/&/g, '-and-')
-        .replace(/[^\w\-]+/g, '')
-        .replace(/\-\-+/g, '-')
-        .replace(/^-+/, '')
-        .replace(/-+$/, '');
+        .replace(/\s+/g, "-")
+        .replace(/&/g, "-and-")
+        .replace(/[^\w\-]+/g, "")
+        .replace(/\-\-+/g, "-")
+        .replace(/^-+/, "")
+        .replace(/-+$/, "");
     stub.val(slug);
 }
 
@@ -105,8 +105,8 @@ $.validator.setDefaults({
 });
 
 function removeAttachmentItem(url, id) {
-    $.post(url, { id: id }, function (response) {
-        if (response.success == true) {
+    $.post(url, { id }, function (response) {
+        if (response.success === true) {
             var attachmentItemId = "#attachmentItem_" + id;
             $(attachmentItemId).remove();
 

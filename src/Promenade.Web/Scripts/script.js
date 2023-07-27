@@ -1,13 +1,16 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
+﻿/*global bootstrap*/
+/*eslint no-undef: "error"*/
+
+document.addEventListener("DOMContentLoaded", function () {
     $(".prom-carousel").slick({
         slidesToShow: 4,
         slidesToScroll: 4,
         autoplay: false,
         dots: false,
         prevArrow:
-            '<span class="fa-solid fa-circle-left fa-fw fa-2x prom-carousel-nav prom-carousel-prev"></span>',
+            "<span class=\"fa-solid fa-circle-left fa-fw fa-2x prom-carousel-nav prom-carousel-prev\"></span>",
         nextArrow:
-            '<span class="fa-solid fa-circle-right fa-fw fa-2x prom-carousel-nav prom-carousel-next"></span>',
+            "<span class=\"fa-solid fa-circle-right fa-fw fa-2x prom-carousel-nav prom-carousel-next\"></span>",
         responsive: [
             {
                 breakpoint: 1350,
@@ -36,7 +39,7 @@
 
 document.addEventListener("DOMContentLoaded", function () {
     $(".prom-carousel-modal").on("click", function (event) {
-        if (typeof bootstrap !== 'undefined') {
+        if (typeof bootstrap !== "undefined") {
             event.preventDefault();
             event.stopPropagation();
             event.stopImmediatePropagation();
@@ -68,9 +71,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     return a.Sort - b.Sort;
                 });
                 buttons.forEach(function (b) {
-                    $(".modal-content-footer").append('<a href="' +
+                    $(".modal-content-footer").append("<a href=\"" +
                         b.Link +
-                        '" target="_blank" class="btn btn-outline-primary m-1">' +
+                        "\" target=\"_blank\" class=\"btn btn-outline-primary m-1\">" +
                         b.Button +
                         "</a>");
                 });
