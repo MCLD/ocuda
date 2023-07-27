@@ -26,7 +26,7 @@ else
                         <thead>
                             <tr>
                                 <th>Title</th>
-                                <th>&nbsp;</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -40,12 +40,12 @@ else
                                         </td>
                                         <td align="center" class="on-top">
                                             <button type="button"
-                                    class="btn btn-danger btn-xs"
-                                    data-toggle="modal"
-                                    data-target="#deleteModal"
+                                    class="btn btn-outline-danger btn-xs"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal"
                                     data-id="@card.Id"
                                     data-name="@card.Title">
-                                                <span class="fa fa-times" aria-hidden="true"></span>
+                                        <span class="fa-solid fa-fw fa-circle-xmark" aria-hidden="true"></span>
                                             </button>
                                         </td>
                                     </tr>

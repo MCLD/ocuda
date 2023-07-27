@@ -5,15 +5,15 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Bookmarklet for reporting cover issues</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span class="visually-hidden" aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div id="bookmarklet-error-div" class="d-none">
-                    <span class="fas fa-exclamation-triangle"></span>
+                    <span class="fa-solid fa-triangle-exclamation"></span>
                     <p id="bookmarklet-error-message" class="d-inline-block"></p>
-                    <span class="fas fa-exclamation-triangle"></span>
+                    <span class="fa-solid fa-triangle-exclamation"></span>
                 </div>
                 <div id="bookmarklet-div" class="d-none">
                     <p>
@@ -32,10 +32,10 @@
         <h1>Cover Issues</h1>
     </div>
     <div class="col-12 col-md-6 py-2">
-        <button class="btn btn-outline-info float-right mx-1"
-                data-toggle="modal"
-                data-target="#bookmarkletModal">
-            <span class="fas fa-bookmark"></span>
+        <button class="btn btn-outline-info float-end mx-1"
+                data-bs-toggle="modal"
+                data-bs-target="#bookmarkletModal">
+            <span class="fa-solid fa-bookmark"></span>
             Bookmarklet
         </button>
     </div>
@@ -96,7 +96,7 @@
                             @header.BibId
                         </a>
                     </td>
-                    <td class="font-weight-bold">
+                    <td class="fw-bold">
                         @if (header.LastResolved == null)
                         {
                             if (DateTime.Now.AddDays(-7) > header.LastResolved)
@@ -119,7 +119,7 @@
                             <a href="@(Model.LeapPath + header.BibId)"
                                class="btn btn-sm btn-outline-info"
                                target="_blank">
-                                <span class="fas fa-book-reader"></span>
+                                <span class="fa-solid fa-book-open-reader"></span>
                                 Leap
                             </a>
                         }

@@ -14,9 +14,9 @@
             <h1>@Model.Location.Name</h1>
             <a aria-label="@Localizer[Promenade.NewWindowItem, @Localizer[Promenade.LocationSeeAMap]]"
                href="@Model.Location.MapLink"
-               class="btn btn-outline-secondary float-right ml-2 prom-locations-maplink d-print-none"
+               class="btn btn-outline-secondary float-end ms-2 prom-locations-maplink d-print-none"
                target="_blank">
-                <span class="fas fa-map-marker-alt"></span> Map
+                <span class="fa-solid fa-map-location-dot"></span> Map
             </a>
             @if (Model.Location.CurrentStatus != null)
             {
@@ -32,7 +32,7 @@
                     }
                 </div>
             }
-            <div class="sr-only">@Localizer[Promenade.LocationOurAddress]</div>
+            <div class="visually-hidden">@Localizer[Promenade.LocationOurAddress]</div>
             <address>
                 @Model.Location.Address
                 <br />
@@ -43,7 +43,7 @@
                 <a aria-label="@Localizer[Promenade.LocationCallUsAt, Model.Location.Phone]"
                    href="tel:@Model.Location.Phone">@Model.Location.Phone</a>
             </address>
-            <div class="sr-only">@Localizer[Promenade.LocationCurrentHours]</div>
+            <div class="visually-hidden">@Localizer[Promenade.LocationCurrentHours]</div>
             @if (Model.Location.IsAlwaysOpen)
             {
                 <p>@Localizer[Promenade.LocationOpen]</p>
@@ -105,20 +105,20 @@
     <div class="row prom-features">
         @foreach (var feature in Model.LocationFeatures)
         {
-            <div class="col-4 col-md-3 col-lg-2 mb-2">
+            <div class="col-4 col-md-3 col-lg-2 my-2">
                 @if (string.IsNullOrEmpty(feature.RedirectLink))
                 {
                     <a asp-action="@nameof(HomeController.Feature)"
                        asp-controller="@HomeController.Name"
                        asp-route-locationSlug="@Model.Location.Stub"
                        asp-route-featureSlug="@feature.Stub"
-                       data-toggle="modal"
-                       data-target="#featureModal"
+                       data-bs-toggle="modal"
+                       data-bs-target="#featureModal"
                        target="@(feature.NewTab == true ? "_blank" : null)"
                        data-featureUrl="@Url.Action(nameof(HomeController.FeatureDetails), HomeController.Name, new { locationSlug = Model.Location.Stub, featureSlug = feature.Stub })"
                        data-name="@feature.Name">
                         <span class="fa-stack fa-2x d-block mx-auto">
-                            <span class="fa fa-square fa-stack-2x"></span>
+                            <span class="fa-solid fa-square fa-stack-2x"></span>
                             <span class="@feature.Icon"
                             @(string.IsNullOrEmpty(feature.IconText) ? "" : "aria-hidden='true'")>
                                 @Html.Raw(feature.IconText)
@@ -127,7 +127,7 @@
                         @feature.Name
                         @if (feature.NewTab == true)
                         {
-                            <span class="sr-only">@Localizer[Promenade.NewWindow]</span>
+                            <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
                         }
                     </a>
                 }
@@ -135,13 +135,13 @@
                 {
                     <a href="@feature.RedirectLink" target="@(feature.NewTab == true ? "_blank" : null)">
                         <span class="fa-stack fa-2x d-block mx-auto">
-                            <span class="fa fa-square fa-stack-2x"></span>
+                            <span class="fa-solid fa-square fa-stack-2x"></span>
                             <span class="@feature.Icon"></span>
                         </span>
                         @feature.Name
                         @if (feature.NewTab.HasValue && feature.NewTab.Value == true)
                         {
-                            <span class="sr-only">@Localizer[Promenade.NewWindow]</span>
+                            <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
                         }
                     </a>
                 }
@@ -178,8 +178,8 @@
                 <div class="col-md-6 col-lg-5">
                     <a href="@Model.LocationNeighborGroup.MapImage"
                        class="map-popup"
-                       data-toggle="modal"
-                       data-target="#mapModal"
+                       data-bs-toggle="modal"
+                       data-bs-target="#mapModal"
                        target="_blank">
                         <img src="@Model.LocationNeighborGroup.MapImage"
                              class="d-block img-fluid mx-auto"
@@ -204,8 +204,8 @@
                                         {
                                             <a aria-label="@Localizer[Promenade.LocationSubscribeToName, locationGroup.Location.Name]"
                                                href="@locationGroup.Location.SubscriptionLink"
-                                               class="btn btn-sm btn-outline-secondary text-dark m-1 float-right">
-                                                <span class="far fa-envelope"></span>
+                                               class="btn btn-sm btn-outline-secondary text-dark m-1 float-end">
+                                                <span class="fa-regular fa-envelope"></span>
                                                 @Localizer[Promenade.ButtonSubscribe]
                                             </a>
                                         }
@@ -213,8 +213,8 @@
                                         {
                                             <a aria-label="@Localizer[Promenade.LocationViewEventsName, locationGroup.Location.Name]"
                                                href="@locationGroup.Location.EventLink"
-                                               class="btn btn-sm btn-outline-secondary text-dark m-1 float-right">
-                                                <span class="fas fa-calendar-alt"></span>
+                                               class="btn btn-sm btn-outline-secondary text-dark m-1 float-end">
+                                                <span class="fa-regular fa-calendar-days"></span>
                                                 @Localizer[Promenade.LocationButtonEvents]
                                             </a>
                                         }
@@ -225,9 +225,9 @@
                         <tr>
                             <td colspan="3">
                                 <a href="@Model.LocationNeighborGroup.SubscriptionUrl"
-                                   class="btn btn-sm btn-outline-secondary text-dark m-1 float-right"
+                                   class="btn btn-sm btn-outline-secondary text-dark m-1 float-end"
                                    target="_blank">
-                                    <span class="far fa-envelope"></span>
+                                    <span class="fa-regular fa-envelope"></span>
                                     @if (Model.NearbyCount == Model.NearbyEventsCount)
                                     {
                                         @Localizer[Promenade.LocationUpdatesFromAllCount, Model.NearbyEventsCount]
@@ -238,7 +238,7 @@
                                         @Localizer[Promenade.LocationUpdatesFromCount, Model.NearbyEventsCount]
                                         ;
                                     }
-                                    <span class="sr-only">@Localizer[Promenade.NewWindow]</span>
+                                    <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
                                 </a>
                             </td>
                         </tr>
@@ -262,7 +262,7 @@
             modal.find(".modal-title").html(name);
 
             var modalBody = modal.find(".modal-body");
-            modalBody.html("<span class=\"fas fa-spinner fa-2x fa-pulse\"></span>")
+            modalBody.html("<span class=\"fa-solid fa-spinner fa-2x fa-pulse\"></span>")
 
             $.getJSON(featureUrl,
                 function (response) {

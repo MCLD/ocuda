@@ -4,18 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData[Ocuda.Ops.Controllers.ViewDataKey.Title]</title>
-    <environment include="Production">
-        <link rel="stylesheet" href="~/css/main.min.css" asp-append-version="true" />
-    </environment>
-    <environment include="Development">
-        <link rel="stylesheet"
-              href="~/devmodules/bootstrap/dist/css/bootstrap.css"
-              asp-append-version="true" />
-        <link rel="stylesheet"
-              href="~/devmodules/@@fortawesome/fontawesome-free/css/all.css"
-              asp-append-version="true" />
-        <link rel="stylesheet" href="~/devstyles/ops.css" asp-append-version="true" />
-    </environment>
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/main.min.css" />
     @if (Context.Items.ContainsKey(ItemKey.ExternalCSS))
     {
         foreach (var cssUrl in (List<string>)Context.Items[ItemKey.ExternalCSS])
@@ -26,179 +16,181 @@
     @RenderSection("Styles", required: false)
 </head>
 <body>
-    <div class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-dark oc-navbar">
-        @{
-            var navigationRows = (List<NavigationRow>)Context.Items[ItemKey.NavColumn];
-            if (navigationRows?.Count > 0)
-            {
-                <a id="openNavColumn" href="#" style="margin-right: 1rem; padding: 0.5rem">
-                    <span class="fas fa-ellipsis-v fa-inverse"></span>
-                </a>
-            }
-        }
-
-        <ul class="navbar-nav oc-navbrand">
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle text-white"
-                   href="#"
-                   id="intranetDropdown"
-                   role="button"
-                   data-toggle="dropdown"
-                   title="Intranet">
-                    <span class="fas fa-info-circle"></span>
-                    Intranet
-                </a>
-                <div class="dropdown-menu">
-                    @if (Context.Items[ItemKey.Sections] != null)
-                    {
-                        @foreach (var opsSection in (ICollection<Ocuda.Ops.Models.Entities.Section>)Context.Items[ItemKey.Sections])
-                        {
-                            <a class="dropdown-item"
-                       asp-area=""
-                       asp-route-slug="@opsSection.Slug"
-                       asp-controller="@HomeController.Name"
-                       asp-action="@(nameof(HomeController.SectionIndex))">
-                                @if (!string.IsNullOrEmpty(opsSection.Icon))
-                                {
-                                    <span class="@opsSection.Icon fa-fw"></span>
-                                }
-                                @opsSection.Name
-                                @if (opsSection.SupervisorsOnly)
-                                {
-                                    <span class="text-muted fas fa-lock fa-fw oc-dropdown-locked"></span>
-                                }
-                            </a>
-                        }
-                    }
-                </div>
-            </li>
-        </ul>
-        <button class="navbar-toggler btn-sm justify-self-end" type="button"
-                data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle Navigation</span>
-            Menu
-        </button>
-
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-white"
-                       href="#"
-                       id="navbarPeopleDropdown"
-                       role="button"
-                       data-toggle="dropdown"
-                       aria-haspopup="true"
-                       aria-expanded="false"
-                       title="Customer Service">
-                        <span class="fas fa-users fa-fw"></span>
-                        Customer Service
-                    </a>
-                    <div class="dropdown-menu"
-                         aria-labelledby="navbarPeopleDropdown">
-                        <a class="dropdown-item"
-                           asp-controller="@Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Name"
-                           asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.Contact))"
-                           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Index))">
-                            <span class="far fa-clock"></span>
-                            Book a Librarian
-                        </a>
-                        <a class="dropdown-item"
-                           asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
-                           asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.Incident))"
-                           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine))">
-                            <span class="fas fa-user-injured"></span>
-                            Incident Reports
-                        </a>
-                    </div>
-                </li>
-            </ul>
-            <ul class="navbar-nav">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-white"
-                       href="#"
-                       id="navbarMaterialsDropdown"
-                       role="button"
-                       data-toggle="dropdown"
-                       aria-haspopup="true"
-                       aria-expanded="false"
-                       title="Materials">
-                        <span class="fas fa-book fa-fw"></span>
-                        Materials
-                    </a>
-                    <div class="dropdown-menu"
-                         aria-labelledby="navbarMaterialsDropdown">
-                        <a class="dropdown-item"
-                           asp-controller="@Ocuda.Ops.Controllers.Areas.CoverIssue.HomeController.Name"
-                           asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.CoverIssue))"
-                           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.CoverIssue.HomeController.Index))">
-                            <span class="fas fa-book-dead fa-fw"></span>
-                            Cover Issues
-                        </a>
-                    </div>
-                </li>
-            </ul>
-        </div>
-
-        <div class="collapse navbar-collapse justify-content-end">
-            <ul class="navbar-nav">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-white"
-                       href="#"
-                       id="navbarManagementDropdown"
-                       role="button"
-                       data-toggle="dropdown"
-                       aria-haspopup="true"
-                       aria-expanded="false"
-                       title="Management">
-                        <span class="fas fa-cog fa-fw"></span>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right"
-                         aria-labelledby="navbarManagementDropdown">
-                        <a class="dropdown-item"
-                           asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
-                           asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement))"
-                           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">
-                            <span class="fas fa-network-wired fa-fw"></span>
-                            Intranet Management
-                        </a>
-                        @if (Context.User?.HasClaim(ClaimType.HasSiteAdminRights, ClaimType.HasSiteAdminRights) == true)
-                        {
-                            <a class="dropdown-item"
-                           asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
-                           asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement))"
-                           asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">
-                                <span class="fas fa-globe-americas fa-fw"></span>
-                                Web Site Management
-                            </a>
-                        }
-                    </div>
-                </li>
-                <li class="nav-item" ActiveBy routeKey="Controller" value="Staff">
-                    <a asp-action="@nameof(StaffController.Index)"
-                       asp-area=""
-                       asp-controller="@StaffController.Name"
-                       class="nav-link text-white"
-                       title="@StaffController.Name">
-                        <span class="fas fa-fw fa-id-card-alt"></span>
-                    </a>
-                </li>
-                @if (Context.Items[ItemKey.Nickname] != null)
+    <nav class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-dark oc-navbar">
+        <div class="container-fluid m-o px-2 py-0">
+            @{
+                var navigationRows = (List<NavigationRow>)Context.Items[ItemKey.NavColumn];
+                if (navigationRows?.Count > 0)
                 {
-                    <li class="nav-item" ActiveBy routeKey="Controller" value="Profile">
-                        <a class="nav-link text-white"
-                       asp-controller="Profile"
-                       asp-action="@(nameof(ProfileController.Index))"
-                       asp-route-section=""
-                       asp-route-area=""
-                       asp-route-id="">
-                            <span class="fas fa-fw fa-user-circle fa-fw"></span>
-                            @Context.Items[ItemKey.Nickname]
+                    <a id="openNavColumn" href="#" style="margin-right: 1rem; padding: 0.5rem">
+                        <span class="fa-solid fa-ellipsis-vertical fa-inverse"></span>
+                    </a>
+                }
+            }
+
+            <ul class="navbar-nav oc-navbrand">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white"
+                       href="#"
+                       id="intranetDropdown"
+                       role="button"
+                       data-bs-toggle="dropdown"
+                       title="Intranet">
+                        <span class="fa-solid fa-circle-info"></span>
+                        Intranet
+                    </a>
+                    <div class="dropdown-menu">
+                        @if (Context.Items[ItemKey.Sections] != null)
+                        {
+                            @foreach (var opsSection in (ICollection<Ocuda.Ops.Models.Entities.Section>)Context.Items[ItemKey.Sections])
+                            {
+                                <a class="dropdown-item"
+                                   asp-area=""
+                                   asp-route-slug="@opsSection.Slug"
+                                   asp-controller="@HomeController.Name"
+                                   asp-action="@(nameof(HomeController.SectionIndex))">
+                                    @if (!string.IsNullOrEmpty(opsSection.Icon))
+                                    {
+                                        <span class="@opsSection.Icon fa-fw"></span>
+                                    }
+                                    @opsSection.Name
+                                    @if (opsSection.SupervisorsOnly)
+                                    {
+                                        <span class="text-muted fa-solid fa-lock fa-fw oc-dropdown-locked"></span>
+                                    }
+                                </a>
+                            }
+                        }
+                    </div>
+                </li>
+            </ul>
+            <button class="navbar-toggler btn-sm justify-self-end" type="button"
+                    data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                <span class="visually-hidden">Toggle Navigation</span>
+                Menu
+            </button>
+
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white"
+                           href="#"
+                           id="navbarPeopleDropdown"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-haspopup="true"
+                           aria-expanded="false"
+                           title="Customer Service">
+                            <span class="fa-solid fa-users fa-fw"></span>
+                            Customer Service
+                        </a>
+                        <div class="dropdown-menu"
+                             aria-labelledby="navbarPeopleDropdown">
+                            <a class="dropdown-item"
+                               asp-controller="@Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Name"
+                               asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.Contact))"
+                               asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Index))">
+                                <span class="fa-regular fa-clock"></span>
+                                Book a Librarian
+                            </a>
+                            <a class="dropdown-item"
+                               asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
+                               asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.Incident))"
+                               asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine))">
+                                <span class="fa-solid fa-user-injured"></span>
+                                Incident Reports
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white"
+                           href="#"
+                           id="navbarMaterialsDropdown"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-haspopup="true"
+                           aria-expanded="false"
+                           title="Materials">
+                            <span class="fa-solid fa-book fa-fw"></span>
+                            Materials
+                        </a>
+                        <div class="dropdown-menu"
+                             aria-labelledby="navbarMaterialsDropdown">
+                            <a class="dropdown-item"
+                               asp-controller="@Ocuda.Ops.Controllers.Areas.CoverIssue.HomeController.Name"
+                               asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.CoverIssue))"
+                               asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.CoverIssue.HomeController.Index))">
+                                <span class="fa-solid fa-book-skull fa-fw"></span>
+                                Cover Issues
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="collapse navbar-collapse justify-content-end">
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white"
+                           href="#"
+                           id="navbarManagementDropdown"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-haspopup="true"
+                           aria-expanded="false"
+                           title="Management">
+                            <span class="fa-solid fa-gear fa-fw"></span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end"
+                             aria-labelledby="navbarManagementDropdown">
+                            <a class="dropdown-item"
+                               asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
+                               asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement))"
+                               asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">
+                                <span class="fa-solid fa-network-wired fa-fw"></span>
+                                Intranet Management
+                            </a>
+                            @if (Context.User?.HasClaim(ClaimType.HasSiteAdminRights, ClaimType.HasSiteAdminRights) == true)
+                            {
+                                <a class="dropdown-item"
+                                   asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
+                                   asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement))"
+                                   asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">
+                                    <span class="fa-solid fa-earth-americas fa-fw"></span>
+                                    Web Site Management
+                                </a>
+                            }
+                        </div>
+                    </li>
+                    <li class="nav-item" ActiveBy routeKey="Controller" value="Staff">
+                        <a asp-action="@nameof(StaffController.Index)"
+                           asp-area=""
+                           asp-controller="@StaffController.Name"
+                           class="nav-link text-white"
+                           title="@StaffController.Name">
+                            <span class="fa-solid fa-id-card fa-fw"></span>
                         </a>
                     </li>
-                }
-            </ul>
+                    @if (Context.Items[ItemKey.Nickname] != null)
+                    {
+                        <li class="nav-item" ActiveBy routeKey="Controller" value="Profile">
+                            <a class="nav-link text-white"
+                               asp-controller="Profile"
+                               asp-action="@(nameof(ProfileController.Index))"
+                               asp-route-section=""
+                               asp-route-area=""
+                               asp-route-id="">
+                                <span class="fa-solid fa-circle-user fa-fw"></span>
+                                @Context.Items[ItemKey.Nickname]
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
         </div>
-    </div>
+    </nav>
 
     <div class="container-fluid">
         @{
@@ -217,7 +209,7 @@
                             {
                                 <div class="navcolumn-item navcolumn-collapsible">
                                     @Html.Raw(row.Name)
-                                    <span class="fas fa-chevron-right float-right"></span>
+                                    <span class="fa-solid fa-chevron-right float-end"></span>
                                 </div>
                                 <div class="collapse navcolumn-collapse">
                                     @foreach (var childRow in row.Rows)
@@ -226,20 +218,20 @@
                                             @if (childRow.Rows?.Count > 0 == false)
                                             {
                                                 <a class="navcolumn-item navcolumn-child"
-                               href="@childRow.Url">@Html.Raw(childRow.Name)</a>
+                                                   href="@childRow.Url">@Html.Raw(childRow.Name)</a>
                                             }
                                             else
                                             {
                                                 <div class="navcolumn-item navcolumn-child navcolumn-collapsible">
                                                     @Html.Raw(childRow.Name)
-                                                    <span class="fas fa-chevron-right float-right"></span>
+                                                    <span class="fa-solid fa-chevron-right float-end"></span>
                                                 </div>
                                                 <div class="collapse navcolumn-collapse">
                                                     @foreach (var grandchildRow in childRow.Rows)
                                                     {
                                                         <div class="card">
                                                             <a class="navcolumn-item navcolumn-grandchild"
-                                       href="@grandchildRow.Url">@Html.Raw(grandchildRow.Name)</a>
+                                                               href="@grandchildRow.Url">@Html.Raw(grandchildRow.Name)</a>
                                                         </div>
                                                     }
                                                 </div>
@@ -290,26 +282,8 @@
         @RenderBody()
     </div>
 
-    <environment include="Production">
-        <script src="~/js/main.min.js" asp-append-version="true"></script>
-    </environment>
-    <environment include="Development">
-        <script src="~/devmodules/jquery/dist/jquery.js" asp-append-version="true"></script>
-        <script src="~/devmodules/popper.js/dist/umd/popper.js"
-                asp-append-version="true"></script>
-        <script src="~/devmodules/bootstrap/dist/js/bootstrap.js"
-                asp-append-version="true"></script>
-        <script src="~/devmodules/jquery-validation/dist/jquery.validate.js"
-                asp-append-version="true"></script>
-        <script src="~/devmodules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js"
-                asp-append-version="true"></script>
-        <script src="~/devmodules/slick-carousel/slick/slick.js"
-                asp-append-version="true"></script>
-        <script src="~/devmodules/slugify/slugify.js"
-                asp-append-version="true"></script>
-        <script src="~/devscripts/Layout.js" asp-append-version="true"></script>
-        <script src="~/devscripts/ops.js" asp-append-version="true"></script>
-    </environment>
+    <script src="~/js/main.min.js" asp-append-version="true"></script>
+    <script src="~/js/bootstrap.min.js" asp-append-version="true"></script>
     @if (Context.Items.ContainsKey(ItemKey.ExternalJS))
     {
         foreach (var jsUrl in (List<string>)Context.Items[ItemKey.ExternalJS])

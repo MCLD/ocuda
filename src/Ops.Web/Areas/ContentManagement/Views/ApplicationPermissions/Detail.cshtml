@@ -5,7 +5,7 @@
         <h1>Application Permissions</h1>
     </div>
     <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-action="@(nameof(ApplicationPermissionsController.Index))">Back</a>
     </div>
 </div>
@@ -35,8 +35,8 @@
                                 <input asp-for="ApplicationPermission.Id" type="hidden" />
                                 <input asp-for="PermissionGroupId" value="@availableGroup.Id" type="hidden" />
                                 @availableGroup.PermissionGroupName
-                                <button class="btn btn-outline-success float-right">
-                                    <span class="fas fa-fw fa-plus-circle"></span>
+                                <button class="btn btn-outline-success float-end">
+                                    <span class="fa-solid fa-fw fa-circle-plus"></span>
                                 </button>
                             </form>
                         </li>
@@ -65,8 +65,8 @@
                                 <input asp-for="ApplicationPermission.Id" type="hidden" />
                                 <input asp-for="PermissionGroupId" value="@assignedGroup.Id" type="hidden" />
                                 @assignedGroup.PermissionGroupName
-                                <button class="btn btn-outline-danger float-right">
-                                    <span class="fas fa-fw fa-minus-circle"></span>
+                                <button class="btn btn-outline-danger float-end">
+                                    <span class="fa-solid fa-fw fa-circle-minus"></span>
                                 </button>
                             </form>
                         </li>

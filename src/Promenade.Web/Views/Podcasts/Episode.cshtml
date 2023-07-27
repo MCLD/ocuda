@@ -12,16 +12,16 @@
                     </em>
                 </div>
             </div>
-            <div class="col-12 col-lg-auto text-sm-left text-md-left text-lg-right">
+            <div class="col-12 col-lg-auto text-sm-start text-md-start text-lg-end">
                 @if (Model.PodcastItem.ShowNotesSegmentId.HasValue)
                 {
                     <div class="mb-4 mb-sm-2">
                         <a href="@Url.Action(nameof(PodcastsController.ShowNotes), new { podcastStub = Model.Podcast.Stub, episodeStub = Model.PodcastItem.Stub})"
                            target="_blank"
                            class="btn d-block d-md-inline-block btn-outline-primary">
-                           <span class="far fa-file-alt"></span>
+                           <span class="fa-regular fa-file-lines"></span>
                            @Localizer[Promenade.ViewShowNotes]
-                            <span class="sr-only">@Localizer[Promenade.NewWindow]</span>
+                            <span class="visually-hidden">@Localizer[Promenade.NewWindow]</span>
                         </a>
                     </div>
                 }
@@ -41,10 +41,12 @@
         <script>
         var player = document.getElementById("player");
         player.addEventListener("play", function () {
-            gtag('event', 'Podcast play', {
-                'event_category': '@Html.Raw(Model.Podcast.Title.Replace("'", "\\'"))',
-                'event_label': '@Model.PodcastItem.Episode.Value'
-            });
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'Podcast play', {
+                    'event_category': '@Html.Raw(Model.Podcast.Title.Replace("'", "\\'"))',
+                    'event_label': '@Model.PodcastItem.Episode.Value'
+                });
+            }
         });
         </script>
     }

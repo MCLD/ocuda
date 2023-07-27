@@ -5,7 +5,7 @@
         <h1>Digital Display Set</h1>
     </div>
     <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Sets))">Back</a>
     </div>
@@ -27,7 +27,7 @@
         <input asp-for="Id" type="hidden" />
         <span class="validation-message text-danger" asp-validation-for="Id"></span>
     }
-    <div class="form-group">
+    <div class="mb-3">
         <label asp-for="Name"></label>
         <input asp-for="Name" class="form-control" />
         <span class="validation-message text-danger" asp-validation-for="Name"></span>
@@ -39,7 +39,7 @@
     else
     {
         <button type="submit" class="btn btn-outline-success">
-            <span class="fas fa-plus-circle"></span>
+            <span class="fa-solid fa-circle-plus"></span>
             Create set
         </button>
     }

@@ -5,22 +5,22 @@
         <h1>Sections</h1>
     </div>
     <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
         @if (Model.IsSiteManager)
         {
-            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
-                    data-toggle="modal"
-                    data-target="#addModal"
+            <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addModal"
                     disabled>
-                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                 Add Section
             </button>
             <form method="post"
                   role="form"
                   action="@Url.Action(nameof(SectionController.ClearSectionCache))">
-                <button class="btn btn-outline-warning mt-2 mb-1 mr-2 float-right"
+                <button class="btn btn-outline-warning mt-2 mb-1 me-2 float-end"
                         type="submit">
                     Clear cache
                 </button>
@@ -50,16 +50,16 @@
                     <div class="card-body d-flex flex-wrap">
                         <a asp-action="@nameof(SectionController.Section)"
                            asp-route-sectionslug="@userSection.Slug"
-                           class="btn btn-outline-primary mr-1 mb-1">
-                            <span class="fas fa-tools"></span>
+                           class="btn btn-outline-primary me-1 mb-1">
+                            <span class="fa-solid fa-wrench"></span>
                             Admin
                         </a>
                         @if (Context.User?.HasClaim(ClaimType.SiteManager, ClaimType.SiteManager) == true)
                         {
                             <a asp-action="@nameof(SectionController.Permissions)"
                                asp-route-slug="@userSection.Slug"
-                               class="btn btn-outline-primary mr-1 mb-1">
-                                <span class="fas fa-user-plus"></span>
+                               class="btn btn-outline-primary me-1 mb-1">
+                                <span class="fa-solid fa-user-plus"></span>
                                 Permissions
                             </a>
                         }
@@ -67,8 +67,8 @@
                            asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.SectionIndex)"
                            asp-area=""
                            asp-route-slug="@userSection.Slug"
-                           class="btn btn-outline-primary mr-1 mb-1">
-                            <span class="fas fa-list"></span>
+                           class="btn btn-outline-primary me-1 mb-1">
+                            <span class="fa-solid fa-list"></span>
                             View
                         </a>
                     </div>

@@ -41,8 +41,8 @@
                             </td>
                             <td class="align-middle">
                                 <button class="btn btn-sm btn-outline-primary"
-                                        data-toggle="modal"
-                                        data-target="#adjustMapping"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#adjustMapping"
                                         data-id="@mapping.Id"
                                         data-name="@mapping.Name"
                                         data-locationid="@mapping.MapToLocationId">
@@ -51,8 +51,8 @@
                                 @if (mapping.MapToLocationId.HasValue)
                                 {
                                     <button class="btn btn-sm btn-outline-dark"
-                                            data-toggle="modal"
-                                            data-target="#clearMapping"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#clearMapping"
                                             data-id="@mapping.Id"
                                             data-name="@mapping.Name">
                                         Clear mapping
@@ -70,7 +70,7 @@
 <form class="d-inline" asp-action="@nameof(RosterController.AdjustMapping)">
     <div class="modal fade"
          id="adjustMapping"
-         data-backdrop="static"
+         data-bs-backdrop="static"
          data-keyboard="false"
          tabindex="-1"
          aria-labelledby="adjustMappingLabel"
@@ -80,8 +80,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="adjustMappingLabel">Adjust mapping</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="visually-hidden" aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -92,7 +92,7 @@
                 <div class="modal-footer">
                     <button type="button"
                             class="btn btn-outline-secondary"
-                            data-dismiss="modal">
+                            data-bs-dismiss="modal">
                         Close
                     </button>
                     <button type="submit" class="btn btn-outline-success">Update</button>
@@ -105,7 +105,7 @@
 <form class="d-inline" asp-action="@nameof(RosterController.AdjustMapping)">
     <div class="modal fade"
          id="clearMapping"
-         data-backdrop="static"
+         data-bs-backdrop="static"
          data-keyboard="false"
          tabindex="-1"
          aria-labelledby="clearMappingLabel"
@@ -116,8 +116,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="clearMappingLabel">Modal title</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="visually-hidden" aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body" id="clearMappingBody">
@@ -125,7 +125,7 @@
                 <div class="modal-footer">
                     <button type="button"
                             class="btn btn-outline-secondary"
-                            data-dismiss="modal">
+                            data-bs-dismiss="modal">
                         Close
                     </button>
                     <button type="submit" class="btn btn-outline-danger">Clear</button>

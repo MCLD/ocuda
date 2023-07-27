@@ -5,7 +5,7 @@
         <h1>Application Permissions</h1>
     </div>
     <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
     </div>
@@ -25,9 +25,9 @@
             <tr>
                 <td class="align-middle">
                     @permission.Data.Name
-                    <span class="far fa-question-circle"
+                    <span class="fa-regular fa-circle-question"
                           title="@permission.Data.Info"
-                          data-toggle="tooltip"
+                          data-bs-toggle="tooltip"
                           data-placement="top">
                     </span>
                 </td>
@@ -37,7 +37,7 @@
                        asp-route-id="@permission.Data.Id"
                        title="Add permission groups"
                        class="btn btn-outline-primary">
-                        <span class="fas fa-fw fa-user-plus" aria-hidden="true"></span>
+                        <span class="fa-solid fa-fw fa-user-plus" aria-hidden="true"></span>
                     </a>
                 </td>
             </tr>
@@ -49,7 +49,7 @@
 {
     <script>
         $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
+            $('[data-bs-toggle="tooltip"]').tooltip()
         })
     </script>
 }

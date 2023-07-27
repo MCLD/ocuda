@@ -14,7 +14,7 @@
     <div class="col-sm-6">
         <a asp-action="@(nameof(EmediaController.GroupDetails))"
            asp-route-id="@Model.Emedia.GroupId"
-           class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+           class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
     </div>
 </div>
 
@@ -29,18 +29,16 @@
                formgroup
                hide-required="true"
                readonly />
-        <div class="row form-group">
-            <label class="col-form-label text-md-right col-md-3" for="CategorySelection">Categories</label>
-            <div class="form-group-inner col-md-9">
+        <div class="row mb-3">
+            <label class="col-form-label text-md-end col-md-3" for="CategorySelection">Categories</label>
+            <div class="mb-3-inner col-md-9">
                 <div class="input-group">
-                    <div class="input-group-prepend">
-                        <button class="btn btn-primary"
-                                type="button"
-                                data-toggle="modal"
-                                data-target="#categoryModal">
-                            <span class="far fa-edit"></span>
-                        </button>
-                    </div>
+                    <button class="btn btn-outline-primary"
+                            type="button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#categoryModal">
+                        <span class="fa-solid fa-pencil"></span>
+                    </button>
                     <input asp-for="CategorySelection" value="@Model.CategorySelectionText" class="form-control" readonly />
                 </div>
             </div>
@@ -62,11 +60,11 @@
 
     <textarea asp-for="EmediaText.Description" formgroup></textarea>
 
-    <div class="form-group row">
-        <div class="col-md-3 text-md-right">
+    <div class="mb-3 row">
+        <div class="col-md-3 text-md-end">
             <label asp-for="EmediaText.Details" class="col-form-label"></label>
         </div>
-        <div class="form-group-inner col-md-9">
+        <div class="mb-3-inner col-md-9">
             <textarea asp-for="EmediaText.Details" markdown-editor></textarea>
             <span asp-validation-for="EmediaText.Details"
                   class="validation-message text-danger"></span>
@@ -78,7 +76,7 @@
             <button type="submit"
                     class="btn btn-outline-success btn-lg"
                     buttonspinner>
-                <span class="far fa-save"></span>
+                <span class="fa-regular fa-floppy-disk"></span>
                 Save
             </button>
         </div>

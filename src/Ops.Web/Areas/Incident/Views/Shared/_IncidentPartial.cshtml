@@ -11,18 +11,18 @@
         </h1>
     </div>
     <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-area=""
            asp-controller="@Ocuda.Ops.Controllers.HomeController.Name"
            asp-action="@nameof(Ocuda.Ops.Controllers.HomeController.Index)">Back</a>
-        <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+        <a class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
            asp-action="@nameof(HomeController.Add)"
            asp-controller="@HomeController.Name"
            asp-route-page="@(Model.Page > 1 ? Model.Page : null)">
-            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
             Add Report
         </a>
-        <a class="btn btn-outline-primary mt-2 mb-1 mr-2 float-right"
+        <a class="btn btn-outline-primary mt-2 mb-1 me-2 float-end"
            asp-action="@nameof(HomeController.Configuration)"
            asp-controller="@HomeController.Name">
             Configuration

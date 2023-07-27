@@ -29,19 +29,19 @@
         @if (Model.CanAdd)
         {
             <button class="btn btn-outline-success d-print-none"
-                data-toggle="modal"
-                data-target="#addFollowup">
-                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                data-bs-toggle="modal"
+                data-bs-target="#addFollowup">
+                <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                 Follow-up
             </button>
             <button class="btn btn-outline-success d-print-none"
-                data-toggle="modal"
-                data-target="#addRelationship">
-                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                data-bs-toggle="modal"
+                data-bs-target="#addRelationship">
+                <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                 Relationship
             </button>
         }
-        <a class="btn btn-outline-dark d-print-none ml-2"
+        <a class="btn btn-outline-dark d-print-none ms-2"
            asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
            asp-action="@nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine)"
            asp-route-page="@(Model.Page > 1 ? Model.Page : null)">Back</a>
@@ -57,8 +57,8 @@
          id="addFollowup"
          name="Follow-up"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add"
-         data-backdrop="static">
-            <div class="form-group">
+         data-bs-backdrop="static">
+            <div class="mb-3">
                 <label for="followupText">Follow-up regarding this incident:</label>
                 <textarea class="form-control"
                       name="followupText"
@@ -82,8 +82,8 @@
          id="addRelationship"
          name="Relationship"
          type="Ocuda.Utility.TagHelpers.ModalTypes.Add"
-         data-backdrop="static">
-            <div class="form-group">
+         data-bs-backdrop="static">
+            <div class="mb-3">
                 <label for="relatedIncidentId">Relate this incident to incident id number:</label>
                 <input type="number"
                    class="form-control"

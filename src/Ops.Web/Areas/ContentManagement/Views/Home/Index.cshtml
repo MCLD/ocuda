@@ -3,17 +3,17 @@
 
 <h1>Intranet management</h1>
 
-<div class="justify-content-left d-flex flex-wrap">
+<div class="row">
     <div class="col-12 col-md-4 my-2">
         <div class="card">
-            <div class="card-header lead font-weight-bold">
+            <div class="card-header lead fw-bold">
                 Digital Displays
             </div>
             <div class="card-body">
                 <a asp-area="@SectionController.Area"
                    asp-controller="@DigitalDisplaysController.Name"
                    asp-action="@nameof(DigitalDisplaysController.Index)"
-                   class="btn btn-outline-primary mt-1">View Digital Displays</a>
+                   class="btn btn-outline-dark mt-1">View Digital Displays</a>
             </div>
         </div>
     </div>
@@ -21,14 +21,14 @@
     {
         <div class="col-12 col-md-4 my-2">
             <div class="card">
-                <div class="card-header lead font-weight-bold">
+                <div class="card-header lead fw-bold">
                     Sections
                 </div>
                 <div class="card-body">
                     <a asp-area="@SectionController.Area"
                        asp-controller="@SectionController.Name"
                        asp-action="@nameof(SectionController.Index)"
-                       class="btn btn-outline-primary mt-1">View @SectionController.Name</a>
+                       class="btn btn-outline-dark mt-1">View @SectionController.Name</a>
                 </div>
             </div>
         </div>
@@ -37,22 +37,22 @@
     {
         <div class="col-12 col-md-4 my-2">
             <div class="card">
-                <div class="card-header lead font-weight-bold">
+                <div class="card-header lead fw-bold">
                     Site configuration
                 </div>
                 <div class="card-body">
                     <a asp-area="@ApplicationPermissionsController.Area"
                        asp-controller="@ApplicationPermissionsController.Name"
                        asp-action="@nameof(ApplicationPermissionsController.Index)"
-                       class="btn btn-outline-primary mt-1">Application Permissions</a>
+                       class="btn btn-outline-dark mt-1">Application Permissions</a>
                     <a asp-area="@ExternalResourcesController.Area"
                        asp-controller="@ExternalResourcesController.Name"
                        asp-action="@nameof(ExternalResourcesController.Index)"
-                       class="btn btn-outline-primary mt-1">External Resources</a>
+                       class="btn btn-outline-dark mt-1">External Resources</a>
                     <a asp-area="@SiteSettingsController.Area"
                        asp-controller="@SiteSettingsController.Name"
                        asp-action="@nameof(SiteSettingsController.Index)"
-                       class="btn btn-outline-primary mt-1">Site Settings</a>
+                       class="btn btn-outline-dark mt-1">Site Settings</a>
                 </div>
             </div>
         </div>
@@ -61,7 +61,7 @@
     {
         <div class="col-12 col-md-4 my-2">
             <div class="card">
-                <div class="card-header lead font-weight-bold">
+                <div class="card-header lead fw-bold">
                     User Management
                 </div>
                 <div class="card-body">
@@ -70,15 +70,15 @@
                         <a asp-area="@UsersController.Area"
                            asp-controller="@UsersController.Name"
                            asp-action="@nameof(UsersController.Metadata)"
-                           class="btn btn-outline-primary mt-1">User Metadata Types</a>
+                           class="btn btn-outline-dark mt-1">User Metadata Types</a>
                         <a asp-area="@UsersController.Area"
                            asp-controller="@UsersController.Name"
                            asp-action="@nameof(UsersController.Permissions)"
-                           class="btn btn-outline-primary mt-1">Permission Groups</a>
+                           class="btn btn-outline-dark mt-1">Permission Groups</a>
                         <a asp-area="@UsersController.Area"
                            asp-controller="@UsersController.Name"
                            asp-action="@nameof(UsersController.TitleClassList)"
-                           class="btn btn-outline-primary mt-1">Title Classifications</a>
+                           class="btn btn-outline-dark mt-1">Title Classifications</a>
 
                     }
                     @if (Model.HasRosterPermissions)
@@ -86,14 +86,14 @@
                         <a asp-area="@RosterController.Area"
                            asp-controller="@RosterController.Name"
                            asp-action="@nameof(RosterController.Index)"
-                           class="btn btn-outline-primary mt-1">Roster Management</a>
+                           class="btn btn-outline-dark mt-1">Roster Management</a>
                     }
                     @if (Model.HasUserSyncPermissions)
                     {
                         <a asp-area="@UserSyncController.Area"
                            asp-controller="@UserSyncController.Name"
                            asp-action="@nameof(UserSyncController.Index)"
-                           class="btn btn-outline-primary mt-1">User Sync</a>
+                           class="btn btn-outline-dark mt-1">User Sync</a>
                     }
                 </div>
             </div>

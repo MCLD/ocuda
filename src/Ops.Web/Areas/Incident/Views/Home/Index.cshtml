@@ -6,19 +6,19 @@
 {
     <div class="row">
         <div class="col-12">
-            <div class="alert alert-info">
-                Search results for: @Model.SearchText
+            <div class="alert alert-info d-flex">
+                <div class="flex-grow-1">Search results for: @Model.SearchText</div>
                 @if (Model.ViewingAll)
                 {
                     <a asp-action="@nameof(HomeController.All)"
-               class="close"
-               aria-label="Close">&times;</a>
+                       class="btn-close"
+                       aria-label="Close"></a>
                 }
                 else
                 {
                     <a asp-action="@nameof(HomeController.Mine)"
-               class="close"
-               aria-label="Close">&times;</a>
+                       class="btn-close"
+                       aria-label="Close"></a>
                 }
             </div>
         </div>
@@ -33,16 +33,12 @@
     <div class="row mb-3">
         <div class="col-12">
             <div class="input-group">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Search:</span>
-                </div>
+                <span class="input-group-text">Search:</span>
                 <input asp-for="SearchText"
                        type="text"
                        class="form-control"
                        aria-label="Search text" />
-                <div class="input-group-append">
-                    <button class="btn btn-outline-success">Go</button>
-                </div>
+                <button class="btn btn-outline-success">Go</button>
             </div>
         </div>
     </div>
@@ -70,9 +66,9 @@
                         <tr>
                             <td class="align-middle">
                                 <a asp-action="@nameof(HistoricalController.Details)"
-                           asp-route-id="@incident.Id"
-                           asp-route-page="@(Model.CurrentPage > 1 ? Model.CurrentPage : null)"
-                           asp-route-searchText="@Model.SearchText">
+                                   asp-route-id="@incident.Id"
+                                   asp-route-page="@(Model.CurrentPage > 1 ? Model.CurrentPage : null)"
+                                   asp-route-searchText="@Model.SearchText">
                                     @incident.IncidentAt.ToString("g")
                                 </a>
                             </td>
@@ -91,10 +87,10 @@
                                     }
                                     else
                                     {
-                                    <a asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
-                           asp-area=""
-                           asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
-                           asp-route-id="@incident.CreatedByUser.Username">@incident.CreatedByUser.Name</a>
+                                        <a asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
+                                           asp-area=""
+                                           asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
+                                           asp-route-id="@incident.CreatedByUser.Username">@incident.CreatedByUser.Name</a>
                                     }
                                 </td>
                             }

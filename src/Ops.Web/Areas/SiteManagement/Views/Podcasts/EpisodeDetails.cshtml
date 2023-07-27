@@ -14,26 +14,27 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Upload podcast file</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="visually-hidden" aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p>Select a file to upload:</p>
+                    <label for="UploadedFile" class="form-label">Select a file to upload (.mp3):</label>
                     <input asp-for="UploadedFile"
+                           class="form-control"
                            accept=".mp3"
                            type="file" />
                 </div>
                 <div class="modal-footer">
                     <button type="button"
                             class="btn btn-outline-secondary"
-                            data-dismiss="modal">
+                            data-bs-dismiss="modal">
                         Cancel
                     </button>
                     <button type="submit"
                             class="btn btn-outline-success"
                             button-spinner>
-                        <span class="fas fa-file-upload"></span>
+                        <span class="fa-solid fa-file-arrow-up"></span>
                         Upload file
                     </button>
                 </div>
@@ -58,26 +59,26 @@
                 <div class="modal-header">
                     <h4 class="modal-title" id="deleteModalLabel">Delete show notes</h4>
                     <button type="button"
-                            class="close"
-                            data-dismiss="modal"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
                             aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <span class="visually-hidden" aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+                    <span class="fa-solid fa-triangle-exclamation" aria-hidden="true"></span>
                     <span id="modal-text">Are you sure you want to delete the show notes for "@Model.Episode.Title"</span>
                 </div>
                 <div class="modal-footer">
                     <button type="button"
-                            class="btn btn-default"
-                            data-dismiss="modal"
+                            class="btn btn-outline-dark"
+                            data-bs-dismiss="modal"
                             style="margin-right: 1em;">
                         Cancel
                     </button>
                     <button type="submit"
                             id="delModalButton"
-                            class="btn btn-danger pull-right"
+                            class="btn btn-danger float-end"
                             aria-label="Confirm"
                             button-spinner>
                         Delete
@@ -89,7 +90,7 @@
 </div>
 
 <div class="modal fade"
-     data-backdrop="static"
+     data-bs-backdrop="static"
      data-keyboard="false"
      id="addSegmentModal"
      tabindex="-1"
@@ -109,10 +110,10 @@
                                 Add segment: Podcast - '@Model.Episode.Podcast?.Title' - Show notes #@Model.Episode.Episode.Value
                             </h5>
                             <button type="button"
-                                    class="close"
-                                    data-dismiss="modal"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
                                     aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+                                <span class="visually-hidden" aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -124,8 +125,8 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button"
-                                    class="btn btn-outline-dark mr-1"
-                                    data-dismiss="modal">
+                                    class="btn btn-outline-dark me-1"
+                                    data-bs-dismiss="modal">
                                 Cancel
                             </button>
                             <button type="submit" class="btn btn-outline-success" button-spinner>
@@ -147,7 +148,7 @@
         </h1>
     </div>
     <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 float-end"
            asp-action="@nameof(PodcastsController.Episodes)"
            asp-controller="@PodcastsController.Name"
            asp-route-podcastId="@Model.Episode.PodcastId">Back</a>
@@ -163,8 +164,8 @@
             @if (Model.EditEpisode)
             {
                 <input asp-for="Episode.Episode" type="hidden" />
-                <div class="row form-group">
-                    <div class="col-md-3 text-right">
+                <div class="row mb-3">
+                    <div class="col-md-3 text-end">
                         <label asp-for="Episode.Episode"></label>
                     </div>
                     <div class="col-md-9">
@@ -186,12 +187,12 @@
             }
             else
             {
-                <div class="row form-group">
-                    <div class="col-md-3 text-right">
+                <div class="row mb-3">
+                    <div class="col-md-3 text-end">
                         <label asp-for="Episode.PublishDate"></label>
                     </div>
                     <div class="col-md-9">
-                        <span class="text-danger font-weight-bold">
+                        <span class="text-danger fw-bold">
                             Please upload the podcast file to set a publish date.
                         </span>
                     </div>
@@ -202,7 +203,7 @@
             <button type="submit"
                     class="btn btn-outline-success btn-lg"
                     button-spinner>
-                <span class="far fa-save"></span>
+                <span class="fa-regular fa-floppy-disk"></span>
                 Save
             </button>
         </div>
@@ -212,7 +213,7 @@
 @if (Model.EditEpisode)
 {
     <div class="row my-3">
-        <div class="col-md-3 text-right">
+        <div class="col-md-3 text-end">
             <span class="h3">File details</span>
         </div>
     </div>
@@ -221,14 +222,14 @@
 
         {
             <div class="row my-3">
-                <div class="col-md-3 text-right">
+                <div class="col-md-3 text-end">
                     File name
                 </div>
                 <div class="col-md-9">
                     @if (Model.FileMissing)
                     {
                         <div class="alert alert-danger">
-                            <span class="fa fa-exclamation-triangle"></span>
+                            <span class="fa-solid fa-triangle-exclamation"></span>
                             File missing: @Model.Filename
                         </div>
 
@@ -242,7 +243,7 @@
             if (!Model.FileMissing)
             {
                 <div class="row my-3">
-                    <div class="col-md-3 text-right">
+                    <div class="col-md-3 text-end">
                         File uploaded
                     </div>
                     <div class="col-md-9">
@@ -250,7 +251,7 @@
                     </div>
                 </div>
                 <div class="row my-3">
-                    <div class="col-md-3 text-right">
+                    <div class="col-md-3 text-end">
                         File size
                     </div>
                     <div class="col-md-9">
@@ -258,7 +259,7 @@
                     </div>
                 </div>
                 <div class="row my-3">
-                    <div class="col-md-3 text-right">
+                    <div class="col-md-3 text-end">
                         Duration
                     </div>
                     <div class="col-md-9">
@@ -269,14 +270,14 @@
         }
     }
     <div class="row my-3">
-        <div class="col-md-3 text-right pt-1">
+        <div class="col-md-3 text-end pt-1">
             Upload podcast
         </div>
         <div class="col-md-9">
             <button type="button"
                     class="btn btn-sm btn-outline-primary"
-                    data-toggle="modal"
-                    data-target="#uploadModal">
+                    data-bs-toggle="modal"
+                    data-bs-target="#uploadModal">
                 @if (Model.Episode.MediaSize > 0)
                 {
                     @:Replace podcast file
@@ -289,15 +290,15 @@
         </div>
     </div>
     <div class="row my-3">
-        <div class="col-md-3 text-right">
+        <div class="col-md-3 text-end">
             Maximum allowed file size
         </div>
         <div class="col-md-9">
             @Model.MaximumFileSizeMB MB
         </div>
     </div>
-    <div class="row form-group mt-4">
-        <div class="col-form-label text-md-right col-md-3">
+    <div class="row mb-3 mt-4">
+        <div class="col-form-label text-md-end col-md-3">
             <label asp-for="Episode.ShowNotesSegmentId">
             </label>
         </div>
@@ -307,39 +308,37 @@
                        class="form-control"
                        disabled
                        value="@Model.ShowNotesSegmentName" />
-                <div class="input-group-append">
-                    @if (string.IsNullOrEmpty(Model.ShowNotesSegmentName) && Model.CanEditShowNotes)
-                    {
-                        <button id="addShowNotesSegment"
-                                class="btn btn-outline-success"
-                                data-segment="Description"
-                                data-segment-display="Description"
-                                data-toggle="modal"
-                                data-target="#addSegmentModal">
-                            <span class="fas fa-plus-circle"
-                                  aria-hidden="true"
-                                  title="Add segment"></span>
-                        </button>
-                    }
-                    else if (!string.IsNullOrEmpty(Model.ShowNotesSegmentName) && Model.CanEditShowNotes)
-                    {
-                        <a class="btn btn-outline-danger"
-                           data-target="#deleteModal"
-                           data-toggle="modal">
-                            <span class="fas fa-minus-circle"
-                                  aria-hidden="true"
-                                  title="Delete segment"></span>
-                        </a>
-                        <a class="btn btn-outline-primary"
-                           asp-action="@nameof(SegmentsController.Detail)"
-                           asp-controller="@SegmentsController.Name"
-                           asp-route-id="@Model.Episode.ShowNotesSegmentId">
-                            <span class="far fa-file-alt"
-                                  aria-hidden="true"
-                                  title="Edit segment"></span>
-                        </a>
-                    }
-                </div>
+                @if (string.IsNullOrEmpty(Model.ShowNotesSegmentName) && Model.CanEditShowNotes)
+                {
+                    <button id="addShowNotesSegment"
+                            class="btn btn-outline-success"
+                            data-segment="Description"
+                            data-segment-display="Description"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addSegmentModal">
+                        <span class="fa-solid fa-circle-plus fa-fw"
+                              aria-hidden="true"
+                              title="Add segment"></span>
+                    </button>
+                }
+                else if (!string.IsNullOrEmpty(Model.ShowNotesSegmentName) && Model.CanEditShowNotes)
+                {
+                    <a class="btn btn-outline-danger"
+                       data-bs-target="#deleteModal"
+                       data-bs-toggle="modal">
+                        <span class="fa-solid fa-circle-minus fa-fw"
+                              aria-hidden="true"
+                              title="Delete segment"></span>
+                    </a>
+                    <a class="btn btn-outline-primary"
+                       asp-action="@nameof(SegmentsController.Detail)"
+                       asp-controller="@SegmentsController.Name"
+                       asp-route-id="@Model.Episode.ShowNotesSegmentId">
+                        <span class="fa-regular fa-file-lines fa-fw"
+                              aria-hidden="true"
+                              title="Edit segment"></span>
+                    </a>
+                }
             </div>
         </div>
         <span class="validation-message text-danger"

@@ -5,15 +5,15 @@
         <h1>Pages</h1>
     </div>
     <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index))">Back</a>
         @if (Model.ShowAddPageButton)
         {
-            <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
-                data-toggle="modal"
-                data-target="#addModal">
-                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
+                data-bs-toggle="modal"
+                data-bs-target="#addModal">
+                <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                 Add Page
             </button>
         }
@@ -225,12 +225,12 @@ else
                                asp-route-id="@header.Id"
                                title="Page content permissions"
                                class="btn btn-outline-primary">
-                                            <span class="fas fa-user-plus" aria-hidden="true"></span>
+                                            <span class="fa-solid fa-user-plus fa-fw" aria-hidden="true"></span>
                                         </a>
                                         <button type="button"
                                     class="btn btn-outline-primary"
-                                    data-toggle="modal"
-                                    data-target="#editModal"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editModal"
                                     data-id="@header.Id"
                                     data-layout="@header.IsLayoutPage"
                                     data-name="@header.PageName"
@@ -241,7 +241,7 @@ else
                                     data-featuretemplate="@header.LayoutFeatureTemplateId"
                                     data-webslidetemplate="@header.LayoutWebslideTemplateId"
                                     title="Edit page name">
-                                            <span class="fas fa-cog" aria-hidden="true"></span>
+                                            <span class="fa-solid fa-gear fa-fw" aria-hidden="true"></span>
                                         </button>
                                     }
                                     @if (Model.IsSiteManager || Model.IsWebContentManager || Model.PermissionIds.Any(_ => header.PermissionGroupIds.Contains(_)))
@@ -250,7 +250,7 @@ else
                                asp-route-id="@header.Id"
                                class="btn btn-outline-primary"
                                title="Edit page content">
-                                            <span class="far fa-file-alt" aria-hidden="true"></span>
+                                            <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
                                         </a>
                                     }
                                     @if (!string.IsNullOrEmpty(Model.BaseLink))
@@ -259,19 +259,19 @@ else
                                target="_blank"
                                href="@Model.MakeLink(header)"
                                title="View page">
-                                            <span class="fas fa-external-link-alt"></span>
+                                            <span class="fa-solid fa-arrow-up-right-from-square fa-fw"></span>
                                         </a>
                                     }
                                     @if (Model.IsSiteManager)
                                     {
                                         <button type="button"
                                     class="btn btn-outline-danger"
-                                    data-toggle="modal"
-                                    data-target="#deleteModal"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal"
                                     data-id="@header.Id"
                                     data-name="@header.PageName"
                                     title="Delete page">
-                                            <span class="fas fa-times-circle" aria-hidden="true"></span>
+                                            <span class="fa-solid fa-circle-xmark fa-fw" aria-hidden="true"></span>
                                         </button>
                                     }
                                 </td>

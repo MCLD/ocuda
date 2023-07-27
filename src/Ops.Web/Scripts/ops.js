@@ -35,52 +35,38 @@ $(".btn-spinner").on("click", function (e) {
     }
 });
 
-$(document).on('change', ':file', function (e) {
-    var fileInput = $(this),
-        filePath = fileInput.val().replace(/\\/g, '/').replace(/.*\//, '');
-
-    validateFile(e, filePath);
-});
-
-$(document).on('fileselect', ':file', function (e) {
-    var fileInput = $(this),
-        filePath = fileInput.val().replace(/\\/g, '/').replace(/.*\//, '');
-
-    validateFile(e, filePath);
-});
-
 function validateFile(e, filePath) {
     var file = $(e.target)[0].files[0],
         fileButton = e.target.parentElement,
-        fileDisplay = $(e.target).parents('.input-group').find(':text'),
-        fileNameField = $('#File_Name');
+        fileDisplay = $(e.target).parents(".input-group").find(":text"),
+        fileNameField = $("#File_Name");
 
     fileDisplay.val(filePath);
 
-    if (fileNameField.val().length == 0) {
-        fileNameField.val(file.name.split('.')[0]);
+    if (fileNameField.val().length === 0) {
+        fileNameField.val(file.name.split(".")[0]);
     }
 
-    $(fileButton).removeClass('btn-outline-secondary');
-    $(fileButton).addClass('btn-success');
+    $(fileButton).removeClass("btn-outline-secondary");
+    $(fileButton).addClass("btn-success");
 }
 
 function updateStub(stub, text) {
     // From https://gist.github.com/mathewbyrne/1280286
     var slug = text.toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/&/g, '-and-')
-        .replace(/[^\w\-]+/g, '')
-        .replace(/\-\-+/g, '-')
-        .replace(/^-+/, '')
-        .replace(/-+$/, '');
+        .replace(/\s+/g, "-")
+        .replace(/&/g, "-and-")
+        .replace(/[^\w\-]+/g, "")
+        .replace(/\-\-+/g, "-")
+        .replace(/^-+/, "")
+        .replace(/-+$/, "");
     stub.val(slug);
 }
 
 function SetValidation(target, message) {
     target.addClass("input-validation-error");
 
-    var validationMessage = target.closest(".form-group-inner").find(".validation-message");
+    var validationMessage = target.closest(".mb-3-inner").find(".validation-message");
     validationMessage.removeClass("field-validation-valid");
     validationMessage.addClass("field-validation-error");
     validationMessage.text(message);
@@ -89,7 +75,7 @@ function SetValidation(target, message) {
 function ClearValidation(target) {
     target.removeClass("input-validation-error");
 
-    var validationMessage = target.closest(".form-group-inner").find(".validation-message");
+    var validationMessage = target.closest(".mb-3-inner").find(".validation-message");
     validationMessage.text("");
     validationMessage.removeClass("field-validation-error");
     validationMessage.addClass("text-danger field-validation-valid");
@@ -98,7 +84,7 @@ function ClearValidation(target) {
 function ValidateField(target, validateUrl, params) {
     ClearValidation(target);
 
-    var validationMessage = target.closest(".form-group-inner").find(".validation-message");
+    var validationMessage = target.closest(".mb-3-inner").find(".validation-message");
     validationMessage.removeClass("text-danger text-success");
     validationMessage.text("Checking...");
 
@@ -119,8 +105,8 @@ $.validator.setDefaults({
 });
 
 function removeAttachmentItem(url, id) {
-    $.post(url, { id: id }, function (response) {
-        if (response.success == true) {
+    $.post(url, { id }, function (response) {
+        if (response.success === true) {
             var attachmentItemId = "#attachmentItem_" + id;
             $(attachmentItemId).remove();
 

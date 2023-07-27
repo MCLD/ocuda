@@ -10,7 +10,7 @@
         </h1>
     </div>
     <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.Index))">Back</a>
     </div>
@@ -59,7 +59,7 @@
                         {
                             <a asp-action="@nameof(DigitalDisplaysController.AssetAssociations)"
                    asp-route-digitalDisplayAssetId="@assetInfo.Asset.Id"
-                   class="btn btn-outline-primary my-1"><span class="fas fa-paperclip"></span></a>
+                   class="btn btn-outline-primary my-1"><span class="fa-solid fa-tv"></span></a>
                         }
                     </td>
                 </tr>

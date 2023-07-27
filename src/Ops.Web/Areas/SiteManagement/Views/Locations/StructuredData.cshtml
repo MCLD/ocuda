@@ -10,7 +10,7 @@
 		</h1>
 	</div>
 	<div class="col-sm-5">
-		<a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+		<a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
 		   asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Name"
 		   asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Index))">Back</a>
 	</div>
@@ -66,19 +66,17 @@
 				   asp-for="Location.ParentOrganization"
 				   formgroup
 				   autocomplete="off" />
-			<div class="row form-group">
-				<label class="col-form-label text-md-right col-md-3">
+			<div class="row mb-3">
+				<label class="col-form-label text-md-end col-md-3">
 					Is Accessible For Free?
 				</label>
 				<div class="col-md-9">
-					<div class="custom-control custom-switch mt-2">
+					<div class="form-switch mt-2">
 						<input type="checkbox"
-							   class="custom-control-input switch"
+							   class="form-check-input"
 							   asp-for="Location.IsAccessibleForFree"
 							   value="@Model.Location.IsAccessibleForFree.ToString().ToLower()"
 							   id="isAccessibleForFree" />
-						<label class="col-form-label text-md-right col-md-3 custom-control-label text-hide"
-							   for="isAccessibleForFree"></label>
 					</div>
 				</div>
 			</div>
@@ -97,7 +95,7 @@
 					class="btn btn-outline-success"
 					button-spinner>
 				<span class="buttonText">
-					<span class="far fa-save"></span>
+					<span class="fa-regular fa-floppy-disk"></span>
 					Save Structured Data
 				</span>
 			</button>

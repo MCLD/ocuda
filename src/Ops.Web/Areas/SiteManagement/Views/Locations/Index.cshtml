@@ -25,7 +25,7 @@
         }
         <a class="btn btn-outline-success"
            asp-action="@nameof(LocationsController.AddLocation)">
-            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
             Add location
         </a>
         <a class="btn btn-outline-dark"
@@ -83,11 +83,11 @@ else
                         {
                             <button type="button"
                         class="btn btn-warning"
-                        data-toggle="modal"
-                        data-target="#undeleteModal"
+                        data-bs-toggle="modal"
+                        data-bs-target="#undeleteModal"
                         data-id="@location.Id"
                         data-name="@location.Name">
-                                <span class="fas fa-plus-circle"
+                                <span class="fa-solid fa-circle-plus"
                           aria-hidden="true"></span>
                             </button>
                         }
@@ -95,11 +95,11 @@ else
                         {
                             <button type="button"
                         class="btn btn-outline-danger"
-                        data-toggle="modal"
-                        data-target="#deleteModal"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteModal"
                         data-id="@location.Id"
                         data-name="@location.Name">
-                                <span class="fas fa-minus-circle"
+                                <span class="fa-solid fa-circle-minus"
                           aria-hidden="true"></span>
                             </button>
                         }
@@ -127,28 +127,28 @@ else
                 <div class="modal-header">
                     <h4 class="modal-title" id="deleteModalLabel">Delete Location</h4>
                     <button type="button"
-                            class="close"
-                            data-dismiss="modal"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
                             aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <span class="visually-hidden" aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+                    <span class="fa-solid fa-triangle-exclamation" aria-hidden="true"></span>
                     <span id="modal-text"></span>
                 </div>
                 <div class="modal-footer">
                     <button type="button"
-                            class="btn btn-default"
-                            data-dismiss="modal"
+                            class="btn btn-outline-dark"
+                            data-bs-dismiss="modal"
                             style="margin-right: 1em;">
                         Cancel
                     </button>
                     <button type="submit"
-                            class="btn btn-danger pull-right"
+                            class="btn btn-danger float-end"
                             aria-label="Confirm"
                             button-spinner>
-                        <span class="fas fa-times" aria-hidden="true"></span>
+                        <span class="fa-solid fa-xmark" aria-hidden="true"></span>
                         Delete
                     </button>
                 </div>
@@ -173,28 +173,28 @@ else
                 <div class="modal-header">
                     <h4 class="modal-title" id="deleteModalLabel">Undelete Location</h4>
                     <button type="button"
-                            class="close"
-                            data-dismiss="modal"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
                             aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <span class="visually-hidden" aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+                    <span class="fa-solid fa-triangle-exclamation" aria-hidden="true"></span>
                     <span id="modal-text"></span>
                 </div>
                 <div class="modal-footer">
                     <button type="button"
-                            class="btn btn-default"
-                            data-dismiss="modal"
+                            class="btn btn-outline-dark"
+                            data-bs-dismiss="modal"
                             style="margin-right: 1em;">
                         Cancel
                     </button>
                     <button type="submit"
-                            class="btn btn-warning pull-right"
+                            class="btn btn-warning float-end"
                             aria-label="Confirm"
                             button-spinner>
-                        <span class="fas fa-times" aria-hidden="true"></span>
+                        <span class="fa-solid fa-xmark" aria-hidden="true"></span>
                         Undelete
                     </button>
                 </div>

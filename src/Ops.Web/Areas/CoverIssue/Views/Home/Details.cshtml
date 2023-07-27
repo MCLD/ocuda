@@ -11,12 +11,12 @@
         @if (Model.Header.HasPendingIssue && Model.CanEdit)
         {
             <form asp-action="@nameof(HomeController.ResolveIssue)"
-                  class="d-inline-block float-right mx-1"
+                  class="d-inline-block float-end mx-1"
                   method="post"
                   role="form">
                 <input asp-for="HeaderId" value="@Model.Header.Id" type="hidden" />
                 <button type="submit" class="btn btn-outline-success">
-                    <span class="far fa-check-square"></span>
+                    <span class="fa-regular fa-square-check"></span>
                     Mark resolved
                 </button>
             </form>
@@ -25,13 +25,13 @@
         {
             <a href="@Model.LeapPath"
                target="_blank"
-               class="btn btn-outline-info float-right d-inline-block mx-1">
-                <span class="fas fa-book-reader"></span>
+               class="btn btn-outline-info float-end d-inline-block mx-1">
+                <span class="fa-solid fa-book-open-reader"></span>
                 Leap
             </a>
         }
-        <a asp-action="Index" class="btn btn-outline-secondary text-dark ml-1 mr-4 float-right">
-            <span class="fas fa-arrow-left"></span>
+        <a asp-action="Index" class="btn btn-outline-secondary text-dark ms-1 me-4 float-end">
+            <span class="fa-solid fa-arrow-left"></span>
             Back
         </a>
 
@@ -62,7 +62,7 @@
                             </td>
                             <td>@detail.CreatedAt.ToShortDateString()</td>
                             <td>
-                                <span class="@(!detail.IsResolved ? null : "fas fa-check")"></span>
+                                <span class="@(!detail.IsResolved ? null : "fa-solid fa-check")"></span>
                             </td>
                         </tr>
                     }

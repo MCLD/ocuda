@@ -8,7 +8,7 @@
         <a class="btn btn-outline-success"
            asp-controller="@SegmentWrapsController.Name"
            asp-action="@nameof(SegmentWrapsController.AddUpdate)">Add Segment Wrap</a>
-        <a class="btn btn-outline-dark ml-2"
+        <a class="btn btn-outline-dark ms-2"
            asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Name"
            asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.HomeController.Index)">Back</a>
     </div>
@@ -41,16 +41,16 @@
                     <td class="align-middle">
                         @if (!segmentWrap.IsDeleted)
                         {
-                            <a class="btn btn-sm btn-outline-info"
+                            <a class="btn btn-sm btn-outline-primary"
                    asp-action="@nameof(SegmentWrapsController.AddUpdate)"
-                   asp-route-segmentWrapId="@segmentWrap.Id"><span class="fas fa-fw fa-edit"></span></a>
+                   asp-route-segmentWrapId="@segmentWrap.Id"><span class="fa-solid fa-pencil fa-fw"></span></a>
                         }
                         @if (!segmentWrap.IsDeleted || segmentWrap.UsedByCount == 0)
                         {
                             <form class="d-inline-block"
                       asp-action="@nameof(SegmentWrapsController.Disable)"
                       asp-route-segmentWrapId="@segmentWrap.Id">
-                                <button class="btn btn-sm btn-outline-danger"><span class="fas fa-fw fa-minus-circle"></span></button>
+                                <button class="btn btn-sm btn-outline-danger"><span class="fa-solid fa-circle-minus fa-fw"></span></button>
                             </form>
 
                         }

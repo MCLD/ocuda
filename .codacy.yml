@@ -1,0 +1,10 @@
+---
+exclude_paths:
+  - src/Ops.DataProvider.SqlServer.Ops/Migrations/**
+  - src/Ops.DataProvider.SqlServer.Promenade/Migrations/**
+  - src/Ops.Web/css/**
+  - src/Ops.Web/js/**
+  - src/Ops.Web/wwwroot/**
+  - src/Promenade.Web/css/**
+  - src/Promenade.Web/js/**
+  - src/Promenade.Web/wwwroot/**

@@ -12,7 +12,7 @@
         </h1>
     </div>
     <div class="col-sm-6">
-        <a class="btn btn-outline-dark mt-2 mb-1 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.PagesController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.PagesController.Index))"
            asp-route-Type="@Model.HeaderType">Back</a>
@@ -72,9 +72,9 @@
                 {
                     <div class="col-3">
                         <button type="button"
-                                class="btn btn-danger float-right"
-                                data-toggle="modal"
-                                data-target="#deleteModal"
+                                class="btn btn-danger float-end"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal"
                                 data-headerId="@Model.Page.PageHeaderId"
                                 data-languageId="@Model.LanguageId"
                                 data-languageDescription="@Model.LanguageDescription">
@@ -99,9 +99,9 @@
 
     <input asp-for="Page.Title" formgroup />
 
-    <div class="form-group row">
-        <label asp-for="Page.Content" class="col-md-3 col-form-label text-md-right"></label>
-        <div class="form-group-inner col-md-9">
+    <div class="mb-3 row">
+        <label asp-for="Page.Content" class="col-md-3 col-form-label text-md-end"></label>
+        <div class="mb-3-inner col-md-9">
             <textarea asp-for="Page.Content" markdown-editor></textarea>
             <span asp-validation-for="Page.Content" class="validation-message text-danger"></span>
         </div>
@@ -121,7 +121,7 @@
             <button type="submit"
                     class="btn btn-outline-success btn-lg"
                     button-spinner>
-                <span class="far fa-save"></span>
+                <span class="fa-regular fa-floppy-disk"></span>
                 Save
             </button>
         </div>

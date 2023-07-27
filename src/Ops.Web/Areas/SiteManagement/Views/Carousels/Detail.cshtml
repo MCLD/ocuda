@@ -13,18 +13,18 @@
             <a asp-controller="@PagesController.Name"
                asp-action="@nameof(PagesController.LayoutDetail)"
                asp-route-id="@Model.PageLayoutId.Value"
-               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+               class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
         }
         else
         {
             <a asp-action="@nameof(CarouselsController.Index)"
-               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Cancel</a>
+               class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Cancel</a>
         }
 
-        <button class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
-                data-toggle="modal"
-                data-target="#addItemModal">
-            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+        <button class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
+                data-bs-toggle="modal"
+                data-bs-target="#addItemModal">
+            <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
             Add Carousel Item
         </button>
     </div>
@@ -134,7 +134,7 @@
                     <button type="submit"
                             class="btn btn-outline-success btn-lg"
                             button-spinner>
-                        <span class="far fa-save"></span>
+                        <span class="fa-regular fa-floppy-disk"></span>
                         Save
                     </button>
                 </div>
@@ -156,46 +156,47 @@
             foreach (var item in Model.Carousel.Items)
             {
                 <div class="accordion mt-2" id="accordion@(item.Id)">
-                    <div class="card">
-                        <div class="card-header d-flex" id="heading@(item.Id)">
-                            <div class="card-title h5 mb-0 flex-grow-1"
-                                 data-toggle="collapse"
-                                 data-target="#collapse@(item.Id)"
+                    <div class="accordion-item">
+                        <div class="accordion-header d-flex" id="heading@(item.Id)">
+                            <button class="accordion-button collapsed"
+                                 data-bs-toggle="collapse"
+                                 data-bs-target="#collapse@(item.Id)"
                                  aria-controls="collapse@(item.Id)"
                                  aria-expanded="@(Model.FocusItemId == item.Id ? "true" : "false")">
-                                <span id="disclosure@(item.Id)"
-                                      class="fas fa-caret-right mr-1"></span>
                                 @item.Name
-                            </div>
-                            <div>
+                            </button>
+                            <div class="btn-group" role="group">
                                 <button class="btn btn-sm btn-outline-primary changeSort decreaseSortButton"
                                         data-id="@item.Id"
                                         data-increase="false"
                                         data-item="true"
-                                        disabled="@(item.Id == Model.Carousel.Items.First().Id ? "disabled" : null)">
-                                    <span class="fas fa-arrow-up"></span>
+                                        disabled="@(item.Id == Model.Carousel.Items.First().Id ? "disabled" : null)"
+                                        type="button">
+                                    <span class="fa-solid fa-arrow-up"></span>
                                 </button>
                                 <button class="btn btn-sm btn-outline-primary changeSort increaseSortButton"
                                         data-id="@item.Id"
                                         data-increase="true"
                                         data-item="true"
-                                        disabled="@(item.Id == Model.Carousel.Items.Last().Id ? "disabled" : null)">
-                                    <span class="fas fa-arrow-down"></span>
+                                        disabled="@(item.Id == Model.Carousel.Items.Last().Id ? "disabled" : null)"
+                                        type="button">
+                                    <span class="fa-solid fa-arrow-down"></span>
                                 </button>
                                 <button class="btn btn-sm btn-outline-danger"
-                                        data-toggle="modal"
-                                        data-target="#deleteItemModal"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteItemModal"
                                         data-id="@item.Id"
-                                        data-name="@item.Name">
-                                    <span class="fas fa-minus-circle"></span>
+                                        data-name="@item.Name"
+                                        type="button">
+                                    <span class="fa-solid fa-circle-minus"></span>
                                 </button>
                             </div>
                         </div>
                         <div id="collapse@(item.Id)"
-                             class="collapse @(Model.FocusItemId == item.Id ? "show" : null)"
+                             class="accordion-collapse collapse"
                              data-parent="#accordion@(item.Id)"
                              aria-labelledby="heading@(item.Id)">
-                            <div class="card-body">
+                            <div class="accordion-body">
                                 @if (Model.FocusItemId == item.Id && !string.IsNullOrWhiteSpace(Model.ItemErrorMessage))
                                 {
                                     <div class="row">
@@ -238,19 +239,17 @@
                                             <button type="submit"
                                                     class="btn btn-outline-success"
                                                     button-spinner>
-                                                <span class="far fa-save"></span>
+                                                <span class="fa-regular fa-floppy-disk"></span>
                                                 Save
                                             </button>
                                         </div>
                                     </div>
                                 </form>
-                            </div>
-                            <div class="card-footer">
-                                <button class="btn btn-info mb-2"
-                                        data-toggle="modal"
-                                        data-target="#addButtonModal"
+                                <button class="btn btn-outline-primary mb-2"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#addButtonModal"
                                         data-id="@item.Id">
-                                    <span class="fas fa-plus-circle"></span>
+                                    <span class="fa-solid fa-circle-plus"></span>
                                     Add button
                                 </button>
                                 @if (item.Buttons.Count > 0)
@@ -269,30 +268,30 @@
                                                                 data-increase="false"
                                                                 data-item="false"
                                                                 disabled="@(button.Id == item.Buttons.First().Id ? "disabled" : null)">
-                                                            <span class="fas fa-arrow-up"></span>
+                                                            <span class="fa-solid fa-arrow-up"></span>
                                                         </button>
                                                         <button class="btn btn-sm btn-outline-info changeSort increaseSortButton"
                                                                 data-id="@button.Id"
                                                                 data-increase="true"
                                                                 data-item="false"
                                                                 disabled="@(button.Id == item.Buttons.Last().Id ? "disabled" : null)">
-                                                            <span class="fas fa-arrow-down"></span>
+                                                            <span class="fa-solid fa-arrow-down"></span>
                                                         </button>
                                                         <button class="btn btn-sm btn-outline-info"
-                                                                data-toggle="modal"
-                                                                data-target="#editButtonModal"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#editButtonModal"
                                                                 data-id="@button.Id"
                                                                 data-label="@button.LabelId"
                                                                 data-url="@button.Url">
-                                                            <span class="fas fa-pencil-alt"></span>
+                                                            <span class="fa-solid fa-pencil"></span>
                                                         </button>
                                                         <button class="btn btn-sm btn-outline-danger"
-                                                                data-toggle="modal"
-                                                                data-target="#deleteButtonModal"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#deleteButtonModal"
                                                                 data-id="@button.Id"
                                                                 data-item="@button.CarouselItemId"
                                                                 data-name="@button.Label.Name">
-                                                            <span class="fas fa-minus-circle"></span>
+                                                            <span class="fa-solid fa-circle-minus"></span>
                                                         </button>
                                                     </div>
                                                 </div>
@@ -300,7 +299,7 @@
                                         }
                                     </div>
                                 }
-                            </div>
+                            </div>                                
                         </div>
                     </div>
                 </div>

@@ -14,7 +14,7 @@ namespace Ocuda.Utility.TagHelpers
         private const string spinnerClass = "btn-spinner";
         private const string ignoreValidationClass = "spinner-ignore-validation";
         private const string spanTag = "span";
-        private const string spanClass = "fa fa-spinner fa-pulse fa-fw d-none";
+        private const string spanClass = "fa-solid fa-spinner fa-pulse fa-fw d-none";
 
         [HtmlAttributeName(ignoreValidationAttributeName)]
         public bool IgnoreValidation { get; set; }

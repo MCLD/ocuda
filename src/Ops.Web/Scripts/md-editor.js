@@ -1101,7 +1101,7 @@ Markdown.HookCollection = HookCollection;
 
             if (allowUploads == true) {
                 var uploadTab = doc.createElement("li");
-                uploadTab.innerHTML = '<a data-toggle="tab" class="nav-link active" href="#uploadFile"><b>Upload File</b></a>';
+                uploadTab.innerHTML = '<a data-bs-toggle="tab" class="nav-link active" href="#uploadFile"><b>Upload File</b></a>';
                 uploadTab.className = "nav-item";
                 tabs.appendChild(uploadTab);
             }
@@ -1111,7 +1111,7 @@ Markdown.HookCollection = HookCollection;
             if (allowUploads == false) {
                 navLinkClass += " active";
             }
-            inputTab.innerHTML = '<a data-toggle="tab" class="' + navLinkClass + '" href="#inputUrl"><b>Input URL</b></a>';
+            inputTab.innerHTML = '<a data-bs-toggle="tab" class="' + navLinkClass + '" href="#inputUrl"><b>Input URL</b></a>';
             inputTab.className = "nav-item";
 
             tabs.appendChild(inputTab);
@@ -1531,41 +1531,41 @@ Markdown.HookCollection = HookCollection;
                 xPosition += 25;
             };
 
-            buttons.bold = makeButton(getString("bold"), "fas fa-bold", bindCommand("doBold"));
-            buttons.italic = makeButton(getString("italic"), "fas fa-italic", bindCommand("doItalic"));
+            buttons.bold = makeButton(getString("bold"), "fa-solid fa-bold fa-fw", bindCommand("doBold"));
+            buttons.italic = makeButton(getString("italic"), "fa-solid fa-italic fa-fw", bindCommand("doItalic"));
             makeSpacer();
-            buttons.link = makeButton(getString("link"), "fas fa-link", bindCommand(function (chunk, postProcessing) {
+            buttons.link = makeButton(getString("link"), "fa-solid fa-link fa-fw", bindCommand(function (chunk, postProcessing) {
                 return this.doLinkOrImage(chunk, postProcessing, false, allowUploads);
             }));
-            buttons.quote = makeButton(getString("quote"), "fas fa-quote-left", bindCommand("doBlockquote"));
+            buttons.quote = makeButton(getString("quote"), "fa-solid fa-quote-left fa-fw", bindCommand("doBlockquote"));
             if (allowCode) {
-                buttons.code = makeButton(getString("code"), "fas fa-code", bindCommand("doCode"));
+                buttons.code = makeButton(getString("code"), "fa-solid fa-code fa-fw", bindCommand("doCode"));
             }
             if (allowImages) {
-                buttons.image = makeButton(getString("image"), "fas fa-image", bindCommand(function (chunk, postProcessing) {
+                buttons.image = makeButton(getString("image"), "fa-solid fa-image fa-fw", bindCommand(function (chunk, postProcessing) {
                     return this.doLinkOrImage(chunk, postProcessing, true, allowUploads);
                 }));
             }
             makeSpacer();
-            buttons.olist = makeButton(getString("olist"), "fas fa-list-ol", bindCommand(function (chunk, postProcessing) {
+            buttons.olist = makeButton(getString("olist"), "fa-solid fa-list-ol fa-fw", bindCommand(function (chunk, postProcessing) {
                 this.doList(chunk, postProcessing, true);
             }));
-            buttons.ulist = makeButton(getString("ulist"), "fas fa-list-ul", bindCommand(function (chunk, postProcessing) {
+            buttons.ulist = makeButton(getString("ulist"), "fa-solid fa-list-ul fa-fw", bindCommand(function (chunk, postProcessing) {
                 this.doList(chunk, postProcessing, false);
             }));
-            buttons.heading = makeButton(getString("heading"), "fas fa-heading", bindCommand("doHeading"));
+            buttons.heading = makeButton(getString("heading"), "fa-solid fa-heading fa-fw", bindCommand("doHeading"));
             if (allowHR) {
-                buttons.hr = makeButton(getString("hr"), "far fa-minus-square", bindCommand("doHorizontalRule"));
+                buttons.hr = makeButton(getString("hr"), "fa-regular fa-square-minus fa-fw", bindCommand("doHorizontalRule"));
             }
             makeSpacer();
-            buttons.undo = makeButton(getString("undo"), "fas fa-undo", null);
+            buttons.undo = makeButton(getString("undo"), "fa-solid fa-rotate-left fa-fw", null);
             buttons.undo.execute = function (manager) { if (manager) manager.undo(); };
 
             var redoTitle = /win/.test(nav.platform.toLowerCase()) ?
                 getString("redo") :
                 getString("redomac"); // mac and other non-Windows platforms
 
-            buttons.redo = makeButton(redoTitle, "fas fa-redo", null);
+            buttons.redo = makeButton(redoTitle, "fa-solid fa-rotate-right fa-fw", null);
             buttons.redo.execute = function (manager) { if (manager) manager.redo(); };
 
             if (helpOptions) {

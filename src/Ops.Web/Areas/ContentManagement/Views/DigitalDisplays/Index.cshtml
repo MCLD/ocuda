@@ -7,14 +7,14 @@
         <h1>Digital Displays</h1>
     </div>
     <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.HomeController.Index))">Back</a>
         @if (Model.IsSiteManager)
         {
-            <a class="btn btn-outline-success mt-2 mb-1 mr-2 float-right"
+            <a class="btn btn-outline-success mt-2 mb-1 me-2 float-end"
            asp-action="@nameof(DigitalDisplaysController.Provision)">
-                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                 @nameof(DigitalDisplaysController.Provision)
             </a>
         }
@@ -86,16 +86,16 @@
                         {
                             <a asp-action="@nameof(DigitalDisplaysController.UpdateDisplay)"
                    asp-route-displayId="@display.Id"
-                   class="btn btn-outline-primary my-1"><span class="fas fa-edit"></span></a>
+                   class="btn btn-outline-primary my-1"><span class="fa-solid fa-pencil"></span></a>
                             @if (!Model.HasSets(display.Id))
                             {
                                 <button type="button"
-                        data-toggle="modal"
-                        data-target="#deleteDisplay"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteDisplay"
                         data-id="@display.Id"
                         data-name="@display.Name"
                         class="btn btn-outline-danger my-1">
-                                    <span class="fas fa-minus-circle"></span>
+                                    <span class="fa-solid fa-circle-minus"></span>
                                 </button>
                             }
                         }
@@ -117,7 +117,7 @@
 <form asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.ContentManagement.DigitalDisplaysController.DeleteDisplay))">
     <div class="modal fade"
          id="deleteDisplay"
-         data-backdrop="static"
+         data-bs-backdrop="static"
          data-keyboard="false"
          tabindex="-1"
          aria-labelledby="deleteDisplayLabel"
@@ -126,8 +126,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="deleteDisplayLabel">Delete digital display</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="visually-hidden" aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -136,7 +136,7 @@
                     <strong><span id="digitalDisplayName"></span></strong>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                         Cancel
                     </button>
                     <button type="submit" class="btn btn-danger">Delete display</button>

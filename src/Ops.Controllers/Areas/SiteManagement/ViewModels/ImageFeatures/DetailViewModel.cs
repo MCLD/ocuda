@@ -89,6 +89,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.ImageFeatures
 
         public int PageLayoutId { get; set; }
 
+        public string PublicLinkBase { get; set; }
+
         [DisplayName("Language")]
         public string SelectLanguage { get; set; }
     }

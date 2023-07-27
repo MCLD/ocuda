@@ -1,12 +1,5 @@
 ﻿@model Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Navigations.DetailsViewModel
 
-@section styles {
-    @if (Model.RoleProperties.CanHaveChildren)
-    {
-        <link rel="stylesheet" href="~/css/iconpicker.min.css" asp-append-version="true" />
-    }
-}
-
 <div class="row mb-2">
     <div class="col-sm-6">
         <h1>
@@ -20,32 +13,32 @@
             <a asp-controller="@NavigationsController.Name"
                asp-action="@(nameof(NavigationsController.Details))"
                asp-route-id="@Model.Navigation.NavigationId.Value"
-               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+               class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
         }
         else
         {
             <a asp-controller="@NavigationsController.Name"
                asp-action="@(nameof(NavigationsController.Index))"
-               class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right">Back</a>
+               class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end">Back</a>
         }
         @if (Model.CanDeleteText)
         {
             <button type="button"
-                    class="btn btn-outline-danger mt-2 mb-1 mr-2 float-right"
-                    data-toggle="modal"
-                    data-target="#deleteTextModal"
+                    class="btn btn-outline-danger mt-2 mb-1 me-2 float-end"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteTextModal"
                     data-languageDescription="@Model.LanguageDescription">
-                <span class="fas fa-minus-circle"></span>
+                <span class="fa-solid fa-circle-minus"></span>
                 Delete Text
             </button>
         }
 
         @if (Model.RoleProperties.CanHaveChildren)
         {
-            <button data-toggle="modal"
-                    data-target="#addModal"
-                    class="btn btn-outline-success mt-2 mb-1 mr-2 float-right">
-                <span class="fas fa-plus-circle" aria-hidden="true"></span>
+            <button data-bs-toggle="modal"
+                    data-bs-target="#addModal"
+                    class="btn btn-outline-success mt-2 mb-1 me-2 float-end">
+                <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                 Add Navigation
             </button>
         }
@@ -58,8 +51,8 @@
         <div class="col-12">
             @if (Model.LanguageList?.Count() > 1)
             {
-                <div class="form-group row">
-                    <div class="col-md-3 text-md-right">
+                <div class="mb-3 row">
+                    <div class="col-md-3 text-md-end">
                         <label asp-for="SelectedLanguage" class="col-form-label"></label>
                     </div>
                     <div class="col-md-9">
@@ -73,7 +66,7 @@
                 <div class="row d-none oc-save-warning">
                     <div class="offset-md-3 col-md-9">
                         <div class="alert alert-warning">
-                            <span class="fas fa-arrow-circle-up"></span> Unsaved changes will be lost if you change languages.
+                            <span class="fa-solid fa-circle-arrow-up"></span> Unsaved changes will be lost if you change languages.
                         </div>
                     </div>
                 </div>
@@ -95,12 +88,12 @@
                     <button type="submit"
                             class="btn btn-outline-success btn-lg"
                             buttonspinner>
-                        <span class="far fa-save"></span>
+                        <span class="fa-regular fa-floppy-disk"></span>
                         Save
                     </button>
-                    <div class="d-none oc-save-warning ml-3 flex-fill">
+                    <div class="d-none oc-save-warning ms-3 flex-fill">
                         <div class="alert alert-warning mb-0">
-                            <span class="fas fa-exclamation-triangle"></span>
+                            <span class="fa-solid fa-triangle-exclamation"></span>
                             You have unsaved changes.
                         </div>
                     </div>
@@ -136,9 +129,9 @@
                                         Navigation has no subnavigations.
                                         <a href="#"
                                            class="text-success"
-                                           data-toggle="modal"
-                                           data-target="#addModal">
-                                            <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                                           data-bs-toggle="modal"
+                                           data-bs-target="#addModal">
+                                            <span class="fa-solid fa-circle-plus" aria-hidden="true"></span>
                                             Add a navigation.
                                         </a>
                                     </em>
@@ -165,18 +158,18 @@
                                             data-id="@navigation.Id"
                                             data-increase="false"
                                             disabled="@(navigation.Id == Model.Navigations.First().Id ? "disabled" : null)">
-                                        <span class="fas fa-arrow-up" aria-hidden="true"></span>
+                                        <span class="fa-solid fa-arrow-up fa-fw" aria-hidden="true"></span>
                                     </button>
                                     <button class="btn btn-outline-primary changeSort increaseSortButton"
                                             data-id="@navigation.Id"
                                             data-increase="true"
                                             disabled="@(navigation.Id == Model.Navigations.Last().Id ? "disabled" : null)">
-                                        <span class="fas fa-arrow-down" aria-hidden="true"></span>
+                                        <span class="fa-solid fa-arrow-down fa-fw" aria-hidden="true"></span>
                                     </button>
                                     <button type="button"
                                             class="btn btn-outline-primary"
-                                            data-toggle="modal"
-                                            data-target="#editModal"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editModal"
                                             data-id="@navigation.Id"
                                             data-name="@navigation.Name"
                                             data-nav-change="@navigation.ChangeToLinkWhenExtraSmall"
@@ -184,22 +177,22 @@
                                             data-nav-icon="@navigation.Icon"
                                             data-nav-target="@navigation.TargetNewWindow"
                                             title="Edit Navigation">
-                                        <span class="fas fa-cog" aria-hidden="true"></span>
+                                        <span class="fa-solid fa-gear fa-fw" aria-hidden="true"></span>
                                     </button>
                                     <a asp-controller="@NavigationsController.Name"
                                        asp-action="@(nameof(NavigationsController.Details))"
                                        asp-route-id="@navigation.Id"
                                        class="btn btn-outline-primary"
                                        title="Edit navigation details">
-                                        <span class="far fa-file-alt" aria-hidden="true"></span>
+                                        <span class="fa-regular fa-file-lines fa-fw" aria-hidden="true"></span>
                                     </a>
                                     <button type="button"
                                             class="btn btn-outline-danger"
-                                            data-toggle="modal"
-                                            data-target="#deleteModal"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal"
                                             data-id="@navigation.Id"
                                             data-name="@navigation.Name">
-                                        <span class="fas fa-minus-circle" aria-hidden="true"></span>
+                                        <span class="fa-solid fa-circle-minus fa-fw" aria-hidden="true"></span>
                                     </button>
                                 </td>
                             </tr>
@@ -358,11 +351,6 @@
 }
 
 @section scripts {
-    @if (Model.RoleProperties.CanHaveChildren)
-    {
-        <script src="~/js/iconpicker.min.js" asp-append-version="true"></script>
-    }
-
     <script>
         @if (Model.RoleProperties.MustHaveText)
         {

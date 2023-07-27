@@ -14,14 +14,14 @@
         </h1>
     </div>
     <div class="col-sm-5">
-        <a class="btn btn-outline-dark mt-2 mb-1 ml-2 float-right"
+        <a class="btn btn-outline-dark mt-2 mb-1 ms-2 float-end"
            asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Name"
            asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Index))">Back</a>
     </div>
 </div>
 
 <div class="modal fade"
-     data-backdrop="static"
+     data-bs-backdrop="static"
      data-keyboard="false"
      id="listAddModal"
      tabindex="-1"
@@ -31,8 +31,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addModalTitle"></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span class="visually-hidden" aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
@@ -41,8 +41,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button"
-                        class="btn btn-outline-dark mr-1"
-                        data-dismiss="modal">
+                        class="btn btn-outline-dark me-1"
+                        data-bs-dismiss="modal">
                     Close
                 </button>
             </div>
@@ -51,7 +51,7 @@
 </div>
 
 <div class="modal fade"
-     data-backdrop="static"
+     data-bs-backdrop="static"
      data-keyboard="false"
      id="itemEditModal"
      tabindex="-1"
@@ -67,8 +67,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editModalTitle">Edit Feature</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="visually-hidden" aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -77,8 +77,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button"
-                            class="btn btn-outline-dark mr-1"
-                            data-dismiss="modal">
+                            class="btn btn-outline-dark me-1"
+                            data-bs-dismiss="modal">
                         Cancel
                     </button>
                     <button type="submit"
@@ -93,7 +93,7 @@
 </div>
 
 <div class="modal fade"
-     data-backdrop="static"
+     data-bs-backdrop="static"
      data-keyboard="false"
      id="deleteModal"
      tabindex="-1"
@@ -106,24 +106,24 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="deleteModalTitle"></h5>
                         <button type="button"
-                                class="close"
-                                data-dismiss="modal"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
                                 aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                            <span class="visually-hidden" aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                     </div>
                     <div class="modal-footer">
                         <button type="button"
-                                class="btn btn-outline-dark mr-1"
-                                data-dismiss="modal">
+                                class="btn btn-outline-dark me-1"
+                                data-bs-dismiss="modal">
                             Cancel
                         </button>
                         <button type="button"
                                 class="btn btn-outline-danger"
                                 id="deleteModalConfirm"
-                                data-dismiss="modal"
+                                data-bs-dismiss="modal"
                                 button-spinner>
                             <span class="buttonText">Delete</span>
                         </button>
@@ -135,7 +135,7 @@
 </div>
 
 <div class="modal fade"
-     data-backdrop="static"
+     data-bs-backdrop="static"
      data-keyboard="false"
      id="addSegmentModal"
      tabindex="-1"
@@ -157,10 +157,10 @@
                                 Add segment: <span id="oc-show-segment-type"></span>
                             </h5>
                             <button type="button"
-                                    class="close"
-                                    data-dismiss="modal"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
                                     aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+                                <span class="visually-hidden" aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -173,8 +173,8 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button"
-                                    class="btn btn-outline-dark mr-1"
-                                    data-dismiss="modal">
+                                    class="btn btn-outline-dark me-1"
+                                    data-bs-dismiss="modal">
                                 Cancel
                             </button>
                             <button type="submit" class="btn btn-outline-success" button-spinner>
@@ -189,7 +189,7 @@
 </div>
 
 <div class="modal fade"
-     data-backdrop="static"
+     data-bs-backdrop="static"
      data-keyboard="false"
      id="removeSegmentModal"
      tabindex="-1"
@@ -211,10 +211,10 @@
                                 Remove segment: <span id="oc-show-remove-segment"></span>
                             </h5>
                             <button type="button"
-                                    class="close"
-                                    data-dismiss="modal"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
                                     aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+                                <span class="visually-hidden" aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -222,8 +222,8 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button"
-                                    class="btn btn-outline-dark mr-1"
-                                    data-dismiss="modal">
+                                    class="btn btn-outline-dark me-1"
+                                    data-bs-dismiss="modal">
                                 Cancel
                             </button>
                             <button type="submit" class="btn btn-outline-danger" button-spinner>
@@ -238,7 +238,7 @@
 </div>
 
 <div class="modal fade"
-     data-backdrop="static"
+     data-bs-backdrop="static"
      data-keyboard="false"
      id="removeSocialCardModal"
      tabindex="-1"
@@ -259,10 +259,10 @@
                                 Remove Social Card
                             </h5>
                             <button type="button"
-                                    class="close"
-                                    data-dismiss="modal"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
                                     aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+                                <span class="visually-hidden" aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -270,8 +270,8 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button"
-                                    class="btn btn-outline-dark mr-1"
-                                    data-dismiss="modal">
+                                    class="btn btn-outline-dark me-1"
+                                    data-bs-dismiss="modal">
                                 Cancel
                             </button>
                             <button type="submit" class="btn btn-outline-danger" button-spinner>
@@ -346,8 +346,8 @@
                    asp-for="Location.Country"
                    formgroup
                    autocomplete="off" />
-            <div class="row form-group mt-4">
-                <div class="col-form-label text-md-right col-md-3">
+            <div class="row mb-3 mt-4">
+                <div class="col-form-label text-md-end col-md-3">
                     <label asp-for="Location.GeoLocation"></label>
                 </div>
                 <div class="col-md-9">
@@ -356,21 +356,19 @@
                                class="form-control"
                                id="geolocation"
                                asp-for="Location.GeoLocation" />
-                        <div class="input-group-append">
-                            <a class="btn btn-outline-info"
-                               id="oc-map"
-                               title="Display these coordinates on a map"
-                               href="#">
-                                <span class="far fa-map" aria-hidden="true"></span>
-                            </a>
-                            <a class="btn btn-outline-primary"
-                               id="oc-geocode"
-                               title="Use address to look up coordinates"
-                               href="#">
-                                <span class="fas fa-redo-alt"
-                                      aria-hidden="true"></span>
-                            </a>
-                        </div>
+                        <a class="btn btn-outline-info"
+                           id="oc-map"
+                           title="Display these coordinates on a map"
+                           href="#">
+                            <span class="fa-regular fa-map fa-fw" aria-hidden="true"></span>
+                        </a>
+                        <a class="btn btn-outline-primary"
+                           id="oc-geocode"
+                           title="Use address to look up coordinates"
+                           href="#">
+                            <span class="fa-solid fa-rotate-right fa-fw"
+                                  aria-hidden="true"></span>
+                        </a>
                     </div>
                 </div>
                 <span class="validation-message text-danger"
@@ -408,7 +406,7 @@
                     class="btn btn-outline-success"
                     button-spinner>
                 <span class="buttonText">
-                    <span class="far fa-save"></span>
+                    <span class="fa-regular fa-floppy-disk"></span>
                     Save Location Details
                 </span>
             </button>
@@ -418,10 +416,10 @@
 
 @if (!Model.Location.IsNewLocation)
 {
-    <div class="row form-group mt-4">
-        <div class="col-form-label text-md-right col-md-3">
+    <div class="row mb-3 mt-4">
+        <div class="col-form-label text-md-end col-md-3">
             <label asp-for="Location.DescriptionSegmentId">
-            </label><span class="fas fa-asterisk fa-xs d-inline-block ml-2 text-danger oc-required-field-marker"></span>
+            </label><span class="fa-solid fa-asterisk fa-xs d-inline-block ms-2 text-danger oc-required-field-marker"></span>
         </div>
         <div class="col-md-9">
             <div class="input-group">
@@ -429,39 +427,37 @@
                        class="form-control"
                        disabled
                        value="@Model.DescriptionSegmentName" />
-                <div class="input-group-append">
-                    @if (string.IsNullOrEmpty(Model.DescriptionSegmentName))
-                    {
-                        <button class="btn btn-outline-success"
-                                data-segment="Description"
-                                data-segment-display="Description"
-                                data-toggle="modal"
-                                data-target="#addSegmentModal">
-                            <span class="fas fa-plus-circle"
-                                  aria-hidden="true"
-                                  title="Add segment"></span>
-                        </button>
-                    }
-                    else
-                    {
-                        <a class="btn btn-outline-primary"
-                           asp-action="@nameof(SegmentsController.Detail)"
-                           asp-controller="@SegmentsController.Name"
-                           asp-route-id="@Model.Location.DescriptionSegmentId">
-                            <span class="far fa-file-alt"
-                                  aria-hidden="true"
-                                  title="Edit segment"></span>
-                        </a>
-                    }
-                </div>
+                @if (string.IsNullOrEmpty(Model.DescriptionSegmentName))
+                {
+                    <button class="btn btn-outline-success"
+                            data-segment="Description"
+                            data-segment-display="Description"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addSegmentModal">
+                        <span class="fa-solid fa-circle-plus fa-fw"
+                              aria-hidden="true"
+                              title="Add segment"></span>
+                    </button>
+                }
+                else
+                {
+                    <a class="btn btn-outline-primary"
+                       asp-action="@nameof(SegmentsController.Detail)"
+                       asp-controller="@SegmentsController.Name"
+                       asp-route-id="@Model.Location.DescriptionSegmentId">
+                        <span class="fa-regular fa-file-lines fa-fw"
+                              aria-hidden="true"
+                              title="Edit segment"></span>
+                    </a>
+                }
             </div>
         </div>
         <span class="validation-message text-danger"
               asp-validation-for="Location.DescriptionSegmentId"></span>
     </div>
 
-    <div class="row form-group">
-        <div class="col-form-label text-md-right col-md-3">
+    <div class="row mb-3">
+        <div class="col-form-label text-md-end col-md-3">
             <label asp-for="Location.HoursSegmentId"></label>
         </div>
         <div class="col-md-9">
@@ -470,48 +466,46 @@
                        class="form-control"
                        disabled
                        value="@Model.HoursSegmentName" />
-                <div class="input-group-append">
-                    @if (string.IsNullOrEmpty(Model.HoursSegmentName))
-                    {
-                        <button class="btn btn-outline-success"
-                                data-segment="HoursOverride"
-                                data-segment-display="Hours Override"
-                                data-toggle="modal"
-                                data-target="#addSegmentModal">
-                            <span class="fas fa-plus-circle"
-                                  aria-hidden="true"
-                                  title="Add segment"></span>
-                        </button>
-                    }
-                    else
-                    {
-                        <button class="btn btn-outline-danger"
-                                data-segment="HoursOverride"
-                                data-segment-display="Hours Override"
-                                data-toggle="modal"
-                                data-target="#removeSegmentModal">
-                            <span class="fas fa-minus-circle"
-                                  aria-hidden="true"
-                                  title="Remove segment"></span>
-                        </button>
-                        <a class="btn btn-outline-primary"
-                           asp-action="@nameof(SegmentsController.Detail)"
-                           asp-controller="@SegmentsController.Name"
-                           asp-route-id="@Model.Location.HoursSegmentId">
-                            <span class="far fa-file-alt"
-                                  aria-hidden="true"
-                                  title="Edit segment"></span>
-                        </a>
-                    }
-                </div>
+                @if (string.IsNullOrEmpty(Model.HoursSegmentName))
+                {
+                    <button class="btn btn-outline-success"
+                            data-segment="HoursOverride"
+                            data-segment-display="Hours Override"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addSegmentModal">
+                        <span class="fa-solid fa-circle-plus fa-fw"
+                              aria-hidden="true"
+                              title="Add segment"></span>
+                    </button>
+                }
+                else
+                {
+                    <button class="btn btn-outline-danger"
+                            data-segment="HoursOverride"
+                            data-segment-display="Hours Override"
+                            data-bs-toggle="modal"
+                            data-bs-target="#removeSegmentModal">
+                        <span class="fa-solid fa-circle-minus fa-fw"
+                              aria-hidden="true"
+                              title="Remove segment"></span>
+                    </button>
+                    <a class="btn btn-outline-primary"
+                       asp-action="@nameof(SegmentsController.Detail)"
+                       asp-controller="@SegmentsController.Name"
+                       asp-route-id="@Model.Location.HoursSegmentId">
+                        <span class="fa-regular fa-file-lines fa-fw"
+                              aria-hidden="true"
+                              title="Edit segment"></span>
+                    </a>
+                }
             </div>
         </div>
         <span class="validation-message text-danger"
               asp-validation-for="Location.HoursSegmentId"></span>
     </div>
 
-    <div class="row form-group">
-        <div class="col-form-label text-md-right col-md-3">
+    <div class="row mb-3">
+        <div class="col-form-label text-md-end col-md-3">
             <label asp-for="Location.PreFeatureSegmentId"></label>
         </div>
         <div class="col-md-9">
@@ -520,48 +514,46 @@
                        class="form-control"
                        disabled
                        value="@Model.PreFeatureSegmentName" />
-                <div class="input-group-append">
-                    @if (string.IsNullOrEmpty(Model.PreFeatureSegmentName))
-                    {
-                        <button class="btn btn-outline-success"
-                                data-segment="PreFeature"
-                                data-segment-display="Pre-Feature"
-                                data-toggle="modal"
-                                data-target="#addSegmentModal">
-                            <span class="fas fa-plus-circle"
-                                  aria-hidden="true"
-                                  title="Add segment"></span>
-                        </button>
-                    }
-                    else
-                    {
-                        <button class="btn btn-outline-danger"
-                                data-segment="PreFeature"
-                                data-segment-display="Pre-Feature"
-                                data-toggle="modal"
-                                data-target="#removeSegmentModal">
-                            <span class="fas fa-minus-circle"
-                                  aria-hidden="true"
-                                  title="Remove segment"></span>
-                        </button>
-                        <a class="btn btn-outline-primary"
-                           asp-action="@nameof(SegmentsController.Detail)"
-                           asp-controller="@SegmentsController.Name"
-                           asp-route-id="@Model.Location.PreFeatureSegmentId">
-                            <span class="far fa-file-alt"
-                                  aria-hidden="true"
-                                  title="Edit segment"></span>
-                        </a>
-                    }
-                </div>
+                @if (string.IsNullOrEmpty(Model.PreFeatureSegmentName))
+                {
+                    <button class="btn btn-outline-success"
+                            data-segment="PreFeature"
+                            data-segment-display="Pre-Feature"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addSegmentModal">
+                        <span class="fa-solid fa-circle-plus fa-fw"
+                              aria-hidden="true"
+                              title="Add segment"></span>
+                    </button>
+                }
+                else
+                {
+                    <button class="btn btn-outline-danger"
+                            data-segment="PreFeature"
+                            data-segment-display="Pre-Feature"
+                            data-bs-toggle="modal"
+                            data-bs-target="#removeSegmentModal">
+                        <span class="fa-solid fa-circle-minus fa-fw"
+                              aria-hidden="true"
+                              title="Remove segment"></span>
+                    </button>
+                    <a class="btn btn-outline-primary"
+                       asp-action="@nameof(SegmentsController.Detail)"
+                       asp-controller="@SegmentsController.Name"
+                       asp-route-id="@Model.Location.PreFeatureSegmentId">
+                        <span class="fa-regular fa-file-lines fa-fw"
+                              aria-hidden="true"
+                              title="Edit segment"></span>
+                    </a>
+                }
             </div>
         </div>
         <span class="validation-message text-danger"
               asp-validation-for="Location.PreFeatureSegmentId"></span>
     </div>
 
-    <div class="row form-group">
-        <div class="col-form-label text-md-right col-md-3">
+    <div class="row mb-3">
+        <div class="col-form-label text-md-end col-md-3">
             <label asp-for="Location.PostFeatureSegmentId"></label>
         </div>
         <div class="col-md-9">
@@ -570,48 +562,46 @@
                        class="form-control"
                        disabled
                        value="@Model.PostFeatureSegmentName" />
-                <div class="input-group-append">
-                    @if (string.IsNullOrEmpty(Model.PostFeatureSegmentName))
-                    {
-                        <button class="btn btn-outline-success"
-                                data-segment="PostFeature"
-                                data-segment-display="Post-Feature"
-                                data-toggle="modal"
-                                data-target="#addSegmentModal">
-                            <span class="fas fa-plus-circle"
-                                  aria-hidden="true"
-                                  title="Add segment"></span>
-                        </button>
-                    }
-                    else
-                    {
-                        <button class="btn btn-outline-danger"
-                                data-segment="PostFeature"
-                                data-segment-display="Post-Feature"
-                                data-toggle="modal"
-                                data-target="#removeSegmentModal">
-                            <span class="fas fa-minus-circle"
-                                  aria-hidden="true"
-                                  title="Remove segment"></span>
-                        </button>
-                        <a class="btn btn-outline-primary"
-                           asp-action="@nameof(SegmentsController.Detail)"
-                           asp-controller="@SegmentsController.Name"
-                           asp-route-id="@Model.Location.PostFeatureSegmentId">
-                            <span class="far fa-file-alt"
-                                  aria-hidden="true"
-                                  title="Edit segment"></span>
-                        </a>
-                    }
-                </div>
+                @if (string.IsNullOrEmpty(Model.PostFeatureSegmentName))
+                {
+                    <button class="btn btn-outline-success"
+                            data-segment="PostFeature"
+                            data-segment-display="Post-Feature"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addSegmentModal">
+                        <span class="fa-solid fa-circle-plus fa-fw"
+                              aria-hidden="true"
+                              title="Add segment"></span>
+                    </button>
+                }
+                else
+                {
+                    <button class="btn btn-outline-danger"
+                            data-segment="PostFeature"
+                            data-segment-display="Post-Feature"
+                            data-bs-toggle="modal"
+                            data-bs-target="#removeSegmentModal">
+                        <span class="fa-solid fa-circle-minus fa-fw"
+                              aria-hidden="true"
+                              title="Remove segment"></span>
+                    </button>
+                    <a class="btn btn-outline-primary"
+                       asp-action="@nameof(SegmentsController.Detail)"
+                       asp-controller="@SegmentsController.Name"
+                       asp-route-id="@Model.Location.PostFeatureSegmentId">
+                        <span class="fa-regular fa-file-lines fa-fw"
+                              aria-hidden="true"
+                              title="Edit segment"></span>
+                    </a>
+                }
             </div>
         </div>
         <span class="validation-message text-danger"
               asp-validation-for="Location.PostFeatureSegmentId"></span>
     </div>
 
-    <div class="row form-group">
-        <div class="col-form-label text-md-right col-md-3">
+    <div class="row mb-3">
+        <div class="col-form-label text-md-end col-md-3">
             <label asp-for="Location.SocialCardId"></label>
         </div>
         <div class="col-md-9">
@@ -620,37 +610,35 @@
                        class="form-control"
                        disabled
                        value="@Model.SocialCardName" />
-                <div class="input-group-append">
-                    @if (string.IsNullOrEmpty(Model.SocialCardName))
-                    {
-                        <a class="btn btn-outline-success"
-                           asp-controller="@SocialCardsController.Name"
-                           asp-action="@nameof(SocialCardsController.EditForLocation)"
-                           asp-route-locationStub="@Model.LocationStub">
-                            <span class="fas fa-plus-circle"
-                                  aria-hidden="true"
-                                  title="Add social card"></span>
-                        </a>
-                    }
-                    else
-                    {
-                        <button class="btn btn-outline-danger"
-                                data-toggle="modal"
-                                data-target="#removeSocialCardModal">
-                            <span class="fas fa-minus-circle"
-                                  aria-hidden="true"
-                                  title="Delete social card"></span>
-                        </button>
-                        <a class="btn btn-outline-primary"
-                           asp-action="@nameof(SocialCardsController.EditForLocation)"
-                           asp-controller="@SocialCardsController.Name"
-                           asp-route-locationStub="@Model.LocationStub">
-                            <span class="far fa-file-alt"
-                                  aria-hidden="true"
-                                  title="Edit social card"></span>
-                        </a>
-                    }
-                </div>
+                @if (string.IsNullOrEmpty(Model.SocialCardName))
+                {
+                    <a class="btn btn-outline-success"
+                       asp-controller="@SocialCardsController.Name"
+                       asp-action="@nameof(SocialCardsController.EditForLocation)"
+                       asp-route-locationStub="@Model.LocationStub">
+                        <span class="fa-solid fa-circle-plus fa-fw"
+                              aria-hidden="true"
+                              title="Add social card"></span>
+                    </a>
+                }
+                else
+                {
+                    <button class="btn btn-outline-danger"
+                            data-bs-toggle="modal"
+                            data-bs-target="#removeSocialCardModal">
+                        <span class="fa-solid fa-circle-minus fa-fw"
+                              aria-hidden="true"
+                              title="Delete social card"></span>
+                    </button>
+                    <a class="btn btn-outline-primary"
+                       asp-action="@nameof(SocialCardsController.EditForLocation)"
+                       asp-controller="@SocialCardsController.Name"
+                       asp-route-locationStub="@Model.LocationStub">
+                        <span class="fa-regular fa-file-lines fa-fw"
+                              aria-hidden="true"
+                              title="Edit social card"></span>
+                    </a>
+                }
             </div>
         </div>
         <span class="validation-message text-danger"
@@ -666,11 +654,11 @@
                         <th class="align-middle">Name</th>
                         <th class="align-middle">Type</th>
                         <th class="align-middle">Custom Text/Redirect URL</th>
-                        <th class="align-middle text-right">
+                        <th class="align-middle text-end">
                             <button type="button"
                                     class="btn btn-outline-success addItemButtonModal"
                                     data-itemType="Feature">
-                                <span class="fas fa-plus-circle"></span>
+                                <span class="fa-solid fa-circle-plus fa-fw"></span>
                             </button>
                         </th>
                     </tr>
@@ -694,12 +682,12 @@
                                     <td class="align-middle text-center">
                                         @if (!string.IsNullOrEmpty(locationFeature.Text))
                                         {
-                                            <span class="fas fa-align-left"
+                                            <span class="fa-solid fa-align-left fa-fw"
                                                   title="Custom Text"></span>
                                         }
                                         else if (!string.IsNullOrEmpty(locationFeature.RedirectUrl))
                                         {
-                                            <span class="fas fa-link" title="Redirect URL"></span>
+                                            <span class="fa-solid fa-link fa-fw" title="Redirect URL"></span>
                                         }
                                         else
                                         {
@@ -709,7 +697,7 @@
                                                asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.FeaturesController.Feature)"
                                                asp-route-featureName="@feature.Name?.Replace(" ", "")"
                                                target="_blank">
-                                                <span class="fas fa-globe-americas" title="Multi-location feature"></span>
+                                                <span class="fa-solid fa-earth-americas fa-fw" title="Multi-location feature"></span>
                                             </a>
                                         }
                                     </td>
@@ -752,17 +740,19 @@
                                             }
                                             @if (locationFeature.NewTab)
                                             {
-                                                <br /><em>Opens in a new tab</em>
+                                                <br />
+
+                                                <em>Opens in a new tab</em>
                                             }
                                         }
                                     </td>
-                                    <td class="align-middle text-right">
+                                    <td class="align-middle text-end">
                                         <button type="button"
                                                 class="btn btn-outline-danger deleteItemButton"
                                                 data-itemType="Feature"
                                                 data-itemId="@locationFeature.FeatureId"
                                                 data-itemName="@feature.Name">
-                                            <span class="fas fa-minus-circle"
+                                            <span class="fa-solid fa-circle-minus fa-fw"
                                                   aria-hidden="true"></span>
                                         </button>
                                     </td>
@@ -787,12 +777,12 @@
                         <th class="align-middle">Group Type</th>
                         <th class="align-middle">Location Region?</th>
                         <th class="align-middle">Location's Map Group</th>
-                        <th class="align-middle text-right">
+                        <th class="align-middle text-end">
                             <button type="button"
                                     class="btn btn-outline-success addItemButtonModal"
-                                    data-toggle="modal"
+                                    data-bs-toggle="modal"
                                     data-itemType="Group">
-                                <span class="fas fa-plus-circle"></span>
+                                <span class="fa-solid fa-circle-plus fa-fw"></span>
                             </button>
                         </th>
                     </tr>
@@ -814,7 +804,7 @@
                                     <td class="align-middle">
                                         @if (group.IsLocationRegion)
                                         {
-                                            <span class="fas fa-check"></span>
+                                            <span class="fa-solid fa-check fa-fw"></span>
                                         }
                                     </td>
                                     <td class="align-middle"
@@ -822,17 +812,17 @@
                                         @if (Model.Location.DisplayGroupId == group.Id)
                                         {
                                             <text>
-                                                <span class="fas fa-check"></span>
+                                                <span class="fa-solid fa-check fa-fw"></span>
                                             </text>
                                         }
                                     </td>
-                                    <td class="align-middle text-right">
+                                    <td class="align-middle text-end">
                                         <button type="button"
                                                 class="btn btn-outline-danger deleteItemButton"
                                                 data-itemType="Group"
                                                 data-itemId="@locationGroup.GroupId"
                                                 data-itemName="@group.GroupType">
-                                            <span class="fas fa-minus-circle"
+                                            <span class="fa-solid fa-circle-minus fa-fw"
                                                   aria-hidden="true"></span>
                                         </button>
                                     </td>
@@ -860,7 +850,7 @@
         }
 
         $(function () {
-            $('[data-toggle="tooltip"]').tooltip();
+            $('[data-bs-toggle="tooltip"]').tooltip();
             var ulMapList = document.createElement("ul");
             ulMapList.classList.add("list-group");
             ulMapList.setAttribute("id", "maplink-suggestions");
@@ -870,33 +860,33 @@
         @if (!Model.Location.IsNewLocation)
         {
             <text>
-            // Helpers
-            function GetItemList(objType) {
-                $("#listAddModal").modal("show");
-                $.get("@Url.Action(nameof(LocationsController.GetItemsList))",
-                    {
-                        objectType: objType,
-                        page: 1
-                    }, function (response) {
-                        $("#modalItemList").html(response);
-                });
-            }
+                // Helpers
+                function GetItemList(objType) {
+                    $("#listAddModal").modal("show");
+                    $.get("@Url.Action(nameof(LocationsController.GetItemsList))",
+                        {
+                            objectType: objType,
+                            page: 1
+                        }, function (response) {
+                            $("#modalItemList").html(response);
+                        });
+                }
 
             $(document).on('click', "button.page-link", function (e) {
                 $.get("@Url.Action(nameof(LocationsController.GetItemsList))",
-                {
-                    objectType: $("#addModalTitle").data("objType"),
-                    page: $(this).data("page")
-                }, function(response) {
-                    $("#modalItemList").html(response);
-                });
+                    {
+                        objectType: $("#addModalTitle").data("objType"),
+                        page: $(this).data("page")
+                    }, function (response) {
+                        $("#modalItemList").html(response);
+                    });
             });
 
             //Adding an Item
             $(".addItemButtonModal").on('click', function (e) {
                 $("#addModalTitle").text("Add a " + $(this).data("itemtype"));
                 $("#addModalTitle").attr("data-objType", $(this).data("itemtype"));
-                $("#modalItemList").html('<div class="fa-3x text-center"><span class="fas fa-spinner fa-spin"></span></div>');
+                $("#modalItemList").html('<div class="fa-3x text-center"><span class="fa-solid fa-spinner fa-spin"></span></div>');
                 $("#listAddModal").modal("show");
                 GetItemList($(this).data("itemtype"));
             });
@@ -917,7 +907,7 @@
                     }, function () {
                         $("#listAddModal").modal('hide');
                         window.location.reload();
-                });
+                    });
             });
 
             // Editing an Item
@@ -932,11 +922,11 @@
                         locationStub: "@Model.Location.Stub"
                     }, function (response) {
                         $("#modalItemInfo").html(response);
-                }).done(function () {
-                    if (objType == "Feature" && typeof Markdown != "undefined") {
-                        var editor = new Markdown.Editor({ allowUploads: false });
-                        editor.run();
-                    }
+                    }).done(function () {
+                        if (objType == "Feature" && typeof Markdown != "undefined") {
+                            var editor = new Markdown.Editor({ allowUploads: false });
+                            editor.run();
+                        }
                     });
             }
 
@@ -944,7 +934,7 @@
                 $("#updateItem").find(".modal-body").html("");
             });
 
-            $("#updateItem").submit(function() {
+            $("#updateItem").submit(function () {
                 if ($("#updateItem").attr("name") == "Hour" && !$("#accordion-header").hasClass("bg-info")) {
                     $("#Group_SubscriptionUrl").val("");
                     $("#group-isLocationRegion").val("False");
@@ -961,19 +951,19 @@
                     url = "@Url.Action(nameof(LocationsController.EditLocationGroup),LocationsController.Name)"
                     $("#editModalTitle").text("Edit Group: " + $(this).data("itemname"));
                 }
-                $("#modalItemInfo").html('<div class="fa-3x text-center"><span class="fas fa-spinner fa-spin"></span></div>');
+                $("#modalItemInfo").html('<div class="fa-3x text-center"><span class="fa-solid fa-spinner fa-spin"></span></div>');
                 $("#itemEditModal").modal("show");
                 $('#updateItem').attr('name', $(this).data("itemtype"));
-                $("#updateItem").attr("action",url);
+                $("#updateItem").attr("action", url);
                 GetEditInfo($(this).data("itemid"), $(this).data("itemtype"));
             });
 
             //Updating Delete Modal
             $('.deleteItemButton').on('click', function () {
-                $($("#deleteModal").find("button#deleteModalConfirm")).attr("data-itemid",$(this).data("itemid").toString());
+                $($("#deleteModal").find("button#deleteModalConfirm")).attr("data-itemid", $(this).data("itemid").toString());
                 $($("#deleteModal").find("button#deleteModalConfirm")).attr("id", "confirmDelete" + $(this).data("itemtype").toString())
-                $("#deleteModalTitle").text("Delete @Model.Location.Name's "+ $(this).data("itemtype") + ": " + $(this).data("itemname"));
-                $("#deleteModal").find(".modal-body").html("Are you sure you want to remove the "+ $(this).data("itemtype") + " '<strong>" + $(this).data("itemname") + "</strong>' from '<strong>@Model.Location.Name</strong>'")
+                $("#deleteModalTitle").text("Delete @Model.Location.Name's " + $(this).data("itemtype") + ": " + $(this).data("itemname"));
+                $("#deleteModal").find(".modal-body").html("Are you sure you want to remove the " + $(this).data("itemtype") + " '<strong>" + $(this).data("itemname") + "</strong>' from '<strong>@Model.Location.Name</strong>'")
                 $("#deleteModal").modal("show");
             });
 
@@ -990,10 +980,10 @@
                     {
                         itemId: itemId,
                         locationId: @Model.Location.Id
-                    }, function () {
-                        $("#deleteModal").modal('hide');
-                        window.location.reload();
-                    });
+                                }, function () {
+                    $("#deleteModal").modal('hide');
+                    window.location.reload();
+                });
             }
 
             $('#addSegmentModal').on('show.bs.modal', function (event) {
@@ -1017,40 +1007,40 @@
             </text>
         }
 
-        // For Google Maps
-        $(document).on('click','#maplink-suggestions li', function () {
-            let data = { placeId: $(this).find("a").data("placeid") };
-            console.info("Place id:", data)
-            $.get("@Url.Action(nameof(LocationsController.GetLocationLink))",
-                data,
-                function (response) {
-                    if (response.success === true) {
-                        $($("input#Location_MapLink")[0]).val(response.link);
-                    } else {
-                        alert(response.message);
+            // For Google Maps
+            $(document).on('click', '#maplink-suggestions li', function () {
+                let data = { placeId: $(this).find("a").data("placeid") };
+                console.info("Place id:", data)
+                $.get("@Url.Action(nameof(LocationsController.GetLocationLink))",
+                    data,
+                    function (response) {
+                        if (response.success === true) {
+                            $($("input#Location_MapLink")[0]).val(response.link);
+                        } else {
+                            alert(response.message);
+                        }
                     }
-                }
-            );
+                );
 
-            let address = $(this).find("span.format-addr").text().split(", ");
-            if (address.length == 5) {
-                $("#Location_Address").val(address[1]);
-                $("#Location_City").val(address[2]);
-                $("#Location_Country").val(address[4]);
-                let stateZip = address[3].split(" ");
-                $("#Location_State").val(stateZip[0]);
-                $("#Location_Zip").val(stateZip[1]);
-                $("#maplink-suggestions").html("");
-            } else {
-                $("#Location_Address").val(address[0]);
-                $("#Location_City").val(address[1]);
-                $("#Location_Country").val(address[3]);
-                let stateZip = address[2].split(" ");
-                $("#Location_State").val(stateZip[0]);
-                $("#Location_Zip").val(stateZip[1]);
-                $("#maplink-suggestions").html("");
-            }
-        });
+                let address = $(this).find("span.format-addr").text().split(", ");
+                if (address.length == 5) {
+                    $("#Location_Address").val(address[1]);
+                    $("#Location_City").val(address[2]);
+                    $("#Location_Country").val(address[4]);
+                    let stateZip = address[3].split(" ");
+                    $("#Location_State").val(stateZip[0]);
+                    $("#Location_Zip").val(stateZip[1]);
+                    $("#maplink-suggestions").html("");
+                } else {
+                    $("#Location_Address").val(address[0]);
+                    $("#Location_City").val(address[1]);
+                    $("#Location_Country").val(address[3]);
+                    let stateZip = address[2].split(" ");
+                    $("#Location_State").val(stateZip[0]);
+                    $("#Location_Zip").val(stateZip[1]);
+                    $("#maplink-suggestions").html("");
+                }
+            });
 
         function CollectAddress() {
             let address = [];
@@ -1104,8 +1094,7 @@
         });
 
         $("input#Location_Address").blur(function () {
-            if ($('#Location_Address').val() && !$('#Location_MapLink').val())
-            {
+            if ($('#Location_Address').val() && !$('#Location_MapLink').val()) {
                 $("#maplink-suggestions").html("");
                 let data = {
                     name: $("#Location_Name").val(),
@@ -1117,25 +1106,22 @@
                         if (response.success == true) {
                             ShowLocationAutocomplete(response.locations);
                         }
-                        else
-                        {
+                        else {
                             alert(response.message);
                         }
                     });
             }
-            else
-            {
+            else {
                 $("#maplink-suggestions").html("");
             }
         });
 
         function ShowLocationAutocomplete(locations) {
-            for (var index = 0; index < locations.length; index++)
-            {
+            for (var index = 0; index < locations.length; index++) {
                 console.info(locations[index]);
                 var icon = document.createElement("span");
-                icon.classList.add("fas");
-                icon.classList.add("fa-map-marker-alt");
+                icon.classList.add("fa-solid");
+                icon.classList.add("fa-location-dot");
 
                 var formatAddr = document.createElement("span");
                 formatAddr.innerHTML = " " + locations[index].address;

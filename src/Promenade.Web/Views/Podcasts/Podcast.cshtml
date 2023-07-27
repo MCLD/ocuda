@@ -18,7 +18,7 @@
         <p>@Model.Podcast.Description</p>
         <div class="row">
             <div class="col-12">
-                <span class="sr-only">@Localizer[Promenade.PodcastListenOn]</span>
+                <span class="visually-hidden">@Localizer[Promenade.PodcastListenOn]</span>
                 @foreach (var directoryInfo in Model.PodcastDirectoryInfos)
                 {
                     <a href="@directoryInfo.Url"
@@ -27,7 +27,7 @@
                 }
                 <a href="@Url.Action(nameof(PodcastsController.RSS), new { stub = Model.Podcast.Stub })"
                    target="_blank"
-                   class="btn btn-outline-secondary mt-1"><span class="fas fa-rss-square"></span> RSS</a>
+                   class="btn btn-outline-secondary mt-1"><span class="fa-solid fa-square-rss"></span> RSS</a>
             </div>
         </div>
     </div>
@@ -49,7 +49,7 @@
                         <em>@Localizer[Promenade.PodcastEpisodePublished, item.Episode, item.PublishDate.Value.ToLongDateString()]</em>
                     </div>
                 </div>
-                <div class="col-12 col-lg-6 col-xl-5 text-right">
+                <div class="col-12 col-lg-6 col-xl-5 text-end">
                     <audio controls class="mb-2 w-100" data-episode="@item.Episode.Value">
                         <source src="@item.MediaUrl" type="@item.MediaType" />
                     </audio>
@@ -65,7 +65,7 @@
                    aria-label="@Localizer[Promenade.NewWindow]"
                    title="@Localizer[Promenade.ShowNotesFor, item.Title]"
                    class="btn d-block d-md-inline-block btn-outline-primary">
-                   <span class="far fa-file-alt"></span>
+                   <span class="fa-regular fa-file-lines"></span>
                    @Localizer[Promenade.ViewShowNotes]
                 </a>
             }
@@ -90,10 +90,12 @@
         for (var index = 0; index < players.length; index++) {
             var episode = players[index].getAttribute("data-episode");
             players[index].addEventListener("play", function () {
-                gtag('event', 'Podcast play', {
-                    'event_category': '@Html.Raw(Model.Podcast.Title.Replace("'", "\\'"))',
-                    'event_label': episode
-                });
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'Podcast play', {
+                        'event_category': '@Html.Raw(Model.Podcast.Title.Replace("'", "\\'"))',
+                        'event_label': episode
+                    });
+                }
             });
         }
         </script>
