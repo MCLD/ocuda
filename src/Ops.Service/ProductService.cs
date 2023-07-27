@@ -140,7 +140,8 @@ namespace Ocuda.Ops.Service
 
         public async Task<Product> GetBySlugAsync(string slug)
         {
-            var product = await GetBySlugAsync(slug, false);
+            var product = await GetBySlugAsync(slug, false)
+                ?? throw new OcudaException($"Product '{slug}' Not found");
             var perms = await _permissionGroupProductManagerRepository
                 .GetByProductIdAsync(product.Id);
             product.PermissionGroupIds = perms.Select(_ => _.PermissionGroupId

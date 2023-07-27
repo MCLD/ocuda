@@ -480,11 +480,25 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpGet("{productSlug}")]
         public async Task<IActionResult> Product(string productSlug)
         {
-            var product = await _productService.GetBySlugAsync(productSlug);
+            Product product = null;
+
+            try
+            {
+                product = await _productService.GetBySlugAsync(productSlug);
+            }
+            catch (OcudaException ex)
+            {
+                _logger.LogError("Unable to find product slug {Slug}: {ErrorMessage}",
+                    productSlug,
+                    ex.Message);
+                ShowAlertWarning($"Unable to show product: {ex.Message}");
+            }
 
             if (product == null)
             {
-                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                return RedirectToAction(nameof(HomeController.Index),
+                    HomeController.Name,
+                    new { Area = "" });
             }
 
             var locationInventories = await _productService
@@ -616,6 +630,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [HttpPost("[action]")]
         public async Task<IActionResult> UpdateInventoryStatus(LocationInventoryViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
             try
             {
                 await _productService.UpdateInventoryStatusAsync(model.ProductId,
@@ -758,9 +773,9 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private bool CanManage(Product product)
         {
             return IsSiteManager()
-                || product.PermissionGroupIds != null
+                || (product.PermissionGroupIds != null
                 && UserClaims(ClaimType.PermissionId)?
-                    .Any(_ => product.PermissionGroupIds.Contains(_)) == true;
+                    .Any(_ => product.PermissionGroupIds.Contains(_)) == true);
         }
     }
 }
