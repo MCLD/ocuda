@@ -16,7 +16,7 @@
     @RenderSection("Styles", required: false)
 </head>
 <body>
-    <nav class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-dark oc-navbar">
+    <nav class="navbar navbar-expand-sm navbar-static-top navbar-dark bg-dark oc-navbar d-print-none">
         <div class="container-fluid m-o px-2 py-0">
             @{
                 var navigationRows = (List<NavigationRow>)Context.Items[ItemKey.NavColumn];
@@ -36,7 +36,7 @@
                        role="button"
                        data-bs-toggle="dropdown"
                        title="Intranet">
-                        <span class="fa-solid fa-circle-info"></span>
+                        <span class="fa-solid fa-circle-info fa-fw"></span>
                         Intranet
                     </a>
                     <div class="dropdown-menu">
@@ -90,15 +90,22 @@
                                asp-controller="@Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Name"
                                asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.Contact))"
                                asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Contact.ScheduleController.Index))">
-                                <span class="fa-regular fa-clock"></span>
+                                <span class="fa-regular fa-clock fa-fw"></span>
                                 Book a Librarian
                             </a>
                             <a class="dropdown-item"
                                asp-controller="@Ocuda.Ops.Controllers.Areas.Incident.HomeController.Name"
                                asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.Incident))"
                                asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.Incident.HomeController.Mine))">
-                                <span class="fa-solid fa-user-injured"></span>
+                                <span class="fa-solid fa-user-injured fa-fw"></span>
                                 Incident Reports
+                            </a>
+                            <a class="dropdown-item"
+                               asp-controller="@Ocuda.Ops.Controllers.Areas.VolunteerSubmissions.HomeController.Name"
+                               asp-area="@(nameof(Ocuda.Ops.Controllers.Areas.VolunteerSubmissions))"
+                               asp-action="@(nameof(Ocuda.Ops.Controllers.Areas.VolunteerSubmissions.HomeController.All))">
+                                <span class="fa-solid fa-hands-helping fa-fw"></span>
+                                Volunteer Submissions
                             </a>
                         </div>
                     </li>
@@ -209,7 +216,7 @@
                             {
                                 <div class="navcolumn-item navcolumn-collapsible">
                                     @Html.Raw(row.Name)
-                                    <span class="fa-solid fa-chevron-right float-end"></span>
+                                    <span class="fa-solid fa-chevron-right float-end fa-fw"></span>
                                 </div>
                                 <div class="collapse navcolumn-collapse">
                                     @foreach (var childRow in row.Rows)
@@ -224,7 +231,7 @@
                                             {
                                                 <div class="navcolumn-item navcolumn-child navcolumn-collapsible">
                                                     @Html.Raw(childRow.Name)
-                                                    <span class="fa-solid fa-chevron-right float-end"></span>
+                                                    <span class="fa-solid fa-chevron-right float-end fa-fw"></span>
                                                 </div>
                                                 <div class="collapse navcolumn-collapse">
                                                     @foreach (var grandchildRow in childRow.Rows)

@@ -51,30 +51,28 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             ISocialCardService socialCardService,
             IVolunteerFormService volunteerFormService) : base(context)
         {
-            if (config == null)
-            {
-                throw new ArgumentNullException(nameof(config));
-            }
-            _featureService = featureService
-                ?? throw new ArgumentNullException(nameof(featureService));
-            _groupService = groupService
-                ?? throw new ArgumentNullException(nameof(groupService));
-            _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
-            _locationFeatureService = locationFeatureService
-                ?? throw new ArgumentNullException(nameof(locationFeatureService));
-            _locationGroupService = locationGroupService
-                ?? throw new ArgumentNullException(nameof(locationGroupService));
-            _locationHoursService = locationHoursService
-                ?? throw new ArgumentNullException(nameof(locationHoursService));
-            _locationService = locationService
-                ?? throw new ArgumentNullException(nameof(locationService));
-            _segmentService = segmentService
-                ?? throw new ArgumentNullException(nameof(segmentService));
-            _socialCardService = socialCardService
-                ?? throw new ArgumentNullException(nameof(socialCardService));
-            _volunteerFormService = volunteerFormService
-                ?? throw new ArgumentNullException(nameof(volunteerFormService));
+            ArgumentNullException.ThrowIfNull(config);
+            ArgumentNullException.ThrowIfNull(featureService);
+            ArgumentNullException.ThrowIfNull(groupService);
+            ArgumentNullException.ThrowIfNull(languageService);
+            ArgumentNullException.ThrowIfNull(locationFeatureService);
+            ArgumentNullException.ThrowIfNull(locationGroupService);
+            ArgumentNullException.ThrowIfNull(locationHoursService);
+            ArgumentNullException.ThrowIfNull(locationService);
+            ArgumentNullException.ThrowIfNull(segmentService);
+            ArgumentNullException.ThrowIfNull(socialCardService);
+            ArgumentNullException.ThrowIfNull(volunteerFormService);
+
+            _featureService = featureService;
+            _groupService = groupService;
+            _languageService = languageService;
+            _locationFeatureService = locationFeatureService;
+            _locationGroupService = locationGroupService;
+            _locationHoursService = locationHoursService;
+            _locationService = locationService;
+            _segmentService = segmentService;
+            _socialCardService = socialCardService;
+            _volunteerFormService = volunteerFormService;
 
             _apiKey = config[Configuration.OcudaGoogleAPI];
         }
@@ -87,7 +85,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
 
         [HttpGet("[action]")]
         [SaveModelState]
-        public async Task<IActionResult> AddLocation()
+        public IActionResult AddLocation()
         {
             var location = new Location
             {
@@ -107,6 +105,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState(Key = nameof(Hours))]
         public async Task<IActionResult> AddOverride(LocationHoursViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
             if (model.AddOverride.Open)
             {
                 if (!model.AddOverride.OpenTime.HasValue || !model.AddOverride.CloseTime.HasValue)
@@ -244,7 +243,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             {
                 if (location?.Phone?.Length == 10)
                 {
-                    location.Phone = $"+1 {Convert.ToInt64(location.Phone):###-###-####}";
+                    location.Phone =
+                        $"+1 {Convert.ToInt64(location.Phone, CultureInfo.InvariantCulture):###-###-####}";
                 }
 
                 try
@@ -362,6 +362,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> DeleteLocation(Location location)
         {
+            ArgumentNullException.ThrowIfNull(location);
             try
             {
                 await _locationService.DeleteAsync(location.Id);
@@ -431,13 +432,14 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> DeleteOverride(LocationHoursViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
             try
             {
                 await _locationHoursService.DeleteLocationsHoursOverrideAsync(
                     model.DeleteOverride.Id);
                 ShowAlertSuccess($"Deleted override: {model.DeleteOverride.Reason}");
             }
-            catch (Exception ex)
+            catch (OcudaException ex)
             {
                 _logger.LogError(ex,
                     "Error deleting override id {Id}: {Message}",
@@ -454,6 +456,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> EditLocation(Location location)
         {
+            ArgumentNullException.ThrowIfNull(location);
+
             if (ModelState.IsValid)
             {
                 try
@@ -508,6 +512,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> EditLocationFeature(LocationFeature locationFeature)
         {
+            ArgumentNullException.ThrowIfNull(locationFeature);
+
             var location = await _locationService.GetLocationByIdAsync(locationFeature.LocationId);
             if (ModelState.IsValid)
             {
@@ -539,6 +545,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> EditLocationGroup(LocationViewModel locationGroupInfo)
         {
+            ArgumentNullException.ThrowIfNull(locationGroupInfo);
+
             var location = await _locationService
                 .GetLocationByIdAsync(locationGroupInfo.LocationGroup.LocationId);
 
@@ -580,6 +588,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState(Key = nameof(Hours))]
         public async Task<IActionResult> EditOverride(LocationHoursViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             if (model.EditOverride.Open)
             {
                 if (!model.EditOverride.OpenTime.HasValue
@@ -871,6 +881,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState(Key = nameof(Hours))]
         public async Task<IActionResult> Hours(LocationHoursViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             for (int i = 0; i < Enum.GetNames(typeof(DayOfWeek)).Length; i++)
             {
                 var day = model.LocationHours[i];
@@ -943,12 +955,12 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                         var formsViewModel = new List<LocationVolunteerFormViewModel>();
                         foreach (var form in forms)
                         {
-                            var mappings = await _volunteerFormService.GetFormUserMappingsAsync(form.VolunteerFormType, location.Id);
+                            var mappings = await _volunteerFormService.GetFormUserMappingsAsync(form.Id, location.Id);
                             var newForm = new LocationVolunteerFormViewModel
                             {
                                 TypeId = (int)form.VolunteerFormType,
                                 TypeName = form.VolunteerFormType.ToString(),
-                                FormMappings = mappings?.ConvertAll(_ => new LocationVolunteerMappingViewModel(_)),
+                                FormMappings = mappings.ToList().ConvertAll(_ => new LocationVolunteerMappingViewModel(_)),
                                 IsDisabled = form.IsDisabled
                             };
                             if (form.IsDisabled)
@@ -1056,7 +1068,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             try
             {
                 await _volunteerFormService.RemoveFormUserMapping(location.Id, userId, (VolunteerFormType)type);
-                ShowAlertSuccess($"User successfully removed.");
+                ShowAlertSuccess("User successfully removed.");
             }
             catch (OcudaException oex)
             {
@@ -1122,8 +1134,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
             catch (OcudaException oex)
             {
                 string message = oex.Message;
-                var inUseList = oex.Data[OcudaExceptionData.SegmentInUseBy] as ICollection<string>;
-                if (inUseList != null)
+                if (oex.Data[OcudaExceptionData.SegmentInUseBy] is ICollection<string> inUseList)
                 {
                     message = $"in use by {inUseList.Count} other locations";
                 }
@@ -1188,6 +1199,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("{locationStub}/[action]")]
         public async Task<IActionResult> StructuredData(LocationViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             try
             {
                 var currentLocation
@@ -1220,6 +1233,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> UndeleteLocation(Location location)
         {
+            ArgumentNullException.ThrowIfNull(location);
+
             try
             {
                 await _locationService.UndeleteAsync(location.Id);
@@ -1305,7 +1320,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
                 var formSubmission = await _volunteerFormService
                     .GetVolunteerFormSubmissionAsync(sid);
                 var viewModel = new VolunteerFormSubmissionDetailsViewModel(formSubmission);
-                var form = await _volunteerFormService.GetFormByIdAsync(formSubmission.FormId);
+                var form = await _volunteerFormService.GetFormByIdAsync(formSubmission.VolunteerFormId);
                 viewModel.LocationStub = location.Stub;
                 viewModel.IsTeen = form.VolunteerFormType == VolunteerFormType.Teen;
                 return View(viewModel);

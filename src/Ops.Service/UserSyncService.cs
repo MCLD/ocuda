@@ -23,6 +23,7 @@ namespace Ocuda.Ops.Service
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly ILdapService _ldapService;
         private readonly ILocationService _locationService;
+        private readonly IUserManagementService _userManagementService;
         private readonly IUserRepository _userRepository;
         private readonly IUserSyncHistoryRepository _userSyncHistoryRepository;
         private readonly IUserSyncLocationRepository _userSyncLocationRepository;
@@ -33,6 +34,7 @@ namespace Ocuda.Ops.Service
             ILdapService ldapService,
             ILocationService locationService,
             IUserRepository userRepository,
+            IUserManagementService userManagementService,
             IUserSyncHistoryRepository userSyncHistoryRepository,
             IUserSyncLocationRepository userSyncLocationRepository)
             : base(logger, httpContextAccessor)
@@ -41,6 +43,7 @@ namespace Ocuda.Ops.Service
             ArgumentNullException.ThrowIfNull(ldapService);
             ArgumentNullException.ThrowIfNull(locationService);
             ArgumentNullException.ThrowIfNull(userRepository);
+            ArgumentNullException.ThrowIfNull(userManagementService);
             ArgumentNullException.ThrowIfNull(userSyncHistoryRepository);
             ArgumentNullException.ThrowIfNull(userSyncLocationRepository);
 
@@ -48,6 +51,7 @@ namespace Ocuda.Ops.Service
             _ldapService = ldapService;
             _locationService = locationService;
             _userRepository = userRepository;
+            _userManagementService = userManagementService;
             _userSyncHistoryRepository = userSyncHistoryRepository;
             _userSyncLocationRepository = userSyncLocationRepository;
         }
@@ -131,6 +135,9 @@ namespace Ocuda.Ops.Service
             return await _userSyncHistoryRepository.GetPaginatedAsync(filter);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
+            "CA1308:Normalize strings to uppercase",
+            Justification = "Normalize usernames to lower case.")]
         public async Task<StatusReport> SyncDirectoryAsync(bool applyChanges)
         {
             var result = new StatusReport
@@ -483,9 +490,8 @@ namespace Ocuda.Ops.Service
                 {
                     try
                     {
-                        await _userRepository.MarkUserDeletedAsync(missingUserName,
-                            GetCurrentUserId(),
-                            result.AsOf);
+                        await _userManagementService
+                            .MarkUserDisabledAsync(missingUserName, result.AsOf);
                     }
                     catch (OcudaException oex)
                     {

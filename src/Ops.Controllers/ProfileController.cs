@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ocuda.Ops.Controllers.Abstract;
 using Ocuda.Ops.Controllers.ViewModels.Profile;
 using Ocuda.Ops.Models.Keys;
+using Ocuda.Ops.Service;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
 using Ocuda.Utility.Exceptions;
 using Ocuda.Utility.Keys;
@@ -21,20 +22,27 @@ namespace Ocuda.Ops.Controllers
         private readonly IHttpContextAccessor _httpContext;
         private readonly ILocationService _locationService;
         private readonly IPermissionGroupService _permissionGroupService;
+        private readonly IUserManagementService _userManagementService;
         private readonly IUserService _userService;
 
         public ProfileController(ServiceFacades.Controller<ProfileController> context,
             IHttpContextAccessor httpContext,
             ILocationService locationService,
             IPermissionGroupService permissionGroupService,
+            IUserManagementService userManagementService,
             IUserService userService) : base(context)
         {
-            _httpContext = httpContext ?? throw new ArgumentNullException(nameof(httpContext));
-            _locationService = locationService
-                ?? throw new ArgumentNullException(nameof(locationService));
-            _permissionGroupService = permissionGroupService
-                ?? throw new ArgumentNullException(nameof(permissionGroupService));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            ArgumentNullException.ThrowIfNull(httpContext);
+            ArgumentNullException.ThrowIfNull(locationService);
+            ArgumentNullException.ThrowIfNull(permissionGroupService);
+            ArgumentNullException.ThrowIfNull(userManagementService);
+            ArgumentNullException.ThrowIfNull(userService);
+
+            _httpContext = httpContext;
+            _locationService = locationService;
+            _permissionGroupService = permissionGroupService;
+            _userManagementService = userManagementService;
+            _userService = userService;
         }
 
         public static string Name
@@ -51,7 +59,7 @@ namespace Ocuda.Ops.Controllers
             {
                 try
                 {
-                    var user = await _userService.EditNicknameAsync(model.User);
+                    var user = await _userManagementService.EditNicknameAsync(model.User);
                     ShowAlertSuccess($"Updated nickname: {user.Nickname}");
                 }
                 catch (OcudaException oex)
@@ -189,7 +197,7 @@ namespace Ocuda.Ops.Controllers
                 }
             }
 
-            await _userService.RemoveProfilePictureAsync(userId);
+            await _userManagementService.RemoveProfilePictureAsync(userId);
             return RedirectToAction(nameof(Index), new { id = username });
         }
 
@@ -201,7 +209,7 @@ namespace Ocuda.Ops.Controllers
                 return RedirectToUnauthorized();
             }
 
-            await _userService.UnsetManualLocationAsync(userId);
+            await _userManagementService.UnsetManualLocationAsync(userId);
 
             return RedirectToAction(nameof(Index));
         }
@@ -213,7 +221,7 @@ namespace Ocuda.Ops.Controllers
             {
                 return RedirectToUnauthorized();
             }
-            await _userService.UpdateLocationAsync(userId, locationId);
+            await _userManagementService.UpdateLocationAsync(userId, locationId);
             return RedirectToAction(nameof(Index));
         }
 
@@ -281,7 +289,7 @@ namespace Ocuda.Ops.Controllers
 
             try
             {
-                await _userService
+                await _userManagementService
                     .UploadProfilePictureAsync(user, updatePictureViewModel.ProfilePicture);
             }
             catch (OcudaException oex)

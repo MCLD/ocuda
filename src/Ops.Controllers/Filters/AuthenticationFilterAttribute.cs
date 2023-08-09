@@ -21,35 +21,46 @@ namespace Ocuda.Ops.Controllers.Filters
     [AttributeUsage(AttributeTargets.All, AllowMultiple = false)]
     public sealed class AuthenticationFilterAttribute : Attribute, IAsyncResourceFilter
     {
-        private readonly IAuthorizationService _authorizationService;
-        private readonly IOcudaCache _cache;
-        private readonly IConfiguration _config;
-        private readonly IDateTimeProvider _dateTimeProvider;
-        private readonly ILdapService _ldapService;
-        private readonly ILogger<AuthenticationFilterAttribute> _logger;
-        private readonly IUserService _userService;
-        private readonly WebHelper _webHelper;
-
-        public AuthenticationFilterAttribute(ILogger<AuthenticationFilterAttribute> logger,
-            IAuthorizationService authorizationService,
+        public AuthenticationFilterAttribute(IAuthorizationService authorizationService,
             IConfiguration configuration,
             IDateTimeProvider dateTimeProvider,
             ILdapService ldapService,
+            ILogger<AuthenticationFilterAttribute> logger,
             IOcudaCache cache,
+            IUserManagementService userManagementService,
             IUserService userService,
             WebHelper webHelper)
         {
-            _authorizationService = authorizationService
-                ?? throw new ArgumentNullException(nameof(authorizationService));
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            _dateTimeProvider = dateTimeProvider
-                ?? throw new ArgumentNullException(nameof(dateTimeProvider));
-            _ldapService = ldapService ?? throw new ArgumentNullException(nameof(ldapService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-            _webHelper = webHelper ?? throw new ArgumentNullException(nameof(webHelper));
+            ArgumentNullException.ThrowIfNull(authorizationService);
+            ArgumentNullException.ThrowIfNull(cache);
+            ArgumentNullException.ThrowIfNull(configuration);
+            ArgumentNullException.ThrowIfNull(dateTimeProvider);
+            ArgumentNullException.ThrowIfNull(ldapService);
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(userManagementService);
+            ArgumentNullException.ThrowIfNull(userService);
+            ArgumentNullException.ThrowIfNull(webHelper);
+
+            AuthorizationService = authorizationService;
+            Cache = cache;
+            Configuration = configuration;
+            DateTimeProvider = dateTimeProvider;
+            LdapService = ldapService;
+            Logger = logger;
+            UserManagementService = userManagementService;
+            UserService = userService;
+            WebHelper = webHelper;
         }
+
+        public IAuthorizationService AuthorizationService { get; }
+        public IOcudaCache Cache { get; }
+        public IConfiguration Configuration { get; }
+        public IDateTimeProvider DateTimeProvider { get; }
+        public ILdapService LdapService { get; }
+        public ILogger<AuthenticationFilterAttribute> Logger { get; }
+        public IUserManagementService UserManagementService { get; }
+        public IUserService UserService { get; }
+        public WebHelper WebHelper { get; }
 
         public async Task OnResourceExecutionAsync(ResourceExecutingContext context,
             ResourceExecutionDelegate next)
@@ -67,8 +78,8 @@ namespace Ocuda.Ops.Controllers.Filters
             string username = null;
             string userId = null;
 
-            var now = _dateTimeProvider.Now;
-            var authRedirectUrl = _config[Configuration.OpsAuthRedirect];
+            var now = DateTimeProvider.Now;
+            var authRedirectUrl = Configuration[Utility.Keys.Configuration.OpsAuthRedirect];
 
             if (!string.IsNullOrEmpty(authRedirectUrl))
             {
@@ -83,7 +94,7 @@ namespace Ocuda.Ops.Controllers.Filters
                     // user is logged in, ensure they exist in the database
                     // TODO probably figure out how to make this use the database less
                     username = usernameClaim.Value;
-                    var user = await _userService.LookupUserAsync(username);
+                    var user = await UserService.LookupUserAsync(username);
                     if (user?.ReauthenticateUser != false)
                     {
                         // user does not exist in the database or needs to be reauthenticated
@@ -97,12 +108,12 @@ namespace Ocuda.Ops.Controllers.Filters
                     // by default time out cookies and distributed cache in 2 minutes
                     int authTimeoutMinutes = 2;
 
-                    var configuredAuthTimeout = _config[Configuration.OpsAuthTimeoutMinutes];
+                    var configuredAuthTimeout = Configuration[Utility.Keys.Configuration.OpsAuthTimeoutMinutes];
                     if (configuredAuthTimeout != null
                         && !int.TryParse(configuredAuthTimeout, out authTimeoutMinutes))
                     {
-                        _logger.LogWarning("Configured {OpsAuthTimeoutMinutes} could not be converted to a number. It should be a number of minutes (defaulting to 2).",
-                            Configuration.OpsAuthTimeoutMinutes);
+                        Logger.LogWarning("Configured {OpsAuthTimeoutMinutes} could not be converted to a number. It should be a number of minutes (defaulting to 2).",
+                            Utility.Keys.Configuration.OpsAuthTimeoutMinutes);
                     }
 
                     // all authentication bits will expire after 2 minutes
@@ -126,20 +137,20 @@ namespace Ocuda.Ops.Controllers.Filters
 
                     // check if there's a username stored in the cache
                     // if so, the authentication has redirected us back here
-                    username = await _cache.GetStringFromCache(string.Format(CultureInfo.InvariantCulture,
-                            Cache.OpsUsername,
+                    username = await Cache.GetStringFromCache(string.Format(CultureInfo.InvariantCulture,
+                            Utility.Keys.Cache.OpsUsername,
                             id));
 
                     if (string.IsNullOrEmpty(username))
                     {
                         // if there is no username: set a return url and redirect to authentication
-                        await _cache.SaveToCacheAsync(string
-                                .Format(CultureInfo.InvariantCulture, Cache.OpsReturn, id),
-                            _webHelper.GetCurrentUrl(context.HttpContext),
+                        await Cache.SaveToCacheAsync(string
+                                .Format(CultureInfo.InvariantCulture, Utility.Keys.Cache.OpsReturn, id),
+                            WebHelper.GetCurrentUrl(context.HttpContext),
                             authenticationExpiration);
 
                         string cacheDiscriminator
-                            = _config[Configuration.OpsDistributedCacheInstanceDiscriminator]
+                            = Configuration[Utility.Keys.Configuration.OpsDistributedCacheInstanceDiscriminator]
                             ?? string.Empty;
 
                         var url = string.Format(CultureInfo.InvariantCulture,
@@ -153,19 +164,19 @@ namespace Ocuda.Ops.Controllers.Filters
                     else
                     {
                         // remove the username from the cache
-                        await _cache.RemoveAsync(string.Format(CultureInfo.InvariantCulture,
-                            Cache.OpsUsername,
+                        await Cache.RemoveAsync(string.Format(CultureInfo.InvariantCulture,
+                            Utility.Keys.Cache.OpsUsername,
                             id));
 
                         // check if there's a domain name specified and strip it from the username
-                        var domainName = _config[Configuration.OpsDomainName];
+                        var domainName = Configuration[Utility.Keys.Configuration.OpsDomainName];
                         if (!string.IsNullOrEmpty(domainName)
                             && username.StartsWith(domainName, StringComparison.OrdinalIgnoreCase))
                         {
                             username = username[(domainName.Length + 1)..];
                         }
 
-                        var user = await _userService.LookupUserAsync(username);
+                        var user = await UserService.LookupUserAsync(username);
                         var newUser = user == null;
                         if (newUser)
                         {
@@ -177,29 +188,29 @@ namespace Ocuda.Ops.Controllers.Filters
                         }
 
                         // perform ldap update of user object
-                        user = _ldapService.LookupByUsername(user);
+                        user = LdapService.LookupByUsername(user);
 
                         // if the user is new, add them to the database
                         if (newUser)
                         {
-                            var rosterUser = await _userService.LookupUserByEmailAsync(user.Email);
+                            var rosterUser = await UserService.LookupUserByEmailAsync(user.Email);
                             if (rosterUser != null)
                             {
-                                _logger.LogInformation("New user {Username} detected, found in database with email {Email}",
+                                Logger.LogInformation("New user {Username} detected, found in database with email {Email}",
                                     user.Username,
                                     user.Email);
-                                user = await _userService
+                                user = await UserManagementService
                                     .UpdateRosterUserAsync(rosterUser.Id, user);
                             }
                             else
                             {
-                                _logger.LogInformation("New user {Username} detected, inserting into database", user.Username);
-                                user = await _userService.AddUser(user);
+                                Logger.LogInformation("New user {Username} detected, inserting into database", user.Username);
+                                user = await UserManagementService.AddUser(user);
                             }
                         }
                         else
                         {
-                            await _userService.LoggedInUpdateAsync(user);
+                            await UserManagementService.LoggedInUpdateAsync(user);
                         }
 
                         userId = user.Id.ToString(CultureInfo.InvariantCulture);
@@ -217,9 +228,9 @@ namespace Ocuda.Ops.Controllers.Filters
                         // prime the loop
                         int groupId = 1;
                         var adGroupName
-                            = await _cache.GetStringFromCache(string
+                            = await Cache.GetStringFromCache(string
                                 .Format(CultureInfo.InvariantCulture,
-                                    Cache.OpsGroup,
+                                    Utility.Keys.Cache.OpsGroup,
                                     id,
                                     groupId));
                         var adGroupNames = new List<string>();
@@ -227,14 +238,14 @@ namespace Ocuda.Ops.Controllers.Filters
                         {
                             adGroupNames.Add(adGroupName);
                             // once it's in our list, remove it from the cache
-                            await _cache.RemoveAsync(string.Format(CultureInfo.InvariantCulture,
-                                Cache.OpsGroup,
+                            await Cache.RemoveAsync(string.Format(CultureInfo.InvariantCulture,
+                                Utility.Keys.Cache.OpsGroup,
                                 id,
                                 groupId));
                             groupId++;
-                            adGroupName = await _cache
+                            adGroupName = await Cache
                                 .GetStringFromCache(string.Format(CultureInfo.InvariantCulture,
-                                    Cache.OpsGroup,
+                                    Utility.Keys.Cache.OpsGroup,
                                     id,
                                     groupId));
                         }
@@ -242,9 +253,9 @@ namespace Ocuda.Ops.Controllers.Filters
                         bool isSiteManager = false;
 
                         // pull lists of AD groups that should be site managers
-                        var claimGroups = await _authorizationService.GetClaimGroupsAsync();
+                        var claimGroups = await AuthorizationService.GetClaimGroupsAsync();
                         var permissionGroups
-                            = await _authorizationService.GetPermissionGroupsAsync();
+                            = await AuthorizationService.GetPermissionGroupsAsync();
 
                         var claimantOf = new Dictionary<string, string>();
                         var inPermissionGroup = new List<int>();
@@ -315,7 +326,7 @@ namespace Ocuda.Ops.Controllers.Filters
                                     permissionId.ToString(CultureInfo.InvariantCulture)));
                             }
 
-                            var hasAdminClaims = await _authorizationService
+                            var hasAdminClaims = await AuthorizationService
                                 .GetAdminClaimsAsync(inPermissionGroup);
 
                             foreach (var hasAdminClaim in hasAdminClaims)
@@ -333,8 +344,8 @@ namespace Ocuda.Ops.Controllers.Filters
                         await context.HttpContext.SignInAsync(new ClaimsPrincipal(identity));
 
                         // remove the return URL from the cache
-                        await _cache.RemoveAsync(string.Format(CultureInfo.InvariantCulture,
-                            Cache.OpsReturn,
+                        await Cache.RemoveAsync(string.Format(CultureInfo.InvariantCulture,
+                            Utility.Keys.Cache.OpsReturn,
                             id));
 
                         context.HttpContext.Response.Cookies.Delete(Cookie.OpsAuthId);

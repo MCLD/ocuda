@@ -49,7 +49,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
                 Availability = Availability,
                 Email = Email,
                 Experience = Experience,
-                FormId = FormId,
+                VolunteerFormId = FormId,
                 LocationId = LocationId,
                 Name = Name,
                 Phone = Phone,

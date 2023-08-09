@@ -7,7 +7,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IEmailService
     {
-        Task<Details> GetDetailsAsync(int emailTemplateId, string languageName,
+        Task<Details> GetDetailsAsync(int emailSetupId, string languageName,
             IDictionary<string, string> tags);
 
         Task<EmailRecord> SendAsync(Details emailDetails);

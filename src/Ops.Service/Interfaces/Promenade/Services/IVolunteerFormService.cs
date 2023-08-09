@@ -21,7 +21,7 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         Task EnableAsync(int formId);
 
-        Dictionary<string, int> GetAllVolunteerFormTypes();
+        IDictionary<string, int> GetAllVolunteerFormTypes();
 
         Task<VolunteerForm> GetFormByIdAsync(int Id);
 
@@ -29,15 +29,31 @@ namespace Ocuda.Ops.Service.Interfaces.Promenade.Services
 
         Task<VolunteerForm> GetFormByTypeAsync(VolunteerFormType type);
 
-        Task<List<VolunteerFormUserMapping>> GetFormUserMappingsAsync(VolunteerFormType type, int locationId);
+        Task<IDictionary<VolunteerFormType, int>> GetFormEmailSetupMappingAsync();
+
+        Task<ICollection<VolunteerFormUserMapping>>
+            GetFormUserMappingsAsync(int formId, int locationId);
+
+        Task<ICollection<VolunteerFormSubmissionEmailRecord>>
+            GetNotificationInfoAsync(int submissionId);
 
         Task<DataWithCount<ICollection<VolunteerForm>>> GetPaginatedListAsync(BaseFilter filter);
+
+        Task<CollectionWithCount<VolunteerFormSubmission>>
+            GetPaginatedSubmissionsAsync(VolunteerSubmissionFilter filter);
+
+        Task<ICollection<VolunteerFormSubmission>> GetPendingNotificationsAsync();
+
+        Task<ICollection<VolunteerFormUserMapping>> GetUserMappingsAsync(int userId);
 
         Task<ICollection<VolunteerForm>> GetVolunteerFormsAsync();
 
         Task<VolunteerFormSubmission> GetVolunteerFormSubmissionAsync(int submissionId);
 
-        Task<ICollection<VolunteerFormSubmission>> GetVolunteerFormSubmissionsAsync(int locationId, int typeId);
+        Task<ICollection<VolunteerFormSubmission>>
+            GetVolunteerFormSubmissionsAsync(int locationId, int typeId);
+
+        Task NotifiedStaffAsync(int formSubmissionId, int emailRecordId, int userId);
 
         Task RemoveFormUserMapping(int locationId, int userId, VolunteerFormType type);
     }

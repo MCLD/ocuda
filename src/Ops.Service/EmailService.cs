@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
+using CommonMark;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ocuda.Ops.Models.Entities;
@@ -35,39 +36,48 @@ namespace Ocuda.Ops.Service
             Utility.Email.Sender sender)
             : base(logger, httpContextAccessor)
         {
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _emailRecordRepository = emailRecordRepository
-                ?? throw new ArgumentNullException(nameof(emailRecordRepository));
-            _emailSetupTextRepository = emailSetupTextRepository
-                ?? throw new ArgumentNullException(nameof(emailSetupTextRepository));
-            _emailTemplateTextRepository = emailTemplateTextRepository
-                ?? throw new ArgumentNullException(nameof(emailTemplateTextRepository));
-            _sender = sender ?? throw new ArgumentNullException(nameof(sender));
-            _siteSettingService = siteSettingService
-                ?? throw new ArgumentNullException(nameof(siteSettingService));
+            ArgumentNullException.ThrowIfNull(cache);
+            ArgumentNullException.ThrowIfNull(emailRecordRepository);
+            ArgumentNullException.ThrowIfNull(emailSetupTextRepository);
+            ArgumentNullException.ThrowIfNull(emailTemplateTextRepository);
+            ArgumentNullException.ThrowIfNull(sender);
+            ArgumentNullException.ThrowIfNull(siteSettingService);
+
+            _cache = cache;
+            _emailRecordRepository = emailRecordRepository;
+            _emailSetupTextRepository = emailSetupTextRepository;
+            _emailTemplateTextRepository = emailTemplateTextRepository;
+            _sender = sender;
+            _siteSettingService = siteSettingService;
         }
 
         public async Task<Utility.Email.Details> GetDetailsAsync(int emailSetupId,
              string languageName,
              IDictionary<string, string> tags)
         {
-            var emailSetupText = await GetEmailSetupAsync(emailSetupId, languageName);
-
-            if (emailSetupText == null)
-            {
-                throw new OcudaEmailException($"Unable to find email setup {emailSetupId} in the requested or default language.");
-            }
+            var emailSetupText = await GetEmailSetupAsync(emailSetupId, languageName)
+                ?? throw new OcudaEmailException($"Unable to find email setup {emailSetupId} in the requested or default language.");
 
             var emailTemplateText
                 = await GetEmailTemplateAsync(emailSetupText.EmailSetup.EmailTemplateId,
-                    languageName);
-
-            if (emailTemplateText == null)
-            {
-                throw new OcudaEmailException($"Unable to find email template {emailSetupText.EmailSetup.EmailTemplateId} in the requested or default language.");
-            }
+                    languageName)
+                ?? throw new OcudaEmailException($"Unable to find email template {emailSetupText.EmailSetup.EmailTemplateId} in the requested or default language.");
 
             var settings = await GetEmailSettingsAsync();
+
+            if (string.IsNullOrEmpty(emailSetupText.BodyHtml))
+            {
+                try
+                {
+                    emailSetupText.BodyHtml = CommonMarkConverter.Convert(emailSetupText.BodyText);
+                }
+                catch (CommonMarkException cmex)
+                {
+                    _logger.LogError(cmex,
+                        "Error converting text format email to HTML with CommonMark: {ErrorMessage}",
+                        cmex.Message);
+                }
+            }
 
             return new Utility.Email.Details(tags)
             {
@@ -107,7 +117,7 @@ namespace Ocuda.Ops.Service
                 catch (Exception ex)
                 {
                     _logger.LogError("Unable to save email record for email sent to {ToAddress}: {ErrorMessage}",
-                        emailDetails.ToEmailAddress,
+                        emailDetails?.ToEmailAddress ?? "unknown",
                         ex.Message);
                 }
             }
@@ -120,23 +130,23 @@ namespace Ocuda.Ops.Service
             var config = new Utility.Email.Configuration
             {
                 BccAddress = await _siteSettingService
-                                .GetSettingStringAsync(Ops.Models.Keys.SiteSetting.Email.BccAddress),
+                    .GetSettingStringAsync(Ops.Models.Keys.SiteSetting.Email.BccAddress),
                 FromAddress = await _siteSettingService
-                                .GetSettingStringAsync(Ops.Models.Keys.SiteSetting.Email.FromAddress),
+                    .GetSettingStringAsync(Ops.Models.Keys.SiteSetting.Email.FromAddress),
                 FromName = await _siteSettingService
-                                .GetSettingStringAsync(Ops.Models.Keys.SiteSetting.Email.FromName),
+                    .GetSettingStringAsync(Ops.Models.Keys.SiteSetting.Email.FromName),
                 OutgoingHost = await _siteSettingService
-                                .GetSettingStringAsync(Ops.Models.Keys.SiteSetting.Email.OutgoingHost),
+                    .GetSettingStringAsync(Ops.Models.Keys.SiteSetting.Email.OutgoingHost),
                 OutgoingLogin = await _siteSettingService
-                                .GetSettingStringAsync(Ops.Models.Keys.SiteSetting.Email.OutgoingLogin),
+                    .GetSettingStringAsync(Ops.Models.Keys.SiteSetting.Email.OutgoingLogin),
                 OutgoingPassword = await _siteSettingService
-                                .GetSettingStringAsync(Ops.Models.Keys.SiteSetting.Email.OutgoingPassword),
+                    .GetSettingStringAsync(Ops.Models.Keys.SiteSetting.Email.OutgoingPassword),
                 OutgoingPort = await _siteSettingService
-                                .GetSettingIntAsync(Ops.Models.Keys.SiteSetting.Email.OutgoingPort),
+                    .GetSettingIntAsync(Ops.Models.Keys.SiteSetting.Email.OutgoingPort),
                 OverrideToAddress = await _siteSettingService
-                                .GetSettingStringAsync(Ops.Models.Keys.SiteSetting.Email.OverrideToAddress),
+                    .GetSettingStringAsync(Ops.Models.Keys.SiteSetting.Email.OverrideToAddress),
                 RestrictToDomain = await _siteSettingService
-                                .GetSettingStringAsync(Ops.Models.Keys.SiteSetting.Email.RestrictToDomain)
+                    .GetSettingStringAsync(Ops.Models.Keys.SiteSetting.Email.RestrictToDomain)
             };
 
             if (string.IsNullOrEmpty(config.FromAddress))
@@ -157,27 +167,20 @@ namespace Ocuda.Ops.Service
             return config;
         }
 
-        private async Task<EmailSetupText> GetEmailSetupAsync(int emailSetupId, string languageName)
+        private async Task<EmailSetupText>
+            GetEmailSetupAsync(int emailSetupId, string languageName)
         {
             var emailSetup = await InternalGetEmailSetupAsync(emailSetupId, languageName);
-            if (emailSetup != null)
-            {
-                return emailSetup;
-            }
-
-            return await InternalGetEmailSetupAsync(emailSetupId, i18n.Culture.DefaultName);
+            return emailSetup
+                ?? await InternalGetEmailSetupAsync(emailSetupId, i18n.Culture.DefaultName);
         }
 
         private async Task<EmailTemplateText> GetEmailTemplateAsync(int emailTemplateId,
             string languageName)
         {
             var emailTemplate = await InternalGetEmailTemplateAsync(emailTemplateId, languageName);
-            if (emailTemplate != null)
-            {
-                return emailTemplate;
-            }
-
-            return await InternalGetEmailTemplateAsync(emailTemplateId, i18n.Culture.DefaultName);
+            return emailTemplate
+                ?? await InternalGetEmailTemplateAsync(emailTemplateId, i18n.Culture.DefaultName);
         }
 
         private async Task<EmailSetupText> InternalGetEmailSetupAsync(int emailSetupId,

@@ -8,9 +8,11 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
     {
         Task AddSaveFormUserMappingAsync(int formId, int locationId, int userId);
 
-        Task<List<VolunteerFormUserMapping>> FindAsync(int locationId, int formId);
-
         Task<VolunteerFormUserMapping> FindAsync(int formId, int locationId, int userId);
+
+        Task<ICollection<VolunteerFormUserMapping>> GetByLocationFormAsync(int locationId, int formId);
+
+        Task<ICollection<VolunteerFormUserMapping>> GetByUserAsync(int userId);
 
         Task RemoveFormUserMappingAsync(int formId, int locationId, int userId);
     }

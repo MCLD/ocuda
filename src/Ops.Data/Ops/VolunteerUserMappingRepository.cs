@@ -8,7 +8,8 @@ using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 
 namespace Ocuda.Ops.Data.Ops
 {
-    public class VolunteerUserMappingRepository : GenericRepository<OpsContext, VolunteerFormUserMapping>, IVolunteerUserMappingRepository
+    public class VolunteerUserMappingRepository
+        : GenericRepository<OpsContext, VolunteerFormUserMapping>, IVolunteerUserMappingRepository
     {
         public VolunteerUserMappingRepository(ServiceFacade.Repository<OpsContext> repositoryFacade,
             ILogger<VolunteerUserMappingRepository> logger) : base(repositoryFacade, logger)
@@ -26,7 +27,19 @@ namespace Ocuda.Ops.Data.Ops
             await SaveAsync();
         }
 
-        public async Task<List<VolunteerFormUserMapping>> FindAsync(int locationId, int formId)
+        public async Task<VolunteerFormUserMapping>
+            FindAsync(int formId, int locationId, int userId)
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Include(_ => _.User)
+                .FirstOrDefaultAsync(_ => _.LocationId == locationId
+                    && _.VolunteerFormId == formId
+                    && _.UserId == userId);
+        }
+
+        public async Task<ICollection<VolunteerFormUserMapping>>
+            GetByLocationFormAsync(int locationId, int formId)
         {
             return await DbSet
                 .AsNoTracking()
@@ -35,12 +48,12 @@ namespace Ocuda.Ops.Data.Ops
                 .ToListAsync();
         }
 
-        public async Task<VolunteerFormUserMapping> FindAsync(int formId, int locationId, int userId)
+        public async Task<ICollection<VolunteerFormUserMapping>> GetByUserAsync(int userId)
         {
             return await DbSet
                 .AsNoTracking()
-                .Include(_ => _.User)
-                .FirstOrDefaultAsync(_ => _.LocationId == locationId && _.VolunteerFormId == formId && _.UserId == userId);
+                .Where(_ => _.UserId == userId)
+                .ToListAsync();
         }
 
         public async Task RemoveFormUserMappingAsync(int formId, int locationId, int userId)

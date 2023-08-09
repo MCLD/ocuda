@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ocuda.Promenade.Models.Entities
 {
@@ -20,9 +21,6 @@ namespace Ocuda.Promenade.Models.Entities
         [DisplayName(i18n.Keys.Promenade.PromptExperience)]
         [MaxLength(255)]
         public string Experience { get; set; }
-
-        [Required]
-        public int FormId { get; set; }
 
         [MaxLength(255)]
         public string GuardianEmail { get; set; }
@@ -55,5 +53,13 @@ namespace Ocuda.Promenade.Models.Entities
         public string Regularity { get; set; }
 
         public DateTime? StaffNotifiedAt { get; set; }
+
+        public VolunteerForm VolunteerForm { get; set; }
+
+        [Required]
+        public int VolunteerFormId { get; set; }
+
+        [NotMapped]
+        public VolunteerFormType? VolunteerFormType { get; set; }
     }
 }

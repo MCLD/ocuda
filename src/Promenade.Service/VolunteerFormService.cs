@@ -103,7 +103,6 @@ namespace Ocuda.Promenade.Service
             ArgumentNullException.ThrowIfNull(form);
 
             form.CreatedAt = _dateTimeProvider.Now;
-            form.StaffNotifiedAt = null;
 
             await _volunteerFormSubmissionRepository.AddAsync(form);
             await _volunteerFormSubmissionRepository.SaveAsync();

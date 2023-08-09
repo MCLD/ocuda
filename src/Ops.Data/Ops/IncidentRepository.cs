@@ -21,13 +21,14 @@ namespace Ocuda.Ops.Data.Ops
             ILogger<IncidentRepository> logger,
             IDateTimeProvider dateTimeProvider) : base(repositoryFacade, logger)
         {
-            _dateTimeProvider = dateTimeProvider
-                ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+            ArgumentNullException.ThrowIfNull(dateTimeProvider);
+
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public async Task<CollectionWithCount<Incident>> GetPaginatedAsync(IncidentFilter filter)
         {
-            if (filter == null) { throw new ArgumentNullException(nameof(filter)); }
+            ArgumentNullException.ThrowIfNull(filter);
 
             var incidents = DbSet.Where(_ => _.IsVisible);
 
@@ -52,6 +53,7 @@ namespace Ocuda.Ops.Data.Ops
                 Data = await query
                     .OrderByDescending(_ => _.IncidentAt)
                     .ApplyPagination(filter)
+                    .AsNoTracking()
                     .ToListAsync()
             };
         }

@@ -31,10 +31,6 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Repositories
 
         Task<ICollection<string>> GetTitlesAsync();
 
-        Task<bool> IsDuplicateEmail(User user);
-
-        Task<bool> IsDuplicateUsername(User user);
-
         Task<bool> IsSupervisor(int userId);
 
         Task MarkUserDeletedAsync(string username, int currentUserId, DateTime asOf);

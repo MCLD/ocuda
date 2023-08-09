@@ -18,31 +18,36 @@ namespace Ocuda.Ops.Service
 {
     public class VolunteerFormService : BaseService<VolunteerFormService>, IVolunteerFormService
     {
+        private readonly IVolunteerFormSubmissionEmailRecordRepository _emailRecordRepository;
         private readonly ILocationFeatureRepository _locationFeatureRepository;
         private readonly ILocationFormRepository _locationFormRepository;
         private readonly IVolunteerFormRepository _volunteerFormRepository;
         private readonly IVolunteerFormSubmissionRepository _volunteerFormSubmissionRepository;
         private readonly IVolunteerUserMappingRepository _volunteerUserMappingRepository;
 
-        public VolunteerFormService(ILogger<VolunteerFormService> logger,
-            IHttpContextAccessor httpContextAccessor,
+        public VolunteerFormService(IHttpContextAccessor httpContextAccessor,
             ILocationFeatureRepository locationFeatureRepository,
             ILocationFormRepository locationFormRepository,
+            ILogger<VolunteerFormService> logger,
             IVolunteerFormRepository volunteerFormRepository,
+            IVolunteerFormSubmissionEmailRecordRepository emailRecordRepository,
             IVolunteerFormSubmissionRepository volunteerFormSubmissionRepository,
             IVolunteerUserMappingRepository volunteerUserMappingRepository)
             : base(logger, httpContextAccessor)
         {
-            _locationFeatureRepository = locationFeatureRepository
-                ?? throw new ArgumentNullException(nameof(locationFeatureRepository));
-            _locationFormRepository = locationFormRepository
-                ?? throw new ArgumentNullException(nameof(locationFormRepository));
-            _volunteerFormRepository = volunteerFormRepository
-                ?? throw new ArgumentNullException(nameof(volunteerFormRepository));
-            _volunteerFormSubmissionRepository = volunteerFormSubmissionRepository
-                ?? throw new ArgumentNullException(nameof(volunteerFormSubmissionRepository));
-            _volunteerUserMappingRepository = volunteerUserMappingRepository
-                ?? throw new ArgumentNullException(nameof(volunteerFormRepository));
+            ArgumentNullException.ThrowIfNull(emailRecordRepository);
+            ArgumentNullException.ThrowIfNull(locationFeatureRepository);
+            ArgumentNullException.ThrowIfNull(locationFormRepository);
+            ArgumentNullException.ThrowIfNull(volunteerFormRepository);
+            ArgumentNullException.ThrowIfNull(volunteerFormSubmissionRepository);
+            ArgumentNullException.ThrowIfNull(volunteerUserMappingRepository);
+
+            _emailRecordRepository = emailRecordRepository;
+            _locationFeatureRepository = locationFeatureRepository;
+            _locationFormRepository = locationFormRepository;
+            _volunteerFormRepository = volunteerFormRepository;
+            _volunteerFormSubmissionRepository = volunteerFormSubmissionRepository;
+            _volunteerUserMappingRepository = volunteerUserMappingRepository;
         }
 
         public async Task AddFormUserMapping(int locationId, VolunteerFormType type, int userId)
@@ -126,7 +131,7 @@ namespace Ocuda.Ops.Service
             await SetDisabled(formId, false);
         }
 
-        public Dictionary<string, int> GetAllVolunteerFormTypes()
+        public IDictionary<string, int> GetAllVolunteerFormTypes()
         {
             return Enum.GetValues(typeof(VolunteerFormType))
                 .Cast<VolunteerFormType>()
@@ -148,20 +153,42 @@ namespace Ocuda.Ops.Service
             return await _volunteerFormRepository.FindByTypeAsync(type);
         }
 
-        public async Task<List<VolunteerFormUserMapping>> GetFormUserMappingsAsync(VolunteerFormType type, int locationId)
+        public async Task<IDictionary<VolunteerFormType, int>> GetFormEmailSetupMappingAsync()
         {
-            var form = await GetFormByTypeAsync(type);
-            if (form != null)
-            {
-                return await _volunteerUserMappingRepository.FindAsync(locationId, form.Id);
-            }
-            return null;
+            return await _volunteerFormRepository.GetEmailSetupMappingAsync();
+        }
+
+        public async Task<ICollection<VolunteerFormUserMapping>> GetFormUserMappingsAsync(int formId, int locationId)
+        {
+            return await _volunteerUserMappingRepository.GetByLocationFormAsync(locationId, formId);
+        }
+
+        public async Task<ICollection<VolunteerFormSubmissionEmailRecord>>
+            GetNotificationInfoAsync(int submissionId)
+        {
+            return await _emailRecordRepository.GetBySubmissionId(submissionId);
         }
 
         public async Task<DataWithCount<ICollection<VolunteerForm>>> GetPaginatedListAsync(
             BaseFilter filter)
         {
             return await _volunteerFormRepository.GetPaginatedListAsync(filter);
+        }
+
+        public async Task<CollectionWithCount<VolunteerFormSubmission>>
+            GetPaginatedSubmissionsAsync(VolunteerSubmissionFilter filter)
+        {
+            return await _volunteerFormSubmissionRepository.GetPaginatedListAsync(filter);
+        }
+
+        public async Task<ICollection<VolunteerFormSubmission>> GetPendingNotificationsAsync()
+        {
+            return await _volunteerFormSubmissionRepository.GetPendingNotificationsAsync();
+        }
+
+        public async Task<ICollection<VolunteerFormUserMapping>> GetUserMappingsAsync(int userId)
+        {
+            return await _volunteerUserMappingRepository.GetByUserAsync(userId);
         }
 
         public async Task<ICollection<VolunteerForm>> GetVolunteerFormsAsync()
@@ -181,6 +208,12 @@ namespace Ocuda.Ops.Service
             return await _volunteerFormSubmissionRepository.GetAllAsync(locationId, form.Id);
         }
 
+        public async Task NotifiedStaffAsync(int formSubmissionId, int emailRecordId, int userId)
+        {
+            await _volunteerFormSubmissionRepository.StaffNotifiedAsync(formSubmissionId);
+            await _emailRecordRepository.AddSaveAsync(formSubmissionId, emailRecordId, userId);
+        }
+
         public async Task RemoveFormUserMapping(int locationId, int userId, VolunteerFormType type)
         {
             var form = await GetFormByTypeAsync(type);
@@ -188,7 +221,7 @@ namespace Ocuda.Ops.Service
             {
                 await _volunteerUserMappingRepository.RemoveFormUserMappingAsync(form.Id, locationId, userId);
 
-                var locationMappings = await _volunteerUserMappingRepository.FindAsync(locationId, form.Id);
+                var locationMappings = await _volunteerUserMappingRepository.GetByLocationFormAsync(locationId, form.Id);
                 var locationForm = await _locationFormRepository.FindAsync(locationId, form.Id);
                 if (locationForm != null && !locationMappings.Any())
                 {

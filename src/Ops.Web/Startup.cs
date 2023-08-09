@@ -38,7 +38,9 @@ namespace Ocuda.Ops.Web
         public Startup(IConfiguration configuration,
             IWebHostEnvironment env)
         {
-            _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            ArgumentNullException.ThrowIfNull(configuration);
+
+            _config = configuration;
             _isDevelopment = env.IsDevelopment();
         }
 
@@ -111,9 +113,6 @@ namespace Ocuda.Ops.Web
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability",
                     "CA1506:Avoid excessive class coupling",
             Justification = "Dependency injection")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Vulnerability",
-            "S4830:Server certificates should be verified during SSL/TLS connections",
-            Justification = "Screenly OSE uses self-signed certificates")]
         public void ConfigureServices(IServiceCollection services)
         {
             // set a default culture of en-US if none is specified
@@ -421,6 +420,8 @@ namespace Ocuda.Ops.Web
                 Data.Ops.UserSyncHistoryRepository>();
             services.AddScoped<Service.Interfaces.Ops.Repositories.IUserSyncLocationRepository,
                 Data.Ops.UserSyncLocationRepository>();
+            services.AddScoped<Service.Interfaces.Ops.Repositories.IVolunteerFormSubmissionEmailRecordRepository,
+                Data.Ops.VolunteerFormSubmissionEmailRecordRepository>();
 
             services.AddScoped<Service.Interfaces.Promenade.Repositories.ICardDetailRepository,
                 Data.Promenade.CardDetailRepository>();
@@ -586,9 +587,11 @@ namespace Ocuda.Ops.Web
             services.AddScoped<ITitleClassService, TitleClassService>();
             services.AddScoped<Service.Abstract.IUserContextProvider, UserContextProvider>();
             services.AddScoped<IUserMetadataTypeService, UserMetadataTypeService>();
+            services.AddScoped<IUserManagementService, UserManagementService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserSyncService, UserSyncService>();
             services.AddScoped<IVolunteerFormService, VolunteerFormService>();
+            services.AddScoped<IVolunteerNotificationService, VolunteerNotificationService>();
 
             // background process
             services.AddScoped<JobScopedProcessingService>();

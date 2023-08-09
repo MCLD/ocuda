@@ -61,6 +61,14 @@ namespace Ocuda.Ops.Data.Promenade
                 .FirstOrDefaultAsync(_ => _.VolunteerFormType == (VolunteerFormType)typeId);
         }
 
+        public async Task<IDictionary<VolunteerFormType, int>> GetEmailSetupMappingAsync()
+        {
+            return await DbSet
+                .AsNoTracking()
+                .Where(_ => _.NotifyStaffEmailSetupId.HasValue)
+                .ToDictionaryAsync(k => k.VolunteerFormType, v => v.NotifyStaffEmailSetupId.Value);
+        }
+
         public async Task<DataWithCount<ICollection<VolunteerForm>>> GetPaginatedListAsync(
             BaseFilter filter)
         {

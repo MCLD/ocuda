@@ -13,19 +13,24 @@ namespace Ocuda.Ops.Web.JobScheduling
         private readonly IDigitalDisplayCleanupService _digitalDisplayCleanupService;
         private readonly IDigitalDisplaySyncService _digitalDisplaySyncService;
         private readonly IScheduleNotificationService _scheduleNotificationService;
+        private readonly IVolunteerNotificationService _volunteerNotificationService;
 
         public JobScopedProcessingService(ILogger<JobScopedProcessingService> logger,
             IDigitalDisplayCleanupService digitalDisplayCleanupService,
             IDigitalDisplaySyncService digitalDisplaySyncService,
-            IScheduleNotificationService scheduleNotificationService)
+            IScheduleNotificationService scheduleNotificationService,
+            IVolunteerNotificationService volunteerNotificationService)
             : base(logger)
         {
-            _digitalDisplayCleanupService = digitalDisplayCleanupService
-                ?? throw new ArgumentNullException(nameof(digitalDisplayCleanupService));
-            _digitalDisplaySyncService = digitalDisplaySyncService
-                ?? throw new ArgumentNullException(nameof(digitalDisplaySyncService));
-            _scheduleNotificationService = scheduleNotificationService
-                ?? throw new ArgumentNullException(nameof(scheduleNotificationService));
+            ArgumentNullException.ThrowIfNull(digitalDisplayCleanupService);
+            ArgumentNullException.ThrowIfNull(digitalDisplaySyncService);
+            ArgumentNullException.ThrowIfNull(scheduleNotificationService);
+            ArgumentNullException.ThrowIfNull(volunteerNotificationService);
+
+            _digitalDisplayCleanupService = digitalDisplayCleanupService;
+            _digitalDisplaySyncService = digitalDisplaySyncService;
+            _scheduleNotificationService = scheduleNotificationService;
+            _volunteerNotificationService = volunteerNotificationService;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
@@ -37,9 +42,10 @@ namespace Ocuda.Ops.Web.JobScheduling
 
             var scheduledTasks = new Dictionary<string, Func<Task>>
             {
-                ["SendPendingNotifications"] = _scheduleNotificationService.SendPendingNotificationsAsync,
+                ["SendPendingScheduleNotifications"] = _scheduleNotificationService.SendPendingNotificationsAsync,
                 ["CleanupSlides"] = _digitalDisplayCleanupService.CleanupSlidesAsync,
-                ["UpdateDigitalDisplays"] = _digitalDisplaySyncService.UpdateDigitalDisplaysAsync
+                ["UpdateDigitalDisplays"] = _digitalDisplaySyncService.UpdateDigitalDisplaysAsync,
+                ["SendPendingVolunteerNotifications"] = _volunteerNotificationService.SendPendingNotificationsAsync
             };
 
             foreach (var methodName in scheduledTasks.Keys)

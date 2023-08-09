@@ -36,7 +36,6 @@ namespace Ocuda.Ops.Data
         public DbSet<FileLibraryFileType> FileLibraryFileTypes { get; set; }
         public DbSet<File> Files { get; set; }
         public DbSet<FileType> FileTypes { get; set; }
-        public DbSet<VolunteerFormUserMapping> VolunteerFormUserMappings { get; set; }
         public DbSet<HistoricalIncident> HistoricalIncidents { get; set; }
         public DbSet<IncidentFollowup> IncidentFollowups { get; set; }
         public DbSet<IncidentParticipant> IncidentParticipants { get; set; }
@@ -72,6 +71,8 @@ namespace Ocuda.Ops.Data
         public DbSet<User> Users { get; set; }
         public DbSet<UserSyncHistory> UserSyncHistories { get; set; }
         public DbSet<UserSyncLocation> UserSyncLocations { get; set; }
+        public DbSet<VolunteerFormSubmissionEmailRecord> VolunteerFormSubmissionEmailRecords { get; set; }
+        public DbSet<VolunteerFormUserMapping> VolunteerFormUserMappings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -96,8 +97,6 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.EmailTemplateId, _.PromenadeLanguageName });
             modelBuilder.Entity<FileLibraryFileType>()
                 .HasKey(_ => new { _.FileLibraryId, _.FileTypeId });
-            modelBuilder.Entity<VolunteerFormUserMapping>()
-                .HasKey(_ => new { _.VolunteerFormId, _.LocationId, _.UserId });
             modelBuilder.Entity<IncidentRelationship>()
                 .HasKey(_ => new { _.IncidentId, _.RelatedIncidentId });
             modelBuilder.Entity<PermissionGroupApplication>()
@@ -120,6 +119,10 @@ namespace Ocuda.Ops.Data
                 .HasKey(_ => new { _.TitleClassId, _.UserTitle });
             modelBuilder.Entity<UserMetadata>()
                 .HasKey(_ => new { _.UserId, _.UserMetadataTypeId });
+            modelBuilder.Entity<VolunteerFormSubmissionEmailRecord>()
+                .HasKey(_ => new { _.VolunterFormSubmissionId, _.EmailRecordId });
+            modelBuilder.Entity<VolunteerFormUserMapping>()
+                .HasKey(_ => new { _.VolunteerFormId, _.LocationId, _.UserId });
         }
 
         #region IMigratableContext

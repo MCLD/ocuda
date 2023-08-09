@@ -1,115 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
-using MimeKit;
 using Ocuda.Ops.Models;
 using Ocuda.Ops.Models.Entities;
 using Ocuda.Ops.Service.Abstract;
 using Ocuda.Ops.Service.Filters;
 using Ocuda.Ops.Service.Interfaces.Ops.Repositories;
 using Ocuda.Ops.Service.Interfaces.Ops.Services;
-using Ocuda.Utility.Exceptions;
-using Ocuda.Utility.Helpers;
 using Ocuda.Utility.Keys;
 using Ocuda.Utility.Models;
 using Ocuda.Utility.Services.Interfaces;
-using SixLabors.ImageSharp;
 
 namespace Ocuda.Ops.Service
 {
     public class UserService : BaseService<UserService>, IUserService
     {
-        private const string ProfilePicturePath = "profilepicture";
-        private static readonly string[] ProfilePictureValidTypes = { ".jpg", ".png" };
-
         private readonly IOcudaCache _cache;
         private readonly IPathResolverService _pathResolver;
         private readonly ITitleClassService _titleClassService;
         private readonly IUserRepository _userRepository;
 
-        public UserService(ILogger<UserService> logger,
-            IHttpContextAccessor httpContextAccessor,
+        public UserService(IHttpContextAccessor httpContextAccessor,
+            ILogger<UserService> logger,
             IOcudaCache cache,
             IPathResolverService pathResolver,
             ITitleClassService titleClassService,
             IUserRepository userRepository)
             : base(logger, httpContextAccessor)
         {
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _pathResolver = pathResolver ?? throw new ArgumentNullException(nameof(pathResolver));
-            _titleClassService = titleClassService
-                ?? throw new ArgumentNullException(nameof(titleClassService));
-            _userRepository = userRepository
-                    ?? throw new ArgumentNullException(nameof(userRepository));
-        }
+            ArgumentNullException.ThrowIfNull(cache);
+            ArgumentNullException.ThrowIfNull(pathResolver);
+            ArgumentNullException.ThrowIfNull(titleClassService);
+            ArgumentNullException.ThrowIfNull(userRepository);
 
-        public async Task<User> AddUser(User user, int? createdById = null)
-        {
-            user.Username = user.Username?.Trim().ToLower();
-            user.Email = user.Email?.Trim().ToLower();
-            user.CreatedAt = DateTime.Now;
-            if (createdById != null)
-            {
-                user.CreatedBy = (int)createdById;
-            }
-
-            await _userRepository.AddAsync(user);
-            await _userRepository.SaveAsync();
-            if (createdById != null)
-            {
-                return user;
-            }
-            {
-                User createdUser = await _userRepository.FindByUsernameAsync(user.Username);
-                createdUser.CreatedBy = createdUser.Id;
-                _userRepository.Update(user);
-                await _userRepository.SaveAsync();
-                return createdUser;
-            }
-        }
-
-        public async Task<User> EditNicknameAsync(User user)
-        {
-            User currentUser = await _userRepository.FindAsync(user.Id);
-            currentUser.Nickname = user.Nickname;
-            currentUser.UpdatedAt = DateTime.Now;
-            currentUser.UpdatedBy = GetCurrentUserId();
-
-            _userRepository.Update(currentUser);
-            await _userRepository.SaveAsync();
-            return currentUser;
-        }
-
-        /// <summary>
-        /// Ensure the sysadmin user exists.
-        /// </summary>
-        public async Task<User> EnsureSysadminUserAsync()
-        {
-            User sysadminUser = await _userRepository.GetSystemAdministratorAsync();
-            if (sysadminUser == null)
-            {
-                sysadminUser = new User
-                {
-                    Username = "sysadmin",
-                    Name = "System",
-                    CreatedAt = DateTime.Now,
-                    IsSysadmin = true
-                };
-                await _userRepository.AddAsync(sysadminUser);
-                await _userRepository.SaveAsync();
-            }
-            if (!sysadminUser.ExcludeFromRoster)
-            {
-                sysadminUser.ExcludeFromRoster = true;
-                _userRepository.Update(sysadminUser);
-                await _userRepository.SaveAsync();
-            }
-            return sysadminUser;
+            _cache = cache;
+            _pathResolver = pathResolver;
+            _titleClassService = titleClassService;
+            _userRepository = userRepository;
         }
 
         public async Task<CollectionWithCount<User>> FindAsync(SearchFilter filter)
@@ -138,9 +69,9 @@ namespace Ocuda.Ops.Service
             return await _userRepository.FindIncludeDeletedAsync(id);
         }
 
-        public async Task<ICollection<User>> GetDirectReportsAsync(int userId)
+        public async Task<ICollection<User>> GetDirectReportsAsync(int supervisorId)
         {
-            return await _userRepository.GetDirectReportsAsync(userId);
+            return await _userRepository.GetDirectReportsAsync(supervisorId);
         }
 
         public async Task<User> GetNameUsernameAsync(int id)
@@ -163,7 +94,8 @@ namespace Ocuda.Ops.Service
                 await _cache.SaveToCacheAsync(cacheKey, filename, 8);
             }
 
-            var filePath = GetProfilePictureFilePath(filename);
+            var filePath = _pathResolver.GetPrivateContentFilePath(filename,
+                UserManagementService.ProfilePicturePath);
 
             new FileExtensionContentTypeProvider()
                 .TryGetContentType(filePath, out string fileType);
@@ -221,189 +153,22 @@ namespace Ocuda.Ops.Service
             return await _userRepository.IsSupervisor(userId);
         }
 
-        public async Task LoggedInUpdateAsync(User user)
-        {
-            var systemAdminUser = await _userRepository.GetSystemAdministratorAsync();
-
-            User dbUser = await GetByIdAsync(user.Id);
-            dbUser.Department = user.Department;
-            dbUser.LastRosterUpdate = user.LastRosterUpdate;
-            dbUser.LastSeen = DateTime.Now;
-            dbUser.Mobile = user.Mobile;
-            dbUser.Name = user.Name;
-            dbUser.Nickname = user.Nickname;
-            dbUser.Phone = user.Phone;
-            dbUser.ReauthenticateUser = false;
-            dbUser.SupervisorId = user.SupervisorId;
-            dbUser.Title = user.Title;
-            dbUser.UpdatedAt = DateTime.Now;
-            dbUser.UpdatedBy = systemAdminUser.Id;
-
-            _userRepository.Update(dbUser);
-            await _userRepository.SaveAsync();
-        }
-
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
+            "CA1308:Normalize strings to uppercase",
+            Justification = "Normalize username to lowercase.")]
         public async Task<User> LookupUserAsync(string username)
         {
-            return await _userRepository.FindByUsernameAsync(username?.Trim().ToLower());
+            return await _userRepository
+                .FindByUsernameAsync(username?.Trim().ToLowerInvariant());
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
+            "CA1308:Normalize strings to uppercase",
+            Justification = "Normalize email address to lowercase.")]
         public async Task<User> LookupUserByEmailAsync(string email)
         {
-            return await _userRepository.FindByEmailAsync(email?.Trim().ToLower());
-        }
-
-        public async Task RemoveProfilePictureAsync(int userId)
-        {
-            var user = await GetByIdAsync(userId);
-            if (user == null)
-            {
-                throw new OcudaException($"Cannot find user ID {userId}");
-            }
-
-            var fullPath = GetProfilePictureFilePath(user.PictureFilename);
-
-            if (System.IO.File.Exists(fullPath))
-            {
-                System.IO.File.Delete(fullPath);
-            }
-
-            user.PictureFilename = null;
-            user.PictureUpdatedBy = GetCurrentUserId();
-
-            _userRepository.Update(user);
-            await _userRepository.SaveAsync();
-
-            var cacheKey = string.Format(CultureInfo.InvariantCulture,
-                Cache.OpsUserProfilePicture,
-                user.Username);
-
-            await _cache.RemoveAsync(cacheKey);
-        }
-
-        public async Task UnsetManualLocationAsync(int userId)
-        {
-            var user = await _userRepository.FindAsync(userId)
-                ?? throw new OcudaException($"Cannot find user id {userId}");
-
-            user.AssociatedLocationManuallySet = false;
-            _userRepository.Update(user);
-            await _userRepository.SaveAsync();
-        }
-
-        public async Task UpdateLocationAsync(int userId, int locationId)
-        {
-            if (userId != GetCurrentUserId() && !IsSiteManager())
-            {
-                throw new OcudaException("Permission denied.");
-            }
-
-            var user = await _userRepository.FindAsync(userId)
-                ?? throw new OcudaException($"Cannot find user id {userId}");
-            user.AssociatedLocation = locationId;
-            user.AssociatedLocationManuallySet = true;
-            _userRepository.Update(user);
-            await _userRepository.SaveAsync();
-        }
-
-        public async Task<User> UpdateRosterUserAsync(int rosterUserId, User user)
-        {
-            var systemAdminUser = await _userRepository.GetSystemAdministratorAsync();
-
-            User rosterUser = await GetByIdAsync(rosterUserId);
-            rosterUser.Department = user.Department;
-            rosterUser.Email = user.Email;
-            rosterUser.Mobile = user.Mobile;
-            rosterUser.Name = user.Name;
-            rosterUser.Nickname = user.Nickname;
-            rosterUser.Phone = user.Phone;
-            rosterUser.UpdatedAt = DateTime.Now;
-            rosterUser.UpdatedBy = systemAdminUser.Id;
-            rosterUser.Username = user.Username;
-
-            _userRepository.Update(rosterUser);
-            await _userRepository.SaveAsync();
-
-            return rosterUser;
-        }
-
-        public async Task UploadProfilePictureAsync(User user, string profilePictureBase64)
-        {
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            byte[] profilePicture;
-
-            string extension;
-            try
-            {
-                profilePicture = Convert.FromBase64String(profilePictureBase64);
-                var imageInfo = Image.Identify(profilePicture);
-                if (imageInfo.Height != imageInfo.Width)
-                {
-                    throw new OcudaException("Profile picture must be square.");
-                }
-
-                var imageFormat = imageInfo.Metadata.DecodedImageFormat;
-
-                var validFileType = false;
-                foreach (var validExtension in ProfilePictureValidTypes)
-                {
-                    if (imageFormat.MimeTypes.Contains(MimeTypes.GetMimeType(validExtension)))
-                    {
-                        validFileType = true;
-                        break;
-                    }
-                }
-
-                if (!validFileType)
-                {
-                    throw new OcudaException("Invalid image format, please upload a JPEG or PNG picture");
-                }
-                extension = imageFormat.FileExtensions.First();
-            }
-            catch (UnknownImageFormatException uifex)
-            {
-                throw new OcudaException("Unknown image type, please upload a JPEG or PNG picture",
-                    uifex);
-            }
-
-            var checkPath = GetProfilePictureFilePath(null);
-            if (!System.IO.Directory.Exists(checkPath))
-            {
-                System.IO.Directory.CreateDirectory(checkPath);
-            }
-
-            var filename = FileHelper.MakeValidFilename(
-                System.IO.Path.ChangeExtension(user.Username, extension));
-
-            var fullPath = GetProfilePictureFilePath(filename);
-
-            if (System.IO.File.Exists(fullPath))
-            {
-                System.IO.File.Delete(fullPath);
-            }
-
-            await System.IO.File.WriteAllBytesAsync(fullPath, profilePicture);
-
-            user.PictureFilename = filename;
-            user.PictureUpdatedBy = GetCurrentUserId();
-
-            _userRepository.Update(user);
-            await _userRepository.SaveAsync();
-
-            var cacheKey = string.Format(CultureInfo.InvariantCulture,
-                Cache.OpsUserProfilePicture,
-                user.Username);
-
-            await _cache.RemoveAsync(cacheKey);
-        }
-
-        private string GetProfilePictureFilePath(string filename)
-        {
-            return _pathResolver.GetPrivateContentFilePath(filename, ProfilePicturePath);
+            return await _userRepository
+                .FindByEmailAsync(email?.Trim().ToLowerInvariant());
         }
     }
 }
