@@ -14,39 +14,39 @@ else
 {
     <div class="row">
         <div class="col-12">
-            <table class="table table-striped">
+            <table class="table table-striped" id="submissionDetails">
                 <tbody>
                     <tr>
-                        <th>Name</th>
+                        <th><label asp-for="VolunteerFormSubmission.Name"></label></th>
                         <td>@Model.VolunteerFormSubmission.Name</td>
                     </tr>
                     <tr>
-                        <th>Email</th>
+                        <th><label asp-for="VolunteerFormSubmission.Email"></label></th>
                         <td>@Model.VolunteerFormSubmission.Email</td>
                     </tr>
                     <tr>
-                        <th>Phone</th>
+                        <th><label asp-for="VolunteerFormSubmission.Phone"></label></th>
                         <td>@Model.VolunteerFormSubmission.Phone</td>
                     </tr>
                     @if (!string.IsNullOrEmpty(Model.VolunteerFormSubmission.GuardianName))
                     {
                         <tr>
-                            <th>Guardian Name</th>
+                            <th><label asp-for="VolunteerFormSubmission.GuardianName"></label></th>
                             <td>@Model.VolunteerFormSubmission.GuardianName</td>
                         </tr>
                         <tr>
-                            <th>Guardian Email</th>
+                            <th><label asp-for="VolunteerFormSubmission.GuardianEmail"></label></th>
                             <td>@Model.VolunteerFormSubmission.GuardianEmail</td>
                         </tr>
                         <tr>
-                            <th>Guardian Phone</th>
+                            <th><label asp-for="VolunteerFormSubmission.Phone"></label></th>
                             <td>@Model.VolunteerFormSubmission.GuardianPhone</td>
                         </tr>
                     }
                     @if (!string.IsNullOrEmpty(Model.VolunteerFormSubmission.Availability))
                     {
                         <tr>
-                            <th>Availability</th>
+                            <th><label asp-for="VolunteerFormSubmission.Availability"></label></th>
                             <td>@Model.VolunteerFormSubmission.Availability</td>
                         </tr>
                     }
@@ -54,14 +54,14 @@ else
                     {
 
                         <tr>
-                            <th>Experience</th>
+                            <th><label asp-for="VolunteerFormSubmission.Experience"></label></th>
                             <td>@Model.VolunteerFormSubmission.Experience</td>
                         </tr>
                     }
                     @if (!string.IsNullOrEmpty(Model.VolunteerFormSubmission.Regularity))
                     {
                         <tr>
-                            <th>Regularity</th>
+                            <th><label asp-for="VolunteerFormSubmission.Regularity"></label></th>
                             <td>@Model.VolunteerFormSubmission.Regularity</td>
                         </tr>
                     }
@@ -98,7 +98,7 @@ else
                                             (<a asp-area=""
                                                 asp-controller="@Ocuda.Ops.Controllers.ProfileController.Name"
                                                 asp-action="@nameof(Ocuda.Ops.Controllers.ProfileController.Index)"
-                                                asp-route-id="@historyItem.User.Username">@historyItem.User.Name</a>)
+                          no                      asp-route-id="@historyItem.User.Username">@historyItem.User.Name</a>)
                                         </span>
                                     }
                                 }
@@ -109,4 +109,16 @@ else
             </table>
         </div>
     </div>
+}
+
+@section Styles {
+    <style type="text/css">
+        table#submissionDetails th {
+            min-width: 40%;
+        }
+
+        table#submissionDetails td {
+            width: 60%
+        }
+    </style>
 }

@@ -9,7 +9,7 @@ namespace Ocuda.Ops.Service.Filters
         }
 
         public VolunteerFormType? FormType { get; set; }
-
         public int LocationId { get; set; }
+        public int SelectedLocation { get; set; }
     }
 }

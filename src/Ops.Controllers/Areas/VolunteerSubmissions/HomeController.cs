@@ -43,11 +43,14 @@ namespace Ocuda.Ops.Controllers.Areas.VolunteerSubmissions
         [HttpGet("")]
         [HttpGet("[action]")]
         [HttpGet("[action]/{page}")]
-        public async Task<IActionResult> All(int page)
+        public async Task<IActionResult> All(int page, int selectedLocation)
         {
             int currentPage = page != 0 ? page : 1;
 
-            var filter = new VolunteerSubmissionFilter(currentPage);
+            var filter = new VolunteerSubmissionFilter(currentPage)
+            {
+                SelectedLocation = selectedLocation
+            };
 
             var viewModel = await GetSubmissionsAsync(filter);
 
@@ -57,53 +60,62 @@ namespace Ocuda.Ops.Controllers.Areas.VolunteerSubmissions
             }
 
             viewModel.SecondaryHeading = nameof(All);
+            viewModel.SelectedLocation = selectedLocation;
 
             return View("Index", viewModel);
         }
 
         [HttpGet("[action]/{id}")]
-        public async Task<IActionResult> Details(int id, int page)
+        public async Task<IActionResult> Details(int id, int page, int selectedLocation)
         {
             var submission = await _volunteerFormService.GetVolunteerFormSubmissionAsync(id);
 
             var viewModel = new DetailsViewModel
             {
-                BackLink = page > 0
-                    ? Url.Action(nameof(All), new { page })
-                    : Url.Action(nameof(All)),
+                BackLink = (page, selectedLocation) switch
+                {
+                    ( > 0, > 0) => Url.Action(nameof(All), new { page, selectedLocation }),
+                    ( > 0, _) => Url.Action(nameof(All), new { page }),
+                    (_, > 0) => Url.Action(nameof(All), new { selectedLocation }),
+                    _ => Url.Action(nameof(All))
+                },
                 CurrentPage = page,
                 VolunteerFormSubmission = submission,
-                SecondaryHeading = submission?.Name
+                SecondaryHeading = submission?.Name,
+                SelectedLocation = selectedLocation,
             };
 
-            viewModel.VolunteerFormHistory.Add(new VolunteerFormHistory
-            {
-                Text = "Form submitted",
-                Timestamp = submission.CreatedAt
-            });
-
-            if (submission.StaffNotifiedAt.HasValue)
+            if (submission != null)
             {
                 viewModel.VolunteerFormHistory.Add(new VolunteerFormHistory
                 {
-                    Text = "Form marked as staff notified",
-                    Timestamp = submission.StaffNotifiedAt.Value
+                    Text = "Form submitted",
+                    Timestamp = submission.CreatedAt
                 });
-            }
 
-            var emailRecords = await _volunteerFormService
-                .GetNotificationInfoAsync(submission.Id);
-
-            if (emailRecords?.Count > 0)
-            {
-                foreach (var record in emailRecords)
+                if (submission.StaffNotifiedAt.HasValue)
                 {
                     viewModel.VolunteerFormHistory.Add(new VolunteerFormHistory
                     {
-                        Text = $"Sent email to {record.EmailRecord.ToEmailAddress}",
-                        Timestamp = record.EmailRecord.CreatedAt,
-                        User = record.User
+                        Text = "Form marked as staff notified",
+                        Timestamp = submission.StaffNotifiedAt.Value
                     });
+                }
+
+                var emailRecords = await _volunteerFormService
+                    .GetNotificationInfoAsync(submission.Id);
+
+                if (emailRecords?.Count > 0)
+                {
+                    foreach (var record in emailRecords)
+                    {
+                        viewModel.VolunteerFormHistory.Add(new VolunteerFormHistory
+                        {
+                            Text = $"Sent email to {record.EmailRecord.ToEmailAddress}",
+                            Timestamp = record.EmailRecord.CreatedAt,
+                            User = record.User
+                        });
+                    }
                 }
             }
 

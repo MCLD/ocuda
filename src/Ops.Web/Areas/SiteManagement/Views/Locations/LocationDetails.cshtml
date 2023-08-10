@@ -2,6 +2,11 @@
 
 @section styles{
     <link rel="stylesheet" href="~/css/md.min.css" asp-append-version="true" />
+    <style type="text/css">
+        th.button-column {
+            width: 5%;
+        }
+    </style>
 }
 
 <div class="row">
@@ -299,6 +304,7 @@
 {
     @await Html.PartialAsync("_LocationPartial")
 }
+
 <form method="post"
       asp-controller="@LocationsController.Name"
       asp-action="@Model.Action"
@@ -624,7 +630,7 @@
                                     @foreach (var formMapping in form.FormMappings)
                                     {
                                         <tr>
-                                            <td>
+                                            <td class="text-center">
                                                 <form method="post" role="form" asp-action="@nameof(Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.RemoveFormUserMapping)"
                                                       asp-controller="@Ocuda.Ops.Controllers.Areas.SiteManagement.LocationsController.Name"
                                                       asp-route-locationStub="@Model.Location.Stub"
@@ -869,6 +875,7 @@
             </table>
         </div>
     </div>
+
     <div class="row mt-2">
         <div class="col">
             <h3>Location groups</h3>
@@ -1081,7 +1088,7 @@
                     {
                         itemId: itemId,
                         locationId: @Model.Location.Id
-                                                                                }, function () {
+                                                                                                        }, function () {
                     $("#deleteModal").modal('hide');
                     window.location.reload();
                 });

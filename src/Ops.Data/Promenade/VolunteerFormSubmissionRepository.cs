@@ -72,6 +72,11 @@ namespace Ocuda.Ops.Data.Promenade
                 ? DbSet.Where(_ => _.VolunteerForm.VolunteerFormType == filter.FormType)
                 : DbSet;
 
+            if (filter.SelectedLocation > 0)
+            {
+                query = query.Where(_ => _.LocationId == filter.SelectedLocation);
+            }
+
             return new CollectionWithCount<VolunteerFormSubmission>
             {
                 Count = await query.CountAsync(),

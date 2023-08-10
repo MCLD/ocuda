@@ -2,6 +2,22 @@
 
 <partial name="_VolunteerPartial" />
 
+<form method="get" role="form">
+    <div class="row my-3">
+        <div class="col-12">
+            <div class="input-group">
+                <span class="input-group-text">Filter by location:</span>
+                <select class="form-select"
+                        asp-for="SelectedLocation"
+                        asp-items="Model.LocationNamesDropdown">
+                    <option value="0">All locations</option>
+                </select>
+                <button class="btn btn-outline-success">Filter</button>
+            </div>
+        </div>
+    </div>
+</form>
+
 @if (Model.Submissions?.Count() > 0)
 {
     <div class="row">
@@ -33,7 +49,8 @@
                                 <a asp-action="@nameof(HomeController.Details)"
                                    asp-controller="@HomeController.Name"
                                    asp-route-id="@submission.Id"
-                                   asp-route-page="@(Model.CurrentPage > 1 ? Model.CurrentPage : 0)">
+                                   asp-route-page="@(Model.CurrentPage > 1 ? Model.CurrentPage : null)"
+                                   asp-route-selectedLocation="@(Model.SelectedLocation > 0 ? Model.SelectedLocation:null)">
                                     @submission.Name
                                 </a>
                             </td>

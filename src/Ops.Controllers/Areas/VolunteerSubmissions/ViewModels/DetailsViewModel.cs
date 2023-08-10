@@ -10,6 +10,7 @@ namespace Ocuda.Ops.Controllers.Areas.VolunteerSubmissions.ViewModels
             VolunteerFormHistory = new List<VolunteerFormHistory>();
         }
 
+        public int SelectedLocation { get; set; }
         public ICollection<VolunteerFormHistory> VolunteerFormHistory { get; }
         public VolunteerFormSubmission VolunteerFormSubmission { get; set; }
     }
