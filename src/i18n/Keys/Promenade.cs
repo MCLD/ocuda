@@ -4,7 +4,7 @@
     // change values in resource files since these are const and not static readonly.
     public static class Promenade
     {
-        public const string AdultVolunteerForm = "Adult Volunteer Form";
+        public const string AvailabilityExperience = "Availability & Experience";
         public const string ButtonBack = "Back";
         public const string ButtonBackToSite = "Back to the site";
         public const string ButtonGo = "Go";
@@ -18,7 +18,7 @@
         public const string CoordinatesErrorItem = "There was a problem locating these coordinates: {0}, {1}";
         public const string Error = "Error";
         public const string ErrorAvailableDaysItem = "This service is only available on the following days: {0}";
-        public const string ErrorCouldNotGeocode = "An error occured and we could not find libraries near that location.";
+        public const string ErrorCouldNotGeocode = "An error occurred and we could not find libraries near that location.";
         public const string ErrorCouldNotSubmit = "An error occurred and we could not save your submission, please try again.";
         public const string ErrorDateClosedItem = "That date is not available for scheduling: {0}";
         public const string ErrorDateOnAfterItem = "You must request a date on or after: {0}";
@@ -35,6 +35,7 @@
         public const string ErrorVolunteerNotAcceptingAdult = "This location is not accepting adult volunteer applications at this time.";
         public const string ErrorVolunteerNotAcceptingTeen = "This location is not accepting teen volunteer applications at this time.";
         public const string ErrorZipCode = "Please enter a 5 digit numeric ZIP code.";
+        public const string HowCanWeHelp = "How can we help?";
         public const string HelpItem = "{0} help";
         public const string KeywordsItem = "Keywords: {0}";
         public const string LinkAdultVolunteerForm = "Use our adult volunteer form.";
@@ -95,22 +96,18 @@
         public const string PromptSubject = "Subject";
         public const string PromptVolunteerRegularity = "Are you interested in regular volunteer work or certain number of hours?";
         public const string PromptWeeklyAvailability = "Weekly Availability";
-        public const string RequiredField = "You must supply a value for: {0}";
         public const string RequiredFieldItem = "The {0} field is required.";
         public const string ScheduleAppointmentDetails = "Here are the details of your appointment:";
         public const string ScheduleCheckEmail = "Please check your email for important information about this appointment.";
-        public const string ScheduleHowCanWeHelp = "How can we help?";
         public const string ScheduleNotAvailable = "Scheduling is currently not available.";
         public const string ScheduleRequestDifferentTime = "Request a different time";
         public const string ScheduleRequiredNotes = "Please help us out by telling us a little about your request.";
         public const string ScheduleYourTime = "Schedule your time";
         public const string ScheduleYourTimeIsScheduled = "Your time is scheduled";
         public const string ShowNotesFor = "Show notes for: {0}";
-        public const string TeenVolunteerForm = "Teen Volunteer Form";
         public const string ViewShowNotes = "View show notes";
         public const string VisitHomePage = "Visit home page";
         public const string VolunteerPageTitle = "Volunteer";
-        public const string VolunteerReceivedSubmission = "We've received your submission.";
         public const string VolunteerThankYou = "Thank you for your interest! Someone will be in touch with you very soon.";
         public const string ZipCodeClosest = "Libraries closest to ZIP code: {0}";
         public const string ZipCodePrompt = "Enter a 5 digit ZIP code";

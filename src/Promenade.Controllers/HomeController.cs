@@ -525,8 +525,7 @@ namespace Ocuda.Promenade.Controllers
                 }
             }
 
-            // todo i18n
-            SetAlertInfo("Thank you for submitting your volunteer application.");
+            SetAlertInfo(Ocuda.i18n.Keys.Promenade.VolunteerThankYou);
             return RedirectToAction(nameof(Location), new { locationSlug });
         }
 

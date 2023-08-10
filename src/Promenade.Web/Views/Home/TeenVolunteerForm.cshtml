@@ -68,7 +68,8 @@
             <input asp-for="GuardianEmail"
                    type="email"
                    formgroup />
-            <h2>Availability & Experience</h2>
+
+            <h2>@Localizer[Ocuda.i18n.Keys.Promenade.AvailabilityExperience]</h2>
             <textarea asp-for="Availability"
                       rows="5"
                       type="text"
@@ -83,9 +84,9 @@
                       formgroup />
             <div>
                 <button type="submit"
-                        class="btn m-2 btn-lg float-right"
+                        class="btn btn-lg m-2 float-right"
                         button-spinner>
-                    <span class="far fa-check-circle"></span>
+                    <span class="fa-regular fa-circle-check"></span>
                     @Localizer[Promenade.ButtonSubmit]
                 </button>
             </div>
