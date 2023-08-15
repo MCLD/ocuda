@@ -207,14 +207,14 @@
         public static readonly string PromLocationSlugToId = "loc-id.{0}";
 
         /// <summary>
-        /// Location status, {0} is the location's id
+        /// Location status, {0} is the location's id, {1} is the language id
         /// </summary>
-        public static readonly string PromLocationStatus = "loc-status.{0}";
+        public static readonly string PromLocationStatus = "loc-status.{0}.{1}";
 
         /// <summary>
-        /// Weekly hours, {0} is the location's id
+        /// Weekly hours, {0} is the location's id, {1} is the language id
         /// </summary>
-        public static readonly string PromLocationWeeklyHours = "loc-hours.{0}";
+        public static readonly string PromLocationWeeklyHours = "loc-hours.{0}.{1}";
 
         /// <summary>
         /// Cached navigation element, {0} is the id of the element, {1} is the language id

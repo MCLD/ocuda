@@ -66,6 +66,12 @@
         public static readonly string PodcastListenOn = "You can listen to our podcast on:";
         public static readonly string PodcastsHeader = "Podcasts";
         public static readonly string PodcastTitle = "{0} Podcast";
+        public static readonly string ProductInventoryDoesNotHave = "Does not have {0}";
+        public static readonly string ProductInventoryHas = "Has {0}";
+        public static readonly string ProductInventoryHours = "Hours";
+        public static readonly string ProductInventoryLastUpdate = "Last Update";
+        public static readonly string ProductInventoryLocation = "Location";
+        public static readonly string ProductInventoryStatus = "Status";
         public static readonly string PromptEmail = "Email";
         public static readonly string PromptLanguage = "Language";
         public static readonly string PromptName = "Name";
@@ -81,16 +87,11 @@
         public static readonly string ScheduleYourTime = "Schedule your time";
         public static readonly string ScheduleYourTimeIsScheduled = "Your time is scheduled";
         public static readonly string ShowNotesFor = "Show notes for: {0}";
+        public static readonly string SpecialHours = "Special Hours";
+        public static readonly string TodaysHours = "Today's Hours: {0}";
         public static readonly string ViewShowNotes = "View show notes";
         public static readonly string VisitHomePage = "Visit home page";
         public static readonly string ZipCodeClosest = "Libraries closest to ZIP code: {0}";
         public static readonly string ZipCodePrompt = "Enter a 5 digit ZIP code";
-
-        public static readonly string ProductInventoryLocation = "Location";
-        public static readonly string ProductInventoryHours = "Hours";
-        public static readonly string ProductInventoryStatus = "Status";
-        public static readonly string ProductInventoryLastUpdate = "Last Update";
-        public static readonly string ProductInventoryHas = "Has {0}";
-        public static readonly string ProductInventoryDoesNotHave = "Does not have {0}";
     }
 }

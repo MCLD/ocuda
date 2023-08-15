@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BranchLocator.Helpers;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Ocuda.Promenade.Models;
@@ -29,8 +30,10 @@ namespace Ocuda.Promenade.Service
         private const char ndash = '\u2013';
 
         private readonly IOcudaCache _cache;
+        private readonly IHttpContextAccessor _contextAccessor;
         private readonly IGoogleClient _googleClient;
         private readonly IGroupRepository _groupRepository;
+        private readonly LanguageService _languageService;
         private readonly IStringLocalizer<i18n.Resources.Shared> _localizer;
         private readonly ILocationFeatureRepository _locationFeatureRepository;
         private readonly ILocationGroupRepository _locationGroupRepository;
@@ -39,37 +42,47 @@ namespace Ocuda.Promenade.Service
         private readonly ILocationRepository _locationRepository;
         private readonly SegmentService _segmentService;
 
-        public LocationService(ILogger<LocationService> logger,
-            IDateTimeProvider dateTimeProvider,
-            IStringLocalizer<i18n.Resources.Shared> localizer,
+        public LocationService(IDateTimeProvider dateTimeProvider,
             IGoogleClient googleClient,
             IGroupRepository groupRepository,
+            IHttpContextAccessor contextAccessor,
             ILocationFeatureRepository locationFeatureRepository,
             ILocationGroupRepository locationGroupRepository,
             ILocationHoursOverrideRepository locationHoursOverrideRepository,
             ILocationHoursRepository locationHoursRepository,
             ILocationRepository locationRepository,
+            ILogger<LocationService> logger,
             IOcudaCache cache,
+            IStringLocalizer<i18n.Resources.Shared> localizer,
+            LanguageService languageService,
             SegmentService segmentService)
             : base(logger, dateTimeProvider)
         {
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _googleClient = googleClient ?? throw new ArgumentNullException(nameof(googleClient));
-            _groupRepository = groupRepository
-                ?? throw new ArgumentNullException(nameof(groupRepository));
-            _localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
-            _locationFeatureRepository = locationFeatureRepository
-                ?? throw new ArgumentNullException(nameof(locationFeatureRepository));
-            _locationGroupRepository = locationGroupRepository
-                ?? throw new ArgumentNullException(nameof(locationGroupRepository));
-            _locationHoursOverrideRepository = locationHoursOverrideRepository
-                ?? throw new ArgumentNullException(nameof(locationHoursOverrideRepository));
-            _locationHoursRepository = locationHoursRepository
-                ?? throw new ArgumentNullException(nameof(locationHoursRepository));
-            _locationRepository = locationRepository
-                ?? throw new ArgumentNullException(nameof(locationRepository));
-            _segmentService = segmentService
-                ?? throw new ArgumentNullException(nameof(segmentService));
+            ArgumentNullException.ThrowIfNull(cache);
+            ArgumentNullException.ThrowIfNull(contextAccessor);
+            ArgumentNullException.ThrowIfNull(googleClient);
+            ArgumentNullException.ThrowIfNull(groupRepository);
+            ArgumentNullException.ThrowIfNull(languageService);
+            ArgumentNullException.ThrowIfNull(localizer);
+            ArgumentNullException.ThrowIfNull(locationFeatureRepository);
+            ArgumentNullException.ThrowIfNull(locationGroupRepository);
+            ArgumentNullException.ThrowIfNull(locationHoursOverrideRepository);
+            ArgumentNullException.ThrowIfNull(locationHoursRepository);
+            ArgumentNullException.ThrowIfNull(locationRepository);
+            ArgumentNullException.ThrowIfNull(segmentService);
+
+            _cache = cache;
+            _contextAccessor = contextAccessor;
+            _googleClient = googleClient;
+            _groupRepository = groupRepository;
+            _languageService = languageService;
+            _localizer = localizer;
+            _locationFeatureRepository = locationFeatureRepository;
+            _locationGroupRepository = locationGroupRepository;
+            _locationHoursOverrideRepository = locationHoursOverrideRepository;
+            _locationHoursRepository = locationHoursRepository;
+            _locationRepository = locationRepository;
+            _segmentService = segmentService;
         }
 
         public async Task<(double? Latitude, double? Longitude)> GeocodeAddressAsync(string address)
@@ -120,9 +133,13 @@ namespace Ocuda.Promenade.Service
         {
             ArgumentNullException.ThrowIfNull(location);
 
+            var currentDefaultLanguageId = await GetCurrentDefaultLanguageIdAsync(_contextAccessor,
+                _languageService);
+
             var cacheKey = string.Format(CultureInfo.InvariantCulture,
                 Utility.Keys.Cache.PromLocationStatus,
-                location.Id);
+                location.Id,
+                currentDefaultLanguageId.First());
 
             LocationHoursResult result = null;
 
@@ -139,10 +156,10 @@ namespace Ocuda.Promenade.Service
             {
                 result = new LocationHoursResult
                 {
-                    Open = true,
                     IsCurrentlyOpen = true,
-                    StatusMessage = "Open",
-                    TodaysHours = "Open"
+                    Open = true,
+                    StatusMessage = i18n.Keys.Promenade.LocationOpen,
+                    TodaysHours = i18n.Keys.Promenade.LocationOpen
                 };
             }
 
@@ -151,8 +168,8 @@ namespace Ocuda.Promenade.Service
                 result = new LocationHoursResult
                 {
                     IsSpecialHours = true,
-                    StatusMessage = "Special Hours",
-                    TodaysHours = "Special Hours"
+                    StatusMessage = i18n.Keys.Promenade.SpecialHours,
+                    TodaysHours = i18n.Keys.Promenade.SpecialHours
                 };
             }
 
@@ -160,10 +177,10 @@ namespace Ocuda.Promenade.Service
             {
                 result = new LocationHoursResult
                 {
-                    Open = false,
                     IsCurrentlyOpen = false,
-                    StatusMessage = "Closed",
-                    TodaysHours = "Closed"
+                    Open = false,
+                    StatusMessage = i18n.Keys.Promenade.LocationClosed,
+                    TodaysHours = i18n.Keys.Promenade.LocationClosed
                 };
             }
 
@@ -703,7 +720,8 @@ namespace Ocuda.Promenade.Service
         private static string GetFormattedDayGroupings(List<DayOfWeek> days,
                     bool isStructuredData = false)
         {
-            var dayFormatter = new DateTimeFormatInfo();
+            var dayFormatter = CultureInfo.CurrentCulture.DateTimeFormat;
+
             if (days.Count == 1)
             {
                 return isStructuredData
@@ -818,9 +836,13 @@ namespace Ocuda.Promenade.Service
         private async Task<ICollection<LocationHours>> GetScheduleAsync(int locationId,
             bool forceReload)
         {
+            var currentDefaultLanguageId = await GetCurrentDefaultLanguageIdAsync(_contextAccessor,
+                _languageService);
+
             string cacheKey = string.Format(CultureInfo.InvariantCulture,
                 Utility.Keys.Cache.PromLocationWeeklyHours,
-                locationId);
+                locationId,
+                currentDefaultLanguageId.First());
 
             ICollection<LocationHours> weeklyHours = null;
 
