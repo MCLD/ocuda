@@ -24,7 +24,7 @@
                     @if (Model.Location.CurrentStatus?.IsCurrentlyOpen == true
                    && !string.IsNullOrEmpty(Model.Location.CurrentStatus.TodaysHours))
                     {
-                        @:Today's Hours: @Model.Location.CurrentStatus.TodaysHours
+                        @Localizer[Promenade.TodaysHours, @Model.Location.CurrentStatus.TodaysHours]
                     }
                     else
                     {
