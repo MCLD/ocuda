@@ -553,4 +553,80 @@
     <value>Horario de hoy: {0}</value>
     <comment>Text to indicate what the hours are for today</comment>
   </data>
+  <data name="Availability &amp; Experience" xml:space="preserve">
+    <value>Disponibilidad y Experiencia</value>
+    <comment>The second part of the volunteer form has this as a header</comment>
+  </data>
+  <data name="Contact Information" xml:space="preserve">
+    <value>Información de Contacto</value>
+    <comment>The first part of the volunteer from has this as a header</comment>
+  </data>
+  <data name="An error occurred and we could not find libraries near that location." xml:space="preserve">
+    <value>Hubo un error y no pudimos encontrar bibliotecas cerca de esa ubicación.</value>
+    <comment>Performing a zip code lookup failed due to a technical issue.</comment>
+  </data>
+  <data name="An error occurred and we could not save your submission, please try again." xml:space="preserve">
+    <value>Hubo un error y no pudimos guardar su aplicación, inténtelo de nuevo.</value>
+    <comment>Saving a volunteer submission failed due to a technical issue.</comment>
+  </data>
+  <data name="This location is not accepting volunteer applications at this time." xml:space="preserve">
+    <value>Esta localidad no está aceptando solicitudes de voluntarios en este momento.</value>
+    <comment>Customer tried to access the form for a location not taking applications.</comment>
+  </data>
+  <data name="This location is not accepting adult volunteer applications at this time." xml:space="preserve">
+    <value>Esta localidad no está aceptando solicitudes de adultos voluntarios en este momento.</value>
+    <comment>Customer tried to access the form for a location not taking adult applications.</comment>
+  </data>
+  <data name="This location is not accepting teen volunteer applications at this time." xml:space="preserve">
+    <value>Esta localidad no está aceptando solicitudes de voluntarios adolescentes en este momento.</value>
+    <comment>Customer tried to access the form for a location not taking teen applications.</comment>
+  </data>
+  <data name="Use our adult volunteer form." xml:space="preserve">
+    <value>Utilice nuestro formulario para adulto voluntario.</value>
+    <comment>If the customer is on the teen form, this is the text that links to the adult form.</comment>
+  </data>
+  <data name="Use our teen volunteer form." xml:space="preserve">
+    <value>Utilice nuestro formulario para adolescente voluntario.</value>
+    <comment>If the customer is on the adult form, this is the text that links to the teen form.</comment>
+  </data>
+  <data name="Are you an adult looking to volunteer?" xml:space="preserve">
+    <value>¿Es adulto y quiere ser voluntario?</value>
+    <comment>If the customer is on the teen form, this prompts them to use the adult form if needed.</comment>
+  </data>
+  <data name="Are you a teen looking to volunteer?" xml:space="preserve">
+    <value>¿Eres adolescente y quieres ser voluntario?</value>
+    <comment>If the customer is on the adult form, this prompts them to use the teen form if needed.</comment>
+  </data>
+  <data name="Why do you want to volunteer? Describe any previous volunteer experience." xml:space="preserve">
+    <value>¿Por qué quiere ser voluntario? Describa cualquier experiencia previa de voluntario.</value>
+    <comment>Volunteer form prompt asking about interest.</comment>
+  </data>
+  <data name="Parent/Guardian Email" xml:space="preserve">
+    <value>Correo Electrónico del Padre/Tutor </value>
+    <comment>If a teen is volunteering, this prompts for their parent or guardian email address.</comment>
+  </data>
+  <data name="Parent/Guardian Name" xml:space="preserve">
+    <value>Nombre del Padre /Tutor</value>
+    <comment>If a teen is volunteering, this prompts for their parent or guardian name.</comment>
+  </data>
+  <data name="Parent/Guardian Phone" xml:space="preserve">
+    <value>Teléfono del Padre/Tutor</value>
+    <comment>If a teen is volunteering, this prompts for their parent or guardian phone.</comment>
+  </data>
+  <data name="Are you interested in regular volunteer work or certain number of hours?" xml:space="preserve">
+    <value>¿Está interesado en el trabajo voluntario regular o solo cierto número de horas?</value>
+    <comment>Volunteer form prompt asking a teen about their volunteer desires</comment>
+  </data>
+  <data name="Weekly Availability" xml:space="preserve">
+    <value>Disponibilidad Semanal</value>
+    <comment>Volunteer form prompt asking about when a customer is available to work</comment>
+  </data>
+  <data name="Volunteer" xml:space="preserve">
+    <value>Voluntario</value>
+    <comment>Text to show as the page title on the volunteer form page</comment>
+  </data>
+  <data name="Thank you for your interest! Someone will be in touch with you very soon." xml:space="preserve">
+    <value>¡Gracias por su interés! Una persona de nuestro equipo se pondrá en contacto con usted muy pronto.</value>
+    <comment>Default follow-up shown to customer after submitting volunteer form.</comment>
+  </data>
 </root>

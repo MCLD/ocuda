@@ -94,6 +94,8 @@
         public const string PromptRequestedDateAndTime = "Requested date and time";
         public const string PromptRequestedTime = "Requested time";
         public const string PromptSubject = "Subject";
+        public const string PromptVolunteerRegularity = "Are you interested in regular volunteer work or certain number of hours?";
+        public const string PromptWeeklyAvailability = "Weekly Availability";
         public const string RequiredField = "You must supply a value for: {0}";
         public const string RequiredFieldItem = "The {0} field is required.";
         public const string ScheduleAppointmentDetails = "Here are the details of your appointment:";
@@ -109,6 +111,8 @@
         public const string TodaysHours = "Today's Hours: {0}";
         public const string ViewShowNotes = "View show notes";
         public const string VisitHomePage = "Visit home page";
+        public const string VolunteerPageTitle = "Volunteer";
+        public const string VolunteerThankYou = "Thank you for your interest! Someone will be in touch with you very soon.";
         public const string ZipCodeClosest = "Libraries closest to ZIP code: {0}";
         public const string ZipCodePrompt = "Enter a 5 digit ZIP code";
     }
