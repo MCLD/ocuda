@@ -20,7 +20,7 @@ namespace Ocuda.Ops.Service
 {
     public class UserManagementService : BaseService<UserManagementService>, IUserManagementService
     {
-        public const string ProfilePicturePath = "profilepicture";
+        public static readonly string ProfilePicturePath = "profilepicture";
         private static readonly string[] ProfilePictureValidTypes = { ".jpg", ".png" };
 
         private readonly IOcudaCache _cache;
@@ -50,31 +50,22 @@ namespace Ocuda.Ops.Service
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization",
             "CA1308:Normalize strings to uppercase",
             Justification = "Normalize usernames and emails to lowercase.")]
-        public async Task<User> AddUser(User user, int? createdById = null)
+        public async Task<User> AddUser(User user)
         {
             ArgumentNullException.ThrowIfNull(user);
 
             user.Username = user.Username?.Trim().ToLowerInvariant();
             user.Email = user.Email?.Trim().ToLowerInvariant();
             user.CreatedAt = DateTime.Now;
-            if (createdById != null)
-            {
-                user.CreatedBy = (int)createdById;
-            }
 
             await _userRepository.AddAsync(user);
             await _userRepository.SaveAsync();
-            if (createdById != null)
-            {
-                return user;
-            }
-            {
-                User createdUser = await _userRepository.FindByUsernameAsync(user.Username);
-                createdUser.CreatedBy = createdUser.Id;
-                _userRepository.Update(user);
-                await _userRepository.SaveAsync();
-                return createdUser;
-            }
+
+            User createdUser = await _userRepository.FindByUsernameAsync(user.Username);
+            createdUser.CreatedBy = createdUser.Id;
+            _userRepository.Update(user);
+            await _userRepository.SaveAsync();
+            return createdUser;
         }
 
         public async Task<User> EditNicknameAsync(User user)

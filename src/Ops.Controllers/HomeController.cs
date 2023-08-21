@@ -165,9 +165,9 @@ namespace Ocuda.Ops.Controllers
             if (!string.IsNullOrEmpty(adminEmail) && returnUrl != null)
             {
                 mailLink = $"mailto:{adminEmail}?subject="
-                    + Uri.EscapeUriString("Requesting intranet access")
+                    + Uri.EscapeDataString("Requesting intranet access")
                     + "&body="
-                    + Uri.EscapeUriString($"I ({CurrentUsername}) request access to: {returnUrl}");
+                    + Uri.EscapeDataString($"I ({CurrentUsername}) request access to: {returnUrl}");
             }
 
             return View(new UnauthorizedViewModel

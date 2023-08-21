@@ -392,7 +392,7 @@ namespace Ocuda.Promenade.Controllers
                     PageTitle = _localizer[i18n.Keys.Promenade.VolunteerPageTitle];
                     var returnViewModel = await PopulateTeenVolunteerViewModelAsync(locationSlug,
                         viewModel);
-                    return View("TeenVolunteerForm", viewModel);
+                    return View("TeenVolunteerForm", returnViewModel);
                 }
             }
 

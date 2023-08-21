@@ -6,7 +6,7 @@ namespace Ocuda.Ops.Service.Interfaces.Ops.Services
 {
     public interface IUserManagementService
     {
-        Task<User> AddUser(User user, int? createdById = null);
+        Task<User> AddUser(User user);
 
         Task<User> EditNicknameAsync(User user);
 
