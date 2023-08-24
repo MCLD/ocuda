@@ -184,7 +184,7 @@ namespace Ocuda.Ops.Data.Ops
         {
             var query = DbSet
                 .AsNoTracking()
-                .Where(_ => !_.IsDeleted && _.IsInLatestRoster == true);
+                .Where(_ => !_.IsDeleted);
 
             searchFilter ??= new SearchFilter();
 
