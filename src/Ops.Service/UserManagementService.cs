@@ -145,9 +145,9 @@ namespace Ocuda.Ops.Service
         {
             try
             {
-                var user = _userRepository.FindByUsernameAsync(username);
+                var user = await _userRepository.FindByUsernameAsync(username);
                 var supervisorUser = await _userRepository.GetSupervisorAsync(user.Id);
-                while (supervisorUser.IsDeleted)
+                while (supervisorUser?.IsDeleted == true)
                 {
                     if (!supervisorUser.SupervisorId.HasValue)
                     {
