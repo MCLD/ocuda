@@ -164,9 +164,18 @@ namespace Ocuda.Ops.Service
                     {
                         var form = await _volunteerFormService
                             .GetFormByIdAsync(mapping.VolunteerFormId);
-                        await _volunteerFormService.AddFormUserMapping(mapping.LocationId,
-                            form.VolunteerFormType,
-                            supervisorUser.Id);
+                        if (supervisorUser != null)
+                        {
+                            await _volunteerFormService.AddFormUserMapping(mapping.LocationId,
+                                form.VolunteerFormType,
+                                supervisorUser.Id);
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Unable to reassign {FormType} to a supervisor - no supervisor found for {Username}",
+                                form.VolunteerFormType,
+                                username);
+                        }
                         await _volunteerFormService.RemoveFormUserMapping(mapping.LocationId,
                             user.Id,
                             form.VolunteerFormType);

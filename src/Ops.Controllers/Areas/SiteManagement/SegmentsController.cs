@@ -156,6 +156,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> Delete(IndexViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             try
             {
                 await _segmentService.DeleteAsync(model.Segment.Id);
@@ -198,6 +200,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> DeleteText(DetailViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             if (!await HasSegmentPermissionAsync(model.SegmentId))
             {
                 return RedirectToUnauthorized();
@@ -385,6 +389,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> Detail(DetailViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             if (!await HasSegmentPermissionAsync(model.SegmentId))
             {
                 return RedirectToUnauthorized();

@@ -88,6 +88,7 @@ namespace Ocuda.Ops.Data
         public DbSet<UrlRedirect> UrlRedirects { get; set; }
         public DbSet<VolunteerForm> VolunteerForms { get; set; }
         public DbSet<VolunteerFormSubmission> VolunteerFormSubmissions { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder == null)

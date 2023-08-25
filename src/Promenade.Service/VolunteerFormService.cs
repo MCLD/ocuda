@@ -28,15 +28,17 @@ namespace Ocuda.Promenade.Service
             SegmentService segmentService)
             : base(logger, dateTimeProvider)
         {
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _locationFormRepository = locationFormRepository
-                ?? throw new ArgumentNullException(nameof(locationFormRepository));
-            _segmentService = segmentService
-                ?? throw new ArgumentNullException(nameof(segmentService));
-            _volunteerFormRepository = volunteerFormRepository
-                ?? throw new ArgumentNullException(nameof(volunteerFormRepository));
-            _volunteerFormSubmissionRepository = volunteerFormSubmissionRepository
-                ?? throw new ArgumentNullException(nameof(volunteerFormSubmissionRepository));
+            ArgumentNullException.ThrowIfNull(cache);
+            ArgumentNullException.ThrowIfNull(locationFormRepository);
+            ArgumentNullException.ThrowIfNull(segmentService);
+            ArgumentNullException.ThrowIfNull(volunteerFormRepository);
+            ArgumentNullException.ThrowIfNull(volunteerFormSubmissionRepository);
+
+            _cache = cache;
+            _locationFormRepository = locationFormRepository;
+            _segmentService = segmentService;
+            _volunteerFormRepository = volunteerFormRepository;
+            _volunteerFormSubmissionRepository = volunteerFormSubmissionRepository;
         }
 
         public async Task<LocationForm> FindLocationFormAsync(VolunteerFormType type,

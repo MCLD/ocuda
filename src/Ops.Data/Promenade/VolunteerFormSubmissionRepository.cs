@@ -56,7 +56,7 @@ namespace Ocuda.Ops.Data.Promenade
         /// <exception cref="ArgumentNullException">Thrown if the filter is null.</exception>
         public async Task<CollectionWithCount<VolunteerFormSubmission>> GetPaginatedListAsync(VolunteerSubmissionFilter filter)
         {
-            if (filter == null) { throw new ArgumentNullException(nameof(filter)); }
+            ArgumentNullException.ThrowIfNull(filter);
 
             if (!filter.Take.HasValue || filter.Take > 30)
             {

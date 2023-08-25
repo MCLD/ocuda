@@ -347,6 +347,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> CreatePageItem(LayoutDetailViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             JsonResponse response;
 
             var layout = await _pageService.GetLayoutByIdAsync(model.PageItem.PageLayoutId);
@@ -540,6 +542,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> Delete(IndexViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
             try
             {
                 await _pageService.DeleteHeaderAsync(model.PageHeader.Id);
@@ -562,6 +565,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> DeleteLayout(LayoutsViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             var pageLayout = await _pageService.GetLayoutByIdAsync(model.PageLayout.Id);
 
             if (!await HasPagePermissionsAsync(pageLayout.PageHeaderId))
@@ -592,6 +597,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> DeletePage(DetailViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             var page = await _pageService.GetByHeaderAndLanguageAsync(model.HeaderId,
                 model.LanguageId);
 
@@ -613,6 +620,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> DeletePageItem(LayoutDetailViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             var layout = await _pageService.GetLayoutForItemAsync(model.PageItem.Id);
 
             if (!await HasPagePermissionsAsync(layout.PageHeaderId))
@@ -747,6 +756,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         public async Task<IActionResult> Edit(IndexViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             JsonResponse response;
 
             if (ModelState.IsValid)
@@ -786,6 +797,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> EditLayout(LayoutsViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             JsonResponse response;
 
             var pageLayout = await _pageService.GetLayoutByIdAsync(model.PageLayout.Id);
@@ -851,6 +864,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Route("[action]")]
         public async Task<IActionResult> EditPageItem(LayoutDetailViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             JsonResponse response;
 
             var layout = await _pageService.GetLayoutForItemAsync(model.PageItem.Id);
@@ -1104,6 +1119,8 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [SaveModelState]
         public async Task<IActionResult> LayoutDetail(LayoutDetailViewModel model)
         {
+            ArgumentNullException.ThrowIfNull(model);
+
             var pageLayout = await _pageService.GetLayoutByIdAsync(
                 model.PageLayoutText.PageLayoutId);
 

@@ -30,12 +30,12 @@ namespace Ocuda.Utility.Clients
             IConfiguration config,
             ILogger<GoogleClient> logger)
         {
-            if (config == null)
-            {
-                throw new ArgumentNullException(nameof(config));
-            }
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            ArgumentNullException.ThrowIfNull(config);
+            ArgumentNullException.ThrowIfNull(httpClient);
+            ArgumentNullException.ThrowIfNull(logger);
+
+            _httpClient = httpClient;
+            _logger = logger;
 
             _httpClient.Timeout = TimeSpan.FromSeconds(15);
 

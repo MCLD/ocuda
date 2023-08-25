@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -20,6 +21,8 @@ namespace Ocuda.Promenade.Controllers.Abstract
         protected BasePageController(ServiceFacades.Controller<T> context,
             ServiceFacades.PageController pageContext) : base(context)
         {
+            ArgumentNullException.ThrowIfNull(pageContext);
+
             PageContext = pageContext;
         }
 

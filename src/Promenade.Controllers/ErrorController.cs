@@ -24,9 +24,11 @@ namespace Ocuda.Promenade.Controllers
             PageService pageService,
             RedirectService redirectService) : base(context, pageContext)
         {
-            _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
-            _redirectService = redirectService
-                ?? throw new ArgumentNullException(nameof(redirectService));
+            ArgumentNullException.ThrowIfNull(pageService);
+            ArgumentNullException.ThrowIfNull(redirectService);
+
+            _pageService = pageService;
+            _redirectService = redirectService;
         }
 
         public static string Name

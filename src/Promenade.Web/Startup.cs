@@ -42,27 +42,18 @@ namespace Ocuda.Promenade.Web
         public Startup(IConfiguration configuration,
             IWebHostEnvironment env)
         {
-            if (env == null)
-            {
-                throw new ArgumentNullException(nameof(env));
-            }
+            ArgumentNullException.ThrowIfNull(configuration);
+            ArgumentNullException.ThrowIfNull(env);
 
-            _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _config = configuration;
             _isDevelopment = env.IsDevelopment();
         }
 
         public void Configure(IApplicationBuilder app,
             Utility.Services.Interfaces.IPathResolverService pathResolver)
         {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-
-            if (pathResolver == null)
-            {
-                throw new ArgumentNullException(nameof(pathResolver));
-            }
+            ArgumentNullException.ThrowIfNull(app);
+            ArgumentNullException.ThrowIfNull(pathResolver);
 
             if (!_isDevelopment)
             {
@@ -166,10 +157,7 @@ namespace Ocuda.Promenade.Web
             Justification = "Dependency injection")]
         public void ConfigureServices(IServiceCollection services)
         {
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
+            ArgumentNullException.ThrowIfNull(services);
 
             if (_isDevelopment)
             {

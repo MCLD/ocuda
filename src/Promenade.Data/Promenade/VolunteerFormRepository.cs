@@ -8,7 +8,8 @@ using Ocuda.Promenade.Service.Interfaces.Repositories;
 
 namespace Ocuda.Promenade.Data.Promenade
 {
-    public class VolunteerFormRepository : GenericRepository<PromenadeContext, VolunteerForm>, IVolunteerFormRepository
+    public class VolunteerFormRepository : GenericRepository<PromenadeContext, VolunteerForm>, 
+        IVolunteerFormRepository
     {
         public VolunteerFormRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<VolunteerFormRepository> logger) : base(repositoryFacade, logger)

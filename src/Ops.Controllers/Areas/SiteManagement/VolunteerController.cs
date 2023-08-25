@@ -30,22 +30,25 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         private readonly IVolunteerFormService _volunteerFormService;
 
         public VolunteerController(ServiceFacades.Controller<VolunteerController> context,
-            IVolunteerFormService volunteerFormService,
             ILanguageService languageService,
             ILocationService locationService,
             IPermissionGroupService permissionGroupService,
-            ISegmentService segmentService) : base(context)
+            ISegmentService segmentService,
+            IVolunteerFormService volunteerFormService) : base(context)
         {
-            _volunteerFormService = volunteerFormService
-                ?? throw new ArgumentNullException(nameof(volunteerFormService));
-            _languageService = languageService
-                ?? throw new ArgumentNullException(nameof(languageService));
-            _locationService = locationService
-                ?? throw new ArgumentNullException(nameof(locationService));
-            _permissionGroupService = permissionGroupService
-                ?? throw new ArgumentNullException(nameof(permissionGroupService));
-            _segmentService = segmentService
-                ?? throw new ArgumentNullException(nameof(segmentService));
+            ArgumentNullException.ThrowIfNull(languageService);
+            ArgumentNullException.ThrowIfNull(locationService);
+            ArgumentNullException.ThrowIfNull(permissionGroupService);
+            ArgumentNullException.ThrowIfNull(segmentService);
+            ArgumentNullException.ThrowIfNull(volunteerFormService);
+
+            _languageService = languageService;
+            _locationService = locationService;
+            _permissionGroupService = permissionGroupService;
+            _segmentService = segmentService;
+            _volunteerFormService = volunteerFormService;
+
+            SetPageTitle("Volunteers");
         }
 
         public static string Area
@@ -99,8 +102,7 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement
         [Authorize(Policy = nameof(ClaimType.SiteManager))]
         [HttpPost]
         [Route("[action]/{type}")]
-        public async Task<IActionResult> AddSegment(int type,
-            string segmentText)
+        public async Task<IActionResult> AddSegment(int type, string segmentText)
         {
             var form = await _volunteerFormService.GetFormByTypeAsync((VolunteerFormType)type);
 

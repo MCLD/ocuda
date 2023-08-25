@@ -47,10 +47,7 @@ namespace Ocuda.Ops.Web
         public void Configure(IApplicationBuilder app,
             Utility.Services.Interfaces.IPathResolverService pathResolver)
         {
-            if (pathResolver == null)
-            {
-                throw new ArgumentNullException(nameof(pathResolver));
-            }
+            ArgumentNullException.ThrowIfNull(pathResolver);
 
             // configure error page handling and development IDE linking
             if (_isDevelopment)
@@ -115,6 +112,8 @@ namespace Ocuda.Ops.Web
             Justification = "Dependency injection")]
         public void ConfigureServices(IServiceCollection services)
         {
+            ArgumentNullException.ThrowIfNull(services);
+
             // set a default culture of en-US if none is specified
             string culture = _config[Configuration.OpsCulture] ?? DefaultCulture;
             services.Configure<RequestLocalizationOptions>(_ =>

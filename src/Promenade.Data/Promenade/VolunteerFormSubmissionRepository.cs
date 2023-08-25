@@ -7,9 +7,12 @@ using Ocuda.Utility.Exceptions;
 
 namespace Ocuda.Promenade.Data.Promenade
 {
-    public class VolunteerFormSubmissionRepository : GenericRepository<PromenadeContext, VolunteerFormSubmission>, IVolunteerFormSubmissionRepository
+    public class VolunteerFormSubmissionRepository
+        : GenericRepository<PromenadeContext, VolunteerFormSubmission>,
+        IVolunteerFormSubmissionRepository
     {
-        public VolunteerFormSubmissionRepository(ServiceFacade.Repository<PromenadeContext> repositoryFacade,
+        public VolunteerFormSubmissionRepository(
+            ServiceFacade.Repository<PromenadeContext> repositoryFacade,
             ILogger<VolunteerFormSubmissionRepository> logger) : base(repositoryFacade, logger)
         {
         }

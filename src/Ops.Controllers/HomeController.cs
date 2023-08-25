@@ -33,14 +33,19 @@ namespace Ocuda.Ops.Controllers
             ISectionService sectionService,
             IUserService userService) : base(context)
         {
-            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
-            _linkService = linkService ?? throw new ArgumentNullException(nameof(linkService));
-            _permissionGroupService = permissionGroupService
-                ?? throw new ArgumentNullException(nameof(permissionGroupService));
-            _postService = postService ?? throw new ArgumentNullException(nameof(postService));
-            _sectionService = sectionService
-                ?? throw new ArgumentNullException(nameof(sectionService));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            ArgumentNullException.ThrowIfNull(fileService);
+            ArgumentNullException.ThrowIfNull(linkService);
+            ArgumentNullException.ThrowIfNull(permissionGroupService);
+            ArgumentNullException.ThrowIfNull(postService);
+            ArgumentNullException.ThrowIfNull(sectionService);
+            ArgumentNullException.ThrowIfNull(userService);
+
+            _fileService = fileService;
+            _linkService = linkService;
+            _permissionGroupService = permissionGroupService;
+            _postService = postService;
+            _sectionService = sectionService;
+            _userService = userService;
         }
 
         public static string Name

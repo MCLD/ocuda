@@ -6,8 +6,11 @@ namespace Ocuda.Ops.Controllers.Areas.SiteManagement.ViewModels.Location
     {
         public LocationVolunteerMappingViewModel(VolunteerFormUserMapping model)
         {
-            Name = model.User.Name;
-            UserId = model.UserId;
+            if (model != null)
+            {
+                Name = model.User?.Name;
+                UserId = model.UserId;
+            }
         }
 
         public string Name { get; set; }

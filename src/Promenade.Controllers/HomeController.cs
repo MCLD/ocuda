@@ -31,13 +31,15 @@ namespace Ocuda.Promenade.Controllers
            VolunteerFormService volunteerFormService)
             : base(context, pageContext)
         {
-            _dateTimeProvider = dateTimeProvider
-                ?? throw new ArgumentNullException(nameof(dateTimeProvider));
-            _locationService = locationService
-                ?? throw new ArgumentNullException(nameof(locationService));
-            _pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
-            _volunteerFormService = volunteerFormService
-                ?? throw new ArgumentNullException(nameof(volunteerFormService));
+            ArgumentNullException.ThrowIfNull(dateTimeProvider);
+            ArgumentNullException.ThrowIfNull(locationService);
+            ArgumentNullException.ThrowIfNull(pageService);
+            ArgumentNullException.ThrowIfNull(volunteerFormService);
+
+            _dateTimeProvider = dateTimeProvider;
+            _locationService = locationService;
+            _pageService = pageService;
+            _volunteerFormService = volunteerFormService;
         }
 
         public static string Name

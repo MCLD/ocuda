@@ -17,8 +17,9 @@ namespace Ocuda.Promenade.Controllers
         public LocationsController(ServiceFacades.Controller<LocationsController> context,
             LocationService locationService) : base(context)
         {
-            _locationService = locationService
-                ?? throw new ArgumentNullException(nameof(locationService));
+            ArgumentNullException.ThrowIfNull(locationService);
+
+            _locationService = locationService;
 
             _apiKey = _config[Utility.Keys.Configuration.OcudaGoogleAPI];
         }

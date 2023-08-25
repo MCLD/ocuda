@@ -27,10 +27,8 @@ namespace Ocuda.Promenade.Controllers.Abstract
 
         protected BaseController(ServiceFacades.Controller<T> context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
+            ArgumentNullException.ThrowIfNull(context);
+
             _logger = context.Logger;
             _config = context.Config;
             _localizer = context.Localizer;
