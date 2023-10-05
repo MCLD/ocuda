@@ -187,16 +187,7 @@ namespace Ocuda.Promenade.Controllers
             }
 
             viewModel.Location.LocationHours
-                = await _locationService.GetHoursAsync(viewModel.Location.Id, forceReload, false);
-
-            if (viewModel.Location.LocationHours != null)
-            {
-                var hours = await _locationService
-                    .GetHoursAsync(viewModel.Location.Id, forceReload, true);
-
-                ((List<string>)viewModel.StructuredLocationHours).AddRange(hours.ToList()
-                    .ConvertAll(_ => $"{_.Days} {_.Time}"));
-            }
+                = await _locationService.GetHoursAsync(viewModel.Location.Id, forceReload);
 
             var locationFeatures = await _locationService
                 .GetFullLocationFeaturesAsync(locationId.Value, forceReload);
@@ -279,20 +270,29 @@ namespace Ocuda.Promenade.Controllers
 
             schema ??= new Schema.NET.LocalBusiness();
 
-            schema.Address = new Schema.NET.PostalAddress
+            if (string.Equals(location.AddressType, nameof(Schema.NET.PostalAddress),
+                StringComparison.OrdinalIgnoreCase))
+
             {
-                AddressCountry = location.Country,
-                AddressLocality = location.City,
-                AddressRegion = location.State,
-                ContactType = location.ContactType,
-                Id = locationUri,
-                PostalCode = location.Zip,
-                StreetAddress = location.Address
-            };
-            schema.AreaServed = new Schema.NET.AdministrativeArea
+                schema.Address = new Schema.NET.PostalAddress
+                {
+                    AddressCountry = location.Country,
+                    AddressLocality = location.City,
+                    AddressRegion = location.State,
+                    ContactType = location.ContactType,
+                    Id = locationUri,
+                    PostalCode = location.Zip,
+                    StreetAddress = location.Address
+                };
+            }
+            if (string.Equals(location.AreaServedType, nameof(Schema.NET.AdministrativeArea),
+                StringComparison.OrdinalIgnoreCase))
             {
-                Name = location.AreaServedName
-            };
+                schema.AreaServed = new Schema.NET.AdministrativeArea
+                {
+                    Name = location.AreaServedName
+                };
+            }
             schema.BranchCode = location.Stub;
             schema.Email = location.Email;
             schema.HasMap = new Uri(location.MapLink);
@@ -310,7 +310,11 @@ namespace Ocuda.Promenade.Controllers
             schema.Telephone = location.Phone;
             schema.Url = locationUri;
 
-            if (!string.IsNullOrEmpty(location.PriceRange))
+            if (location.IsAccessibleForFree)
+            {
+                schema.PriceRange = "$0";
+            }
+            else if (!string.IsNullOrEmpty(location.PriceRange))
             {
                 schema.PriceRange = location.PriceRange;
             }
