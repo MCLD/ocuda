@@ -811,7 +811,9 @@ namespace Ocuda.Promenade.Service
 
                 var locationDayGrouping = new LocationDayGrouping
                 {
+                    Close = CloseTime.TimeOfDay,
                     Days = days,
+                    Open = OpenTime.TimeOfDay,
                     Time = FormatOpeningHours(OpenTime, CloseTime, isStructuredData)
                 };
                 ((List<DayOfWeek>)locationDayGrouping.DaysOfWeek).AddRange(DaysOfWeek);

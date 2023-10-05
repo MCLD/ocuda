@@ -26,6 +26,7 @@ namespace Ocuda.Promenade.Controllers.ViewModels.Home
         public string PostFeatureSegmentText { get; set; }
         public string PreFeatureSegmentHeader { get; set; }
         public string PreFeatureSegmentText { get; set; }
+        public Schema.NET.Thing Schema { get; set; }
         public string ShowMessage { get; set; }
         public ICollection<string> StructuredLocationHours { get; }
     }
