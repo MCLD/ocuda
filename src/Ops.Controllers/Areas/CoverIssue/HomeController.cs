@@ -17,13 +17,12 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
     [Route("[area]")]
     public class HomeController : BaseController<HomeController>
     {
-        private readonly IWebHostEnvironment _hostingEnvironment;
+        private static readonly string BookmarkletFilePath = Path.Combine("scripts",
+            "CoverIssue-Bookmarklet.js");
+
         private readonly ICoverIssueService _coverIssueService;
+        private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IPermissionGroupService _permissionGroupService;
-
-        public static string Name { get { return "Home"; } }
-
-        private const string BookmarkletFilePath = "js/coverissue-bookmarklet.min.js";
 
         public HomeController(ServiceFacades.Controller<HomeController> context,
             IWebHostEnvironment hostingEnvironment,
@@ -36,6 +35,74 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
                 ?? throw new ArgumentNullException(nameof(coverIssueService));
             _permissionGroupService = permissionGroupService
                 ?? throw new ArgumentNullException(nameof(permissionGroupService));
+        }
+
+        public static string Name
+        { get { return "Home"; } }
+
+        [Route("[action]/{id}")]
+        public async Task<IActionResult> Details(int id)
+        {
+            var header = await _coverIssueService.GetHeaderByIdAsync(id);
+            if (header == null)
+            {
+                _logger.LogWarning("Cover issue report {CoverIssueReportId} could not be found.",
+                    id);
+                ShowAlertDanger("The requested report could not be found.");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var viewModel = new DetailViewModel
+            {
+                Header = header,
+                Details = await _coverIssueService.GetDetailsByHeaderIdAsync(header.Id),
+                CanEdit = await HasAppPermissionAsync(_permissionGroupService,
+                    ApplicationPermission.CoverIssueManagement)
+            };
+
+            var leapBibUrl = await _siteSettingService.GetSettingStringAsync(Models
+                .Keys
+                .SiteSetting
+                .CoverIssueReporting
+                .LeapBibUrl);
+
+            if (!string.IsNullOrWhiteSpace(leapBibUrl))
+            {
+                viewModel.LeapPath = leapBibUrl + header.BibId;
+            }
+
+            return View(viewModel);
+        }
+
+        [Route("[action]")]
+        public async Task<JsonResult> GetBookmarklet()
+        {
+            try
+            {
+                var filePath = Path.Combine(_hostingEnvironment.ContentRootPath,
+                    BookmarkletFilePath);
+                if (!System.IO.File.Exists(filePath))
+                {
+                    _logger.LogError("Unable to find bookmarklet template at {filePath}",
+                        filePath);
+                }
+                var unminifiedBookmarklet = await System.IO.File.ReadAllTextAsync(filePath);
+                var baseUrl = Url.Action(nameof(Report), Name, new { bibId = 0 }, Request.Scheme);
+                baseUrl = baseUrl.TrimEnd('0');
+                var bookmarklet = NUglify.Uglify.Js(unminifiedBookmarklet.Replace("{0}",
+                    baseUrl,
+                    StringComparison.OrdinalIgnoreCase)).Code;
+                return Json(new { success = true, bookmarklet });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "An error occurred creating the bookmarklet: {ErrorMessage}",
+                    ex.Message);
+            }
+            {
+                return Json(new { success = false, message = "Could not retrieve bookmarklet, contact an administrator." });
+            }
         }
 
         [Route("")]
@@ -75,39 +142,6 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
             return View(viewModel);
         }
 
-        [Route("[action]/{id}")]
-        public async Task<IActionResult> Details(int id)
-        {
-            var header = await _coverIssueService.GetHeaderByIdAsync(id);
-            if (header == null)
-            {
-                _logger.LogWarning("Cover issue report {CoverIssueReportId} could not be found.",
-                    id);
-                ShowAlertDanger("The requested report could not be found.");
-                return RedirectToAction(nameof(Index));
-            }
-
-            var viewModel = new DetailViewModel
-            {
-                Header = header,
-                Details = await _coverIssueService.GetDetailsByHeaderIdAsync(header.Id),
-                CanEdit = await HasAppPermissionAsync(_permissionGroupService,
-                    ApplicationPermission.CoverIssueManagement)
-            };
-
-            var leapBibUrl = await _siteSettingService.GetSettingStringAsync(Models
-                .Keys
-                .SiteSetting
-                .CoverIssueReporting
-                .LeapBibUrl);
-
-            if (!string.IsNullOrWhiteSpace(leapBibUrl))
-            {
-                viewModel.LeapPath = leapBibUrl + header.BibId;
-            }
-
-            return View(viewModel);
-        }
         [Route("[action]/{bibId}")]
         public async Task<IActionResult> Report(int bibId)
         {
@@ -140,45 +174,26 @@ namespace Ocuda.Ops.Controllers.Areas.CoverIssue
                 return RedirectToUnauthorized();
             }
 
-            try
+            if (model != null)
             {
-                var header = await _coverIssueService.GetHeaderByIdAsync(model.HeaderId);
+                try
+                {
+                    var header = await _coverIssueService.GetHeaderByIdAsync(model.HeaderId);
 
-                await _coverIssueService.ResolveCoverIssueAsnyc(header.Id);
-                ShowAlertSuccess("Issue marked as resolved!");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex,
-                    "Error resolving cover issue for header {HeaderId}: {Message}",
-                    model.HeaderId,
-                    ex.Message);
-                ShowAlertDanger("An error occured while trying to make the issue as resolved");
+                    await _coverIssueService.ResolveCoverIssueAsnyc(header.Id);
+                    ShowAlertSuccess("Issue marked as resolved!");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex,
+                        "Error resolving cover issue for header {HeaderId}: {Message}",
+                        model.HeaderId,
+                        ex.Message);
+                    ShowAlertDanger("An error occured while trying to make the issue as resolved");
+                }
             }
 
             return RedirectToAction(nameof(Index));
-        }
-
-        [Route("[action]")]
-        public async Task<JsonResult> GetBookmarklet()
-        {
-            try
-            {
-                var filePath = Path.Combine(_hostingEnvironment.WebRootPath,
-                    BookmarkletFilePath);
-                using (var sr = new StreamReader(filePath))
-                {
-                    var baseUrl = Url.Action(nameof(Report), Name, new { bibId = 0 }, Request.Scheme);
-                    baseUrl = baseUrl.TrimEnd('0');
-                    var bookmarklet = await sr.ReadToEndAsync();
-                    bookmarklet = bookmarklet.Replace("{0}", baseUrl).Trim();
-                    return Json(new { success = true, bookmarklet });
-                }
-            }
-            catch
-            {
-                return Json(new { success = false, message = "Could not retrieve bookmarklet, contact an administrator." });
-            }
         }
     }
 }
