@@ -49,6 +49,27 @@ namespace Ocuda.Promenade.Controllers.Abstract
         }
 
         /// <summary>
+        /// Provide a UriBuilder with the Scheme, Host, and Port information present
+        /// </summary>
+        protected UriBuilder BaseUriBuilder
+        {
+            get
+            {
+                var builder = new UriBuilder
+                {
+                    Scheme = HttpContext.Request.Scheme,
+                    Host = HttpContext.Request.Host.Host
+                };
+                var port = HttpContext.Request.Host.Port;
+                if (port.HasValue && (port != 80 && port != 443))
+                {
+                    builder.Port = port.Value;
+                }
+                return builder;
+            }
+        }
+
+        /// <summary>
         /// Returns a boolean indicating whether or not there is a pending info alert to show
         /// </summary>
         protected bool HasAlertInfo

@@ -310,8 +310,7 @@ namespace Ocuda.Promenade.Service
             if (result.OpenTime.HasValue && result.CloseTime.HasValue)
             {
                 result.TodaysHours = FormatOpeningHours(result.OpenTime.Value,
-                    result.CloseTime.Value,
-                    false);
+                    result.CloseTime.Value);
             }
 
             bool cached = false;
@@ -366,8 +365,7 @@ namespace Ocuda.Promenade.Service
         }
 
         public async Task<List<LocationDayGrouping>> GetHoursAsync(int locationId,
-            bool forceReload,
-            bool getStructuredData)
+            bool forceReload)
         {
             var location = await GetLocationAsync(locationId, forceReload);
             if (location?.IsAlwaysOpen != false || location.IsClosed)
@@ -375,7 +373,7 @@ namespace Ocuda.Promenade.Service
                 return null;
             }
             var weeklyHours = await GetScheduleAsync(locationId, forceReload);
-            return ComputeWeeklyHours(weeklyHours, getStructuredData);
+            return ComputeWeeklyHours(weeklyHours);
         }
 
         public async Task<Location> GetLocationAsync(int id, bool forceReload)
@@ -686,47 +684,33 @@ namespace Ocuda.Promenade.Service
         }
 
         private static string FormatOpeningHours(DateTime openTime,
-            DateTime closeTime,
-            bool isStructuredData)
+            DateTime closeTime)
         {
-            if (isStructuredData)
+            var format = new StringBuilder("{0:%h");
+            if (openTime.Minute != 0)
             {
-                return string.Format(CultureInfo.InvariantCulture,
-                    "{0:%H:mm} {1} {2:%H:mm}",
-                    openTime,
-                    ndash,
-                    closeTime);
+                format.Append(":mm");
             }
-            else
+            format.Append(" tt} ").Append(ndash).Append(" {1:%h");
+            if (closeTime.Minute != 0)
             {
-                var format = new StringBuilder("{0:%h");
-                if (openTime.Minute != 0)
-                {
-                    format.Append(":mm");
-                }
-                format.Append(" tt} ").Append(ndash).Append(" {1:%h");
-                if (closeTime.Minute != 0)
-                {
-                    format.Append(":mm");
-                }
-                format.Append(" tt}");
-                return string.Format(CultureInfo.CurrentCulture,
-                    format.ToString(),
-                    openTime,
-                    closeTime);
+                format.Append(":mm");
             }
+            format.Append(" tt}");
+            return string.Format(CultureInfo.CurrentCulture,
+                format.ToString(),
+                openTime,
+                closeTime);
+
         }
 
-        private static string GetFormattedDayGroupings(List<DayOfWeek> days,
-                    bool isStructuredData = false)
+        private static string GetFormattedDayGroupings(List<DayOfWeek> days)
         {
             var dayFormatter = CultureInfo.CurrentCulture.DateTimeFormat;
 
             if (days.Count == 1)
             {
-                return isStructuredData
-                    ? dayFormatter.GetAbbreviatedDayName(days[0])[..2]
-                    : dayFormatter.GetAbbreviatedDayName(days[0]);
+                return dayFormatter.GetAbbreviatedDayName(days[0]);
             }
             else
             {
@@ -735,29 +719,17 @@ namespace Ocuda.Promenade.Service
 
                 if (days.Count == 2)
                 {
-                    if (isStructuredData)
-                    {
-                        return dayFormatter.GetAbbreviatedDayName(firstDay)[..2]
-                            + ndash + dayFormatter.GetAbbreviatedDayName(lastDay)[..2];
-                    }
-                    else
-                    {
-                        return dayFormatter.GetAbbreviatedDayName(firstDay)
-                            + " & " + dayFormatter.GetAbbreviatedDayName(lastDay);
-                    }
+
+                    return dayFormatter.GetAbbreviatedDayName(firstDay)
+                        + " & " + dayFormatter.GetAbbreviatedDayName(lastDay);
+
                 }
                 else if (days.Count == lastDay - firstDay + 1)
                 {
-                    if (isStructuredData)
-                    {
-                        return dayFormatter.GetAbbreviatedDayName(firstDay)[..2]
-                            + ndash + dayFormatter.GetAbbreviatedDayName(lastDay)[..2];
-                    }
-                    else
-                    {
-                        return dayFormatter.GetAbbreviatedDayName(firstDay) +
-                            $" {ndash} {dayFormatter.GetAbbreviatedDayName(lastDay)}";
-                    }
+
+                    return dayFormatter.GetAbbreviatedDayName(firstDay) +
+                        $" {ndash} {dayFormatter.GetAbbreviatedDayName(lastDay)}";
+
                 }
                 else
                 {
@@ -767,8 +739,7 @@ namespace Ocuda.Promenade.Service
             }
         }
 
-        private List<LocationDayGrouping> ComputeWeeklyHours(ICollection<LocationHours> weeklyHours,
-            bool isStructuredData)
+        private List<LocationDayGrouping> ComputeWeeklyHours(ICollection<LocationHours> weeklyHours)
         {
             // Order weeklyHours to start on Monday
             weeklyHours = weeklyHours.OrderBy(_ => ((int)_.DayOfWeek + 6) % 7).ToList();
@@ -806,19 +777,20 @@ namespace Ocuda.Promenade.Service
             var formattedDayGroupings = new List<LocationDayGrouping>();
             foreach (var (DaysOfWeek, OpenTime, CloseTime) in dayGroupings)
             {
-                var days = isStructuredData ? GetFormattedDayGroupings(DaysOfWeek, true)
-                    : GetFormattedDayGroupings(DaysOfWeek);
+                var days = GetFormattedDayGroupings(DaysOfWeek);
 
                 var locationDayGrouping = new LocationDayGrouping
                 {
+                    Close = CloseTime.TimeOfDay,
                     Days = days,
-                    Time = FormatOpeningHours(OpenTime, CloseTime, isStructuredData)
+                    Open = OpenTime.TimeOfDay,
+                    Time = FormatOpeningHours(OpenTime, CloseTime)
                 };
                 ((List<DayOfWeek>)locationDayGrouping.DaysOfWeek).AddRange(DaysOfWeek);
                 formattedDayGroupings.Add(locationDayGrouping);
             }
 
-            if (closedDays.Count > 0 && !isStructuredData)
+            if (closedDays.Count > 0)
             {
                 var formattedClosedDays = GetFormattedDayGroupings(closedDays);
                 var locationDayGrouping = new LocationDayGrouping

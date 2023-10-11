@@ -278,53 +278,10 @@
         });
     </script>
 
-    <script type="application/ld+json">
-        {
-        "@@context": "http://schema.org",
-        "@@type": "@Model.Location.Type",
-        "name": "@Model.Location.Name",
-        "areaServed": {
-        "@@type": "@Model.Location.AreaServedType",
-        "name": "@Model.Location.AreaServedName"
-        },
-        "email": "@Model.Location.Email",
-        "address": {
-        "@@id": "@Model.CanonicalLink",
-        "@@type": "@Model.Location.AddressType",
-        "addressCountry": "@Model.Location.Country",
-        "addressRegion": "@Model.Location.State",
-        "addressLocality": "@Model.Location.City",
-        "contactType": "@Model.Location.ContactType",
-        "postalCode": "@Model.Location.Zip",
-        "streetAddress": "@Model.Location.Address"
-        },
-        "location": { "@@id": "@Model.CanonicalLink" },
-        "parentOrganization": "@Model.Location.ParentOrganization",
-        "telephone": "@Html.Raw(@Model.Location.Phone)",
-        @if (!Model.Location.IsClosed && Model.HoursSegmentText == null)
-        {
-            @:"openingHours": @Html.Raw(Json.Serialize(@Model.StructuredLocationHours)),
-        }
-        @if (!string.IsNullOrEmpty(Model.Location.ImagePath))
-        {
-            @:"image": "@Model.Location.ImagePath",
-        }
-        "isAccessibleForFree": @Model.Location.IsAccessibleForFree.ToString().ToLowerInvariant(),
-        @if (Model.Location.IsAccessibleForFree)
-        {
-            @:"priceRange" : "$000 - $000",
-        }
-        else
-        {
-            @:"priceRange" : "@Model.Location.PriceRange",
-        }
-        "sameAs": [
-        "@Model.Location.MapLink"
-        @if (!string.IsNullOrEmpty(Model.Location.Facebook))
-        {
-            @:, "@Model.Location.Facebook"
-        }
-        ]
-        }
-    </script>
+    @if(Model.Schema != null)
+    {
+        <script type="application/ld+json">
+            @Html.Raw(Model.Schema.ToHtmlEscapedString())
+        </script>
+    }
 }

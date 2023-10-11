@@ -187,16 +187,7 @@ namespace Ocuda.Promenade.Controllers
             }
 
             viewModel.Location.LocationHours
-                = await _locationService.GetHoursAsync(viewModel.Location.Id, forceReload, false);
-
-            if (viewModel.Location.LocationHours != null)
-            {
-                var hours = await _locationService
-                    .GetHoursAsync(viewModel.Location.Id, forceReload, true);
-
-                ((List<string>)viewModel.StructuredLocationHours).AddRange(hours.ToList()
-                    .ConvertAll(_ => $"{_.Days} {_.Time}"));
-            }
+                = await _locationService.GetHoursAsync(viewModel.Location.Id, forceReload);
 
             var locationFeatures = await _locationService
                 .GetFullLocationFeaturesAsync(locationId.Value, forceReload);
@@ -230,6 +221,8 @@ namespace Ocuda.Promenade.Controllers
 
             PageTitle = viewModel.Location.Name;
 
+            viewModel.Schema = await GetSchemaAsync(viewModel.Location);
+
             return View(nameof(Location), viewModel);
         }
 
@@ -262,6 +255,125 @@ namespace Ocuda.Promenade.Controllers
 
             return await _locationService
                 .GetLocationFullFeatureAsync(locationId.Value, featureSlug, forceReload);
+        }
+
+        private async Task<Schema.NET.Thing> GetSchemaAsync(Location location)
+        {
+            var locationUri = new Uri(await GetCanonicalLinkAsync());
+            Schema.NET.LocalBusiness schema = null;
+
+            if (string.Equals(location.Type, nameof(Schema.NET.Library),
+                StringComparison.OrdinalIgnoreCase))
+            {
+                schema = new Schema.NET.Library();
+            }
+
+            schema ??= new Schema.NET.LocalBusiness();
+
+            if (string.Equals(location.AddressType, nameof(Schema.NET.PostalAddress),
+                StringComparison.OrdinalIgnoreCase))
+
+            {
+                schema.Address = new Schema.NET.PostalAddress
+                {
+                    AddressCountry = location.Country,
+                    AddressLocality = location.City,
+                    AddressRegion = location.State,
+                    ContactType = location.ContactType,
+                    Id = locationUri,
+                    PostalCode = location.Zip,
+                    StreetAddress = location.Address
+                };
+            }
+            if (string.Equals(location.AreaServedType, nameof(Schema.NET.AdministrativeArea),
+                StringComparison.OrdinalIgnoreCase))
+            {
+                schema.AreaServed = new Schema.NET.AdministrativeArea
+                {
+                    Name = location.AreaServedName
+                };
+            }
+            schema.BranchCode = location.Stub;
+            schema.Email = location.Email;
+            schema.HasMap = new Uri(location.MapLink);
+            schema.IsAccessibleForFree = location.IsAccessibleForFree;
+            schema.Location = new Schema.NET.Place
+            {
+                Id = locationUri
+            };
+            schema.Name = location.Name;
+            schema.ParentOrganization = new Schema.NET.Organization
+            {
+                Name = location.ParentOrganization,
+                Url = new Uri(location.ParentOrganization),
+            };
+            schema.Telephone = location.Phone;
+            schema.Url = locationUri;
+
+            if (location.IsAccessibleForFree)
+            {
+                schema.PriceRange = "$0";
+            }
+            else if (!string.IsNullOrEmpty(location.PriceRange))
+            {
+                schema.PriceRange = location.PriceRange;
+            }
+
+            if (!location.IsClosed && location.LocationHours?.Count > 0)
+            {
+                var openingHoursList = new List<Schema.NET.IOpeningHoursSpecification>();
+                var locationHoursOpen = location.LocationHours
+                        .Where(_ => _.Open != default && _.Close != default);
+
+                foreach (var locationHour in locationHoursOpen)
+                {
+                    var openingHours = new Schema.NET.OpeningHoursSpecification();
+                    var daysOfweek = new List<Schema.NET.DayOfWeek?>();
+                    foreach (var dayOfWeek in locationHour.DaysOfWeek)
+                    {
+                        if (Enum.TryParse(dayOfWeek.ToString(),
+                            out Schema.NET.DayOfWeek parsedDayOfWeek))
+                        {
+                            daysOfweek.Add(parsedDayOfWeek);
+                        }
+                    }
+                    if (daysOfweek.Count > 0)
+                    {
+                        openingHoursList.Add(new Schema.NET.OpeningHoursSpecification
+                        {
+                            DayOfWeek = daysOfweek,
+                            Opens = locationHour.Open,
+                            Closes = locationHour.Close
+                        });
+                    }
+                }
+                schema.OpeningHoursSpecification = openingHoursList;
+            }
+
+            if (location.ImagePath != null)
+            {
+                var builder = BaseUriBuilder;
+                builder.Path = location.ImagePath;
+                schema.Image = builder.Uri;
+                schema.Photo = new Schema.NET.Photograph
+                {
+                    Url = builder.Uri
+                };
+            }
+
+            var sameAs = new List<Uri>
+            {
+                new Uri(location.MapLink)
+            };
+
+            if (!string.IsNullOrEmpty(location.Facebook))
+            {
+                sameAs.Add(new Uri(location.Facebook));
+            }
+
+            schema.SameAs = sameAs;
+
+            return schema;
         }
 
         #region Volunteer form handling
