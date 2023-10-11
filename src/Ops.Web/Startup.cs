@@ -260,10 +260,6 @@ namespace Ocuda.Ops.Web
                     "Scripts/md-editor.js"
                     ).UseContentRoot();
 
-                _.AddJavaScriptBundle("/js/coverissue-bookmarklet.min.js",
-                    "Scripts/CoverIssue-Bookmarklet.js"
-                    ).UseContentRoot();
-
                 _.AddJavaScriptBundle("/js/crop.min.js",
                     "js/smartcrop.js",
                     "js/cropper.js",
